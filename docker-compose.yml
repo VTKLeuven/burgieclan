@@ -1,0 +1,23 @@
+version: '3.5'
+
+services:
+  db:
+    image: mysql:8.0
+    volumes:
+      - easyadmin-db:/var/lib/mysql
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: easyadmin_db_root
+      MYSQL_DATABASE: easyadmin_db
+      MYSQL_USER: easyadmin_db_user
+      MYSQL_PASSWORD: easyadmin_db_pass
+
+  mailcatcher:
+    image: schickling/mailcatcher
+    ports:
+      - '1025:1025'
+      - '1080:1080'
+
+volumes:
+  easyadmin-db: {}

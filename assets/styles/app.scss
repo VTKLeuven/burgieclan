@@ -1,0 +1,603 @@
+@import "variables";
+
+// @import "~bootstrap/scss/bootstrap.scss";
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/root";
+@import "~bootstrap/scss/reboot";
+@import "~bootstrap/scss/type";
+// @import "~bootstrap/scss/images";
+@import "~bootstrap/scss/code";
+@import "~bootstrap/scss/grid";
+@import "~bootstrap/scss/tables";
+@import "~bootstrap/scss/forms";
+@import "~bootstrap/scss/buttons";
+@import "~bootstrap/scss/transitions";
+@import "~bootstrap/scss/dropdown";
+@import "~bootstrap/scss/button-group";
+@import "~bootstrap/scss/input-group";
+// @import "~bootstrap/scss/custom-forms";
+@import "~bootstrap/scss/nav";
+@import "~bootstrap/scss/navbar";
+// @import "~bootstrap/scss/card";
+@import "~bootstrap/scss/breadcrumb";
+@import "~bootstrap/scss/pagination";
+@import "~bootstrap/scss/badge";
+@import "~bootstrap/scss/jumbotron";
+@import "~bootstrap/scss/alert";
+// @import "~bootstrap/scss/progress";
+// @import "~bootstrap/scss/media";
+// @import "~bootstrap/scss/list-group";
+@import "~bootstrap/scss/close";
+// @import "~bootstrap/scss/toasts";
+@import "~bootstrap/scss/modal";
+// @import "~bootstrap/scss/tooltip";
+// @import "~bootstrap/scss/popover";
+// @import "~bootstrap/scss/carousel";
+// @import "~bootstrap/scss/spinners";
+@import "~bootstrap/scss/utilities";
+// @import "~bootstrap/scss/print";
+
+@import "~bootswatch/dist/flatly/bootswatch";
+@import "~@fortawesome/fontawesome-free/css/all.css";
+@import "~@fortawesome/fontawesome-free/css/v4-shims.css";
+@import "~highlight.js/styles/github-dark-dimmed.css";
+
+// pick the Lato fonts individually to avoid importing the entire font family
+@import '~lato-font/scss/public-api';
+
+@include lato-include-font('normal');
+@include lato-include-font('bold');
+
+/* Basic styles
+   ------------------------------------------------------------------------- */
+h1, .h1 {
+  font-size: $font-heading;
+}
+
+h3, .h3 {
+  font-size: $font-subtitle;
+}
+
+p, ul, ol {
+  font-size: $font-default;
+  margin-bottom: 1.5em
+}
+
+strong {
+  font-weight: bold;
+}
+
+li:not(.nav-item) {
+  margin-bottom: 0.5em
+}
+
+code {
+  background: $secondary-color;
+  color: $blue;
+  font-size: 90%;
+}
+
+.text-danger, .text-danger:hover {
+  color: $red
+}
+
+i {
+  margin-right: 0.25em
+}
+
+.table.table-middle-aligned th,
+.table.table-middle-aligned td {
+  vertical-align: middle;
+}
+
+.doclink {
+  color: inherit
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+.help-block {
+  display: block;
+}
+
+.alert-danger ul {
+  margin-bottom: 0;
+}
+
+/* Utilities
+   ------------------------------------------------------------------------- */
+.jumbotron {
+  padding: 1.5rem 1rem
+}
+
+/* Page elements
+   ------------------------------------------------------------------------- */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  &:not(#homepage) {
+    padding-top: 110px
+  }
+}
+
+header {
+  nav.navbar {
+
+    margin-bottom: $navbar-margin-bottom;
+
+    .navbar-brand {
+      padding: 0;
+    }
+    .navbar-toggler {
+      padding: 0 $navbar-toggler-padding-x;
+    }
+
+    .nav-item {
+      font-size: 18px;
+      margin-left: 20px;
+    }
+  }
+}
+
+#locale-selector-modal {
+  background: #2c3e50;
+
+  .modal-dialog {
+    @media (min-width: map-get($grid-breakpoints, 'md')) {
+      max-width: 800px;
+      width: 96%;
+    }
+  }
+
+  .modal-content {
+    border: 0;
+  }
+
+  .modal-header {
+    background: #2c3e50;
+    border-bottom: 0;
+    color: var(--white);
+
+    .close { color: var(--white); opacity: 1; }
+  }
+
+  .modal-body {
+    background: #2c3e50;
+
+    .locales {
+      list-style: none;
+      padding: 0;
+
+      @media (min-width: map-get($grid-breakpoints, 'md')) {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 10px 20px;
+      }
+
+      li {
+        border-radius: 4px;
+        margin-bottom: 10px;
+        position: relative;
+
+        @media (min-width: map-get($grid-breakpoints, 'md')) {
+          margin: 0;
+        }
+
+        &.rtl a {
+          direction: rtl;
+        }
+
+        a {
+          align-items: center;
+          background: #fff;
+          border-radius: 4px;
+          color: $gray-900;
+          display: flex;
+          justify-content: space-between;
+          padding: 10px 20px;
+
+          small {
+            border-radius: 4px;
+            border: 2px solid $gray-300;
+            color: $gray-800;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 1.1;
+            margin-inline-start: 10px;
+            min-width: 26px;
+            padding: 2px 6px;
+            text-align: center;
+            text-transform: uppercase;
+          }
+        }
+
+        &:hover a {
+          outline: 3px solid #18bc9c;
+          outline-offset: -5px;
+
+          small {
+            background: #18bc9c;
+            border-color: #18bc9c;
+            color: #fff;
+          }
+        }
+
+        &.active a, &:hover.active a {
+          background: #18bc9c;
+          color: #fff;
+          outline: none;
+
+          small {
+            background: transparent;
+            border-color: #fff;
+            color: #fff;
+          }
+        }
+      }
+    }
+  }
+}
+
+.body-container {
+  flex: 1;
+  /* needed to prevent pages with a very small height and browsers not supporting flex */
+  min-height: 600px
+}
+
+.body-container #main h1, .body-container #main h2 {
+  margin-top: 0
+}
+
+#sidebar .section {
+  margin-bottom: 2em
+}
+
+#sidebar p {
+  font-size: 15px
+}
+
+#sidebar p + p {
+  margin: 1.5em 0 0
+}
+
+footer {
+  background: $secondary-color;
+  margin-top: 2em;
+  padding-top: 2em;
+  padding-bottom: 2em
+}
+
+footer p {
+  color: $gray-700;
+  font-size: 13px;
+  margin-bottom: 0.25em
+}
+
+footer #footer-resources {
+  text-align: right
+}
+
+footer #footer-resources i {
+  color: $gray-700;
+  font-size: 28.5px;
+  margin-left: 0.5em
+}
+
+#sourceCodeModal {
+  .modal-header {
+    border-bottom: 0;
+    padding: 1rem 1rem 0;
+
+    h3 { font-size: 18px; margin-top: 0; }
+  }
+
+  .nav-tabs {
+    border-bottom-color: #95a5a6;
+    margin-bottom: 15px;
+
+    .nav-link { font-size: 16px; }
+    .nav-link.active { border-color: #95a5a6 #95a5a6 #fff; }
+    .nav-link:not(.active):hover { border-color: transparent; text-decoration: underline; }
+  }
+
+  .tab-content {
+    .file-link { font-size: 16px; margin: 0 0 10px 5px; }
+  }
+
+  pre {
+    margin-bottom: 0;
+    padding: 0;
+    display: block;
+    word-break: break-all;
+    word-wrap: break-word;
+
+    code {
+      border-radius: 6px;
+      white-space: pre-wrap;
+    }
+  }
+}
+
+#confirmationModal .modal-dialog {
+  width: 500px
+}
+
+#confirmationModal .modal-footer button {
+  min-width: 75px
+}
+
+/* Misc. elements
+   ------------------------------------------------------------------------- */
+.section.rss a {
+  color: $yellow;
+  font-size: 21px;
+}
+
+/* Forms
+   ------------------------------------------------------------------------- */
+.form-control {
+  height: 45px;
+}
+
+.form-group.has-error .form-control {
+  border-color: $red
+}
+
+.form-group.has-error .control-label {
+  color: $red
+}
+
+.form-group.has-error .help-block {
+  background-color: $red;
+  color: $white;
+  font-size: 15px;
+  padding: 1em
+}
+
+.form-group.has-error .help-block ul,
+.form-group.has-error .help-block li {
+  margin-bottom: 0
+}
+
+.form-group.has-error .help-block li + li {
+  margin-top: 0.5em;
+}
+
+textarea {
+  max-width: 100%
+}
+
+/* Page: 'Technical Requirements Checker'
+   ------------------------------------------------------------------------- */
+body#requirements_checker header h1 {
+  margin-bottom: 0;
+  margin-top: 0
+}
+
+body#requirements_checker header h1 span {
+  font-size: 120%;
+  opacity: 0.7;
+  padding: 0 5px
+}
+
+body#requirements_checker .panel li {
+  margin-bottom: 1em
+}
+
+/* Page: 'Homepage'
+   ------------------------------------------------------------------------- */
+body#homepage {
+  text-align: center;
+
+  .page-header {
+    padding-bottom: 9.5px;
+    margin: 42px 0px 21px;
+
+    h1 {
+      font-size: 39px;
+      margin-top: 21px;
+      margin-bottom: 10.5px
+    }
+  }
+
+  .jumbotron {
+    padding: 48px 60px !important;
+
+    .btn {
+      font-size: 19px;
+      line-height: 1.33333;
+      padding: 18px 27px;
+      border-radius: 6px;
+    }
+
+    P {
+      margin-bottom: 15px;
+      font-size: 23px;
+      font-weight: 200
+    }
+  }
+}
+
+/* Page: 'Login'
+   ------------------------------------------------------------------------- */
+body#login #login-users-help p {
+  font-size: 15px;
+  line-height: 1.42857
+}
+
+body#login #login-users-help p:last-child {
+  margin-bottom: 0
+}
+
+body#login #login-users-help p .label {
+  margin-right: 5px
+}
+
+body#login #login-users-help p .console {
+  display: block;
+  margin: 5px 0;
+  padding: 10px
+}
+
+body#login .form-group-password {
+  position: relative;
+
+  input {
+    padding-right: 48px;
+  }
+
+  button {
+    background: transparent;
+    border: 0;
+    color: #2C3E50;
+    height: 45px;
+    outline: 0;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+}
+
+/* Common Blog page elements
+   ------------------------------------------------------------------------- */
+.post {
+  h2 {
+    font-size: $font-title;
+  }
+}
+
+.post-metadata {
+  color: $gray-600;
+  font-size: $font-default;
+  margin-bottom: 16px;
+}
+
+.post-metadata .metadata {
+  margin-right: 1.5em;
+}
+
+.post-tags .badge {
+  margin-right: 5px;
+  color: $gray-700;
+  padding: .5rem .75rem;
+  background-color: $gray-200;
+
+  &.badge-success {
+    background-color: $success;
+    color: $white;
+  }
+}
+
+/* Page: 'Blog index'
+   ------------------------------------------------------------------------- */
+body#blog_index #main h1,
+body#blog_index #main p {
+  margin-bottom: 0.5em
+}
+
+body#blog_index article.post {
+  margin-bottom: 3em;
+}
+
+body#blog_index .post-metadata {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+body#blog_index .post-tags .label-default {
+  background-color: $gray-7500;
+  color: #6d8283;
+}
+
+body#blog_index .post-tags .label-default i {
+  color: #a3b2b2;
+}
+
+/* Page: 'Blog post show'
+   ------------------------------------------------------------------------- */
+body#blog_post_show #main h3 {
+  margin-bottom: 0.75em
+}
+
+body#blog_post_show .post-tags .label-default {
+  background-color: $gray-7500;
+  color: #6D8283;
+  font-size: 16px;
+  margin-right: 10px;
+  padding: .4em 1em .5em;
+}
+
+body#blog_post_show .post-tags .label-default i {
+  color: #95A6A7;
+}
+
+body#blog_post_show #post-add-comment {
+  margin: 2em 0
+}
+
+body#blog_post_show #post-add-comment p {
+  margin-bottom: 0
+}
+
+body#blog_post_show #post-add-comment p a.btn {
+  margin-right: 0.5em
+}
+
+body#blog_post_show .post-comment {
+  margin-bottom: 2em
+}
+
+body#blog_post_show .post-comment h4 {
+  font-size: 13px;
+  line-height: 1.42857;
+  margin-top: 0
+}
+
+body#blog_post_show .post-comment h4 strong {
+  display: block
+}
+
+/* Page: 'Comment form error'
+   ------------------------------------------------------------------------- */
+body#comment_form_error h1.text-danger {
+  margin-bottom: 1em
+}
+
+@media (min-width: 768px) and (max-width: 1200px) {
+  .container {
+    width: 98%;
+  }
+}
+
+/* Page: 'Blog search'
+   ------------------------------------------------------------------------- */
+body#blog_search #main h1,
+body#blog_search #main p {
+  margin-bottom: 0.5em
+}
+
+body#blog_search article.post:first-child {
+  margin-top: 2em;
+}
+
+body#blog_search article.post {
+  margin-bottom: 2em;
+}
+
+body#blog_search .post-metadata {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.input-group {
+  button.btn {
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+}
