@@ -57,7 +57,8 @@ final class AppFixtures extends Fixture
     private function loadTags(ObjectManager $manager): void
     {
         foreach ($this->getTagData() as $name) {
-            $tag = new Tag($name);
+            $tag = new Tag();
+            $tag->setName($name);
 
             $manager->persist($tag);
             $this->addReference('tag-'.$name, $tag);
