@@ -47,7 +47,13 @@ final class RedirectToPreferredLocaleSubscriber implements EventSubscriberInterf
         $this->defaultLocale = $defaultLocale ?: $this->locales[0];
 
         if (!\in_array($this->defaultLocale, $this->locales, true)) {
-            throw new \UnexpectedValueException(sprintf('The default locale ("%s") must be one of "%s".', $this->defaultLocale, $locales));
+            throw new \UnexpectedValueException(
+                sprintf(
+                    'The default locale ("%s") must be one of "%s".',
+                    $this->defaultLocale,
+                    $locales
+                )
+            );
         }
 
         // Add the default locale at the first position of the array,
@@ -82,7 +88,9 @@ final class RedirectToPreferredLocaleSubscriber implements EventSubscriberInterf
         $preferredLanguage = $request->getPreferredLanguage($this->locales);
 
         if ($preferredLanguage !== $this->defaultLocale) {
-            $response = new RedirectResponse($this->urlGenerator->generate('homepage', ['_locale' => $preferredLanguage]));
+            $response = new RedirectResponse(
+                $this->urlGenerator->generate('homepage', ['_locale' => $preferredLanguage])
+            );
             $event->setResponse($response);
         }
     }

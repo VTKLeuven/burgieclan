@@ -93,9 +93,9 @@ class Post
         return $this->id;
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
-        return $this->title;
+        return $this->title ?? '';
     }
 
     public function setTitle(?string $title): void
@@ -103,9 +103,9 @@ class Post
         $this->title = $title;
     }
 
-    public function getSlug(): ?string
+    public function getSlug(): string
     {
-        return $this->slug;
+        return $this->slug ?? '';
     }
 
     public function setSlug(string $slug): void
@@ -113,9 +113,9 @@ class Post
         $this->slug = $slug;
     }
 
-    public function getContent(): ?string
+    public function getContent(): string
     {
-        return $this->content;
+        return $this->content ?? '';
     }
 
     public function setContent(?string $content): void
@@ -198,6 +198,6 @@ class Post
 
     public function __toString(): string
     {
-        return $this->getTitle();
+        return $this->getTitle() ?? '';
     }
 }

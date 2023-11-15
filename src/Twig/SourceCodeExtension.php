@@ -41,7 +41,12 @@ final class SourceCodeExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('show_source_code', [$this, 'showSourceCode'], ['is_safe' => ['html'], 'needs_environment' => true]),
+            new TwigFunction(
+                'show_source_code',
+                [$this, 'showSourceCode'],
+                ['is_safe' => ['html'],
+                    'needs_environment' => true]
+            ),
         ];
     }
 
@@ -72,7 +77,9 @@ final class SourceCodeExtension extends AbstractExtension
         $fileName = $method->getFileName();
 
         if (false === $classCode = file($fileName)) {
-            throw new \LogicException(sprintf('There was an error while trying to read the contents of the "%s" file.', $fileName));
+            throw new \LogicException(
+                sprintf('There was an error while trying to read the contents of the "%s" file.', $fileName)
+            );
         }
 
         $startLine = $method->getStartLine() - 1;

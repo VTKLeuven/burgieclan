@@ -131,7 +131,15 @@ final class AppFixtures extends Fixture
     /**
      * @throws \Exception
      *
-     * @return array<int, array{0: string, 1: AbstractUnicodeString, 2: string, 3: string, 4: \DateTime, 5: User, 6: array<Tag>}>
+     * @return array<int, array{
+     *     0: string,
+     *     1: AbstractUnicodeString,
+     *     2: string,
+     *     3: string,
+     *     4: \DateTime,
+     *     5: User,
+     *     6: array<Tag>
+     *     }>
      */
     private function getPostData(): array
     {
@@ -147,7 +155,8 @@ final class AppFixtures extends Fixture
                 $this->slugger->slug($title)->lower(),
                 $this->getRandomText(),
                 $this->getPostContent(),
-                (new \DateTime('now - '.$i.'days'))->setTime(random_int(8, 17), random_int(7, 49), random_int(0, 59)),
+                (new \DateTime('now - '.$i.'days'))
+                    ->setTime(random_int(8, 17), random_int(7, 49), random_int(0, 59)),
                 // Ensure that the first post is written by Jane Doe to simplify tests
                 $user,
                 $this->getRandomTags(),

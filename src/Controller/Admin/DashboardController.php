@@ -42,7 +42,7 @@ class DashboardController extends AbstractDashboardController
     public function configureUserMenu(UserInterface $user): UserMenu
     {
         return parent::configureUserMenu($user)
-            ->setName($user->getFullName());
+            ->setName($user->getUserIdentifier());
     }
 
     public function configureMenuItems(): iterable
@@ -57,10 +57,20 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToUrl('Home', 'fa fa-window-maximize', '/');
 
         yield MenuItem::section('Resources');
-        yield MenuItem::linkToUrl('EasyAdmin Docs', 'fas fa-book', 'https://symfony.com/doc/current/bundles/EasyAdminBundle/index.html')->setLinkTarget('_blank');
+        yield MenuItem::linkToUrl(
+            'EasyAdmin Docs',
+            'fas fa-book',
+            'https://symfony.com/doc/current/bundles/EasyAdminBundle/index.html'
+        )->setLinkTarget('_blank');
 
         yield MenuItem::section('Links');
-        yield MenuItem::linkToUrl('Symfony Demo', 'fab fa-symfony', 'https://github.com/symfony/demo')->setLinkTarget('_blank');
-        yield MenuItem::linkToUrl('Symfony Cast - Easy Admin', 'fab fa-symfony', 'https://symfonycasts.com/screencast/easyadminbundle')->setLinkTarget('_blank');
+        yield MenuItem::linkToUrl('Symfony Demo', 'fab fa-symfony', 'https://github.com/symfony/demo')
+            ->setLinkTarget('_blank');
+        yield MenuItem::linkToUrl(
+            'Symfony Cast - Easy Admin',
+            'fab fa-symfony',
+            'https://symfonycasts.com/screencast/easyadminbundle'
+        )
+            ->setLinkTarget('_blank');
     }
 }

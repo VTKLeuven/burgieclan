@@ -33,6 +33,11 @@ class Tag implements \JsonSerializable
     #[ORM\Column(type: Types::STRING, unique: true)]
     private string $name;
 
+    public function __construct(string $name = '')
+    {
+        $this->name = $name;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

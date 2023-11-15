@@ -46,10 +46,21 @@ final class BlogController extends AbstractController
      */
     #[Route('/', name: 'blog_index', defaults: ['page' => '1', '_format' => 'html'], methods: ['GET'])]
     #[Route('/rss.xml', name: 'blog_rss', defaults: ['page' => '1', '_format' => 'xml'], methods: ['GET'])]
-    #[Route('/page/{page<[1-9]\d{0,8}>}', name: 'blog_index_paginated', defaults: ['_format' => 'html'], methods: ['GET'])]
+    #[Route(
+        '/page/{page<[1-9]\d{0,8}>}',
+        name: 'blog_index_paginated',
+        defaults: ['_format' => 'html'],
+        methods: ['GET']
+    )
+    ]
     #[Cache(smaxage: 10)]
-    public function index(Request $request, int $page, string $_format, PostRepository $posts, TagRepository $tags): Response
-    {
+    public function index(
+        Request $request,
+        int $page,
+        string $_format,
+        PostRepository $posts,
+        TagRepository $tags
+    ): Response {
         $tag = null;
         if ($request->query->has('tag')) {
             $tag = $tags->findOneBy(['name' => $request->query->get('tag')]);
@@ -75,20 +86,6 @@ final class BlogController extends AbstractController
     #[Route('/posts/{slug}', name: 'blog_post', methods: ['GET'])]
     public function postShow(Post $post): Response
     {
-        // Symfony's 'dump()' function is an improved version of PHP's 'var_dump()' but
-        // it's not available in the 'prod' environment to prevent leaking sensitive information.
-        // It can be used both in PHP files and Twig templates, but it requires to
-        // have enabled the DebugBundle. Uncomment the following line to see it in action:
-        //
-        // dump($post, $this->getUser(), new \DateTime());
-        //
-        // The result will be displayed either in the Symfony Profiler or in the stream output.
-        // See https://symfony.com/doc/current/profiler.html
-        // See https://symfony.com/doc/current/templates.html#the-dump-twig-utilities
-        //
-        // You can also leverage Symfony's 'dd()' function that dumps and
-        // stops the execution
-
         return $this->render('blog/post_show.html.twig', ['post' => $post]);
     }
 
@@ -96,7 +93,8 @@ final class BlogController extends AbstractController
      * NOTE: The ParamConverter mapping is required because the route parameter
      * (postSlug) doesn't match any of the Doctrine entity properties (slug).
      *
-     * See https://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/annotations/converters.html#doctrine-converter
+     * See
+     * https://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/annotations/converters.html#doctrine-converter
      */
     #[Route('/comment/{postSlug}/new', name: 'comment_new', methods: ['POST'])]
     #[IsGranted('IS_AUTHENTICATED')]
