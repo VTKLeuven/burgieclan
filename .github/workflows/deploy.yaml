@@ -1,3 +1,5 @@
+name: "Deploy"
+
 on:
   push:
     branches:
@@ -6,24 +8,25 @@ on:
   
 jobs:
   run_pull:
-    name: run pull
+    name: Run pull
     runs-on: ubuntu-latest
     
     steps:
-    - name: install ssh keys
+    - name: Install ssh keys
       # check this thread to understand why its needed:
       # https://stackoverflow.com/a/70447517
       run: |
         install -m 600 -D /dev/null ~/.ssh/id_rsa
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
-    - name: connect and pull
+    - name: Connect and fetch
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git fetch && git reset --hard origin/${{ secrets.MAIN_BRANCH }}"
+    - name: Run composer install
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && composer2 install --no-dev --optimize-autoloader"
+    - name: Update migrations
       run: |
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git fetch && git reset --hard origin/${{ secrets.MAIN_BRANCH }}"
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && composer2 install --no-dev --optimize-autoloader"
-      # Update migrations
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && bin/console doctrine:schema:update --force"
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && bin/console cache:clear --env=prod"
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && bin/console cache:warmup --env=prod"
-    - name: cleanup
+    - name: Cleanup
       run: rm -rf ~/.ssh
