@@ -22,7 +22,7 @@ jobs:
     - name: Connect and fetch
       run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git fetch && git reset --hard origin/${{ secrets.MAIN_BRANCH }}"
     - name: Run composer install
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && composer2 install --no-dev --optimize-autoloader"
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && composer install --no-dev --optimize-autoloader"
     - name: Update migrations
       run: |
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && bin/console doctrine:schema:update --force"
