@@ -7,3 +7,4 @@ knpu_oauth2_client:
             client_id: '%env(LITUS_API_KEY)%'
             client_secret: '%env(LITUS_SECRET)%'
             redirect_route: login_litus
+            use_state: false # needed to allow login through kuleuven shibboleth

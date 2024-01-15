@@ -38,7 +38,7 @@ final class SecurityController extends AbstractController
      * must be accessible to anonymous visitors too.
      */
     #[Route('/login', name: 'security_login')]
-    public function login(#[CurrentUser] ?User $user, Request $request, AuthenticationUtils  $helper): Response
+    public function login(#[CurrentUser] ?User $user, Request $request, AuthenticationUtils $helper): Response
     {
         // if user is already logged in, don't display the login page again
         if ($user) {

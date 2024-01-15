@@ -19,7 +19,6 @@ class LitusProvider extends AbstractProvider
      * @var string
      */
     public string $apiDomain = 'https://vtk.be/api';
-//    public string $apiDomain = 'http://litus/api';
 
 
     /**
@@ -105,5 +104,10 @@ class LitusProvider extends AbstractProvider
     protected function createResourceOwner(array $response, AccessToken $token): LitusResourceOwner
     {
         return new LitusResourceOwner($response);
+    }
+
+    protected function getAuthorizationHeaders($token = null)
+    {
+        return ['Authorization' => 'Bearer ' . $token];
     }
 }

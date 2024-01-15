@@ -48,12 +48,13 @@ class LitusAuthenticator extends OAuth2Authenticator implements AuthenticationEn
                 $litusUser = $client->fetchUserFromToken($accessToken);
 
                 $user = $this->userRepository->findOneBy(["username" => $litusUser->getUsername()]);
-
                 if (null === $user) {
                     $user = new User();
-                    $user->setUsername($litusUser->getId());
+                    $user->setUsername($litusUser->getUsername());
                     $user->setEmail($litusUser->getEmail());
                     $user->setFullName($litusUser->getFullName());
+                    $user->setPassword('');
+                    $user->setRoles([User::ROLE_USER]);
 
                     $this->em->persist($user);
                 }
@@ -67,11 +68,13 @@ class LitusAuthenticator extends OAuth2Authenticator implements AuthenticationEn
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        // redirect to user to your post authentication page (e.g. dashboard, home)
+        $targetUrl = $this->router->generate('blog_index');
+        return new RedirectResponse($targetUrl);
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        // do something
+        $message = strtr($exception->getMessageKey(), $exception->getMessageData());
+        return new Response($message, Response::HTTP_FORBIDDEN);
     }
 }
