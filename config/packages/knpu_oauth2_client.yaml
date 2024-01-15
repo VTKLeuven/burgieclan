@@ -1,0 +1,9 @@
+knpu_oauth2_client:
+    clients:
+        # configure your clients as described here: https://github.com/knpuniversity/oauth2-client-bundle#configuration
+        litus:
+            type: generic
+            provider_class: App\OauthProvider\LitusProvider
+            client_id: '%env(LITUS_API_KEY)%'
+            client_secret: '%env(LITUS_SECRET)%'
+            redirect_route: login_litus

@@ -12,7 +12,9 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -36,11 +38,8 @@ final class SecurityController extends AbstractController
      * must be accessible to anonymous visitors too.
      */
     #[Route('/login', name: 'security_login')]
-    public function login(
-        #[CurrentUser] ?User $user,
-        Request $request,
-        AuthenticationUtils $helper,
-    ): Response {
+    public function login(#[CurrentUser] ?User $user, Request $request, AuthenticationUtils  $helper): Response
+    {
         // if user is already logged in, don't display the login page again
         if ($user) {
             return $this->redirectToRoute('blog_index');
@@ -58,6 +57,18 @@ final class SecurityController extends AbstractController
             // last authentication error (if any)
             'error' => $helper->getLastAuthenticationError(),
         ]);
+    }
+
+    #[Route("/login/litus", name: "login_litus")]
+    public function loginLitus(Request $request, ClientRegistry $clientRegistry)
+    {
+        //This is handled in the LitusAuthenticator
+    }
+
+    #[Route("/login/litus/start", name: "login_litus_start")]
+    public function loginLitusStart(ClientRegistry $clientRegistry): RedirectResponse
+    {
+        return $clientRegistry->getClient("litus")->redirect();
     }
 
     /**
