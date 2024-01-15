@@ -20,6 +20,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.11",
         "easycorp/easyadmin-bundle": "^4.8",
+        "knpuniversity/oauth2-client-bundle": "^2.18",
         "league/commonmark": "^2.1",
         "symfony/apache-pack": "^1.0",
         "symfony/asset": "^6.3",
