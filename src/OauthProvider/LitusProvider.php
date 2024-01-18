@@ -3,6 +3,7 @@
 namespace App\OauthProvider;
 
 use App\OauthProvider\Exception\LitusIdentityProviderException;
+use InvalidArgumentException;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
@@ -14,12 +15,66 @@ class LitusProvider extends AbstractProvider
     use BearerAuthorizationTrait;
 
     /**
-     * API domain
+     * Authorize url
      *
      * @var string
      */
-    public string $apiDomain = 'https://vtk.be/api';
+    public string $urlAuthorize;
 
+    /**
+     * Access token url
+     * @var string
+     */
+    public string $urlAccessToken;
+
+    /**
+     * Resource owner details
+     * @var string
+     */
+    public string $urlResourceOwnerDetails;
+
+    public function __construct(array $options = [], array $collaborators = [])
+    {
+        $this->assertRequiredOptions($options);
+
+        $this->urlAuthorize = $options['urlAuthorize'];
+        $this->urlAccessToken = $options['urlAccessToken'];
+        $this->urlResourceOwnerDetails = $options['urlResourceOwnerDetails'];
+
+        parent::__construct($options, $collaborators);
+    }
+
+    /**
+     * Verifies that all required options have been passed.
+     *
+     * @param  array $options
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    private function assertRequiredOptions(array $options): void
+    {
+        $missing = array_diff_key(array_flip($this->getRequiredOptions()), $options);
+
+        if (!empty($missing)) {
+            throw new InvalidArgumentException(
+                'Required options not defined: ' . implode(', ', array_keys($missing))
+            );
+        }
+    }
+
+    /**
+     * Returns all options that are required.
+     *
+     * @return array
+     */
+    protected function getRequiredOptions(): array
+    {
+        return [
+            'urlAuthorize',
+            'urlAccessToken',
+            'urlResourceOwnerDetails',
+        ];
+    }
 
     /**
      * Get authorization URL to begin OAuth flow
@@ -28,7 +83,7 @@ class LitusProvider extends AbstractProvider
      */
     public function getBaseAuthorizationUrl(): string
     {
-        return $this->apiDomain . '/oauth/authorize';
+        return $this->urlAuthorize;
     }
 
     /**
@@ -39,7 +94,7 @@ class LitusProvider extends AbstractProvider
      */
     public function getBaseAccessTokenUrl(array $params): string
     {
-        return $this->apiDomain . '/oauth/token';
+        return $this->urlAccessToken;
     }
 
     /**
@@ -50,7 +105,7 @@ class LitusProvider extends AbstractProvider
      */
     public function getResourceOwnerDetailsUrl(AccessToken $token): string
     {
-        return $this->apiDomain . '/auth/me';
+        return $this->urlResourceOwnerDetails;
     }
 
     /**
@@ -106,7 +161,7 @@ class LitusProvider extends AbstractProvider
         return new LitusResourceOwner($response);
     }
 
-    protected function getAuthorizationHeaders($token = null)
+    protected function getAuthorizationHeaders($token = null): array
     {
         return ['Authorization' => 'Bearer ' . $token];
     }
