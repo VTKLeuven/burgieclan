@@ -59,6 +59,8 @@ class LitusAuthenticator extends OAuth2Authenticator implements AuthenticationEn
                     $this->em->persist($user);
                 }
 
+                $user->setAccessToken($accessToken);
+
                 $this->em->flush();
 
                 return $user;

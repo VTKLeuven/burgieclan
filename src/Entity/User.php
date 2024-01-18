@@ -14,6 +14,7 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -64,6 +65,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private $accesstoken;
 
     public function getId(): ?int
     {
@@ -136,6 +143,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRoles(array $roles): void
     {
         $this->roles = $roles;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccesstoken()
+    {
+        return $this->accesstoken ? new AccessToken(json_decode($this->accesstoken, true)): null;
+    }
+
+    /**
+     * @param array $accesstoken
+     */
+    public function setAccesstoken(AccessToken $accesstoken)
+    {
+        $this->accesstoken = json_encode($accesstoken);
     }
 
     /**
