@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\OauthProvider\LitusResourceOwner;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Security\Authenticator\OAuth2Authenticator;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -49,14 +50,20 @@ class LitusAuthenticator extends OAuth2Authenticator implements AuthenticationEn
 
                 $user = $this->userRepository->findOneBy(["username" => $litusUser->getUsername()]);
                 if (null === $user) {
-                    $user = new User();
-                    $user->setUsername($litusUser->getUsername());
-                    $user->setEmail($litusUser->getEmail());
-                    $user->setFullName($litusUser->getFullName());
-                    $user->setPassword('');
-                    $user->setRoles([User::ROLE_USER]);
+                    $user = $this->userRepository->findOneBy(["email" => $litusUser->getEmail()]);
+                    if (null === $user) {
+                        $user = new User();
+                        $user->setUsername($litusUser->getUsername());
+                        $user->setEmail($litusUser->getEmail());
+                        $user->setFullName($litusUser->getFullName());
+                        $user->setPassword('');
+                        $user->setRoles([User::ROLE_USER]);
 
-                    $this->em->persist($user);
+                        $this->em->persist($user);
+                    } else {
+                        // Person trying to exist hast the same email as an existing user -> not allowed.
+                        throw new Exception(sprintf("Email %s already taken", $litusUser->getEmail()));
+                    }
                 }
 
                 $user->setAccessToken($accessToken);
