@@ -61,8 +61,8 @@ class LitusAuthenticator extends OAuth2Authenticator implements AuthenticationEn
 
                         $this->em->persist($user);
                     } else {
-                        // Person trying to exist hast the same email as an existing user -> not allowed.
-                        throw new Exception(sprintf("Email %s already taken", $litusUser->getEmail()));
+                        // Person trying to create an account has the same email as an existing user -> not allowed.
+                        throw new AuthenticationException();
                     }
                 }
 
@@ -83,7 +83,7 @@ class LitusAuthenticator extends OAuth2Authenticator implements AuthenticationEn
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        $message = strtr($exception->getMessageKey(), $exception->getMessageData());
-        return new Response($message, Response::HTTP_FORBIDDEN);
+        $this->saveAuthenticationErrorToSession($request, $exception);
+        return new RedirectResponse($this->router->generate('security_login'));
     }
 }
