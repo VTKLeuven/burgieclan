@@ -37,6 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // It also prevents from making typo errors.
     final public const ROLE_USER = 'ROLE_USER';
     final public const ROLE_ADMIN = 'ROLE_ADMIN';
+    final public const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -184,5 +185,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __toString(): string
     {
         return $this->getFullName() ?? '';
+    }
+
+    /**
+     * Returns the available roles for a user.
+     */
+    public static function getAvailableRoles(): array
+    {
+        return array(self::ROLE_USER, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN);
     }
 }
