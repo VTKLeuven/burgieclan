@@ -34,7 +34,6 @@ class LitusResourceOwner implements ResourceOwnerInterface
      */
     public function getId(): ?string
     {
-//        return $this->getValueByKey($this->response, 'id');
         return $this->getUsername();
     }
 
