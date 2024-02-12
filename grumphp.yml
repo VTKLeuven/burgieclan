@@ -1,6 +1,6 @@
 parameters:
     # Project preferences
-    commit_project_names: "(BURGIECLAN)" # The prefix(es) of the jira project.
+    commit_project_names: "(BUR)" # The prefix(es) of the jira project.
     run_phpstan: false # Enable after installing the phpstan preset
     run_psalm: false # Enable after installing the psalm preset
     run_security_advisories: false # Enable after installing the security advisories preset
@@ -25,3 +25,6 @@ grumphp:
                 - /^src\/(.*)/
         file_size:
             max_size: 2M
+        git_commit_message:
+            matchers:
+                Must contain JIRA issue number: /BUR-\d+/
