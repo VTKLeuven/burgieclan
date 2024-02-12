@@ -1,9 +1,9 @@
-name: "Deploy"
+name: "Deploy to test"
 
 on:
   push:
     branches:
-      - main
+      - test
   workflow_dispatch:
   
 jobs:
@@ -20,7 +20,7 @@ jobs:
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
     - name: Connect and fetch
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git fetch && git reset --hard origin/${{ secrets.MAIN_BRANCH }}"
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git fetch && git reset --hard origin/test"
     - name: Run composer install
       run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && composer install --no-dev --optimize-autoloader"
     - name: Update migrations
