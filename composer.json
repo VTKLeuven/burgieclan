@@ -21,6 +21,7 @@
         "doctrine/orm": "^2.11",
         "easycorp/easyadmin-bundle": "^4.8",
         "league/commonmark": "^2.1",
+        "sentry/sentry-symfony": "^4.13",
         "symfony/apache-pack": "^1.0",
         "symfony/asset": "^6.3",
         "symfony/console": "^6.3",
@@ -70,7 +71,8 @@
             "symfony/flex": true,
             "symfony/runtime": true,
             "phpstan/extension-installer": true,
-            "phpro/grumphp": true
+            "phpro/grumphp": true,
+            "php-http/discovery": true
         },
         "platform": {
             "php": "8.1.0"
