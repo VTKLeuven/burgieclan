@@ -14,6 +14,7 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -37,6 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // It also prevents from making typo errors.
     final public const ROLE_USER = 'ROLE_USER';
     final public const ROLE_ADMIN = 'ROLE_ADMIN';
+    final public const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -64,6 +66,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private $accesstoken;
 
     public function getId(): ?int
     {
@@ -139,6 +147,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * @return string
+     */
+    public function getAccesstoken()
+    {
+        return $this->accesstoken ? new AccessToken(json_decode($this->accesstoken, true)): null;
+    }
+
+    /**
+     * @param array $accesstoken
+     */
+    public function setAccesstoken(AccessToken $accesstoken)
+    {
+        $this->accesstoken = json_encode($accesstoken);
+    }
+
+    /**
      * Returns the salt that was originally used to encode the password.
      *
      * {@inheritdoc}
@@ -184,5 +208,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __toString(): string
     {
         return $this->getFullName() ?? '';
+    }
+
+    /**
+     * Returns the available roles for a user.
+     */
+    public static function getAvailableRoles(): array
+    {
+        return array(self::ROLE_USER, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN);
     }
 }
