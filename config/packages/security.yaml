@@ -24,6 +24,9 @@ security:
             lazy: true
             provider: database_users
 
+            custom_authenticators:
+                - App\Security\LitusAuthenticator
+
             # This allows the user to login by submitting a username and password
             # Reference: https://symfony.com/doc/current/security/form_login_setup.html
             form_login:
