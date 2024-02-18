@@ -35,6 +35,7 @@ class Course
 
     #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
     #[Assert\NotBlank]
+    #[Assert\Length(6)]
     private ?string $code = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
@@ -47,6 +48,7 @@ class Course
     private array $semesters = [];
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Positive]
     private ?int $credits = null;
 
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'new_courses')]

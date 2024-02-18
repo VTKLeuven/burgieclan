@@ -33,6 +33,7 @@ class CourseCrudController extends AbstractCrudController
         yield ChoiceField::new('semesters')
             ->setChoices(Course::SEMESTERS)
             ->allowMultipleChoices()
+            ->renderExpanded()
             ->setTemplatePath('admin/field/semesters.html.twig');
         yield IntegerField::new('credits');
         yield AssociationField::new('old_courses')
