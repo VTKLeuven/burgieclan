@@ -19,6 +19,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: 'burgieclan_course')]
 class Course
 {
+    final public const SEMESTERS = [
+        'Semester 1' => 'Semester 1',
+        'Semester 2' => 'Semester 2',
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -28,18 +33,21 @@ class Course
     #[Assert\NotBlank]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    private array $modules = [];
-
-    #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    private array $professors = [];
-
-    #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    private array $semesters = [];
-
     #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
     #[Assert\NotBlank]
     private ?string $code = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private array $modules = [];
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private array $professors = [];
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private array $semesters = [];
+
+    #[ORM\Column(nullable: true)]
+    private ?int $credits = null;
 
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'new_courses')]
     private Collection $old_courses;
@@ -51,6 +59,11 @@ class Course
     {
         $this->old_courses = new ArrayCollection();
         $this->new_courses = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return $this->getName();
     }
 
     public function getId(): ?int
@@ -169,6 +182,18 @@ class Course
             $this->new_courses->removeElement($newCourse);
             $newCourse->removeOldCourse($this);
         }
+
+        return $this;
+    }
+
+    public function getCredits(): ?int
+    {
+        return $this->credits;
+    }
+
+    public function setCredits(?int $credits): self
+    {
+        $this->credits = $credits;
 
         return $this;
     }

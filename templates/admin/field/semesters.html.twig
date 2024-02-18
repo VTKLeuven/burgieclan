@@ -1,0 +1,10 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+{% if field.formattedValue == 'Semester 1' %}
+    <i class="fa-solid fa-circle-half-stroke" style="color: #74C0FC;"></i>
+{% elseif field.formattedValue == 'Semester 2' %}
+    <i class="fa-solid fa-circle-half-stroke fa-rotate-180" style="color: #74C0FC;"></i>
+{% else %}
+    <i class="fa-solid fa-circle" style="color: #74C0FC;"></i>
+{% endif %}
