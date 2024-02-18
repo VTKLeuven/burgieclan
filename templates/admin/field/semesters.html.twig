@@ -5,6 +5,8 @@
     <i class="fa-solid fa-circle-half-stroke" style="color: #74C0FC;"></i>
 {% elseif field.formattedValue|trans|raw == 'Semester 2' %}
     <i class="fa-solid fa-circle-half-stroke fa-rotate-180" style="color: #74C0FC;"></i>
+{% elseif field.formattedValue|trans|raw == '' %}
+    <i class="fa-regular fa-circle" style="color: #74C0FC;"></i>
 {% else %}
     <i class="fa-solid fa-circle" style="color: #74C0FC;"></i>
 {% endif %}
