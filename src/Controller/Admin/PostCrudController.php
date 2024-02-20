@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\Post;
@@ -39,8 +41,7 @@ class PostCrudController extends AbstractCrudController
         return $filters
             ->add('title')
             ->add('author')
-            ->add('publishedAt')
-        ;
+            ->add('publishedAt');
     }
 
     public function configureFields(string $pageName): iterable

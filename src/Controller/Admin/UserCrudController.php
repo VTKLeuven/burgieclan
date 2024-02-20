@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\User;
@@ -29,6 +31,6 @@ class UserCrudController extends AbstractCrudController
             ->allowMultipleChoices()
             ->renderExpanded()
             ->renderAsBadges()
-            ->setPermission(USER::ROLE_SUPER_ADMIN);
+            ->setPermission(User::ROLE_SUPER_ADMIN);
     }
 }

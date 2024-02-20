@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -71,8 +73,7 @@ final class CommentNotificationSubscriber implements EventSubscriberInterface
             ->from($this->sender)
             ->to($emailAddress)
             ->subject($subject)
-            ->html($body)
-        ;
+            ->html($body);
 
         // In config/packages/dev/mailer.yaml the delivery of messages is disabled.
         // That's why in the development environment you won't actually receive any email.
