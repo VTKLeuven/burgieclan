@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Defines the properties of the User entity to represent the application courses.
+ * Defines the properties of the Course entity to represent the application courses.
  * See https://burgieclan.atlassian.net/wiki/spaces/Burgieclan/pages/8192123/Vakkenbeheer
  *
  * @author Pedro Devogelaere <pedro.devogelaere@vtk.be>
