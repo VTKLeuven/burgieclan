@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 /*
  * This file is part of the Symfony package.
  *
@@ -20,6 +21,7 @@ use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\String\AbstractUnicodeString;
 use Symfony\Component\String\Slugger\SluggerInterface;
+
 use function Symfony\Component\String\u;
 
 final class AppFixtures extends Fixture
@@ -151,10 +153,10 @@ final class AppFixtures extends Fixture
             $user = $this->getReference(['jane_admin', 'tom_admin'][0 === $i ? 0 : random_int(0, 1)]);
 
             $posts[] = [
-                $title,
-                $this->slugger->slug($title)->lower(),
-                $this->getRandomText(),
-                $this->getPostContent(),
+                (string) $title,
+                (string) $this->slugger->slug($title)->lower(),
+                (string) $this->getRandomText(),
+                (string) $this->getPostContent(),
                 (new \DateTime('now - '.$i.'days'))
                     ->setTime(random_int(8, 17), random_int(7, 49), random_int(0, 59)),
                 // Ensure that the first post is written by Jane Doe to simplify tests
@@ -215,7 +217,7 @@ final class AppFixtures extends Fixture
             array_pop($phrases);
         } while ($text->length() > $maxLength);
 
-        return $text;
+        return (string) $text;
     }
 
     private function getPostContent(): string

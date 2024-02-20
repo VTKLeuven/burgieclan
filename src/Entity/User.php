@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -151,13 +153,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getAccesstoken()
     {
-        return $this->accesstoken ? new AccessToken(json_decode($this->accesstoken, true)): null;
+        return $this->accesstoken ? new AccessToken(json_decode($this->accesstoken, true)) : null;
     }
 
     /**
      * @param array $accesstoken
      */
-    public function setAccesstoken(AccessToken $accesstoken)
+    public function setAccesstoken(AccessToken $accesstoken): void
     {
         $this->accesstoken = json_encode($accesstoken);
     }
@@ -215,6 +217,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public static function getAvailableRoles(): array
     {
-        return array(self::ROLE_USER, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN);
+        return [self::ROLE_USER, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN];
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\OauthProvider;
 
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
@@ -10,7 +12,7 @@ class LitusResourceOwner implements ResourceOwnerInterface
     use ArrayAccessorTrait;
 
     /**
-     * Raw response
+     * Raw response.
      *
      * @var array
      */
@@ -19,16 +21,17 @@ class LitusResourceOwner implements ResourceOwnerInterface
     /**
      * Creates new resource owner.
      *
-     * @param  array $response
+     * @param array $response
+     *
      * @return void
      */
-    public function __construct(array $response = array())
+    public function __construct(array $response = [])
     {
         $this->response = $response;
     }
 
     /**
-     * Get resource owner ID
+     * Get resource owner ID.
      *
      * @return string|null
      */
@@ -38,7 +41,7 @@ class LitusResourceOwner implements ResourceOwnerInterface
     }
 
     /**
-     * Get resource owner username
+     * Get resource owner username.
      *
      * @return string|null
      */
@@ -48,7 +51,7 @@ class LitusResourceOwner implements ResourceOwnerInterface
     }
 
     /**
-     * Get resource owner full name
+     * Get resource owner full name.
      *
      * @return string|null
      */
@@ -58,7 +61,7 @@ class LitusResourceOwner implements ResourceOwnerInterface
     }
 
     /**
-     * Get resource owner email
+     * Get resource owner email.
      *
      * @return string|null
      */
