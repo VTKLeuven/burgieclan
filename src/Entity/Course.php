@@ -39,9 +39,6 @@ class Course
     private ?string $code = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
-    private array $modules = [];
-
-    #[ORM\Column(type: Types::JSON, nullable: true)]
     private array $professors = [];
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
@@ -57,10 +54,14 @@ class Course
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'old_courses')]
     private Collection $new_courses;
 
+    #[ORM\ManyToMany(targetEntity: Module::class, mappedBy: 'courses')]
+    private Collection $modules;
+
     public function __construct()
     {
         $this->old_courses = new ArrayCollection();
         $this->new_courses = new ArrayCollection();
+        $this->modules = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -81,18 +82,6 @@ class Course
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getModules(): array
-    {
-        return $this->modules;
-    }
-
-    public function setModules(?array $modules): self
-    {
-        $this->modules = $modules;
 
         return $this;
     }
@@ -196,6 +185,33 @@ class Course
     public function setCredits(?int $credits): self
     {
         $this->credits = $credits;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Module>
+     */
+    public function getModules(): Collection
+    {
+        return $this->modules;
+    }
+
+    public function addModule(Module $module): self
+    {
+        if (!$this->modules->contains($module)) {
+            $this->modules->add($module);
+            $module->addCourse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeModule(Module $module): self
+    {
+        if ($this->modules->removeElement($module)) {
+            $module->removeCourse($this);
+        }
 
         return $this;
     }
