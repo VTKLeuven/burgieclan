@@ -12,6 +12,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use League\OAuth2\Client\Token\AccessToken;
@@ -72,6 +74,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private $accesstoken;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Node::class)]
+    private Collection $nodes;
+
+    public function __construct()
+    {
+        $this->nodes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -151,7 +161,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getAccesstoken()
     {
-        return $this->accesstoken ? new AccessToken(json_decode($this->accesstoken, true)): null;
+        return $this->accesstoken ? new AccessToken(json_decode($this->accesstoken, true)) : null;
     }
 
     /**
@@ -216,5 +226,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public static function getAvailableRoles(): array
     {
         return array(self::ROLE_USER, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN);
+    }
+
+    /**
+     * @return Collection<int, Node>
+     */
+    public function getNodes(): Collection
+    {
+        return $this->nodes;
+    }
+
+    public function addNode(Node $node): self
+    {
+        if (!$this->nodes->contains($node)) {
+            $this->nodes->add($node);
+            $node->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNode(Node $node): self
+    {
+        if ($this->nodes->removeElement($node)) {
+            // set the owning side to null (unless already changed)
+            if ($node->getUser() === $this) {
+                $node->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
