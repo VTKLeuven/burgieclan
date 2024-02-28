@@ -16,7 +16,7 @@ class ProgramTest extends KernelTestCase
         $this->assertSame("Program 1", $program->getName());
     }
 
-    public function testAddModules(): void
+    public function testAddRemoveModules(): void
     {
         $program = new Program();
         $m1 = new Module();
@@ -29,10 +29,17 @@ class ProgramTest extends KernelTestCase
         $m3 = new Module();
         $m3->setName("Module 3");
 
+        $this->assertCount(2, $program->getModules());
         $this->assertContains($m1, $program->getModules());
         $this->assertContains($m2, $program->getModules());
         $this->assertNotContains($m3, $program->getModules());
         $this->assertSame($program, $m1->getProgram());
         $this->assertSame($program, $m2->getProgram());
+
+        $program->removeModule($m1);
+        $this->assertCount(1, $program->getModules());
+        $this->assertNotContains($m1, $program->getModules());
+        $this->assertContains($m2, $program->getModules());
+        $this->assertNotContains($m3, $program->getModules());
     }
 }
