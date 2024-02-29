@@ -17,10 +17,8 @@ class CommentCategoryCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return [
-            IdField::new('id')->onlyOnDetail(),
-            TextField::new('name'),
-            TextEditorField::new('description'),
-        ];
+        yield IdField::new('id')->onlyOnDetail();
+        yield TextField::new('name');
+        yield TextEditorField::new('description');
     }
 }
