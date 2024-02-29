@@ -25,7 +25,7 @@ abstract class Node
 
     public function __construct()
     {
-        $this->createDate = new \DateTime();
+        $this->createDate = new \DateTimeImmutable();
         $this->updateDate = $this->createDate;
     }
 
