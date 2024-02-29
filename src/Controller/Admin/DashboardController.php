@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Controller\Admin\PostCrudController;
 use App\Entity\Comment;
 use App\Entity\Course;
+use App\Entity\DocumentCategory;
 use App\Entity\Post;
 use App\Entity\Tag;
 use App\Entity\User;
@@ -54,6 +55,10 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Blog Posts', 'fa fa-file-text-o', Post::class);
         yield MenuItem::linkToCrud('Comments', 'far fa-comments', Comment::class);
         yield MenuItem::linkToCrud('Tags', 'fas fa-tags', Tag::class);
+        yield MenuItem::subMenu('Documents', 'fa-solid fa-file')
+            ->setSubItems([
+            MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class)
+        ]);
 
         yield MenuItem::section('Frontend');
         yield MenuItem::linkToUrl('Home', 'fa fa-window-maximize', '/');
