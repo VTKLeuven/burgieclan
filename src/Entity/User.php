@@ -227,34 +227,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return array(self::ROLE_USER, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN);
     }
-
-    /**
-     * @return Collection<int, Node>
-     */
-    public function getNodes(): Collection
-    {
-        return $this->nodes;
-    }
-
-    public function addNode(Node $node): self
-    {
-        if (!$this->nodes->contains($node)) {
-            $this->nodes->add($node);
-            $node->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeNode(Node $node): self
-    {
-        if ($this->nodes->removeElement($node)) {
-            // set the owning side to null (unless already changed)
-            if ($node->getUser() === $this) {
-                $node->setUser(null);
-            }
-        }
-
-        return $this;
-    }
 }
