@@ -57,10 +57,14 @@ class Course
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'old_courses')]
     private Collection $new_courses;
 
+    #[ORM\OneToMany(mappedBy: 'course', targetEntity: CourseComment::class, orphanRemoval: true)]
+    private Collection $courseComments;
+
     public function __construct()
     {
         $this->old_courses = new ArrayCollection();
         $this->new_courses = new ArrayCollection();
+        $this->courseComments = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -196,6 +200,36 @@ class Course
     public function setCredits(?int $credits): self
     {
         $this->credits = $credits;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CourseComment>
+     */
+    public function getCourseComments(): Collection
+    {
+        return $this->courseComments;
+    }
+
+    public function addCourseComment(CourseComment $courseComment): self
+    {
+        if (!$this->courseComments->contains($courseComment)) {
+            $this->courseComments->add($courseComment);
+            $courseComment->setCourse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCourseComment(CourseComment $courseComment): self
+    {
+        if ($this->courseComments->removeElement($courseComment)) {
+            // set the owning side to null (unless already changed)
+            if ($courseComment->getCourse() === $this) {
+                $courseComment->setCourse(null);
+            }
+        }
 
         return $this;
     }

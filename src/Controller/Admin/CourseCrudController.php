@@ -42,5 +42,7 @@ class CourseCrudController extends AbstractCrudController
         yield AssociationField::new('new_courses')
             ->autocomplete()
             ->setFormTypeOption('by_reference', false);
+        yield AssociationField::new('courseComments')
+            ->hideOnForm();
     }
 }
