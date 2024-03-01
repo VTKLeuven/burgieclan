@@ -3,8 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Comment;
-use App\Entity\CommentCategory;
 use App\Entity\Course;
+use App\Entity\CommentCategory;
 use App\Entity\Post;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
