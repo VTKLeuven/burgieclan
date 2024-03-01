@@ -29,9 +29,9 @@ class CourseCommentCrudController extends AbstractCrudController
         yield AssociationField::new('category')
             ->autocomplete()
             ->setFormTypeOption('by_reference', false);
-//        yield DateTimeField::new('createDate')
-//            ->hideOnForm();
-//        yield DateTimeField::new('updateDate')
-//            ->hideOnForm();
+        yield DateTimeField::new('createDate')
+            ->hideOnForm();
+        yield DateTimeField::new('updateDate')
+            ->hideOnForm();
     }
 }
