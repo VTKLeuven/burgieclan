@@ -2,24 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\NodeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\DiscriminatorColumn;
-use Doctrine\ORM\Mapping\DiscriminatorMap;
-use Doctrine\ORM\Mapping\InheritanceType;
 
-#[ORM\Entity(repositoryClass: NodeRepository::class)]
-#[InheritanceType('JOINED')]
-#[DiscriminatorColumn(name: 'discr', type: 'string')]
-#[DiscriminatorMap([])]
+#[ORM\MappedSuperclass]
+#[ORM\HasLifecycleCallbacks]
 abstract class Node
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\ManyToOne(inversedBy: 'nodes')]
     private ?User $user = null;
 
@@ -33,17 +22,6 @@ abstract class Node
     {
         $this->createDate = new \DateTimeImmutable();
         $this->updateDate = $this->createDate;
-    }
-
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
     }
 
     public function setUser(?User $user): self
@@ -64,6 +42,7 @@ abstract class Node
     }
 
     // can be used to update the date when the node is updated
+    #[ORM\PreUpdate]
     public function setUpdateDate(): self
     {
         $this->updateDate = new \DateTime();
