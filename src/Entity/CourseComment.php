@@ -3,21 +3,15 @@
 namespace App\Entity;
 
 use App\Repository\CourseCommentRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CourseCommentRepository::class)]
-class CourseComment extends Node
+class CourseComment extends Comment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    #[ORM\Column(type: Types::TEXT)]
-    #[Assert\NotBlank]
-    private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'courseComments')]
     #[ORM\JoinColumn(nullable: false)]
@@ -30,18 +24,6 @@ class CourseComment extends Node
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getContent(): ?string
-    {
-        return $this->content;
-    }
-
-    public function setContent(string $content): self
-    {
-        $this->content = $content;
-
-        return $this;
     }
 
     public function getCourse(): ?Course
