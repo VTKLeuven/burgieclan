@@ -6,6 +6,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\MappedSuperclass]
+#[ORM\HasLifecycleCallbacks]
 abstract class Node
 {
     #[ORM\ManyToOne(inversedBy: 'nodes')]
@@ -47,6 +48,7 @@ abstract class Node
     }
 
     // can be used to update the date when the node is updated
+    #[ORM\PreUpdate]
     public function setUpdateDate(): self
     {
         $this->updateDate = new \DateTime();
