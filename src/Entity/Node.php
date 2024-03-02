@@ -31,6 +31,11 @@ abstract class Node
         return $this;
     }
 
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
     public function getCreateDate(): ?\DateTimeInterface
     {
         return $this->createDate;
