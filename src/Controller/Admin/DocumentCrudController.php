@@ -4,12 +4,9 @@ namespace App\Controller\Admin;
 
 use App\Entity\Document;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
-
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class DocumentCrudController extends AbstractCrudController
@@ -19,10 +16,8 @@ class DocumentCrudController extends AbstractCrudController
         return Document::class;
     }
 
-    
     public function configureFields(string $pageName): iterable
     {
-        
         yield TextField::new('name');
         yield DateTimeField::new('createDate')
         ->hideOnForm();
@@ -33,7 +28,5 @@ class DocumentCrudController extends AbstractCrudController
         ->autocomplete();
         yield AssociationField::new('course')
         ->autocomplete();
-
     }
-    
 }
