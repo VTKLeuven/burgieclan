@@ -6,6 +6,7 @@ use App\Entity\Course;
 use App\Entity\CourseComment;
 use App\Entity\CommentCategory;
 use App\Entity\DocumentCategory;
+use App\Entity\Document;
 use App\Entity\Post;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -56,7 +57,9 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Categories', 'fas fa-tags', CommentCategory::class);
         yield MenuItem::subMenu('Documents', 'fa-solid fa-file')
             ->setSubItems([
-            MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class)
+            MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class),
+            MenuItem::linkToCrud('Documents', 'fa fa-file', Document::class)
+
         ]);
 
         yield MenuItem::section('Frontend');
