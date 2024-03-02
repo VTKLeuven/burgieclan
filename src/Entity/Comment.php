@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\MappedSuperclass]
-#[ORM\HasLifecycleCallbacks]
 abstract class Comment extends Node
 {
     #[ORM\Column(type: Types::TEXT)]
