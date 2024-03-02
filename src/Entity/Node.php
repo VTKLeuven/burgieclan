@@ -24,12 +24,6 @@ abstract class Node
         $this->updateDate = $this->createDate;
     }
 
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
     public function getUser(): ?User
     {
         return $this->user;

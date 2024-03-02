@@ -59,7 +59,6 @@ class DashboardController extends AbstractDashboardController
             ->setSubItems([
             MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class),
             MenuItem::linkToCrud('Documents', 'fa fa-file', Document::class)
-
         ]);
 
         yield MenuItem::section('Frontend');
