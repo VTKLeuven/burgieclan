@@ -16,7 +16,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Notification>
+ * @extends ServiceEntityRepository <Notification>
  *
  * @method Notification|null find($id, $lockMode = null, $lockVersion = null)
  * @method Notification|null findOneBy(array $criteria, array $orderBy = null)
