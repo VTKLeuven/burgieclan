@@ -75,6 +75,4 @@ class Notification
     {
         $this->endTime = $endTime;
     }
-
-
 }
