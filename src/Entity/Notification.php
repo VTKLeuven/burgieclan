@@ -20,8 +20,8 @@ use Doctrine\ORM\Mapping as ORM;
  * See https://symfony.com/doc/current/doctrine.html#creating-an-entity-class.
  */
 #[ORM\Entity]
-#[ORM\Table(name: 'symfony_demo_notification')]
-class Notification
+#[ORM\Table(name: 'notification')]
+class Notification extends Node
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -29,8 +29,6 @@ class Notification
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Assert\NotBlank(message: 'comment.blank')]
-    #[Assert\Length(min: 5, minMessage: 'comment.too_short', max: 10000, maxMessage: 'comment.too_long')]
     private ?string $content = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -38,6 +36,9 @@ class Notification
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private \DateTime $endTime;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $title = null;
 
     public function getId(): ?int
     {
@@ -74,5 +75,17 @@ class Notification
     public function setEndTime(\DateTime $endTime): void
     {
         $this->endTime = $endTime;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(?string $title): static
+    {
+        $this->title = $title;
+
+        return $this;
     }
 }
