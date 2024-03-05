@@ -23,7 +23,8 @@ class DocumentCrudController extends AbstractCrudController
         ->hideOnForm();
         yield DateTimeField::new('updateDate')
         ->hideOnForm();
-        yield BooleanField::new('under_review');
+        yield BooleanField::new('under_review')
+        ->setLabel('Published');
         yield AssociationField::new('category')
         ->autocomplete();
         yield AssociationField::new('course')
