@@ -16,6 +16,7 @@
 
 ###> symfony/phpunit-bridge ###
 .phpunit.result.cache
+.phpcs-cache/
 ###< symfony/phpunit-bridge ###
 
 ###> symfony/webpack-encore-bundle ###
