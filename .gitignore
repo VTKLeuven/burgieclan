@@ -14,11 +14,6 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
-###> symfony/phpunit-bridge ###
-.phpunit.result.cache
-.phpcs-cache/
-###< symfony/phpunit-bridge ###
-
 ###> symfony/webpack-encore-bundle ###
 /node_modules/
 npm-debug.log
@@ -32,9 +27,11 @@ yarn-error.log
 
 ###> phpunit/phpunit ###
 .phpunit.result.cache
+/.phpunit.cache/
 ###< phpunit/phpunit ###
 
 ###> php-cs-fixer/shim ###
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
 ###< php-cs-fixer/shim ###
+
