@@ -7,7 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DocumentCommentRepository::class)]
-class DocumentComment extends Comment
+class DocumentComment extends AbstractComment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
