@@ -6,7 +6,7 @@ use App\Repository\CourseCommentRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CourseCommentRepository::class)]
-class CourseComment extends Comment
+class CourseComment extends AbstractComment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
