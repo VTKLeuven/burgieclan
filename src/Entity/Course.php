@@ -51,9 +51,11 @@ class Course
     #[Assert\Positive]
     private ?int $credits = null;
 
-    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'new_courses')]
-    private Collection $old_courses;
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'newCourses')]
+    private Collection $oldCourses;
 
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'oldCourses')]
+    private Collection $newCourses;
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'old_courses')]
     private Collection $new_courses;
 
@@ -62,6 +64,8 @@ class Course
 
     public function __construct()
     {
+        $this->oldCourses = new ArrayCollection();
+        $this->newCourses = new ArrayCollection();
         $this->old_courses = new ArrayCollection();
         $this->new_courses = new ArrayCollection();
         $this->courseComments = new ArrayCollection();
@@ -142,13 +146,13 @@ class Course
      */
     public function getOldCourses(): Collection
     {
-        return $this->old_courses;
+        return $this->oldCourses;
     }
 
     public function addOldCourse(self $oldCourse): self
     {
-        if (!$this->old_courses->contains($oldCourse)) {
-            $this->old_courses->add($oldCourse);
+        if (!$this->oldCourses->contains($oldCourse)) {
+            $this->oldCourses->add($oldCourse);
             $oldCourse->addNewCourse($this);
         }
 
@@ -157,8 +161,8 @@ class Course
 
     public function removeOldCourse(self $oldCourse): self
     {
-        if ($this->old_courses->removeElement($oldCourse)) {
-            $this->old_courses->removeElement($oldCourse);
+        if ($this->oldCourses->removeElement($oldCourse)) {
+            $this->oldCourses->removeElement($oldCourse);
             $oldCourse->removeNewCourse($this);
         }
         return $this;
@@ -169,13 +173,13 @@ class Course
      */
     public function getNewCourses(): Collection
     {
-        return $this->new_courses;
+        return $this->newCourses;
     }
 
     public function addNewCourse(self $newCourse): self
     {
-        if (!$this->new_courses->contains($newCourse)) {
-            $this->new_courses->add($newCourse);
+        if (!$this->newCourses->contains($newCourse)) {
+            $this->newCourses->add($newCourse);
             $newCourse->addOldCourse($this);
         }
 
@@ -184,8 +188,8 @@ class Course
 
     public function removeNewCourse(self $newCourse): self
     {
-        if ($this->new_courses->removeElement($newCourse)) {
-            $this->new_courses->removeElement($newCourse);
+        if ($this->newCourses->removeElement($newCourse)) {
+            $this->newCourses->removeElement($newCourse);
             $newCourse->removeOldCourse($this);
         }
 
