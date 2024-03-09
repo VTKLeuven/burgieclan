@@ -147,17 +147,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return string
+     * @return AccessToken|null
      */
-    public function getAccesstoken()
+    public function getAccesstoken(): ?AccessToken
     {
-        return $this->accesstoken ? new AccessToken(json_decode($this->accesstoken, true)): null;
+        return $this->accesstoken ? new AccessToken(json_decode($this->accesstoken, true)) : null;
     }
 
     /**
-     * @param array $accesstoken
+     * @param AccessToken|string $accesstoken
      */
-    public function setAccesstoken(AccessToken $accesstoken)
+    public function setAccesstoken(AccessToken|string $accesstoken): void
     {
         $this->accesstoken = json_encode($accesstoken);
     }
