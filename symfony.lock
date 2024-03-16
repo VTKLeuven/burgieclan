@@ -164,18 +164,6 @@
             ".php-cs-fixer.dist.php"
         ]
     },
-    "php-http/discovery": {
-        "version": "1.19",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "1.18",
-            "ref": "f45b5dd173a27873ab19f5e3180b2f661c21de02"
-        },
-        "files": [
-            "config/packages/http_discovery.yaml"
-        ]
-    },
     "phpunit/phpunit": {
         "version": "10.5",
         "recipe": {
@@ -204,18 +192,6 @@
     },
     "psr/log": {
         "version": "1.1.4"
-    },
-    "sentry/sentry-symfony": {
-        "version": "4.13",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "4.6",
-            "ref": "153de5f041f7e8a9c19f3674b800b76be0e6fd90"
-        },
-        "files": [
-            "config/packages/sentry.yaml"
-        ]
     },
     "squizlabs/php_codesniffer": {
         "version": "3.7",
@@ -494,6 +470,20 @@
     },
     "symfony/service-contracts": {
         "version": "v3.0.0"
+    },
+    "symfony/stimulus-bundle": {
+        "version": "2.16",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.13",
+            "ref": "6acd9ff4f7fd5626d2962109bd4ebab351d43c43"
+        },
+        "files": [
+            "assets/bootstrap.js",
+            "assets/controllers.json",
+            "assets/controllers/hello_controller.js"
+        ]
     },
     "symfony/stopwatch": {
         "version": "v6.0.0"
