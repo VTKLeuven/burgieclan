@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -27,7 +25,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
-
 use function Symfony\Component\String\u;
 
 /**
@@ -86,7 +83,8 @@ final class AddUserCommand extends Command
                 null,
                 InputOption::VALUE_NONE,
                 'If set, the user is created as an administrator'
-            );
+            )
+        ;
     }
 
     /**
@@ -113,8 +111,8 @@ final class AddUserCommand extends Command
      */
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
-        if (null !== $input->getArgument('username') && null !== $input->getArgument('password')
-            && null !== $input->getArgument('email') && null !== $input->getArgument('full-name')) {
+        if (null !== $input->getArgument('username') && null !== $input->getArgument('password') &&
+            null !== $input->getArgument('email') && null !== $input->getArgument('full-name')) {
             return;
         }
 

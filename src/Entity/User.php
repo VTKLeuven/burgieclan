@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -14,6 +12,8 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use League\OAuth2\Client\Token\AccessToken;
@@ -74,6 +74,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private $accesstoken;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Node::class)]
+    private Collection $nodes;
+
+    public function __construct()
+    {
+        $this->nodes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -159,7 +167,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @param array $accesstoken
      */
-    public function setAccesstoken(AccessToken $accesstoken): void
+    public function setAccesstoken(AccessToken $accesstoken)
     {
         $this->accesstoken = json_encode($accesstoken);
     }
@@ -217,6 +225,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public static function getAvailableRoles(): array
     {
-        return [self::ROLE_USER, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN];
+        return array(self::ROLE_USER, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN);
     }
 }

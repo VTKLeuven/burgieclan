@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -88,7 +86,8 @@ final class ListUsersCommand extends Command
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'If set, the result is sent to the given email address'
-            );
+            )
+        ;
     }
 
     /**

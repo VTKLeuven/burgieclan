@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -61,16 +59,16 @@ final class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route('/login/litus', name: 'login_litus')]
-    public function loginLitus(Request $request, ClientRegistry $clientRegistry): void
+    #[Route("/login/litus", name: "login_litus")]
+    public function loginLitus(Request $request, ClientRegistry $clientRegistry)
     {
-        // This is handled in the LitusAuthenticator
+        //This is handled in the LitusAuthenticator
     }
 
-    #[Route('/login/litus/start', name: 'login_litus_start')]
+    #[Route("/login/litus/start", name: "login_litus_start")]
     public function loginLitusStart(ClientRegistry $clientRegistry): RedirectResponse
     {
-        return $clientRegistry->getClient('litus')->redirect();
+        return $clientRegistry->getClient("litus")->redirect();
     }
 
     /**
