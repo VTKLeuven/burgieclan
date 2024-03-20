@@ -14,6 +14,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use App\Controller\Admin\DocumentCrudController;
+use App\Controller\Admin\DocumentPendingCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -59,6 +61,11 @@ class DashboardController extends AbstractDashboardController
             ->setSubItems([
             MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class),
             MenuItem::linkToCrud('Documents', 'fa fa-file', Document::class)
+            ->setController(DocumentCrudController::class),
+            MenuItem::linkToCrud('Pending Documents', 'fa-regular fa-file', Document::class)
+            ->setPermission('ROLE_ADMIN')
+            ->setController(DocumentPendingCrudController::class),
+
         ]);
 
         yield MenuItem::section('Frontend');
