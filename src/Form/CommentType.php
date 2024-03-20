@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -40,8 +42,7 @@ final class CommentType extends AbstractType
         $builder
             ->add('content', TextareaType::class, [
                 'help' => 'help.comment_content',
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

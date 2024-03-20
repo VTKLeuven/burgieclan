@@ -1,3 +1,5 @@
+imports:
+    - { resource: vendor/phpro/symfony-conventions/grumphp-convention.yml }
 parameters:
     # Project preferences
     commit_project_names: "(BUR)" # The prefix(es) of the jira project.
@@ -11,6 +13,15 @@ parameters:
 
 grumphp:
     tasks:
+        phpunit:
+            metadata:
+                enabled: true
+            config_file: phpunit.xml
+            testsuite: BurgieclanTests
+            group: [ ]
+            exclude_group: [ ]
+            always_execute: true
+            order: null
         git_blacklist:
             keywords:
                 - "die("

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -34,6 +36,8 @@ final class PostVoter extends Voter
 
     /**
      * @phpstan-param object $subject
+     *
+     * @param mixed $subject
      */
     protected function supports(string $attribute, $subject): bool
     {

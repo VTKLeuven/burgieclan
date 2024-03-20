@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -42,15 +44,17 @@ class UserRepository extends ServiceEntityRepository
 
     /**
      * @param LitusResourceOwner $litusUser
-     * @param AccessToken $accessToken
-     * @return User
+     * @param AccessToken        $accessToken
+     *
      * @throws AuthenticationException
+     *
+     * @return User
      */
     public function createUserFromLitusUser(LitusResourceOwner $litusUser, AccessToken $accessToken): User
     {
-        $user = $this->findOneBy(["username" => $litusUser->getUsername()]);
+        $user = $this->findOneBy(['username' => $litusUser->getUsername()]);
         if (null === $user) {
-            $user = $this->findOneBy(["email" => $litusUser->getEmail()]);
+            $user = $this->findOneBy(['email' => $litusUser->getEmail()]);
             if ($user) {
                 // Person trying to create an account has the same email as an existing user -> not allowed.
                 throw new AuthenticationException();

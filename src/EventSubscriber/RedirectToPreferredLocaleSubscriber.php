@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -16,6 +18,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
 use function Symfony\Component\String\u;
 
 /**
@@ -37,7 +40,7 @@ final class RedirectToPreferredLocaleSubscriber implements EventSubscriberInterf
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
         string $locales,
-        string $defaultLocale = null
+        ?string $defaultLocale = null
     ) {
         $this->locales = explode('|', trim($locales));
         if (empty($this->locales)) {

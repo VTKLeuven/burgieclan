@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Security;
 
 use App\OauthProvider\LitusResourceOwner;
@@ -13,8 +15,8 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 class LitusAuthenticator extends OAuth2Authenticator implements AuthenticationEntryPointInterface
 {
@@ -25,20 +27,21 @@ class LitusAuthenticator extends OAuth2Authenticator implements AuthenticationEn
     ) {
     }
 
-    public function start(Request $request, AuthenticationException $authException = null): RedirectResponse
+    public function start(Request $request, ?AuthenticationException $authException = null): RedirectResponse
     {
-        return new RedirectResponse($this->router->generate("login_litus_start"), Response::HTTP_TEMPORARY_REDIRECT);
+        return new RedirectResponse($this->router->generate('login_litus_start'), Response::HTTP_TEMPORARY_REDIRECT);
     }
 
     public function supports(Request $request): ?bool
     {
-        return $request->attributes->get("_route") === "login_litus";
+        return 'login_litus' === $request->attributes->get('_route');
     }
 
     public function authenticate(Request $request): SelfValidatingPassport
     {
-        $client = $this->clientRegistry->getClient("litus");
+        $client = $this->clientRegistry->getClient('litus');
         $accessToken = $this->fetchAccessToken($client);
+
         return new SelfValidatingPassport(
             new UserBadge($accessToken->getToken(), function () use ($accessToken, $client) {
                 /** @var LitusResourceOwner $litusUser */
@@ -52,12 +55,14 @@ class LitusAuthenticator extends OAuth2Authenticator implements AuthenticationEn
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         $targetUrl = $this->router->generate('blog_index');
+
         return new RedirectResponse($targetUrl);
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $this->saveAuthenticationErrorToSession($request, $exception);
+
         return new RedirectResponse($this->router->generate('security_login'));
     }
 }
