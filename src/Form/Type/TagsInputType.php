@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -45,7 +43,8 @@ final class TagsInputType extends AbstractType
             // but here we're doing the transformation in two steps (Collection <-> array <-> string)
             // and reuse the existing CollectionToArrayTransformer.
             ->addModelTransformer(new CollectionToArrayTransformer(), true)
-            ->addModelTransformer(new TagArrayToStringTransformer($this->tags), true);
+            ->addModelTransformer(new TagArrayToStringTransformer($this->tags), true)
+        ;
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options): void

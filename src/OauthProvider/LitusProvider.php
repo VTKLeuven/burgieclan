@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\OauthProvider;
 
 use App\OauthProvider\Exception\LitusIdentityProviderException;
+use InvalidArgumentException;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
@@ -16,22 +15,20 @@ class LitusProvider extends AbstractProvider
     use BearerAuthorizationTrait;
 
     /**
-     * Authorize url.
+     * Authorize url
      *
      * @var string
      */
     public string $urlAuthorize;
 
     /**
-     * Access token url.
-     *
+     * Access token url
      * @var string
      */
     public string $urlAccessToken;
 
     /**
-     * Resource owner details.
-     *
+     * Resource owner details
      * @var string
      */
     public string $urlResourceOwnerDetails;
@@ -50,19 +47,17 @@ class LitusProvider extends AbstractProvider
     /**
      * Verifies that all required options have been passed.
      *
-     * @param array $options
-     *
-     * @throws \InvalidArgumentException
-     *
+     * @param  array $options
      * @return void
+     * @throws InvalidArgumentException
      */
     private function assertRequiredOptions(array $options): void
     {
         $missing = array_diff_key(array_flip($this->getRequiredOptions()), $options);
 
         if (!empty($missing)) {
-            throw new \InvalidArgumentException(
-                'Required options not defined: '.implode(', ', array_keys($missing))
+            throw new InvalidArgumentException(
+                'Required options not defined: ' . implode(', ', array_keys($missing))
             );
         }
     }
@@ -82,7 +77,7 @@ class LitusProvider extends AbstractProvider
     }
 
     /**
-     * Get authorization URL to begin OAuth flow.
+     * Get authorization URL to begin OAuth flow
      *
      * @return string
      */
@@ -92,10 +87,9 @@ class LitusProvider extends AbstractProvider
     }
 
     /**
-     * Get access token URL to retrieve token.
+     * Get access token URL to retrieve token
      *
-     * @param array $params
-     *
+     * @param  array $params
      * @return string
      */
     public function getBaseAccessTokenUrl(array $params): string
@@ -104,10 +98,9 @@ class LitusProvider extends AbstractProvider
     }
 
     /**
-     * Get provider URL to retrieve user details.
+     * Get provider URL to retrieve user details
      *
-     * @param AccessToken $token
-     *
+     * @param  AccessToken $token
      * @return string
      */
     public function getResourceOwnerDetailsUrl(AccessToken $token): string
@@ -143,12 +136,11 @@ class LitusProvider extends AbstractProvider
     /**
      * Check a provider response for errors.
      *
-     * @param ResponseInterface $response
-     * @param array             $data     Parsed response data
+     * @param  ResponseInterface $response
+     * @param  array $data Parsed response data
+     * @return void
      *
      * @throws IdentityProviderException
-     *
-     * @return void
      */
     protected function checkResponse(ResponseInterface $response, $data): void
     {
@@ -160,9 +152,8 @@ class LitusProvider extends AbstractProvider
     /**
      * Generate a user object from a successful user details request.
      *
-     * @param array       $response
-     * @param AccessToken $token
-     *
+     * @param  array $response
+     * @param  AccessToken $token
      * @return LitusResourceOwner
      */
     protected function createResourceOwner(array $response, AccessToken $token): LitusResourceOwner
@@ -172,6 +163,6 @@ class LitusProvider extends AbstractProvider
 
     protected function getAuthorizationHeaders($token = null): array
     {
-        return ['Authorization' => 'Bearer '.$token];
+        return ['Authorization' => 'Bearer ' . $token];
     }
 }
