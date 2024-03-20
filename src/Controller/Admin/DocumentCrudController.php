@@ -23,7 +23,6 @@ class DocumentCrudController extends AbstractCrudController
     {
         return $actions
         ->disable(Action::NEW);
-
     }
 
     public function configureFields(string $pageName): iterable
@@ -34,7 +33,8 @@ class DocumentCrudController extends AbstractCrudController
         yield DateTimeField::new('updateDate')
         ->hideOnForm();
         yield BooleanField::new('under_review')
-        ->setLabel('Published');
+        ->setLabel('Published')
+        ->renderAsSwitch(false);
         yield AssociationField::new('category')
         ->autocomplete();
         yield AssociationField::new('course')
