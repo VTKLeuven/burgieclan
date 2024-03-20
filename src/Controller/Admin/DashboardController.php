@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\PostCrudController;
 use App\Entity\Comment;
+use App\Entity\Course;
 use App\Entity\Post;
 use App\Entity\Tag;
 use App\Entity\User;
@@ -49,6 +50,7 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linktoDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Users', 'fa fa-users', User::class);
+        yield MenuItem::linkToCrud('Courses', 'fa fa-book', Course::class);
         yield MenuItem::linkToCrud('Blog Posts', 'fa fa-file-text-o', Post::class);
         yield MenuItem::linkToCrud('Comments', 'far fa-comments', Comment::class);
         yield MenuItem::linkToCrud('Tags', 'fas fa-tags', Tag::class);
