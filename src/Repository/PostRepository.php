@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -18,7 +16,6 @@ use App\Entity\Tag;
 use App\Pagination\Paginator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-
 use function Symfony\Component\String\u;
 
 /**
@@ -42,7 +39,7 @@ class PostRepository extends ServiceEntityRepository
         parent::__construct($registry, Post::class);
     }
 
-    public function findLatest(int $page = 1, ?Tag $tag = null): Paginator
+    public function findLatest(int $page = 1, Tag $tag = null): Paginator
     {
         $qb = $this->createQueryBuilder('p')
             ->addSelect('a', 't')
@@ -50,7 +47,8 @@ class PostRepository extends ServiceEntityRepository
             ->leftJoin('p.tags', 't')
             ->where('p.publishedAt <= :now')
             ->orderBy('p.publishedAt', 'DESC')
-            ->setParameter('now', new \DateTime());
+            ->setParameter('now', new \DateTime())
+        ;
 
         if (null !== $tag) {
             $qb->andWhere(':tag MEMBER OF p.tags')
@@ -76,7 +74,8 @@ class PostRepository extends ServiceEntityRepository
         foreach ($searchTerms as $key => $term) {
             $queryBuilder
                 ->orWhere('p.title LIKE :t_'.$key)
-                ->setParameter('t_'.$key, '%'.$term.'%');
+                ->setParameter('t_'.$key, '%'.$term.'%')
+            ;
         }
 
         /** @var Post[] $result */
@@ -84,7 +83,8 @@ class PostRepository extends ServiceEntityRepository
             ->orderBy('p.publishedAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
 
         return $result;
     }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -48,7 +46,8 @@ final class UserType extends AbstractType
             ])
             ->add('email', EmailType::class, [
                 'label' => 'label.email',
-            ]);
+            ])
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

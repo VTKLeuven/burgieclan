@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\OauthProvider\Exception;
 
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
@@ -10,11 +8,10 @@ use Psr\Http\Message\ResponseInterface;
 class LitusIdentityProviderException extends IdentityProviderException
 {
     /**
-     * Creates client exception from response.
+     * Creates client exception from response
      *
      * @param ResponseInterface $response
-     * @param array             $data     Parsed response data
-     *
+     * @param array $data Parsed response data
      * @return IdentityProviderException
      */
     public static function clientException(ResponseInterface $response, array $data): IdentityProviderException
@@ -26,15 +23,14 @@ class LitusIdentityProviderException extends IdentityProviderException
     }
 
     /**
-     * Creates identity exception from response.
+     * Creates identity exception from response
      *
      * @param ResponseInterface $response
-     * @param string|null       $message
-     *
+     * @param string|null $message
      * @return IdentityProviderException
      */
-    protected static function fromResponse(ResponseInterface $response, ?string $message = null)
+    protected static function fromResponse(ResponseInterface $response, string $message = null)
     {
-        return new static($message, $response->getStatusCode(), (string) $response->getBody());
+        return new static($message, $response->getStatusCode(), (string)$response->getBody());
     }
 }

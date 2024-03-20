@@ -152,18 +152,6 @@
     "nikic/php-parser": {
         "version": "v4.13.2"
     },
-    "php-cs-fixer/shim": {
-        "version": "3.49",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "3.0",
-            "ref": "16422bf8eac6c3be42afe07d37e2abc89d2bdf6b"
-        },
-        "files": [
-            ".php-cs-fixer.dist.php"
-        ]
-    },
     "php-http/discovery": {
         "version": "1.19",
         "recipe": {
@@ -176,8 +164,11 @@
             "config/packages/http_discovery.yaml"
         ]
     },
+    "phpstan/phpstan": {
+        "version": "1.2.0"
+    },
     "phpunit/phpunit": {
-        "version": "10.5",
+        "version": "9.6",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",

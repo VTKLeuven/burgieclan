@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -17,7 +15,6 @@ use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TemplateWrapper;
 use Twig\TwigFunction;
-
 use function Symfony\Component\String\u;
 
 /**
@@ -154,19 +151,15 @@ final class SourceCodeExtension extends AbstractExtension
         $codeLines = u($code)->split("\n");
 
         $indentedOrBlankLines = array_filter($codeLines, static function ($lineOfCode) {
-            $lineOfCode = (string) $lineOfCode;
-
-            return (string) u($lineOfCode)->isEmpty() || (string) u($lineOfCode)->startsWith('    ');
+            return u($lineOfCode)->isEmpty() || u($lineOfCode)->startsWith('    ');
         });
 
         $codeIsIndented = \count($indentedOrBlankLines) === \count($codeLines);
         if ($codeIsIndented) {
             $unindentedLines = array_map(static function ($lineOfCode) {
-                $lineOfCode = (string) $lineOfCode;
-
-                return (string) u($lineOfCode)->after('    ');
+                return u($lineOfCode)->after('    ');
             }, $codeLines);
-            $code = (string) u("\n")->join($unindentedLines)->toString();
+            $code = u("\n")->join($unindentedLines)->toString();
         }
 
         return $code;
