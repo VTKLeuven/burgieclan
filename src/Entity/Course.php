@@ -62,8 +62,8 @@ class Course
 
     public function __construct()
     {
-        $this->old_courses = new ArrayCollection();
-        $this->new_courses = new ArrayCollection();
+        $this->oldCourses = new ArrayCollection();
+        $this->newCourses = new ArrayCollection();
         $this->courseComments = new ArrayCollection();
         $this->modules = new ArrayCollection();
     }
