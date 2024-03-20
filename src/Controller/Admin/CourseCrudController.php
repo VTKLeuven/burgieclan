@@ -34,10 +34,10 @@ class CourseCrudController extends AbstractCrudController
             ->renderExpanded()
             ->setTemplatePath('admin/field/semesters.html.twig');
         yield IntegerField::new('credits');
-        yield AssociationField::new('old_courses')
+        yield AssociationField::new('oldCourses')
             ->autocomplete()
             ->setFormTypeOption('by_reference', false);
-        yield AssociationField::new('new_courses')
+        yield AssociationField::new('newCourses')
             ->autocomplete()
             ->setFormTypeOption('by_reference', false);
     }
