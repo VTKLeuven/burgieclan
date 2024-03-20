@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -60,7 +58,8 @@ final class ChangePasswordType extends AbstractType
                 'second_options' => [
                     'label' => 'label.new_password_confirm',
                 ],
-            ]);
+            ])
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

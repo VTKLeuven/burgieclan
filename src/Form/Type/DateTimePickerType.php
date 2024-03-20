@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -16,7 +14,6 @@ namespace App\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use function Symfony\Component\String\u;
 
 /**
@@ -42,7 +39,7 @@ final class DateTimePickerType extends AbstractType
                 'class' => 'flatpickr',
                 // Attributes for flatpickr usage
                 'data-flatpickr-class' => 'standard',
-                'data-date-locale' => (string) u(\Locale::getDefault())->replace('_', '-')->lower(),
+                'data-date-locale' => u(\Locale::getDefault())->replace('_', '-')->lower(),
                 'data-date-format' => 'Y-m-d H:i',
             ],
             'format' => 'yyyy-MM-dd HH:mm',
