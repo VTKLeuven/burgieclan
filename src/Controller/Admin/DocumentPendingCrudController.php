@@ -15,15 +15,18 @@ use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 
-
 class DocumentPendingCrudController extends DocumentCrudController
 {
     public static function getEntityFqcn(): string
     {
         return Document::class;
     }
-    public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
-    {
+    public function createIndexQueryBuilder(
+        SearchDto $searchDto,
+        EntityDto $entityDto,
+        FieldCollection $fields,
+        FilterCollection $filters
+    ): QueryBuilder {
         return parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters)
             ->andWhere('entity.under_review = :approved')
             ->setParameter('approved', false);
@@ -36,8 +39,6 @@ class DocumentPendingCrudController extends DocumentCrudController
         ->hideOnForm();
         yield DateTimeField::new('updateDate')
         ->hideOnForm();
-        yield BooleanField::new('under_review')
-        ->setLabel('Published');
         yield AssociationField::new('category')
         ->autocomplete();
         yield AssociationField::new('course')
