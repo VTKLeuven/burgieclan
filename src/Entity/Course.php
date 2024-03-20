@@ -57,10 +57,14 @@ class Course
     #[ORM\ManyToMany(targetEntity: Module::class, mappedBy: 'courses')]
     private Collection $modules;
 
+    #[ORM\OneToMany(mappedBy: 'course', targetEntity: CourseComment::class, orphanRemoval: true)]
+    private Collection $courseComments;
+
     public function __construct()
     {
         $this->old_courses = new ArrayCollection();
         $this->new_courses = new ArrayCollection();
+        $this->courseComments = new ArrayCollection();
         $this->modules = new ArrayCollection();
     }
 
@@ -190,6 +194,24 @@ class Course
     }
 
     /**
+     * @return Collection<int, CourseComment>
+     */
+    public function getCourseComments(): Collection
+    {
+        return $this->courseComments;
+    }
+
+    public function addCourseComment(CourseComment $courseComment): self
+    {
+        if (!$this->courseComments->contains($courseComment)) {
+            $this->courseComments->add($courseComment);
+            $courseComment->setCourse($this);
+        }
+
+        return $this;
+    }
+
+    /** 
      * @return Collection<int, Module>
      */
     public function getModules(): Collection
@@ -207,6 +229,16 @@ class Course
         return $this;
     }
 
+    public function removeCourseComment(CourseComment $courseComment): self
+    {
+        if ($this->courseComments->removeElement($courseComment)) {
+            // set the owning side to null (unless already changed)
+            if ($courseComment->getCourse() === $this) {
+                $courseComment->setCourse(null);
+            }
+        return $this;
+    }
+  
     public function removeModule(Module $module): self
     {
         if ($this->modules->removeElement($module)) {

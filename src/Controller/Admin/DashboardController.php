@@ -2,8 +2,8 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Comment;
 use App\Entity\Course;
+use App\Entity\CourseComment;
 use App\Entity\CommentCategory;
 use App\Entity\Module;
 use App\Entity\Post;
@@ -56,7 +56,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Programs', 'fa fa-briefcase', Program::class);
         yield MenuItem::linkToCrud('Modules', 'fa fa-folder', Module::class);
         yield MenuItem::linkToCrud('Blog Posts', 'fa fa-file-text-o', Post::class);
-        yield MenuItem::linkToCrud('Comments', 'far fa-comments', Comment::class);
+        yield MenuItem::linkToCrud('Comments', 'far fa-comments', CourseComment::class);
         yield MenuItem::linkToCrud('Categories', 'fas fa-tags', CommentCategory::class);
 
         yield MenuItem::section('Frontend');
