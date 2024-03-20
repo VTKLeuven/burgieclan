@@ -211,7 +211,7 @@ class Course
         return $this;
     }
 
-    /** 
+    /**
      * @return Collection<int, Module>
      */
     public function getModules(): Collection
@@ -236,6 +236,8 @@ class Course
             if ($courseComment->getCourse() === $this) {
                 $courseComment->setCourse(null);
             }
+        }
+
         return $this;
     }
   
