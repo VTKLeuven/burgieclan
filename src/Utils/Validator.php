@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -14,7 +12,6 @@ declare(strict_types=1);
 namespace App\Utils;
 
 use Symfony\Component\Console\Exception\InvalidArgumentException;
-
 use function Symfony\Component\String\u;
 
 /**
