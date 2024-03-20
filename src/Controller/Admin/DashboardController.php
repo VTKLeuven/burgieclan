@@ -1,9 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\PostCrudController;
 use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\Tag;
