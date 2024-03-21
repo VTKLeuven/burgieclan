@@ -19,11 +19,12 @@ class DocumentCrudController extends AbstractCrudController
         return Document::class;
     }
 
-    public function configureActions(Actions $actions): Actions
-    {
-        return $actions
-        ->disable(Action::NEW);
-    }
+//    COMMENTED BECAUSE NICE TO HAVE FOR TESTING
+//    public function configureActions(Actions $actions): Actions
+//    {
+//        return $actions
+//        ->disable(Action::NEW);
+//    }
 
     public function configureFields(string $pageName): iterable
     {

@@ -41,7 +41,8 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->displayAsButton();
 
         return parent::configureActions($actions)
-            ->add(Crud::PAGE_INDEX, $approveAction);
+            ->add(Crud::PAGE_INDEX, $approveAction)
+            ->disable(Action::NEW);
     }
 
     public function createIndexQueryBuilder(
@@ -73,8 +74,12 @@ class DocumentPendingCrudController extends DocumentCrudController
         yield AssociationField::new('course')
         ->autocomplete();
     }
-    public function approve(AdminContext $adminContext, EntityManagerInterface $entityManagerInterface, AdminUrlGenerator $adminUrlGenerator)
-    {
+    
+    public function approve(
+        AdminContext $adminContext,
+        EntityManagerInterface $entityManagerInterface,
+        AdminUrlGenerator $adminUrlGenerator
+    ) {
         $document = $adminContext->getEntity()->getInstance();
         if (!$document instanceof Document) {
             throw new \LogicException('Entity is missing or not a Document');
@@ -88,6 +93,6 @@ class DocumentPendingCrudController extends DocumentCrudController
         ->setAction(Crud::PAGE_EDIT)
         ->setEntityId($document->getId())
         ->generateUrl();
-    return $this->redirect($targetUrl);
+        return $this->redirect($targetUrl);
     }
 }
