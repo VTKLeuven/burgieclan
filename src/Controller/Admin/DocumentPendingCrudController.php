@@ -4,13 +4,11 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Document;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-
 
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -23,6 +21,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class DocumentPendingCrudController extends DocumentCrudController
 {
@@ -79,7 +78,7 @@ class DocumentPendingCrudController extends DocumentCrudController
         AdminContext $adminContext,
         EntityManagerInterface $entityManagerInterface,
         AdminUrlGenerator $adminUrlGenerator
-    ) {
+    ): RedirectResponse {
         $document = $adminContext->getEntity()->getInstance();
         if (!$document instanceof Document) {
             throw new \LogicException('Entity is missing or not a Document');
