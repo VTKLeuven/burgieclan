@@ -56,8 +56,6 @@ class Course
 
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'oldCourses')]
     private Collection $newCourses;
-    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'old_courses')]
-    private Collection $new_courses;
 
     #[ORM\OneToMany(mappedBy: 'course', targetEntity: CourseComment::class, orphanRemoval: true)]
     private Collection $courseComments;
@@ -66,8 +64,6 @@ class Course
     {
         $this->oldCourses = new ArrayCollection();
         $this->newCourses = new ArrayCollection();
-        $this->old_courses = new ArrayCollection();
-        $this->new_courses = new ArrayCollection();
         $this->courseComments = new ArrayCollection();
     }
 
