@@ -39,9 +39,6 @@ class Course
     private ?string $code = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
-    private array $modules = [];
-
-    #[ORM\Column(type: Types::JSON, nullable: true)]
     private array $professors = [];
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
@@ -51,20 +48,24 @@ class Course
     #[Assert\Positive]
     private ?int $credits = null;
 
-    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'new_courses')]
-    private Collection $old_courses;
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'newCourses')]
+    private Collection $oldCourses;
 
-    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'old_courses')]
-    private Collection $new_courses;
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'oldCourses')]
+    private Collection $newCourses;
+
+    #[ORM\ManyToMany(targetEntity: Module::class, mappedBy: 'courses')]
+    private Collection $modules;
 
     #[ORM\OneToMany(mappedBy: 'course', targetEntity: CourseComment::class, orphanRemoval: true)]
     private Collection $courseComments;
 
     public function __construct()
     {
-        $this->old_courses = new ArrayCollection();
-        $this->new_courses = new ArrayCollection();
+        $this->oldCourses = new ArrayCollection();
+        $this->newCourses = new ArrayCollection();
         $this->courseComments = new ArrayCollection();
+        $this->modules = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -89,12 +90,12 @@ class Course
         return $this;
     }
 
-    public function getModules(): array
+    public function getModules(): Collection
     {
         return $this->modules;
     }
 
-    public function setModules(?array $modules): self
+    public function setModules(?Collection $modules): self
     {
         $this->modules = $modules;
 
@@ -142,13 +143,13 @@ class Course
      */
     public function getOldCourses(): Collection
     {
-        return $this->old_courses;
+        return $this->oldCourses;
     }
 
     public function addOldCourse(self $oldCourse): self
     {
-        if (!$this->old_courses->contains($oldCourse)) {
-            $this->old_courses->add($oldCourse);
+        if (!$this->oldCourses->contains($oldCourse)) {
+            $this->oldCourses->add($oldCourse);
             $oldCourse->addNewCourse($this);
         }
 
@@ -157,8 +158,8 @@ class Course
 
     public function removeOldCourse(self $oldCourse): self
     {
-        if ($this->old_courses->removeElement($oldCourse)) {
-            $this->old_courses->removeElement($oldCourse);
+        if ($this->oldCourses->removeElement($oldCourse)) {
+            $this->oldCourses->removeElement($oldCourse);
             $oldCourse->removeNewCourse($this);
         }
         return $this;
@@ -169,13 +170,13 @@ class Course
      */
     public function getNewCourses(): Collection
     {
-        return $this->new_courses;
+        return $this->newCourses;
     }
 
     public function addNewCourse(self $newCourse): self
     {
-        if (!$this->new_courses->contains($newCourse)) {
-            $this->new_courses->add($newCourse);
+        if (!$this->newCourses->contains($newCourse)) {
+            $this->newCourses->add($newCourse);
             $newCourse->addOldCourse($this);
         }
 
@@ -184,8 +185,8 @@ class Course
 
     public function removeNewCourse(self $newCourse): self
     {
-        if ($this->new_courses->removeElement($newCourse)) {
-            $this->new_courses->removeElement($newCourse);
+        if ($this->newCourses->removeElement($newCourse)) {
+            $this->newCourses->removeElement($newCourse);
             $newCourse->removeOldCourse($this);
         }
 
@@ -222,6 +223,16 @@ class Course
         return $this;
     }
 
+    public function addModule(Module $module): self
+    {
+        if (!$this->modules->contains($module)) {
+            $this->modules->add($module);
+            $module->addCourse($this);
+        }
+
+        return $this;
+    }
+
     public function removeCourseComment(CourseComment $courseComment): self
     {
         if ($this->courseComments->removeElement($courseComment)) {
@@ -229,6 +240,15 @@ class Course
             if ($courseComment->getCourse() === $this) {
                 $courseComment->setCourse(null);
             }
+        }
+
+        return $this;
+    }
+
+    public function removeModule(Module $module): self
+    {
+        if ($this->modules->removeElement($module)) {
+            $module->removeCourse($this);
         }
 
         return $this;
