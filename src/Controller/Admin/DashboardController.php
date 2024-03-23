@@ -70,13 +70,13 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Documents', 'fa-solid fa-file')
             ->setSubItems([
             MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class),
-            MenuItem::linkToCrud('Comments', 'fa-solid fa-comments', DocumentComment::class)
+            MenuItem::linkToCrud('Comments', 'fa-solid fa-comments', DocumentComment::class),
             MenuItem::linkToCrud('Documents', 'fa fa-file', Document::class)
             ->setController(DocumentCrudController::class),
             MenuItem::linkToCrud('Pending Documents', 'fa-regular fa-file', Document::class)
             ->setPermission('ROLE_ADMIN')
             ->setController(DocumentPendingCrudController::class),
-        ]);
+                ]);
 
         yield MenuItem::section('Frontend');
         yield MenuItem::linkToUrl('Home', 'fa fa-window-maximize', '/');
