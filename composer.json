@@ -16,36 +16,37 @@
         "php": ">=8.1",
         "ext-pdo_sqlite": "*",
         "doctrine/dbal": "^3.1",
-        "doctrine/doctrine-bundle": "^2.8",
-        "doctrine/doctrine-migrations-bundle": "^3.0",
-        "doctrine/orm": "^2.11",
+        "doctrine/doctrine-bundle": "^2.11",
+        "doctrine/doctrine-migrations-bundle": "^3.3",
+        "doctrine/orm": "^2.16",
         "easycorp/easyadmin-bundle": "^4.8",
         "knpuniversity/oauth2-client-bundle": "^2.18",
         "league/commonmark": "^2.1",
         "sentry/sentry-symfony": "^4.13",
         "symfony/apache-pack": "^1.0",
-        "symfony/asset": "^6.3",
-        "symfony/console": "^6.3",
-        "symfony/dotenv": "^6.3",
-        "symfony/expression-language": "^6.3",
-        "symfony/flex": "^2.0",
-        "symfony/form": "^6.3",
-        "symfony/framework-bundle": "^6.3",
-        "symfony/html-sanitizer": "^6.3",
-        "symfony/http-client": "^6.3",
-        "symfony/intl": "^6.3",
-        "symfony/mailer": "^6.3",
+        "symfony/asset": "^6.4",
+        "symfony/console": "^6.4",
+        "symfony/dotenv": "^6.4",
+        "symfony/expression-language": "^6.4",
+        "symfony/flex": "^2",
+        "symfony/form": "^6.4",
+        "symfony/framework-bundle": "^6.4",
+        "symfony/html-sanitizer": "^6.4",
+        "symfony/http-client": "^6.4",
+        "symfony/intl": "^6.4",
+        "symfony/mailer": "^6.4",
         "symfony/monolog-bundle": "^3.7",
         "symfony/polyfill-intl-messageformatter": "^1.12",
-        "symfony/runtime": "^6.3",
-        "symfony/security-bundle": "^6.3",
-        "symfony/string": "^6.3",
-        "symfony/translation": "^6.3",
-        "symfony/twig-bundle": "^6.3",
+        "symfony/runtime": "^6.4",
+        "symfony/security-bundle": "^6.4",
+        "symfony/stimulus-bundle": "^2.16",
+        "symfony/string": "^6.4",
+        "symfony/translation": "^6.4",
+        "symfony/twig-bundle": "^6.4",
         "symfony/ux-live-component": "^2.6",
-        "symfony/validator": "^6.3",
-        "symfony/webpack-encore-bundle": "^1.13",
-        "symfony/yaml": "^6.3",
+        "symfony/validator": "^6.4",
+        "symfony/webpack-encore-bundle": "^2.1",
+        "symfony/yaml": "^6.4",
         "twig/extra-bundle": "^3.3",
         "twig/intl-extra": "^3.3",
         "twig/markdown-extra": "^3.3"
@@ -60,13 +61,13 @@
         "phpstan/phpstan-symfony": "^1.2",
         "phpunit/phpunit": "^9.5",
         "squizlabs/php_codesniffer": "^3.7",
-        "symfony/browser-kit": "^6.3",
-        "symfony/css-selector": "^6.3",
-        "symfony/debug-bundle": "^6.3",
+        "symfony/browser-kit": "^6.4",
+        "symfony/css-selector": "^6.4",
+        "symfony/debug-bundle": "^6.4",
         "symfony/maker-bundle": "^1.36",
-        "symfony/phpunit-bridge": "^6.3",
-        "symfony/stopwatch": "^6.3",
-        "symfony/web-profiler-bundle": "^6.3"
+        "symfony/phpunit-bridge": "^6.4",
+        "symfony/stopwatch": "^6.4",
+        "symfony/web-profiler-bundle": "^6.4"
     },
     "config": {
         "allow-plugins": {
@@ -77,7 +78,7 @@
             "php-http/discovery": true
         },
         "platform": {
-            "php": "8.1.0"
+            "php": "8.1"
         },
         "preferred-install": {
             "*": "dist"
@@ -109,7 +110,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": true,
-            "require": "6.3"
+            "require": "6.4.*"
         }
     }
 }

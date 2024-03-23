@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Course;
 use App\Repository\CourseRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -24,22 +25,19 @@ class CourseCrudController extends AbstractCrudController
         yield IdField::new('id')->onlyOnDetail();
         yield TextField::new('name');
         yield TextField::new('code');
-        yield ChoiceField::new('modules')
-            ->setChoices(array('Module 1', 'Module 2', 'Module 3'))
-            ->allowMultipleChoices();   // TODO: change to autocomplete with module association
-        yield ChoiceField::new('professors')
-            ->setChoices(array('Professor 1', 'Professor 2', 'Professor 3'))
-            ->allowMultipleChoices();   // TODO: change to list autocomplete with all professors
+        yield AssociationField::new('modules')
+            ->setFormTypeOption('by_reference', false);
+        yield ArrayField::new('professors');
         yield ChoiceField::new('semesters')
             ->setChoices(Course::SEMESTERS)
             ->allowMultipleChoices()
             ->renderExpanded()
             ->setTemplatePath('admin/field/semesters.html.twig');
         yield IntegerField::new('credits');
-        yield AssociationField::new('old_courses')
+        yield AssociationField::new('oldCourses')
             ->autocomplete()
             ->setFormTypeOption('by_reference', false);
-        yield AssociationField::new('new_courses')
+        yield AssociationField::new('newCourses')
             ->autocomplete()
             ->setFormTypeOption('by_reference', false);
         yield AssociationField::new('courseComments')

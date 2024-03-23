@@ -1,3 +1,4 @@
+import './bootstrap.js';
 import './styles/app.scss';
 
 // loads the Bootstrap plugins
