@@ -39,9 +39,6 @@ class Course
     private ?string $code = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
-    private array $modules = [];
-
-    #[ORM\Column(type: Types::JSON, nullable: true)]
     private array $professors = [];
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
@@ -93,12 +90,12 @@ class Course
         return $this;
     }
 
-    public function getModules(): array
+    public function getModules(): Collection
     {
         return $this->modules;
     }
 
-    public function setModules(?array $modules): self
+    public function setModules(?Collection $modules): self
     {
         $this->modules = $modules;
 
