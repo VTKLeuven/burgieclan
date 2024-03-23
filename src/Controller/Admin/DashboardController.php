@@ -7,6 +7,8 @@ use App\Entity\Notification;
 use App\Entity\CourseComment;
 use App\Entity\CommentCategory;
 use App\Entity\Module;
+use App\Entity\DocumentCategory;
+use App\Entity\Document;
 use App\Entity\Post;
 use App\Entity\Program;
 use App\Entity\Tag;
@@ -16,6 +18,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use App\Controller\Admin\DocumentCrudController;
+use App\Controller\Admin\DocumentPendingCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -53,15 +57,25 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linktoDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Users', 'fa fa-users', User::class);
-      
+
         yield MenuItem::linkToCrud('Notifications', "fa-solid fa-bell", Notification::class);
-      
+
         yield MenuItem::linkToCrud('Programs', 'fa fa-briefcase', Program::class);
         yield MenuItem::linkToCrud('Modules', 'fa fa-folder', Module::class);
         yield MenuItem::linkToCrud('Courses', 'fa fa-book', Course::class);
 
         yield MenuItem::linkToCrud('Comments', 'far fa-comments', CourseComment::class);
         yield MenuItem::linkToCrud('Categories', 'fas fa-tags', CommentCategory::class);
+        yield MenuItem::subMenu('Documents', 'fa-solid fa-file')
+            ->setSubItems([
+            MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class),
+            MenuItem::linkToCrud('Documents', 'fa fa-file', Document::class)
+            ->setController(DocumentCrudController::class),
+            MenuItem::linkToCrud('Pending Documents', 'fa-regular fa-file', Document::class)
+            ->setPermission('ROLE_ADMIN')
+            ->setController(DocumentPendingCrudController::class),
+
+        ]);
 
         yield MenuItem::section('Frontend');
         yield MenuItem::linkToUrl('Home', 'fa fa-window-maximize', '/');

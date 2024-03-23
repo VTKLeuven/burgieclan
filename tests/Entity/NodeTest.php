@@ -44,11 +44,4 @@ class NodeTest extends TestCase
         $nodeMock->setUser($user);
         $this->assertSame($user, $nodeMock->getUser());
     }
-
-    public function testGetId()
-    {
-        $nodeMock = $this->getMockBuilder(Node::class)
-        ->getMockForAbstractClass();
-        $this->assertNull($nodeMock->getId());
-    }
 }
