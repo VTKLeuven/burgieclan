@@ -97,5 +97,4 @@ class Document extends Node
     {
         return $this->getName();
     }
-
 }
