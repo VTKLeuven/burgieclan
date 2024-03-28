@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -13,14 +16,15 @@ abstract class Node
     private ?User $user = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private ?\DateTimeInterface $createDate;
+    private ?DateTimeInterface $createDate;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updateDate;
+    private ?DateTimeInterface $updateDate;
 
-    public function __construct()
+    public function __construct(?User $user)
     {
-        $this->createDate = new \DateTimeImmutable();
+        $this->user = $user;
+        $this->createDate = new DateTimeImmutable();
         $this->updateDate = $this->createDate;
     }
 
@@ -36,12 +40,12 @@ abstract class Node
         return $this->user;
     }
 
-    public function getCreateDate(): ?\DateTimeInterface
+    public function getCreateDate(): ?DateTimeInterface
     {
         return $this->createDate;
     }
 
-    public function getUpdateDate(): ?\DateTimeInterface
+    public function getUpdateDate(): ?DateTimeInterface
     {
         return $this->updateDate;
     }
@@ -50,7 +54,7 @@ abstract class Node
     #[ORM\PreUpdate]
     public function setUpdateDate(): self
     {
-        $this->updateDate = new \DateTime();
+        $this->updateDate = new DateTime();
 
         return $this;
     }

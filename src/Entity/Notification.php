@@ -30,6 +30,11 @@ class Notification extends Node
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $title = null;
 
+    public function __construct(?User $user)
+    {
+        parent::__construct($user);
+    }
+
     public function getId(): ?int
     {
         return $this->id;
