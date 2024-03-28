@@ -36,6 +36,11 @@ class Document extends Node
     #[ORM\Column]
     private ?bool $under_review = null;
 
+    public function __construct(?User $user)
+    {
+        parent::__construct($user);
+    }
+
     public function getId(): ?int
     {
         return $this->id;
