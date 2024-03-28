@@ -13,6 +13,8 @@ abstract class AbstractComment extends Node
     #[Assert\NotBlank]
     private ?string $content = null;
 
+    #[ORM\Column]
+    private ?bool $anonymous = false;
 
     public function getContent(): ?string
     {
@@ -22,6 +24,18 @@ abstract class AbstractComment extends Node
     public function setContent(string $content): self
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function isAnonymous(): ?bool
+    {
+        return $this->anonymous;
+    }
+
+    public function setAnonymous(bool $anonymous): static
+    {
+        $this->anonymous = $anonymous;
 
         return $this;
     }
