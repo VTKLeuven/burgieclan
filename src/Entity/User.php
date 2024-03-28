@@ -12,6 +12,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use League\OAuth2\Client\Token\AccessToken;
@@ -72,6 +74,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private $accesstoken;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Node::class)]
+    private Collection $nodes;
+
+    public function __construct()
+    {
+        $this->nodes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -147,17 +157,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return string
+     * @return AccessToken|null
      */
-    public function getAccesstoken()
+    public function getAccesstoken(): ?AccessToken
     {
-        return $this->accesstoken ? new AccessToken(json_decode($this->accesstoken, true)): null;
+        return $this->accesstoken ? new AccessToken(json_decode($this->accesstoken, true)) : null;
     }
 
     /**
-     * @param array $accesstoken
+     * @param AccessToken|string $accesstoken
      */
-    public function setAccesstoken(AccessToken $accesstoken)
+    public function setAccesstoken(AccessToken|string $accesstoken): void
     {
         $this->accesstoken = json_encode($accesstoken);
     }
