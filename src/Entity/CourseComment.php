@@ -21,11 +21,6 @@ class CourseComment extends AbstractComment
     #[ORM\JoinColumn(nullable: false)]
     private ?CommentCategory $category = null;
 
-    public function __construct(?User $user)
-    {
-        parent::__construct($user);
-    }
-
     public function getId(): ?int
     {
         return $this->id;

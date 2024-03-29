@@ -18,11 +18,6 @@ class DocumentComment extends AbstractComment
     #[ORM\JoinColumn(nullable: false)]
     private ?Document $document = null;
 
-    public function __construct(?User $user)
-    {
-        parent::__construct($user);
-    }
-
     public function getId(): ?int
     {
         return $this->id;
