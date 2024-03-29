@@ -13,11 +13,6 @@ abstract class AbstractComment extends Node
     #[Assert\NotBlank]
     private ?string $content = null;
 
-    public function __construct(?User $user)
-    {
-        parent::__construct($user);
-    }
-
     public function getContent(): ?string
     {
         return $this->content;
