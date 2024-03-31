@@ -1,37 +1,37 @@
-.idea
+/backend/.idea
 
-/public/build/fonts/glyphicons-*
-/public/build/images/glyphicons-*
+/backend/public/build/fonts/glyphicons-*
+/backend/public/build/images/glyphicons-*
 
-.php-version
+/backend/.php-version
 
 ###> symfony/framework-bundle ###
-/.env
-/.env.local
-/.env.local.php
-/.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
-/var/
-/vendor/
+/backend/.env
+/backend/.env.local
+/backend/.env.local.php
+/backend/.env.*.local
+/backend/config/secrets/prod/prod.decrypt.private.php
+/backend/public/bundles/
+/backend/var/
+/backend/vendor/
 ###< symfony/framework-bundle ###
 
 ###> symfony/phpunit-bridge ###
-.phpunit.result.cache
-/phpunit.xml
+/backend/.phpunit.result.cache
+/backend/phpunit.xml
 ###< symfony/phpunit-bridge ###
 ###> symfony/webpack-encore-bundle ###
-/node_modules/
-npm-debug.log
-yarn-error.log
+/backend/node_modules/
+/backend/npm-debug.log
+/backend/yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 
 ###> squizlabs/php_codesniffer ###
-/.phpcs-cache
-/phpcs.xml
+/backend/.phpcs-cache
+/backend/phpcs.xml
 ###< squizlabs/php_codesniffer ###
 
 ###> phpunit/phpunit ###
-/phpunit.xml
-.phpunit.result.cache
+/backend/phpunit.xml
+/backend/.phpunit.result.cache
 ###< phpunit/phpunit ###
