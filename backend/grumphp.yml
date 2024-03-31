@@ -1,0 +1,30 @@
+parameters:
+    # Project preferences
+    commit_project_names: "(BUR)" # The prefix(es) of the jira project.
+    run_phpstan: false # Enable after installing the phpstan preset
+    run_psalm: false # Enable after installing the psalm preset
+    run_security_advisories: false # Enable after installing the security advisories preset
+    phpunit.parallel: false # Decide if it is possible to run phpunit tests in parallel or not.
+    grumhp_exec_command: php
+    # Personal preferences
+    stop_on_first_failure: false
+
+grumphp:
+    tasks:
+        git_blacklist:
+            keywords:
+                - "die("
+                - "var_dump"
+                - "exit;"
+                - "console.log"
+#                - " dd(" # add space to avoid false positives on "add"
+#                - "dump("
+        phpcs:
+            standard: [ PSR2 ]
+            whitelist_patterns:
+                - /^src\/(.*)/
+        file_size:
+            max_size: 2M
+        git_commit_message:
+            matchers:
+                Must contain JIRA issue number: /BUR-\d+/
