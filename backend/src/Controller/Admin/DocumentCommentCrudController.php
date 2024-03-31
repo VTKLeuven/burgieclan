@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\DocumentComment;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
@@ -23,6 +24,8 @@ class DocumentCommentCrudController extends AbstractCrudController
         yield TextEditorField::new('content');
         yield TextField::new('user')
             ->hideOnForm();
+        yield BooleanField::new('anonymous')
+            ->renderAsSwitch(false);
         yield AssociationField::new('document')
             ->autocomplete();
         yield DateTimeField::new('createDate')
