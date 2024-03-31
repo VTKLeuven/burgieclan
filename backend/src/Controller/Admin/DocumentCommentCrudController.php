@@ -18,11 +18,16 @@ class DocumentCommentCrudController extends AbstractCrudController
         return DocumentComment::class;
     }
 
+    public function createEntity(string $entityFqcn)
+    {
+        return new DocumentComment($this->getUser());
+    }
+
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnDetail();
         yield TextEditorField::new('content');
-        yield TextField::new('user')
+        yield AssociationField::new('user')
             ->hideOnForm();
         yield BooleanField::new('anonymous')
             ->renderAsSwitch(false);

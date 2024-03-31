@@ -19,6 +19,11 @@ class DocumentCrudController extends AbstractCrudController
         return Document::class;
     }
 
+    public function createEntity(string $entityFqcn)
+    {
+        return new Document($this->getUser());
+    }
+
 //    COMMENTED BECAUSE NICE TO HAVE FOR TESTING
 //    public function configureActions(Actions $actions): Actions
 //    {
