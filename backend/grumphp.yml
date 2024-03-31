@@ -17,8 +17,8 @@ grumphp:
                 - "var_dump"
                 - "exit;"
                 - "console.log"
-#                - " dd(" # add space to avoid false positives on "add"
-#                - "dump("
+                - " dd(" # add space to avoid false positives on "add"
+                - "dump("
         phpcs:
             standard: [ PSR2 ]
             whitelist_patterns:
