@@ -14,6 +14,10 @@ class NotificationCrudController extends AbstractCrudController
         return Notification::class;
     }
 
+    public function createEntity(string $entityFqcn)
+    {
+        return new Notification($this->getUser());
+    }
 
     public function configureFields(string $pageName): iterable
     {
