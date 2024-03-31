@@ -1,6 +1,6 @@
 ###> BACKEND ###
 
-/backend/.idea
+/.idea
 
 /backend/public/build/fonts/glyphicons-*
 /backend/public/build/images/glyphicons-*
