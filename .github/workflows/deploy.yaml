@@ -21,12 +21,16 @@ jobs:
         ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
     - name: Connect and fetch
       run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git fetch && git reset --hard origin/test"
-    - name: Run composer install
+    - name: Backend - Run composer install
       run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && composer install --no-dev --optimize-autoloader"
-    - name: Update migrations
+    - name: Backend - Update migrations
       run: |
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console doctrine:migrations:migrate"
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console cache:clear --env=prod"
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console cache:warmup --env=prod"
+    - name: Frontend - Run npm install
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && npm install"
+    - name: Frontend - Build NextJS app
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && npm run build"
     - name: Cleanup
       run: rm -rf ~/.ssh
