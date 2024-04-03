@@ -7,10 +7,10 @@ on:
   workflow_dispatch:
   
 jobs:
-  run_pull:
-    name: Deploy
+  git_pull:
+    name: Git pull
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Install ssh keys
       # check this thread to understand why its needed:
@@ -21,6 +21,13 @@ jobs:
         ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
     - name: Connect and fetch
       run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git fetch && git reset --hard origin/test"
+
+  deploy_backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    needs: git_pull
+    
+    steps:
     - name: Backend - Run composer install
       run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && composer install --no-dev --optimize-autoloader"
     - name: Backend - Update migrations
@@ -28,9 +35,25 @@ jobs:
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console doctrine:migrations:migrate"
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console cache:clear --env=prod"
         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console cache:warmup --env=prod"
+
+  deploy_frontend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    needs: deploy_backend
+
+    steps:
     - name: Frontend - Run npm install
       run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && npm install"
     - name: Frontend - Build NextJS app
       run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && npm run build"
     - name: Cleanup
       run: rm -rf ~/.ssh
+
+  cleanup:
+    name: Clean up
+    runs-on: ubuntu-latest
+    needs: deploy_frontend
+
+    steps:
+      - name: Cleanup
+        run: rm -rf ~/.ssh
