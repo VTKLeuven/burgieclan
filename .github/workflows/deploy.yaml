@@ -5,55 +5,28 @@ on:
     branches:
       - test
   workflow_dispatch:
-  
+
 jobs:
-  git_pull:
-    name: Git pull
+  run_pull:
+    name: Deploy
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install ssh keys
-      # check this thread to understand why its needed:
-      # https://stackoverflow.com/a/70447517
-      run: |
-        install -m 600 -D /dev/null ~/.ssh/id_rsa
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
-    - name: Connect and fetch
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git fetch && git reset --hard origin/test"
-
-  deploy_backend:
-    name: Deploy Backend
-    runs-on: ubuntu-latest
-    needs: git_pull
-    
-    steps:
-    - name: Backend - Run composer install
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && composer install --no-dev --optimize-autoloader"
-    - name: Backend - Update migrations
-      run: |
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console doctrine:migrations:migrate"
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console cache:clear --env=prod"
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console cache:warmup --env=prod"
-
-  deploy_frontend:
-    name: Deploy Backend
-    runs-on: ubuntu-latest
-    needs: git_pull
-
-    steps:
-    - name: Frontend - Run npm install
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && npm install"
-    - name: Frontend - Build NextJS app
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && npm run build"
-
-  cleanup:
-    name: Clean up
-    runs-on: ubuntu-latest
-    needs:
-      - deploy_frontend
-      - deploy_backend
-
-    steps:
+      - name: Install ssh keys
+        # check this thread to understand why its needed:
+        # https://stackoverflow.com/a/70447517
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+      - name: Connect and fetch
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git fetch && git reset --hard origin/test"
+      - name: Run composer install
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && composer install --no-dev --optimize-autoloader"
+      - name: Update migrations
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console doctrine:migrations:migrate"
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console cache:clear --env=prod"
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console cache:warmup --env=prod"
       - name: Cleanup
         run: rm -rf ~/.ssh
