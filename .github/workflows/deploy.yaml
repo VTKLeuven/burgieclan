@@ -39,20 +39,20 @@ jobs:
   deploy_frontend:
     name: Deploy Backend
     runs-on: ubuntu-latest
-    needs: deploy_backend
+    needs: git_pull
 
     steps:
     - name: Frontend - Run npm install
       run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && npm install"
     - name: Frontend - Build NextJS app
       run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && npm run build"
-    - name: Cleanup
-      run: rm -rf ~/.ssh
 
   cleanup:
     name: Clean up
     runs-on: ubuntu-latest
-    needs: deploy_frontend
+    needs:
+      - deploy_frontend
+      - deploy_backend
 
     steps:
       - name: Cleanup
