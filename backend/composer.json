@@ -61,7 +61,7 @@
     },
     "require-dev": {
         "dama/doctrine-test-bundle": "^7.0",
-        "doctrine/doctrine-fixtures-bundle": "^3.4",
+        "doctrine/doctrine-fixtures-bundle": "^3.5",
         "phpro/grumphp": "^2.2",
         "phpstan/extension-installer": "^1.2",
         "phpstan/phpstan": "^1.2",
@@ -76,7 +76,8 @@
         "symfony/phpunit-bridge": "^6.4",
         "symfony/stopwatch": "^6.4",
         "symfony/web-profiler-bundle": "^6.4",
-        "zenstruck/browser": "^1.8"
+        "zenstruck/browser": "^1.8",
+        "zenstruck/foundry": "^1.37"
     },
     "config": {
         "allow-plugins": {
