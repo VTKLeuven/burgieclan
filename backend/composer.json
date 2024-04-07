@@ -75,7 +75,8 @@
         "symfony/maker-bundle": "^1.36",
         "symfony/phpunit-bridge": "^6.4",
         "symfony/stopwatch": "^6.4",
-        "symfony/web-profiler-bundle": "^6.4"
+        "symfony/web-profiler-bundle": "^6.4",
+        "zenstruck/browser": "^1.8"
     },
     "config": {
         "allow-plugins": {
