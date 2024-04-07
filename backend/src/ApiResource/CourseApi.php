@@ -34,18 +34,18 @@ class CourseApi
     #[Assert\Length(6)]
     public ?string $code = null;
 
-    public ?array $professors = null;
+    public array $professors = [];
 
-    public ?array $semesters = null;
+    public array $semesters = [];
 
     #[Assert\Positive]
     public ?int $credits = null;
 
-    public array $oldCourses;
+    public array $oldCourses = [];
 
-    public array $newCourses;
+    public array $newCourses = [];
 
-    public array $modules;
+    public array $modules = [];
 
-    public array $courseComments;
+    public array $courseComments = [];
 }
