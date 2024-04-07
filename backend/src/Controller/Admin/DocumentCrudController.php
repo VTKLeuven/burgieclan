@@ -45,6 +45,7 @@ class DocumentCrudController extends AbstractCrudController
             ->setLabel('Published')
             ->renderAsSwitch(false);
         yield TextField::new('file_name')
+            ->setLabel('File')
             ->setFormType(FileUploadType::class)
             ->setFormTypeOptions([
                 'upload_dir' => 'public/uploads/documents',
