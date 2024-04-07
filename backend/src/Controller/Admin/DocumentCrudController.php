@@ -48,6 +48,7 @@ class DocumentCrudController extends AbstractCrudController
             ->setLabel('File')
             ->setFormType(FileUploadType::class)
             ->setFormTypeOptions([
+                'help' => 'Max upload size is '. ini_get('upload_max_filesize') . '.',
                 'upload_dir' => 'public/uploads/documents',
                 'upload_filename' => '[slug]-[timestamp].[extension]',
             ])
