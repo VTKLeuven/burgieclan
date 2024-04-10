@@ -3,7 +3,6 @@
 namespace App\Tests\Api;
 
 use App\Factory\CourseFactory;
-use App\Factory\UserFactory;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
@@ -15,9 +14,7 @@ class CourseResourceTest extends ApiTestCase
     public function testGetCollectionOfCourses(): void
     {
         CourseFactory::createMany(5);
-        $user = UserFactory::createOne();
         $json = $this->browser()
-            ->actingAs($user)
             ->get('/api/courses')
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
@@ -43,9 +40,8 @@ class CourseResourceTest extends ApiTestCase
     public function testGetOneCourse(): void
     {
         $course = CourseFactory::createOne();
-        $user = UserFactory::createOne();
+
         $this->browser()
-            ->actingAs($user)
             ->get('/api/courses/'.$course->getId())
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/courses/'.$course->getId());
