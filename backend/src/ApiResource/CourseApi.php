@@ -2,7 +2,9 @@
 
 namespace App\ApiResource;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -28,10 +30,12 @@ class CourseApi
     public ?int $id = null;
 
     #[Assert\NotBlank]
+    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     public ?string $name = null;
 
     #[Assert\NotBlank]
     #[Assert\Length(6)]
+    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     public ?string $code = null;
 
     public array $professors = [];

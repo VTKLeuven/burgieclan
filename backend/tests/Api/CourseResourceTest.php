@@ -46,4 +46,60 @@ class CourseResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/courses/'.$course->getId());
     }
+
+    public function testGetCourseFilterByName(): void
+    {
+        $course1 = CourseFactory::createOne([
+            'name' => 'Course1',
+        ]);
+
+        $course2 = CourseFactory::createOne([
+            'name' => 'Course2',
+        ]);
+
+        $course3 = CourseFactory::createOne([
+            'name' => 'Course3',
+        ]);
+
+        CourseFactory::createMany(5);
+
+        $this->browser()
+            ->get('/api/courses?name=course2')
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('length("hydra:member")', 1)
+            ->get('/api/courses?name=course')
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 3)
+            ->assertJsonMatches('length("hydra:member")', 3)
+        ;
+    }
+
+    public function testGetCourseFilterByCod(): void
+    {
+        $course1 = CourseFactory::createOne([
+            'code' => 'code1',
+        ]);
+
+        $course2 = CourseFactory::createOne([
+            'code' => 'code2',
+        ]);
+
+        $course3 = CourseFactory::createOne([
+            'code' => 'code3',
+        ]);
+
+        CourseFactory::createMany(5);
+
+        $this->browser()
+            ->get('/api/courses?code=code2')
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('length("hydra:member")', 1)
+            ->get('/api/courses?code=code')
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 3)
+            ->assertJsonMatches('length("hydra:member")', 3)
+        ;
+    }
 }
