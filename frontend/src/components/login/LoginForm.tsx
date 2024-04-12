@@ -45,7 +45,7 @@ export default function LoginForm() {
                         <Collapsible
                             trigger= {
                                 <div
-                                    className="font-semibold text-center text-sm leading-6 text-blue-600 hover:text-blue-500">
+                                    className="mt-10 font-semibold text-center text-sm leading-6 text-blue-600 hover:text-blue-500">
                                     Or log in manually >
                                 </div>
                             }
