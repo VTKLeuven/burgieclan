@@ -4,7 +4,6 @@ namespace App\Mapper;
 
 use App\ApiResource\CourseApi;
 use App\Entity\Course;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -19,51 +18,48 @@ class CourseEntityToApiMapper implements MapperInterface
 
     public function load(object $from, string $toClass, array $context): object
     {
-        $entity = $from;
-        assert($entity instanceof Course);
+        assert($from instanceof Course);
 
         $dto = new CourseApi();
-        $dto->id = $entity->getId();
+        $dto->id = $from->getId();
 
         return $dto;
     }
 
     public function populate(object $from, object $to, array $context): object
     {
-        $entity = $from;
-        $dto = $to;
-        assert($entity instanceof Course);
-        assert($dto instanceof CourseApi);
+        assert($from instanceof Course);
+        assert($to instanceof CourseApi);
 
-        $dto->name = $entity->getName();
-        $dto->code = $entity->getCode();
-        $dto->professors = $entity->getProfessors();
-        $dto->semesters = $entity->getSemesters();
-        $dto->credits = $entity->getCredits();
-        $dto->oldCourses = array_map(function (Course $course) {
+        $to->name = $from->getName();
+        $to->code = $from->getCode();
+        $to->professors = $from->getProfessors();
+        $to->semesters = $from->getSemesters();
+        $to->credits = $from->getCredits();
+        $to->oldCourses = array_map(function (Course $course) {
             return $this->microMapper->map($course, CourseApi::class, [
                 MicroMapperInterface::MAX_DEPTH => 0,
             ]);
-        }, $entity->getOldCourses()->getValues());
-        $dto->newCourses = array_map(function (Course $course) {
+        }, $from->getOldCourses()->getValues());
+        $to->newCourses = array_map(function (Course $course) {
             return $this->microMapper->map($course, CourseApi::class, [
                 MicroMapperInterface::MAX_DEPTH => 0,
             ]);
-        }, $entity->getNewCourses()->getValues());
+        }, $from->getNewCourses()->getValues());
 
         /*
          * TODO: Add this code when corresponding dto's are available
-        $dto->modules = array_map(function(Module $module) {
+        $to->modules = array_map(function(Module $module) {
             return $this->microMapper->map($module, ModuleApi::class, [
                 MicroMapperInterface::MAX_DEPTH => 0,
             ]);
-        }, $entity->getModules()->getValues());
-        $dto->courseComments = array_map(function(CourseComment $comment) {
+        }, $from->getModules()->getValues());
+        $to->courseComments = array_map(function(CourseComment $comment) {
             return $this->microMapper->map($comment, CourseCommentApi::class, [
                 MicroMapperInterface::MAX_DEPTH => 0,
             ]);
-        }, $entity->getCourseComments()->getValues());
+        }, $from->getCourseComments()->getValues());
        */
-        return $dto;
+        return $to;
     }
 }
