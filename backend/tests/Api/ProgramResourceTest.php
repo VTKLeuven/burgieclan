@@ -2,7 +2,6 @@
 
 namespace Api;
 
-use App\Factory\CourseFactory;
 use App\Factory\ProgramFactory;
 use App\Tests\Api\ApiTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -42,7 +41,7 @@ class ProgramResourceTest extends ApiTestCase
             ->assertJsonMatches('"@id"', '/api/programs/'.$program->getId());
     }
 
-    public function testGetCourseFilterByName(): void
+    public function testGetProgramFilterByName(): void
     {
         $program1 = ProgramFactory::createOne([
             'name' => 'program1',

@@ -4,9 +4,9 @@ namespace App\Mapper;
 
 use App\ApiResource\CourseApi;
 use App\ApiResource\ModuleApi;
+use App\ApiResource\ProgramApi;
 use App\Entity\Course;
 use App\Entity\Module;
-use App\Entity\Program;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -41,12 +41,9 @@ class ModuleEntityToApiMapper implements MapperInterface
             ]);
         }, $from->getCourses()->getValues());
 
-        /*
-         * TODO: Add this code when corresponding dto's are available
-          $to->program = $this->microMapper->map($from->getProgram(), ProgramApi::class, [
+        $to->program = $this->microMapper->map($from->getProgram(), ProgramApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);
-       */
         return $to;
     }
 }

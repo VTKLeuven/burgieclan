@@ -28,7 +28,7 @@ class ModuleResourceTest extends ApiTestCase
             '@type',
             'name',
             'courses',
-//            'program',
+            'program',
         ]);
     }
 
