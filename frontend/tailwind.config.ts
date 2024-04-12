@@ -4,7 +4,17 @@ const config: Config = {
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        vtk: {
+          blue: {
+            400: "#353761",
+            500: "#212347",  // dark blue vtk logo
+            600: "#1b1d40",
+          }
+        }
+      }
+    },
   },
   plugins: [],
 };
