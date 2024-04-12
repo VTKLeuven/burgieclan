@@ -71,7 +71,7 @@ final class ModuleFactory extends ModelFactory
     {
         return [
             'name' => 'Module: ' . self::faker()->word(),
-            'program' => ProgramFactory::new(),
+            'program' => ProgramFactory::randomOrCreate(),
         ];
     }
 
