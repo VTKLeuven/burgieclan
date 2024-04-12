@@ -75,7 +75,7 @@ class CourseResourceTest extends ApiTestCase
         ;
     }
 
-    public function testGetCourseFilterByCod(): void
+    public function testGetCourseFilterByCode(): void
     {
         $course1 = CourseFactory::createOne([
             'code' => 'code1',
