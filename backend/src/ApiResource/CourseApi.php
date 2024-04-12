@@ -45,11 +45,23 @@ class CourseApi
     #[Assert\Positive]
     public ?int $credits = null;
 
+    /**
+     * @var CourseApi[]
+     */
     public array $oldCourses = [];
 
+    /**
+     * @var CourseApi[]
+     */
     public array $newCourses = [];
 
+    /**
+     * @var ModuleApi[]
+     */
     public array $modules = [];
 
+    /**
+     * @var CourseCommentApi[]
+     */
     public array $courseComments = [];
 }

@@ -33,10 +33,10 @@ class ModuleApi
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     public ?string $name = null;
 
+    /**
+     * @var CourseApi[]
+     */
     public array $courses = [];
 
-    /*
-     * TODO: Add this code when corresponding dto's are available
     public ProgramApi $program;
-    */
 }
