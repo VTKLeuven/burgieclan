@@ -105,8 +105,6 @@ final class CourseFactory extends ModelFactory
 
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
-     *
-     * @todo inject services if required
      */
     public function __construct()
     {
@@ -121,11 +119,16 @@ final class CourseFactory extends ModelFactory
         $code = self::faker()->randomKey(self::COURSES);
 
         $professors = array();
-        for ($i = 0; $i < self::faker()->numberBetween(0, 3); $i++) {
+        for ($i = 0; $i < self::faker()->numberBetween(1, 3); $i++) {
             $professors[] = self::faker()->numerify('u0######');
         }
 
-        $semesters = array('Semester '. self::faker()->numberBetween(1, 2));
+        if (self::faker()->numberBetween(1, 20) == 1) {
+            // 5% chance of having both semesters
+            $semesters = array('Semester 1', 'Semester 2');
+        } else {
+            $semesters = array('Semester ' . self::faker()->numberBetween(1, 2));
+        }
 
         return [
             'code' => self::faker()->regexify('H[A-Z0-9]{5}'),
