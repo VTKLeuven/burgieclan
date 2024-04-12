@@ -2,21 +2,21 @@
 
 namespace Api;
 
-use App\Factory\ProgramFactory;
+use App\Factory\ModuleFactory;
 use App\Tests\Api\ApiTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-class ProgramResourceTest extends ApiTestCase
+class ModuleResourceTest extends ApiTestCase
 {
     use ResetDatabase;
     use Factories;
 
-    public function testGetCollectionOfPrograms(): void
+    public function testGetCollectionOfModules(): void
     {
-        ProgramFactory::createMany(5);
+        ModuleFactory::createMany(5);
         $json = $this->browser()
-            ->get('/api/programs')
+            ->get('/api/modules')
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
@@ -27,42 +27,43 @@ class ProgramResourceTest extends ApiTestCase
             '@id',
             '@type',
             'name',
-            'modules',
+            'courses',
+            'program',
         ]);
     }
 
-    public function testGetOneProgram(): void
+    public function testGetOneModule(): void
     {
-        $program = ProgramFactory::createOne();
+        $module = ModuleFactory::createOne();
 
         $this->browser()
-            ->get('/api/programs/'.$program->getId())
+            ->get('/api/modules/'.$module->getId())
             ->assertJson()
-            ->assertJsonMatches('"@id"', '/api/programs/'.$program->getId());
+            ->assertJsonMatches('"@id"', '/api/modules/'.$module->getId());
     }
 
-    public function testGetProgramFilterByName(): void
+    public function testGetModuleFilterByName(): void
     {
-        $program1 = ProgramFactory::createOne([
-            'name' => 'program1',
+        $module1 = ModuleFactory::createOne([
+            'name' => 'testmodule1',
         ]);
 
-        $program2 = ProgramFactory::createOne([
-            'name' => 'program2',
+        $module2 = ModuleFactory::createOne([
+            'name' => 'testmodule2',
         ]);
 
-        $program3 = ProgramFactory::createOne([
-            'name' => 'program3',
+        $module3 = ModuleFactory::createOne([
+            'name' => 'testmodule3',
         ]);
 
-        ProgramFactory::createMany(5);
+        ModuleFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/programs?name=program2')
+            ->get('/api/modules?name=module2')
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/programs?name=program')
+            ->get('/api/modules?name=testmodule')
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
