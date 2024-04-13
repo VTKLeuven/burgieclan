@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import CollapsibleComponent from "@/components/collapsible/CollapsibleComponent";
+import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import {useState} from "react";
 
 export default function LoginForm() {
@@ -56,9 +56,10 @@ export default function LoginForm() {
                     </div>
 
                     <div
-                        className="mt-10 w-full max-w-sm font-semibold text-center text-sm leading-6 text-vtk-blue-500 hover:text-vtk-blue-400 cursor-pointer"
+                        className="mt-10 w-full max-w-sm font-semibold text-center text-sm leading-6 text-vtk-blue-500 hover:text-vtk-blue-400 cursor-pointer flex items-center justify-center"
                         onClick={toggleCollapse}>
-                        Or log in manually >
+                        <p>Or log in manually</p>
+                        {isOpen ? <ChevronDownIcon className="mt-0.5 h-4 w-4" aria-hidden="true" /> : <ChevronRightIcon className="mt-0.5 h-4 w-4" aria-hidden="true" />}
                     </div>
                 </div>
                 <div className={`flex flex-col items-center justify-center ${isOpen ? 'h-2/5' : 'h-0'} overflow-hidden`}>
