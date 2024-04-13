@@ -22,7 +22,7 @@ export default function LoginForm() {
             ```
             */}
             <div className="h-screen px-6 py-12 lg:px-8">
-                <div className="h-1/5"></div>
+                <div className="h-1/6"></div>
                 <div className="flex flex-col items-center justify-center h-2/5">
                     <div className="w-full max-w-sm">
                         <Image
@@ -56,13 +56,15 @@ export default function LoginForm() {
                     </div>
 
                     <div
-                        className="mt-10 w-full max-w-sm font-semibold text-center text-sm leading-6 text-vtk-blue-500 hover:text-vtk-blue-400 cursor-pointer flex items-center justify-center"
+                        className="mt-4 w-full max-w-sm font-semibold text-center text-sm leading-6 text-vtk-blue-500 hover:text-vtk-blue-400 cursor-pointer flex items-center justify-center"
                         onClick={toggleCollapse}>
                         <p>Or log in manually</p>
-                        {isOpen ? <ChevronDownIcon className="mt-0.5 h-4 w-4" aria-hidden="true" /> : <ChevronRightIcon className="mt-0.5 h-4 w-4" aria-hidden="true" />}
+                        {isOpen ? <ChevronDownIcon className="mt-0.5 h-4 w-4" aria-hidden="true"/> :
+                            <ChevronRightIcon className="mt-0.5 h-4 w-4" aria-hidden="true"/>}
                     </div>
                 </div>
-                <div className={`flex flex-col items-center justify-center ${isOpen ? 'h-2/5' : 'h-0'} overflow-hidden`}>
+                <div
+                    className={`flex flex-col items-center justify-center ${isOpen ? 'h-3/7' : 'h-0'} overflow-hidden`}>
                     <div className="mt-10 w-full max-w-sm">
                         <label htmlFor="email"
                                className="block text-sm font-medium leading-6 text-gray-900">
@@ -83,11 +85,11 @@ export default function LoginForm() {
                     <div className="w-full max-w-sm">
                         <div className="flex items-center justify-between">
                             <label htmlFor="password"
-                                   className="mt-2 block text-sm font-medium leading-6 text-gray-900">
+                                   className="mt-2 block text-sm font-medium leading-6 text-vtk-blue-600">
                                 Password
                             </label>
                             <div className="mt-2 text-sm">
-                                <a href="#" className="font-semibold text-vtk-blue-600 hover:text-vtk-blue-500">
+                                <a href="#" className="text-xs font-semibold text-vtk-blue-600 hover:text-vtk-blue-500">
                                     Forgot password?
                                 </a>
                             </div>
@@ -99,7 +101,7 @@ export default function LoginForm() {
                                 type="password"
                                 autoComplete="current-password"
                                 required
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-600 sm:text-sm sm:leading-6"
+                                className="block w-full rounded-md border-0 py-1.5 text-vtk-blue-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-600 sm:text-sm sm:leading-6"
                             />
                         </div>
                     </div>
