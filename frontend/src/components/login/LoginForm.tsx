@@ -4,25 +4,17 @@ import Image from 'next/image'
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useRef, useEffect, useState } from 'react';
 
+/**
+ * Login form component, displays initial login form with VTK login option and expands
+ * when user chooses to log in manually.
+ *
+ * Should be rendered as full page.
+ */
 export default function LoginForm() {
     const [isOpen, setIsOpen] = useState(false);
     const [elementHeight, setElementHeight] = useState(0);
     const initialForm = useRef(null);
     const whiteSpaceDiv = useRef(null);
-
-    useEffect(() => {
-        if (initialForm.current && whiteSpaceDiv) {
-            const height = initialForm.current.clientHeight;
-            setElementHeight(height);
-
-            // Calculate the margin-top dynamically
-            const whiteSpaceHeight = `calc(32vh - ${height / 2}px)`;
-
-            // Set the margin-top directly to the element style
-            whiteSpaceDiv.current.style.height = whiteSpaceHeight;
-        }
-    }, [initialForm]);
-
 
     const toggleCollapse = () => {
         setIsOpen(!isOpen);
@@ -30,19 +22,12 @@ export default function LoginForm() {
 
     return (
         <>
-            {/*
-            This example requires updating your template:
-
-            ```
-            <html class="h-full bg-white">
-            <body class="h-full">
-            ```
-            */}
             <div className="min-h-screen px-6 py-10 lg:px-8">
                 <div ref={whiteSpaceDiv}></div>
-                <div className="flex flex-col items-center justify-center" ref={initialForm}>
+                <div className="flex flex-col items-center justify-center mt-[10vh]">
                     <div className="w-full max-w-sm">
                         <Image
+                            // TODO: Replace with the actual logo
                             src="/images/logos/seafile-logo.png"
                             alt="Burgieclan Logo"
                             width={100}
