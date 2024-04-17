@@ -41,7 +41,7 @@ class CourseCommentApi
     public ?string $content = null;
 
     #[ApiFilter(BooleanFilter::class)]
-    public bool $anonymous;
+    public bool $anonymous = false;
 
     public ?CourseApi $course;
 
