@@ -46,8 +46,8 @@ class NotificationApi
     public string $endTime;
 
     #[ApiProperty(writable: false)]
-    public DateTime $createdAt;
+    public string $createdAt;
 
     #[ApiProperty(writable: false)]
-    public DateTime $updatedAt;
+    public string $updatedAt;
 }
