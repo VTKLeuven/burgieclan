@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Notification;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
+use DateTime;
 
 #[ApiResource(
     shortName: 'Notification',
@@ -45,8 +46,8 @@ class NotificationApi
     public string $endTime;
 
     #[ApiProperty(writable: false)]
-    public string $createdAt;
+    public DateTime $createdAt;
 
     #[ApiProperty(writable: false)]
-    public string $updatedAt;
+    public DateTime $updatedAt;
 }
