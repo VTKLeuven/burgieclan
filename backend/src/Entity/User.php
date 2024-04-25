@@ -78,8 +78,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Node::class)]
     private Collection $nodes;
 
+    /**
+     * @var Collection|Program[]
+     */
+    #[ORM\ManyToMany(targetEntity: Program::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'user_program')]
+    private Collection $favoritePrograms;
+
+    /**
+     * @var Collection|Module[]
+     */
+    #[ORM\ManyToMany(targetEntity: Module::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'user_module')]
+    private Collection $favoriteModules;
+
+    /**
+     * @var Collection|Course[]
+     */
+    #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'user_course')]
+    private Collection $favoriteCourses;
+
+    /**
+     * @var Collection|Document[]
+     */
+    #[ORM\ManyToMany(targetEntity: Document::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'user_document')]
+    private Collection $favoriteDocuments;
+
     public function __construct()
     {
+        $this->favoritePrograms = new ArrayCollection();
+        $this->favoriteModules = new ArrayCollection();
+        $this->favoriteCourses = new ArrayCollection();
+        $this->favoriteDocuments = new ArrayCollection();
         $this->nodes = new ArrayCollection();
     }
 
@@ -227,4 +259,89 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return array(self::ROLE_USER, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN);
     }
+
+    /**
+     * Get the favorite programs of the user.
+     * 
+     * @return Collection
+     */
+    public function getFavoritePrograms(): Collection
+    {
+        return $this->favoritePrograms;
+    }
+
+    /**
+     * Set the favorite programs of the user.
+     * 
+     * @param Collection $programs
+     * @return void
+     */
+    public function setFavoritePrograms(Collection $programs): void
+    {
+        $this->favoritePrograms = $programs;
+    }
+
+    /**
+     * Get the favorite modules of the user.
+     * 
+     * @return Collection
+     */
+    public function getFavoriteModules(): Collection
+    {
+        return $this->favoriteModules;
+    }
+
+    /**
+     * Set the favorite modules of the user.
+     * 
+     * @param Collection $modules
+     * @return void
+     */
+    public function setFavoriteModules(Collection $modules): void
+    {
+        $this->favoriteModules = $modules;
+    }
+
+    /**
+     * Get the favorite courses of the user.
+     * 
+     * @return Collection
+     */
+    public function getFavoriteCourses(): Collection
+    {
+        return $this->favoriteCourses;
+    }
+
+    /**
+     * Set the favorite courses of the user.
+     * 
+     * @param Collection $courses
+     * @return void
+     */
+    public function setFavoriteCourses(Collection $courses): void
+    {
+        $this->favoriteCourses = $courses;
+    }
+
+    /**
+     * Get the favorite documents of the user.
+     * 
+     * @return Collection
+     */
+    public function getFavoriteDocuments(): Collection
+    {
+        return $this->favoriteDocuments;
+    }
+
+    /**
+     * Set the favorite documents of the user.
+     * 
+     * @param Collection $documents
+     * @return void
+     */
+    public function setFavoriteDocuments(Collection $documents): void
+    {
+        $this->favoriteDocuments = $documents;
+    }
+
 }
