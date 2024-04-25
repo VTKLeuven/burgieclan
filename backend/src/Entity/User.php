@@ -78,9 +78,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Node::class)]
     private Collection $nodes;
 
+    #[ORM\OneToMany(targetEntity: Rating::class, mappedBy: "user")]
+
+    private $ratings;
+
     public function __construct()
     {
         $this->nodes = new ArrayCollection();
+        $this->ratings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -227,4 +232,49 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return array(self::ROLE_USER, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN);
     }
+
+    /**
+     * Get the ratings associated with the user.
+     *
+     * @return Collection|Rating[]
+     */
+    public function getRatings(): Collection
+    {
+        return $this->ratings;
+    }
+
+    /**
+     * Add a rating to the user.
+     *
+     * @param Rating $rating The rating to add
+     * @return self Returns the instance of this class to allow for method chaining.
+     */
+    public function addRating(Rating $rating): self
+    {
+        if (!$this->ratings->contains($rating)) {
+            $this->ratings[] = $rating;
+            $rating->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove a rating from the user.
+     *
+     * @param Rating $rating The rating to remove
+     * @return self Returns the instance of this class to allow for method chaining.
+     */
+    public function removeRating(Rating $rating): self
+    {
+        if ($this->ratings->removeElement($rating)) {
+            // Set the owning side to null (unless already changed)
+            if ($rating->getUser() === $this) {
+                $rating->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

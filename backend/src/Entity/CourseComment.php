@@ -4,13 +4,14 @@ namespace App\Entity;
 
 use App\Repository\CourseCommentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: CourseCommentRepository::class)]
 class CourseComment extends AbstractComment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'courseComments')]
