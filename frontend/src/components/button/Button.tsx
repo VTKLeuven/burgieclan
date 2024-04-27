@@ -1,5 +1,6 @@
 import React from "react";
 
+// TODO: check if args should be text instead
 export default function Button({children} : {children: React.ReactNode}) {
     return (
         <button
