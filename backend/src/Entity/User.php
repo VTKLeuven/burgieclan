@@ -82,28 +82,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection|Program[]
      */
     #[ORM\ManyToMany(targetEntity: Program::class, inversedBy: 'users')]
-    #[ORM\JoinTable(name: 'user_program')]
+    #[ORM\JoinTable(name: 'favorite_user_program')]
     private Collection $favoritePrograms;
-
+    
     /**
      * @var Collection|Module[]
      */
     #[ORM\ManyToMany(targetEntity: Module::class, inversedBy: 'users')]
-    #[ORM\JoinTable(name: 'user_module')]
+    #[ORM\JoinTable(name: 'favorite_user_module')]
     private Collection $favoriteModules;
 
     /**
      * @var Collection|Course[]
      */
     #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'users')]
-    #[ORM\JoinTable(name: 'user_course')]
+    #[ORM\JoinTable(name: 'favorite_user_course')]
     private Collection $favoriteCourses;
 
     /**
      * @var Collection|Document[]
      */
     #[ORM\ManyToMany(targetEntity: Document::class, inversedBy: 'users')]
-    #[ORM\JoinTable(name: 'user_document')]
+    #[ORM\JoinTable(name: 'favorite_user_document')]
     private Collection $favoriteDocuments;
 
     public function __construct()
