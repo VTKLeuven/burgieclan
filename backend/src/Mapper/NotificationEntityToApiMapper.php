@@ -3,6 +3,7 @@
 namespace App\Mapper;
 
 use App\ApiResource\NotificationApi;
+use App\ApiResource\UserApi;
 use App\Entity\Notification;
 use Nette\Utils\DateTime;
 use Symfonycasts\MicroMapper\AsMapper;
@@ -35,12 +36,9 @@ class NotificationEntityToApiMapper implements MapperInterface
         $to->title = $from->getTitle();
         $to->content = $from->getContent();
 
-        /*
-         * TODO when UserApi is available
         $to->creator = $this->microMapper->map($from->getUser(), UserApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
-        */
+            MicroMapperInterface::MAX_DEPTH => 0,
+        ]);
 
         $to->startTime = $from->getStartTime()->format('Y-m-d H:i:s');
         $to->endTime = $from->getEndTime()->format('Y-m-d H:i:s');

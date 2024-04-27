@@ -34,8 +34,7 @@ class CourseCommentResourceTest extends ApiTestCase
             'anonymous',
             'course',
             'category',
-// TODO add creator when UserApi exists
-//            'creator',
+            'creator',
             'createdAt',
             'updatedAt',
         ]);

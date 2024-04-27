@@ -30,6 +30,7 @@ class NotificationResourceTest extends ApiTestCase
             '@type',
             'title',
             'content',
+            'creator',
             'startTime',
             'endTime',
             'createdAt',

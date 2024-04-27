@@ -36,8 +36,7 @@ class NotificationApi
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     public ?string $content = null;
 
-    // TODO add creator when UserApi exists
-//    public ?UserApi $creator;
+    public ?UserApi $creator;
 
     #[ApiFilter(DateFilter::class)]
     public string $startTime;
