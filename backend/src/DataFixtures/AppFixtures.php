@@ -12,6 +12,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Comment;
+use App\Entity\Notification;
 use App\Entity\Post;
 use App\Entity\Tag;
 use App\Entity\User;
@@ -19,6 +20,7 @@ use App\Factory\CommentCategoryFactory;
 use App\Factory\CourseCommentFactory;
 use App\Factory\CourseFactory;
 use App\Factory\ModuleFactory;
+use App\Factory\NotificationFactory;
 use App\Factory\ProgramFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -45,6 +47,7 @@ final class AppFixtures extends Fixture
         ProgramFactory::createMany(10);
         ModuleFactory::createMany(30);
         CourseFactory::createMany(80);
+        NotificationFactory::createMany(10);
         CommentCategoryFactory::createMany(5);
         CourseCommentFactory::createMany(100);
     }
