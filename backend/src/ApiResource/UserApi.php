@@ -29,6 +29,7 @@ class UserApi
     public ?string $fullName = null;
 
     #[Assert\NotBlank]
+    #[Assert\Length(min: 2, max: 50)]
     public ?string $username = null;
 
     #[Assert\Email]
