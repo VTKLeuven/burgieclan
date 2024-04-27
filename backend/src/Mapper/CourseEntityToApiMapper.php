@@ -3,8 +3,10 @@
 namespace App\Mapper;
 
 use App\ApiResource\CourseApi;
+use App\ApiResource\CourseCommentApi;
 use App\ApiResource\ModuleApi;
 use App\Entity\Course;
+use App\Entity\CourseComment;
 use App\Entity\Module;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
@@ -55,14 +57,11 @@ class CourseEntityToApiMapper implements MapperInterface
             ]);
         }, $from->getModules()->getValues());
 
-        /*
-         * TODO: Add this code when corresponding dto's are available
-        $to->courseComments = array_map(function(CourseComment $comment) {
+        $to->courseComments = array_map(function (CourseComment $comment) {
             return $this->microMapper->map($comment, CourseCommentApi::class, [
                 MicroMapperInterface::MAX_DEPTH => 0,
             ]);
         }, $from->getCourseComments()->getValues());
-       */
         return $to;
     }
 }
