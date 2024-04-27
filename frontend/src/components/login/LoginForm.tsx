@@ -12,8 +12,6 @@ import React, { useRef, useEffect, useState } from 'react';
  */
 export default function LoginForm() {
     const [isOpen, setIsOpen] = useState(false);
-    const [elementHeight, setElementHeight] = useState(0);
-    const initialForm = useRef(null);
     const whiteSpaceDiv = useRef(null);
 
     const toggleCollapse = () => {
