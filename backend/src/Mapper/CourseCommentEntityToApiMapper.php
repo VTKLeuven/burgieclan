@@ -5,6 +5,7 @@ namespace App\Mapper;
 use App\ApiResource\CommentCategoryApi;
 use App\ApiResource\CourseApi;
 use App\ApiResource\CourseCommentApi;
+use App\ApiResource\UserApi;
 use App\Entity\CourseComment;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
@@ -41,9 +42,9 @@ class CourseCommentEntityToApiMapper implements MapperInterface
         $to->category = $this->microMapper->map($from->getCategory(), CommentCategoryApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);
-//        $to->creator = $this->microMapper->map($from->getUser(), UserApi::class, [
-//            MicroMapperInterface::MAX_DEPTH => 0,
-//        ]);
+        $to->creator = $this->microMapper->map($from->getUser(), UserApi::class, [
+            MicroMapperInterface::MAX_DEPTH => 0,
+        ]);
         $to->createdAt = $from->getCreateDate()->format('Y-m-d H:i:s');
         $to->updatedAt = $from->getUpdateDate()->format('Y-m-d H:i:s');
 
