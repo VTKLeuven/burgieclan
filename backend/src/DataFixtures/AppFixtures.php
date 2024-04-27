@@ -16,6 +16,8 @@ use App\Entity\Notification;
 use App\Entity\Post;
 use App\Entity\Tag;
 use App\Entity\User;
+use App\Factory\CommentCategoryFactory;
+use App\Factory\CourseCommentFactory;
 use App\Factory\CourseFactory;
 use App\Factory\ModuleFactory;
 use App\Factory\NotificationFactory;
@@ -46,6 +48,8 @@ final class AppFixtures extends Fixture
         ModuleFactory::createMany(30);
         CourseFactory::createMany(80);
         NotificationFactory::createMany(10);
+        CommentCategoryFactory::createMany(5);
+        CourseCommentFactory::createMany(100);
     }
 
     private function loadUsers(ObjectManager $manager): void
