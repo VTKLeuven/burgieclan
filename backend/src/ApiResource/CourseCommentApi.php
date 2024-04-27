@@ -47,8 +47,7 @@ class CourseCommentApi
 
     public ?CommentCategoryApi $category;
 
-    // TODO add creator when UserApi exists
-//    public ?UserApi $creator;
+    public ?UserApi $creator;
 
     #[ApiProperty(writable: false)]
     public string $createdAt;
