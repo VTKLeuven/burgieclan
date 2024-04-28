@@ -6,7 +6,6 @@ use App\ApiResource\DocumentCommentApi;
 use App\Entity\Document;
 use App\Entity\DocumentComment;
 use App\Repository\DocumentCommentRepository;
-use App\Repository\DocumentRepository;
 use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfonycasts\MicroMapper\AsMapper;
@@ -20,7 +19,6 @@ class DocumentCommentApiToEntityMapper implements MapperInterface
         private readonly DocumentCommentRepository $repository,
         private readonly Security                  $security,
         private readonly MicroMapperInterface      $microMapper,
-        private readonly DocumentRepository        $documentRepository,
     ) {
     }
 
