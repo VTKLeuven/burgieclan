@@ -43,8 +43,7 @@ class DocumentCommentApi
     #[ApiFilter(BooleanFilter::class)]
     public bool $anonymous = false;
 
-//    TODO when DocumentApi exists
-//    public ?DocumentApi $document;
+    public ?DocumentApi $document;
 
     public ?UserApi $creator;
 

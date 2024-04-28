@@ -30,8 +30,7 @@ class DocumentCommentResourceTest extends ApiTestCase
             '@type',
             'content',
             'anonymous',
-// TODO add when DocumentApi exists
-//            'document',
+            'document',
             'creator',
             'createdAt',
             'updatedAt',
@@ -114,8 +113,7 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->post('/api/document_comments', HttpOptions::json([
                 'content' => 'The content of this comment',
                 'anonymous' => true,
-// TODO add when DocumentApi exists
-//                'document' => '/api/documents/' . $document->getId(),
+                'document' => '/api/documents/' . $document->getId(),
             ]))
             ->assertStatus(201)
             ->assertJsonMatches('content', 'The content of this comment')
