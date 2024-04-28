@@ -2,6 +2,7 @@
 
 namespace App\Mapper;
 
+use App\ApiResource\DocumentApi;
 use App\ApiResource\DocumentCommentApi;
 use App\ApiResource\UserApi;
 use App\Entity\DocumentComment;
@@ -34,10 +35,9 @@ class DocumentCommentEntityToApiMapper implements MapperInterface
 
         $to->content = $from->getContent();
         $to->anonymous = $from->isAnonymous();
-//        TODO when DocumentApi exists
-//        $to->document = $this->microMapper->map($from->getDocument(), DocumentApi::class, [
-//            MicroMapperInterface::MAX_DEPTH => 0,
-//        ]);
+        $to->document = $this->microMapper->map($from->getDocument(), DocumentApi::class, [
+            MicroMapperInterface::MAX_DEPTH => 0,
+        ]);
         $to->creator = $this->microMapper->map($from->getUser(), UserApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);

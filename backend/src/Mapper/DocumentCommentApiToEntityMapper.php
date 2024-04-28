@@ -3,6 +3,7 @@
 namespace App\Mapper;
 
 use App\ApiResource\DocumentCommentApi;
+use App\Entity\Document;
 use App\Entity\DocumentComment;
 use App\Repository\DocumentCommentRepository;
 use App\Repository\DocumentRepository;
@@ -45,13 +46,9 @@ class DocumentCommentApiToEntityMapper implements MapperInterface
 
         $to->setContent($from->content);
         $to->setAnonymous($from->anonymous);
-//        TODO when DocumentApi exists
-//        $to->setDocument($this->microMapper->map($from->document, Document::class, [
-//            MicroMapperInterface::MAX_DEPTH => 0,
-//        ]));
-        // Find a document with id 1 to link to this comment.
-        // TODO remove this when DocumentApi exists and the document is given with the api call.
-        $to->setDocument($this->documentRepository->findOneBy(['id' => 1]));
+        $to->setDocument($this->microMapper->map($from->document, Document::class, [
+            MicroMapperInterface::MAX_DEPTH => 0,
+        ]));
         $to->setUpdateDate();
 
         return $to;
