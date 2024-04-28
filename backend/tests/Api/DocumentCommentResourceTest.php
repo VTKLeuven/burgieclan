@@ -14,7 +14,7 @@ class DocumentCommentResourceTest extends ApiTestCase
     use ResetDatabase;
     use Factories;
 
-    public function testGetCollectionOfComments(): void
+    public function testGetCollectionOfDocumentComments(): void
     {
         DocumentCommentFactory::createMany(5);
         $json = $this->browser()
@@ -38,7 +38,7 @@ class DocumentCommentResourceTest extends ApiTestCase
         ]);
     }
 
-    public function testGetOneComment(): void
+    public function testGetOneDocumentComments(): void
     {
         $comment = DocumentCommentFactory::createOne();
 
@@ -48,7 +48,7 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->assertJsonMatches('"@id"', '/api/document_comments/' . $comment->getId());
     }
 
-    public function testGetCommentFilterByContent(): void
+    public function testGetDocumentCommentsFilterByContent(): void
     {
         $comment1 = DocumentCommentFactory::createOne([
             'content' => 'comment1',
@@ -76,7 +76,7 @@ class DocumentCommentResourceTest extends ApiTestCase
         ;
     }
 
-    public function testGetCourseFilterByAnonymous(): void
+    public function testGetDocumentCommentFilterByAnonymous(): void
     {
         DocumentCommentFactory::createMany(3, [
             'anonymous' => true,
@@ -122,7 +122,7 @@ class DocumentCommentResourceTest extends ApiTestCase
         ;
     }
 
-    public function testPatchToUpdateComment()
+    public function testPatchToUpdateDocumentComment()
     {
         $comment = DocumentCommentFactory::createOne();
 
@@ -138,7 +138,7 @@ class DocumentCommentResourceTest extends ApiTestCase
         ;
     }
 
-    public function testDeleteComment(){
+    public function testDeleteDocumentComment(){
         $comment = DocumentCommentFactory::createOne();
         $commentId = $comment->getId();
 

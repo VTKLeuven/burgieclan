@@ -16,7 +16,7 @@ class CourseCommentResourceTest extends ApiTestCase
     use ResetDatabase;
     use Factories;
 
-    public function testGetCollectionOfComments(): void
+    public function testGetCollectionOfCourseComments(): void
     {
         CourseCommentFactory::createMany(5);
         $json = $this->browser()
@@ -40,7 +40,7 @@ class CourseCommentResourceTest extends ApiTestCase
         ]);
     }
 
-    public function testGetOneComment(): void
+    public function testGetOneCourseComment(): void
     {
         $comment = CourseCommentFactory::createOne();
 
@@ -50,7 +50,7 @@ class CourseCommentResourceTest extends ApiTestCase
             ->assertJsonMatches('"@id"', '/api/course_comments/'.$comment->getId());
     }
 
-    public function testGetCommentFilterByContent(): void
+    public function testGetCourseCommentFilterByContent(): void
     {
         $comment1 = CourseCommentFactory::createOne([
             'content' => 'comment1',
@@ -78,7 +78,7 @@ class CourseCommentResourceTest extends ApiTestCase
         ;
     }
 
-    public function testGetCourseFilterByAnonymous(): void
+    public function testGetCourseCommentFilterByAnonymous(): void
     {
         CourseCommentFactory::createMany(3, [
             'anonymous' => true,
@@ -125,7 +125,7 @@ class CourseCommentResourceTest extends ApiTestCase
         ;
     }
 
-    public function testPatchToUpdateComment()
+    public function testPatchToUpdateCourseComment()
     {
         $comment = CourseCommentFactory::createOne();
 
@@ -141,7 +141,7 @@ class CourseCommentResourceTest extends ApiTestCase
         ;
     }
 
-    public function testDeleteComment(){
+    public function testDeleteCourseComment(){
         $comment = CourseCommentFactory::createOne();
         $commentId = $comment->getId();
 
