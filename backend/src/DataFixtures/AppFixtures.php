@@ -19,6 +19,9 @@ use App\Entity\User;
 use App\Factory\CommentCategoryFactory;
 use App\Factory\CourseCommentFactory;
 use App\Factory\CourseFactory;
+use App\Factory\DocumentCategoryFactory;
+use App\Factory\DocumentCommentFactory;
+use App\Factory\DocumentFactory;
 use App\Factory\ModuleFactory;
 use App\Factory\NotificationFactory;
 use App\Factory\ProgramFactory;
@@ -50,6 +53,9 @@ final class AppFixtures extends Fixture
         NotificationFactory::createMany(10);
         CommentCategoryFactory::createMany(5);
         CourseCommentFactory::createMany(100);
+        DocumentCategoryFactory::createMany(5);
+        DocumentFactory::createMany(100);
+        DocumentCommentFactory::createMany(150);
     }
 
     private function loadUsers(ObjectManager $manager): void
