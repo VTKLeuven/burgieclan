@@ -77,7 +77,7 @@ final class NotificationFactory extends ModelFactory
             'content' => self::faker()->text(),
             'startTime' => $startTime,
             'endTime' => $endTime,
-            'user' => UserFactory::randomOrCreate(),
+            'creator' => UserFactory::randomOrCreate(),
         ];
     }
 

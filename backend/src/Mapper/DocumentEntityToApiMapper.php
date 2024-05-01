@@ -42,7 +42,7 @@ class DocumentEntityToApiMapper implements MapperInterface
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);
         $to->under_review = $from->isUnderReview();
-        $to->creator = $this->microMapper->map($from->getUser(), UserApi::class, [
+        $to->creator = $this->microMapper->map($from->getCreator(), UserApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);
         $to->createdAt = $from->getCreateDate()->format('Y-m-d H:i:s');

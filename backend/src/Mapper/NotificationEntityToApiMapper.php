@@ -36,7 +36,7 @@ class NotificationEntityToApiMapper implements MapperInterface
         $to->title = $from->getTitle();
         $to->content = $from->getContent();
 
-        $to->creator = $this->microMapper->map($from->getUser(), UserApi::class, [
+        $to->creator = $this->microMapper->map($from->getCreator(), UserApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);
 

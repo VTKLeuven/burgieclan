@@ -42,7 +42,7 @@ class CourseCommentEntityToApiMapper implements MapperInterface
         $to->category = $this->microMapper->map($from->getCategory(), CommentCategoryApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);
-        $to->creator = $this->microMapper->map($from->getUser(), UserApi::class, [
+        $to->creator = $this->microMapper->map($from->getCreator(), UserApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);
         $to->createdAt = $from->getCreateDate()->format('Y-m-d H:i:s');

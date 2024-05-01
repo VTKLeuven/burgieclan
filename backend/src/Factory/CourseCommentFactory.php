@@ -72,7 +72,7 @@ final class CourseCommentFactory extends ModelFactory
             'category' => CommentCategoryFactory::randomOrCreate(),
             'content' => self::faker()->text(),
             'course' => CourseFactory::randomOrCreate(),
-            'user' => UserFactory::randomOrCreate(),
+            'creator' => UserFactory::randomOrCreate(),
         ];
     }
 
