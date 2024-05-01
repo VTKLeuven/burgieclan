@@ -71,7 +71,7 @@ final class DocumentCommentFactory extends ModelFactory
             'anonymous' => self::faker()->boolean(),
             'content' => self::faker()->text(),
             'document' => DocumentFactory::randomOrCreate(),
-            'user' => UserFactory::randomOrCreate(),
+            'creator' => UserFactory::randomOrCreate(),
         ];
     }
 
