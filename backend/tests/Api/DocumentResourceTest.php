@@ -98,6 +98,99 @@ class DocumentResourceTest extends ApiTestCase
         ;
     }
 
+    public function testGetDocumentFilterByCourse(): void
+    {
+        $course1 = CourseFactory::createOne();
+        $course2 = CourseFactory::createOne();
+        DocumentFactory::createMany(1, [
+            'course' => $course1,
+        ]);
+        DocumentFactory::createMany(2, [
+            'course' => $course2,
+        ]);
+        DocumentFactory::createMany(5, [
+            'course' => CourseFactory::createOne(),
+        ]);
+
+        $this->browser()
+            ->get('/api/documents?course=/api/courses/' . $course1->getId())
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('length("hydra:member")', 1)
+            ->get('/api/documents?course[]=/api/courses/' . $course1->getId() .
+                '&course[]=/api/courses/' . $course2->getId())
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 3)
+            ->assertJsonMatches('length("hydra:member")', 3)
+            ->get('/api/documents')
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 8)
+            ->assertJsonMatches('length("hydra:member")', 8)
+        ;
+    }
+
+    public function testGetDocumentFilterByCategory(): void
+    {
+        $category1 = DocumentCategoryFactory::createOne();
+        $category2 = DocumentCategoryFactory::createOne();
+        DocumentFactory::createMany(1, [
+            'category' => $category1,
+        ]);
+        DocumentFactory::createMany(2, [
+            'category' => $category2,
+        ]);
+        DocumentFactory::createMany(5, [
+            'category' => DocumentCategoryFactory::createOne(),
+        ]);
+
+        $this->browser()
+            ->get('/api/documents?category=/api/document_categories/' . $category1->getId())
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('length("hydra:member")', 1)
+            ->get('/api/documents?category[]=/api/document_categories/' . $category1->getId() .
+                '&category[]=/api/document_categories/' . $category2->getId())
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 3)
+            ->assertJsonMatches('length("hydra:member")', 3)
+            ->get('/api/documents')
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 8)
+            ->assertJsonMatches('length("hydra:member")', 8)
+        ;
+    }
+
+    public function testGetDocumentFilterByCreator(): void
+    {
+        $user1 = UserFactory::createOne();
+        $user2 = UserFactory::createOne();
+        DocumentFactory::createMany(1, [
+            'creator' => $user1,
+        ]);
+        DocumentFactory::createMany(2, [
+            'creator' => $user2,
+        ]);
+        DocumentFactory::createMany(5, [
+            'creator' => UserFactory::createOne(),
+        ]);
+
+        $this->browser()
+            ->get('/api/documents?creator=/api/users/' . $user1->getId())
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('length("hydra:member")', 1)
+            ->get('/api/documents?creator[]=/api/users/' . $user1->getId() .
+                '&creator[]=/api/users/' . $user2->getId())
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 3)
+            ->assertJsonMatches('length("hydra:member")', 3)
+            ->get('/api/documents')
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 8)
+            ->assertJsonMatches('length("hydra:member")', 8)
+        ;
+    }
+
     public function testPostToCreateDocument(): void
     {
         $user = UserFactory::createOne();

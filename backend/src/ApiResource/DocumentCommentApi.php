@@ -43,8 +43,11 @@ class DocumentCommentApi
     #[ApiFilter(BooleanFilter::class)]
     public bool $anonymous = false;
 
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     public ?DocumentApi $document;
 
+    #[ApiProperty(writable: false)]
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     public ?UserApi $creator;
 
     #[ApiProperty(writable: false)]
