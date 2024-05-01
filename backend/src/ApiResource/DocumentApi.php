@@ -36,8 +36,10 @@ class DocumentApi
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     public ?string $name = null;
 
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     public ?CourseApi $course;
 
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     public ?DocumentCategoryApi $category = null;
 
     #[ApiFilter(BooleanFilter::class)]
@@ -46,6 +48,7 @@ class DocumentApi
     // TODO add a way to upload a file
     // TODO add a way to get the file
 
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     public ?UserApi $creator;
 
     #[ApiProperty(writable: false)]

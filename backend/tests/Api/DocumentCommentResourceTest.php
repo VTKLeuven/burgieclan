@@ -96,6 +96,68 @@ class DocumentCommentResourceTest extends ApiTestCase
         ;
     }
 
+    public function testGetDocumentCommentFilterByDocument(): void
+    {
+        $document1 = DocumentFactory::createOne();
+        $document2 = DocumentFactory::createOne();
+        DocumentCommentFactory::createMany(1, [
+            'document' => $document1,
+        ]);
+        DocumentCommentFactory::createMany(2, [
+            'document' => $document2,
+        ]);
+        DocumentCommentFactory::createMany(5, [
+            'document' => DocumentFactory::createOne(),
+        ]);
+
+        $this->browser()
+            ->get('/api/document_comments?document=/api/documents/' . $document1->getId())
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('length("hydra:member")', 1)
+            ->get('/api/document_comments?document[]=/api/documents/' . $document1->getId() .
+                '&document[]=/api/documents/' . $document2->getId())
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 3)
+            ->assertJsonMatches('length("hydra:member")', 3)
+            ->get('/api/document_comments')
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 8)
+            ->assertJsonMatches('length("hydra:member")', 8)
+        ;
+    }
+
+    public function testGetDocumentCommentFilterByCreator(): void
+    {
+        $user1 = UserFactory::createOne();
+        $user2 = UserFactory::createOne();
+        DocumentCommentFactory::createMany(1, [
+            'creator' => $user1,
+        ]);
+        DocumentCommentFactory::createMany(2, [
+            'creator' => $user2,
+        ]);
+        DocumentCommentFactory::createMany(5, [
+            'creator' => UserFactory::createOne(),
+        ]);
+
+        $this->browser()
+            ->get('/api/document_comments?creator=/api/users/' . $user1->getId())
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('length("hydra:member")', 1)
+            ->get('/api/document_comments?creator[]=/api/users/' . $user1->getId() .
+                '&creator[]=/api/users/' . $user2->getId())
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 3)
+            ->assertJsonMatches('length("hydra:member")', 3)
+            ->get('/api/document_comments')
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 8)
+            ->assertJsonMatches('length("hydra:member")', 8)
+        ;
+    }
+
     public function testPostToCreateDocumentComment(): void
     {
         $user = UserFactory::createOne();
