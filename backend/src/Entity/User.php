@@ -63,6 +63,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::STRING)]
     private ?string $password = null;
 
+    private ?string $plainPassword;
+
     /**
      * @var string[]
      */
@@ -133,6 +135,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->password = $password;
     }
 
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(string $plainPassword): void
+    {
+        $this->plainPassword = $plainPassword;
+    }
+
     /**
      * Returns the roles or permissions granted to the user for security.
      */
@@ -193,8 +205,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials(): void
     {
-        // if you had a plainPassword property, you'd nullify it here
-        // $this->plainPassword = null;
+         $this->plainPassword = null;
     }
 
     /**
