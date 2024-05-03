@@ -1,6 +1,6 @@
 <?php
 
-namespace Api;
+namespace App\Tests\Api;
 
 use App\Factory\CommentCategoryFactory;
 use App\Factory\CourseCommentFactory;
@@ -20,7 +20,12 @@ class CourseCommentResourceTest extends ApiTestCase
     {
         CourseCommentFactory::createMany(5);
         $json = $this->browser()
-            ->get('/api/course_comments')
+            ->get('/api/course_comments', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
@@ -45,7 +50,12 @@ class CourseCommentResourceTest extends ApiTestCase
         $comment = CourseCommentFactory::createOne();
 
         $this->browser()
-            ->get('/api/course_comments/'.$comment->getId())
+            ->get('/api/course_comments/' . $comment->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/course_comments/'.$comment->getId());
     }
@@ -67,11 +77,20 @@ class CourseCommentResourceTest extends ApiTestCase
         CourseCommentFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/course_comments?content=comment2')
+            ->get('/api/course_comments?content=comment2', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/course_comments?content=comment')
+            ->get('/api/course_comments?content=comment', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
@@ -88,11 +107,21 @@ class CourseCommentResourceTest extends ApiTestCase
         ]);
 
         $this->browser()
-            ->get('/api/course_comments?anonymous=true')
+            ->get('/api/course_comments?anonymous=true', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
-            ->get('/api/course_comments?anonymous=false')
+            ->get('/api/course_comments?anonymous=false', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
@@ -114,12 +143,17 @@ class CourseCommentResourceTest extends ApiTestCase
                 ],
             ])
             ->assertStatus(422)
-            ->post('/api/course_comments', HttpOptions::json([
-                'content' => 'The content of this comment',
-                'anonymous' => true,
-                'course' => '/api/courses/' . $course->getId(),
-                'category' => '/api/comment_categories/' . $category->getId(),
-            ]))
+            ->post('/api/course_comments', [
+                'json' => [
+                    'content' => 'The content of this comment',
+                    'anonymous' => true,
+                    'course' => '/api/courses/' . $course->getId(),
+                    'category' => '/api/comment_categories/' . $category->getId(),
+                ],
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token
+                ]
+            ])
             ->assertStatus(201)
             ->assertJsonMatches('content', 'The content of this comment')
         ;
@@ -134,7 +168,10 @@ class CourseCommentResourceTest extends ApiTestCase
                 'json' => [
                     'content' => 'Some new content',
                 ],
-                'headers' => ['Content-Type' => 'application/merge-patch+json']
+                'headers' => [
+                    'Content-Type' => 'application/merge-patch+json',
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
             ])
             ->assertStatus(200)
             ->assertJsonMatches('content', 'Some new content')
@@ -146,16 +183,28 @@ class CourseCommentResourceTest extends ApiTestCase
         $commentId = $comment->getId();
 
         $this->browser()
-            ->get('/api/course_comments/' . $commentId)
+            ->get('/api/course_comments/' . $commentId, [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertStatus(200);
 
         $this->browser()
-            ->delete('/api/course_comments/' . $commentId)
+            ->delete('/api/course_comments/' . $commentId, [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertStatus(204)
         ;
 
         $this->browser()
-            ->get('/api/course_comments/' . $commentId)
+            ->get('/api/course_comments/' . $commentId, [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertStatus(404);
     }
 }
