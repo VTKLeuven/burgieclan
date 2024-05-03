@@ -23,6 +23,7 @@
         "easycorp/easyadmin-bundle": "^4.8",
         "knpuniversity/oauth2-client-bundle": "^2.18",
         "league/commonmark": "^2.1",
+        "lexik/jwt-authentication-bundle": "^2.21",
         "nelmio/cors-bundle": "^2.4",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.27",
