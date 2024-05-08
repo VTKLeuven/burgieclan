@@ -36,7 +36,7 @@ class Document extends Node
     #[ORM\Column]
     private ?bool $under_review = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $file_name = null;
 
     public function getId(): ?int
