@@ -28,6 +28,13 @@ jobs:
     needs: git_pull
 
     steps:
+      - name: Install ssh keys
+        # check this thread to understand why its needed:
+        # https://stackoverflow.com/a/70447517
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
       - name: Backend - Run composer install
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && composer install --no-dev --optimize-autoloader"
       - name: Backend - Update migrations
@@ -42,6 +49,13 @@ jobs:
     needs: git_pull
 
     steps:
+      - name: Install ssh keys
+        # check this thread to understand why its needed:
+        # https://stackoverflow.com/a/70447517
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
       - name: Frontend - Run npm install
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && npm install"
       - name: Frontend - Build NextJS app
