@@ -46,6 +46,10 @@ jobs:
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && npm install"
       - name: Frontend - Build NextJS app
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && npm run build"
+      - name: Frontend - Restart pm2
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && pm2 restart ${{ secrets.FRONTEND_PM2_APP_NAME }}"
+      - name: Frontend - Restart apache2
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "systemctl restart apache2"
 
   cleanup:
     name: Clean up
