@@ -70,10 +70,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private array $roles = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     #[ORM\Column(type: Types::JSON, nullable: true)]
-    private $accesstoken;
+    private ?string $accesstoken;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Node::class)]
     private Collection $nodes;
