@@ -51,7 +51,6 @@ class DocumentApiToEntityMapper implements MapperInterface
             MicroMapperInterface::MAX_DEPTH => 0,
         ]));
         $to->setUnderReview($from->under_review);
-        $to->setUpdateDate();
 
         return $to;
     }

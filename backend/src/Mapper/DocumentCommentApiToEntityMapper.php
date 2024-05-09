@@ -47,7 +47,6 @@ class DocumentCommentApiToEntityMapper implements MapperInterface
         $to->setDocument($this->microMapper->map($from->document, Document::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]));
-        $to->setUpdateDate();
 
         return $to;
     }
