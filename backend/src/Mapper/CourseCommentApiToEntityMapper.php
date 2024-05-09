@@ -51,7 +51,6 @@ class CourseCommentApiToEntityMapper implements MapperInterface
         $to->setCategory($this->microMapper->map($from->category, CommentCategory::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]));
-        $to->setUpdateDate();
 
         return $to;
     }
