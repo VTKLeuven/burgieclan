@@ -11,6 +11,7 @@
 
 namespace App\Entity;
 
+use App\Factory\UserFactory;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -63,6 +64,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::STRING)]
     private ?string $password = null;
 
+    /**
+     * @var string|null $plainPassword
+     * This variable contains the plaintext password during creation. It is needed for the @see UserFactory
+     * This isn't saved in the database.
+     */
     private ?string $plainPassword;
 
     /**
