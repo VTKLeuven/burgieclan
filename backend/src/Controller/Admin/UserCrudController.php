@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 
 class UserCrudController extends AbstractCrudController
 {
@@ -30,5 +31,22 @@ class UserCrudController extends AbstractCrudController
             ->renderExpanded()
             ->renderAsBadges()
             ->setPermission(USER::ROLE_SUPER_ADMIN);
+            
+        yield AssociationField::new('favoritePrograms')
+            ->setFormTypeOptions(['by_reference' => false])
+            ->autocomplete()
+            ->setLabel('Favorite Programs');
+        yield AssociationField::new('favoriteModules')
+            ->setFormTypeOptions(['by_reference' => false])
+            ->autocomplete()
+            ->setLabel('Favorite Modules');
+        yield AssociationField::new('favoriteCourses')
+            ->setFormTypeOptions(['by_reference' => false])
+            ->autocomplete()
+            ->setLabel('Favorite Courses');
+        yield AssociationField::new('favoriteDocuments')
+            ->setFormTypeOptions(['by_reference' => false])
+            ->autocomplete()
+            ->setLabel('Favorite Documents');
     }
 }
