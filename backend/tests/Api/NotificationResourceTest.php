@@ -1,6 +1,6 @@
 <?php
 
-namespace Api;
+namespace App\Tests\Api;
 
 use App\Factory\NotificationFactory;
 use App\Tests\Api\ApiTestCase;
@@ -18,7 +18,12 @@ class NotificationResourceTest extends ApiTestCase
     {
         NotificationFactory::createMany(5);
         $json = $this->browser()
-            ->get('/api/notifications')
+            ->get('/api/notifications', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
@@ -43,7 +48,12 @@ class NotificationResourceTest extends ApiTestCase
         $notification = NotificationFactory::createOne();
 
         $this->browser()
-            ->get('/api/notifications/' . $notification->getId())
+            ->get('/api/notifications/' . $notification->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/notifications/' . $notification->getId());
     }
@@ -65,11 +75,20 @@ class NotificationResourceTest extends ApiTestCase
         NotificationFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/notifications?title=testnotification2')
+            ->get('/api/notifications?title=testnotification2', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/notifications?title=testnotification')
+            ->get('/api/notifications?title=testnotification', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
@@ -93,11 +112,20 @@ class NotificationResourceTest extends ApiTestCase
         NotificationFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/notifications?content=testnotification2')
+            ->get('/api/notifications?content=testnotification2', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/notifications?content=testnotification')
+            ->get('/api/notifications?content=testnotification', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
@@ -122,19 +150,39 @@ class NotificationResourceTest extends ApiTestCase
         ]);
 
         $this->browser()
-            ->get('/api/notifications?startTime[before]=' . $startTime2->format('Y-m-d H:i:s'))
+            ->get('/api/notifications?startTime[before]=' . $startTime2->format('Y-m-d H:i:s'), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->get('/api/notifications?startTime[strictly_before]=' . $startTime2->format('Y-m-d H:i:s'))
+            ->get('/api/notifications?startTime[strictly_before]=' . $startTime2->format('Y-m-d H:i:s'), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/notifications?startTime[after]=' . $startTime2->format('Y-m-d H:i:s'))
+            ->get('/api/notifications?startTime[after]=' . $startTime2->format('Y-m-d H:i:s'), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->get('/api/notifications?startTime[strictly_after]=' . $startTime2->format('Y-m-d H:i:s'))
+            ->get('/api/notifications?startTime[strictly_after]=' . $startTime2->format('Y-m-d H:i:s'), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
@@ -159,19 +207,39 @@ class NotificationResourceTest extends ApiTestCase
         ]);
 
         $this->browser()
-            ->get('/api/notifications?endTime[before]=' . $endTime2->format('Y-m-d H:i:s'))
+            ->get('/api/notifications?endTime[before]=' . $endTime2->format('Y-m-d H:i:s'), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->get('/api/notifications?endTime[strictly_before]=' . $endTime2->format('Y-m-d H:i:s'))
+            ->get('/api/notifications?endTime[strictly_before]=' . $endTime2->format('Y-m-d H:i:s'), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/notifications?endTime[after]=' . $endTime2->format('Y-m-d H:i:s'))
+            ->get('/api/notifications?endTime[after]=' . $endTime2->format('Y-m-d H:i:s'), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->get('/api/notifications?endTime[strictly_after]=' . $endTime2->format('Y-m-d H:i:s'))
+            ->get('/api/notifications?endTime[strictly_after]=' . $endTime2->format('Y-m-d H:i:s'), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)

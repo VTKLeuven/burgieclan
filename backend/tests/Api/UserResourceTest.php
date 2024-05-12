@@ -16,7 +16,11 @@ class UserResourceTest extends ApiTestCase
         $user = UserFactory::createOne();
 
         $this->browser()
-            ->get('/api/users/'.$user->getId())
+            ->get('/api/users/' . $user->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/users/' . $user->getId());
     }
