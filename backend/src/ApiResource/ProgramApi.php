@@ -33,5 +33,8 @@ class ProgramApi
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     public ?string $name = null;
 
+    /**
+     * @var ModuleApi[]
+     */
     public array $modules = [];
 }
