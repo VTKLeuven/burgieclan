@@ -2,17 +2,16 @@
 
 namespace App\Mapper;
 
-use App\ApiResource\CommentCategoryApi;
-use App\ApiResource\CourseApi;
-use App\ApiResource\CourseCommentApi;
+use App\ApiResource\DocumentApi;
+use App\ApiResource\DocumentCommentApi;
 use App\ApiResource\UserApi;
-use App\Entity\CourseComment;
+use App\Entity\DocumentComment;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
-#[AsMapper(from: CourseComment::class, to: CourseCommentApi::class)]
-class CourseCommentEntityToApiMapper implements MapperInterface
+#[AsMapper(from: DocumentComment::class, to: DocumentCommentApi::class)]
+class DocumentCommentEntityToApiMapper implements MapperInterface
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
@@ -21,9 +20,9 @@ class CourseCommentEntityToApiMapper implements MapperInterface
 
     public function load(object $from, string $toClass, array $context): object
     {
-        assert($from instanceof CourseComment);
+        assert($from instanceof DocumentComment);
 
-        $dto = new CourseCommentApi();
+        $dto = new DocumentCommentApi();
         $dto->id = $from->getId();
 
         return $dto;
@@ -31,15 +30,12 @@ class CourseCommentEntityToApiMapper implements MapperInterface
 
     public function populate(object $from, object $to, array $context): object
     {
-        assert($from instanceof CourseComment);
-        assert($to instanceof CourseCommentApi);
+        assert($from instanceof DocumentComment);
+        assert($to instanceof DocumentCommentApi);
 
         $to->content = $from->getContent();
         $to->anonymous = $from->isAnonymous();
-        $to->course = $this->microMapper->map($from->getCourse(), CourseApi::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
-        ]);
-        $to->category = $this->microMapper->map($from->getCategory(), CommentCategoryApi::class, [
+        $to->document = $this->microMapper->map($from->getDocument(), DocumentApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);
         $to->creator = $this->microMapper->map($from->getCreator(), UserApi::class, [

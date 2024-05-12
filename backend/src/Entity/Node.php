@@ -13,39 +13,39 @@ use Doctrine\ORM\Mapping as ORM;
 abstract class Node
 {
     #[ORM\ManyToOne(inversedBy: 'nodes')]
-    private ?User $user = null;
+    private User $creator;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private ?DateTimeInterface $createDate;
+    private DateTimeInterface $createDate;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?DateTimeInterface $updateDate;
+    private DateTimeInterface $updateDate;
 
-    public function __construct(?User $user)
+    public function __construct(User $creator)
     {
-        $this->user = $user;
+        $this->creator = $creator;
         $this->createDate = new DateTimeImmutable();
         $this->updateDate = $this->createDate;
     }
 
-    public function setUser(?User $user): self
+    public function setCreator(User $creator): self
     {
-        $this->user = $user;
+        $this->creator = $creator;
 
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getCreator(): User
     {
-        return $this->user;
+        return $this->creator;
     }
 
-    public function getCreateDate(): ?DateTimeInterface
+    public function getCreateDate(): DateTimeInterface
     {
         return $this->createDate;
     }
 
-    public function getUpdateDate(): ?DateTimeInterface
+    public function getUpdateDate(): DateTimeInterface
     {
         return $this->updateDate;
     }
