@@ -11,6 +11,7 @@
 
 namespace App\Entity;
 
+use App\Factory\UserFactory;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -64,22 +65,61 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     /**
+     * @var string|null $plainPassword
+     * This variable contains the plaintext password during creation. It is needed for the @see UserFactory
+     * This isn't saved in the database.
+     */
+    private ?string $plainPassword;
+
+    /**
      * @var string[]
      */
     #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     #[ORM\Column(type: Types::JSON, nullable: true)]
-    private $accesstoken;
+    private ?string $accesstoken;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Node::class)]
     private Collection $nodes;
 
+    /**
+     * @var Collection|Program[]
+     */
+    #[ORM\ManyToMany(targetEntity: Program::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'favorite_user_program')]
+    private Collection $favoritePrograms;
+    
+    /**
+     * @var Collection|Module[]
+     */
+    #[ORM\ManyToMany(targetEntity: Module::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'favorite_user_module')]
+    private Collection $favoriteModules;
+
+    /**
+     * @var Collection|Course[]
+     */
+    #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'favorite_user_course')]
+    private Collection $favoriteCourses;
+
+    /**
+     * @var Collection|Document[]
+     */
+    #[ORM\ManyToMany(targetEntity: Document::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'favorite_user_document')]
+    private Collection $favoriteDocuments;
+
     public function __construct()
     {
+        $this->favoritePrograms = new ArrayCollection();
+        $this->favoriteModules = new ArrayCollection();
+        $this->favoriteCourses = new ArrayCollection();
+        $this->favoriteDocuments = new ArrayCollection();
         $this->nodes = new ArrayCollection();
     }
 
@@ -131,6 +171,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): void
     {
         $this->password = $password;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(string $plainPassword): void
+    {
+        $this->plainPassword = $plainPassword;
     }
 
     /**
@@ -193,8 +243,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials(): void
     {
-        // if you had a plainPassword property, you'd nullify it here
-        // $this->plainPassword = null;
+         $this->plainPassword = null;
     }
 
     /**
@@ -227,4 +276,89 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return array(self::ROLE_USER, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN);
     }
+
+    /**
+     * Get the favorite programs of the user.
+     * 
+     * @return Collection
+     */
+    public function getFavoritePrograms(): Collection
+    {
+        return $this->favoritePrograms;
+    }
+
+    /**
+     * Set the favorite programs of the user.
+     * 
+     * @param Collection $programs
+     * @return void
+     */
+    public function setFavoritePrograms(Collection $programs): void
+    {
+        $this->favoritePrograms = $programs;
+    }
+
+    /**
+     * Get the favorite modules of the user.
+     * 
+     * @return Collection
+     */
+    public function getFavoriteModules(): Collection
+    {
+        return $this->favoriteModules;
+    }
+
+    /**
+     * Set the favorite modules of the user.
+     * 
+     * @param Collection $modules
+     * @return void
+     */
+    public function setFavoriteModules(Collection $modules): void
+    {
+        $this->favoriteModules = $modules;
+    }
+
+    /**
+     * Get the favorite courses of the user.
+     * 
+     * @return Collection
+     */
+    public function getFavoriteCourses(): Collection
+    {
+        return $this->favoriteCourses;
+    }
+
+    /**
+     * Set the favorite courses of the user.
+     * 
+     * @param Collection $courses
+     * @return void
+     */
+    public function setFavoriteCourses(Collection $courses): void
+    {
+        $this->favoriteCourses = $courses;
+    }
+
+    /**
+     * Get the favorite documents of the user.
+     * 
+     * @return Collection
+     */
+    public function getFavoriteDocuments(): Collection
+    {
+        return $this->favoriteDocuments;
+    }
+
+    /**
+     * Set the favorite documents of the user.
+     * 
+     * @param Collection $documents
+     * @return void
+     */
+    public function setFavoriteDocuments(Collection $documents): void
+    {
+        $this->favoriteDocuments = $documents;
+    }
+
 }
