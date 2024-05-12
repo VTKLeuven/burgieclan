@@ -36,6 +36,9 @@ class Document extends Node
     #[ORM\Column]
     private ?bool $under_review = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $file_name = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -84,6 +87,18 @@ class Document extends Node
     public function setUnderReview(bool $under_review): static
     {
         $this->under_review = $under_review;
+
+        return $this;
+    }
+
+    public function getFileName(): ?string
+    {
+        return $this->file_name;
+    }
+
+    public function setFileName(string $file_name): static
+    {
+        $this->file_name = $file_name;
 
         return $this;
     }
