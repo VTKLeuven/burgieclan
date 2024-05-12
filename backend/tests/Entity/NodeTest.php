@@ -38,10 +38,10 @@ class NodeTest extends TestCase
         $nodeMock = $this->getMockBuilder(Node::class)
             ->getMockForAbstractClass();
 
-        $this->assertNull($nodeMock->getUser());
+        $this->assertNull($nodeMock->getCreator());
 
         $user = $this->createMock(User::class);
-        $nodeMock->setUser($user);
-        $this->assertSame($user, $nodeMock->getUser());
+        $nodeMock->setCreator($user);
+        $this->assertSame($user, $nodeMock->getCreator());
     }
 }
