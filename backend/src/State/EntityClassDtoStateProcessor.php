@@ -20,6 +20,13 @@ class EntityClassDtoStateProcessor implements ProcessorInterface
     ) {
     }
 
+    /**
+     * @param mixed $data
+     * @param Operation $operation
+     * @param array $uriVariables
+     * @param array $context
+     * @return mixed|void|null
+     */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         $stateOptions = $operation->getStateOptions();

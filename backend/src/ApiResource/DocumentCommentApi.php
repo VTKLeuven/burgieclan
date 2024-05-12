@@ -13,13 +13,13 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use App\Entity\CourseComment;
+use App\Entity\DocumentComment;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    shortName: 'Course Comment',
+    shortName: 'Document Comment',
     operations: [
         new Get(),
         new GetCollection(),
@@ -29,9 +29,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
-    stateOptions: new Options(entityClass: CourseComment::class),
+    stateOptions: new Options(entityClass: DocumentComment::class),
 )]
-class CourseCommentApi
+class DocumentCommentApi
 {
     #[ApiProperty(readable: false, writable: false, identifier: true)]
     public ?int $id = null;
@@ -43,10 +43,11 @@ class CourseCommentApi
     #[ApiFilter(BooleanFilter::class)]
     public bool $anonymous = false;
 
-    public ?CourseApi $course;
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    public ?DocumentApi $document;
 
-    public ?CommentCategoryApi $category;
-
+    #[ApiProperty(writable: false)]
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     public ?UserApi $creator;
 
     #[ApiProperty(writable: false)]

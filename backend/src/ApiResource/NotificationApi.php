@@ -2,52 +2,47 @@
 
 namespace App\ApiResource;
 
-use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use App\Entity\CourseComment;
+use App\Entity\Notification;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
-use Symfony\Component\Validator\Constraints as Assert;
+use DateTime;
 
 #[ApiResource(
-    shortName: 'Course Comment',
+    shortName: 'Notification',
     operations: [
         new Get(),
         new GetCollection(),
-        new Patch(),
-        new Post(),
-        new Delete(),
     ],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
-    stateOptions: new Options(entityClass: CourseComment::class),
+    stateOptions: new Options(entityClass: Notification::class),
 )]
-class CourseCommentApi
+class NotificationApi
 {
     #[ApiProperty(readable: false, writable: false, identifier: true)]
     public ?int $id = null;
 
-    #[Assert\NotBlank]
+    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
+    public ?string $title = null;
+
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     public ?string $content = null;
 
-    #[ApiFilter(BooleanFilter::class)]
-    public bool $anonymous = false;
-
-    public ?CourseApi $course;
-
-    public ?CommentCategoryApi $category;
-
     public ?UserApi $creator;
+
+    #[ApiFilter(DateFilter::class)]
+    public string $startTime;
+
+    #[ApiFilter(DateFilter::class)]
+    public string $endTime;
 
     #[ApiProperty(writable: false)]
     public string $createdAt;
