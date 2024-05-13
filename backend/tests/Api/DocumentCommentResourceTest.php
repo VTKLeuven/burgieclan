@@ -18,7 +18,11 @@ class DocumentCommentResourceTest extends ApiTestCase
     {
         DocumentCommentFactory::createMany(5);
         $json = $this->browser()
-            ->get('/api/document_comments')
+            ->get('/api/document_comments', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
@@ -42,7 +46,11 @@ class DocumentCommentResourceTest extends ApiTestCase
         $comment = DocumentCommentFactory::createOne();
 
         $this->browser()
-            ->get('/api/document_comments/' . $comment->getId())
+            ->get('/api/document_comments/' . $comment->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/document_comments/' . $comment->getId());
     }
@@ -64,11 +72,19 @@ class DocumentCommentResourceTest extends ApiTestCase
         DocumentCommentFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/document_comments?content=comment2')
+            ->get('/api/document_comments?content=comment2', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/document_comments?content=comment')
+            ->get('/api/document_comments?content=comment', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
@@ -85,11 +101,19 @@ class DocumentCommentResourceTest extends ApiTestCase
         ]);
 
         $this->browser()
-            ->get('/api/document_comments?anonymous=true')
+            ->get('/api/document_comments?anonymous=true', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
-            ->get('/api/document_comments?anonymous=false')
+            ->get('/api/document_comments?anonymous=false', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
@@ -111,16 +135,28 @@ class DocumentCommentResourceTest extends ApiTestCase
         ]);
 
         $this->browser()
-            ->get('/api/document_comments?document=/api/documents/' . $document1->getId())
+            ->get('/api/document_comments?document=/api/documents/' . $document1->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
             ->get('/api/document_comments?document[]=/api/documents/' . $document1->getId() .
-                '&document[]=/api/documents/' . $document2->getId())
+                '&document[]=/api/documents/' . $document2->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
-            ->get('/api/document_comments')
+            ->get('/api/document_comments', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 8)
             ->assertJsonMatches('length("hydra:member")', 8)
@@ -142,16 +178,28 @@ class DocumentCommentResourceTest extends ApiTestCase
         ]);
 
         $this->browser()
-            ->get('/api/document_comments?creator=/api/users/' . $user1->getId())
+            ->get('/api/document_comments?creator=/api/users/' . $user1->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
             ->get('/api/document_comments?creator[]=/api/users/' . $user1->getId() .
-                '&creator[]=/api/users/' . $user2->getId())
+                '&creator[]=/api/users/' . $user2->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
-            ->get('/api/document_comments')
+            ->get('/api/document_comments', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 8)
             ->assertJsonMatches('length("hydra:member")', 8)
@@ -172,11 +220,17 @@ class DocumentCommentResourceTest extends ApiTestCase
                 ],
             ])
             ->assertStatus(422)
-            ->post('/api/document_comments', HttpOptions::json([
-                'content' => 'The content of this comment',
-                'anonymous' => true,
-                'document' => '/api/documents/' . $document->getId(),
-            ]))
+            ->post('/api/document_comments',
+                [
+                    'json' => [
+                        'content' => 'The content of this comment',
+                        'anonymous' => true,
+                        'document' => '/api/documents/' . $document->getId(),
+                    ],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ])
             ->assertStatus(201)
             ->assertJsonMatches('content', 'The content of this comment')
         ;
@@ -191,7 +245,10 @@ class DocumentCommentResourceTest extends ApiTestCase
                 'json' => [
                     'content' => 'Some new content',
                 ],
-                'headers' => ['Content-Type' => 'application/merge-patch+json']
+                'headers' => [
+                    'Content-Type' => 'application/merge-patch+json',
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
             ])
             ->assertStatus(200)
             ->assertJsonMatches('content', 'Some new content')
@@ -203,15 +260,27 @@ class DocumentCommentResourceTest extends ApiTestCase
         $commentId = $comment->getId();
 
         $this->browser()
-            ->get('/api/document_comments/' . $commentId)
+            ->get('/api/document_comments/' . $commentId, [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertStatus(200);
 
         $this->browser()
-            ->delete('/api/document_comments/' . $commentId)
+            ->delete('/api/document_comments/' . $commentId, [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertStatus(204);
 
         $this->browser()
-            ->get('/api/document_comments/' . $commentId)
+            ->get('/api/document_comments/' . $commentId, [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertStatus(404);
     }
 }
