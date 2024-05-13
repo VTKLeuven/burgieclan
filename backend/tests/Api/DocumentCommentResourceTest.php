@@ -29,7 +29,7 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->json()
         ;
 
-        $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
+        $this->assertEqualsCanonicalizing([
             '@id',
             '@type',
             'content',
@@ -38,7 +38,7 @@ class DocumentCommentResourceTest extends ApiTestCase
             'creator',
             'createdAt',
             'updatedAt',
-        ]);
+        ], array_keys($json->decoded()['hydra:member'][0]));
     }
 
     public function testGetOneDocumentComments(): void
@@ -238,21 +238,62 @@ class DocumentCommentResourceTest extends ApiTestCase
 
     public function testPatchToUpdateDocumentComment()
     {
-        $comment = DocumentCommentFactory::createOne();
+        $creator = UserFactory::createOne(
+            [
+                'username' => 'creator',
+                'plainPassword' => 'password'
+            ]);
+        $otherUser = UserFactory::createOne(
+            [
+                'username' => 'other user',
+                'plainPassword' => 'password']);
+
+        $creatorTokenResponse = $this->browser()
+            ->post('/api/auth/login', HttpOptions::json([
+                'username' => $creator->getUsername(),
+                'password' => 'password',
+            ]))
+            ->json()
+            ->decoded();
+        $creatorToken = $creatorTokenResponse['token'];
+
+        $otherUserTokenResponse = $this->browser()
+            ->post('/api/auth/login', HttpOptions::json([
+                'username' => $otherUser->getUsername(),
+                'password' => 'password',
+            ]))
+            ->json()
+            ->decoded();
+        $otherToken = $otherUserTokenResponse['token'];
+
+        $comment = DocumentCommentFactory::createOne([
+            'creator' => $creator,
+        ]);
 
         $this->browser()
-            ->patch('/api/document_comments/'.$comment->getId(), [
+            ->patch('/api/document_comments/' . $comment->getId(), [
                 'json' => [
                     'content' => 'Some new content',
                 ],
                 'headers' => [
                     'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' =>'Bearer ' . $creatorToken
                 ]
             ])
             ->assertStatus(200)
-            ->assertJsonMatches('content', 'Some new content')
-        ;
+            ->assertJsonMatches('content', 'Some new content');
+
+        $this->browser()
+            ->patch('/api/document_comments/' . $comment->getId(), [
+                'json' => [
+                    'content' => 'Some new content',
+                ],
+                'headers' => [
+                    'Content-Type' => 'application/merge-patch+json',
+                    'Authorization' =>'Bearer ' . $otherToken
+                ]
+            ])
+            ->assertStatus(403);
     }
 
     public function testDeleteDocumentComment(){
