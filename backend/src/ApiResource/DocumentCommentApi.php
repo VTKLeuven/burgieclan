@@ -21,7 +21,11 @@ use App\State\EntityClassDtoStateProvider;
     operations: [
         new Get(),
         new GetCollection(),
-        new Patch(),
+        new Patch(
+        // This redirects the security check to all voters to see if one accepts CourseCommentApi objects
+        // This is handled by the src/Security/Voter/AbstractCommentVoter
+            security: 'is_granted("EDIT", object)'
+        ),
         new Post(),
         new Delete(),
     ],
