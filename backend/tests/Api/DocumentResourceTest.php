@@ -19,7 +19,11 @@ class DocumentResourceTest extends ApiTestCase
     {
         DocumentFactory::createMany(5);
         $json = $this->browser()
-            ->get('/api/documents')
+            ->get('/api/documents', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
@@ -44,9 +48,13 @@ class DocumentResourceTest extends ApiTestCase
         $comment = DocumentFactory::createOne();
 
         $this->browser()
-            ->get('/api/documents/'.$comment->getId())
+            ->get('/api/documents/' . $comment->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
-            ->assertJsonMatches('"@id"', '/api/documents/'.$comment->getId());
+            ->assertJsonMatches('"@id"', '/api/documents/' . $comment->getId());
     }
 
     public function testGetDocumentFilterByName(): void
@@ -66,11 +74,19 @@ class DocumentResourceTest extends ApiTestCase
         DocumentFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/documents?name=document2')
+            ->get('/api/documents?name=document2', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/documents?name=document')
+            ->get('/api/documents?name=document', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
@@ -87,11 +103,19 @@ class DocumentResourceTest extends ApiTestCase
         ]);
 
         $this->browser()
-            ->get('/api/documents?under_review=true')
+            ->get('/api/documents?under_review=true', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
-            ->get('/api/documents?under_review=false')
+            ->get('/api/documents?under_review=false', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
@@ -113,16 +137,28 @@ class DocumentResourceTest extends ApiTestCase
         ]);
 
         $this->browser()
-            ->get('/api/documents?course=/api/courses/' . $course1->getId())
+            ->get('/api/documents?course=/api/courses/' . $course1->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
             ->get('/api/documents?course[]=/api/courses/' . $course1->getId() .
-                '&course[]=/api/courses/' . $course2->getId())
+                '&course[]=/api/courses/' . $course2->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
-            ->get('/api/documents')
+            ->get('/api/documents', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 8)
             ->assertJsonMatches('length("hydra:member")', 8)
@@ -144,16 +180,28 @@ class DocumentResourceTest extends ApiTestCase
         ]);
 
         $this->browser()
-            ->get('/api/documents?category=/api/document_categories/' . $category1->getId())
+            ->get('/api/documents?category=/api/document_categories/' . $category1->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
             ->get('/api/documents?category[]=/api/document_categories/' . $category1->getId() .
-                '&category[]=/api/document_categories/' . $category2->getId())
+                '&category[]=/api/document_categories/' . $category2->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
-            ->get('/api/documents')
+            ->get('/api/documents', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 8)
             ->assertJsonMatches('length("hydra:member")', 8)
@@ -175,16 +223,28 @@ class DocumentResourceTest extends ApiTestCase
         ]);
 
         $this->browser()
-            ->get('/api/documents?creator=/api/users/' . $user1->getId())
+            ->get('/api/documents?creator=/api/users/' . $user1->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
             ->get('/api/documents?creator[]=/api/users/' . $user1->getId() .
-                '&creator[]=/api/users/' . $user2->getId())
+                '&creator[]=/api/users/' . $user2->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
-            ->get('/api/documents')
+            ->get('/api/documents', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 8)
             ->assertJsonMatches('length("hydra:member")', 8)
@@ -206,12 +266,18 @@ class DocumentResourceTest extends ApiTestCase
                 ],
             ])
             ->assertStatus(422)
-            ->post('/api/documents', HttpOptions::json([
-                'name' => 'Document name',
-                'course' => '/api/courses/' . $course->getId(),
-                'category' => '/api/document_categories/' . $category->getId(),
-                'under_review' => true,
-            ]))
+            ->post('/api/documents',
+                [
+                    'json' => [
+                        'name' => 'Document name',
+                        'course' => '/api/courses/' . $course->getId(),
+                        'category' => '/api/document_categories/' . $category->getId(),
+                        'under_review' => true,
+                    ],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+            ])
             ->assertStatus(201)
             ->assertJsonMatches('name', 'Document name')
         ;
