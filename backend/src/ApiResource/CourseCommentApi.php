@@ -16,7 +16,6 @@ use ApiPlatform\Metadata\Post;
 use App\Entity\CourseComment;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'Course Comment',
@@ -31,27 +30,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: CourseComment::class),
 )]
-class CourseCommentApi
+class CourseCommentApi extends AbstractCommentApi
 {
     #[ApiProperty(readable: false, writable: false, identifier: true)]
     public ?int $id = null;
 
-    #[Assert\NotBlank]
-    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    public ?string $content = null;
-
-    #[ApiFilter(BooleanFilter::class)]
-    public bool $anonymous = false;
-
     public ?CourseApi $course;
 
     public ?CommentCategoryApi $category;
-
-    public ?UserApi $creator;
-
-    #[ApiProperty(writable: false)]
-    public string $createdAt;
-
-    #[ApiProperty(writable: false)]
-    public string $updatedAt;
 }
