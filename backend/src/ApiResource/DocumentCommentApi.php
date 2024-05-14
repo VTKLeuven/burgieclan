@@ -27,7 +27,11 @@ use App\State\EntityClassDtoStateProvider;
             security: 'is_granted("EDIT", object)'
         ),
         new Post(),
-        new Delete(),
+        new Delete(
+        // This redirects the security check to all voters to see if one accepts CourseCommentApi objects
+        // This is handled by the src/Security/Voter/AbstractCommentVoter
+            security: 'is_granted("DELETE", object)'
+        ),
     ],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,

@@ -262,13 +262,45 @@ class CourseCommentResourceTest extends ApiTestCase
     }
 
     public function testDeleteCourseComment(){
-        $comment = CourseCommentFactory::createOne();
+        $creator = UserFactory::createOne(
+            [
+                'username' => 'creator',
+                'plainPassword' => 'password'
+            ]);
+        $otherUser = UserFactory::createOne(
+            [
+                'username' => 'other user',
+                'plainPassword' => 'password']);
+
+        $creatorTokenResponse = $this->browser()
+            ->post('/api/auth/login', HttpOptions::json([
+                'username' => $creator->getUsername(),
+                'password' => 'password',
+            ]))
+            ->json()
+            ->decoded();
+        $creatorToken = $creatorTokenResponse['token'];
+
+        $otherUserTokenResponse = $this->browser()
+            ->post('/api/auth/login', HttpOptions::json([
+                'username' => $otherUser->getUsername(),
+                'password' => 'password',
+            ]))
+            ->json()
+            ->decoded();
+        $otherToken = $otherUserTokenResponse['token'];
+
+        $comment = CourseCommentFactory::createOne(
+            [
+            'creator' => $creator,
+            ]
+        );
         $commentId = $comment->getId();
 
         $this->browser()
             ->get('/api/course_comments/' . $commentId, [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' =>'Bearer ' . $creatorToken
                 ]
             ])
             ->assertStatus(200);
@@ -276,16 +308,23 @@ class CourseCommentResourceTest extends ApiTestCase
         $this->browser()
             ->delete('/api/course_comments/' . $commentId, [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' =>'Bearer ' . $otherToken
                 ]
             ])
-            ->assertStatus(204)
-        ;
+            ->assertStatus(403);
+
+        $this->browser()
+            ->delete('/api/course_comments/' . $commentId, [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $creatorToken
+                ]
+            ])
+            ->assertStatus(204);
 
         $this->browser()
             ->get('/api/course_comments/' . $commentId, [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' =>'Bearer ' . $creatorToken
                 ]
             ])
             ->assertStatus(404);

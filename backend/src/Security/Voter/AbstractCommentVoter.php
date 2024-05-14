@@ -21,6 +21,7 @@ use Symfonycasts\MicroMapper\MicroMapperInterface;
 class AbstractCommentVoter extends Voter
 {
     public const EDIT = 'EDIT';
+    public const DELETE = 'DELETE';
 
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
@@ -32,7 +33,7 @@ class AbstractCommentVoter extends Voter
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
-        return $attribute === self::EDIT && $subject instanceof AbstractCommentApi;
+        return in_array($attribute, [self::EDIT, self::DELETE]) && $subject instanceof AbstractCommentApi;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
@@ -48,6 +49,17 @@ class AbstractCommentVoter extends Voter
         switch ($attribute) {
             case self::EDIT:
                 // logic to determine if the user can EDIT
+                // return true or false
+                $creator = $this->microMapper->map($subject->creator, User::class, [
+                    MicroMapperInterface::MAX_DEPTH => 0,
+                ]);
+
+                if ($creator == $user) {
+                    return true;
+                }
+                break;
+            case self::DELETE:
+                // logic to determine if the user can DELETE
                 // return true or false
                 $creator = $this->microMapper->map($subject->creator, User::class, [
                     MicroMapperInterface::MAX_DEPTH => 0,
