@@ -3,10 +3,14 @@
 namespace App\Mapper;
 
 use App\ApiResource\UserApi;
+use App\Entity\Course;
+use App\Entity\Document;
+use App\Entity\Module;
+use App\Entity\Program;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Exception;
-use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -15,7 +19,9 @@ use Symfonycasts\MicroMapper\MicroMapperInterface;
 class UserApiToEntityMapper implements MapperInterface
 {
     public function __construct(
-        private readonly UserRepository $repository,
+        private readonly UserRepository            $repository,
+        private readonly MicroMapperInterface      $microMapper,
+        private readonly PropertyAccessorInterface $propertyAccessor,
     ) {
     }
 
@@ -39,7 +45,40 @@ class UserApiToEntityMapper implements MapperInterface
         assert($from instanceof UserApi);
         assert($to instanceof User);
 
-        // No need to set any fields from user. It either gets pulled from the database in load() or doesn't exist.
+        // No need to set any fields from user except the favorites.
+        // It either gets pulled from the database in load() or doesn't exist.
+
+        $favoriteCourses = [];
+        foreach ($from->favoriteCourses as $course) {
+            $favoriteCourses[] = $this->microMapper->map($course, Course::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }
+        $this->propertyAccessor->setValue($to, 'favoriteCourses', $favoriteCourses);
+
+        $favoriteModules = [];
+        foreach ($from->favoriteModules as $module) {
+            $favoriteModules[] = $this->microMapper->map($module, Module::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }
+        $this->propertyAccessor->setValue($to, 'favoriteModules', $favoriteModules);
+
+        $favoritePrograms = [];
+        foreach ($from->favoritePrograms as $program) {
+            $favoritePrograms[] = $this->microMapper->map($program, Program::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }
+        $this->propertyAccessor->setValue($to, 'favoritePrograms', $favoritePrograms);
+
+        $favoriteDocuments = [];
+        foreach ($from->favoriteDocuments as $document) {
+            $favoriteDocuments[] = $this->microMapper->map($document, Document::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }
+        $this->propertyAccessor->setValue($to, 'favoriteDocuments', $favoriteDocuments);
 
         return $to;
     }
