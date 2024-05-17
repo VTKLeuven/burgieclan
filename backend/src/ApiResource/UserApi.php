@@ -36,4 +36,24 @@ class UserApi
     #[Assert\Email]
     #[ApiProperty(security: 'is_granted("VIEW_EMAIL", object)')]
     public ?string $email = null;
+
+    /**
+     * @var CourseApi[]
+     */
+    public array $favoriteCourses = [];
+
+    /**
+     * @var ModuleApi[]
+     */
+    public array $favoriteModules = [];
+
+    /**
+     * @var ProgramApi[]
+     */
+    public array $favoritePrograms = [];
+
+    /**
+     * @var DocumentApi[]
+     */
+    public array $favoriteDocuments = [];
 }
