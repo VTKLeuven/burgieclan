@@ -79,26 +79,54 @@ class UserResourceTest extends ApiTestCase
         $module = ModuleFactory::createOne();
         $program = ProgramFactory::createOne();
         $document = DocumentFactory::createOne();
-        $user = UserFactory::createOne([
+        $user = UserFactory::CreateOne([
+            'plainPassword' => 'password',
             'favoriteCourses' => [$course],
             'favoriteModules' => [$module],
             'favoritePrograms' => [$program],
             'favoriteDocuments' => [$document],
         ]);
 
+        self::assertEquals(1, count($user->getFavoriteCourses()));
+        self::assertEquals(1, count($user->getFavoriteModules()));
+        self::assertEquals(1, count($user->getFavoritePrograms()));
+        self::assertEquals(1, count($user->getFavoriteDocuments()));
+
+
         $this->browser()
             ->get('/api/users/' . $user->getId(), [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' =>'Bearer ' . $this->getToken($user->getUsername(), 'password')
                 ]
             ])
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/users/' . $user->getId())
+            ->assertJsonMatches('length(favoriteCourses)', 1)
+            ->assertJsonMatches('length(favoriteModules)', 1)
+            ->assertJsonMatches('length(favoritePrograms)', 1)
+            ->assertJsonMatches('length(favoriteDocuments)', 1)
+            ->assertJsonMatches('favoriteCourses[0]', '/api/courses/' . $course->getId())
+            ->assertJsonMatches('favoriteModules[0]', '/api/modules/' . $module->getId())
+            ->assertJsonMatches('favoritePrograms[0]', '/api/programs/' . $program->getId())
+            ->assertJsonMatches('favoriteDocuments[0]', '/api/documents/' . $document->getId())
+            ->get('/api/users/' . $user->getId() . '/favorites', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->getToken($user->getUsername(), 'password')
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('"@id"', '/api/users/' . $user->getId() . '/favorites')
+            ->assertJsonMatches('length(favoriteCourses)', 1)
+            ->assertJsonMatches('length(favoriteModules)', 1)
+            ->assertJsonMatches('length(favoritePrograms)', 1)
+            ->assertJsonMatches('length(favoriteDocuments)', 1)
             ->assertJsonMatches('favoriteCourses[0]', '/api/courses/' . $course->getId())
             ->assertJsonMatches('favoriteModules[0]', '/api/modules/' . $module->getId())
             ->assertJsonMatches('favoritePrograms[0]', '/api/programs/' . $program->getId())
             ->assertJsonMatches('favoriteDocuments[0]', '/api/documents/' . $document->getId());
+
     }
 
     public function testAddFavorites(): void
@@ -107,7 +135,7 @@ class UserResourceTest extends ApiTestCase
         $module = ModuleFactory::createOne();
         $program = ProgramFactory::createOne();
         $document = DocumentFactory::createOne();
-        $user = UserFactory::createOne();
+        $user = UserFactory::CreateOne(['plainPassword' => 'password']);
 
         self::assertEmpty($user->getFavoriteCourses());
         self::assertEmpty($user->getFavoriteModules());
@@ -115,10 +143,10 @@ class UserResourceTest extends ApiTestCase
         self::assertEmpty($user->getFavoriteDocuments());
 
         $this->browser()
-            ->patch('/api/users/' . $user->getId(), [
+            ->patch('/api/users/' . $user->getId() . '/favorites/add', [
                 'headers' => [
                     'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' =>'Bearer ' . $this->getToken($user->getUsername(), 'password')
                 ],
                 'json' => [
                     'favoriteCourses' => ['/api/courses/' . $course->getId()],
@@ -129,47 +157,69 @@ class UserResourceTest extends ApiTestCase
             ])
             ->assertStatus(200)
             ->assertJson()
-            ->assertJsonMatches('"@id"', '/api/users/' . $user->getId())
             ->assertJsonMatches('favoriteCourses[0]', '/api/courses/' . $course->getId())
             ->assertJsonMatches('favoriteModules[0]', '/api/modules/' . $module->getId())
             ->assertJsonMatches('favoritePrograms[0]', '/api/programs/' . $program->getId())
             ->assertJsonMatches('favoriteDocuments[0]', '/api/documents/' . $document->getId())
         ;
+
+        self::assertEquals(1, count($user->getFavoriteCourses()));
+        self::assertEquals(1, count($user->getFavoriteModules()));
+        self::assertEquals(1, count($user->getFavoritePrograms()));
+        self::assertEquals(1, count($user->getFavoriteDocuments()));
     }
 
     public function testRemoveFavorites(): void
     {
-        $course = CourseFactory::createOne();
-        $module = ModuleFactory::createOne();
-        $program = ProgramFactory::createOne();
-        $document = DocumentFactory::createOne();
-        $user = UserFactory::createOne([
-            'favoriteCourses' => [$course],
-            'favoriteModules' => [$module],
-            'favoritePrograms' => [$program],
-            'favoriteDocuments' => [$document],
+        $course1 = CourseFactory::createOne();
+        $course2 = CourseFactory::createOne();
+        $module1 = ModuleFactory::createOne();
+        $module2 = ModuleFactory::createOne();
+        $program1 = ProgramFactory::createOne();
+        $program2 = ProgramFactory::createOne();
+        $document1 = DocumentFactory::createOne();
+        $document2 = DocumentFactory::createOne();
+        $user = UserFactory::CreateOne([
+            'plainPassword' => 'password',
+            'favoriteCourses' => [$course1, $course2],
+            'favoriteModules' => [$module1, $module2],
+            'favoritePrograms' => [$program1, $program2],
+            'favoriteDocuments' => [$document1, $document2],
         ]);
 
+        self::assertEquals(2, count($user->getFavoriteCourses()));
+        self::assertEquals(2, count($user->getFavoriteModules()));
+        self::assertEquals(2, count($user->getFavoritePrograms()));
+        self::assertEquals(2, count($user->getFavoriteDocuments()));
+
+
         $this->browser()
-            ->patch('/api/users/' . $user->getId(), [
+            ->patch('/api/users/' . $user->getId() . '/favorites/remove', [
                 'headers' => [
                     'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' =>'Bearer ' . $this->getToken($user->getUsername(), 'password')
                 ],
                 'json' => [
-                    'favoriteCourses' => [],
-                    'favoriteModules' => [],
-                    'favoritePrograms' => [],
-                    'favoriteDocuments' => [],
+                    'favoriteCourses' => ['/api/courses/' . $course2->getId()],
+                    'favoriteModules' => ['/api/modules/' . $module2->getId()],
+                    'favoritePrograms' => ['/api/programs/' . $program2->getId()],
+                    'favoriteDocuments' => ['/api/documents/' . $document2->getId()],
                 ]
             ])
             ->assertStatus(200)
             ->assertJson()
-            ->assertJsonMatches('"@id"', '/api/users/' . $user->getId())
-            ->assertJsonMatches('length(favoriteCourses)', 0)
-            ->assertJsonMatches('length(favoriteModules)', 0)
-            ->assertJsonMatches('length(favoritePrograms)', 0)
-            ->assertJsonMatches('length(favoriteDocuments)', 0)
-        ;
+            ->assertJsonMatches('length(favoriteCourses)', 1)
+            ->assertJsonMatches('length(favoriteModules)', 1)
+            ->assertJsonMatches('length(favoritePrograms)', 1)
+            ->assertJsonMatches('length(favoriteDocuments)', 1)
+            ->assertJsonMatches('favoriteCourses[0]', '/api/courses/' . $course1->getId())
+            ->assertJsonMatches('favoriteModules[0]', '/api/modules/' . $module1->getId())
+            ->assertJsonMatches('favoritePrograms[0]', '/api/programs/' . $program1->getId())
+            ->assertJsonMatches('favoriteDocuments[0]', '/api/documents/' . $document1->getId());
+
+        self::assertEquals(1, count($user->getFavoriteCourses()));
+        self::assertEquals(1, count($user->getFavoriteModules()));
+        self::assertEquals(1, count($user->getFavoritePrograms()));
+        self::assertEquals(1, count($user->getFavoriteDocuments()));
     }
 }
