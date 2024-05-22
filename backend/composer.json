@@ -58,7 +58,8 @@
         "symfonycasts/micro-mapper": "^0.1.4",
         "twig/extra-bundle": "^3.3",
         "twig/intl-extra": "^3.3",
-        "twig/markdown-extra": "^3.3"
+        "twig/markdown-extra": "^3.3",
+        "vich/uploader-bundle": "^2.3"
     },
     "require-dev": {
         "dama/doctrine-test-bundle": "^7.0",
