@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Api;
 
 use App\ApiResource\LitusAuthApi;
 use App\OauthProvider\Exception\LitusIdentityProviderException;
