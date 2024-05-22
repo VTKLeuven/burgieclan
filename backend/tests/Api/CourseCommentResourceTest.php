@@ -172,16 +172,16 @@ class CourseCommentResourceTest extends ApiTestCase
 
     public function testPostToCreateCourseComment(): void
     {
-        $user = UserFactory::createOne();
+        $user = UserFactory::createOne(['plainPassword' => 'password']);
         $course = CourseFactory::createOne();
         $category = CommentCategoryFactory::createOne();
 
         $this->browser()
-            ->actingAs($user)
             ->post('/api/course_comments', [
                 'json' => [],
                 'headers' => [
                     'Content-Type' => 'application/ld+json',
+                    'Authorization' => 'Bearer ' . $this->getToken($user->getUsername(), 'password')
                 ],
             ])
             ->assertStatus(422)
