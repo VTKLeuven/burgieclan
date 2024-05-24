@@ -2,6 +2,7 @@ api_platform:
     title: Burgieclan API Platform
     version: 1.0.0
     formats:
+        multipart: ['multipart/form-data']
         jsonld: ['application/ld+json']
     docs_formats:
         jsonld: ['application/ld+json']
