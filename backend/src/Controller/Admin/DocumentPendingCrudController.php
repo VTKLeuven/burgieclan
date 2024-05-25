@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Document;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
@@ -18,6 +19,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Vich\UploaderBundle\Form\Type\VichFileType;
 
 class DocumentPendingCrudController extends DocumentCrudController
 {
@@ -61,13 +63,28 @@ class DocumentPendingCrudController extends DocumentCrudController
     {
         yield TextField::new('name');
         yield DateTimeField::new('createDate')
-        ->hideOnForm();
+            ->hideOnForm();
         yield DateTimeField::new('updateDate')
-        ->hideOnForm();
+            ->hideOnForm();
         yield AssociationField::new('category')
-        ->autocomplete();
+            ->autocomplete();
         yield AssociationField::new('course')
-        ->autocomplete();
+            ->autocomplete();
+        yield AssociationField::new('category')
+            ->autocomplete();
+        yield BooleanField::new('under_review')
+            ->setLabel('Published')
+            ->renderAsSwitch(false)
+            ->hideOnIndex();
+        yield TextField::new('file')
+            ->setFormType(VichFileType::class)
+            ->setFormTypeOptions([
+                'download_label' => true,
+                'allow_delete' => false,
+            ])
+            ->hideOnIndex();
+        yield TextField::new('file_name')
+            ->onlyOnIndex();
     }
 
     public function approve(
