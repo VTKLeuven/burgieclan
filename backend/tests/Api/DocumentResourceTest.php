@@ -253,15 +253,16 @@ class DocumentResourceTest extends ApiTestCase
 
     public function testPostToCreateDocument(): void
     {
-        $this->markTestSkipped('For some reason, after completing this test, the image gets deleted.
-I spent multiple hours debugging this but to no avail. 
-This test should work but is skipped to make sure automated testing works.');
-
         $course = CourseFactory::createOne();
         $category = DocumentCategoryFactory::createOne();
-        $file = new UploadedFile(__DIR__ . '/../../public/image-for-test.png', 'image.png', test: true);
 
-        $this->browser()
+        // Create copy of file in system tmp directory
+        $filePath = tempnam(sys_get_temp_dir(), uniqid());
+        $img = file_get_contents(__DIR__ . '/../../public/image-for-test.png');
+        file_put_contents($filePath, $img);
+        $file = new UploadedFile($filePath, 'image-for-test.png');
+
+        $json = $this->browser()
             ->post('/api/documents', [
                 'headers' => [
                     'Content-Type' => 'multipart/form-data',
@@ -285,6 +286,11 @@ This test should work but is skipped to make sure automated testing works.');
                 ]
             ])
             ->assertStatus(201)
-            ->assertJsonMatches('name', 'Document name');
+            ->assertJsonMatches('name', 'Document name')
+            ->json();
+
+        $contentUrl = $json->decoded()['contentUrl'];
+        // Delete saved file to clean up.
+        unlink(__DIR__ . '/../../public' . $contentUrl);
     }
 }
