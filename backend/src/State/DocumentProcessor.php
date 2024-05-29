@@ -27,9 +27,12 @@ final class DocumentProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
+        // $data doesn't contain anything. The data is located in the $context['request'].
         $dto = new DocumentApi();
         $request = $context['request']->request;
 
+        // Get all variables from the request (these are IRI's), convert them to an object and add them to the dto.
+        // If a variable is missing, throw a BadRequestHttpException.
         $dto->name = $request->get('name') ?? throw new BadRequestHttpException('"name" is required');
         /** @var CourseApi $course */
         $course = $this->iriConverter->getResourceFromIri($request->get('course') ??
@@ -42,6 +45,7 @@ final class DocumentProcessor implements ProcessorInterface
         $dto->under_review = $request->get('under_review') ??
             throw new BadRequestHttpException('"under_review" is required');
 
+        // Convert the documentDto to an actual Document.
         $document = $this->microMapper->map($dto, Document::class);
         assert($document instanceof Document);
 
@@ -52,11 +56,15 @@ final class DocumentProcessor implements ProcessorInterface
 
         $document->setFile($uploadedFile);
 
+        // Persist the document to the database.
         $this->persistProcessor->process($document, $operation, $uriVariables, $context);
 
+        // Add the id of the persisted document to the dto.
         $dto->id = $document->getId();
+        // Generate the url to the file.
         $dto->contentUrl = $this->storage->resolveUri($document, 'file');
-        ;
+
+        // The return value is the object that gets send as reply to the user calling the API endpoint.
         return $dto;
     }
 }
