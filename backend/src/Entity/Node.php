@@ -16,10 +16,10 @@ abstract class Node
     private User $creator;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeInterface $createDate;
+    protected DateTimeInterface $createDate;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private DateTimeInterface $updateDate;
+    protected DateTimeInterface $updateDate;
 
     public function __construct(User $creator)
     {
