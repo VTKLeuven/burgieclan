@@ -23,7 +23,7 @@ class NotificationCrudController extends AbstractCrudController
     {
         yield TextField::new('title');
         yield TextField::new('content');
-        yield DateTimeField::new('starttime');
-        yield DateTimeField::new('endtime');
+        yield DateTimeField::new('startTime');
+        yield DateTimeField::new('endTime');
     }
 }

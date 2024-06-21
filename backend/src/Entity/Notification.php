@@ -5,6 +5,7 @@ namespace App\Entity;
 use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Defines the properties of the Notification entity to represent the blog comments.
@@ -23,9 +24,11 @@ class Notification extends Node
     private ?string $content = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\GreaterThanOrEqual('now Europe/Brussels')]
     private DateTime $startTime;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\GreaterThan(propertyPath: 'startTime')]
     private DateTime $endTime;
 
     #[ORM\Column(length: 255, nullable: true)]
