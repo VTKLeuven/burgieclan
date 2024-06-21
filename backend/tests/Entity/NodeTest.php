@@ -4,30 +4,33 @@ namespace App\Tests\Entity;
 
 use App\Entity\Node;
 use App\Entity\User;
-use Doctrine\DBAL\Types\Types;
+use DateTime;
 use PHPUnit\Framework\TestCase;
 
 class NodeTest extends TestCase
 {
     public function testConstructNode()
     {
-
-        $beforedate = new \DateTime();
+        $creator = $this->createMock(User::class);
+        $beforedate = new DateTime();
         $nodeMock = $this->getMockBuilder(Node::class)
-        ->getMockForAbstractClass();
-        $afterdate = new \DateTime();
+            ->setConstructorArgs(array($creator))
+            ->getMockForAbstractClass();
+        $afterdate = new DateTime();
         $this->assertGreaterThanOrEqual($beforedate, $nodeMock->getCreateDate(), 'The createDate should be set to the current date');
         $this->assertLessThanOrEqual($afterdate, $nodeMock->getCreateDate());
     }
 
     public function testSetUpdate()
     {
+        $creator = $this->createMock(User::class);
         $nodeMock = $this->getMockBuilder(Node::class)
+            ->setConstructorArgs(array($creator))
             ->getMockForAbstractClass();
 
-        $beforedate = new \DateTime();
+        $beforedate = new DateTime();
         $nodeMock->setUpdateDate();
-        $afterdate = new \DateTime();
+        $afterdate = new DateTime();
 
         $this->assertGreaterThanOrEqual($beforedate, $nodeMock->getUpdateDate(), 'The updateDate should be set to the current date');
         $this->assertLessThanOrEqual($afterdate, $nodeMock->getUpdateDate());
@@ -35,10 +38,12 @@ class NodeTest extends TestCase
 
     public function testSetUser()
     {
+        $creator = $this->createMock(User::class);
         $nodeMock = $this->getMockBuilder(Node::class)
+            ->setConstructorArgs(array($creator))
             ->getMockForAbstractClass();
 
-        $this->assertNull($nodeMock->getCreator());
+        $this->assertSame($creator, $nodeMock->getCreator());
 
         $user = $this->createMock(User::class);
         $nodeMock->setCreator($user);
