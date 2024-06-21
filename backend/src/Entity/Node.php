@@ -12,7 +12,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\HasLifecycleCallbacks]
 abstract class Node
 {
-    #[ORM\ManyToOne(inversedBy: 'nodes')]
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
     private User $creator;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
@@ -28,16 +29,16 @@ abstract class Node
         $this->updateDate = $this->createDate;
     }
 
-    public function setCreator(User $creator): self
+    public function getCreator(): User
+    {
+        return $this->creator;
+    }
+
+    public function setCreator(User $creator): static
     {
         $this->creator = $creator;
 
         return $this;
-    }
-
-    public function getCreator(): User
-    {
-        return $this->creator;
     }
 
     public function getCreateDate(): DateTimeInterface
