@@ -21,6 +21,7 @@ class ModuleCrudController extends AbstractCrudController
         yield IdField::new('id')->onlyOnDetail();
         yield TextField::new('name');
         yield AssociationField::new('program');
+        yield AssociationField::new('modules');
         yield AssociationField::new('courses');
     }
 }
