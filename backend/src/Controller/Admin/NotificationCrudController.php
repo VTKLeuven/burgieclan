@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Notification;
+use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -16,7 +17,9 @@ class NotificationCrudController extends AbstractCrudController
 
     public function createEntity(string $entityFqcn)
     {
-        return new Notification($this->getUser());
+        $user = $this->getUser();
+        assert($user instanceof User);
+        return new Notification($user);
     }
 
     public function configureFields(string $pageName): iterable
