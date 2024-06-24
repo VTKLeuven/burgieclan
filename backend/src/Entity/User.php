@@ -83,16 +83,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?string $accesstoken;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Node::class)]
-    private Collection $nodes;
-
     /**
      * @var Collection|Program[]
      */
     #[ORM\ManyToMany(targetEntity: Program::class, inversedBy: 'users')]
     #[ORM\JoinTable(name: 'favorite_user_program')]
     private Collection $favoritePrograms;
-    
+
     /**
      * @var Collection|Module[]
      */
@@ -120,7 +117,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->favoriteModules = new ArrayCollection();
         $this->favoriteCourses = new ArrayCollection();
         $this->favoriteDocuments = new ArrayCollection();
-        $this->nodes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -279,7 +275,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Get the favorite programs of the user.
-     * 
+     *
      * @return Collection
      */
     public function getFavoritePrograms(): Collection
@@ -289,7 +285,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Set the favorite programs of the user.
-     * 
+     *
      * @param Collection $programs
      * @return void
      */
@@ -300,7 +296,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Get the favorite modules of the user.
-     * 
+     *
      * @return Collection
      */
     public function getFavoriteModules(): Collection
@@ -310,7 +306,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Set the favorite modules of the user.
-     * 
+     *
      * @param Collection $modules
      * @return void
      */
@@ -321,7 +317,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Get the favorite courses of the user.
-     * 
+     *
      * @return Collection
      */
     public function getFavoriteCourses(): Collection
@@ -331,7 +327,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Set the favorite courses of the user.
-     * 
+     *
      * @param Collection $courses
      * @return void
      */
@@ -342,7 +338,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Get the favorite documents of the user.
-     * 
+     *
      * @return Collection
      */
     public function getFavoriteDocuments(): Collection
@@ -352,7 +348,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Set the favorite documents of the user.
-     * 
+     *
      * @param Collection $documents
      * @return void
      */
@@ -360,5 +356,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->favoriteDocuments = $documents;
     }
-
 }
