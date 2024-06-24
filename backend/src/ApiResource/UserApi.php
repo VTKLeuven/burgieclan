@@ -58,13 +58,11 @@ class UserApi
 
     #[Assert\NotBlank]
     #[Assert\Length(min: 2, max: 50)]
-    #[ApiProperty(writable: false)]
-    #[ApiProperty(security: 'is_granted("VIEW_USERNAME", object)')]
+    #[ApiProperty(writable: false, security: 'is_granted("VIEW_USERNAME", object)')]
     public ?string $username = null;
 
     #[Assert\Email]
-    #[ApiProperty(writable: false)]
-    #[ApiProperty(security: 'is_granted("VIEW_EMAIL", object)')]
+    #[ApiProperty(writable: false, security: 'is_granted("VIEW_EMAIL", object)')]
     public ?string $email = null;
 
     /**

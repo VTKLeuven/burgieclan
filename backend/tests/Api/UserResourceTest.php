@@ -52,6 +52,10 @@ class UserResourceTest extends ApiTestCase
             'fullName',
             'username',
             'email',
+            'favoriteCourses',
+            'favoriteDocuments',
+            'favoriteModules',
+            'favoritePrograms'
         ], array_keys($json->decoded()));
 
         $json = $this->browser()
