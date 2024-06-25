@@ -30,7 +30,7 @@ class Page
      * @param string $name
      * @param string|null $urlKey
      */
-    public function __construct(string $name, ?string $urlKey)
+    public function __construct(string $name, ?string $urlKey = null)
     {
         $this->name = $name;
         $this->urlKey = is_null($urlKey) ? self::createUrlKey($name): self::createUrlKey($urlKey);
