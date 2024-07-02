@@ -3,7 +3,6 @@
 namespace App\Tests\Api;
 
 use App\Factory\NotificationFactory;
-use App\Tests\Api\ApiTestCase;
 use DateInterval;
 use DateTime;
 use Zenstruck\Foundry\Test\Factories;
