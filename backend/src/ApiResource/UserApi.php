@@ -43,6 +43,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => ['user:favorites']],
         ),
     ],
+    security: 'is_granted("VIEW_FAVORITES", object)',
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: User::class),
@@ -69,23 +70,27 @@ class UserApi
      * @var CourseApi[]
      */
     #[Groups('user:favorites')]
+    #[ApiProperty(security: 'is_granted("VIEW_FAVORITES", object)')]
     public array $favoriteCourses = [];
 
     /**
      * @var ModuleApi[]
      */
     #[Groups('user:favorites')]
+    #[ApiProperty(security: 'is_granted("VIEW_FAVORITES", object)')]
     public array $favoriteModules = [];
 
     /**
      * @var ProgramApi[]
      */
     #[Groups('user:favorites')]
+    #[ApiProperty(security: 'is_granted("VIEW_FAVORITES", object)')]
     public array $favoritePrograms = [];
 
     /**
      * @var DocumentApi[]
      */
     #[Groups('user:favorites')]
+    #[ApiProperty(security: 'is_granted("VIEW_FAVORITES", object)')]
     public array $favoriteDocuments = [];
 }
