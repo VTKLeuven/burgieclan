@@ -1,29 +1,53 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import { Dialog } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import Logo from "@/components/branding/Logo";
-import Input from "@/components/ui/Input";
+import React, { useEffect, useRef, useState } from 'react';
+import { Dialog } from '@headlessui/react';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import Logo from '@/components/branding/Logo';
+import Input from '@/components/ui/Input';
 
 const navigation = [
-    { name: 'Courses', href: '#' },
-    { name: 'FAQ', href: '#' },
-    { name: 'Overview', href: '#' },
-]
+    { name: 'Product', href: '#' },
+    { name: 'Features', href: '#' },
+    { name: 'Marketplace', href: '#' },
+    { name: 'Company', href: '#' },
+];
 
 export default function Header() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const searchInputRef = useRef(null);
+
+    /**
+     * Ctrl+F or Cmd+F to focus on search input
+     */
+    useEffect(() => {
+        const handleKeydown = (event: KeyboardEvent) => {
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            const isCtrlF = event.ctrlKey && event.key === 'f';
+            const isCmdF = isMac && event.metaKey && event.key === 'f';
+
+            if (isCtrlF || isCmdF) {
+                event.preventDefault();
+                searchInputRef.current.focus();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeydown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeydown);
+        };
+    }, []);
 
     return (
         <header className="bg-white">
-            <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8 gap-x-12 lg:gap-x-0">
-                <div className="flex items-center gap-x-12">
+            <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
+                <div className="flex gap-x-12 items-center">
                     <a href="#" className="-m-1.5 p-1.5 flex-shrink-0">
-                        <span className="sr-only">Burgieclan</span>
+                        <span className="sr-only">Your Company</span>
                         <Logo width={50} height={50} />
                     </a>
-                    <Input placeholder={"search"} />
+                    <Input ref={searchInputRef} id="search" name="search" type="search" placeholder="search..." />
                 </div>
                 <div className="flex lg:hidden">
                     <button
@@ -48,12 +72,11 @@ export default function Header() {
             </nav>
             <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
                 <div className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
-                    <div className="flex items-center justify-between gap-x-12">
+                    <div className="flex items-center justify-between">
                         <a href="#" className="-m-1.5 p-1.5 flex-shrink-0">
-                            <span className="sr-only">Burgieclan</span>
+                            <span className="sr-only">Your Company</span>
                             <Logo width={50} height={50} />
                         </a>
-                        <Input placeholder={"search"} />
                         <button
                             type="button"
                             onClick={() => setMobileMenuOpen(false)}
@@ -89,5 +112,5 @@ export default function Header() {
                 </div>
             </Dialog>
         </header>
-    )
+    );
 }
