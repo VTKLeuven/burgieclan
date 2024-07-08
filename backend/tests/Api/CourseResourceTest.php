@@ -16,6 +16,13 @@ class CourseResourceTest extends ApiTestCase
         CourseFactory::createMany(5);
         $json = $this->browser()
             ->get('/api/courses')
+            ->assertStatus(401)
+            ->get('/api/courses', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
@@ -42,7 +49,12 @@ class CourseResourceTest extends ApiTestCase
         $course = CourseFactory::createOne();
 
         $this->browser()
-            ->get('/api/courses/'.$course->getId())
+            ->get('/api/courses/' . $course->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/courses/'.$course->getId());
     }
@@ -64,11 +76,20 @@ class CourseResourceTest extends ApiTestCase
         CourseFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/courses?name=course2')
+            ->get('/api/courses?name=course2', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/courses?name=course')
+            ->get('/api/courses?name=course', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
@@ -92,11 +113,21 @@ class CourseResourceTest extends ApiTestCase
         CourseFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/courses?code=code2')
+            ->get('/api/courses?code=code2', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/courses?code=code')
+            ->get('/api/courses?code=code', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)

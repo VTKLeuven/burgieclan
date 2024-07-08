@@ -21,3 +21,6 @@ controllers:
         _locale: '%app_locales%'
     defaults:
         _locale: '%locale%'
+
+api_auth_login:
+    path: /api/auth/login
