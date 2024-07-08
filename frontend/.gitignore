@@ -36,4 +36,4 @@
 /next-env.d.ts
 
 # pm2 ecosystem file
-ecosystem.config.js
+/ecosystem.config.js
