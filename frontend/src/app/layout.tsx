@@ -21,7 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.className} h-full`}>
-      <body className="h-full">{children}</body>
+      <body className="h-full">
+        {children}
+      </body>
     </html>
   );
 }
