@@ -1,8 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useRef, useEffect, useState } from 'react';
+import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
+import Logo from "@/components/branding/Logo";
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
@@ -24,14 +25,7 @@ export default function LoginForm() {
                 <div ref={whiteSpaceDiv}></div>
                 <div className="flex flex-col items-center justify-center mt-[10vh]">
                     <div className="w-full max-w-sm">
-                        <Image
-                            // TODO: Replace with the actual logo
-                            src="/images/logos/seafile-logo.png"
-                            alt="Burgieclan Logo"
-                            width={100}
-                            height={100}
-                            className="mx-auto"
-                        />
+                        <Logo width={100} height={100} />
                         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-vtk-blue-500">
                             Sign in to your account
                         </h2>
