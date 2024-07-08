@@ -3,14 +3,13 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Document;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Asset;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Form\Type\FileUploadType;
 
 class DocumentCrudController extends AbstractCrudController
 {
@@ -38,12 +37,24 @@ class DocumentCrudController extends AbstractCrudController
         ->hideOnForm();
         yield DateTimeField::new('updateDate')
         ->hideOnForm();
-        yield BooleanField::new('under_review')
-        ->setLabel('Published')
-        ->renderAsSwitch(false);
+        yield AssociationField::new('course')
+            ->autocomplete();
         yield AssociationField::new('category')
         ->autocomplete();
-        yield AssociationField::new('course')
-        ->autocomplete();
+        yield BooleanField::new('under_review')
+            ->setLabel('Published')
+            ->renderAsSwitch(false);
+        yield TextField::new('file_name')
+            ->setLabel('File')
+            ->setFormType(FileUploadType::class)
+            ->setFormTypeOptions([
+                'help' => 'Max upload size is '. ini_get('upload_max_filesize') . '.',
+                'upload_dir' => 'public/uploads/documents',
+                'upload_filename' => '[slug]-[timestamp].[extension]',
+            ])
+            ->addJsFiles(
+                Asset::fromEasyAdminAssetPackage('field-image.js'),
+                Asset::fromEasyAdminAssetPackage('field-file-upload.js')
+            );
     }
 }
