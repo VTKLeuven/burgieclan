@@ -45,18 +45,23 @@ export default function Header() {
                 <div className="flex gap-x-12 items-center">
                     <a href="#" className="-m-1.5 p-1.5 flex-shrink-0">
                         <span className="sr-only">Your Company</span>
-                        <Logo width={50} height={50} />
+                        <Logo width={50} height={50}/>
                     </a>
-                    <Input ref={searchInputRef} id="search" name="search" type="search" placeholder="search..." />
+                    <div className="hidden lg:flex">
+                        <Input ref={searchInputRef} id="search" name="search" type="search" placeholder="search..."/>
+                    </div>
+                </div>
+                <div className="flex lg:hidden">
+                    <Input ref={searchInputRef} id="search" name="search" type="search" placeholder="search..."/>
                 </div>
                 <div className="flex lg:hidden">
                     <button
                         type="button"
                         onClick={() => setMobileMenuOpen(true)}
-                        className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+                        className="-m-1.5 p-1.5 w-[50px] h-[50px] inline-flex items-center justify-center rounded-md text-gray-700"
                     >
                         <span className="sr-only">Open main menu</span>
-                        <Bars3Icon aria-hidden="true" className="h-6 w-6" />
+                        <Bars3Icon aria-hidden="true" className="h-6 w-6"/>
                     </button>
                 </div>
                 <div className="hidden lg:flex lg:gap-x-12">
@@ -65,25 +70,30 @@ export default function Header() {
                             {item.name}
                         </a>
                     ))}
-                    <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
+                    <a href="login" className="text-sm font-semibold leading-6 text-gray-900">
                         Log in <span aria-hidden="true">&rarr;</span>
                     </a>
                 </div>
             </nav>
             <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
-                <div className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+                <div
+                    className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
                     <div className="flex items-center justify-between">
                         <a href="#" className="-m-1.5 p-1.5 flex-shrink-0">
                             <span className="sr-only">Your Company</span>
-                            <Logo width={50} height={50} />
+                            <Logo width={50} height={50}/>
                         </a>
+                        <div className="flex lg:hidden">
+                            <Input ref={searchInputRef} id="search" name="search" type="search"
+                                   placeholder="search..."/>
+                        </div>
                         <button
                             type="button"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="-m-2.5 rounded-md p-2.5 text-gray-700"
+                            className="-m-1.5 p-1.5 w-[50px] h-[50px] rounded-md text-gray-700 justify-center items-center flex"
                         >
                             <span className="sr-only">Close menu</span>
-                            <XMarkIcon aria-hidden="true" className="h-6 w-6" />
+                            <XMarkIcon aria-hidden="true" className="h-6 w-6"/>
                         </button>
                     </div>
                     <div className="mt-6 flow-root">
@@ -101,7 +111,7 @@ export default function Header() {
                             </div>
                             <div className="py-6">
                                 <a
-                                    href="#"
+                                    href="login"
                                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                 >
                                     Log in
