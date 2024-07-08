@@ -67,7 +67,7 @@ jobs:
       - name: Frontend - Restart pm2
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && export NVM_DIR=~/.nvm && source ~/.nvm/nvm.sh && pm2 restart ${{ secrets.FRONTEND_PM2_APP_NAME }}"
       - name: Frontend - Restart apache2
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "systemctl restart apache2"
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo systemctl restart apache2"
 
   cleanup:
     name: Clean up
