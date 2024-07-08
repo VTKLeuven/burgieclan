@@ -25,7 +25,10 @@ export default function LoginForm() {
                 <div ref={whiteSpaceDiv}></div>
                 <div className="flex flex-col items-center justify-center mt-[10vh]">
                     <div className="w-full max-w-sm">
-                        <Logo width={100} height={100} />
+                        <a href="/">
+                            <span className="sr-only">Burgieclan</span>
+                            <Logo width={100} height={100}/>
+                        </a>
                         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-vtk-blue-500">
                             Sign in to your account
                         </h2>
