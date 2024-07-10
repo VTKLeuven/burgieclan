@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react';
+import './input.css';
 
 type InputProps = {
     id?: string;
