@@ -12,7 +12,6 @@ import React, { useRef, useEffect, useState } from 'react';
  */
 export default function LoginForm() {
     const [isOpen, setIsOpen] = useState(false);
-    const whiteSpaceDiv = useRef(null);
 
     const toggleCollapse = () => {
         setIsOpen(!isOpen);
@@ -21,7 +20,6 @@ export default function LoginForm() {
     return (
         <>
             <div className="min-h-screen px-6 py-10 lg:px-8">
-                <div ref={whiteSpaceDiv}></div>
                 <div className="flex flex-col items-center justify-center mt-[10vh]">
                     <div className="w-full max-w-sm">
                         <Image
@@ -41,7 +39,7 @@ export default function LoginForm() {
                         <form className="space-y-6" action="#" method="POST">
                             <button
                                 type="submit"
-                                className="flex flex-row w-full justify-center items-center rounded-md border-0 px-3 py-1.5 text-sm ring-1 ring-inset ring-gray-300 font-semibold leading-6 text-black shadow-sm hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vtk-blue-400"
+                                className="flex flex-row w-full justify-center items-center rounded-md border-0 px-3 py-1.5 text-sm ring-1 ring-inset ring-gray-300 font-semibold leading-6 text-black shadow-sm hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-vtk-blue-400"
                             >
                                 <Image
                                     src="/images/logos/vtk-logo-blue.png"
@@ -64,7 +62,7 @@ export default function LoginForm() {
                     </div>
                 </div>
                 <div
-                    className={`flex flex-col items-center justify-center ${isOpen ? 'h-3/7' : 'h-0'} overflow-hidden`}>
+                    className={`flex flex-col items-center justify-center ${isOpen ? 'h-3/7 pb-2' : 'h-0'} overflow-hidden`}>
                     <div className="mt-10 w-full max-w-sm">
                         <label htmlFor="email"
                                className="block text-sm font-medium leading-6 text-gray-900">
@@ -89,7 +87,7 @@ export default function LoginForm() {
                                 Password
                             </label>
                             <div className="mt-2 text-sm">
-                                <a href="#" className="text-xs font-semibold text-vtk-blue-600 hover:text-vtk-blue-500">
+                                <a href="#" className="text-xs font-semibold text-vtk-blue-600 focus:outline-none hover:text-vtk-blue-500 focus:ring-2 focus:ring-offset-1 focus:ring-vtk-blue-600">
                                     Forgot password?
                                 </a>
                             </div>
@@ -109,7 +107,7 @@ export default function LoginForm() {
                     <div className="mt-5 w-full max-w-sm">
                         <button
                             type="submit"
-                            className="flex w-full justify-center rounded-md bg-amber-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vtk-blue-600"
+                            className="primary-button"
                         >
                             Sign in
                         </button>
