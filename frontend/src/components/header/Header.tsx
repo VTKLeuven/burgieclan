@@ -17,7 +17,7 @@ export default function Header() {
     const searchInputRef = useRef(null);
 
     /**
-     * Ctrl+F or Cmd+F to focus on search input
+     * Ctrl+F or Cmd+F to focus on search input (not in mobile mode)
      */
     useEffect(() => {
         const handleKeydown = (event: KeyboardEvent) => {
@@ -41,19 +41,16 @@ export default function Header() {
     return (
         <header className="bg-white">
             <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
-                <div className="flex gap-x-12 items-center">
+                <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
                     <a href="/" className="-m-1.5 p-1.5 flex-shrink-0">
                         <span className="sr-only">Burgieclan</span>
                         <Logo width={50} height={50}/>
                     </a>
-                    <div className="hidden sm:flex">
+                    <div className="flex">
                         <Input ref={searchInputRef} id="search" name="search" type="search" placeholder="search"/>
                     </div>
                 </div>
-                <div className="flex sm:hidden">
-                    <Input id="search" name="search" type="search" placeholder="search"/>
-                </div>
-                <div className="flex lg:hidden">
+                <div className="flex md:hidden">
                     <button
                         type="button"
                         onClick={() => setMobileMenuOpen(true)}
@@ -63,7 +60,7 @@ export default function Header() {
                         <Bars3Icon aria-hidden="true" className="h-6 w-6"/>
                     </button>
                 </div>
-                <div className="hidden lg:flex lg:gap-x-12">
+                <div className="hidden md:flex md:gap-x-8">
                     {navigation.map((item) => (
                         <a key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-gray-900">
                             {item.name}
@@ -74,16 +71,18 @@ export default function Header() {
                     </a>
                 </div>
             </nav>
-            <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
+            <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="md:hidden">
                 <div
                     className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
                     <div className="flex items-center justify-between sm:justify-end">
-                        <a href="/" className="-m-1.5 p-1.5 flex-shrink-0 flex sm:hidden">
-                            <span className="sr-only">Burgieclan</span>
-                            <Logo width={50} height={50}/>
-                        </a>
-                        <div className="flex sm:hidden">
-                            <Input id="search" name="search" type="search" placeholder="search"/>
+                        <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
+                            <a href="/" className="-m-1.5 p-1.5 flex-shrink-0 flex sm:hidden">
+                                <span className="sr-only">Burgieclan</span>
+                                <Logo width={50} height={50}/>
+                            </a>
+                            <div className="flex sm:hidden">
+                                <Input id="search" name="search" type="search" placeholder="search"/>
+                            </div>
                         </div>
                         <button
                             type="button"
