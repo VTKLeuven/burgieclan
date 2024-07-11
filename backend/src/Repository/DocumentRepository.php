@@ -13,6 +13,8 @@ namespace App\Repository;
 
 use App\Entity\Document;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -30,6 +32,22 @@ class DocumentRepository extends ServiceEntityRepository
         parent::__construct($registry, Document::class);
     }
 
+    /**
+     * @return float|bool|int|string
+     */
+    public function getAmountPending(): float|bool|int|string
+    {
+        try {
+            return $this->createQueryBuilder('d')
+                ->select('count(d.id)')
+                ->andWhere('d.under_review = :under_review')
+                ->setParameter('under_review', false)
+                ->getQuery()
+                ->getSingleScalarResult() ?? 0;
+        } catch (NoResultException|NonUniqueResultException $e) {
+            return 0;
+        }
+    }
 //    /**
 //     * @return Document[] Returns an array of Document objects
 //     */

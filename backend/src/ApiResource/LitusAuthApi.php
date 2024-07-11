@@ -4,7 +4,7 @@ namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
-use App\Controller\LitusAuthApiController;
+use App\Controller\Api\LitusAuthApiController;
 
 #[ApiResource(
     shortName: 'Litus Authentication',
