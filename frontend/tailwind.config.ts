@@ -1,5 +1,5 @@
-/** @type {import('tailwindcss').Config} */
-const config: Config = {
+
+const config = {
   content: [
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
