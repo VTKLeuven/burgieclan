@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Document;
+use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Asset;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -20,7 +21,9 @@ class DocumentCrudController extends AbstractCrudController
 
     public function createEntity(string $entityFqcn)
     {
-        return new Document($this->getUser());
+        $user = $this->getUser();
+        assert($user instanceof User);
+        return new Document($user);
     }
 
 //    COMMENTED BECAUSE NICE TO HAVE FOR TESTING

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Api;
 
 use App\ApiResource\LitusAuthApi;
+use App\OauthProvider\Exception\LitusIdentityProviderException;
 use App\OauthProvider\LitusResourceOwner;
 use App\Repository\UserRepository;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
@@ -25,10 +26,16 @@ class LitusAuthApiController extends AbstractController
     {
         $client = $this->clientRegistry->getClient("litus");
         $accessToken = new AccessToken(["access_token" => $litusAuthApi->accessToken]);
-        /** @var LitusResourceOwner $litusUser */
-        $litusUser = $client->fetchUserFromToken($accessToken);
+
+        try {
+            /** @var LitusResourceOwner $litusUser */
+            $litusUser = $client->fetchUserFromToken($accessToken);
+        } catch (LitusIdentityProviderException $e) {
+            // The LitusIdentityProviderException gets thrown when the access token is invalid or not existing.
+            return new JsonResponse(['error' => $e->getMessage()], 400);
+        }
         $user = $this->userRepository->createUserfromLitusUser($litusUser, $accessToken);
         $jwtToken = $this->JWTManager->create($user);
-        return new JsonResponse(['token' => $jwtToken]);
+        return new JsonResponse(['token' => $jwtToken], 201);
     }
 }

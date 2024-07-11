@@ -25,9 +25,13 @@ class Module
     #[ORM\JoinColumn(nullable: false)]
     private ?Program $program = null;
 
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'modules')]
+    private Collection $modules;
+
     public function __construct()
     {
         $this->courses = new ArrayCollection();
+        $this->modules = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -84,6 +88,30 @@ class Module
     public function setProgram(?Program $program): self
     {
         $this->program = $program;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getModules(): Collection
+    {
+        return $this->modules;
+    }
+
+    public function addModule(self $module): static
+    {
+        if (!$this->modules->contains($module)) {
+            $this->modules->add($module);
+        }
+
+        return $this;
+    }
+
+    public function removeModule(self $module): static
+    {
+        $this->modules->removeElement($module);
 
         return $this;
     }
