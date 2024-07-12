@@ -290,7 +290,9 @@ class DocumentResourceTest extends ApiTestCase
             ->json();
 
         $contentUrl = $json->decoded()['contentUrl'];
+        $array = explode('/', $contentUrl);
+        $filename = end($array);
         // Delete saved file to clean up.
-        unlink(__DIR__ . '/../../public' . $contentUrl);
+        unlink(__DIR__ . '/../../data/documents/' . $filename);
     }
 }
