@@ -11,14 +11,13 @@ const Callback = () => {
     useEffect(() => {
         console.log("callback");
 
-
         const state = searchParams.get('state');
         const storedState = localStorage.getItem('oauth_state');
 
-        if (state !== storedState) {
-            console.error('State mismatch: potential CSRF attack.');
-            return;
-        }
+        // if (state !== storedState) {
+        //     console.error('State mismatch: potential CSRF attack.');
+        //     return;
+        // }
 
         const code = searchParams.get('code');
         const codeVerifier = localStorage.getItem('code_verifier');
@@ -27,6 +26,9 @@ const Callback = () => {
         if (!tokenUrl) {
             throw new Error("Missing environment variables for OAuth flow");
         }
+
+        console.log("code: ", code);
+        console.log("codeVerifier: ", codeVerifier);
 
         if (code && codeVerifier) {
             console.log("code verified");
@@ -37,19 +39,19 @@ const Callback = () => {
                 redirect_uri: process.env.NEXT_PUBLIC_REDIRECT_URL,
                 code_verifier: codeVerifier,
             })
-                .then(response => {
-                    const { access_token } = response.data;
-                    console.log("access_token: ", access_token);
+                .then((response: { data: { accessToken: any; }; }) => {
+                    const { accessToken } = response.data;
+                    console.log("access_token: ", accessToken);
 
-                    return axios.post(`${process.env.NEXT_PUBLIC_NEXT_PUBLIC_BACKEND_URL}/api/auth/exchange-token`, { access_token });
+                    return axios.post(process.env.NEXT_PUBLIC_BACKEND_AUTH, { accessToken });
                 })
-                .then(response => {
+                .then((response: { data: { jwt: any; }; }) => {
                     document.cookie = `jwt=${response.data.jwt}; path=/; HttpOnly; Secure`;
 
                     console.log("cookie: ", document.cookie);
                     router.push('/');
                 })
-                .catch(error => {
+                .catch((error: any) => {
                     console.error('Error during token exchange:', error);
                 });
         }
