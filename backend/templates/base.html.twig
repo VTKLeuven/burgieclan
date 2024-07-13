@@ -9,7 +9,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <title>{% block title %}Symfony Demo application{% endblock %}</title>
-        <link rel="alternate" type="application/rss+xml" title="{{ 'rss.title'|trans }}" href="{{ path('blog_rss') }}">
+{#        <link rel="alternate" type="application/rss+xml" title="{{ 'rss.title'|trans }}" href="{{ path('blog_rss') }}">#}
 
         {#
             Those two blocks defines frontend entrypoint for CSS and JavaScript assets
@@ -42,11 +42,11 @@
                         <div class="navbar-collapse collapse" id="appNavbar">
                             <ul class="navbar-nav ml-auto">
                                 {% block header_navigation_links %}
-                                    <li class="nav-item{{ _route == 'blog_index' ? ' active' : '' }}">
-                                        <a class="nav-link" href="{{ path('blog_index') }}">
-                                            <i class="fa fa-home" aria-hidden="true"></i> {{ 'menu.homepage'|trans }}
-                                        </a>
-                                    </li>
+{#                                    <li class="nav-item{{ _route == 'blog_index' ? ' active' : '' }}">#}
+{#                                        <a class="nav-link" href="{{ path('blog_index') }}">#}
+{#                                            <i class="fa fa-home" aria-hidden="true"></i> {{ 'menu.homepage'|trans }}#}
+{#                                        </a>#}
+{#                                    </li>#}
                                     {% if is_granted('ROLE_ADMIN') %}
                                         <li class="nav-item">
                                             <a class="nav-link" href="{{ path('admin') }}">
@@ -56,9 +56,9 @@
                                     {% endif %}
                                 {% endblock %}
 
-                                <li class="nav-item{{ _route == 'blog_search' ? ' active' : '' }}">
-                                    <a class="nav-link" href="{{ path('blog_search') }}"> <i class="fa fa-search"></i> {{ 'menu.search'|trans }}</a>
-                                </li>
+{#                                <li class="nav-item{{ _route == 'blog_search' ? ' active' : '' }}">#}
+{#                                    <a class="nav-link" href="{{ path('blog_search') }}"> <i class="fa fa-search"></i> {{ 'menu.search'|trans }}</a>#}
+{#                                </li>#}
 
                                 {% if app.user %}
                                     <li class="nav-item dropdown">
@@ -111,10 +111,10 @@
                                     {% set is_active = app.request.locale == locale.code %}
                                     {% set is_rtl = locale.code in ['ar', 'fa', 'he'] %}
                                     <li class="{{ is_active ? 'active' }} {{ is_rtl ? 'rtl' }}" translate="no">
-                                        <a class="stretched-link" lang="{{ locale.code }}" hreflang="{{ locale.code }}" href="{{ path(app.request.get('_route', 'blog_index'), app.request.get('_route_params', [])|merge({_locale: locale.code})) }}">
-                                            {{ locale.name|capitalize }}
-                                            <small>{{ locale.code }}</small>
-                                        </a>
+{#                                        <a class="stretched-link" lang="{{ locale.code }}" hreflang="{{ locale.code }}" href="{{ path(app.request.get('_route', 'blog_index'), app.request.get('_route_params', [])|merge({_locale: locale.code})) }}">#}
+{#                                            {{ locale.name|capitalize }}#}
+{#                                            <small>{{ locale.code }}</small>#}
+{#                                        </a>#}
                                     </li>
                                 {% endfor %}
                             </ul>

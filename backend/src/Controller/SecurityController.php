@@ -29,6 +29,7 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
  * @author Ryan Weaver <weaverryan@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
+#[Route('/admin')]
 final class SecurityController extends AbstractController
 {
     use TargetPathTrait;
@@ -42,7 +43,7 @@ final class SecurityController extends AbstractController
     {
         // if user is already logged in, don't display the login page again
         if ($user) {
-            return $this->redirectToRoute('blog_index');
+            return $this->redirectToRoute('admin');
         }
 
         // this statement solves an edge-case: if you change the locale in the login
