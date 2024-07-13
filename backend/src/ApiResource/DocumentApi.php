@@ -42,12 +42,14 @@ class DocumentApi
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     public ?DocumentCategoryApi $category = null;
 
+    #[ApiProperty(writable: false)]
     #[ApiFilter(BooleanFilter::class)]
     public bool $under_review = true;
 
     // TODO add a way to upload a file
     // TODO add a way to get the file
 
+    #[ApiProperty(writable: false)]
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     public ?UserApi $creator;
 
