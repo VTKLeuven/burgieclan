@@ -29,6 +29,7 @@ const initiateOAuthFlow = (router: AppRouterInstance) => {
     const codeChallenge = generateCodeChallenge(codeVerifier);
 
     localStorage.setItem('code_verifier', codeVerifier);
+    console.log("code verifier: ", codeVerifier);
 
     const authorization = process.env.NEXT_PUBLIC_LITUS_OAUTH_AUTHORIZE;
     const clientId = process.env.NEXT_PUBLIC_LITUS_API_KEY;
