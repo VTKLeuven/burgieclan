@@ -83,8 +83,8 @@ security:
     access_control:
         # this is a catch-all for the admin area
         # additional security lives in the controllers
-        - { path: '^/(%app_locales%)/admin/login', roles: PUBLIC_ACCESS }
-        - { path: '^/(%app_locales%)/admin', roles: ROLE_ADMIN }
+        - { path: '^/admin/login', roles: PUBLIC_ACCESS }
+        - { path: '^/admin', roles: ROLE_ADMIN }
         - { path: ^/api$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/api/$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/api/docs, roles: PUBLIC_ACCESS } # Allows accessing API documentations and Swagger UI docs
