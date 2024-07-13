@@ -272,7 +272,6 @@ class DocumentResourceTest extends ApiTestCase
                         'name' => 'Document name',
                         'course' => '/api/courses/' . $course->getId(),
                         'category' => '/api/document_categories/' . $category->getId(),
-                        'under_review' => true,
                     ],
                     'headers' => [
                         'Authorization' => 'Bearer ' . $this->token
