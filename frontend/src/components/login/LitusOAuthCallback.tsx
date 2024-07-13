@@ -7,13 +7,12 @@ export async function LitusOAuthCallback(req: Request) {
     const state = url.searchParams.get('state');
     const storedState = cookies().get('oauth_state')?.value;
 
-    // Uncomment if you want to verify state to prevent CSRF attacks
+    // Verify state to prevent CSRF attacks
     // if (state !== storedState) {
     //     return new Response('State mismatch: potential CSRF attack.', { status: 400 });
     // }
 
     const codeVerifier = cookies().get('code_verifier')?.value;
-
     if (!codeVerifier) {
         return new Response('Code verifier is missing.', { status: 400 });
     }
