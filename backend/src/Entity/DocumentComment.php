@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\DocumentCommentRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DocumentCommentRepository::class)]
@@ -15,7 +14,7 @@ class DocumentComment extends AbstractComment
     private ?int $id = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'cascade')]
     private ?Document $document = null;
 
     public function getId(): ?int

@@ -4,13 +4,12 @@ namespace App\Controller\Admin;
 
 use App\Entity\Document;
 use App\Entity\User;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Asset;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Form\Type\FileUploadType;
+use Vich\UploaderBundle\Form\Type\VichFileType;
 
 class DocumentCrudController extends AbstractCrudController
 {
@@ -47,17 +46,14 @@ class DocumentCrudController extends AbstractCrudController
         yield BooleanField::new('under_review')
             ->setLabel('Published')
             ->renderAsSwitch(false);
-        yield TextField::new('file_name')
-            ->setLabel('File')
-            ->setFormType(FileUploadType::class)
+        yield TextField::new('file')
+            ->setFormType(VichFileType::class)
             ->setFormTypeOptions([
-                'help' => 'Max upload size is '. ini_get('upload_max_filesize') . '.',
-                'upload_dir' => 'public/uploads/documents',
-                'upload_filename' => '[slug]-[timestamp].[extension]',
+                'download_label' => true,
+                'allow_delete' => false,
             ])
-            ->addJsFiles(
-                Asset::fromEasyAdminAssetPackage('field-image.js'),
-                Asset::fromEasyAdminAssetPackage('field-file-upload.js')
-            );
+            ->hideOnIndex();
+        yield TextField::new('file_name')
+            ->onlyOnIndex();
     }
 }

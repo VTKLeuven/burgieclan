@@ -6,7 +6,7 @@ use App\Factory\CourseFactory;
 use App\Factory\DocumentCategoryFactory;
 use App\Factory\DocumentFactory;
 use App\Factory\UserFactory;
-use Zenstruck\Browser\HttpOptions;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
@@ -253,33 +253,46 @@ class DocumentResourceTest extends ApiTestCase
 
     public function testPostToCreateDocument(): void
     {
-        $user = UserFactory::createOne();
         $course = CourseFactory::createOne();
         $category = DocumentCategoryFactory::createOne();
 
-        $this->browser()
-            ->actingAs($user)
+        // Create copy of file in system tmp directory
+        $filePath = tempnam(sys_get_temp_dir(), uniqid());
+        $img = file_get_contents(__DIR__ . '/../../public/image-for-test.png');
+        file_put_contents($filePath, $img);
+        $file = new UploadedFile($filePath, 'image-for-test.png');
+
+        $json = $this->browser()
             ->post('/api/documents', [
-                'json' => [],
                 'headers' => [
-                    'Content-Type' => 'application/ld+json',
-                ],
+                    'Content-Type' => 'multipart/form-data',
+                    'Authorization' => 'Bearer ' . $this->token
+                ]
             ])
-            ->assertStatus(422)
-            ->post('/api/documents',
-                [
-                    'json' => [
-                        'name' => 'Document name',
-                        'course' => '/api/courses/' . $course->getId(),
-                        'category' => '/api/document_categories/' . $category->getId(),
-                        'under_review' => true,
-                    ],
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->token
-                    ]
+            ->assertStatus(400)
+            ->post('/api/documents', [
+                'headers' => [
+                    'Content-Type' => 'multipart/form-data',
+                    'Authorization' => 'Bearer ' . $this->token
+                ],
+                'body' => [
+                    'name' => 'Document name',
+                    'course' => '/api/courses/' . $course->getId(),
+                    'category' => '/api/document_categories/' . $category->getId(),
+                    'under_review' => true,
+                ],
+                'files' => [
+                    'file' => $file,
+                ]
             ])
             ->assertStatus(201)
             ->assertJsonMatches('name', 'Document name')
-        ;
+            ->json();
+
+        $contentUrl = $json->decoded()['contentUrl'];
+        $array = explode('/', $contentUrl);
+        $filename = end($array);
+        // Delete saved file to clean up.
+        unlink(__DIR__ . '/../../data/documents/' . $filename);
     }
 }
