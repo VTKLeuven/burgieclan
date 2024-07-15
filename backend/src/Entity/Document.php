@@ -1,19 +1,13 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace App\Entity;
 
 use App\Repository\DocumentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: DocumentRepository::class)]
 class Document extends Node
 {
@@ -36,7 +30,10 @@ class Document extends Node
     #[ORM\Column]
     private ?bool $under_review = null;
 
-    #[ORM\Column(length: 255)]
+    #[Vich\UploadableField(mapping: 'document_object', fileNameProperty: 'file_name')]
+    private ?File $file = null;
+
+    #[ORM\Column(nullable: true)]
     private ?string $file_name = null;
 
     public function getId(): ?int
@@ -96,11 +93,27 @@ class Document extends Node
         return $this->file_name;
     }
 
-    public function setFileName(string $file_name): static
+    public function setFileName(?string $file_name): static
     {
         $this->file_name = $file_name;
 
         return $this;
+    }
+
+    public function getFile(): ?File
+    {
+        return $this->file;
+    }
+
+    public function setFile(?File $file = null): void
+    {
+        $this->file = $file;
+
+        if (null !== $file) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->setUpdateDate();
+        }
     }
 
     public function __toString(): string
