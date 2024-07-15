@@ -90,9 +90,6 @@ class DocumentApi
     #[ApiFilter(BooleanFilter::class)]
     public bool $under_review = true;
 
-    // TODO add a way to upload a file
-    // TODO add a way to get the file
-
     public ?string $contentUrl = null;
 
     #[Assert\NotNull(groups: ['document_create'])]
