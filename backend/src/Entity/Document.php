@@ -30,8 +30,6 @@ class Document extends Node
     #[ORM\Column]
     private ?bool $under_review = null;
 
-    private ?string $contentUrl = null;
-
     #[Vich\UploadableField(mapping: 'document_object', fileNameProperty: 'file_name')]
     private ?File $file = null;
 
@@ -100,16 +98,6 @@ class Document extends Node
         $this->file_name = $file_name;
 
         return $this;
-    }
-
-    public function getContentUrl(): ?string
-    {
-        return $this->contentUrl;
-    }
-
-    public function setContentUrl(?string $contentUrl): void
-    {
-        $this->contentUrl = $contentUrl;
     }
 
     public function getFile(): ?File
