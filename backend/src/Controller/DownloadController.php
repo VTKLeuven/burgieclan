@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Vich\UploaderBundle\Handler\DownloadHandler;
 
-#[Route('/admin/uploads/documents')]
+#[Route('/files/download')]
 final class DownloadController extends AbstractController
 {
     #[Route('/{filename}', name: 'document_download', methods: ['GET'])]
