@@ -10,12 +10,14 @@ use App\Entity\Document;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
+use Vich\UploaderBundle\Storage\StorageInterface;
 
 #[AsMapper(from: Document::class, to: DocumentApi::class)]
 class DocumentEntityToApiMapper implements MapperInterface
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
+        private readonly StorageInterface $storage,
     ) {
     }
 
@@ -47,6 +49,7 @@ class DocumentEntityToApiMapper implements MapperInterface
         ]);
         $to->createdAt = $from->getCreateDate()->format('Y-m-d H:i:s');
         $to->updatedAt = $from->getUpdateDate()->format('Y-m-d H:i:s');
+        $to->contentUrl = $this->storage->resolveUri($from, 'file');
 
         return $to;
     }
