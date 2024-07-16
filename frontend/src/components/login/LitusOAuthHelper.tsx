@@ -9,7 +9,7 @@ import axios from "axios";
  * @param buffer
  */
 function base64URLEncode(buffer : crypto.BinaryLike) {
-    return buffer.toString("base64")
+    return btoa(buffer.toString())
         .replace(/\+/g, '-')
         .replace(/\//g, '_')
         .replace(/=/g, '');
@@ -49,10 +49,14 @@ export const initiateLitusOAuthFlow = (router: AppRouterInstance) => {
 
     localStorage.setItem('code_verifier', codeVerifier);
 
+    const state = crypto.randomBytes(16).toString('hex');
+
+    localStorage.setItem('state', state);
+
     const authorization = process.env.NEXT_PUBLIC_LITUS_OAUTH_AUTHORIZE;
     const clientId = process.env.NEXT_PUBLIC_LITUS_API_KEY;
     const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URL;
-    const state = crypto.randomBytes(16).toString('hex');
+
 
     if (!authorization || !clientId || !redirectUri) {
         throw new Error("Missing environment variables for OAuth flow");
@@ -64,7 +68,8 @@ export const initiateLitusOAuthFlow = (router: AppRouterInstance) => {
         client_id: clientId,
         redirect_uri: redirectUri,
         code_challenge: codeChallenge,
-        code_challenge_method: 'S256'
+        code_challenge_method: 'S256',
+        state: state,
     });
     const authUrl = `${authorization}?${params.toString()}`;
 
@@ -139,6 +144,14 @@ export const LitusOAuthCallback = (): null => {
 
         if (!codeVerifier) {
             console.error('Code verifier is missing.');
+            return;
+        }
+
+        const state = searchParams.get('state');
+        const storedState = localStorage.getItem('state');
+
+        if (state !== storedState) {
+            console.error('State mismatch: potential CSRF attack.', { status: 400 });
             return;
         }
 
