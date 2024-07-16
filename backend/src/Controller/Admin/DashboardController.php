@@ -10,6 +10,7 @@ use App\Entity\Module;
 use App\Entity\DocumentCategory;
 use App\Entity\Document;
 use App\Entity\DocumentComment;
+use App\Entity\Page;
 use App\Entity\Program;
 use App\Entity\User;
 use App\Repository\DocumentRepository;
@@ -87,6 +88,8 @@ class DashboardController extends AbstractDashboardController
             $pendingDocumentsMenu->setBadge($amountPending, 'danger');
         }
         yield $documentsMenu;
+
+        yield MenuItem::linkToCrud('Pages', 'fa-solid fa-newspaper', Page::Class);
 
         yield MenuItem::section('Frontend');
         yield MenuItem::linkToUrl('Home', 'fa fa-window-maximize', '/');

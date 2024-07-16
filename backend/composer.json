@@ -15,6 +15,7 @@
     "require": {
         "php": ">=8.1",
         "ext-pdo_sqlite": "*",
+        "ext-iconv": "*",
         "api-platform/core": "^3.2",
         "doctrine/dbal": "^3.1",
         "doctrine/doctrine-bundle": "^2.11",

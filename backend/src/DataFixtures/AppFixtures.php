@@ -24,6 +24,7 @@ use App\Factory\DocumentCommentFactory;
 use App\Factory\DocumentFactory;
 use App\Factory\ModuleFactory;
 use App\Factory\NotificationFactory;
+use App\Factory\PageFactory;
 use App\Factory\ProgramFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -56,6 +57,7 @@ final class AppFixtures extends Fixture
         DocumentCategoryFactory::createMany(5);
         DocumentFactory::createMany(100);
         DocumentCommentFactory::createMany(150);
+        PageFactory::createMany(20);
     }
 
     private function loadUsers(ObjectManager $manager): void
