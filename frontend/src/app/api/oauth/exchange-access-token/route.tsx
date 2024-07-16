@@ -2,14 +2,10 @@ import { NextResponse } from 'next/server';
 import axios from 'axios';
 
 /**
- * This POST request passes a code and code-verifier to the Litus authorization server in order to retrieve an access
- * code.
+ * Passes a code and code-verifier to the Litus authorization server in order to retrieve an access code.
  *
- * This request is executed on the server-side, which avoids CORS issues taking place when calling the Litus endpoint
- * directly from the frontend.
- *
- * @param req
- * @constructor
+ * This is done by an API endpoint which executes on the server-side, which avoids CORS issues taking place when calling
+ * the Litus endpoint directly from the frontend.
  */
 export async function POST(req: Request) {
     const body = await req.json();

@@ -6,7 +6,6 @@ import axios from "axios";
 
 /**
  * Encode binary buffer to base64url
- * @param buffer
  */
 function base64URLEncode(buffer : crypto.BinaryLike) {
     return buffer.toString("base64")
@@ -17,7 +16,6 @@ function base64URLEncode(buffer : crypto.BinaryLike) {
 
 /**
  * Hash binary buffer with SHA256
- * @param buffer
  */
 function sha256(buffer: crypto.BinaryLike) {
     return crypto.createHash('sha256').update(buffer).digest();
@@ -32,7 +30,6 @@ const generateCodeVerifier = () => {
 
 /**
  * Generate code challenge which is to be verified later (following PCKE for OAuth, see RFC7636)
- * @param codeVerifier
  */
 const generateCodeChallenge = (codeVerifier: string) => {
     return base64URLEncode(sha256(codeVerifier));
@@ -41,7 +38,6 @@ const generateCodeChallenge = (codeVerifier: string) => {
 /**
  * Redirects the user to Litus where he should authenticate himself, after which the Litus authentication server
  * redirects back to the callback url
- * @param router
  */
 export const initiateLitusOAuthFlow = (router: AppRouterInstance) => {
     const codeVerifier = generateCodeVerifier();
@@ -79,8 +75,6 @@ export const initiateLitusOAuthFlow = (router: AppRouterInstance) => {
 
 /**
  * Request authorization code and provide PCKE code and code verifier to authentication server
- * @param code
- * @param codeVerifier
  */
 const exchangeAuthorizationCode = async (code: string, codeVerifier: string) => {
     // Proxy access-token retrieval through backend to avoid CORS issues
@@ -105,7 +99,6 @@ const exchangeAuthorizationCode = async (code: string, codeVerifier: string) => 
 
 /**
  * Retrieve JWT from access token via backend endpoint
- * @param accessToken
  */
 const exchangeAccessTokenForJWT = async (accessToken: string) => {
     const backendAuthUrl = process.env.NEXT_PUBLIC_BURGIECLAN_BACKEND_AUTH;
@@ -129,7 +122,6 @@ const exchangeAccessTokenForJWT = async (accessToken: string) => {
 /**
  * Provides functionality for callback url, where the Litus authentication server redirects to after successful user
  * login. Retrieves access token and JWT and sets it as cookie for future requests.
- * @constructor
  */
 export const LitusOAuthCallback = (): null => {
     const router = useRouter();
@@ -162,8 +154,8 @@ export const LitusOAuthCallback = (): null => {
                     const accessToken = await exchangeAuthorizationCode(code, codeVerifier);
                     const jwt = await exchangeAccessTokenForJWT(accessToken);
 
-                    document.cookie = `jwt=${jwt}; path=/; HttpOnly; Secure`;
-                    console.log("jwt: ", jwt);
+                    // Put JWT in Http-only cookie for session management
+                    await axios.post('/api/oauth/set-jwt-cookie', { jwt });
 
                     router.push('/');
                 } catch (error) {
