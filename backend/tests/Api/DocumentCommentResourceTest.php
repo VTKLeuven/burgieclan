@@ -212,11 +212,11 @@ class DocumentCommentResourceTest extends ApiTestCase
         $document = DocumentFactory::createOne();
 
         $this->browser()
-            ->actingAs($user)
             ->post('/api/document_comments', [
                 'json' => [],
                 'headers' => [
                     'Content-Type' => 'application/ld+json',
+                    'Authorization' =>'Bearer ' . $this->token
                 ],
             ])
             ->assertStatus(422)
