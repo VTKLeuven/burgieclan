@@ -5,18 +5,18 @@ import {useEffect, useRef} from "react";
 import axios from "axios";
 
 /**
- * Encode to base64url
+ * Encode binary buffer to base64url
  * @param buffer
  */
 function base64URLEncode(buffer : crypto.BinaryLike) {
-    return btoa(buffer.toString())
+    return buffer.toString("base64")
         .replace(/\+/g, '-')
         .replace(/\//g, '_')
         .replace(/=/g, '');
 }
 
 /**
- * Hash with SHA256
+ * Hash binary buffer with SHA256
  * @param buffer
  */
 function sha256(buffer: crypto.BinaryLike) {
@@ -49,16 +49,17 @@ export const initiateLitusOAuthFlow = (router: AppRouterInstance) => {
 
     localStorage.setItem('code_verifier', codeVerifier);
 
+    // store for later use
     const state = crypto.randomBytes(16).toString('hex');
 
+    // store for later verification of received state
     localStorage.setItem('state', state);
 
-    const authorization = process.env.NEXT_PUBLIC_LITUS_OAUTH_AUTHORIZE;
+    const authorizationUri = process.env.NEXT_PUBLIC_LITUS_OAUTH_AUTHORIZE;
     const clientId = process.env.NEXT_PUBLIC_LITUS_API_KEY;
-    const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URL;
+    const redirectUri = process.env.NEXT_PUBLIC_BURGIECLAN_REDIRECT_URL;
 
-
-    if (!authorization || !clientId || !redirectUri) {
+    if (!authorizationUri || !clientId || !redirectUri) {
         throw new Error("Missing environment variables for OAuth flow");
     }
 
@@ -71,7 +72,7 @@ export const initiateLitusOAuthFlow = (router: AppRouterInstance) => {
         code_challenge_method: 'S256',
         state: state,
     });
-    const authUrl = `${authorization}?${params.toString()}`;
+    const authUrl = `${authorizationUri}?${params.toString()}`;
 
     router.push(authUrl);
 }
@@ -83,15 +84,15 @@ export const initiateLitusOAuthFlow = (router: AppRouterInstance) => {
  */
 const exchangeAuthorizationCode = async (code: string, codeVerifier: string) => {
     // Proxy access-token retrieval through backend to avoid CORS issues
-    const tokenProxyUrl = '/api/oauth/exchange-access-token';
+    const tokenProxyUri = process.env.NEXT_PUBLIC_BURGIECLAN_TOKEN_PROXY_API;
     const clientId = process.env.NEXT_PUBLIC_LITUS_API_KEY;
-    const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URL;
+    const redirectUri = process.env.NEXT_PUBLIC_BURGIECLAN_REDIRECT_URL;
 
-    if (!clientId || !redirectUri) {
+    if (!tokenProxyUri || !clientId || !redirectUri) {
         throw new Error("Missing environment variables for OAuth flow");
     }
 
-    const response = await axios.post(tokenProxyUrl, {
+    const response = await axios.post(tokenProxyUri, {
         grant_type: 'authorization_code',
         code,
         client_id: clientId,
@@ -107,7 +108,7 @@ const exchangeAuthorizationCode = async (code: string, codeVerifier: string) => 
  * @param accessToken
  */
 const exchangeAccessTokenForJWT = async (accessToken: string) => {
-    const backendAuthUrl = process.env.NEXT_PUBLIC_BACKEND_AUTH;
+    const backendAuthUrl = process.env.NEXT_PUBLIC_BURGIECLAN_BACKEND_AUTH;
 
     if (!backendAuthUrl) {
         throw new Error("Missing environment variables for OAuth flow");
