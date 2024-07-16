@@ -87,6 +87,7 @@ class DocumentApi
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     public ?DocumentCategoryApi $category = null;
 
+    #[ApiProperty(writable: false)]
     #[ApiFilter(BooleanFilter::class)]
     public bool $under_review = true;
 
@@ -96,6 +97,7 @@ class DocumentApi
     #[ApiProperty(readable: false)]
     public ?File $file = null;
 
+    #[ApiProperty(writable: false)]
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     public ?UserApi $creator;
 
