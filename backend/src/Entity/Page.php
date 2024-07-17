@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\PageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,6 +25,9 @@ class Page
     private string $urlKey;
 
     #[ORM\Column]
+    /*
+     * If unauthorized users can view the page
+     */
     private bool $publicAvailable = false;
 
     /**

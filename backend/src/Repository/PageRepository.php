@@ -20,4 +20,13 @@ class PageRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Page::class);
     }
+
+    public function findOneByUrlKey(string $urlKey): ?Page
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.urlKey = :urlKey')
+            ->setParameter('urlKey', $urlKey)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
