@@ -5,11 +5,9 @@ namespace App\State;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Metadata\Operation;
 use App\ApiResource\PageApi;
-use App\Mapper\PageEntityToApiMapper;
 use App\Repository\PageRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
-use LogicException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
@@ -19,7 +17,6 @@ class PageApiProvider implements ProviderInterface
 {
     public function __construct(
         private readonly PageRepository $pageRepository,
-        private readonly PageEntityToApiMapper $mapper,
         private readonly MicroMapperInterface $microMapper,
     ) {
     }
