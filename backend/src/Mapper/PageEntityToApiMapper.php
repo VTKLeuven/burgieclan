@@ -33,4 +33,10 @@ class PageEntityToApiMapper implements MapperInterface
 
         return $to;
     }
+
+    public function map(object $from, string $toClass, array $context = []): object
+    {
+        $dto = $this->load($from, $toClass, $context);
+        return $this->populate($from, $dto, $context);
+    }
 }

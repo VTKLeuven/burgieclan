@@ -5,6 +5,7 @@ namespace App\State;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Metadata\Operation;
 use App\ApiResource\PageApi;
+use App\Mapper\PageEntityToApiMapper;
 use App\Repository\PageRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -18,6 +19,7 @@ class PageApiProvider implements ProviderInterface
 {
     public function __construct(
         private readonly PageRepository $pageRepository,
+        private readonly PageEntityToApiMapper $mapper,
         private readonly MicroMapperInterface $microMapper,
     ) {
     }
@@ -37,9 +39,10 @@ class PageApiProvider implements ProviderInterface
             throw new NotFoundHttpException(sprintf('Page not found for urlKey: %s', $urlKey));
         }
 
-        $pageApiObject = $this->microMapper->map($page, PageApi::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
-        ]);
+        $pageApiObject = $this->mapper->map($page, PageApi::class);
+//        $pageApiObject = $this->microMapper->map($page, PageApi::class, [
+//            MicroMapperInterface::MAX_DEPTH => 0,
+//        ]);
         if (!$pageApiObject instanceof PageApi) {
             throw new HttpException(500, 'Page could not be converted to PageApi object');
         }
