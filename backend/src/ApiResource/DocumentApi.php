@@ -48,11 +48,6 @@ use Symfony\Component\Validator\Constraints as Assert;
                                         "format" => "iri-reference",
                                         "example" => "/api/document_categories/1"
                                     ],
-                                    "under_review" => [
-                                        "default" => true,
-                                        "example" => true,
-                                        "type" => "boolean"
-                                    ],
                                     'file' => [
                                         'type' => 'string',
                                         'format' => 'binary'
