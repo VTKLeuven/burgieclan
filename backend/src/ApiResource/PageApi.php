@@ -9,7 +9,6 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Page;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
@@ -23,7 +22,6 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: 'is_granted("VIEW", object)', // Handled by the src/Security/Voter/PageVoter
             provider: PageApiProvider::class,
         ),
-        new GetCollection(),
     ],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
@@ -38,13 +36,10 @@ class PageApi
 
     #[Assert\NotBlank]
     #[Assert\Length(max: 255)]
-    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     public ?string $name = null;
 
     #[Assert\NotBlank]
-    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     public ?string $content = null;
 
-    #[ApiFilter(BooleanFilter::class)]
     public bool $publicAvailable = false;
 }
