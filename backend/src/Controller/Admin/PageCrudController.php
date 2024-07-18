@@ -15,7 +15,7 @@ class PageCrudController extends AbstractCrudController
         return Page::class;
     }
 
-    public function createEntity(string $entityFqcn)
+    public function createEntity(string $entityFqcn): Page
     {
         return new Page("");
     }
