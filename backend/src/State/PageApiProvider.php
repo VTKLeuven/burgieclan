@@ -39,10 +39,8 @@ class PageApiProvider implements ProviderInterface
             throw new NotFoundHttpException(sprintf('Page not found for urlKey: %s', $urlKey));
         }
 
-        $pageApiObject = $this->mapper->map($page, PageApi::class);
-//        $pageApiObject = $this->microMapper->map($page, PageApi::class, [
-//            MicroMapperInterface::MAX_DEPTH => 0,
-//        ]);
+        //$pageApiObject = $this->mapper->map($page, PageApi::class);
+        $pageApiObject = $this->microMapper->map($page, PageApi::class);
         if (!$pageApiObject instanceof PageApi) {
             throw new HttpException(500, 'Page could not be converted to PageApi object');
         }
