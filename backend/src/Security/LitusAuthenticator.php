@@ -51,7 +51,7 @@ class LitusAuthenticator extends OAuth2Authenticator implements AuthenticationEn
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        $targetUrl = $this->router->generate('blog_index');
+        $targetUrl = $this->router->generate('admin');
         return new RedirectResponse($targetUrl);
     }
 

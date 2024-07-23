@@ -38,5 +38,10 @@ class ModuleApi
      */
     public array $courses = [];
 
+    /**
+     * @var ModuleApi[]
+     */
+    public array $modules = [];
+
     public ProgramApi $program;
 }
