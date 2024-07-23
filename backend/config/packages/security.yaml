@@ -83,12 +83,15 @@ security:
     access_control:
         # this is a catch-all for the admin area
         # additional security lives in the controllers
-        - { path: '^/(%app_locales%)/admin', roles: ROLE_ADMIN }
+        - { path: '^/admin/login', roles: PUBLIC_ACCESS }
+        - { path: '^/admin', roles: ROLE_ADMIN }
         - { path: ^/api$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/api/$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/api/docs, roles: PUBLIC_ACCESS } # Allows accessing API documentations and Swagger UI docs
         - { path: ^/api/auth, roles: PUBLIC_ACCESS } # Allows accessing the auth endpoints
+        - { path: ^/api/pages, roles: PUBLIC_ACCESS } # Allows accessing the public available pages (see PageVoter)
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY } # Restricts access to all api endpoints for not logged-in users
+        - { path: ^/files/download, roles: IS_AUTHENTICATED_REMEMBERED } # Restricts access to download endpoint for not logged-in users
 
     # The ROLE_ADMIN role inherits from the ROLE_USER role
     role_hierarchy:

@@ -4,6 +4,7 @@ namespace App\Tests\Api;
 
 use App\Factory\UserFactory;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Browser\Test\HasBrowser;
@@ -25,14 +26,21 @@ abstract class ApiTestCase extends KernelTestCase
     protected function setUp(): void
     {
         $user = UserFactory::createOne(['plainPassword' => 'password']);
+        $this->token = $this->getToken($user->getUsername(), 'password');
+    }
 
+    protected function getToken(string $username, string $password){
         $tokenResponse = $this->browser()
             ->post('/api/auth/login', HttpOptions::json([
-                'username' => $user->getUsername(),
+                'username' => $username,
                 'password' => 'password',
             ]))
             ->json()
             ->decoded();
-        $this->token = $tokenResponse['token'];
+
+        if(!isset($tokenResponse['token'])){
+            throw new AuthenticationException('Token not found');
+        }
+        return $tokenResponse['token'];
     }
 }
