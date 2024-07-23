@@ -89,6 +89,7 @@ security:
         - { path: ^/api/$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/api/docs, roles: PUBLIC_ACCESS } # Allows accessing API documentations and Swagger UI docs
         - { path: ^/api/auth, roles: PUBLIC_ACCESS } # Allows accessing the auth endpoints
+        - { path: ^/api/pages, roles: PUBLIC_ACCESS } # Allows accessing the public available pages (see PageVoter)
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY } # Restricts access to all api endpoints for not logged-in users
         - { path: ^/files/download, roles: IS_AUTHENTICATED_REMEMBERED } # Restricts access to download endpoint for not logged-in users
 

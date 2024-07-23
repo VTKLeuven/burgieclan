@@ -24,6 +24,9 @@ class Page
     private string $urlKey;
 
     #[ORM\Column]
+    /*
+     * If unauthorized users can view the page
+     */
     private bool $publicAvailable = false;
 
     /**
