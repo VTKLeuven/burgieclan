@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useRef, useEffect, useState } from 'react';
+import LitusOAuthButton from "@/components/login/LitusOAuthButton";
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
@@ -35,23 +36,7 @@ export default function LoginForm() {
                         </h2>
                     </div>
 
-                    <div className="mt-10 w-full max-w-sm">
-                        <form className="space-y-6" action="#" method="POST">
-                            <button
-                                type="submit"
-                                className="flex flex-row w-full justify-center items-center rounded-md border-0 px-3 py-1.5 text-sm ring-1 ring-inset ring-gray-300 font-semibold leading-6 text-black shadow-sm hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-vtk-blue-400"
-                            >
-                                <Image
-                                    src="/images/logos/vtk-logo-blue.png"
-                                    alt="VTK Logo"
-                                    width={50}
-                                    height={25}
-                                    className="p-2 pb-3"
-                                />
-                                <p className="inline p-2 text-vtk-blue-500">Log in with VTK</p>
-                            </button>
-                        </form>
-                    </div>
+                    <LitusOAuthButton />
 
                     <div
                         className="mt-4 w-full max-w-sm font-semibold text-center text-sm leading-6 text-vtk-blue-500 hover:text-vtk-blue-400 cursor-pointer flex items-center justify-center"
