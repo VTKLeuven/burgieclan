@@ -1,24 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
+/**
+ * Proxy for outgoing request which retrieves the JWT token from http-only cookie and sets it as bearer token in the
+ * authorization header before executing the request.
+ */
 export async function POST(req: NextRequest) {
     try {
         const { method, url, body, headers: customHeaders } = await req.json();
 
-        // Extract the auth token from cookies
         const jwt = req.cookies.get('jwt')?.value;
-
         if (!jwt) {
             return NextResponse.json({ error: 'Unauthorized: No JWT token found' }, { status: 401 });
         }
 
-        // Merge the custom headers with the Authorization header
         const headers = {
             ...customHeaders,
             Authorization: `Bearer ${jwt}`,
         };
 
-        // Create Axios config
         const config = {
             method,
             url,
@@ -26,13 +26,10 @@ export async function POST(req: NextRequest) {
             data: body,
         };
 
-        // Make the API request with the bearer token
         const response = await axios(config);
 
-        // Return the data from the API
         return NextResponse.json(response.data);
-    } catch (error) {
-        // @ts-ignore
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (err) {
+        return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }

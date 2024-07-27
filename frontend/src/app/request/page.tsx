@@ -3,7 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import { apiClient } from '@/utils/api';
 
-const HomePage: React.FC = () => {
+/**
+ * This is a temporary component that shows how to use the apiClient to request data from the backend.
+ * It should be removed later.
+ *
+ * TODO: remove after apiClient is used in other places
+ */
+const Page: React.FC = () => {
     const [data, setData] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -13,7 +19,6 @@ const HomePage: React.FC = () => {
                 const result = await apiClient('GET', '/api/users/1');
                 setData(result);
             } catch (err) {
-                // @ts-ignore
                 setError(err.message);
             }
         };
@@ -31,10 +36,9 @@ const HomePage: React.FC = () => {
 
     return (
         <div>
-            <h1>Welcome to the Home Page</h1>
             <p>Data: {JSON.stringify(data)}</p>
         </div>
     );
 };
 
-export default HomePage;
+export default Page;
