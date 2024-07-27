@@ -1,4 +1,6 @@
-// app/utils/apiClient.ts
+/**
+ * API Client for requests to the backend server.
+ */
 export const apiClient = async (method: string, endpoint: string, body?: any, headers?: Record<string, string>) => {
     const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -8,6 +10,7 @@ export const apiClient = async (method: string, endpoint: string, body?: any, he
 
     const url = baseUrl + endpoint;
 
+    // Execute request via proxy
     const response = await fetch('/api/proxy', {
         method: 'POST',
         headers: {
