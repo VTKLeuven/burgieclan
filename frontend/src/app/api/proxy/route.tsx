@@ -3,25 +3,26 @@ import axios from 'axios';
 
 export async function POST(req: NextRequest) {
     try {
-        const { method, url, body } = await req.json();
+        const { method, url, body, headers: customHeaders } = await req.json();
 
         // Extract the auth token from cookies
         const jwt = req.cookies.get('jwt')?.value;
 
-        console.log(jwt);
-
         if (!jwt) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            return NextResponse.json({ error: 'Unauthorized: No JWT token found' }, { status: 401 });
         }
+
+        // Merge the custom headers with the Authorization header
+        const headers = {
+            ...customHeaders,
+            Authorization: `Bearer ${jwt}`,
+        };
 
         // Create Axios config
         const config = {
             method,
             url,
-            headers: {
-                Authorization: `Bearer ${jwt}`,
-                'Content-Type': 'application/json',
-            },
+            headers,
             data: body,
         };
 
