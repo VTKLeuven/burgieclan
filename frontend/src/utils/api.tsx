@@ -10,7 +10,7 @@ export const apiClient = async (method: string, endpoint: string, body?: any, he
 
     const url = baseUrl + endpoint;
 
-    // Execute request via proxy
+    // Execute request via proxy that adds JWT
     const response = await fetch('/api/proxy', {
         method: 'POST',
         headers: {
