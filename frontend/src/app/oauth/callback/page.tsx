@@ -1,4 +1,4 @@
 'use client';
-import {LitusOAuthCallback} from "@/components/login/LitusOAuthHelper";
+import {LitusOAuthCallback} from "@/utils/oauth";
 
 export default LitusOAuthCallback;
