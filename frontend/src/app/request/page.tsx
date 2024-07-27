@@ -1,7 +1,7 @@
-// app/home/page.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { apiClient } from '@/utils/api';
 
 const HomePage: React.FC = () => {
     const [data, setData] = useState<any>(null);
@@ -10,11 +10,7 @@ const HomePage: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('/api/data');
-                if (!response.ok) {
-                    throw new Error(`Error: ${response.statusText}`);
-                }
-                const result = await response.json();
+                const result = await apiClient('GET', '/api/users/1');
                 setData(result);
             } catch (err) {
                 // @ts-ignore

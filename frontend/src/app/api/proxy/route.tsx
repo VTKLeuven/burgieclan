@@ -1,22 +1,32 @@
-// app/api/data/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
     try {
+        const { method, url, body } = await req.json();
+
         // Extract the auth token from cookies
         const jwt = req.cookies.get('jwt')?.value;
+
+        console.log(jwt);
 
         if (!jwt) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Make the API request with the bearer token
-        const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/users/1", {
+        // Create Axios config
+        const config = {
+            method,
+            url,
             headers: {
                 Authorization: `Bearer ${jwt}`,
+                'Content-Type': 'application/json',
             },
-        });
+            data: body,
+        };
+
+        // Make the API request with the bearer token
+        const response = await axios(config);
 
         // Return the data from the API
         return NextResponse.json(response.data);
