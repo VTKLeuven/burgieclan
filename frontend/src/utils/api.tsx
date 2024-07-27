@@ -1,17 +1,18 @@
 /**
- * API Client for requests to the backend server.
+ * API Client for authenticated or unauthenticated requests to the backend server.
  */
-export const apiClient = async (method: string, endpoint: string, body?: any, headers?: Record<string, string>) => {
-    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+export const ApiClient = async (method: string, endpoint: string, body?: any, headers?: Record<string, string>) => {
+    const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    const frontendBaseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL;
 
-    if (!baseUrl) {
-        throw new Error(`Missing environment variable for backend base URL`)
+    if (!backendBaseUrl || !frontendBaseUrl) {
+        throw new Error(`Missing environment variable for backend or frontend base URL`)
     }
 
-    const url = baseUrl + endpoint;
+    const url = backendBaseUrl + endpoint;
 
     // Execute request via proxy that adds JWT
-    const response = await fetch('/api/proxy', {
+    const response = await fetch(frontendBaseUrl + '/api/proxy', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
