@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
-import {initiateLitusOAuthFlow} from "@/components/login/LitusOAuthHelper";
+import {initiateLitusOAuthFlow} from "@/utils/LitusOAuthHelper";
 
 
 const LitusOAuthButton = () => {
