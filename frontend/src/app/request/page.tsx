@@ -22,7 +22,7 @@ const HomePage: React.FC = () => {
     }, []);
 
     if (error) {
-        return <div>Error: {error}</div>;
+        return <div>{error}</div>;
     }
 
     if (!data) {

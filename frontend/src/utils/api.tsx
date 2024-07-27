@@ -1,4 +1,5 @@
-export const apiClient = async (method: string, endpoint: string, body?: any) => {
+// app/utils/apiClient.ts
+export const apiClient = async (method: string, endpoint: string, body?: any, headers?: Record<string, string>) => {
     const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
     if (!baseUrl) {
@@ -12,7 +13,7 @@ export const apiClient = async (method: string, endpoint: string, body?: any) =>
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ method, url, body }),
+        body: JSON.stringify({ method, url, body, headers }),
     });
 
     if (!response.ok) {
