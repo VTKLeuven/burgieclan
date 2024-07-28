@@ -30,10 +30,16 @@ export default function Page({params}: { params: { url_key: string; } }) {
         return <div>Loading...</div>;
     }
 
+    const content = { __html: page.content };
+
     return (
         <div>
-            <h1>{page.name}</h1>
-            {page.content}
+            <div className="bg-white px-6 py-32 lg:px-8">
+                <div className="mx-auto max-w-3xl text-base leading-7 text-gray-700">
+                    <h1>{page.name}</h1>
+                    <div dangerouslySetInnerHTML={content}/>
+                </div>
+            </div>
         </div>
     );
 }
