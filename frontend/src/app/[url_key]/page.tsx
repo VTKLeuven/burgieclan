@@ -1,29 +1,55 @@
-'use client'
+'use client';
 
-import {ApiClient} from "@/utils/api";
-import {useEffect, useState} from "react";
+import { ApiClient } from "@/utils/api";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ApiClientError } from "@/utils/api";
 
-export default function Page({params}: { params: { url_key: string; } }) {
-    const {url_key} = params
+
+export default function Page({ params }: { params: any }) {
+    const router = useRouter();
+    const { url_key } = params;
 
     const [page, setPage] = useState<any>(null);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<ApiClientError | null>(null);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const FetchData = async () => {
             try {
-                const result = await ApiClient('GET', `/api/pages/${url_key}`);
-                setPage(result);
-            } catch (err) {
-                setError(err.message);
+                const res = await ApiClient('GET', `/api/pages/${url_key}`);
+
+                if (res.error) {
+                    setError({ message: res.error.message, status: res.error.code });
+                    return;
+                }
+
+                setPage(res);
+            } catch (err: any) {
+                setError({ message: err.message, status: '500' });
             }
         };
 
-        fetchData();
-    }, []);
+        FetchData();
+    }, [url_key]);
+
+    useEffect(() => {
+        if (error) {
+            if (error.status === '401') {
+                router.push('/login');
+            } else if (error.status === '404') {
+                router.push('/404');
+            }
+        }
+    }, [error, router]);
 
     if (error) {
-        return <div>{error}</div>;
+        console.log(error.message);
+        return (
+            <div>
+                <h1>Error {error.status}</h1>
+                <p>{error.message}</p>
+            </div>
+        );
     }
 
     if (!page) {
@@ -37,7 +63,7 @@ export default function Page({params}: { params: { url_key: string; } }) {
             <div className="bg-white px-6 py-32 lg:px-8">
                 <div className="mx-auto max-w-3xl text-base leading-7 text-gray-700">
                     <h1>{page.name}</h1>
-                    <div dangerouslySetInnerHTML={content}/>
+                    <div dangerouslySetInnerHTML={content} />
                 </div>
             </div>
         </div>
