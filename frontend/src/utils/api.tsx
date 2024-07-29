@@ -16,6 +16,7 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, he
 
     const url = backendBaseUrl + endpoint;
 
+    // TODO BUR-110: instead of try-catch, throw errors here and catch with higher-level generic wrapper
     try {
         const res = await fetch(frontendBaseUrl + '/api/proxy', {
             method: 'POST',

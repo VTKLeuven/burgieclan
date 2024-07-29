@@ -5,7 +5,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiClientError } from "@/utils/api";
 
-
+/**
+ * Displays pages from page management system.
+ *
+ * Each page is identified with a unique url_key. When visiting /[url_key], the page with that url_key is fetched
+ * from the backend if it exists.
+ */
 export default function Page({ params }: { params: any }) {
     const router = useRouter();
     const { url_key } = params;
@@ -32,11 +37,14 @@ export default function Page({ params }: { params: any }) {
         FetchData();
     }, [url_key]);
 
+    // TODO BUR-110: put in generic wrapper that catches errors from lower levels
     useEffect(() => {
         if (error) {
             if (error.status === '401') {
+                // the page is not public available
                 router.push('/login');
             } else if (error.status === '404') {
+                // no page with url_key exists
                 router.push('/404');
             }
         }
@@ -52,9 +60,11 @@ export default function Page({ params }: { params: any }) {
     }
 
     if (!page) {
+        // TODO: replace with loading icon
         return <div>Loading...</div>;
     }
 
+    // the page content is expected to be in html
     const content = { __html: page.content };
 
     return (

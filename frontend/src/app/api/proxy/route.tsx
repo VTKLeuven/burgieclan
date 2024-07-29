@@ -7,6 +7,7 @@ import {NextRequest, NextResponse} from 'next/server';
  * Can also be used without authentication, in that case no authorization header is set.
  */
 export async function POST(req: NextRequest) {
+    // TODO BUR-110: instead of try-catch, throw errors here and catch with higher-level generic wrapper
     try {
         const { method, url, body, headers: customHeaders } = await req.json();
 
