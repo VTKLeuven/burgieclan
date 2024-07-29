@@ -1,5 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
+import {NextRequest, NextResponse} from 'next/server';
 
 /**
  * Proxy for outgoing request which retrieves the JWT token from http-only cookie and sets it as bearer token in the
@@ -22,17 +21,20 @@ export async function POST(req: NextRequest) {
             headers['Authorization'] = `Bearer ${jwt}`;
         }
 
-        const config = {
+        const res =  await fetch(url, {
             method,
-            url,
             headers,
-            data: body,
-        };
+            body: JSON.stringify(body),
+        });
 
-        const response = await axios(config);
+        const data = await res.json();
 
-        return NextResponse.json(response.data);
-    } catch (err) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        if (!res.ok) {
+            return NextResponse.json({ error: data });
+        }
+
+        return NextResponse.json(data);
+    } catch (error: any) {
+        return NextResponse.json({ error: { message: error.message || 'An error occurred', status: 500 } });
     }
 }
