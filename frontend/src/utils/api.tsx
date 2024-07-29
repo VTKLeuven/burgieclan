@@ -7,8 +7,6 @@ export type ApiClientError = {
  * API Client for authenticated or unauthenticated requests to the backend server.
  */
 export const ApiClient = async (method: string, endpoint: string, body?: any, headers?: Record<string, string>) => {
-    // const router = useRouter();
-
     const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     const frontendBaseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL;
 

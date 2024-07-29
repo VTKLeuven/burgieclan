@@ -43,7 +43,6 @@ export default function Page({ params }: { params: any }) {
     }, [error, router]);
 
     if (error) {
-        console.log(error.message);
         return (
             <div>
                 <h1>Error {error.status}</h1>
