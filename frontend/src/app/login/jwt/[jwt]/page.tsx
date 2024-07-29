@@ -1,10 +1,12 @@
 'use client'
 
-import LoginForm from "@/components/login/LoginForm";
 import {useEffect} from "react";
 import axios from "axios";
 import {useRouter} from "next/navigation";
 
+/**
+ * Component allows for manually storing jwt as a http-only cookie. Can be used later to authenticate requests to the backend.
+ */
 export default function Page({ params }: { params: any }) {
     const router = useRouter();
     const { jwt } = params;
