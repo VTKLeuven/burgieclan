@@ -8,6 +8,7 @@ import axios from "axios";
  * Encode binary buffer to base64url
  */
 function base64URLEncode(buffer : crypto.BinaryLike) {
+    // @ts-ignore
     return buffer.toString("base64")
         .replace(/\+/g, '-')
         .replace(/\//g, '_')
