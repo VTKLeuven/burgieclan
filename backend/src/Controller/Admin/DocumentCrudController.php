@@ -4,6 +4,8 @@ namespace App\Controller\Admin;
 
 use App\Entity\Document;
 use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
@@ -27,12 +29,11 @@ class DocumentCrudController extends AbstractCrudController
         return new Document($user);
     }
 
-//    COMMENTED BECAUSE NICE TO HAVE FOR TESTING
-//    public function configureActions(Actions $actions): Actions
-//    {
-//        return $actions
-//        ->disable(Action::NEW);
-//    }
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->disable(Action::NEW);
+    }
 
     public function configureFields(string $pageName): iterable
     {
@@ -46,7 +47,7 @@ class DocumentCrudController extends AbstractCrudController
         yield AssociationField::new('category')
         ->autocomplete();
         yield BooleanField::new('under_review')
-            ->setLabel('Published')
+            ->setLabel('Under review')
             ->renderAsSwitch(false);
         yield TextField::new('file')
             ->setFormType(VichFileType::class)
