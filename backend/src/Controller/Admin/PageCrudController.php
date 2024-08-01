@@ -3,11 +3,14 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Page;
+use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted(User::ROLE_ADMIN)]
 class PageCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
