@@ -19,6 +19,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
+use LogicException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Vich\UploaderBundle\Form\Type\VichFileType;
@@ -34,9 +35,9 @@ class DocumentPendingCrudController extends DocumentCrudController
     public function configureActions(Actions $actions): Actions
     {
         $approveAction = Action::new('approve')
-        ->linkToCrudAction('approve')
-        ->setTemplatePath('admin/approve_action.html.twig')
-        ->addCssClass('btn btn-success')
+            ->linkToCrudAction('approve')
+            ->setTemplatePath('admin/approve_action.html.twig')
+            ->addCssClass('btn btn-success')
             ->setIcon('fa fa-check-circle')
             ->displayAsButton();
 
@@ -52,8 +53,8 @@ class DocumentPendingCrudController extends DocumentCrudController
         FilterCollection $filters
     ): QueryBuilder {
         return parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters)
-            ->andWhere('entity.under_review = :approved')
-            ->setParameter('approved', false);
+            ->andWhere('entity.under_review = :under_review')
+            ->setParameter('under_review', true);
     }
 
     public function configureCrud(Crud $crud): Crud
@@ -76,7 +77,7 @@ class DocumentPendingCrudController extends DocumentCrudController
         yield AssociationField::new('category')
             ->autocomplete();
         yield BooleanField::new('under_review')
-            ->setLabel('Published')
+            ->setLabel('Under review')
             ->renderAsSwitch(false)
             ->hideOnIndex();
         yield TextField::new('file')
@@ -97,17 +98,17 @@ class DocumentPendingCrudController extends DocumentCrudController
     ): RedirectResponse {
         $document = $adminContext->getEntity()->getInstance();
         if (!$document instanceof Document) {
-            throw new \LogicException('Entity is missing or not a Document');
+            throw new LogicException('Entity is missing or not a Document');
         }
-        $document->setUnderReview(true);
+        $document->setUnderReview(false);
 
         $entityManagerInterface->flush();
 
         $targetUrl = $adminUrlGenerator
-        ->setController(self::class)
-        ->setAction(Crud::PAGE_EDIT)
-        ->setEntityId($document->getId())
-        ->generateUrl();
+            ->setController(self::class)
+            ->setAction(Crud::PAGE_EDIT)
+            ->setEntityId($document->getId())
+            ->generateUrl();
         return $this->redirect($targetUrl);
     }
 }
