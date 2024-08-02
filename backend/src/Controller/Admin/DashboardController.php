@@ -2,14 +2,14 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Course;
-use App\Entity\Notification;
-use App\Entity\CourseComment;
 use App\Entity\CommentCategory;
-use App\Entity\Module;
-use App\Entity\DocumentCategory;
+use App\Entity\Course;
+use App\Entity\CourseComment;
 use App\Entity\Document;
+use App\Entity\DocumentCategory;
 use App\Entity\DocumentComment;
+use App\Entity\Module;
+use App\Entity\Notification;
 use App\Entity\Page;
 use App\Entity\Program;
 use App\Entity\User;
@@ -26,8 +26,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class DashboardController extends AbstractDashboardController
 {
-
-
     public function __construct(private readonly DocumentRepository $documentRepository)
     {
     }
@@ -61,35 +59,43 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linktoDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Users', 'fa fa-users', User::class);
+        yield MenuItem::linkToCrud('Users', 'fa fa-users', User::class)
+            ->setPermission(User::ROLE_SUPER_ADMIN);
 
-        yield MenuItem::linkToCrud('Notifications', "fa-solid fa-bell", Notification::class);
+        yield MenuItem::linkToCrud('Notifications', "fa-solid fa-bell", Notification::class)
+            ->setPermission(User::ROLE_ADMIN);
 
-        yield MenuItem::linkToCrud('Programs', 'fa fa-briefcase', Program::class);
-        yield MenuItem::linkToCrud('Modules', 'fa fa-folder', Module::class);
-        yield MenuItem::linkToCrud('Courses', 'fa fa-book', Course::class);
-
-        yield MenuItem::linkToCrud('Comments', 'far fa-comments', CourseComment::class);
-        yield MenuItem::linkToCrud('Categories', 'fas fa-tags', CommentCategory::class);
+        yield MenuItem::linkToCrud('Programs', 'fa fa-briefcase', Program::class)
+            ->setPermission(User::ROLE_ADMIN);
+        yield MenuItem::linkToCrud('Modules', 'fa fa-folder', Module::class)
+            ->setPermission(User::ROLE_ADMIN);
+        yield MenuItem::linkToCrud('Courses', 'fa fa-book', Course::class)
+            ->setPermission(User::ROLE_ADMIN);
+        yield MenuItem::linkToCrud('Comments', 'far fa-comments', CourseComment::class)
+            ->setPermission(User::ROLE_ADMIN);
+        yield MenuItem::linkToCrud('Categories', 'fas fa-tags', CommentCategory::class)
+            ->setPermission(User::ROLE_ADMIN);
         $pendingDocumentsMenu = MenuItem::linkToCrud('Pending Documents', 'fa-regular fa-file', Document::class)
-            ->setPermission('ROLE_ADMIN')
             ->setController(DocumentPendingCrudController::class);
         $documentsMenu = MenuItem::subMenu('Documents', 'fa-solid fa-file')
             ->setSubItems([
-                MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class),
-                MenuItem::linkToCrud('Comments', 'fa-solid fa-comments', DocumentComment::class),
+                MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class)
+                    ->setPermission(User::ROLE_ADMIN),
+                MenuItem::linkToCrud('Comments', 'fa-solid fa-comments', DocumentComment::class)
+                    ->setPermission(User::ROLE_ADMIN),
                 MenuItem::linkToCrud('Documents', 'fa fa-file', Document::class)
                     ->setController(DocumentCrudController::class),
                 $pendingDocumentsMenu
             ]);
         $amountPending = $this->documentRepository->getAmountPending();
-        if ($amountPending>0) {
+        if ($amountPending > 0) {
             $documentsMenu->setBadge($amountPending, 'danger');
             $pendingDocumentsMenu->setBadge($amountPending, 'danger');
         }
         yield $documentsMenu;
 
-        yield MenuItem::linkToCrud('Pages', 'fa-solid fa-newspaper', Page::Class);
+        yield MenuItem::linkToCrud('Pages', 'fa-solid fa-newspaper', Page::Class)
+            ->setPermission(User::ROLE_ADMIN);
 
         yield MenuItem::section('Frontend');
         yield MenuItem::linkToUrl('Home', 'fa fa-window-maximize', '/');
