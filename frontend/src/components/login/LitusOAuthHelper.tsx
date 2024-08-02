@@ -90,7 +90,7 @@ const exchangeAuthorizationCode = async (code: string, codeVerifier: string) => 
     }
 
     const redirectUri = frontendUri + "/oauth/callback"
-    const tokenProxyUri = frontendApiUri + "/api/oauth/exchange-access-token"
+    const tokenProxyUri = frontendApiUri + "/api/frontend/oauth/exchange-access-token"
 
     const response = await axios.post(tokenProxyUri, {
         grant_type: 'authorization_code',
@@ -166,7 +166,7 @@ export const LitusOAuthCallback = (): null => {
                         throw new Error("Error during setting JWT cookie: missing environment variables for OAuth flow");
                     }
 
-                    const setCookieUrl = frontendApiUrl + "/api/oauth/set-jwt-cookie"
+                    const setCookieUrl = frontendApiUrl + "/api/frontend/oauth/set-jwt-cookie"
 
                     // Put JWT in Http-only cookie for session management
                     await axios.post(setCookieUrl, { jwt });
