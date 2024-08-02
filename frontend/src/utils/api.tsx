@@ -1,39 +1,27 @@
-export type ApiClientError = {
-    message: string;
-    status: string;
-}
-
 /**
- * API Client for authenticated or unauthenticated requests to the backend server.
+ * API Client for requests to the backend server.
  */
-export const ApiClient = async (method: string, endpoint: string, body?: any, headers?: Record<string, string>) => {
-    const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-    const frontendBaseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL;
+export const apiClient = async (method: string, endpoint: string, body?: any, headers?: Record<string, string>) => {
+    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-    if (!backendBaseUrl || !frontendBaseUrl) {
-        throw new Error(`Missing environment variable for backend or frontend base URL`)
+    if (!baseUrl) {
+        throw new Error(`Missing environment variable for backend base URL`)
     }
 
-    const url = backendBaseUrl + endpoint;
+    const url = baseUrl + endpoint;
 
-    // TODO BUR-110: instead of try-catch, throw errors here and catch with higher-level generic wrapper
-    try {
-        const res = await fetch(frontendBaseUrl + '/api/proxy', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({method, url, body, headers}),
-        });
+    // Execute request via proxy that adds JWT
+    const response = await fetch('/api/proxy', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ method, url, body, headers }),
+    });
 
-        const data = await res.json();
-
-        if (!res.ok) {
-            return { error: data.error };
-        }
-
-        return data;
-    } catch (error: any) {
-        return { error: { message: error.message || 'An error occurred', status: 500 } };
+    if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
     }
+
+    return response.json();
 };
