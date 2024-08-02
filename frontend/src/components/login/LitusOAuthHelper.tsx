@@ -57,7 +57,7 @@ export const initiateLitusOAuthFlow = (router: AppRouterInstance) => {
     const frontendUri = process.env.NEXT_PUBLIC_FRONTEND_URL
 
     if (!authorizationUri || !clientId || !frontendUri) {
-        throw new Error("Missing environment variables for OAuth flow");
+        throw new Error("Error during Litus authorization redirect: missing environment variables for OAuth flow");
     }
 
     const redirectUri = frontendUri + "/oauth/callback"
@@ -86,7 +86,7 @@ const exchangeAuthorizationCode = async (code: string, codeVerifier: string) => 
     const frontendUri = process.env.NEXT_PUBLIC_FRONTEND_URL
 
     if (!frontendApiUri || !clientId || !frontendUri) {
-        throw new Error("Missing environment variables for OAuth flow");
+        throw new Error("Error during authorization code exchange: missing environment variables for OAuth flow");
     }
 
     const redirectUri = frontendUri + "/oauth/callback"
@@ -110,7 +110,7 @@ const exchangeAccessTokenForJWT = async (accessToken: string) => {
     const backendAuthUrl = process.env.NEXT_PUBLIC_BURGIECLAN_BACKEND_AUTH;
 
     if (!backendAuthUrl) {
-        throw new Error("Missing environment variables for OAuth flow");
+        throw new Error("Error during JWT exchange: missing environment variables for OAuth flow");
     }
 
     const response = await axios.post(backendAuthUrl, {
@@ -160,10 +160,10 @@ export const LitusOAuthCallback = (): null => {
                     const accessToken = await exchangeAuthorizationCode(code, codeVerifier);
                     const jwt = await exchangeAccessTokenForJWT(accessToken);
 
-                    const frontendApiUrl = process.env.NEXT_PUBLIC_FRONTEND_URL
+                    const frontendApiUrl = process.env.NEXT_PUBLIC_FRONTEND_API_URL
 
                     if (!frontendApiUrl) {
-                        throw new Error("Missing environment variables for OAuth flow");
+                        throw new Error("Error during setting JWT cookie: missing environment variables for OAuth flow");
                     }
 
                     const setCookieUrl = frontendApiUrl + "/api/oauth/set-jwt-cookie"
