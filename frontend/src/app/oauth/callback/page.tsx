@@ -1,6 +1,6 @@
 'use client'
 
-import { LitusOAuthCallback } from "@/components/login/LitusOAuthHelper";
+import {LitusOAuthCallback} from "@/utils/oauth";
 import {Suspense} from "react";
 
 export default function OAuthCallbackPage() {
