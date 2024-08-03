@@ -39,3 +39,6 @@
 
 # pm2 ecosystem file
 /ecosystem.config.js
+
+# Sentry Config File
+.env.sentry-build-plugin
