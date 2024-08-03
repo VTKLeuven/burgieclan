@@ -3,7 +3,6 @@ homepage:
     defaults:
         _controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
         route: admin
-        permanent: true
 
 controllers:
     resource:
