@@ -44,13 +44,13 @@ export const initiateLitusOAuthFlow = (router: AppRouterInstance) => {
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = generateCodeChallenge(codeVerifier);
 
-    localStorage.setItem('code_verifier', codeVerifier);
+    sessionStorage.setItem('code_verifier', codeVerifier);
 
     // store for later use
     const state = crypto.randomBytes(16).toString('hex');
 
     // store for later verification of received state
-    localStorage.setItem('state', state);
+    sessionStorage.setItem('state', state);
 
     const authorizationUri = process.env.NEXT_PUBLIC_LITUS_OAUTH_AUTHORIZE;
     const clientId = process.env.NEXT_PUBLIC_LITUS_API_KEY;
@@ -139,7 +139,7 @@ export const LitusOAuthCallback = (): null => {
         hasRun.current = true;
 
         const code = searchParams.get('code');
-        const codeVerifier = localStorage.getItem('code_verifier');
+        const codeVerifier = sessionStorage.getItem('code_verifier');
 
         if (!codeVerifier) {
             console.error('Code verifier is missing.');
@@ -147,7 +147,7 @@ export const LitusOAuthCallback = (): null => {
         }
 
         const state = searchParams.get('state');
-        const storedState = localStorage.getItem('state');
+        const storedState = sessionStorage.getItem('state');
 
         if (state !== storedState) {
             console.error('State mismatch: potential CSRF attack.', { status: 400 });
