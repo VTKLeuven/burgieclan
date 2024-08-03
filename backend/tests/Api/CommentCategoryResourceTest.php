@@ -3,7 +3,6 @@
 namespace App\Tests\Api;
 
 use App\Factory\CommentCategoryFactory;
-use App\Tests\Api\ApiTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 

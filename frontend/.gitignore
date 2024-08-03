@@ -27,6 +27,8 @@
 
 # local env files
 /.env*.local
+/.env
+/.env.*
 
 # vercel
 /.vercel
@@ -34,3 +36,9 @@
 # typescript
 /*.tsbuildinfo
 /next-env.d.ts
+
+# pm2 ecosystem file
+/ecosystem.config.js
+
+# Sentry Config File
+.env.sentry-build-plugin

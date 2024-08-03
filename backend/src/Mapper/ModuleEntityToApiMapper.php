@@ -40,7 +40,11 @@ class ModuleEntityToApiMapper implements MapperInterface
                 MicroMapperInterface::MAX_DEPTH => 0,
             ]);
         }, $from->getCourses()->getValues());
-
+        $to->modules = array_map(function (Module $module) {
+            return $this->microMapper->map($module, ModuleApi::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }, $from->getModules()->getValues());
         $to->program = $this->microMapper->map($from->getProgram(), ProgramApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);

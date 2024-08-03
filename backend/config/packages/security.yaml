@@ -53,7 +53,7 @@ security:
                 enable_csrf: true
                 # The page users are redirect to when there is no previous page stored in the
                 # session (for example when the users access directly to the login page).
-                default_target_path: blog_index
+                default_target_path: admin
 
             # This option allows users to choose to stay logged in for longer than
             # the session lasts using a cookie. Reference: https://symfony.com/doc/current/security/remember_me.html
@@ -83,16 +83,20 @@ security:
     access_control:
         # this is a catch-all for the admin area
         # additional security lives in the controllers
-        - { path: '^/(%app_locales%)/admin', roles: ROLE_ADMIN }
+        - { path: '^/admin/login', roles: PUBLIC_ACCESS }
+        - { path: '^/admin/logout', roles: PUBLIC_ACCESS }
+        - { path: '^/admin', roles: ROLE_MODERATOR }
         - { path: ^/api$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/api/$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/api/docs, roles: PUBLIC_ACCESS } # Allows accessing API documentations and Swagger UI docs
         - { path: ^/api/auth, roles: PUBLIC_ACCESS } # Allows accessing the auth endpoints
+        - { path: ^/api/pages, roles: PUBLIC_ACCESS } # Allows accessing the public available pages (see PageVoter)
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY } # Restricts access to all api endpoints for not logged-in users
+        - { path: ^/files/download, roles: IS_AUTHENTICATED_REMEMBERED } # Restricts access to download endpoint for not logged-in users
 
-    # The ROLE_ADMIN role inherits from the ROLE_USER role
     role_hierarchy:
-        ROLE_ADMIN: ROLE_USER
+        ROLE_MODERATOR: ROLE_USER
+        ROLE_ADMIN: ROLE_MODERATOR
         ROLE_SUPER_ADMIN: ROLE_ADMIN
 
 when@test:

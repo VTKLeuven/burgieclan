@@ -5,7 +5,6 @@ namespace App\Tests\Entity;
 use App\Entity\Course;
 use App\Entity\Module;
 use App\Entity\Program;
-use PhpParser\Node\Expr\AssignOp\Mod;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class ModuleTest extends KernelTestCase
@@ -46,5 +45,26 @@ class ModuleTest extends KernelTestCase
         $this->assertNotContains($c1, $module->getCourses());
         $this->assertContains($c2, $module->getCourses());
         $this->assertNotContains($c3, $module->getCourses());
+    }
+
+    public function testAddRemoveModule(): void
+    {
+        $module = new Module();
+        $m1 = new Module();
+        $m2 = new Module();
+        $m3 = new Module();
+        $module->addModule($m1);
+        $module->addModule($m2);
+
+        $this->assertCount(2, $module->getModules());
+        $this->assertContains($m1, $module->getModules());
+        $this->assertContains($m2, $module->getModules());
+        $this->assertNotContains($m3, $module->getModules());
+
+        $module->removeModule($m1);
+        $this->assertCount(1, $module->getModules());
+        $this->assertNotContains($m1, $module->getModules());
+        $this->assertContains($m2, $module->getModules());
+        $this->assertNotContains($m3, $module->getModules());
     }
 }
