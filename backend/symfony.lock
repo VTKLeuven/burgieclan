@@ -671,6 +671,18 @@
     "twig/twig": {
         "version": "v3.3.4"
     },
+    "vich/uploader-bundle": {
+        "version": "2.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "1.13",
+            "ref": "1b3064c2f6b255c2bc2f56461aaeb76b11e07e36"
+        },
+        "files": [
+            "config/packages/vich_uploader.yaml"
+        ]
+    },
     "zenstruck/foundry": {
         "version": "1.37",
         "recipe": {
