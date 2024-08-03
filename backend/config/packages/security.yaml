@@ -53,7 +53,7 @@ security:
                 enable_csrf: true
                 # The page users are redirect to when there is no previous page stored in the
                 # session (for example when the users access directly to the login page).
-                default_target_path: blog_index
+                default_target_path: admin
 
             # This option allows users to choose to stay logged in for longer than
             # the session lasts using a cookie. Reference: https://symfony.com/doc/current/security/remember_me.html
@@ -84,6 +84,7 @@ security:
         # this is a catch-all for the admin area
         # additional security lives in the controllers
         - { path: '^/admin/login', roles: PUBLIC_ACCESS }
+        - { path: '^/admin/logout', roles: PUBLIC_ACCESS }
         - { path: '^/admin', roles: ROLE_MODERATOR }
         - { path: ^/api$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/api/$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI

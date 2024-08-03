@@ -58,9 +58,6 @@
                                             <span class="sr-only">{{ app.user.fullname }}</span>
                                         </a>
                                         <div class="dropdown-menu user" role="menu" aria-labelledby="user">
-                                            <a class="dropdown-item" href="{{ path('user_edit') }}">
-                                                <i class="fa fa-edit" aria-hidden="true"></i> {{ 'menu.user'|trans }}
-                                            </a>
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item" href="{{ logout_path() }}">
                                                 <i class="fa fa-sign-out" aria-hidden="true"></i> {{ 'menu.logout'|trans }}
@@ -110,11 +107,6 @@
 
                     <div id="sidebar" class="col-sm-3">
                         {% block sidebar %}
-                            {{ render_esi(controller('Symfony\\Bundle\\FrameworkBundle\\Controller\\TemplateController::templateAction', {
-                                'template': 'blog/about.html.twig',
-                                'sharedAge': 600,
-                                '_locale': app.request.locale
-                            })) }}
                         {% endblock %}
                     </div>
                 </div>
