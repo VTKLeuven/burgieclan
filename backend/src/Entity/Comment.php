@@ -52,8 +52,8 @@ class Comment
     #[ORM\JoinColumn(nullable: false)]
     private ?User $author = null;
 
-    #[ORM\OneToMany(targetEntity: Rating::class, mappedBy: "comment")]
-    private ?Rating $ratings = null;
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: "comment")]
+    private ?Vote $ratings = null;
 
     public function __construct()
     {
@@ -119,7 +119,7 @@ class Comment
         return $this->ratings;
     }
 
-    public function addRating(Rating $rating): self
+    public function addRating(Vote $rating): self
     {
         if (!$this->ratings->contains($rating)) {
             $this->ratings[] = $rating;
@@ -129,7 +129,7 @@ class Comment
         return $this;
     }
 
-    public function removeRating(Rating $rating): self
+    public function removeRating(Vote $rating): self
     {
         if ($this->ratings->removeElement($rating)) {
             if ($rating->getComment() === $this) {
