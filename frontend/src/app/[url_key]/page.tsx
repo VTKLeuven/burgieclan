@@ -4,6 +4,7 @@ import { ApiClient } from "@/utils/api";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiClientError } from "@/utils/api";
+import Loading from "@/app/loading";
 
 /**
  * Displays pages from page management system.
@@ -60,8 +61,7 @@ export default function Page({ params }: { params: any }) {
     }
 
     if (!page) {
-        // TODO: replace with loading icon
-        return <div>Loading...</div>;
+        return <Loading/>;
     }
 
     // the page content is expected to be in html
