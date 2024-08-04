@@ -34,3 +34,9 @@ services:
         $sender: '%app.notifications.email_sender%'
 
     Symfony\Component\Security\Http\Logout\LogoutUrlGenerator: '@security.logout_url_generator'
+
+    # Create a service that listens for a jwt token being created and adds the userId to the jwt
+    acme_api.event.authentication_success_listener:
+        class: App\EventListener\JWTCreatedListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: onJWTCreated }

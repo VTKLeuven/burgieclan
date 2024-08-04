@@ -1,12 +1,26 @@
-import type { Config } from "tailwindcss";
 
-const config: Config = {
+const config = {
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  theme: {},
-  plugins: [],
+  theme: {
+    extend: {
+      screens: {
+        'xs': '320px',
+      },
+      colors: {
+        vtk: {
+          blue: {
+            400: "#353761",
+            500: "#212347",  // dark blue vtk logo
+            600: "#1b1d40",
+          }
+        }
+      }
+    },
+  },
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
 };
 export default config;

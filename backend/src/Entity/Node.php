@@ -7,49 +7,52 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\MappedSuperclass]
 #[ORM\HasLifecycleCallbacks]
 abstract class Node
 {
-    #[ORM\ManyToOne(inversedBy: 'nodes')]
-    private ?User $user = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private User $creator;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private ?DateTimeInterface $createDate;
+    protected DateTimeInterface $createDate;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?DateTimeInterface $updateDate;
+    protected DateTimeInterface $updateDate;
 
     #[ORM\OneToMany(mappedBy: 'node', targetEntity: Node::class)]
-    private ?Collection $votes = null;
+    private Collection $votes;
 
-    public function __construct(?User $user)
+    public function __construct(User $creator)
     {
-        $this->user = $user;
+        $this->creator = $creator;
         $this->createDate = new DateTimeImmutable();
         $this->updateDate = $this->createDate;
+        $this->votes = new ArrayCollection();
     }
 
-    public function setUser(?User $user): self
+    public function getCreator(): User
     {
-        $this->user = $user;
+        return $this->creator;
+    }
+
+    public function setCreator(User $creator): static
+    {
+        $this->creator = $creator;
 
         return $this;
     }
 
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function getCreateDate(): ?DateTimeInterface
+    public function getCreateDate(): DateTimeInterface
     {
         return $this->createDate;
     }
 
-    public function getUpdateDate(): ?DateTimeInterface
+    public function getUpdateDate(): DateTimeInterface
     {
         return $this->updateDate;
     }
