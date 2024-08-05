@@ -37,26 +37,26 @@ services:
 
     # Service that listens for a jwt token being created and adds the userId to the jwt
     acme_api.event.authentication_success_listener:
-        class: App\EventListener\JWTCreatedListener
+        class: App\EventListener\Api\JWTCreatedListener
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: onJWTCreated }
     # Service that listens for a failed authentication event (invalid credentials) and sends a custom response
     acme_api.event.authentication_failure_listener:
-        class: App\EventListener\AuthenticationFailureListener
+        class: App\EventListener\Api\AuthenticationFailureListener
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_failure, method: onAuthenticationFailureResponse }
     # Service that listens for an invalid JWT event and sends a custom response
     acme_api.event.jwt_invalid_listener:
-        class: App\EventListener\JWTInvalidListener
+        class: App\EventListener\Api\JWTInvalidListener
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_invalid, method: onJWTInvalid }
     # Service that listens for a JWT not found event and sends a custom response
     acme_api.event.jwt_notfound_listener:
-        class: App\EventListener\JWTNotFoundListener
+        class: App\EventListener\Api\JWTNotFoundListener
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_not_found, method: onJWTNotFound }
     # Service that listens for a JWT expired event and sends a custom response
     acme_api.event.jwt_expired_listener:
-        class: App\EventListener\JWTExpiredListener
+        class: App\EventListener\Api\JWTExpiredListener
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_expired, method: onJWTExpired }
