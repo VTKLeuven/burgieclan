@@ -112,12 +112,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinTable(name: 'favorite_user_document')]
     private Collection $favoriteDocuments;
 
+    /**
+     * @var Collection
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Vote::class)]
+    #[ORM\JoinTable(name: 'vote')]
+    private Collection $votes;
+
     public function __construct()
     {
         $this->favoritePrograms = new ArrayCollection();
         $this->favoriteModules = new ArrayCollection();
         $this->favoriteCourses = new ArrayCollection();
         $this->favoriteDocuments = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -355,6 +363,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->favoriteDocuments->removeElement($document);
 
+        return $this;
+    }
+
+
+    public function getVotes(): Collection
+    {
+        return $this->votes;
+    }
+
+    public function addVote(self $vote): self
+    {
+        if (!$this->votes->contains($vote)) {
+            $this->votes->add($vote);
+        }
+
+        return $this;
+    }
+
+    public function removeVote(self $vote): self
+    {
+        if ($this->votes->removeElement($vote)) {
+            $this->votes->removeElement($vote);
+        }
         return $this;
     }
 }
