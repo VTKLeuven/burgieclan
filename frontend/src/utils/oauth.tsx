@@ -1,3 +1,5 @@
+'use client'
+
 import crypto from "crypto";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {useRouter, useSearchParams} from "next/navigation";
@@ -181,3 +183,11 @@ export const LitusOAuthCallback = (): null => {
 
     return null;
 };
+
+/**
+ * Check the presence of a JWT in http-only cookie
+ */
+export const hasJwt = async (): Promise<boolean> => {
+    const response = await axios.post('/api/frontend/oauth/has-jwt');
+    return response.data.isAuthenticated;
+}
