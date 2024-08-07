@@ -11,6 +11,7 @@
 
 namespace App\Entity;
 
+use App\Factory\UserFactory;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -40,6 +41,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // It also prevents from making typo errors.
     final public const ROLE_USER = 'ROLE_USER';
     final public const ROLE_ADMIN = 'ROLE_ADMIN';
+    final public const ROLE_MODERATOR = 'ROLE_MODERATOR';
     final public const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
 
     #[ORM\Id]
@@ -64,23 +66,58 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     /**
+     * @var string|null $plainPassword
+     * This variable contains the plaintext password during creation. It is needed for the @see UserFactory
+     * This isn't saved in the database.
+     */
+    private ?string $plainPassword;
+
+    /**
      * @var string[]
      */
     #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     #[ORM\Column(type: Types::JSON, nullable: true)]
-    private $accesstoken;
+    private ?string $accesstoken;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Node::class)]
-    private Collection $nodes;
+    /**
+     * @var Collection
+     */
+    #[ORM\ManyToMany(targetEntity: Program::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'favorite_user_program')]
+    private Collection $favoritePrograms;
+
+    /**
+     * @var Collection
+     */
+    #[ORM\ManyToMany(targetEntity: Module::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'favorite_user_module')]
+    private Collection $favoriteModules;
+
+    /**
+     * @var Collection
+     */
+    #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'favorite_user_course')]
+    private Collection $favoriteCourses;
+
+    /**
+     * @var Collection
+     */
+    #[ORM\ManyToMany(targetEntity: Document::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'favorite_user_document')]
+    private Collection $favoriteDocuments;
 
     public function __construct()
     {
-        $this->nodes = new ArrayCollection();
+        $this->favoritePrograms = new ArrayCollection();
+        $this->favoriteModules = new ArrayCollection();
+        $this->favoriteCourses = new ArrayCollection();
+        $this->favoriteDocuments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -131,6 +168,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): void
     {
         $this->password = $password;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(string $plainPassword): void
+    {
+        $this->plainPassword = $plainPassword;
     }
 
     /**
@@ -193,8 +240,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials(): void
     {
-        // if you had a plainPassword property, you'd nullify it here
-        // $this->plainPassword = null;
+         $this->plainPassword = null;
     }
 
     /**
@@ -225,6 +271,90 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public static function getAvailableRoles(): array
     {
-        return array(self::ROLE_USER, self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN);
+        return array(self::ROLE_USER, self::ROLE_ADMIN, self::ROLE_MODERATOR, self::ROLE_SUPER_ADMIN);
+    }
+
+    public function getFavoritePrograms(): Collection
+    {
+        return $this->favoritePrograms;
+    }
+
+    public function addFavoriteProgram(Program $program): self
+    {
+        if (!$this->favoritePrograms->contains($program)) {
+            $this->favoritePrograms->add($program);
+        }
+
+        return $this;
+    }
+
+    public function removeFavoriteProgram(Program $program): self
+    {
+        $this->favoritePrograms->removeElement($program);
+
+        return $this;
+    }
+
+    public function getFavoriteModules(): Collection
+    {
+        return $this->favoriteModules;
+    }
+
+    public function addFavoriteModule(Module $module): self
+    {
+        if (!$this->favoriteModules->contains($module)) {
+            $this->favoriteModules->add($module);
+        }
+
+        return $this;
+    }
+
+    public function removeFavoriteModule(Module $module): self
+    {
+        $this->favoriteModules->removeElement($module);
+
+        return $this;
+    }
+
+    public function getFavoriteCourses(): Collection
+    {
+        return $this->favoriteCourses;
+    }
+
+    public function addFavoriteCourse(Course $course): self
+    {
+        if (!$this->favoriteCourses->contains($course)) {
+            $this->favoriteCourses->add($course);
+        }
+
+        return $this;
+    }
+
+    public function removeFavoriteCourse(Course $course): self
+    {
+        $this->favoriteCourses->removeElement($course);
+
+        return $this;
+    }
+
+    public function getFavoriteDocuments(): Collection
+    {
+        return $this->favoriteDocuments;
+    }
+
+    public function addFavoriteDocument(Document $document): self
+    {
+        if (!$this->favoriteDocuments->contains($document)) {
+            $this->favoriteDocuments->add($document);
+        }
+
+        return $this;
+    }
+
+    public function removeFavoriteDocument(Document $document): self
+    {
+        $this->favoriteDocuments->removeElement($document);
+
+        return $this;
     }
 }

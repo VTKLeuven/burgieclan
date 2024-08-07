@@ -15,6 +15,7 @@
     "require": {
         "php": ">=8.1",
         "ext-pdo_sqlite": "*",
+        "ext-iconv": "*",
         "api-platform/core": "^3.2",
         "doctrine/dbal": "^3.1",
         "doctrine/doctrine-bundle": "^2.11",
@@ -23,6 +24,7 @@
         "easycorp/easyadmin-bundle": "^4.8",
         "knpuniversity/oauth2-client-bundle": "^2.18",
         "league/commonmark": "^2.1",
+        "lexik/jwt-authentication-bundle": "^2.21",
         "nelmio/cors-bundle": "^2.4",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.27",
@@ -57,7 +59,8 @@
         "symfonycasts/micro-mapper": "^0.1.4",
         "twig/extra-bundle": "^3.3",
         "twig/intl-extra": "^3.3",
-        "twig/markdown-extra": "^3.3"
+        "twig/markdown-extra": "^3.3",
+        "vich/uploader-bundle": "^2.3"
     },
     "require-dev": {
         "dama/doctrine-test-bundle": "^7.0",

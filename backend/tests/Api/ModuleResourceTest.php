@@ -1,9 +1,8 @@
 <?php
 
-namespace Api;
+namespace App\Tests\Api;
 
 use App\Factory\ModuleFactory;
-use App\Tests\Api\ApiTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
@@ -16,7 +15,12 @@ class ModuleResourceTest extends ApiTestCase
     {
         ModuleFactory::createMany(5);
         $json = $this->browser()
-            ->get('/api/modules')
+            ->get('/api/modules', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
@@ -28,6 +32,7 @@ class ModuleResourceTest extends ApiTestCase
             '@type',
             'name',
             'courses',
+            'modules',
             'program',
         ]);
     }
@@ -37,7 +42,12 @@ class ModuleResourceTest extends ApiTestCase
         $module = ModuleFactory::createOne();
 
         $this->browser()
-            ->get('/api/modules/'.$module->getId())
+            ->get('/api/modules/' . $module->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/modules/'.$module->getId());
     }
@@ -59,11 +69,21 @@ class ModuleResourceTest extends ApiTestCase
         ModuleFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/modules?name=module2')
+            ->get('/api/modules?name=module2', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/modules?name=testmodule')
+            ->get('/api/modules?name=testmodule', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)

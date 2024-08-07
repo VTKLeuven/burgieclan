@@ -3,14 +3,16 @@
 namespace App\Controller\Admin;
 
 use App\Entity\DocumentComment;
+use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted(User::ROLE_ADMIN)]
 class DocumentCommentCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
@@ -20,14 +22,16 @@ class DocumentCommentCrudController extends AbstractCrudController
 
     public function createEntity(string $entityFqcn)
     {
-        return new DocumentComment($this->getUser());
+        $user = $this->getUser();
+        assert($user instanceof User);
+        return new DocumentComment($user);
     }
 
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnDetail();
         yield TextEditorField::new('content');
-        yield AssociationField::new('user')
+        yield AssociationField::new('creator')
             ->hideOnForm();
         yield BooleanField::new('anonymous')
             ->renderAsSwitch(false);
