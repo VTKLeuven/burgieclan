@@ -9,7 +9,10 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted(User::ROLE_SUPER_ADMIN)]
 class UserCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
@@ -28,7 +31,22 @@ class UserCrudController extends AbstractCrudController
             ->setChoices(array_combine(User::getAvailableRoles(), User::getAvailableRoles()))
             ->allowMultipleChoices()
             ->renderExpanded()
-            ->renderAsBadges()
-            ->setPermission(USER::ROLE_SUPER_ADMIN);
+            ->renderAsBadges();
+        yield AssociationField::new('favoritePrograms')
+            ->setFormTypeOptions(['by_reference' => false])
+            ->autocomplete()
+            ->setLabel('Favorite Programs');
+        yield AssociationField::new('favoriteModules')
+            ->setFormTypeOptions(['by_reference' => false])
+            ->autocomplete()
+            ->setLabel('Favorite Modules');
+        yield AssociationField::new('favoriteCourses')
+            ->setFormTypeOptions(['by_reference' => false])
+            ->autocomplete()
+            ->setLabel('Favorite Courses');
+        yield AssociationField::new('favoriteDocuments')
+            ->setFormTypeOptions(['by_reference' => false])
+            ->autocomplete()
+            ->setLabel('Favorite Documents');
     }
 }
