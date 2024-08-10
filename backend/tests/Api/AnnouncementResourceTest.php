@@ -2,22 +2,22 @@
 
 namespace App\Tests\Api;
 
-use App\Factory\NotificationFactory;
+use App\Factory\AnnouncementFactory;
 use DateInterval;
 use DateTime;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-class NotificationResourceTest extends ApiTestCase
+class AnnouncementResourceTest extends ApiTestCase
 {
     use ResetDatabase;
     use Factories;
 
-    public function testGetCollectionOfNotifications(): void
+    public function testGetCollectionOfAnnouncements(): void
     {
-        NotificationFactory::createMany(5);
+        AnnouncementFactory::createMany(5);
         $json = $this->browser()
-            ->get('/api/notifications', [
+            ->get('/api/announcements', [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]
@@ -42,39 +42,39 @@ class NotificationResourceTest extends ApiTestCase
         ]);
     }
 
-    public function testGetOneNotification(): void
+    public function testGetOneAnnouncement(): void
     {
-        $notification = NotificationFactory::createOne();
+        $announcement = AnnouncementFactory::createOne();
 
         $this->browser()
-            ->get('/api/notifications/' . $notification->getId(), [
+            ->get('/api/announcements/' . $announcement->getId(), [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]
             ])
             ->assertStatus(200)
             ->assertJson()
-            ->assertJsonMatches('"@id"', '/api/notifications/' . $notification->getId());
+            ->assertJsonMatches('"@id"', '/api/announcements/' . $announcement->getId());
     }
 
-    public function testGetNotificationFilterByTitle(): void
+    public function testGetAnnouncementFilterByTitle(): void
     {
-        $notification1 = NotificationFactory::createOne([
-            'title' => 'testnotification1',
+        $announcement1 = AnnouncementFactory::createOne([
+            'title' => 'testannouncement1',
         ]);
 
-        $notification2 = NotificationFactory::createOne([
-            'title' => 'testnotification2',
+        $announcement2 = AnnouncementFactory::createOne([
+            'title' => 'testannouncement2',
         ]);
 
-        $notification3 = NotificationFactory::createOne([
-            'title' => 'testnotification3',
+        $announcement3 = AnnouncementFactory::createOne([
+            'title' => 'testannouncement3',
         ]);
 
-        NotificationFactory::createMany(5);
+        AnnouncementFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/notifications?title=testnotification2', [
+            ->get('/api/announcements?title=testannouncement2', [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]
@@ -83,7 +83,7 @@ class NotificationResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/notifications?title=testnotification', [
+            ->get('/api/announcements?title=testannouncement', [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]
@@ -94,24 +94,24 @@ class NotificationResourceTest extends ApiTestCase
         ;
     }
 
-    public function testGetNotificationFilterByContent(): void
+    public function testGetAnnouncementFilterByContent(): void
     {
-        $notification1 = NotificationFactory::createOne([
-            'content' => 'testnotification1',
+        $announcement1 = AnnouncementFactory::createOne([
+            'content' => 'testannouncement1',
         ]);
 
-        $notification2 = NotificationFactory::createOne([
-            'content' => 'testnotification2',
+        $announcement2 = AnnouncementFactory::createOne([
+            'content' => 'testannouncement2',
         ]);
 
-        $notification3 = NotificationFactory::createOne([
-            'content' => 'testnotification3',
+        $announcement3 = AnnouncementFactory::createOne([
+            'content' => 'testannouncement3',
         ]);
 
-        NotificationFactory::createMany(5);
+        AnnouncementFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/notifications?content=testnotification2', [
+            ->get('/api/announcements?content=testannouncement2', [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]
@@ -120,7 +120,7 @@ class NotificationResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/notifications?content=testnotification', [
+            ->get('/api/announcements?content=testannouncement', [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]
@@ -131,25 +131,25 @@ class NotificationResourceTest extends ApiTestCase
         ;
     }
 
-    public function testGetNotificationFilterByStartTime(): void
+    public function testGetAnnouncementFilterByStartTime(): void
     {
         $startTime1 = (new DateTime());
-        $notification1 = NotificationFactory::createOne([
+        $announcement1 = AnnouncementFactory::createOne([
             'startTime' => $startTime1,
         ]);
 
         $startTime2 = (new DateTime())->add(new DateInterval('P1D'));
-        $notification2 = NotificationFactory::createOne([
+        $announcement2 = AnnouncementFactory::createOne([
             'startTime' => $startTime2,
         ]);
 
         $startTime3 = (new DateTime())->add(new DateInterval('P2D'));
-        $notification3 = NotificationFactory::createOne([
+        $announcement3 = AnnouncementFactory::createOne([
             'startTime' => $startTime3,
         ]);
 
         $this->browser()
-            ->get('/api/notifications?startTime[before]=' . $startTime2->format('Y-m-d H:i:s'), [
+            ->get('/api/announcements?startTime[before]=' . $startTime2->format('Y-m-d H:i:s'), [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]
@@ -158,7 +158,7 @@ class NotificationResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->get('/api/notifications?startTime[strictly_before]=' . $startTime2->format('Y-m-d H:i:s'), [
+            ->get('/api/announcements?startTime[strictly_before]=' . $startTime2->format('Y-m-d H:i:s'), [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]
@@ -167,7 +167,7 @@ class NotificationResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/notifications?startTime[after]=' . $startTime2->format('Y-m-d H:i:s'), [
+            ->get('/api/announcements?startTime[after]=' . $startTime2->format('Y-m-d H:i:s'), [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]
@@ -176,7 +176,7 @@ class NotificationResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->get('/api/notifications?startTime[strictly_after]=' . $startTime2->format('Y-m-d H:i:s'), [
+            ->get('/api/announcements?startTime[strictly_after]=' . $startTime2->format('Y-m-d H:i:s'), [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]
@@ -188,25 +188,25 @@ class NotificationResourceTest extends ApiTestCase
         ;
     }
 
-    public function testGetNotificationFilterByEndTime(): void
+    public function testGetAnnouncementFilterByEndTime(): void
     {
         $endTime1 = (new DateTime());
-        $notification1 = NotificationFactory::createOne([
+        $announcement1 = AnnouncementFactory::createOne([
             'endTime' => $endTime1,
         ]);
 
         $endTime2 = (new DateTime())->add(new DateInterval('P1D'));
-        $notification2 = NotificationFactory::createOne([
+        $announcement2 = AnnouncementFactory::createOne([
             'endTime' => $endTime2,
         ]);
 
         $endTime3 = (new DateTime())->add(new DateInterval('P2D'));
-        $notification3 = NotificationFactory::createOne([
+        $announcement3 = AnnouncementFactory::createOne([
             'endTime' => $endTime3,
         ]);
 
         $this->browser()
-            ->get('/api/notifications?endTime[before]=' . $endTime2->format('Y-m-d H:i:s'), [
+            ->get('/api/announcements?endTime[before]=' . $endTime2->format('Y-m-d H:i:s'), [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]
@@ -215,7 +215,7 @@ class NotificationResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->get('/api/notifications?endTime[strictly_before]=' . $endTime2->format('Y-m-d H:i:s'), [
+            ->get('/api/announcements?endTime[strictly_before]=' . $endTime2->format('Y-m-d H:i:s'), [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]
@@ -224,7 +224,7 @@ class NotificationResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/notifications?endTime[after]=' . $endTime2->format('Y-m-d H:i:s'), [
+            ->get('/api/announcements?endTime[after]=' . $endTime2->format('Y-m-d H:i:s'), [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]
@@ -233,7 +233,7 @@ class NotificationResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->get('/api/notifications?endTime[strictly_after]=' . $endTime2->format('Y-m-d H:i:s'), [
+            ->get('/api/announcements?endTime[strictly_after]=' . $endTime2->format('Y-m-d H:i:s'), [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]

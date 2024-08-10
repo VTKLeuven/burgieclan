@@ -7,13 +7,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * Defines the properties of the Notification entity to represent the blog comments.
- * See https://symfony.com/doc/current/doctrine.html#creating-an-entity-class.
- */
 #[ORM\Entity]
-#[ORM\Table(name: 'notification')]
-class Notification extends Node
+#[ORM\Table(name: 'announcement')]
+class Announcement extends Node
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
