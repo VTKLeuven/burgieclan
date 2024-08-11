@@ -5,15 +5,12 @@ namespace App\Entity;
 use App\Repository\CourseCommentRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: CourseCommentRepository::class)]
 class CourseComment extends AbstractComment
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private ?int $id = null;
-
     #[ORM\ManyToOne(inversedBy: 'courseComments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Course $course = null;
@@ -22,9 +19,21 @@ class CourseComment extends AbstractComment
     #[ORM\JoinColumn(nullable: false)]
     private ?CommentCategory $category = null;
 
-    public function getId(): ?int
+    /**
+     * @var Collection
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'comment',
+        targetEntity: CourseCommentVote::class,
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
+    private Collection $votes;
+
+    public function __construct(User $creator)
     {
-        return $this->id;
+        parent::__construct($creator);
+        $this->votes = new ArrayCollection();
     }
 
     public function getCourse(): ?Course
@@ -47,6 +56,30 @@ class CourseComment extends AbstractComment
     public function setCategory(?CommentCategory $category): self
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getVotes(): Collection
+    {
+        return $this->votes;
+    }
+
+    public function addVote(CourseCommentVote $vote): self
+    {
+        if (!$this->votes->contains($vote)) {
+            $this->votes->add($vote);
+            $vote->setComment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVote(CourseCommentVote $vote): self
+    {
+        if ($this->votes->removeElement($vote)) {
+            $vote->setComment(null);
+        }
 
         return $this;
     }

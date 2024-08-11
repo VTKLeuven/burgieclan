@@ -52,13 +52,9 @@ class Comment
     #[ORM\JoinColumn(nullable: false)]
     private ?User $author = null;
 
-    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: "comment")]
-    private ?Vote $ratings = null;
-
     public function __construct()
     {
         $this->publishedAt = new \DateTime();
-        $this->ratings = new ArrayCollection();
     }
 
     #[Assert\IsTrue(message: 'comment.is_spam')]
@@ -112,31 +108,5 @@ class Comment
     public function setPost(Post $post): void
     {
         $this->post = $post;
-    }
-
-    public function getRatings(): Collection
-    {
-        return $this->ratings;
-    }
-
-    public function addRating(Vote $rating): self
-    {
-        if (!$this->ratings->contains($rating)) {
-            $this->ratings[] = $rating;
-            $rating->setComment($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRating(Vote $rating): self
-    {
-        if ($this->ratings->removeElement($rating)) {
-            if ($rating->getComment() === $this) {
-                $rating->setComment(null);
-            }
-        }
-
-        return $this;
     }
 }

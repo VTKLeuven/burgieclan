@@ -15,11 +15,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: 'notification')]
 class Notification extends Node
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private ?int $id = null;
-
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
@@ -33,11 +28,6 @@ class Notification extends Node
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $title = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getContent(): ?string
     {

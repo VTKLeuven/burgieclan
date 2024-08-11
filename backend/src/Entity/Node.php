@@ -14,6 +14,11 @@ use Doctrine\Common\Collections\Collection;
 #[ORM\HasLifecycleCallbacks]
 abstract class Node
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private User $creator;
@@ -24,15 +29,16 @@ abstract class Node
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     protected DateTimeInterface $updateDate;
 
-    #[ORM\OneToMany(mappedBy: 'node', targetEntity: Node::class)]
-    private Collection $votes;
-
     public function __construct(User $creator)
     {
         $this->creator = $creator;
         $this->createDate = new DateTimeImmutable();
         $this->updateDate = $this->createDate;
-        $this->votes = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 
     public function getCreator(): User
@@ -63,28 +69,6 @@ abstract class Node
     {
         $this->updateDate = new DateTime();
 
-        return $this;
-    }
-    
-    public function getVotes(): Collection
-    {
-        return $this->votes;
-    }
-
-    public function addVote(self $vote): self
-    {
-        if (!$this->votes->contains($vote)) {
-            $this->votes->add($vote);
-        }
-
-        return $this;
-    }
-
-    public function removeVote(self $vote): self
-    {
-        if ($this->votes->removeElement($vote)) {
-            $this->votes->removeElement($vote);
-        }
         return $this;
     }
 }

@@ -3,23 +3,33 @@
 namespace App\Entity;
 
 use App\Repository\DocumentCommentRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DocumentCommentRepository::class)]
 class DocumentComment extends AbstractComment
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private ?int $id = null;
-
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'cascade')]
     private ?Document $document = null;
 
-    public function getId(): ?int
+    /**
+     * @var Collection
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'comment',
+        targetEntity: DocumentCommentVote::class,
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
+    private Collection $votes;
+
+    public function __construct(User $creator)
     {
-        return $this->id;
+        parent::__construct($creator);
+        $this->votes = new ArrayCollection();
     }
 
     public function getDocument(): ?Document
@@ -30,6 +40,30 @@ class DocumentComment extends AbstractComment
     public function setDocument(?Document $document): static
     {
         $this->document = $document;
+
+        return $this;
+    }
+
+    public function getVotes(): Collection
+    {
+        return $this->votes;
+    }
+
+    public function addVote(DocumentCommentVote $vote): self
+    {
+        if (!$this->votes->contains($vote)) {
+            $this->votes->add($vote);
+            $vote->setComment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVote(DocumentCommentVote $vote): self
+    {
+        if ($this->votes->removeElement($vote)) {
+            $vote->setComment(null);
+        }
 
         return $this;
     }

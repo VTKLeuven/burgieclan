@@ -5,9 +5,11 @@ namespace App\Controller\Admin;
 use App\Entity\CommentCategory;
 use App\Entity\Course;
 use App\Entity\CourseComment;
+use App\Entity\CourseCommentVote;
 use App\Entity\Document;
 use App\Entity\DocumentCategory;
 use App\Entity\DocumentComment;
+use App\Entity\DocumentCommentVote;
 use App\Entity\Module;
 use App\Entity\Notification;
 use App\Entity\Page;
@@ -71,8 +73,13 @@ class DashboardController extends AbstractDashboardController
             ->setPermission(User::ROLE_ADMIN);
         yield MenuItem::linkToCrud('Courses', 'fa fa-book', Course::class)
             ->setPermission(User::ROLE_ADMIN);
-        yield MenuItem::linkToCrud('Comments', 'far fa-comments', CourseComment::class)
-            ->setPermission(User::ROLE_ADMIN);
+        yield MenuItem::subMenu('Comments', 'far fa-comments')
+            ->setSubItems([
+                MenuItem::linkToCrud('Comments', 'fa-solid fa-comments', CourseComment::class)
+                    ->setPermission(User::ROLE_ADMIN),
+                MenuItem::linkToCrud('Votes', 'fas fa-tags', CourseCommentVote::class)
+                    ->setPermission(User::ROLE_ADMIN),
+            ]);
         yield MenuItem::linkToCrud('Categories', 'fas fa-tags', CommentCategory::class)
             ->setPermission(User::ROLE_ADMIN);
         $pendingDocumentsMenu = MenuItem::linkToCrud('Pending Documents', 'fa-regular fa-file', Document::class)
@@ -81,7 +88,14 @@ class DashboardController extends AbstractDashboardController
             ->setSubItems([
                 MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class)
                     ->setPermission(User::ROLE_ADMIN),
-                MenuItem::linkToCrud('Comments', 'fa-solid fa-comments', DocumentComment::class)
+                MenuItem::subMenu('Comments', 'fa-solid fa-comments')
+                    ->setSubItems([
+                        MenuItem::linkToCrud('Comments', 'fa-solid fa-comments', DocumentComment::class)
+                            ->setPermission(User::ROLE_ADMIN),
+                        MenuItem::linkToCrud('Votes', 'fas fa-tags', DocumentCommentVote::class)
+                            ->setPermission(User::ROLE_ADMIN),
+                    ]),
+                MenuItem::linkToCrud('Votes', 'fas fa-tags', DocumentVote::class)
                     ->setPermission(User::ROLE_ADMIN),
                 MenuItem::linkToCrud('Documents', 'fa fa-file', Document::class)
                     ->setController(DocumentCrudController::class),

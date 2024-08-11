@@ -115,8 +115,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection
      */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Vote::class)]
-    #[ORM\JoinTable(name: 'vote')]
+    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: AbstractVote::class, cascade: ['remove'], orphanRemoval: true)]
     private Collection $votes;
 
     public function __construct()
@@ -366,26 +365,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-
     public function getVotes(): Collection
     {
         return $this->votes;
     }
 
-    public function addVote(self $vote): self
+    public function addVote(AbstractVote $vote): self
     {
         if (!$this->votes->contains($vote)) {
             $this->votes->add($vote);
+            $vote->setCreator($this);
         }
 
         return $this;
     }
 
-    public function removeVote(self $vote): self
+    public function removeVote(AbstractVote $vote): self
     {
         if ($this->votes->removeElement($vote)) {
-            $this->votes->removeElement($vote);
+            $vote->setCreator(null);
         }
+
         return $this;
+    }
+
+    public function getDocumentVotes(): Collection
+    {
+        return $this->votes->filter(fn(AbstractVote $vote) => $vote instanceof DocumentVote);
+    }
+
+    public function getDocumentCommentVotes(): Collection
+    {
+        return $this->votes->filter(fn(AbstractVote $vote) => $vote instanceof DocumentCommentVote);
+    }
+
+    public function getCourseCommentVotes(): Collection
+    {
+        return $this->votes->filter(fn(AbstractVote $vote) => $vote instanceof CourseCommentVote);
     }
 }
