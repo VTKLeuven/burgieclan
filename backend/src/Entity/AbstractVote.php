@@ -23,13 +23,19 @@ abstract class AbstractVote extends Node
         return $this->isUpvote;
     }
 
-    public function setUpvote(): self
+    public function setUpvote(bool $vote): self
+    {
+        $this->isUpvote = $vote;
+        return $this;
+    }
+
+    public function upvote(): self
     {
         $this->isUpvote = true;
         return $this;
     }
 
-    public function setDownvote(): self
+    public function downvote(): self
     {
         $this->isUpvote = false;
         return $this;
