@@ -16,14 +16,17 @@ export default function ErrorPage(status: string, detail?: string) {
         router.push('/');
     };
 
+    const redirectSupport = () => {
+        router.push('/support');
+    };
+
     return (
         <>
             <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
                 <div className="text-center">
                     <p className="text-base font-semibold text-amber-700">{status}</p>
-                    <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">{statusDescription}</h1>
-                    <p className="mt-6 text-base leading-7 text-gray-600">{customDescription}</p>
-
+                    <h1 className="mt-4">{statusDescription}</h1>
+                    <p className="mt-6 text-gray-600">{customDescription}</p>
                     <div className="mt-10 flex items-center justify-center space-x-6">
                         <button
                             type="button"
@@ -33,7 +36,7 @@ export default function ErrorPage(status: string, detail?: string) {
                         </button>
                         <button
                             type="button"
-                            onClick={redirectHome}
+                            onClick={redirectSupport}
                             className="white-button flex-1 min-w-max">
                             Contact support <span aria-hidden="true">&rarr;</span>
                         </button>
@@ -41,6 +44,5 @@ export default function ErrorPage(status: string, detail?: string) {
                 </div>
             </main>
         </>
-
     )
 }

@@ -7,7 +7,7 @@
 }
 
 .white-button {
-    @apply flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-vtk-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vtk-blue-600
+    @apply flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900
 }
 
 body {
@@ -15,35 +15,35 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    @apply text-vtk-blue-500;
+    @apply text-gray-900;
 }
 
 h1 {
-    @apply text-4xl font-semibold my-4;
+    @apply text-4xl sm:text-5xl font-bold tracking-tight my-4;
 }
 
 h2 {
-    @apply text-3xl font-semibold my-3;
+    @apply text-3xl sm:text-4xl font-semibold my-3;
 }
 
 h3 {
-    @apply text-2xl font-semibold my-2;
+    @apply text-2xl sm:text-3xl font-semibold my-2;
 }
 
 h4 {
-    @apply text-xl font-medium my-2;
+    @apply text-xl sm:text-2xl font-medium my-2;
 }
 
 h5 {
-    @apply text-lg font-medium my-1;
+    @apply text-lg sm:text-xl font-medium my-1;
 }
 
 h6 {
-    @apply text-base font-medium my-1;
+    @apply text-base sm:text-lg font-medium my-1;
 }
 
 p {
-    @apply text-base leading-normal
+    @apply text-base leading-7
 }
 
 ul {
