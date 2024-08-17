@@ -1,5 +1,6 @@
 export type ApiClientError = {
-    message: string;
+    title: string;
+    detail: string;
     status: string;
 }
 
@@ -16,9 +17,9 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, he
 
     const url = backendBaseUrl + endpoint;
 
-    // TODO BUR-110: instead of try-catch, throw errors here and catch with higher-level generic wrapper
     try {
-        const res = await fetch(frontendBaseUrl + '/api/frontend/proxy', {
+        // Forward every request to the proxy endpoint, which adds the JWT
+        const response = await fetch(frontendBaseUrl + '/api/frontend/proxy', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -26,14 +27,35 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, he
             body: JSON.stringify({method, url, body, headers}),
         });
 
-        const data = await res.json();
-
-        if (!res.ok) {
-            return { error: data.error };
+        // Handle successful response
+        if (response.ok) {
+            return await response.json();
         }
 
-        return data;
+        // Handle backend errors
+        const errorData = await response.json();
+        const apiError: ApiClientError = {
+            title: errorData.title || 'An error occurred',
+            detail: errorData.detail || 'An error occurred',
+            status: response.status.toString(),
+        };
+
+        throw apiError;
+
     } catch (error: any) {
-        return { error: { message: error.message || 'An error occurred', status: 500 } };
+        // Re-throw error so that calling component can handle them
+
+        if (!error.status) {
+            // Network or other unexpected error
+            const unexpectedError: ApiClientError = {
+                title: 'Unexpected error',
+                detail: 'Please try again later',
+                status: '',
+            };
+            throw unexpectedError;
+        }
+
+        // Backend error
+        throw error;
     }
 };

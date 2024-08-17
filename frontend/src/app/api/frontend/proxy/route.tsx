@@ -4,10 +4,11 @@ import {NextRequest, NextResponse} from 'next/server';
  * Proxy for outgoing request which retrieves the JWT token from http-only cookie and sets it as bearer token in the
  * authorization header before executing the request.
  *
+ * Http-only cookies can't be accessed by client-components, which is why this server-side endpoint should be used.
+ *
  * Can also be used without authentication, in that case no authorization header is set.
  */
 export async function POST(req: NextRequest) {
-    // TODO BUR-110: instead of try-catch, throw errors here and catch with higher-level generic wrapper
     try {
         const { method, url, body, headers: customHeaders } = await req.json();
 
@@ -15,14 +16,16 @@ export async function POST(req: NextRequest) {
 
         const headers = {
             ...customHeaders,
+            'Content-Type': 'application/json',
         };
 
-        // proxy should continue even if no jwt is present
+        // Set the JWT token in the authorization header if present
         if (jwt) {
             headers['Authorization'] = `Bearer ${jwt}`;
         }
 
-        const res =  await fetch(url, {
+        // Make request to the actual backend
+        const res = await fetch(url, {
             method,
             headers,
             body: JSON.stringify(body),
@@ -30,13 +33,27 @@ export async function POST(req: NextRequest) {
 
         const data = await res.json();
 
-        if (!res.ok) {
-            return NextResponse.json({ error: data });
-        }
+        console.log(data);
 
-        return NextResponse.json(data);
-    } catch (error: any) {
-        return NextResponse.json({ error: { message: error.message || 'An error occurred', status: 500 } });
+        const contentLength = res.headers.get('content-length');
+        console.log(contentLength)
+
+        // Forward the exact status code and body to the client
+        return new NextResponse(
+            JSON.stringify(data),
+            {
+                status: res.status,
+            }
+        );
+
+    } catch (error) {
+        // Handle unexpected errors (e.g. network issues)
+        return new NextResponse(
+            // Error message body in same format as backend errors
+            JSON.stringify({ title: 'API proxy error', detail: error.message }),
+        {
+                status: 500
+            }
+        );
     }
-
 }
