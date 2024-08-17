@@ -33,11 +33,6 @@ export async function POST(req: NextRequest) {
 
         const data = await res.json();
 
-        console.log(data);
-
-        const contentLength = res.headers.get('content-length');
-        console.log(contentLength)
-
         // Forward the exact status code and body to the client
         return new NextResponse(
             JSON.stringify(data),
