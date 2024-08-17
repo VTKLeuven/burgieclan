@@ -17,7 +17,7 @@ class AuthenticationFailureListener
         $data = [
             'title' => 'An error occurred',
             'detail' => 'Bad credentials, please verify that your username/password are correctly set.',
-            'status' => 401,
+            'status' => Response::HTTP_UNAUTHORIZED,
         ];
 
         $response = new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
