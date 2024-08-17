@@ -33,7 +33,7 @@ export default function Page({ params }: { params: any }) {
     }, [url_key]);
 
     if (error) {
-        return (ErrorPage(error.status, error.title, error.detail));
+        return (ErrorPage(error.status));
     }
 
     if (!page) {
