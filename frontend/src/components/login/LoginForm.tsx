@@ -4,6 +4,9 @@ import Image from 'next/image'
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useRef, useEffect, useState } from 'react';
 import LitusOAuthButton from "@/components/login/LitusOAuthButton";
+import {ApiClient, ApiClientError} from "@/utils/api";
+import {useRouter} from "next/navigation";
+import {SetJWTAsCookie} from "@/utils/oauth";
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
@@ -12,11 +15,37 @@ import LitusOAuthButton from "@/components/login/LitusOAuthButton";
  * Should be rendered as full page.
  */
 export default function LoginForm() {
+    const router = useRouter();
+
     const [isOpen, setIsOpen] = useState(false);
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
 
     const toggleCollapse = () => {
         setIsOpen(!isOpen);
     };
+
+    const handleLogin = (event) => {
+        // Prevent the form from causing a page reload
+        event.preventDefault();
+
+        const Login = async () => {
+            try {
+                const response = await ApiClient('POST', `/api/auth/login`, {
+                    username: username,
+                    password: password,
+                });
+                await SetJWTAsCookie(response.token);
+
+                router.push('/');
+            } catch (err: any) {
+                setError(err.detail || 'Bad credentials, please verify that your username/password are correctly set.');
+            }
+        };
+
+        Login();
+    }
 
     return (
         <>
@@ -48,55 +77,56 @@ export default function LoginForm() {
                 </div>
                 <div
                     className={`flex flex-col items-center justify-center ${isOpen ? 'h-3/7 pb-2' : 'h-0'} overflow-hidden`}>
-                    <div className="mt-10 w-full max-w-sm">
-                        <label htmlFor="email"
-                               className="block text-sm font-medium leading-6 text-gray-900">
-                            Email address
-                        </label>
-                        <div className="mt-2">
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                required
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-600 sm:text-sm sm:leading-6"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="w-full max-w-sm">
-                        <div className="flex items-center justify-between">
-                            <label htmlFor="password"
-                                   className="mt-2 block text-sm font-medium leading-6 text-vtk-blue-600">
-                                Password
+                    <form onSubmit={handleLogin} className="w-full max-w-sm mt-10">
+                        <div>
+                            <label htmlFor="username">
+                                <p className="mt-2 text-sm font-medium">Username</p>
                             </label>
-                            <div className="mt-2 text-sm">
-                                <a href="#" className="text-xs font-semibold text-vtk-blue-600 focus:outline-none hover:text-vtk-blue-500 focus:ring-2 focus:ring-offset-1 focus:ring-vtk-blue-600">
-                                    Forgot password?
-                                </a>
+                            <div className="mt-2">
+                                <input
+                                    id="username"
+                                    name="username"
+                                    type="text"
+                                    autoComplete="username"
+                                    required
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-600 sm:text-sm sm:leading-6"
+                                />
                             </div>
                         </div>
-                        <div className="mt-2">
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autoComplete="current-password"
-                                required
-                                className="block w-full rounded-md border-0 py-1.5 text-vtk-blue-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-600 sm:text-sm sm:leading-6"
-                            />
-                        </div>
-                    </div>
 
-                    <div className="mt-5 w-full max-w-sm">
-                        <button
-                            type="submit"
-                            className="primary-button"
-                        >
-                            Sign in
-                        </button>
-                    </div>
+                        <div>
+                            <label htmlFor="password">
+                                <p className="mt-2 text-sm font-medium">Password</p>
+                            </label>
+                            <div className="mt-2">
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    autoComplete="current-password"
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="block w-full rounded-md border-0 py-1.5 text-vtk-blue-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-600 sm:text-sm sm:leading-6"
+                                />
+                            </div>
+                        </div>
+
+                        { error && (
+                            <p className="mt-4 text-sm text-red-600">{ error }</p>
+                        )}
+
+                        <div className="mt-5 w-full max-w-sm">
+                            <button
+                                type="submit"
+                                className="primary-button"
+                            >
+                                Sign in
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </>

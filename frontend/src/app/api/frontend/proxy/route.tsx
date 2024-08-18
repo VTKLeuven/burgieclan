@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
         // Forward the exact status code and body to the client
         return new NextResponse(
             JSON.stringify(data),
-            {
+        {
                 status: res.status,
             }
         );
