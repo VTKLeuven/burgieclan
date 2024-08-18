@@ -34,7 +34,7 @@ export default function Page({ params }: { params: any }) {
     }, [url_key]);
 
     if (error) {
-        return (ErrorPage(error.status));
+        return <ErrorPage status={error.status} />;
     }
 
     if (!page) {
