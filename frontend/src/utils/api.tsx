@@ -6,6 +6,11 @@ export type ApiClientError = {
 
 /**
  * API Client for authenticated or unauthenticated requests to the backend server.
+ *
+ * Two types of errors are handled:
+ * - Network or other unexpected errors
+ * - Backend error response messages
+ * Both are encoded in the ApiClientError type for easy handling in the calling component.
  */
 export const ApiClient = async (method: string, endpoint: string, body?: any, headers?: Record<string, string>) => {
     const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;

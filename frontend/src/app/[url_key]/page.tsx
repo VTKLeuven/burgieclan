@@ -25,8 +25,7 @@ export default function Page({ params }: { params: any }) {
                 const result = await ApiClient('GET', `/api/pages/${url_key}`);
                 setPage(result);
             } catch (err: any) {
-                throw new Error("this is an error");
-                // setError(err);
+                setError(err);
             }
         };
 
