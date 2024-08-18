@@ -30,6 +30,9 @@ export default function LoginForm() {
         // Prevent the form from causing a page reload
         event.preventDefault();
 
+        /**
+         * Handles credentials login
+         */
         const Login = async () => {
             try {
                 const response = await ApiClient('POST', `/api/auth/login`, {
@@ -65,6 +68,7 @@ export default function LoginForm() {
                         </h2>
                     </div>
 
+                    {/* Handles OAuth login via Litus */}
                     <LitusOAuthButton />
 
                     <div
