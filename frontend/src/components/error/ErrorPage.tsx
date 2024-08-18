@@ -6,11 +6,11 @@ import {getHttpStatusDescription} from "@/utils/httpStatusDescriptions";
  * Displays an error page with a status code, brief standard description and a longer custom description (which is
  * either given by `detail`, retrieved from the httpStatusDescriptions.ts file or left empty).
  */
-export default function ErrorPage({ status, detail }: { status: string; detail?: string }) {
+export default function ErrorPage({ status, detail }: { status?: string; detail?: string }) {
     const router = useRouter();
 
-    const statusDescription = STATUS_CODES[status] || 'Unexpected error';  // short standard description
-    const customDescription = detail || getHttpStatusDescription(Number(status));  // longer custom description
+    const statusDescription = status ? STATUS_CODES[status] || 'Unexpected error' : 'Unexpected error';  // short standard description
+    const customDescription = detail || getHttpStatusDescription(Number(status)) || "";  // longer custom description
 
     const redirectHome = () => {
         router.push('/');

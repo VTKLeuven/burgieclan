@@ -2,27 +2,19 @@
 
 import { useEffect } from 'react'
 import * as Sentry from "@sentry/nextjs";
+import ErrorPage from "@/components/error/ErrorPage";
 
-export default function Error({ error, reset, } : {
-    error: Error & { digest?: string }
-    reset: () => void
-}) {
+/**
+ * Catches unexpected client-side errors in all lower-level components
+ */
+export default function Error({ error }: { error: Error & { digest?: string } }) {
     useEffect(() => {
         Sentry.captureException(error);
-        console.error(error)
     }, [error])
 
     return (
-        <div>
-            <h2>Something went wrong!</h2>
-            <button
-                onClick={
-                    // Attempt to recover by trying to re-render the segment
-                    () => reset()
-                }
-            >
-                Try again
-            </button>
+        <div className="h-full">
+            <ErrorPage detail={error.message}/>
         </div>
     )
 }
