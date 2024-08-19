@@ -10,7 +10,7 @@ if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test') {
   Sentry.init({
     dsn: "https://c7a1562dd406594aeb3e6d27b13e53bc@o918793.ingest.us.sentry.io/4506733883621376",
 
-    // Set Sentry environment
+    // Set custom Sentry environment
     environment: "frontend-" + process.env.NODE_ENV,
 
     // Adjust this value in production, or use tracesSampler for greater control
