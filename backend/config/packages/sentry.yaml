@@ -12,8 +12,9 @@ when@prod:
         register_error_listener: false
         register_error_handler: false
 
-        # Set custom Sentry environment
-        environment: 'backend-%kernel.environment%'
+        options:
+            # Set custom Sentry environment
+            environment: 'backend-%kernel.environment%'
 
     monolog:
         handlers:
