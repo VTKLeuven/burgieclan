@@ -63,7 +63,7 @@ jobs:
       - name: Frontend - Build NextJS app
         # We run extra commands to solve the issue with nvm not being found
         # https://stackoverflow.com/questions/62863080/github-actions-err-bash-line-3-npm-command-not-found
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && export NVM_DIR=~/.nvm && source ~/.nvm/nvm.sh && export NODE_ENV=test && npm run build"
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && export NVM_DIR=~/.nvm && source ~/.nvm/nvm.sh && npm run build"
       - name: Frontend - Restart pm2
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && export NVM_DIR=~/.nvm && source ~/.nvm/nvm.sh && pm2 restart ${{ secrets.FRONTEND_PM2_APP_NAME }}"
       - name: Frontend - Restart apache2
