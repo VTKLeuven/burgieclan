@@ -13,7 +13,6 @@ import ErrorPage from "@/components/error/ErrorPage";
  * from the backend if it exists.
  */
 export default function Page({ params }: { params: any }) {
-    const router = useRouter();
     const { url_key } = params;
 
     const [page, setPage] = useState<any>(null);

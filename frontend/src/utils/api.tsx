@@ -34,7 +34,7 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, he
 
         // Handle successful response
         if (response.ok) {
-            return await response.json();
+            return response.json();
         }
 
         // Handle backend errors
