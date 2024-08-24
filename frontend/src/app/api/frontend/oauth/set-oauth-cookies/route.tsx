@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { parseJWT } from "@/utils/oauth";
+import {getJWTExpiration, parseJWT} from "@/utils/oauth";
 
 /**
  * Stores the JWT, JWT expiration timestamp and Litus refresh token in http-only cookies.
@@ -14,9 +14,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'JWT or refresh token missing in request body' }, { status: 400 });
     }
 
-    // Parse expiration time of JWT
-    const parsedJWT = parseJWT(jwt);
-    const expirationTime = parsedJWT?.exp;
+    const expirationTime = getJWTExpiration(jwt);
 
     if (!expirationTime) {
         return NextResponse.json({ error: 'JWT token is missing expiration time' }, { status: 400 });
@@ -37,7 +35,7 @@ export async function POST(request: Request) {
     // Set JWT expiration time cookie
     response.cookies.set({
         name: 'jwt_expiration',
-        value: expirationTime.toString(), // Store the expiration time (Unix epoch) as a string
+        value: expirationTime.toString(), // Store the JWT expiration Unix timestamp as a string
         path: '/',
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -48,7 +46,7 @@ export async function POST(request: Request) {
     if (refreshToken) {
         response.cookies.set({
             name: 'litus_refresh',
-            value: refreshToken, // Store the expiration time (Unix epoch) as a string
+            value: refreshToken,
             path: '/',
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',

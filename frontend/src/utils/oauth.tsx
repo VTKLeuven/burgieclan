@@ -43,7 +43,7 @@ const requestLitusTokens = async (code: string, codeVerifier: string) => {
     const frontendUri = process.env.NEXT_PUBLIC_FRONTEND_URL
 
     if (!frontendApiUri || !clientId || !frontendUri) {
-        throw new Error("Error during authorization code exchange: missing environment variables for OAuth flow");
+        throw Error("Error during authorization code exchange: missing environment variables for OAuth flow");
     }
 
     const redirectUri = frontendUri + "/oauth/callback"
@@ -73,7 +73,7 @@ const refreshLitusTokens = async (refreshToken: string) => {
     const frontendUri = process.env.NEXT_PUBLIC_FRONTEND_URL
 
     if (!frontendApiUri || !clientId || !frontendUri) {
-        throw new Error("Error during authorization code exchange: missing environment variables for OAuth flow");
+        throw Error("Error during authorization code exchange: missing environment variables for OAuth flow");
     }
 
     const redirectUri = frontendUri + "/oauth/callback"
@@ -85,8 +85,6 @@ const refreshLitusTokens = async (refreshToken: string) => {
         client_id: clientId,
         redirect_uri: redirectUri,
     });
-
-    console.log(response);
 
     return {
         newAccessToken: response.data.access_token,
@@ -101,7 +99,7 @@ const requestJWT = async (accessToken: string) => {
     const backendAuthUrl = process.env.NEXT_PUBLIC_BURGIECLAN_BACKEND_AUTH;
 
     if (!backendAuthUrl) {
-        throw new Error("Error during JWT exchange: missing environment variables for OAuth flow");
+        throw Error("Error during JWT exchange: missing environment variables for OAuth flow");
     }
 
     const response = await axios.post(backendAuthUrl, {
@@ -117,13 +115,13 @@ const requestJWT = async (accessToken: string) => {
 };
 
 /**
- * Put JWT and Litus refresh token in Http-only cookies for session management
+ * Store JWT and Litus refresh token in Http-only cookies for session management
  */
 const storeOAuthTokens = async (jwt: string, refreshToken: string) => {
     const frontendApiUrl = process.env.NEXT_PUBLIC_FRONTEND_API_URL
 
     if (!frontendApiUrl) {
-        throw new Error("Error during setting JWT cookie: missing environment variables for OAuth flow");
+        throw Error("Error during setting JWT cookie: missing environment variables for OAuth flow");
     }
 
     const setOAuthCookiesUrl = frontendApiUrl + "/api/frontend/oauth/set-oauth-cookies"
@@ -135,13 +133,21 @@ const storeOAuthTokens = async (jwt: string, refreshToken: string) => {
 /**
  * Decode and parse JWT
  */
-export const parseJWT = (jwt: string) : string => {
+const parseJWT = (jwt: string) : string => {
     const base64Url = jwt.split('.')[1];
     const base64Str = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = atob(base64Str);
 
     return JSON.parse(jsonPayload);
 };
+
+/**
+ * Returns the expiration time of a JWT as Unix timestamp
+ */
+export const getJWTExpiration = (jwt: string) : number => {
+    const parsedJWT = parseJWT(jwt);
+    return parsedJWT?.exp;
+}
 
 /**
  * Redirects the user to Litus where he should authenticate himself, after which the Litus authentication server
@@ -164,7 +170,7 @@ export const initiateLitusOAuthFlow = (router: AppRouterInstance) => {
     const frontendUri = process.env.NEXT_PUBLIC_FRONTEND_URL
 
     if (!authorizationUri || !clientId || !frontendUri) {
-        throw new Error("Error during Litus authorization redirect: missing environment variables for OAuth flow");
+        throw Error("Error during Litus authorization redirect: missing environment variables for OAuth flow");
     }
 
     const redirectUri = frontendUri + "/oauth/callback"
@@ -187,52 +193,48 @@ export const initiateLitusOAuthFlow = (router: AppRouterInstance) => {
  * Provides functionality for callback url, where the Litus authentication server redirects to after successful user
  * login. Retrieves access token and JWT and sets it as cookie for future requests.
  */
-export const LitusOAuthCallback = (router : AppRouterInstance, searchParams : ReadonlyURLSearchParams): null => {
+export const LitusOAuthCallback = async (router : AppRouterInstance, searchParams : ReadonlyURLSearchParams): null => {
     const code = searchParams.get('code');
     const codeVerifier = sessionStorage.getItem('code_verifier');
 
     if (!codeVerifier) {
-        console.error('Code verifier is missing.');
-        return;
+        throw Error('Code verifier is missing.');
     }
 
     const state = searchParams.get('state');
     const storedState = sessionStorage.getItem('state');
 
     if (state !== storedState) {
-        console.error('State mismatch: potential CSRF attack.', { status: 400 });
-        return;
+        throw Error('State mismatch: potential CSRF attack.');
     }
 
     if (code && codeVerifier) {
-        (async () => {
-            try {
-                const {accessToken, refreshToken} = await requestLitusTokens(code, codeVerifier);
-                const jwt = await requestJWT(accessToken);
-                await storeOAuthTokens(jwt, refreshToken);
+        try {
+            const {accessToken, refreshToken} = await requestLitusTokens(code, codeVerifier);
+            const jwt = await requestJWT(accessToken);
+            await storeOAuthTokens(jwt, refreshToken);
 
-                router.push('/');
-            } catch (error) {
-                console.error('Error during token exchange:', error);
-            }
-        })();
+            router.push('/');
+        } catch (error) {
+            throw Error(error.message);
+        }
     }
 };
 
+/**
+ * Refreshes JWT by exchanging the old Litus refresh token for new Litus access and refresh tokens and then exchanging
+ * the new access token for a new JWT from the backend.
+ * */
 export const LitusOAuthRefresh = async (oldRefreshToken: string): Promise<string | null> => {
-    console.log("refreshing token");
+    console.log("refresh called");
 
     try {
         const { newAccessToken, newRefreshToken } = await refreshLitusTokens(oldRefreshToken);
-        console.log("new access token", newAccessToken);
         const jwt = await requestJWT(newAccessToken);
-        console.log("new jwt", jwt);
         await storeOAuthTokens(jwt, newRefreshToken);
-        console.log("tokens stored");
 
         return jwt;
     } catch (error) {
-        console.error('Error during token exchange:', error);
-        return null;
+        throw Error(error.message);
     }
 };

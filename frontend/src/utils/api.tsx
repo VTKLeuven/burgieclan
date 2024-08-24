@@ -48,19 +48,19 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, he
         throw apiError;
 
     } catch (error: any) {
-        // Re-throw error so that calling component can handle them
-
+        // Network or other unexpected error
         if (!error.status) {
-            // Network or other unexpected error
-            const unexpectedError: ApiClientError = {
+                const unexpectedError: ApiClientError = {
                 title: 'Unexpected error',
                 detail: 'Please try again later',
                 status: '',
             };
+
+            // Re-throw error so that client can handle them
             throw unexpectedError;
         }
 
-        // Backend error
+        // Other backend error
         throw error;
     }
 };
