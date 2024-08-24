@@ -225,15 +225,12 @@ export const LitusOAuthCallback = async (router : AppRouterInstance, searchParam
  * Refreshes JWT by exchanging the old Litus refresh token for new Litus access and refresh tokens and then exchanging
  * the new access token for a new JWT from the backend.
  * */
-export const LitusOAuthRefresh = async (oldRefreshToken: string): Promise<string | null> => {
-    console.log("refresh called");
-
+export const LitusOAuthRefresh = async (oldRefreshToken: string): Promise<{ newJwt: string; newRefreshToken: string }> => {
     try {
         const { newAccessToken, newRefreshToken } = await refreshLitusTokens(oldRefreshToken);
-        const jwt = await requestJWT(newAccessToken);
-        await storeOAuthTokens(jwt, newRefreshToken);
+        const newJwt = await requestJWT(newAccessToken);
 
-        return jwt;
+        return { newJwt, newRefreshToken };
     } catch (error) {
         throw Error(error.message);
     }

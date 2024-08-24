@@ -1,26 +1,12 @@
 import { NextResponse } from 'next/server';
-import {getJWTExpiration, parseJWT} from "@/utils/oauth";
+import { getJWTExpiration } from "@/utils/oauth";
 
-/**
- * Stores the JWT, JWT expiration timestamp and Litus refresh token in http-only cookies.
- *
- * This is done by an API endpoint because at the time of writing, cookies can only be written in a Route Handler (this
- * case) or a Server Action. Client-side components can't access http-only cookies.
- */
-export async function POST(request: Request) {
-    const { jwt, refreshToken } = await request.json();
-
-    if (!jwt) {
-        return NextResponse.json({ error: 'JWT or refresh token missing in request body' }, { status: 400 });
-    }
-
+export const AddOAuthCookies = (response : NextResponse, jwt: string, refreshToken?: string) => {
     const expirationTime = getJWTExpiration(jwt);
 
     if (!expirationTime) {
         return NextResponse.json({ error: 'JWT token is missing expiration time' }, { status: 400 });
     }
-
-    const response = NextResponse.json({ success: true });
 
     // Set JWT http-only cookie
     response.cookies.set({
@@ -55,4 +41,25 @@ export async function POST(request: Request) {
     }
 
     return response;
+}
+
+/**
+ * Stores the JWT, JWT expiration timestamp and Litus refresh token in http-only cookies. Make sure the response is
+ * sent to a client-side component for the cookies to be stored in the browser.
+ *
+ * This is done by an API endpoint because at the time of writing, cookies can only be written in a Route Handler (this
+ * case) or a Server Action. Client-side components can't access http-only cookies.
+ */
+export async function POST(request: Request) {
+    const { jwt, refreshToken } = await request.json();
+
+    if (!jwt) {
+        return NextResponse.json({ error: 'JWT or refresh token missing in request body' }, { status: 400 });
+    }
+
+    return AddOAuthCookies(
+        NextResponse.json({ success: true }),
+        jwt,
+        refreshToken
+    );
 }
