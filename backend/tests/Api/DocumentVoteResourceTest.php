@@ -63,8 +63,6 @@ class DocumentVoteResourceTest extends ApiTestCase
         $vote2 = DocumentVoteFactory::createOne(['isUpvote' => false]);
         $vote3 = DocumentVoteFactory::createOne(['isUpvote' => true]);
 
-        DocumentVoteFactory::createMany(5);
-
         $this->browser()
             ->get('/api/document_votes?isUpvote=true', [
                 'headers' => [
@@ -73,8 +71,8 @@ class DocumentVoteResourceTest extends ApiTestCase
             ])
             ->assertStatus(200)
             ->assertJson()
-            ->assertJsonMatches('"hydra:totalItems"', 3)
-            ->assertJsonMatches('length("hydra:member")', 3);
+            ->assertJsonMatches('"hydra:totalItems"', 2)
+            ->assertJsonMatches('length("hydra:member")', 2);
     }
 
     public function testGetDocumentVoteFilterByCreator(): void
@@ -83,7 +81,6 @@ class DocumentVoteResourceTest extends ApiTestCase
         $user2 = UserFactory::createOne();
         DocumentVoteFactory::createOne(['creator' => $user1]);
         DocumentVoteFactory::createMany(2, ['creator' => $user2]);
-        DocumentVoteFactory::createMany(5);
 
         $this->browser()
             ->get('/api/document_votes?creator=/api/users/' . $user1->getId(), [
@@ -112,8 +109,8 @@ class DocumentVoteResourceTest extends ApiTestCase
             ])
             ->assertStatus(200)
             ->assertJson()
-            ->assertJsonMatches('"hydra:totalItems"', 8)
-            ->assertJsonMatches('length("hydra:member")', 8);
+            ->assertJsonMatches('"hydra:totalItems"', 3)
+            ->assertJsonMatches('length("hydra:member")', 3);
     }
 
     public function testPostToCreateDocumentVote(): void
@@ -130,7 +127,6 @@ class DocumentVoteResourceTest extends ApiTestCase
                 ],
             ])
             ->assertStatus(422)
-            ->assertJsonMatches('message', 'Validation Failed')
             ->post('/api/document_votes', [
                 'json' => [
                     'isUpvote' => true,

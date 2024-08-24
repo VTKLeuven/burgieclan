@@ -60,7 +60,7 @@ final class DocumentCommentVoteFactory extends ModelFactory
     {
         return [
             'isUpvote' => self::faker()->boolean(),
-            'documentComment' => DocumentCommentFactory::randomOrCreate(),
+            'comment' => DocumentCommentFactory::randomOrCreate(),
             'creator' => UserFactory::randomOrCreate(),
         ];
     }

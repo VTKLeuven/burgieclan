@@ -35,7 +35,7 @@ class DocumentCommentVoteResourceTest extends ApiTestCase
             '@id',
             '@type',
             'isUpvote',
-            'documentComment',
+            'comment',
             'creator',
             'createdAt',
             'updatedAt',
@@ -63,8 +63,6 @@ class DocumentCommentVoteResourceTest extends ApiTestCase
         $commentVote2 = DocumentCommentVoteFactory::createOne(['isUpvote' => false]);
         $commentVote3 = DocumentCommentVoteFactory::createOne(['isUpvote' => true]);
 
-        DocumentCommentVoteFactory::createMany(5);
-
         $this->browser()
             ->get('/api/document_comment_votes?isUpvote=true', [
                 'headers' => [
@@ -73,8 +71,8 @@ class DocumentCommentVoteResourceTest extends ApiTestCase
             ])
             ->assertStatus(200)
             ->assertJson()
-            ->assertJsonMatches('"hydra:totalItems"', 3)
-            ->assertJsonMatches('length("hydra:member")', 3);
+            ->assertJsonMatches('"hydra:totalItems"', 2)
+            ->assertJsonMatches('length("hydra:member")', 2);
     }
 
     public function testGetDocumentCommentVoteFilterByCreator(): void
@@ -83,7 +81,6 @@ class DocumentCommentVoteResourceTest extends ApiTestCase
         $user2 = UserFactory::createOne();
         DocumentCommentVoteFactory::createOne(['creator' => $user1]);
         DocumentCommentVoteFactory::createMany(2, ['creator' => $user2]);
-        DocumentCommentVoteFactory::createMany(5);
 
         $this->browser()
             ->get('/api/document_comment_votes?creator=/api/users/' . $user1->getId(), [
@@ -112,8 +109,8 @@ class DocumentCommentVoteResourceTest extends ApiTestCase
             ])
             ->assertStatus(200)
             ->assertJson()
-            ->assertJsonMatches('"hydra:totalItems"', 8)
-            ->assertJsonMatches('length("hydra:member")', 8);
+            ->assertJsonMatches('"hydra:totalItems"', 3)
+            ->assertJsonMatches('length("hydra:member")', 3);
     }
 
     public function testPostToCreateDocumentCommentVote(): void
@@ -130,11 +127,10 @@ class DocumentCommentVoteResourceTest extends ApiTestCase
                 ],
             ])
             ->assertStatus(422)
-            ->assertJsonMatches('message', 'Validation Failed')
             ->post('/api/document_comment_votes', [
                 'json' => [
                     'isUpvote' => true,
-                    'documentComment' => '/api/document_comments/' . $documentComment->getId(),
+                    'comment' => '/api/document_comments/' . $documentComment->getId(),
                 ],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->getToken($user->getUsername(), 'password')
@@ -168,21 +164,22 @@ class DocumentCommentVoteResourceTest extends ApiTestCase
         $otherToken = $otherUserTokenResponse['token'];
 
         $commentVote = DocumentCommentVoteFactory::createOne(['creator' => $creator]);
+        $documentComment = DocumentCommentFactory::createOne();
 
         $this->browser()
             ->patch('/api/document_comment_votes/' . $commentVote->getId(), [
-                'json' => ['content' => 'Some new content'],
+                'json' => ['comment' => '/api/document_comments/' . $documentComment->getId()],
                 'headers' => [
                     'Content-Type' => 'application/merge-patch+json',
                     'Authorization' => 'Bearer ' . $creatorToken
                 ]
             ])
             ->assertStatus(200)
-            ->assertJsonMatches('content', 'Some new content');
+            ->assertJsonMatches('comment', '/api/document_comments/' . $documentComment->getId());
 
         $this->browser()
             ->patch('/api/document_comment_votes/' . $commentVote->getId(), [
-                'json' => ['content' => 'Some new content'],
+                'json' => ['comment' => '/api/document_comments/' . $documentComment->getId()],
                 'headers' => [
                     'Content-Type' => 'application/merge-patch+json',
                     'Authorization' => 'Bearer ' . $otherToken

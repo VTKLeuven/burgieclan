@@ -69,10 +69,8 @@ final class CourseCommentVoteFactory extends ModelFactory
     {
         return [
             'isUpvote' => self::faker()->boolean(),
-            'courseComment' => CourseCommentFactory::randomOrCreate(),
+            'comment' => CourseCommentFactory::randomOrCreate(),
             'creator' => UserFactory::randomOrCreate(),
-            'createdAt' => self::faker()->dateTimeBetween('-1 year', 'now'),
-            'updatedAt' => self::faker()->dateTimeBetween('-1 year', 'now'),
         ];
     }
 

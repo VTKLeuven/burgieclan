@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Post;
 use App\Entity\CourseCommentVote;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'Course Comment Vote',
@@ -43,5 +44,6 @@ class CourseCommentVoteApi extends AbstractVoteApi
     public ?int $id = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[Assert\NotNull(message: "Comment must be provided.")]
     public ?CourseCommentApi $comment;
 }

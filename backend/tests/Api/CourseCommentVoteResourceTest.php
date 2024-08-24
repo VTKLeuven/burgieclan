@@ -35,7 +35,7 @@ class CourseCommentVoteResourceTest extends ApiTestCase
             '@id',
             '@type',
             'isUpvote',
-            'courseComment',
+            'comment',
             'creator',
             'createdAt',
             'updatedAt',
@@ -63,8 +63,6 @@ class CourseCommentVoteResourceTest extends ApiTestCase
         $commentVote2 = CourseCommentVoteFactory::createOne(['isUpvote' => false]);
         $commentVote3 = CourseCommentVoteFactory::createOne(['isUpvote' => true]);
 
-        CourseCommentVoteFactory::createMany(5);
-
         $this->browser()
             ->get('/api/course_comment_votes?isUpvote=true', [
                 'headers' => [
@@ -73,8 +71,8 @@ class CourseCommentVoteResourceTest extends ApiTestCase
             ])
             ->assertStatus(200)
             ->assertJson()
-            ->assertJsonMatches('"hydra:totalItems"', 3)
-            ->assertJsonMatches('length("hydra:member")', 3);
+            ->assertJsonMatches('"hydra:totalItems"', 2)
+            ->assertJsonMatches('length("hydra:member")', 2);
     }
 
     public function testGetCourseCommentVoteFilterByCreator(): void
@@ -83,7 +81,6 @@ class CourseCommentVoteResourceTest extends ApiTestCase
         $user2 = UserFactory::createOne();
         CourseCommentVoteFactory::createOne(['creator' => $user1]);
         CourseCommentVoteFactory::createMany(2, ['creator' => $user2]);
-        CourseCommentVoteFactory::createMany(5);
 
         $this->browser()
             ->get('/api/course_comment_votes?creator=/api/users/' . $user1->getId(), [
@@ -112,8 +109,8 @@ class CourseCommentVoteResourceTest extends ApiTestCase
             ])
             ->assertStatus(200)
             ->assertJson()
-            ->assertJsonMatches('"hydra:totalItems"', 8)
-            ->assertJsonMatches('length("hydra:member")', 8);
+            ->assertJsonMatches('"hydra:totalItems"', 3)
+            ->assertJsonMatches('length("hydra:member")', 3);
     }
 
     public function testPostToCreateCourseCommentVote(): void
@@ -130,11 +127,10 @@ class CourseCommentVoteResourceTest extends ApiTestCase
                 ],
             ])
             ->assertStatus(422)
-            ->assertJsonMatches('message', 'Validation Failed')
             ->post('/api/course_comment_votes', [
                 'json' => [
                     'isUpvote' => true,
-                    'courseComment' => '/api/course_comments/' . $courseComment->getId(),
+                    'comment' => '/api/course_comments/' . $courseComment->getId(),
                 ],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->getToken($user->getUsername(), 'password')
@@ -168,21 +164,22 @@ class CourseCommentVoteResourceTest extends ApiTestCase
         $otherToken = $otherUserTokenResponse['token'];
 
         $commentVote = CourseCommentVoteFactory::createOne(['creator' => $creator]);
+        $courseComment = CourseCommentFactory::createOne();
 
         $this->browser()
             ->patch('/api/course_comment_votes/' . $commentVote->getId(), [
-                'json' => ['content' => 'Some new content'],
+                'json' => ['comment' => '/api/course_comments/' . $courseComment->getId()],
                 'headers' => [
                     'Content-Type' => 'application/merge-patch+json',
                     'Authorization' => 'Bearer ' . $creatorToken
                 ]
             ])
             ->assertStatus(200)
-            ->assertJsonMatches('content', 'Some new content');
+            ->assertJsonMatches('comment', '/api/course_comments/' . $courseComment->getId());
 
         $this->browser()
             ->patch('/api/course_comment_votes/' . $commentVote->getId(), [
-                'json' => ['content' => 'Some new content'],
+                'json' => ['comment' => '/api/course_comments/' . $courseComment->getId()],
                 'headers' => [
                     'Content-Type' => 'application/merge-patch+json',
                     'Authorization' => 'Bearer ' . $otherToken

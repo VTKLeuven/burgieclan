@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Post;
 use App\Entity\DocumentCommentVote;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'Document Comment Vote',
@@ -22,14 +23,14 @@ use App\State\EntityClassDtoStateProvider;
         new Get(),
         new GetCollection(),
         new Patch(
-        // This redirects the security check to all voters to see if one accepts CourseCommentApi objects
-        // This is handled by the src/Security/Voter/AbstractCommentVoter
+        // This redirects the security check to all voters to see if one accepts DocumentCommentVoteApi objects
+        // This is handled by the src/Security/Voter/AbstractVoteVoter
             security: 'is_granted("EDIT", object)'
         ),
         new Post(),
         new Delete(
-        // This redirects the security check to all voters to see if one accepts CourseCommentApi objects
-        // This is handled by the src/Security/Voter/AbstractCommentVoter
+        // This redirects the security check to all voters to see if one accepts DocumentCommentVoteApi objects
+        // This is handled by the src/Security/Voter/AbstractVoteVoter
             security: 'is_granted("DELETE", object)'
         ),
     ],
@@ -43,5 +44,6 @@ class DocumentCommentVoteApi extends AbstractVoteApi
     public ?int $id = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[Assert\NotNull(message: "Comment must be provided.")]
     public ?DocumentCommentApi $comment;
 }

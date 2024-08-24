@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Post;
 use App\Entity\DocumentVote;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'Document Vote',
@@ -43,5 +44,6 @@ class DocumentVoteApi extends AbstractVoteApi
     public ?int $id = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[Assert\NotNull(message: "Document must be provided.")]
     public ?DocumentApi $document;
 }

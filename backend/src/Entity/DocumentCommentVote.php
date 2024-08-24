@@ -10,6 +10,7 @@ class DocumentCommentVote extends AbstractVote
 {
     #[ORM\ManyToOne(inversedBy: 'courseComments')]
     #[ORM\JoinColumn(nullable: false)]
+
     private ?DocumentComment $comment = null;
 
     public function getComment(): ?DocumentComment
