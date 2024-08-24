@@ -1,5 +1,6 @@
 import {NextRequest, NextResponse} from 'next/server';
-import {getJWTExpiration, LitusOAuthRefresh, parseJWT} from "@/utils/oauth";
+import {getJWTExpiration, LitusOAuthRefresh} from "@/utils/oauth";
+import {AddOAuthCookies} from "@/app/api/frontend/oauth/set-oauth-cookies/route";
 
 /**
  * Proxy for outgoing request which retrieves the JWT token from http-only cookie and sets it as bearer token in the
@@ -13,9 +14,13 @@ export async function POST(req: NextRequest) {
     try {
         const { method, url, body, headers: customHeaders } = await req.json();
 
-        const jwt = req.cookies.get('jwt')?.value;
+        let jwt = req.cookies.get('jwt')?.value || null;
+        let jwtUpdated = false;
+
         const jwtExpirationCookie = req.cookies.get('jwt_expiration')?.value; // Unix timestamp as string
         let jwtExpiration : number;
+
+        let refreshToken = req.cookies.get('litus_refresh')?.value;
 
         const headers = {
             ...customHeaders,
@@ -32,24 +37,25 @@ export async function POST(req: NextRequest) {
             // Check if JWT is expired and refresh if necessary
             // Convert JWT expiration Unix timestamp to number in milliseconds and compare it to current time
             if (Date.now() > jwtExpiration * 1000) {
-                const refreshToken = req.cookies.get('litus_refresh')?.value;
+
                 if (!refreshToken) {
-                    throw Error("no refresh token found");
+                    // TODO: login required (refresh token not available)
+                    throw Error("No refresh token found");
                 }
-                else {
-                    // Retrieve and store new oauth tokens
-                    const newJWt = await LitusOAuthRefresh(refreshToken)
-                    if (newJWt) {
-                        // Set new JWT in header
-                        headers['Authorization'] = `Bearer ${newJWt}`;
-                    } else {
-                        throw Error("Failed to refresh token");
-                    }
+
+                // Retrieve and store new oauth tokens
+                const { newJwt, newRefreshToken } = await LitusOAuthRefresh(refreshToken);
+
+                if (!newJwt || !newRefreshToken) {
+                    // TODO: login required (error occurred, possibly refresh token expired)
+                    throw Error("Failed to refresh token");
                 }
+
+                jwt = newJwt;
+                refreshToken = newRefreshToken;
+                jwtUpdated = true;
             }
-            else {
-                headers['Authorization'] = `Bearer ${jwt}`;
-            }
+            headers['Authorization'] = `Bearer ${jwt}`;
         }
 
         // Make request to the actual backend
@@ -61,13 +67,18 @@ export async function POST(req: NextRequest) {
 
         const data = await res.json();
 
-        // Forward the exact status code and body to the client
-        return new NextResponse(
+        // Forward received status code and body from backend to client
+        const response =  new NextResponse(
             JSON.stringify(data),
             {
                 status: res.status,
             }
         );
+
+        const newResponse = jwtUpdated ? AddOAuthCookies(response, jwt, refreshToken) : response
+
+        // If tokens refreshed, set new JWT (and possibly refresh token) in http-only cookies in response to client
+        return newResponse;
 
     } catch (error) {
         // Handle unexpected errors (e.g. network issues)
