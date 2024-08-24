@@ -15,7 +15,7 @@ export default function Page({ params }: { params: any }) {
         (async () => {
             try {
                 // Put JWT in Http-only cookie for session management
-                await axios.post('/api/oauth/set-jwt-cookie', { jwt });
+                await axios.post('/api/oauth/set-oauth-cookies', { jwt });
 
                 router.push('/');
             } catch (error) {

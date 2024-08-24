@@ -2,13 +2,15 @@ import { NextResponse } from 'next/server';
 import axios from 'axios';
 
 /**
- * Passes a code and code-verifier to the Litus authorization server in order to retrieve an access code.
+ * Passes a body to the Litus token endpoint.
  *
- * This is done by an API endpoint which executes on the server-side, which avoids CORS issues taking place when calling
+ * This is done by an API endpoint which executes on the server-side, to avoid CORS issues taking place when calling
  * the Litus endpoint directly from the frontend.
  */
 export async function POST(req: Request) {
     const body = await req.json();
+
+    console.log("Litus token proxy");
 
     try {
         const response = await axios.post(process.env.NEXT_PUBLIC_LITUS_OAUTH_TOKEN!, body, {
