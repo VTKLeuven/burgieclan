@@ -1,8 +1,6 @@
 import crypto from "crypto";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import {useRouter, useSearchParams} from "next/navigation";
-import {useEffect, useRef} from "react";
-import axios from "axios";
+import {ReadonlyURLSearchParams} from "next/navigation";import axios from "axios";
 
 /**
  * Encode binary buffer to base64url
@@ -34,6 +32,115 @@ const generateCodeVerifier = () => {
  */
 const generateCodeChallenge = (codeVerifier: string) => {
     return base64URLEncode(sha256(codeVerifier));
+};
+
+/**
+ * Exchange PCKE code and code verifier for access and refresh tokens from Litus authorization server
+ */
+const requestLitusTokens = async (code: string, codeVerifier: string) => {
+    const frontendApiUri = process.env.NEXT_PUBLIC_FRONTEND_API_URL;
+    const clientId = process.env.NEXT_PUBLIC_LITUS_API_KEY;
+    const frontendUri = process.env.NEXT_PUBLIC_FRONTEND_URL
+
+    if (!frontendApiUri || !clientId || !frontendUri) {
+        throw new Error("Error during authorization code exchange: missing environment variables for OAuth flow");
+    }
+
+    const redirectUri = frontendUri + "/oauth/callback"
+    const tokenProxyUri = frontendApiUri + "/api/frontend/oauth/litus-token-proxy"
+
+    // Request access and refresh tokens from Litus via proxy endpoint
+    const response = await axios.post(tokenProxyUri, {
+        grant_type: 'authorization_code',
+        code,
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        code_verifier: codeVerifier,
+    });
+
+    return {
+        accessToken: response.data.access_token,
+        refreshToken: response.data.refresh_token
+    };
+};
+
+/**
+ * Exchange refresh token for new access and refresh tokens from Litus authorization server
+ */
+const refreshLitusTokens = async (refreshToken: string) => {
+    const frontendApiUri = process.env.NEXT_PUBLIC_FRONTEND_API_URL;
+    const clientId = process.env.NEXT_PUBLIC_LITUS_API_KEY;
+    const frontendUri = process.env.NEXT_PUBLIC_FRONTEND_URL
+
+    if (!frontendApiUri || !clientId || !frontendUri) {
+        throw new Error("Error during authorization code exchange: missing environment variables for OAuth flow");
+    }
+
+    const redirectUri = frontendUri + "/oauth/callback"
+    const tokenProxyUri = frontendApiUri + "/api/frontend/oauth/litus-token-proxy"
+
+    const response = await axios.post(tokenProxyUri, {
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+        client_id: clientId,
+        redirect_uri: redirectUri,
+    });
+
+    console.log(response);
+
+    return {
+        newAccessToken: response.data.access_token,
+        newRefreshToken: response.data.refresh_token
+    };
+}
+
+/**
+ * Exchange Litus access token for JWT from backend
+ */
+const requestJWT = async (accessToken: string) => {
+    const backendAuthUrl = process.env.NEXT_PUBLIC_BURGIECLAN_BACKEND_AUTH;
+
+    if (!backendAuthUrl) {
+        throw new Error("Error during JWT exchange: missing environment variables for OAuth flow");
+    }
+
+    const response = await axios.post(backendAuthUrl, {
+        accessToken: accessToken
+    }, {
+        headers: {
+            'accept': 'application/ld+json',
+            'Content-Type': 'application/ld+json'
+        }
+    });
+
+    return response.data.token;
+};
+
+/**
+ * Put JWT and Litus refresh token in Http-only cookies for session management
+ */
+const storeOAuthTokens = async (jwt: string, refreshToken: string) => {
+    const frontendApiUrl = process.env.NEXT_PUBLIC_FRONTEND_API_URL
+
+    if (!frontendApiUrl) {
+        throw new Error("Error during setting JWT cookie: missing environment variables for OAuth flow");
+    }
+
+    const setOAuthCookiesUrl = frontendApiUrl + "/api/frontend/oauth/set-oauth-cookies"
+
+    // Store cookies via server-side API endpoint because client-side can't set Http-only cookies
+    await axios.post(setOAuthCookiesUrl, { jwt, refreshToken });
+}
+
+/**
+ * Decode and parse JWT
+ */
+export const parseJWT = (jwt: string) : string => {
+    const base64Url = jwt.split('.')[1];
+    const base64Str = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = atob(base64Str);
+
+    return JSON.parse(jsonPayload);
 };
 
 /**
@@ -77,107 +184,55 @@ export const initiateLitusOAuthFlow = (router: AppRouterInstance) => {
 }
 
 /**
- * Request authorization code and provide PCKE code and code verifier to authentication server
- */
-const exchangeAuthorizationCode = async (code: string, codeVerifier: string) => {
-    // Proxy access-token retrieval through backend to avoid CORS issues
-    const frontendApiUri = process.env.NEXT_PUBLIC_FRONTEND_API_URL;
-    const clientId = process.env.NEXT_PUBLIC_LITUS_API_KEY;
-    const frontendUri = process.env.NEXT_PUBLIC_FRONTEND_URL
-
-    if (!frontendApiUri || !clientId || !frontendUri) {
-        throw new Error("Error during authorization code exchange: missing environment variables for OAuth flow");
-    }
-
-    const redirectUri = frontendUri + "/oauth/callback"
-    const tokenProxyUri = frontendApiUri + "/api/frontend/oauth/exchange-access-token"
-
-    const response = await axios.post(tokenProxyUri, {
-        grant_type: 'authorization_code',
-        code,
-        client_id: clientId,
-        redirect_uri: redirectUri,
-        code_verifier: codeVerifier,
-    });
-
-    return response.data.access_token;
-};
-
-/**
- * Retrieve JWT from access token via backend endpoint
- */
-const exchangeAccessTokenForJWT = async (accessToken: string) => {
-    const backendAuthUrl = process.env.NEXT_PUBLIC_BURGIECLAN_BACKEND_AUTH;
-
-    if (!backendAuthUrl) {
-        throw new Error("Error during JWT exchange: missing environment variables for OAuth flow");
-    }
-
-    const response = await axios.post(backendAuthUrl, {
-        accessToken: accessToken
-    }, {
-        headers: {
-            'accept': 'application/ld+json',
-            'Content-Type': 'application/ld+json'
-        }
-    });
-
-    return response.data.token;
-};
-
-/**
  * Provides functionality for callback url, where the Litus authentication server redirects to after successful user
  * login. Retrieves access token and JWT and sets it as cookie for future requests.
  */
-export const LitusOAuthCallback = (): null => {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const hasRun = useRef(false);
+export const LitusOAuthCallback = (router : AppRouterInstance, searchParams : ReadonlyURLSearchParams): null => {
+    const code = searchParams.get('code');
+    const codeVerifier = sessionStorage.getItem('code_verifier');
 
-    useEffect(() => {
-        if (hasRun.current) return;
-        hasRun.current = true;
+    if (!codeVerifier) {
+        console.error('Code verifier is missing.');
+        return;
+    }
 
-        const code = searchParams.get('code');
-        const codeVerifier = sessionStorage.getItem('code_verifier');
+    const state = searchParams.get('state');
+    const storedState = sessionStorage.getItem('state');
 
-        if (!codeVerifier) {
-            console.error('Code verifier is missing.');
-            return;
-        }
+    if (state !== storedState) {
+        console.error('State mismatch: potential CSRF attack.', { status: 400 });
+        return;
+    }
 
-        const state = searchParams.get('state');
-        const storedState = sessionStorage.getItem('state');
+    if (code && codeVerifier) {
+        (async () => {
+            try {
+                const {accessToken, refreshToken} = await requestLitusTokens(code, codeVerifier);
+                const jwt = await requestJWT(accessToken);
+                await storeOAuthTokens(jwt, refreshToken);
 
-        if (state !== storedState) {
-            console.error('State mismatch: potential CSRF attack.', { status: 400 });
-            return;
-        }
+                router.push('/');
+            } catch (error) {
+                console.error('Error during token exchange:', error);
+            }
+        })();
+    }
+};
 
-        if (code && codeVerifier) {
-            (async () => {
-                try {
-                    const accessToken = await exchangeAuthorizationCode(code, codeVerifier);
-                    const jwt = await exchangeAccessTokenForJWT(accessToken);
+export const LitusOAuthRefresh = async (oldRefreshToken: string): Promise<string | null> => {
+    console.log("refreshing token");
 
-                    const frontendApiUrl = process.env.NEXT_PUBLIC_FRONTEND_API_URL
+    try {
+        const { newAccessToken, newRefreshToken } = await refreshLitusTokens(oldRefreshToken);
+        console.log("new access token", newAccessToken);
+        const jwt = await requestJWT(newAccessToken);
+        console.log("new jwt", jwt);
+        await storeOAuthTokens(jwt, newRefreshToken);
+        console.log("tokens stored");
 
-                    if (!frontendApiUrl) {
-                        throw new Error("Error during setting JWT cookie: missing environment variables for OAuth flow");
-                    }
-
-                    const setCookieUrl = frontendApiUrl + "/api/frontend/oauth/set-jwt-cookie"
-
-                    // Put JWT in Http-only cookie for session management
-                    await axios.post(setCookieUrl, { jwt });
-
-                    router.push('/');
-                } catch (error) {
-                    console.error('Error during token exchange:', error);
-                }
-            })();
-        }
-    }, [searchParams, router]);
-
-    return null;
+        return jwt;
+    } catch (error) {
+        console.error('Error during token exchange:', error);
+        return null;
+    }
 };
