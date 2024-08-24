@@ -1,5 +1,5 @@
 import {NextRequest, NextResponse} from 'next/server';
-import {LitusOAuthRefresh} from "@/utils/oauth";
+import {getJWTExpiration, LitusOAuthRefresh, parseJWT} from "@/utils/oauth";
 
 /**
  * Proxy for outgoing request which retrieves the JWT token from http-only cookie and sets it as bearer token in the
@@ -14,42 +14,43 @@ export async function POST(req: NextRequest) {
         const { method, url, body, headers: customHeaders } = await req.json();
 
         const jwt = req.cookies.get('jwt')?.value;
-        const jwtExpiration = req.cookies.get('jwt_expiration')?.value; // In milliseconds
+        const jwtExpirationCookie = req.cookies.get('jwt_expiration')?.value; // Unix timestamp as string
+        let jwtExpiration : number;
 
         const headers = {
             ...customHeaders,
             'Content-Type': 'application/json',
         };
 
-        // Set the JWT token in the authorization header if present
         if (jwt) {
-            if (!jwtExpiration) {
-                console.error('JWT token is missing expiration time');
+            if (!jwtExpirationCookie) {
+                jwtExpiration = getJWTExpiration(jwt);
             }
             else {
-                // Check if JWT is expired
-                if (Date.now() > parseInt(jwtExpiration)) {
-                    const refreshToken = req.cookies.get('litus_refresh')?.value;
-                    if (!refreshToken) {
-                        console.error("no refresh token found");
-                    }
-                    else {
-                        const newJWt = await LitusOAuthRefresh(refreshToken)
-                        if (newJWt) {
-                            console.log("Refreshed jwt", newJWt);
-                            headers['Authorization'] = `Bearer ${newJWt}`;
-                        } else {
-                            console.error("Failed to refresh token");
-                        }
-                    }
+                jwtExpiration = parseInt(jwtExpirationCookie);
+            }
+            // Check if JWT is expired and refresh if necessary
+            // Convert JWT expiration Unix timestamp to number in milliseconds and compare it to current time
+            if (Date.now() > jwtExpiration * 1000) {
+                const refreshToken = req.cookies.get('litus_refresh')?.value;
+                if (!refreshToken) {
+                    throw Error("no refresh token found");
                 }
                 else {
-                    headers['Authorization'] = `Bearer ${jwt}`;
+                    // Retrieve and store new oauth tokens
+                    const newJWt = await LitusOAuthRefresh(refreshToken)
+                    if (newJWt) {
+                        // Set new JWT in header
+                        headers['Authorization'] = `Bearer ${newJWt}`;
+                    } else {
+                        throw Error("Failed to refresh token");
+                    }
                 }
             }
+            else {
+                headers['Authorization'] = `Bearer ${jwt}`;
+            }
         }
-
-        console.log("exit");
 
         // Make request to the actual backend
         const res = await fetch(url, {
@@ -59,8 +60,6 @@ export async function POST(req: NextRequest) {
         });
 
         const data = await res.json();
-
-        console.log(data);
 
         // Forward the exact status code and body to the client
         return new NextResponse(

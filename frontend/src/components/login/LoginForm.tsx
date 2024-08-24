@@ -2,9 +2,11 @@
 
 import Image from 'next/image'
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import LitusOAuthButton from "@/components/login/LitusOAuthButton";
-
+import {initiateLitusOAuthFlow} from "@/utils/oauth";
+import ErrorPage from "@/components/error/ErrorPage";
+import {useRouter} from "next/navigation";
 /**
  * Login form component, displays initial login form with VTK login option and expands
  * when user chooses to log in manually.
@@ -12,11 +14,27 @@ import LitusOAuthButton from "@/components/login/LitusOAuthButton";
  * Should be rendered as full page.
  */
 export default function LoginForm() {
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
+    const [error, setError] = useState<Error>(null);
+
+    const handleLoginClick = (event: { preventDefault: () => void; }) => {
+        event.preventDefault();
+        try {
+            initiateLitusOAuthFlow(router);
+        }
+        catch (err: any) {
+            setError(err);
+        }
+    };
 
     const toggleCollapse = () => {
         setIsOpen(!isOpen);
     };
+
+    if (error) {
+        return <ErrorPage detail={ error.message } />;
+    }
 
     return (
         <>
@@ -36,7 +54,7 @@ export default function LoginForm() {
                         </h2>
                     </div>
 
-                    <LitusOAuthButton />
+                    <LitusOAuthButton loginClickHandler={ handleLoginClick }/>
 
                     <div
                         className="mt-4 w-full max-w-sm font-semibold text-center text-sm leading-6 text-vtk-blue-500 hover:text-vtk-blue-400 cursor-pointer flex items-center justify-center"

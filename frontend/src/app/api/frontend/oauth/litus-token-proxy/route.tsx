@@ -10,8 +10,6 @@ import axios from 'axios';
 export async function POST(req: Request) {
     const body = await req.json();
 
-    console.log("Litus token proxy");
-
     try {
         const response = await axios.post(process.env.NEXT_PUBLIC_LITUS_OAUTH_TOKEN!, body, {
             headers: {
