@@ -2,6 +2,15 @@ import crypto from "crypto";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { ReadonlyURLSearchParams } from "next/navigation";import axios from "axios";
 
+// Helper to retrieve and validate environment variables
+const getEnvVar = (key: string): string => {
+    const value = process.env[key];
+    if (!value) {
+        throw new Error(`Missing environment variable: ${key}`);
+    }
+    return value;
+};
+
 /**
  * Encode binary buffer to base64url
  */
@@ -38,13 +47,9 @@ const generateCodeChallenge = (codeVerifier: string) => {
  * Exchange PCKE code and code verifier for access and refresh tokens from Litus authorization server
  */
 const requestLitusTokens = async (code: string, codeVerifier: string) => {
-    const frontendApiUri = process.env.NEXT_PUBLIC_FRONTEND_API_URL;
-    const clientId = process.env.NEXT_PUBLIC_LITUS_API_KEY;
-    const frontendUri = process.env.NEXT_PUBLIC_FRONTEND_URL
-
-    if (!frontendApiUri || !clientId || !frontendUri) {
-        throw Error("Error during authorization code exchange: missing environment variables for OAuth flow");
-    }
+    const frontendApiUri = getEnvVar('NEXT_PUBLIC_FRONTEND_API_URL');
+    const clientId = getEnvVar('NEXT_PUBLIC_LITUS_API_KEY');
+    const frontendUri = getEnvVar('NEXT_PUBLIC_FRONTEND_URL');
 
     const redirectUri = frontendUri + "/oauth/callback"
     const tokenProxyUri = frontendApiUri + "/api/frontend/oauth/litus-token-proxy"
@@ -68,13 +73,9 @@ const requestLitusTokens = async (code: string, codeVerifier: string) => {
  * Exchange refresh token for new access and refresh tokens from Litus authorization server
  */
 const refreshLitusTokens = async (refreshToken: string) => {
-    const frontendApiUri = process.env.NEXT_PUBLIC_FRONTEND_API_URL;
-    const clientId = process.env.NEXT_PUBLIC_LITUS_API_KEY;
-    const frontendUri = process.env.NEXT_PUBLIC_FRONTEND_URL
-
-    if (!frontendApiUri || !clientId || !frontendUri) {
-        throw Error("Error during authorization code exchange: missing environment variables for OAuth flow");
-    }
+    const frontendApiUri = getEnvVar('NEXT_PUBLIC_FRONTEND_API_URL');
+    const clientId = getEnvVar('NEXT_PUBLIC_LITUS_API_KEY');
+    const frontendUri = getEnvVar('NEXT_PUBLIC_FRONTEND_URL');
 
     const redirectUri = frontendUri + "/oauth/callback"
     const tokenProxyUri = frontendApiUri + "/api/frontend/oauth/litus-token-proxy"
@@ -137,11 +138,7 @@ export const getJWTExpiration = (jwt: string) : number => {
  * Store JWT and Litus refresh token in Http-only cookies for session management
  */
 export const storeOAuthTokens = async (jwt: string, refreshToken?: string) => {
-    const frontendApiUrl = process.env.NEXT_PUBLIC_FRONTEND_API_URL
-
-    if (!frontendApiUrl) {
-        throw Error("Error during setting JWT cookie: missing environment variables for OAuth flow");
-    }
+    const frontendApiUrl = getEnvVar('NEXT_PUBLIC_FRONTEND_API_URL');
 
     const setOAuthCookiesUrl = frontendApiUrl + "/api/frontend/oauth/set-oauth-cookies"
 
@@ -169,13 +166,9 @@ export const initiateLitusOAuthFlow = (router: AppRouterInstance, redirectTo : s
     // Store for later verification of received state
     sessionStorage.setItem('state', state);
 
-    const authorizationUri = process.env.NEXT_PUBLIC_LITUS_OAUTH_AUTHORIZE;
-    const clientId = process.env.NEXT_PUBLIC_LITUS_API_KEY;
-    const frontendUri = process.env.NEXT_PUBLIC_FRONTEND_URL
-
-    if (!authorizationUri || !clientId || !frontendUri) {
-        throw Error("Error during Litus authorization redirect: missing environment variables for OAuth flow");
-    }
+    const authorizationUri = getEnvVar('NEXT_PUBLIC_LITUS_OAUTH_AUTHORIZE');
+    const clientId = getEnvVar('NEXT_PUBLIC_LITUS_API_KEY');
+    const frontendUri = getEnvVar('NEXT_PUBLIC_FRONTEND_URL');
 
     const redirectUri = frontendUri + "/oauth/callback"
 
