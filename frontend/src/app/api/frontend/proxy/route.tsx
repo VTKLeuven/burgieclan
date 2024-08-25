@@ -3,6 +3,21 @@ import {getJWTExpiration, LitusOAuthRefresh} from "@/utils/oauth";
 import {AddOAuthCookies} from "@/app/api/frontend/oauth/set-oauth-cookies/route";
 
 /**
+ * Redirects the user to the login page with the initial URL as redirectTo parameter.
+ */
+const redirectToLoginResponse = (req : NextRequest) => {
+    const referer = req.headers.get('referer');
+
+    // Redirect back to referer or the root URL if no referer is set
+    const redirectTo = referer ? encodeURIComponent(referer) : '/';
+
+    // Use origin because redirect expects absolute URL
+    const origin = req.nextUrl.origin;
+
+    return NextResponse.redirect(`${origin}/login?redirectTo=${redirectTo}`, 307);
+}
+
+/**
  * Proxy for outgoing request which retrieves the JWT token from http-only cookie and sets it as bearer token in the
  * authorization header before executing the request.
  *
@@ -39,16 +54,14 @@ export async function POST(req: NextRequest) {
             if (Date.now() > jwtExpiration * 1000) {
 
                 if (!refreshToken) {
-                    // TODO: login required (refresh token not available)
-                    throw Error("No refresh token found");
+                    return redirectToLoginResponse(req);
                 }
 
                 // Retrieve and store new oauth tokens
                 const { newJwt, newRefreshToken } = await LitusOAuthRefresh(refreshToken);
 
                 if (!newJwt || !newRefreshToken) {
-                    // TODO: login required (error occurred, possibly refresh token expired)
-                    throw Error("Failed to refresh token");
+                    return redirectToLoginResponse(req);
                 }
 
                 jwt = newJwt;

@@ -153,16 +153,20 @@ export const getJWTExpiration = (jwt: string) : number => {
  * Redirects the user to Litus where he should authenticate himself, after which the Litus authentication server
  * redirects back to the callback url
  */
-export const initiateLitusOAuthFlow = (router: AppRouterInstance) => {
+export const initiateLitusOAuthFlow = (router: AppRouterInstance, redirectTo : string) => {
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = generateCodeChallenge(codeVerifier);
 
+    // Store for later verification of received code
     sessionStorage.setItem('code_verifier', codeVerifier);
 
-    // store for later use
-    const state = crypto.randomBytes(16).toString('hex');
+    const randomState = crypto.randomBytes(16).toString('hex');
+    const state = JSON.stringify({
+        state: randomState,
+        redirectTo: redirectTo,
+    })
 
-    // store for later verification of received state
+    // Store for later verification of received state
     sessionStorage.setItem('state', state);
 
     const authorizationUri = process.env.NEXT_PUBLIC_LITUS_OAUTH_AUTHORIZE;
@@ -182,7 +186,7 @@ export const initiateLitusOAuthFlow = (router: AppRouterInstance) => {
         redirect_uri: redirectUri,
         code_challenge: codeChallenge,
         code_challenge_method: 'S256',
-        state: state,
+        state: encodeURIComponent(state),
     });
     const authUrl = `${authorizationUri}?${params.toString()}`;
 
@@ -201,7 +205,8 @@ export const LitusOAuthCallback = async (router : AppRouterInstance, searchParam
         throw Error('Code verifier is missing.');
     }
 
-    const state = searchParams.get('state');
+    const encodedState = searchParams.get('state');
+    const state = encodedState ? decodeURIComponent(encodedState) : null;
     const storedState = sessionStorage.getItem('state');
 
     if (state !== storedState) {
@@ -214,7 +219,10 @@ export const LitusOAuthCallback = async (router : AppRouterInstance, searchParam
             const jwt = await requestJWT(accessToken);
             await storeOAuthTokens(jwt, refreshToken);
 
-            router.push('/');
+            // Redirect to the redirect URL from the state parameter
+            const parsedState = JSON.parse(storedState);
+            const redirectTo = (parsedState && parsedState.redirectTo) ? parsedState.redirectTo : '/';
+            router.push(redirectTo);
         } catch (error) {
             throw Error(error.message);
         }

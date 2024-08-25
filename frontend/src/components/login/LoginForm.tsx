@@ -6,7 +6,8 @@ import React, { useState } from 'react';
 import LitusOAuthButton from "@/components/login/LitusOAuthButton";
 import {initiateLitusOAuthFlow} from "@/utils/oauth";
 import ErrorPage from "@/components/error/ErrorPage";
-import {useRouter} from "next/navigation";
+import {ReadonlyURLSearchParams, useRouter} from "next/navigation";
+import { useSearchParams } from 'next/navigation'
 /**
  * Login form component, displays initial login form with VTK login option and expands
  * when user chooses to log in manually.
@@ -15,13 +16,17 @@ import {useRouter} from "next/navigation";
  */
 export default function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams()
+
     const [isOpen, setIsOpen] = useState(false);
     const [error, setError] = useState<Error>(null);
+
+    const redirectTo = searchParams.get('redirectTo') || '/';
 
     const handleLoginClick = (event: { preventDefault: () => void; }) => {
         event.preventDefault();
         try {
-            initiateLitusOAuthFlow(router);
+            initiateLitusOAuthFlow(router, decodeURIComponent(redirectTo));
         }
         catch (err: any) {
             setError(err);
