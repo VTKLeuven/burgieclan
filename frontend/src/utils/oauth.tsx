@@ -1,20 +1,12 @@
 import crypto from "crypto";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { ReadonlyURLSearchParams } from "next/navigation";import axios from "axios";
-
-// Helper to retrieve and validate environment variables
-const getEnvVar = (key: string): string => {
-    const value = process.env[key];
-    if (!value) {
-        throw new Error(`Missing environment variable: ${key}`);
-    }
-    return value;
-};
+import { ReadonlyURLSearchParams } from "next/navigation";
+import axios from "axios";
 
 /**
  * Encode binary buffer to base64url
  */
-function base64URLEncode(buffer : crypto.BinaryLike) {
+function base64URLEncode(buffer: crypto.BinaryLike) {
     // @ts-ignore
     return buffer.toString("base64")
         .replace(/\+/g, '-')
@@ -44,54 +36,70 @@ const generateCodeChallenge = (codeVerifier: string) => {
 };
 
 /**
+ * Make a POST request for tokens from the Litus authorization server
+ */
+const requestTokens = async (data: Record<string, string>) => {
+    const frontendApiUri = process.env.NEXT_PUBLIC_FRONTEND_API_URL;
+
+    if (!frontendApiUri) {
+        throw new Error("Failed to make token request: FRONTEND_API_URL is not defined.");
+    }
+
+    const tokenProxyUri = `${frontendApiUri}/api/frontend/oauth/litus-token-proxy`;
+
+    try {
+        const response = await axios.post(tokenProxyUri, data);
+        return {
+            accessToken: response.data.access_token,
+            refreshToken: response.data.refresh_token
+        };
+    } catch (error) {
+        throw new Error(`Token request failed: ${error.response?.data?.message || error.message}`);
+    }
+};
+
+/**
  * Exchange PCKE code and code verifier for access and refresh tokens from Litus authorization server
  */
-const requestLitusTokens = async (code: string, codeVerifier: string) => {
-    const frontendApiUri = getEnvVar('NEXT_PUBLIC_FRONTEND_API_URL');
-    const clientId = getEnvVar('NEXT_PUBLIC_LITUS_API_KEY');
-    const frontendUri = getEnvVar('NEXT_PUBLIC_FRONTEND_URL');
+export const requestLitusTokens = async (code: string, codeVerifier: string) => {
+    const clientId = process.env.NEXT_PUBLIC_LITUS_API_KEY;
+    const frontendUri = process.env.NEXT_PUBLIC_FRONTEND_URL;
 
-    const redirectUri = frontendUri + "/oauth/callback"
-    const tokenProxyUri = frontendApiUri + "/api/frontend/oauth/litus-token-proxy"
+    if (!clientId || !frontendUri) {
+        throw new Error("Authorization request failed: Missing LITUS_API_KEY or FRONTEND_URL.");
+    }
 
-    // Request access and refresh tokens from Litus via proxy endpoint
-    const response = await axios.post(tokenProxyUri, {
+    const redirectUri = `${frontendUri}/oauth/callback`;
+
+    return requestTokens({
         grant_type: 'authorization_code',
         code,
         client_id: clientId,
         redirect_uri: redirectUri,
         code_verifier: codeVerifier,
     });
-
-    return {
-        accessToken: response.data.access_token,
-        refreshToken: response.data.refresh_token
-    };
 };
 
 /**
  * Exchange refresh token for new access and refresh tokens from Litus authorization server
  */
-const refreshLitusTokens = async (refreshToken: string) => {
-    const frontendApiUri = getEnvVar('NEXT_PUBLIC_FRONTEND_API_URL');
-    const clientId = getEnvVar('NEXT_PUBLIC_LITUS_API_KEY');
-    const frontendUri = getEnvVar('NEXT_PUBLIC_FRONTEND_URL');
+export const refreshLitusTokens = async (refreshToken: string) => {
+    const clientId = process.env.NEXT_PUBLIC_LITUS_API_KEY;
+    const frontendUri = process.env.NEXT_PUBLIC_FRONTEND_URL;
 
-    const redirectUri = frontendUri + "/oauth/callback"
-    const tokenProxyUri = frontendApiUri + "/api/frontend/oauth/litus-token-proxy"
+    if (!clientId || !frontendUri) {
+        throw new Error("Token refresh failed: Missing LITUS_API_KEY or FRONTEND_URL.");
+    }
 
-    const response = await axios.post(tokenProxyUri, {
+    const redirectUri = `${frontendUri}/oauth/callback`;
+
+    return requestTokens({
         grant_type: 'refresh_token',
         refresh_token: refreshToken,
         client_id: clientId,
         redirect_uri: redirectUri,
     });
-
-    return {
-        newAccessToken: response.data.access_token,
-        newRefreshToken: response.data.refresh_token
-    };
-}
+};
 
 /**
  * Exchange Litus access token for JWT from backend
@@ -100,57 +108,76 @@ const requestJWT = async (accessToken: string) => {
     const backendAuthUrl = process.env.NEXT_PUBLIC_BURGIECLAN_BACKEND_AUTH;
 
     if (!backendAuthUrl) {
-        throw Error("Error during JWT exchange: missing environment variables for OAuth flow");
+        throw new Error("JWT request failed: BACKEND_AUTH_URL is not defined.");
     }
 
-    const response = await axios.post(backendAuthUrl, {
-        accessToken: accessToken
-    }, {
-        headers: {
-            'accept': 'application/ld+json',
-            'Content-Type': 'application/ld+json'
-        }
-    });
-
-    return response.data.token;
+    try {
+        const response = await axios.post(backendAuthUrl, { accessToken }, {
+            headers: {
+                'Accept': 'application/ld+json',
+                'Content-Type': 'application/ld+json'
+            }
+        });
+        return response.data.token;
+    } catch (error) {
+        throw new Error(`Failed to exchange access token for JWT: ${error.response?.data?.message || error.message}`);
+    }
 };
 
 /**
  * Decode and parse JWT
  */
-const parseJWT = (jwt: string) : string => {
-    const base64Url = jwt.split('.')[1];
-    const base64Str = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = atob(base64Str);
-
-    return JSON.parse(jsonPayload);
+const parseJWT = (jwt: string): string => {
+    try {
+        const base64Url = jwt.split('.')[1];
+        const base64Str = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = atob(base64Str);
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        throw new Error("Failed to parse JWT: Invalid token format.");
+    }
 };
 
 /**
  * Returns the expiration time of a JWT as Unix timestamp
  */
-export const getJWTExpiration = (jwt: string) : number => {
+export const getJWTExpiration = (jwt: string): number => {
     const parsedJWT = parseJWT(jwt);
     return parsedJWT?.exp;
-}
+};
 
 /**
  * Store JWT and Litus refresh token in Http-only cookies for session management
  */
 export const storeOAuthTokens = async (jwt: string, refreshToken?: string) => {
-    const frontendApiUrl = getEnvVar('NEXT_PUBLIC_FRONTEND_API_URL');
+    const frontendApiUrl = process.env.NEXT_PUBLIC_FRONTEND_API_URL;
 
-    const setOAuthCookiesUrl = frontendApiUrl + "/api/frontend/oauth/set-oauth-cookies"
+    if (!frontendApiUrl) {
+        throw new Error("Failed to store tokens: FRONTEND_API_URL is not defined.");
+    }
 
-    // Store cookies via server-side API endpoint because client-side can't set Http-only cookies
-    await axios.post(setOAuthCookiesUrl, { jwt, refreshToken });
-}
+    const setOAuthCookiesUrl = `${frontendApiUrl}/api/frontend/oauth/set-oauth-cookies`;
+
+    try {
+        await axios.post(setOAuthCookiesUrl, { jwt, refreshToken });
+    } catch (error) {
+        throw new Error(`Failed to store tokens in cookies: ${error.response?.data?.message || error.message}`);
+    }
+};
 
 /**
- * Redirects the user to Litus where he should authenticate himself, after which the Litus authentication server
- * redirects back to the callback url
+ * Redirects the user to Litus where they should authenticate, after which the Litus authentication server
+ * redirects back to the callback url.
  */
-export const initiateLitusOAuthFlow = (router: AppRouterInstance, redirectTo : string) => {
+export const initiateLitusOAuthFlow = (router: AppRouterInstance, redirectTo: string) => {
+    const clientId = process.env.NEXT_PUBLIC_LITUS_API_KEY;
+    const frontendUri = process.env.NEXT_PUBLIC_FRONTEND_URL;
+    const authorizationUri = process.env.NEXT_PUBLIC_LITUS_OAUTH_AUTHORIZE;
+
+    if (!clientId || !frontendUri || !authorizationUri) {
+        throw new Error("OAuth flow initiation failed: Missing environment variables.");
+    }
+
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = generateCodeChallenge(codeVerifier);
 
@@ -161,79 +188,64 @@ export const initiateLitusOAuthFlow = (router: AppRouterInstance, redirectTo : s
     const state = JSON.stringify({
         state: randomState,
         redirectTo: redirectTo,
-    })
+    });
 
     // Store for later verification of received state
     sessionStorage.setItem('state', state);
-
-    const authorizationUri = getEnvVar('NEXT_PUBLIC_LITUS_OAUTH_AUTHORIZE');
-    const clientId = getEnvVar('NEXT_PUBLIC_LITUS_API_KEY');
-    const frontendUri = getEnvVar('NEXT_PUBLIC_FRONTEND_URL');
-
-    const redirectUri = frontendUri + "/oauth/callback"
 
     const params = new URLSearchParams({
         scope: 'openid profile email',
         response_type: 'code',
         client_id: clientId,
-        redirect_uri: redirectUri,
+        redirect_uri: `${frontendUri}/oauth/callback`,
         code_challenge: codeChallenge,
         code_challenge_method: 'S256',
         state: encodeURIComponent(state),
     });
     const authUrl = `${authorizationUri}?${params.toString()}`;
-
     router.push(authUrl);
-}
+};
 
 /**
- * Provides functionality for callback url, where the Litus authentication server redirects to after successful user
- * login. Retrieves access token and JWT and sets it as cookie for future requests.
+ * Handles OAuth callback, exchanges code for tokens, and stores them
  */
-export const LitusOAuthCallback = async (router : AppRouterInstance, searchParams : ReadonlyURLSearchParams): null => {
+export const LitusOAuthCallback = async (router: AppRouterInstance, searchParams: ReadonlyURLSearchParams): Promise<null> => {
     const code = searchParams.get('code');
     const codeVerifier = sessionStorage.getItem('code_verifier');
-
-    if (!codeVerifier) {
-        throw Error('Code verifier is missing.');
-    }
-
     const encodedState = searchParams.get('state');
-    const state = encodedState ? decodeURIComponent(encodedState) : null;
     const storedState = sessionStorage.getItem('state');
 
-    if (state !== storedState) {
-        throw Error('State mismatch: potential CSRF attack.');
-    }
+    if (!codeVerifier) throw new Error('OAuth callback failed: Code verifier is missing.');
+    if (!encodedState || encodedState !== storedState) throw new Error('OAuth callback failed: State mismatch, possible CSRF attack.');
 
     if (code && codeVerifier) {
         try {
             // Retrieve and store OAuth tokens
-            const {accessToken, refreshToken} = await requestLitusTokens(code, codeVerifier);
+            const { accessToken, refreshToken } = await requestLitusTokens(code, codeVerifier);
             const jwt = await requestJWT(accessToken);
             await storeOAuthTokens(jwt, refreshToken);
 
             // Redirect to the redirect URL from the state parameter
-            const parsedState = JSON.parse(storedState);
-            const redirectTo = (parsedState && parsedState.redirectTo) ? parsedState.redirectTo : '/';
+            const parsedState = JSON.parse(storedState || '{}');
+            const redirectTo = parsedState.redirectTo || '/';
             router.push(redirectTo);
         } catch (error) {
-            throw Error(error.message);
+            throw new Error(`OAuth callback failed: ${error.message}`);
         }
     }
+
+    return null;
 };
 
 /**
- * Refreshes JWT by exchanging the old Litus refresh token for new Litus access and refresh tokens and then exchanging
- * the new access token for a new JWT from the backend.
- * */
+ * Refreshes JWT by exchanging the old Litus refresh token for new tokens.
+ */
 export const LitusOAuthRefresh = async (oldRefreshToken: string): Promise<{ newJwt: string; newRefreshToken: string }> => {
     try {
         const { newAccessToken, newRefreshToken } = await refreshLitusTokens(oldRefreshToken);
         const newJwt = await requestJWT(newAccessToken);
-
         return { newJwt, newRefreshToken };
     } catch (error) {
-        throw Error(error.message);
+        throw new Error(`Token refresh failed: ${error.message}`);
     }
 };
