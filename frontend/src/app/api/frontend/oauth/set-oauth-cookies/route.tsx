@@ -18,7 +18,8 @@ export const AddOAuthCookies = (response : NextResponse, jwt: string, refreshTok
         sameSite: 'strict',
     });
 
-    // Set JWT expiration time cookie
+    // Set JWT expiration time http-only cookie
+    // Stored separately so we don't have to do the decoding at every request to check if the JWT is expired
     response.cookies.set({
         name: 'jwt_expiration',
         value: expirationTime.toString(), // Store the JWT expiration Unix timestamp as a string
@@ -28,7 +29,7 @@ export const AddOAuthCookies = (response : NextResponse, jwt: string, refreshTok
         sameSite: 'strict',
     });
 
-    // Set Litus refresh token
+    // Set Litus refresh token http-only cookie
     if (refreshToken) {
         response.cookies.set({
             name: 'litus_refresh',
