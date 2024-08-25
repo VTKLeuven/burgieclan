@@ -2,7 +2,6 @@
 
 import { ApiClient } from "@/utils/api";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { ApiClientError } from "@/utils/api";
 import ErrorPage from "@/components/error/ErrorPage";
 

@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import {ReadonlyURLSearchParams} from "next/navigation";import axios from "axios";
+import { ReadonlyURLSearchParams } from "next/navigation";import axios from "axios";
 
 /**
  * Encode binary buffer to base64url
@@ -115,22 +115,6 @@ const requestJWT = async (accessToken: string) => {
 };
 
 /**
- * Store JWT and Litus refresh token in Http-only cookies for session management
- */
-const storeOAuthTokens = async (jwt: string, refreshToken: string) => {
-    const frontendApiUrl = process.env.NEXT_PUBLIC_FRONTEND_API_URL
-
-    if (!frontendApiUrl) {
-        throw Error("Error during setting JWT cookie: missing environment variables for OAuth flow");
-    }
-
-    const setOAuthCookiesUrl = frontendApiUrl + "/api/frontend/oauth/set-oauth-cookies"
-
-    // Store cookies via server-side API endpoint because client-side can't set Http-only cookies
-    await axios.post(setOAuthCookiesUrl, { jwt, refreshToken });
-}
-
-/**
  * Decode and parse JWT
  */
 const parseJWT = (jwt: string) : string => {
@@ -147,6 +131,22 @@ const parseJWT = (jwt: string) : string => {
 export const getJWTExpiration = (jwt: string) : number => {
     const parsedJWT = parseJWT(jwt);
     return parsedJWT?.exp;
+}
+
+/**
+ * Store JWT and Litus refresh token in Http-only cookies for session management
+ */
+export const storeOAuthTokens = async (jwt: string, refreshToken?: string) => {
+    const frontendApiUrl = process.env.NEXT_PUBLIC_FRONTEND_API_URL
+
+    if (!frontendApiUrl) {
+        throw Error("Error during setting JWT cookie: missing environment variables for OAuth flow");
+    }
+
+    const setOAuthCookiesUrl = frontendApiUrl + "/api/frontend/oauth/set-oauth-cookies"
+
+    // Store cookies via server-side API endpoint because client-side can't set Http-only cookies
+    await axios.post(setOAuthCookiesUrl, { jwt, refreshToken });
 }
 
 /**

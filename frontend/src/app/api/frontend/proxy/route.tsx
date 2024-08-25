@@ -1,6 +1,6 @@
-import {NextRequest, NextResponse} from 'next/server';
-import {getJWTExpiration, LitusOAuthRefresh} from "@/utils/oauth";
-import {AddOAuthCookies} from "@/app/api/frontend/oauth/set-oauth-cookies/route";
+import { NextRequest, NextResponse } from 'next/server';
+import { getJWTExpiration, LitusOAuthRefresh } from "@/utils/oauth";
+import { AddOAuthCookies } from "@/app/api/frontend/oauth/set-oauth-cookies/route";
 
 /**
  * Redirects the user to the login page with the initial URL as redirectTo parameter.
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
         return new NextResponse(
             // Error message body in same format as backend errors
             JSON.stringify({ title: 'API proxy error', detail: error.message }),
-        {
+            {
                 status: 500
             }
         );
