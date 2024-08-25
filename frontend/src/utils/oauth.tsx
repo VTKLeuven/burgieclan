@@ -215,6 +215,7 @@ export const LitusOAuthCallback = async (router : AppRouterInstance, searchParam
 
     if (code && codeVerifier) {
         try {
+            // Retrieve and store OAuth tokens
             const {accessToken, refreshToken} = await requestLitusTokens(code, codeVerifier);
             const jwt = await requestJWT(accessToken);
             await storeOAuthTokens(jwt, refreshToken);

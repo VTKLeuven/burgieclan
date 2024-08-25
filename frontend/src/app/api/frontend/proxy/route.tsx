@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getJWTExpiration, LitusOAuthRefresh } from "@/utils/oauth";
-import { AddOAuthCookies } from "@/app/api/frontend/oauth/set-oauth-cookies/route";
+import {NextRequest, NextResponse} from 'next/server';
+import {getJWTExpiration, LitusOAuthRefresh} from "@/utils/oauth";
+import {AddOAuthCookies} from "@/app/api/frontend/oauth/set-oauth-cookies/route";
 
 /**
  * Redirects the user to the login page with the initial URL as redirectTo parameter.
@@ -37,29 +37,34 @@ export async function POST(req: NextRequest) {
 
         let refreshToken = req.cookies.get('litus_refresh')?.value;
 
-        const headers = {
-            ...customHeaders,
-            'Content-Type': 'application/json',
-        };
-
         if (jwt) {
+            // Backend expects content-type when including JWT
+            const headers = {
+                ...customHeaders,
+                'Content-Type': 'application/json',
+            };
+
+            // Retrieve JWT expiration timestamp from cookie or by decoding JWT
             if (!jwtExpirationCookie) {
                 jwtExpiration = getJWTExpiration(jwt);
             }
             else {
                 jwtExpiration = parseInt(jwtExpirationCookie);
             }
+
             // Check if JWT is expired and refresh if necessary
             // Convert JWT expiration Unix timestamp to number in milliseconds and compare it to current time
             if (Date.now() > jwtExpiration * 1000) {
 
+                // If no refresh token is available, redirect to login page
                 if (!refreshToken) {
                     return redirectToLoginResponse(req);
                 }
 
-                // Retrieve and store new oauth tokens
+                // Refresh oauth tokens
                 const { newJwt, newRefreshToken } = await LitusOAuthRefresh(refreshToken);
 
+                // If refresh failed (eg, refresh token expired), redirect to login page
                 if (!newJwt || !newRefreshToken) {
                     return redirectToLoginResponse(req);
                 }
@@ -71,16 +76,15 @@ export async function POST(req: NextRequest) {
             headers['Authorization'] = `Bearer ${jwt}`;
         }
 
-        // Make request to the actual backend
+        // Forward request to the backend
         const res = await fetch(url, {
             method,
             headers,
             body: JSON.stringify(body),
         });
-
         const data = await res.json();
 
-        // Forward received status code and body from backend to client
+        // Forward received status code and body back to client
         const response =  new NextResponse(
             JSON.stringify(data),
             {
@@ -88,15 +92,13 @@ export async function POST(req: NextRequest) {
             }
         );
 
-        const newResponse = jwtUpdated ? AddOAuthCookies(response, jwt, refreshToken) : response
-
-        // If tokens refreshed, set new JWT (and possibly refresh token) in http-only cookies in response to client
-        return newResponse;
+        // If tokens refreshed, store new oauth tokens in http-only cookies in response to client
+        return ( jwtUpdated && jwt ) ? AddOAuthCookies(response, jwt, refreshToken) : response;
 
     } catch (error) {
         // Handle unexpected errors (e.g. network issues)
         return new NextResponse(
-            // Error message body in same format as backend errors
+            // Error message body in same format as backend errors (title, detail and status)
             JSON.stringify({ title: 'API proxy error', detail: error.message }),
             {
                 status: 500
