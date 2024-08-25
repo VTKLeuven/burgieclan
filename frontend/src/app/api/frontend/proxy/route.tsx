@@ -37,13 +37,13 @@ export async function POST(req: NextRequest) {
 
         let refreshToken = req.cookies.get('litus_refresh')?.value;
 
-        if (jwt) {
-            // Backend expects content-type when including JWT
-            const headers = {
-                ...customHeaders,
-                'Content-Type': 'application/json',
-            };
+        // Backend expects content-type when including JWT
+        const headers = {
+            ...customHeaders,
+            'Content-Type': 'application/json',
+        };
 
+        if (jwt) {
             // Retrieve JWT expiration timestamp from cookie or by decoding JWT
             if (!jwtExpirationCookie) {
                 jwtExpiration = getJWTExpiration(jwt);
