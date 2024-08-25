@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
         return new NextResponse(
             // Error message body in same format as backend errors
             JSON.stringify({ title: 'API proxy error', detail: error.message }),
-        {
+            {
                 status: 500
             }
         );
