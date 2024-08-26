@@ -1,10 +1,9 @@
 'use client'
 
-import Image from 'next/image'
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useState } from 'react';
 import LitusOAuthButton from "@/components/login/LitusOAuthButton";
-import Logo from "@/components/branding/Logo";
+import Logo from "@/components/common/Logo";
 import {ApiClient} from "@/utils/api";
 import {useRouter} from "next/navigation";
 import {SetJWTAsCookie} from "@/utils/oauth";

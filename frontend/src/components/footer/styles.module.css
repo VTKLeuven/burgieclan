@@ -1,0 +1,7 @@
+.footerText {
+    @apply text-xs leading-5 text-gray-500
+}
+
+.footerLink {
+    @apply text-xs font-semibold underline leading-5 text-gray-500
+}
