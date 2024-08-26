@@ -1,3 +1,7 @@
+import styles from "./styles.module.css";
+import Link from 'next/link'
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
+
 const navigation = [
     {
         name: 'Facebook',
@@ -53,24 +57,43 @@ const navigation = [
     },
 ]
 
-export default function Footer() {
+const Footer = () => {
     return (
-        <footer className="bg-white">
-            <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
-                <div className="flex justify-center space-x-6 md:order-2">
-                    {navigation.map((item) => (
-                        <a key={item.name} href={item.href} className="text-gray-400 hover:text-gray-500">
-                            <span className="sr-only">{item.name}</span>
-                            <item.icon aria-hidden="true" className="h-6 w-6" />
+        <footer aria-labelledby="footer-heading" className="bg-white">
+            <div className="mx-auto border-t border-gray-900/10 max-w-7xl px-6 py-12 lg:px-8">
+                <div className="md:flex md:items-center md:justify-between">
+
+                    {/* Social Links Section */}
+                    <div className="flex space-x-6 md:order-3  md:mt-0">
+                        {navigation.map((item) => (
+                            <a key={item.name} href={item.href} className="text-gray-400 hover:text-gray-500">
+                                <span className="sr-only">{item.name}</span>
+                                <item.icon aria-hidden="true" className="h-6 w-6"/>
+                            </a>
+                        ))}
+                    </div>
+
+                    {/* Contribution / Issue Reporting Section */}
+                    <div className="mt-2 flex space-x-4 md:order-2  md:mt-0">
+                        <Link href="/support" prefetch={true} className={styles.footerLink}>
+                            Report an issue
+                        </Link>
+                        <p className={styles.footerText}>{" or "}</p>
+                        <a href="https://github.com/VTKLeuven/burgieclan" className={styles.footerLink}>
+                            Contribute on Github<span><ArrowTopRightOnSquareIcon className="h-3 w-3 inline-block ml-0.5 mb-1 text-gray-500" aria-hidden="true" /></span>
                         </a>
-                    ))}
-                </div>
-                <div className="mt-8 md:order-1 md:mt-0">
-                    <p className="text-center text-xs leading-5 text-gray-500">
-                        &copy; 2020 Your Company, Inc. All rights reserved.
-                    </p>
+                    </div>
+
+                    {/* Copyright Section */}
+                    <div>
+                        <p className="mt-2 text-xs leading-5 text-gray-500 md:order-1 md:mt-0">
+                            &copy; 2024 Vlaamse Technische Kring vzw
+                        </p>
+                    </div>
                 </div>
             </div>
         </footer>
     )
 }
+
+export default Footer;
