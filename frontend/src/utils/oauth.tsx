@@ -128,6 +128,22 @@ const exchangeAccessTokenForJWT = async (accessToken: string) => {
 };
 
 /**
+ * Set JWT as http-only cookie for session management
+ */
+export const SetJWTAsCookie = async (jwt: string): null => {
+    const frontendApiUrl = process.env.NEXT_PUBLIC_FRONTEND_API_URL
+
+    if (!frontendApiUrl) {
+        throw new Error("Error during setting JWT cookie: missing environment variables for OAuth flow");
+    }
+
+    const setCookieUrl = frontendApiUrl + "/api/frontend/oauth/set-jwt-cookie"
+
+    // Put JWT in Http-only cookie for session management
+    await axios.post(setCookieUrl, {jwt});
+}
+
+/**
  * Provides functionality for callback url, where the Litus authentication server redirects to after successful user
  * login. Retrieves access token and JWT and sets it as cookie for future requests.
  */
@@ -162,16 +178,7 @@ export const LitusOAuthCallback = (): null => {
                     const accessToken = await exchangeAuthorizationCode(code, codeVerifier);
                     const jwt = await exchangeAccessTokenForJWT(accessToken);
 
-                    const frontendApiUrl = process.env.NEXT_PUBLIC_FRONTEND_API_URL
-
-                    if (!frontendApiUrl) {
-                        throw new Error("Error during setting JWT cookie: missing environment variables for OAuth flow");
-                    }
-
-                    const setCookieUrl = frontendApiUrl + "/api/frontend/oauth/set-jwt-cookie"
-
-                    // Put JWT in Http-only cookie for session management
-                    await axios.post(setCookieUrl, { jwt });
+                    await SetJWTAsCookie(jwt);
 
                     router.push('/');
                 } catch (error) {
