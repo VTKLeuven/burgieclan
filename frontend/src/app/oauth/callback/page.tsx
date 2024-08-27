@@ -2,7 +2,7 @@
 
 import {LitusOAuthCallback} from "@/utils/oauth";
 import {Suspense} from "react";
-import LoadingPage from "@/components/common/LoadingPage";
+import LoadingPage from "@/components/loading/LoadingPage";
 
 export default function OAuthCallbackPage() {
     return (
