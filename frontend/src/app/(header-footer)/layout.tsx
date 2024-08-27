@@ -4,6 +4,7 @@ import "@/app/globals.css";
 import React, {useEffect, useState} from "react";
 import Header from "@/components/header/Header";
 import {hasJwt} from "@/utils/oauth";
+import Footer from "@/components/footer/Footer";
 
 export default function HeaderLayout({children,}: Readonly<{ children: React.ReactNode }>) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -24,8 +25,13 @@ export default function HeaderLayout({children,}: Readonly<{ children: React.Rea
 
     return (
         <>
-            <Header isAuthenticated={isAuthenticated} />
-            {children}
+            <div className="flex h-full flex-col min-h-full">
+                <Header isAuthenticated={isAuthenticated} />
+                <div className="grow">
+                    {children}
+                </div>
+                <Footer />
+            </div>
         </>
     );
 }

@@ -40,7 +40,7 @@ export default function Header({ isAuthenticated }) {
 
     return (
         <header className="bg-white">
-            <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
+            <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between border-b border-gray-900/10 p-6 lg:px-8">
 
                 {/* Logo and search */}
                 <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
