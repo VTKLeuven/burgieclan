@@ -18,6 +18,8 @@ export default function Header({ isAuthenticated }) {
 
     /**
      * Ctrl+F or Cmd+F to focus on search input (not in mobile mode)
+     *
+     * TODO: change to ctrl+K/cmd+k and open search popup (solve in BUR-75)
      */
     useEffect(() => {
         const handleKeydown = (event: KeyboardEvent) => {
@@ -73,6 +75,7 @@ export default function Header({ isAuthenticated }) {
                         </a>
                     ))}
                     {/* Mobile menu toggle button */}
+                    {/*TODO: move logic to global state (redux or react context)*/}
                     {isAuthenticated ?
                         <a href="profile" className="text-sm font-semibold leading-6 text-gray-900">
                             Profile <span aria-hidden="true">&rarr;</span>
