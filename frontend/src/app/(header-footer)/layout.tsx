@@ -13,10 +13,9 @@ export default function HeaderLayout({children,}: Readonly<{ children: React.Rea
         const checkAuthentication = async () => {
             try {
                 const authenticated = await hasJwt();
-                console.log("authenticated", authenticated);
                 setIsAuthenticated(authenticated);
             } catch (error) {
-                console.error('Error checking authentication status:', error);
+                throw Error('Error checking authentication status:', error);
             }
         };
 
