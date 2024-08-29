@@ -1,7 +1,7 @@
 'use client'
 
 import {LitusOAuthCallback} from "@/utils/oauth";
-import React, {Suspense, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useRouter, useSearchParams} from "next/navigation";
 import ErrorPage from "@/components/error/ErrorPage";
 import LoadingPage from "@/components/common/LoadingPage";
@@ -33,10 +33,6 @@ export default function OAuthCallbackPage() {
     }
 
     return (
-        // useSearchParams() needs to be wrapped in Suspense boundary
-        // (https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout)
-        <Suspense>
-            <LoadingPage />
-        </Suspense>
+        <LoadingPage />
     );
 }
