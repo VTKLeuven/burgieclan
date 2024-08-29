@@ -6,7 +6,7 @@ import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import LitusOAuthButton from "@/components/login/LitusOAuthButton";
 
 // Logic
-import React, {FormEventHandler, useState} from 'react';
+import React, {useState} from 'react';
 import {initiateLitusOAuthFlow, storeOAuthTokens} from "@/utils/oauth";
 import ErrorPage from "@/components/error/ErrorPage";
 import { useRouter } from "next/navigation";
