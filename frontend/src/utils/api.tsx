@@ -58,7 +58,7 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, he
     } catch (error: any) {
         // Network or other unexpected error
         if (!error.status) {
-                const unexpectedError: ApiClientError = {
+            const unexpectedError: ApiClientError = {
                 title: 'Unexpected error',
                 detail: 'Please try again later',
                 status: '',

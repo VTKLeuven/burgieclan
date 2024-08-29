@@ -1,7 +1,10 @@
 import Image from "next/image";
 
+interface LitusOAuthButtonProps {
+    loginClickHandler: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}
 
-const LitusOAuthButton = ({ loginClickHandler }) => {
+const LitusOAuthButton = ({ loginClickHandler } : LitusOAuthButtonProps) => {
     return (
         <div className="mt-10 w-full max-w-sm">
             <button

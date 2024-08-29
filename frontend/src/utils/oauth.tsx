@@ -2,6 +2,12 @@ import crypto from "crypto";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { ReadonlyURLSearchParams } from "next/navigation";
 import axios from "axios";
+import {NextResponse} from "next/server";
+
+interface JWTPayload {
+    exp: number;
+    [key: string]: any; // Allows other attributes of any type
+}
 
 /**
  * Encode binary buffer to base64url
@@ -127,12 +133,17 @@ const requestJWT = async (accessToken: string) => {
 /**
  * Decode and parse JWT
  */
-const parseJWT = (jwt: string): string => {
+const parseJWT = (jwt: string): JWTPayload => {
     try {
         const base64Url = jwt.split('.')[1];
         const base64Str = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = atob(base64Str);
-        return JSON.parse(jsonPayload);
+        const decodedPayload = atob(base64Str);
+        const parsedPayload = JSON.parse(decodedPayload);
+        if (typeof(parsedPayload.exp) !== 'number') {
+            throw new Error("Failed to parse JWT: Expiration time is missing.");
+        }
+
+        return parsedPayload;
     } catch (error) {
         throw new Error("Failed to parse JWT: Invalid token format.");
     }
@@ -164,6 +175,52 @@ export const storeOAuthTokens = async (jwt: string, refreshToken?: string) => {
         throw new Error(`Failed to store tokens in cookies: ${error.response?.data?.message || error.message}`);
     }
 };
+
+/**
+ * Add JWT, JWT expiration timestamp and Litus refresh token to a response as http-only cookies
+ */
+export const addOAuthCookiesToResponse = (response : NextResponse, jwt: string, refreshToken?: string) => {
+    const expirationTime = getJWTExpiration(jwt);
+
+    if (!expirationTime) {
+        return NextResponse.json({ error: 'JWT token is missing expiration time' }, { status: 400 });
+    }
+
+    // Set JWT http-only cookie
+    response.cookies.set({
+        name: 'jwt',
+        value: jwt,
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+    });
+
+    // Set JWT expiration time http-only cookie
+    // Stored separately so we don't have to do the decoding at every request to check if the JWT is expired
+    response.cookies.set({
+        name: 'jwt_expiration',
+        value: expirationTime.toString(), // Store the JWT expiration Unix timestamp as a string
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+    });
+
+    // Set Litus refresh token http-only cookie
+    if (refreshToken) {
+        response.cookies.set({
+            name: 'litus_refresh',
+            value: refreshToken,
+            path: '/',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+        });
+    }
+
+    return response;
+}
 
 /**
  * Redirects the user to Litus where they should authenticate, after which the Litus authentication server
