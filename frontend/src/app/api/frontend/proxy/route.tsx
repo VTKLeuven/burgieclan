@@ -1,6 +1,5 @@
 import {NextRequest, NextResponse} from 'next/server';
-import {getJWTExpiration, LitusOAuthRefresh} from "@/utils/oauth";
-import {AddOAuthCookies} from "@/app/api/frontend/oauth/set-oauth-cookies/route";
+import {addOAuthCookiesToResponse, getJWTExpiration, LitusOAuthRefresh} from "@/utils/oauth";
 
 /**
  * Redirects the user to the login page with the initial URL as redirectTo parameter.
@@ -93,7 +92,7 @@ export async function POST(req: NextRequest) {
         );
 
         // If tokens refreshed, store new oauth tokens in http-only cookies in response to client
-        return ( jwtUpdated && jwt ) ? AddOAuthCookies(response, jwt, refreshToken) : response;
+        return ( jwtUpdated && jwt ) ? addOAuthCookiesToResponse(response, jwt, refreshToken) : response;
 
     } catch (error) {
         // Handle unexpected errors (e.g. network issues)

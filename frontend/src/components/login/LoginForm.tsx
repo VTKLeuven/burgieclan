@@ -24,7 +24,7 @@ export default function LoginForm() {
     const searchParams = useSearchParams()
 
     const [isOpen, setIsOpen] = useState(false);
-    const [error, setError] = useState<Error>(null);
+    const [error, setError] = useState<Error | null>(null);
 
     const redirectTo = searchParams.get('redirectTo') || '/';
 
@@ -32,11 +32,11 @@ export default function LoginForm() {
     const [password, setPassword] = useState('');
     const [credentialsError, setCredentialsError] = useState('');
 
-    const toggleCollapse = () => {
+    const toggleCollapse = (): void => {
         setIsOpen(!isOpen);
     };
 
-    const handleOAuthLogin = (event) => {
+    const handleOAuthLogin = (event : React.MouseEvent<HTMLElement>): void => {
         event.preventDefault();
         try {
             initiateLitusOAuthFlow(router, decodeURIComponent(redirectTo));
@@ -46,7 +46,7 @@ export default function LoginForm() {
         }
     };
 
-    const handleCredentialsLogin = (event) => {
+    const handleCredentialsLogin = (event : React.MouseEvent<HTMLElement>): void => {
         // Prevent the form from causing a page reload
         event.preventDefault();
 
