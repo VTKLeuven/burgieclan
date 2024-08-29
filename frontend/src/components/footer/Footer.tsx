@@ -1,6 +1,7 @@
 import styles from "./styles.module.css";
 import Link from 'next/link'
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
+import {useEffect, useState} from "react";
 
 const navigation = [
     {
@@ -58,6 +59,16 @@ const navigation = [
 ]
 
 const Footer = () => {
+    const [currentYear, setCurrentYear] = useState('');
+
+    /**
+     * Get the current year
+     */
+    useEffect(() => {
+        const year = new Date().getFullYear();
+        setCurrentYear(year.toString());
+    }, []);
+
     return (
         <footer aria-labelledby="footer-heading" className="bg-white">
             <div className="mx-auto border-t border-gray-900/10 max-w-7xl px-6 py-12 lg:px-8">
@@ -87,7 +98,7 @@ const Footer = () => {
                     {/* Copyright Section */}
                     <div>
                         <p className="mt-2 text-xs leading-5 text-gray-500 md:order-1 md:mt-0">
-                            &copy; 2024 Vlaamse Technische Kring vzw
+                            &copy; {currentYear} Vlaamse Technische Kring vzw
                         </p>
                     </div>
                 </div>
