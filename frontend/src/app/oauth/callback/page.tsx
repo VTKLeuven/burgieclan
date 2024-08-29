@@ -8,7 +8,7 @@ import ErrorPage from "@/components/error/ErrorPage";
 export default function OAuthCallbackPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [error, setError] = useState<Error>(null);
+    const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
 
