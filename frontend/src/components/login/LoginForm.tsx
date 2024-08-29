@@ -1,13 +1,17 @@
 'use client'
 
+// UI
 import Image from 'next/image'
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
-import React, { useRef, useEffect, useState } from 'react';
 import LitusOAuthButton from "@/components/login/LitusOAuthButton";
-import {ApiClient, ApiClientError} from "@/utils/api";
-import {useRouter} from "next/navigation";
-import {SetJWTAsCookie} from "@/utils/oauth";
-import Logo from "@/components/branding/Logo";
+
+// Logic
+import React, {useState} from 'react';
+import {initiateLitusOAuthFlow, storeOAuthTokens} from "@/utils/oauth";
+import ErrorPage from "@/components/error/ErrorPage";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from 'next/navigation'
+import { ApiClient } from "@/utils/api";
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
@@ -17,38 +21,46 @@ import Logo from "@/components/branding/Logo";
  */
 export default function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams()
 
     const [isOpen, setIsOpen] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const redirectTo = searchParams.get('redirectTo') || '/';
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [credentialsError, setCredentialsError] = useState('');
 
-    const toggleCollapse = () => {
+    const toggleCollapse = (): void => {
         setIsOpen(!isOpen);
     };
 
-    const handleLogin = (event) => {
-        // Prevent the form from causing a page reload
+    const handleOAuthLogin = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
         event.preventDefault();
+        try {
+            initiateLitusOAuthFlow(router, decodeURIComponent(redirectTo));
+        } catch (err: any) {
+            setError(err);
+        }
+    };
 
-        /**
-         * Handles credentials login
-         */
-        const Login = async () => {
-            try {
-                const response = await ApiClient('POST', `/api/auth/login`, {
-                    username: username,
-                    password: password,
-                });
-                await SetJWTAsCookie(response.token);
+    const handleCredentialsLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+        event.preventDefault();
+        try {
+            const response = await ApiClient('POST', `/api/auth/login`, {
+                username: username,
+                password: password,
+            });
+            await storeOAuthTokens(response.token);
+            router.push('/');
+        } catch (err: any) {
+            setCredentialsError(err.detail || 'Bad credentials, please verify that your username/password are correctly set.');
+        }
+    };
 
-                router.push('/');
-            } catch (err: any) {
-                setError(err.detail || 'Bad credentials, please verify that your username/password are correctly set.');
-            }
-        };
-
-        Login();
+    if (error) {
+        return <ErrorPage detail={ error.message } />;
     }
 
     return (
@@ -70,7 +82,7 @@ export default function LoginForm() {
                     </div>
 
                     {/* Handles OAuth login via Litus */}
-                    <LitusOAuthButton />
+                    <LitusOAuthButton loginHandler={ handleOAuthLogin }/>
 
                     <div
                         className="mt-4 w-full max-w-sm font-semibold text-center text-sm leading-6 text-vtk-blue-500 hover:text-vtk-blue-400 cursor-pointer flex items-center justify-center"
@@ -82,7 +94,7 @@ export default function LoginForm() {
                 </div>
                 <div
                     className={`flex flex-col items-center justify-center ${isOpen ? 'h-3/7 pb-2' : 'h-0'} overflow-hidden`}>
-                    <form onSubmit={handleLogin} className="w-full max-w-sm mt-10">
+                    <form onSubmit={ handleCredentialsLogin } className="w-full max-w-sm mt-10">
                         <div>
                             <label htmlFor="username">
                                 <p className="mt-2 text-sm font-medium">Username</p>
@@ -119,8 +131,8 @@ export default function LoginForm() {
                             </div>
                         </div>
 
-                        { error && (
-                            <p className="mt-4 text-sm text-red-600">{ error }</p>
+                        { credentialsError && (
+                            <p className="mt-4 text-sm text-red-600">{ credentialsError }</p>
                         )}
 
                         <div className="mt-5 w-full max-w-sm">
