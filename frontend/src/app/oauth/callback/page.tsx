@@ -1,19 +1,16 @@
 'use client'
 
 import {LitusOAuthCallback} from "@/utils/oauth";
-import React, {Suspense, useEffect, useRef, useState} from "react";
+import React, {Suspense, useEffect, useState} from "react";
 import {useRouter, useSearchParams} from "next/navigation";
 import ErrorPage from "@/components/error/ErrorPage";
 
 export default function OAuthCallbackPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const hasRun = useRef(false);
     const [error, setError] = useState<Error>(null);
 
     useEffect(() => {
-        if (hasRun.current) return;  // Prevent running the effect multiple times
-        hasRun.current = true;
 
         (async () => {
             try {
@@ -36,7 +33,7 @@ export default function OAuthCallbackPage() {
     }
 
     return (
-        <Suspense>
-        </Suspense>
+        // TODO: Add loading page
+        <></>
     );
 }
