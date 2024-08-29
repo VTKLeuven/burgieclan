@@ -1,7 +1,10 @@
 import LoginForm from "@/components/login/LoginForm";
+import {Suspense} from "react";
 
 export default function Page() {
     return (
-        <LoginForm />
+        <Suspense>
+            <LoginForm />
+        </Suspense>
     );
 }

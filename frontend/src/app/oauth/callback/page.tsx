@@ -11,7 +11,6 @@ export default function OAuthCallbackPage() {
     const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
-
         (async () => {
             try {
                 if (!searchParams.has('code')) {
@@ -33,7 +32,10 @@ export default function OAuthCallbackPage() {
     }
 
     return (
-        // TODO: Add loading page
-        <></>
+        // useSearchParams() needs to be wrapped in Suspense boundary
+        // (https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout)
+        <Suspense>
+            {/*TODO: Add loading page*/}
+        </Suspense>
     );
 }
