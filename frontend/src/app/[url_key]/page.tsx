@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiClientError } from "@/utils/api";
 import Loading from "@/app/loading";
+import ErrorPage from "@/components/error/ErrorPage";
 
 /**
  * Displays pages from page management system.
@@ -13,7 +14,6 @@ import Loading from "@/app/loading";
  * from the backend if it exists.
  */
 export default function Page({ params }: { params: any }) {
-    const router = useRouter();
     const { url_key } = params;
 
     const [page, setPage] = useState<any>(null);
@@ -22,42 +22,18 @@ export default function Page({ params }: { params: any }) {
     useEffect(() => {
         const FetchData = async () => {
             try {
-                const res = await ApiClient('GET', `/api/pages/${url_key}`);
-
-                if (res.error) {
-                    setError({ message: res.error.message, status: res.error.code });
-                    return;
-                }
-
-                setPage(res);
+                const result = await ApiClient('GET', `/api/pages/${url_key}`);
+                setPage(result);
             } catch (err: any) {
-                setError({ message: err.message, status: '500' });
+                setError(err);
             }
         };
 
         FetchData();
     }, [url_key]);
 
-    // TODO BUR-110: put in generic wrapper that catches errors from lower levels
-    useEffect(() => {
-        if (error) {
-            if (error.status === '401') {
-                // the page is not public available
-                router.push('/login');
-            } else if (error.status === '404') {
-                // no page with url_key exists
-                router.push('/404');
-            }
-        }
-    }, [error, router]);
-
     if (error) {
-        return (
-            <div>
-                <h1>Error {error.status}</h1>
-                <p>{error.message}</p>
-            </div>
-        );
+        return <ErrorPage status={error.status} />;
     }
 
     if (!page) {

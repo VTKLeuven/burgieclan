@@ -1,6 +1,6 @@
 <?php
 
-namespace App\EventListener;
+namespace App\EventListener\Api;
 
 use App\Entity\User;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
@@ -9,7 +9,6 @@ class JWTCreatedListener
 {
     /**
      * @param JWTCreatedEvent $event
-     *
      * @return void
      */
     public function onJWTCreated(JWTCreatedEvent $event): void
