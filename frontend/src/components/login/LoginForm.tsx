@@ -36,7 +36,7 @@ export default function LoginForm() {
         setIsOpen(!isOpen);
     };
 
-    const handleOAuthLogin = (event: { preventDefault: () => void; }) => {
+    const handleOAuthLogin = (event) => {
         event.preventDefault();
         try {
             initiateLitusOAuthFlow(router, decodeURIComponent(redirectTo));

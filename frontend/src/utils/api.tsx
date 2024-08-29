@@ -34,9 +34,9 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, he
             body: JSON.stringify({method, url, body, headers}),
         });
 
+        // Handle redirect
         if (response.redirected) {
-            // Handle 307 redirect
-            window.location.href = response.url; // Redirect the user to the login page with the redirectTo parameter
+            window.location.href = response.url;
             return;
         }
 
