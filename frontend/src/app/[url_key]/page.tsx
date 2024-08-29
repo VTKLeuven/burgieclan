@@ -1,7 +1,7 @@
 'use client';
 
 import { ApiClient } from "@/utils/api";
-import { useEffect, useState, Suspense} from "react";
+import { useEffect, useState} from "react";
 import { ApiClientError } from "@/utils/api";
 import ErrorPage from "@/components/error/ErrorPage";
 import Loading from "@/app/loading";
