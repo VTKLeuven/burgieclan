@@ -1,8 +1,8 @@
 'use client'
 
 import {useEffect} from "react";
+import axios from "axios";
 import {useRouter} from "next/navigation";
-import {SetJWTAsCookie} from "@/utils/oauth";
 
 /**
  * Component allows for manually storing jwt as a http-only cookie. Can be used later to authenticate requests to the backend.
@@ -14,7 +14,8 @@ export default function Page({ params }: { params: any }) {
     useEffect(() => {
         (async () => {
             try {
-                await SetJWTAsCookie(jwt);
+                // Put JWT in Http-only cookie for session management
+                await axios.post('/api/oauth/set-oauth-cookies', { jwt });
 
                 router.push('/');
             } catch (error) {

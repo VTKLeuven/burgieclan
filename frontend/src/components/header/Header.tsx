@@ -12,9 +12,9 @@ const navigation = [
     { name: 'Overview', href: '#' },
 ];
 
-export default function Header({ isAuthenticated }) {
+export default function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const searchInputRef = useRef(null);
+    const searchInputRef = useRef<HTMLInputElement | null>(null);
 
     /**
      * Ctrl+F or Cmd+F to focus on search input (not in mobile mode)
@@ -29,6 +29,7 @@ export default function Header({ isAuthenticated }) {
 
             if (isCtrlF || isCmdF) {
                 event.preventDefault();
+                if (!searchInputRef.current) return;
                 searchInputRef.current.focus()
             }
         };
@@ -74,10 +75,9 @@ export default function Header({ isAuthenticated }) {
                             {item.name}
                         </a>
                     ))}
-                    {/* Mobile menu toggle button */}
                     {/*TODO: move logic to global state (redux or react context)*/}
                     {isAuthenticated ?
-                        <a href="profile" className="text-sm font-semibold leading-6 text-gray-900">
+                        <a href="account" className="text-sm font-semibold leading-6 text-gray-900">
                             Profile <span aria-hidden="true">&rarr;</span>
                         </a> :
                         <a href="login" className="text-sm font-semibold leading-6 text-gray-900">
@@ -130,12 +130,14 @@ export default function Header({ isAuthenticated }) {
                                 ))}
                             </div>
                             <div className="py-6">
-                                <a
-                                    href="login"
-                                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                                >
-                                    Log in
-                                </a>
+                                {isAuthenticated ?
+                                    <a href="account" className="text-sm font-semibold leading-6 text-gray-900">
+                                        Profile <span aria-hidden="true">&rarr;</span>
+                                    </a> :
+                                    <a href="login" className="text-sm font-semibold leading-6 text-gray-900">
+                                        Login <span aria-hidden="true">&rarr;</span>
+                                    </a>
+                                }
                             </div>
                         </div>
                     </div>
