@@ -6,7 +6,7 @@ import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import LitusOAuthButton from "@/components/login/LitusOAuthButton";
 
 // Logic
-import React, { useState } from 'react';
+import React, {FormEventHandler, useState} from 'react';
 import {initiateLitusOAuthFlow, storeOAuthTokens} from "@/utils/oauth";
 import ErrorPage from "@/components/error/ErrorPage";
 import { useRouter } from "next/navigation";
@@ -36,39 +36,28 @@ export default function LoginForm() {
         setIsOpen(!isOpen);
     };
 
-    const handleOAuthLogin = (event : React.MouseEvent<HTMLElement>): void => {
+    const handleOAuthLogin = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
         event.preventDefault();
         try {
             initiateLitusOAuthFlow(router, decodeURIComponent(redirectTo));
-        }
-        catch (err: any) {
+        } catch (err: any) {
             setError(err);
         }
     };
 
-    const handleCredentialsLogin = (event : React.MouseEvent<HTMLElement>): void => {
-        // Prevent the form from causing a page reload
+    const handleCredentialsLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
-
-        /**
-         * Handles credentials login
-         */
-        const Login = async () => {
-            try {
-                const response = await ApiClient('POST', `/api/auth/login`, {
-                    username: username,
-                    password: password,
-                });
-                await storeOAuthTokens(response.token);
-
-                router.push('/');
-            } catch (err: any) {
-                setCredentialsError(err.detail || 'Bad credentials, please verify that your username/password are correctly set.');
-            }
-        };
-
-        Login();
-    }
+        try {
+            const response = await ApiClient('POST', `/api/auth/login`, {
+                username: username,
+                password: password,
+            });
+            await storeOAuthTokens(response.token);
+            router.push('/');
+        } catch (err: any) {
+            setCredentialsError(err.detail || 'Bad credentials, please verify that your username/password are correctly set.');
+        }
+    };
 
     if (error) {
         return <ErrorPage detail={ error.message } />;
@@ -93,7 +82,7 @@ export default function LoginForm() {
                     </div>
 
                     {/* Handles OAuth login via Litus */}
-                    <LitusOAuthButton loginClickHandler={ handleOAuthLogin }/>
+                    <LitusOAuthButton loginHandler={ handleOAuthLogin }/>
 
                     <div
                         className="mt-4 w-full max-w-sm font-semibold text-center text-sm leading-6 text-vtk-blue-500 hover:text-vtk-blue-400 cursor-pointer flex items-center justify-center"
@@ -105,7 +94,7 @@ export default function LoginForm() {
                 </div>
                 <div
                     className={`flex flex-col items-center justify-center ${isOpen ? 'h-3/7 pb-2' : 'h-0'} overflow-hidden`}>
-                    <form onSubmit={handleCredentialsLogin} className="w-full max-w-sm mt-10">
+                    <form onSubmit={ handleCredentialsLogin } className="w-full max-w-sm mt-10">
                         <div>
                             <label htmlFor="username">
                                 <p className="mt-2 text-sm font-medium">Username</p>

@@ -44,7 +44,7 @@ const generateCodeChallenge = (codeVerifier: string) => {
 /**
  * Make a POST request for tokens from the Litus authorization server
  */
-const requestTokens = async (data: Record<string, string>) => {
+const requestTokens = async (data: Record<string, string>): Promise<{ accessToken: string; refreshToken: string }> => {
     const frontendApiUri = process.env.NEXT_PUBLIC_FRONTEND_API_URL;
 
     if (!frontendApiUri) {
@@ -110,7 +110,7 @@ export const refreshLitusTokens = async (refreshToken: string) => {
 /**
  * Exchange Litus access token for JWT from backend
  */
-const requestJWT = async (accessToken: string) => {
+const requestJWT = async (accessToken: string): Promise<string> => {
     const backendAuthUrl = process.env.NEXT_PUBLIC_BURGIECLAN_BACKEND_AUTH;
 
     if (!backendAuthUrl) {
@@ -299,9 +299,12 @@ export const LitusOAuthCallback = async (router: AppRouterInstance, searchParams
  */
 export const LitusOAuthRefresh = async (oldRefreshToken: string): Promise<{ newJwt: string; newRefreshToken: string }> => {
     try {
-        const { newAccessToken, newRefreshToken } = await refreshLitusTokens(oldRefreshToken);
-        const newJwt = await requestJWT(newAccessToken);
-        return { newJwt, newRefreshToken };
+        const { accessToken, refreshToken } = await refreshLitusTokens(oldRefreshToken);
+        const newJwt = await requestJWT(accessToken);
+        return {
+            newJwt: newJwt,
+            newRefreshToken: refreshToken
+        };
     } catch (error) {
         throw new Error(`Token refresh failed: ${error.message}`);
     }
