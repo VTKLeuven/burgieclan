@@ -3,11 +3,13 @@ import Link from 'next/link'
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import {useEffect, useState} from "react";
 
+type IconProps = React.SVGProps<SVGSVGElement>;
+
 const navigation = [
     {
         name: 'Facebook',
         href: 'https://facebook.com/VTKLeuven',
-        icon: (props) => (
+        icon: (props: IconProps) => (
             <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
                 <path
                     fillRule="evenodd"
@@ -20,7 +22,7 @@ const navigation = [
     {
         name: 'Instagram',
         href: 'https://www.instagram.com/vtkleuven/',
-        icon: (props) => (
+        icon: (props: IconProps) => (
             <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
                 <path
                     fillRule="evenodd"
@@ -33,7 +35,7 @@ const navigation = [
     {
         name: 'YouTube',
         href: 'https://www.youtube.com/user/VTKLeuven',
-        icon: (props) => (
+        icon: (props: IconProps) => (
             <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
                 <path
                     fillRule="evenodd"
@@ -46,7 +48,7 @@ const navigation = [
     {
         name: 'Tiktok',
         href: 'https://www.tiktok.com/@vtkleuven',
-        icon: (props) => (
+        icon: (props: IconProps) => (
             <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
                 <path
                     fillRule="evenodd"
