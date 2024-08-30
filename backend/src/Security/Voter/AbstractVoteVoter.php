@@ -2,14 +2,14 @@
 
 namespace App\Security\Voter;
 
-use App\ApiResource\AbstractCommentApi;
+use App\ApiResource\AbstractVoteApi;
 use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
-class AbstractCommentVoter extends Voter
+class AbstractVoteVoter extends Voter
 {
     public const EDIT = 'EDIT';
     public const DELETE = 'DELETE';
@@ -21,7 +21,7 @@ class AbstractCommentVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::EDIT, self::DELETE]) && $subject instanceof AbstractCommentApi;
+        return in_array($attribute, [self::EDIT, self::DELETE]) && $subject instanceof AbstractVoteApi;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
@@ -31,7 +31,7 @@ class AbstractCommentVoter extends Voter
             return false;
         }
 
-        assert($subject instanceof AbstractCommentApi);
+        assert($subject instanceof AbstractVoteApi);
 
         $creator = $this->microMapper->map($subject->creator, User::class, [
             MicroMapperInterface::MAX_DEPTH => 0,

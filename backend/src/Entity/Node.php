@@ -7,11 +7,18 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\MappedSuperclass]
 #[ORM\HasLifecycleCallbacks]
 abstract class Node
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private User $creator;
@@ -27,6 +34,11 @@ abstract class Node
         $this->creator = $creator;
         $this->createDate = new DateTimeImmutable();
         $this->updateDate = $this->createDate;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 
     public function getCreator(): User

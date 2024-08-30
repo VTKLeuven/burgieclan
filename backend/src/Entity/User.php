@@ -112,12 +112,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinTable(name: 'favorite_user_document')]
     private Collection $favoriteDocuments;
 
+    /**
+     * @var Collection
+     */
+    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: AbstractVote::class, cascade: ['remove'], orphanRemoval: true)]
+    private Collection $votes;
+
     public function __construct()
     {
         $this->favoritePrograms = new ArrayCollection();
         $this->favoriteModules = new ArrayCollection();
         $this->favoriteCourses = new ArrayCollection();
         $this->favoriteDocuments = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -356,5 +363,44 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->favoriteDocuments->removeElement($document);
 
         return $this;
+    }
+
+    public function getVotes(): Collection
+    {
+        return $this->votes;
+    }
+
+    public function addVote(AbstractVote $vote): self
+    {
+        if (!$this->votes->contains($vote)) {
+            $this->votes->add($vote);
+            $vote->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVote(AbstractVote $vote): self
+    {
+        if ($this->votes->removeElement($vote)) {
+            $vote->setCreator(null);
+        }
+
+        return $this;
+    }
+
+    public function getDocumentVotes(): Collection
+    {
+        return $this->votes->filter(fn(AbstractVote $vote) => $vote instanceof DocumentVote);
+    }
+
+    public function getDocumentCommentVotes(): Collection
+    {
+        return $this->votes->filter(fn(AbstractVote $vote) => $vote instanceof DocumentCommentVote);
+    }
+
+    public function getCourseCommentVotes(): Collection
+    {
+        return $this->votes->filter(fn(AbstractVote $vote) => $vote instanceof CourseCommentVote);
     }
 }

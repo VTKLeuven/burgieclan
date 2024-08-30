@@ -5,9 +5,11 @@ namespace App\Controller\Admin;
 use App\Entity\CommentCategory;
 use App\Entity\Course;
 use App\Entity\CourseComment;
+use App\Entity\CourseCommentVote;
 use App\Entity\Document;
 use App\Entity\DocumentCategory;
 use App\Entity\DocumentComment;
+use App\Entity\DocumentCommentVote;
 use App\Entity\Module;
 use App\Entity\Notification;
 use App\Entity\Page;
@@ -71,7 +73,7 @@ class DashboardController extends AbstractDashboardController
             ->setPermission(User::ROLE_ADMIN);
         yield MenuItem::linkToCrud('Courses', 'fa fa-book', Course::class)
             ->setPermission(User::ROLE_ADMIN);
-        yield MenuItem::linkToCrud('Comments', 'far fa-comments', CourseComment::class)
+        MenuItem::linkToCrud('Comments', 'fa-solid fa-comments', CourseComment::class)
             ->setPermission(User::ROLE_ADMIN);
         yield MenuItem::linkToCrud('Categories', 'fas fa-tags', CommentCategory::class)
             ->setPermission(User::ROLE_ADMIN);

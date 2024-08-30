@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\DocumentRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -11,11 +13,6 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 #[ORM\Entity(repositoryClass: DocumentRepository::class)]
 class Document extends Node
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
@@ -36,9 +33,16 @@ class Document extends Node
     #[ORM\Column(nullable: true)]
     private ?string $file_name = null;
 
-    public function getId(): ?int
+    /**
+     * @var Collection
+     */
+    #[ORM\OneToMany(mappedBy: 'document', targetEntity: DocumentVote::class, cascade: ['remove'], orphanRemoval: true)]
+    private Collection $votes;
+
+    public function __construct(User $creator)
     {
-        return $this->id;
+        parent::__construct($creator);
+        $this->votes = new ArrayCollection();
     }
 
     public function getName(): ?string
@@ -119,5 +123,27 @@ class Document extends Node
     public function __toString(): string
     {
         return $this->getName();
+    }
+
+    public function getVotes(): Collection
+    {
+        return $this->votes;
+    }
+
+    public function addVote(DocumentVote $vote): self
+    {
+        if (!$this->votes->contains($vote)) {
+            $this->votes->add($vote);
+        }
+
+        return $this;
+    }
+
+    public function removeVote(DocumentVote $vote): self
+    {
+        if ($this->votes->removeElement($vote)) {
+            $vote->setDocument(null);
+        }
+        return $this;
     }
 }
