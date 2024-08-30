@@ -22,9 +22,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.className} h-full`}>
-      <body className="h-full">
-        {children}
-        <CookieBanner />
+      <body className="flex min-h-full">
+        <div className="w-full">
+          {children}
+          <CookieBanner />
+        </div>
       </body>
     </html>
   );

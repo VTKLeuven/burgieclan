@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import Logo from '@/components/branding/Logo';
+import Logo from '@/components/common/Logo';
 import Input from '@/components/ui/Input';
 
 const navigation = [
@@ -43,7 +43,7 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
 
     return (
         <header className="bg-white">
-            <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
+            <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between border-b border-gray-900/10 p-6 lg:px-8">
 
                 {/* Logo and search */}
                 <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">

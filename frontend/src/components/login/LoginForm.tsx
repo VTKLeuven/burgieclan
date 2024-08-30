@@ -1,9 +1,9 @@
 'use client'
 
 // UI
-import Image from 'next/image'
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import LitusOAuthButton from "@/components/login/LitusOAuthButton";
+import Logo from "@/components/common/Logo";
 
 // Logic
 import React, {useState} from 'react';
@@ -68,14 +68,10 @@ export default function LoginForm() {
             <div className="min-h-screen px-6 py-10 lg:px-8">
                 <div className="flex flex-col items-center justify-center mt-[10vh]">
                     <div className="w-full max-w-sm">
-                        <Image
-                            // TODO: Replace with the actual logo
-                            src="/images/logos/seafile-logo.png"
-                            alt="Burgieclan Logo"
-                            width={100}
-                            height={100}
-                            className="mx-auto"
-                        />
+                        <a href="/">
+                            <span className="sr-only">Burgieclan</span>
+                            <Logo width={100} height={100}/>
+                        </a>
                         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-vtk-blue-500">
                             Sign in to your account
                         </h2>

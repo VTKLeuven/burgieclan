@@ -4,7 +4,7 @@ import {LitusOAuthCallback} from "@/utils/oauth";
 import React, {useEffect, useState} from "react";
 import {useRouter, useSearchParams} from "next/navigation";
 import ErrorPage from "@/components/error/ErrorPage";
-import LoadingPage from "@/components/common/LoadingPage";
+import Loading from "@/app/loading";
 
 export default function OAuthCallbackPage() {
     const router = useRouter();
@@ -33,6 +33,6 @@ export default function OAuthCallbackPage() {
     }
 
     return (
-        <LoadingPage />
+        <Loading />
     );
 }
