@@ -1,10 +1,10 @@
 'use client';
 
 import { ApiClient } from "@/utils/api";
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { ApiClientError } from "@/utils/api";
-import ErrorPage from "@/components/error/ErrorPage";
 import Loading from "@/app/loading";
+import ErrorPage from "@/components/error/ErrorPage";
 
 /**
  * Displays pages from page management system.
@@ -36,7 +36,7 @@ export default function Page({ params }: { params: any }) {
     }
 
     if (!page) {
-        return <Loading/>;
+        return <Loading />;
     }
 
     // the page content is expected to be in html

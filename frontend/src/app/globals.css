@@ -14,6 +14,10 @@ body {
     @apply leading-relaxed m-0 p-0 h-full
 }
 
+a {
+    @apply text-sm font-semibold leading-6 text-gray-900
+}
+
 h1, h2, h3, h4, h5, h6 {
     @apply text-gray-900;
 }
