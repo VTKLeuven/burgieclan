@@ -295,6 +295,14 @@ export const LitusOAuthCallback = async (router: AppRouterInstance, searchParams
 };
 
 /**
+ * Check the presence of a JWT in http-only cookie
+ */
+export const hasJwt = async (): Promise<boolean> => {
+    const response = await axios.post('/api/frontend/oauth/has-jwt');
+    return response.data.isAuthenticated;
+}
+
+/**
  * Refreshes JWT by exchanging the old Litus refresh token for new tokens.
  */
 export const LitusOAuthRefresh = async (oldRefreshToken: string): Promise<{ newJwt: string; newRefreshToken: string }> => {
