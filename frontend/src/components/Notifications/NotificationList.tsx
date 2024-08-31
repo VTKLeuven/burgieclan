@@ -14,21 +14,17 @@ const NotificationList = () => {
 
     const Notification: React.FC<NotificationProps> = ({ title, subtext }) => {
         return (
-            <div className="grid grid-cols-4 gap-2 p-4 h-[100px]">
-                <div className="col-span-1 justify-center items-center p-4">
+            <div className="grid grid-cols-4 gap-2 p-5 h-[100px]">
+                <div className="col-span-1 flex justify-center items-center p-4">
                     <NotificationIcon />
                 </div>
 
                 <div className="col-span-2 grid">
-                    <div className="">
-                        <h4>{title}</h4>
-                    </div>
-                    <div className="mt-0">
-                        {subtext}
-                    </div>
+                    <h4 className="mb-0 text-wireframe-darkestGrey text-xl">{title}</h4>
+                    <p className="mt-0 text-wireframe-midGrey font-roboto text-base">{subtext}</p>
                 </div>
 
-                <div className="col-span-1 p-4">
+                <div className="col-span-1 p-4 flex justify-center items-center">
                     <YellowOpenButton />
                 </div>
             </div>
@@ -36,7 +32,7 @@ const NotificationList = () => {
     };
 
     return (
-        <div className="border border-[#EFF1F7] rounded-md p-4 w-[30%]">
+        <div className="border border-[#EFF1F7] rounded-notificationBorder p-1 w-[30%] m-5">
             <Notification title="Notifications" subtext="Lorem ipsum dolor sit amet"/>
             <Notification title="Notifications" subtext="Lorem ipsum dolor sit amet"/>
             <Notification title="Notifications" subtext="Lorem ipsum dolor sit amet"/>
