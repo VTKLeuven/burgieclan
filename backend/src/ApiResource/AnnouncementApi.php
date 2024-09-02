@@ -10,22 +10,21 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use App\Entity\Notification;
+use App\Entity\Announcement;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
-use DateTime;
 
 #[ApiResource(
-    shortName: 'Notification',
+    shortName: 'Announcement',
     operations: [
         new Get(),
         new GetCollection(),
     ],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
-    stateOptions: new Options(entityClass: Notification::class),
+    stateOptions: new Options(entityClass: Announcement::class),
 )]
-class NotificationApi
+class AnnouncementApi
 {
     #[ApiProperty(readable: false, writable: false, identifier: true)]
     public ?int $id = null;
