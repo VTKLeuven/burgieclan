@@ -7,11 +7,12 @@ import Logo from "@/components/common/Logo";
 
 // Logic
 import React, {useState} from 'react';
-import {initiateLitusOAuthFlow, storeOAuthTokens} from "@/utils/oauth";
+import {initiateLitusOAuthFlow} from "@/utils/oauth";
 import ErrorPage from "@/components/error/ErrorPage";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from 'next/navigation'
 import { ApiClient } from "@/utils/api";
+import {storeOAuthTokens} from "@/actions/oauth";
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
