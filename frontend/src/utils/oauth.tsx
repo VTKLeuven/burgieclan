@@ -2,8 +2,15 @@ import crypto from "crypto";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { ReadonlyURLSearchParams } from "next/navigation";
 import axios from "axios";
-import {NextResponse} from "next/server";
 import {storeOAuthTokens} from "@/actions/oauth";
+
+export class ApiError extends Error {
+    status: number;
+    constructor(message: string, status: number) {
+        super(message);
+        this.status = status;
+    }
+}
 
 interface JWTPayload {
     exp: number;
