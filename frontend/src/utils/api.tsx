@@ -2,11 +2,20 @@
 
 import {proxyRequest} from "@/actions/oauth";
 
-export type ApiClientError = {
-    title: string;
-    detail: string;
-    status: string;
-}
+const handleError = async (response: Response) => {
+    const errorData = await response.json();
+
+    switch (response.status) {
+        case 401:
+            return { error: {message: errorData.message || 'Unauthorized access. Please log in.', status: 401 } };
+        case 404:
+            return { error: {message: errorData.message || 'Resource not found.', status: 404 } };
+        case 500:
+            return { error: {message: errorData.message || 'Internal Server Error. Please try again later.', status: 500 } };
+        default:
+            return { error: {message: errorData.message || 'Unauthorized access. Please log in.', status: response.status } };
+    }
+};
 
 /**
  * API Client for authenticated or unauthenticated requests to the backend server.
@@ -27,18 +36,8 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, he
     const url = backendBaseUrl + endpoint;
 
     try {
-        // Forward every request to the proxy endpoint, which adds the JWT
-        // const response = await fetch(frontendBaseUrl + '/api/frontend/proxy', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({method, url, body, headers}),
-        // });
-
         const response = await proxyRequest(method, url, body, headers);
-
-        console.log(response)
+        console.log(response);
 
         // Handle redirect
         if (response.redirected) {
@@ -47,34 +46,14 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, he
         }
 
         // Handle successful response
-        if (response.ok) {
-            return response.json();
+        if (!response.ok) {
+            return await handleError(response);
         }
 
-        // Handle backend errors
-        const errorData = await response.json();
-        const apiError: ApiClientError = {
-            title: errorData.title || 'An error occurred',
-            detail: errorData.detail || 'An error occurred',
-            status: response.status.toString(),
-        };
-
-        throw apiError;
+        return response.json();
 
     } catch (error: any) {
-        // Network or other unexpected error
-        if (!error.status) {
-            const unexpectedError: ApiClientError = {
-                title: 'Unexpected error',
-                detail: 'Please try again later',
-                status: '',
-            };
-
-            // Re-throw error so that client can handle them
-            throw unexpectedError;
-        }
-
-        // Other backend error
+        console.log("error caught in apiclient", error);
         throw error;
     }
-};
+}
