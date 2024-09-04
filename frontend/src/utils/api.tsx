@@ -1,4 +1,6 @@
-'use client'
+'use server'
+
+import {proxyRequest} from "@/actions/oauth";
 
 export type ApiClientError = {
     title: string;
@@ -14,7 +16,7 @@ export type ApiClientError = {
  * - Backend error response messages
  * Both are encoded in the ApiClientError type for easy handling in the calling component.
  */
-export const ApiClient = async (method: string, endpoint: string, body?: any, headers?: Record<string, string>) => {
+export const ApiClient = async (method: string, endpoint: string, body?: any, headers?: Headers) => {
     const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     const frontendBaseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL;
 
@@ -26,13 +28,17 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, he
 
     try {
         // Forward every request to the proxy endpoint, which adds the JWT
-        const response = await fetch(frontendBaseUrl + '/api/frontend/proxy', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({method, url, body, headers}),
-        });
+        // const response = await fetch(frontendBaseUrl + '/api/frontend/proxy', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({method, url, body, headers}),
+        // });
+
+        const response = await proxyRequest(method, url, body, headers);
+
+        console.log(response)
 
         // Handle redirect
         if (response.redirected) {
