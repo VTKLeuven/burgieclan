@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: PageApiProvider::class,
         ),
         new GetCollection(
+            // Returns all pages with publicAvailable set to true
             provider: PageApiProvider::class,
         )
     ],
