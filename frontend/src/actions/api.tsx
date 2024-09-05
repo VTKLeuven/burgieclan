@@ -3,7 +3,7 @@
 import {proxyRequest} from "@/actions/oauth";
 
 /**
- * Encodes an API error response from the backend server into a serializable format for the frontend.
+ * Encodes an API error response from the backend server into a structured serializable format for the frontend.
  */
 const handleError = async (response: Response) => {
     const errorData = await response.json();
