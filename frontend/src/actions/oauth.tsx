@@ -54,6 +54,12 @@ export const hasJwt = async (): Promise<boolean> => {
     return !!cookies().get('jwt')?.value;
 }
 
+/**
+ * Proxies an outgoing token request to the Litus OAuth server.
+ *
+ * This is done by a Server Action to avoid CORS issues taking place when calling the Litus endpoint directly from the
+ * client.
+ */
 export const proxyTokenRequest = async (body: any): Promise<{ accessToken: string, refreshToken: string }> => {
     if (!process.env.NEXT_PUBLIC_LITUS_OAUTH_TOKEN) {
         throw new Error('Missing environment variable for Litus OAuth token endpoint')
@@ -75,8 +81,8 @@ export const proxyTokenRequest = async (body: any): Promise<{ accessToken: strin
 }
 
 /**
- * Server Action that proxies an outgoing request, retrieves the JWT token from http-only cookie,
- * and sets it as a bearer token in the authorization header before executing the request.
+ * Proxies an outgoing request, retrieves the JWT token from http-only cookie, and sets it as a bearer token in the
+ * authorization header before executing the request.
  *
  * Handles automatic JWT refreshing if it's expired, or redirects to the login page if refresh fails.
  */

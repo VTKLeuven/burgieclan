@@ -1,8 +1,8 @@
 import crypto from "crypto";
-import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
-import {ReadonlyURLSearchParams} from "next/navigation";
 import axios from "axios";
-import {proxyTokenRequest, storeOAuthTokens} from "@/actions/oauth";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { ReadonlyURLSearchParams } from "next/navigation";
+import { proxyTokenRequest, storeOAuthTokens } from "@/actions/oauth";
 
 interface JWTPayload {
     exp: number;
