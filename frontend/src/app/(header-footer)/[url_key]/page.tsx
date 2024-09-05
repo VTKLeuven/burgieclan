@@ -12,7 +12,7 @@ import ErrorPage from "@/components/error/ErrorPage";
  * Each page is identified with a unique url_key. When visiting /[url_key], the page with that url_key is fetched
  * from the backend if it exists.
  */
-export default function Page({ params }: { params: any }) {
+export default function Page({ params }: { params: { url_key: string } }) {
     const { url_key } = params;
 
     const [page, setPage] = useState<any>(null);
