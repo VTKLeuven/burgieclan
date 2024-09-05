@@ -11,7 +11,7 @@ import {initiateLitusOAuthFlow} from "@/utils/oauth";
 import ErrorPage from "@/components/error/ErrorPage";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from 'next/navigation'
-import { ApiClient } from "@/utils/api";
+import { ApiClient } from "@/actions/api";
 import {storeOAuthTokens} from "@/actions/oauth";
 
 /**

@@ -1,10 +1,10 @@
 'use client';
 
-import {ApiClient} from "@/utils/api";
+import {ApiClient} from "@/actions/api";
 import { useEffect, useState } from "react";
 import Loading from "@/app/loading";
 import ErrorPage from "@/components/error/ErrorPage";
-import {ApiError} from "@/utils/oauth";
+import {ApiError} from "@/utils/error/api";
 
 /**
  * Displays pages from page management system.
@@ -16,31 +16,21 @@ export default function Page({ params }: { params: any }) {
     const { url_key } = params;
 
     const [page, setPage] = useState<any>(null);
-    const [error, setError] = useState<{ message: string, status: number } | null>(null);
+    const [error, setError] = useState<ApiError | null>(null);
 
     useEffect(() => {
         const FetchData = async () => {
-            try {
-                const result = await ApiClient('GET', `/api/pages/${url_key}`);
-                if (result.error) {
-                    setError({
-                        message: result.error.message || "test",
-                        status: result.error.status || 500
-                    })
-                }
-                else {
-                    setPage(result);
-                }
-            } catch (err: any) {
-                setError({message: err.message || "test", status: 500});
+            const result = await ApiClient('GET', `/api/pages/${url_key}`);
+            if (result.error) {
+                setError(new ApiError(result.error.message, result.error.status));
             }
+            setPage(result);
         };
 
         FetchData();
     }, [url_key]);
 
     if (error) {
-        console.log("status", error.status);
         return <ErrorPage status={error.status} detail={error.message} />;
     }
 
