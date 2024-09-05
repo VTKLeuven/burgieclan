@@ -4,14 +4,6 @@ import { ReadonlyURLSearchParams } from "next/navigation";
 import axios from "axios";
 import {storeOAuthTokens} from "@/actions/oauth";
 
-export class ApiError extends Error {
-    status: number;
-    constructor(message: string, status: number) {
-        super(message);
-        this.status = status;
-    }
-}
-
 interface JWTPayload {
     exp: number;
     [key: string]: any; // Allows other attributes of any type

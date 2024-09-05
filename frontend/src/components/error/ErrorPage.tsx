@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import { STATUS_CODES } from 'http';
-import {getHttpStatusDescription} from "@/utils/httpStatusDescriptions";
+import {getHttpStatusDescription} from "@/utils/error/httpStatusDescriptions";
 
 /**
  * Displays an error page with a status code, brief standard description and a longer custom description (which is

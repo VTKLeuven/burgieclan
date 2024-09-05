@@ -61,77 +61,61 @@ export const hasJwt = async (): Promise<boolean> => {
  * Handles automatic JWT refreshing if it's expired, or redirects to the login page if refresh fails.
  */
 export const proxyRequest = async (method: string, url: string, body: any, customHeaders?: Headers): Promise<Response> => {
-    try {
-        const cookieStore = cookies();
+    const cookieStore = cookies();
 
-        let jwt = cookieStore.get('jwt')?.value || null;
-        let jwtUpdated = false;
+    let jwt = cookieStore.get('jwt')?.value || null;
+    let jwtUpdated = false;
 
-        const jwtExpirationCookie = cookieStore.get('jwt_expiration')?.value; // Unix timestamp as string
-        let jwtExpiration: number;
+    const jwtExpirationCookie = cookieStore.get('jwt_expiration')?.value; // Unix timestamp as string
+    let jwtExpiration: number;
 
-        let refreshToken = cookieStore.get('litus_refresh')?.value;
+    let refreshToken = cookieStore.get('litus_refresh')?.value;
 
-        const headers = new Headers(customHeaders);
+    const headers = new Headers(customHeaders);
 
-        // Backend expects content-type when including JWT
-        if (!headers.has('Content-Type')) {
-            headers.set('Content-Type', 'application/json');
-        }
-
-        if (jwt) {
-            // Retrieve JWT expiration timestamp from cookie or by decoding JWT
-            if (!jwtExpirationCookie) {
-                jwtExpiration = getJWTExpiration(jwt);
-            } else {
-                jwtExpiration = parseInt(jwtExpirationCookie);
-            }
-
-            // Check if JWT is expired and refresh if necessary
-            if (Date.now() > jwtExpiration * 1000) {
-                // If no refresh token is available, redirect to login page
-                if (!refreshToken) {
-                    redirectToLogin();
-                    return;
-                }
-
-                // Refresh OAuth tokens
-                const { newJwt, newRefreshToken } = await LitusOAuthRefresh(refreshToken);
-
-                // If refresh failed (e.g. refresh token expired), redirect to login page
-                if (!newJwt || !newRefreshToken) {
-                    redirectToLogin();
-                    return;
-                }
-
-                jwt = newJwt;
-                refreshToken = newRefreshToken;
-                jwtUpdated = true;
-            }
-            headers.set('Authorization', `Bearer ${jwt}`);
-        }
-
-        // Forward request to the backend
-        return await fetch(url, {
-            method,
-            headers,
-            body: JSON.stringify(body),
-        });
-
-    } catch (error) {
-        // TODO: test this
-        // Handle unexpected errors (e.g., network issues)
-        const errorData = {
-            status: 500,
-            title: 'Unexpected API Error',
-            detail: error.message || 'An unknown error occurred.',
-        };
-
-        return new Promise((resolve) => new Response(
-            JSON.stringify(errorData),
-            { status: 500 }
-        ));
+    // Backend expects content-type when including JWT
+    if (!headers.has('Content-Type')) {
+        headers.set('Content-Type', 'application/json');
     }
+
+    if (jwt) {
+        // Retrieve JWT expiration timestamp from cookie or by decoding JWT
+        if (!jwtExpirationCookie) {
+            jwtExpiration = getJWTExpiration(jwt);
+        } else {
+            jwtExpiration = parseInt(jwtExpirationCookie);
+        }
+
+        // Check if JWT is expired and refresh if necessary
+        if (Date.now() > jwtExpiration * 1000) {
+            // If no refresh token is available, redirect to login page
+            if (!refreshToken) {
+                redirectToLogin();
+                return;
+            }
+
+            // Refresh OAuth tokens
+            const { newJwt, newRefreshToken } = await LitusOAuthRefresh(refreshToken);
+
+            // If refresh failed (e.g. refresh token expired), redirect to login page
+            if (!newJwt || !newRefreshToken) {
+                redirectToLogin();
+                return;
+            }
+
+            jwt = newJwt;
+            refreshToken = newRefreshToken;
+            jwtUpdated = true;
+        }
+        headers.set('Authorization', `Bearer ${jwt}`);
+    }
+
+    // Forward request to the backend
+    return await fetch(url, {
+        method,
+        headers,
+        body: JSON.stringify(body),
+    });
 }
 
 /**
