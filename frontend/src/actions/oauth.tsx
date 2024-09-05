@@ -54,6 +54,26 @@ export const hasJwt = async (): Promise<boolean> => {
     return !!cookies().get('jwt')?.value;
 }
 
+export const proxyTokenRequest = async (body: any): Promise<{ accessToken: string, refreshToken: string }> => {
+    if (!process.env.NEXT_PUBLIC_LITUS_OAUTH_TOKEN) {
+        throw new Error('Missing environment variable for Litus OAuth token endpoint')
+    }
+
+    const response = await fetch(process.env.NEXT_PUBLIC_LITUS_OAUTH_TOKEN!, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(body).toString(), // Format body as application/x-www-form-urlencoded
+    });
+
+    const responseData = await response.json();
+    return {
+        accessToken: responseData.access_token,
+        refreshToken: responseData.refresh_token,
+    };
+}
+
 /**
  * Server Action that proxies an outgoing request, retrieves the JWT token from http-only cookie,
  * and sets it as a bearer token in the authorization header before executing the request.
@@ -112,8 +132,8 @@ export const proxyRequest = async (method: string, url: string, body: any, custo
 
     // Forward request to the backend
     return await fetch(url, {
-        method,
-        headers,
+        method: method,
+        headers: headers,
         body: JSON.stringify(body),
     });
 }
