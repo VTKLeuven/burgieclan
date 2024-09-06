@@ -21,7 +21,11 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: PageApiProvider::class,
         ),
         new GetCollection(
-            // Returns all pages with publicAvailable set to true
+            openapiContext: [
+                'summary' => 'Retrieves the collection of publicly available Page resources.',
+                'description' => 'Retrieves the collection of publicly available Page resources.'
+            ],
+            paginationEnabled: false,
             provider: PageApiProvider::class,
         )
     ],
