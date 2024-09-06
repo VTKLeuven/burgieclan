@@ -35,7 +35,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class PageApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
+    #[ApiProperty(readable: true, writable: false, identifier: true)]
     #[Assert\NotBlank]
     #[Assert\Length(max: 255)]
     public ?string $urlKey = null;
