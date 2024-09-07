@@ -1,11 +1,4 @@
-/**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
+/* editor.module.css */
 .other h2 {
     font-size: 18px;
     color: #444;
@@ -24,7 +17,7 @@
     list-style-type: none;
 }
 
-.App {
+.app {
     font-family: sans-serif;
     text-align: center;
 }
@@ -37,7 +30,7 @@
     text-align: right;
 }
 
-.editor-container {
+.editorContainer {
     margin: 20px auto 20px auto;
     border-radius: 2px;
     max-width: 600px;
@@ -50,12 +43,12 @@
     border-top-right-radius: 10px;
 }
 
-.editor-inner {
+.editorInner {
     background: #fff;
     position: relative;
 }
 
-.editor-input {
+.editorInput {
     min-height: 150px;
     resize: none;
     font-size: 15px;
@@ -67,7 +60,7 @@
     caret-color: #444;
 }
 
-.editor-placeholder {
+.editorPlaceholder {
     color: #999;
     overflow: hidden;
     position: absolute;
@@ -80,39 +73,39 @@
     pointer-events: none;
 }
 
-.editor-text-bold {
+.editorTextBold {
     font-weight: bold;
 }
 
-.editor-text-italic {
+.editorTextItalic {
     font-style: italic;
 }
 
-.editor-text-underline {
+.editorTextUnderline {
     text-decoration: underline;
 }
 
-.editor-text-strikethrough {
+.editorTextStrikethrough {
     text-decoration: line-through;
 }
 
-.editor-text-underlineStrikethrough {
+.editorTextUnderlineStrikethrough {
     text-decoration: underline line-through;
 }
 
-.editor-text-code {
+.editorTextCode {
     background-color: rgb(240, 242, 245);
     padding: 1px 0.25rem;
     font-family: Menlo, Consolas, Monaco, monospace;
     font-size: 94%;
 }
 
-.editor-link {
+.editorLink {
     color: rgb(33, 111, 219);
     text-decoration: none;
 }
 
-.tree-view-output {
+.treeViewOutput {
     display: block;
     background: #222;
     color: #fff;
@@ -128,7 +121,7 @@
     line-height: 14px;
 }
 
-.editor-code {
+.editorCode {
     background-color: rgb(240, 242, 245);
     font-family: Menlo, Consolas, Monaco, monospace;
     display: block;
@@ -139,12 +132,11 @@
     margin-top: 8px;
     margin-bottom: 8px;
     tab-size: 2;
-    /* white-space: pre; */
     overflow-x: auto;
     position: relative;
 }
 
-.editor-code:before {
+.editorCode:before {
     content: attr(data-gutter);
     position: absolute;
     background-color: #eee;
@@ -157,7 +149,7 @@
     text-align: right;
     min-width: 25px;
 }
-.editor-code:after {
+.editorCode:after {
     content: attr(data-highlight-language);
     top: 0;
     right: 3px;
@@ -168,49 +160,49 @@
     color: rgba(0, 0, 0, 0.5);
 }
 
-.editor-tokenComment {
+.editorTokenComment {
     color: slategray;
 }
 
-.editor-tokenPunctuation {
+.editorTokenPunctuation {
     color: #999;
 }
 
-.editor-tokenProperty {
+.editorTokenProperty {
     color: #905;
 }
 
-.editor-tokenSelector {
+.editorTokenSelector {
     color: #690;
 }
 
-.editor-tokenOperator {
+.editorTokenOperator {
     color: #9a6e3a;
 }
 
-.editor-tokenAttr {
+.editorTokenAttr {
     color: #07a;
 }
 
-.editor-tokenVariable {
+.editorTokenVariable {
     color: #e90;
 }
 
-.editor-tokenFunction {
+.editorTokenFunction {
     color: #dd4a68;
 }
 
-.editor-paragraph {
+.editorParagraph {
     margin: 0;
     margin-bottom: 8px;
     position: relative;
 }
 
-.editor-paragraph:last-child {
+.editorParagraph:last-child {
     margin-bottom: 0;
 }
 
-.editor-heading-h1 {
+.editorHeadingH1 {
     font-size: 24px;
     color: rgb(5, 5, 5);
     font-weight: 400;
@@ -219,7 +211,7 @@
     padding: 0;
 }
 
-.editor-heading-h2 {
+.editorHeadingH2 {
     font-size: 15px;
     color: rgb(101, 103, 107);
     font-weight: 700;
@@ -229,7 +221,7 @@
     text-transform: uppercase;
 }
 
-.editor-quote {
+.editorQuote {
     margin: 0;
     margin-left: 20px;
     font-size: 15px;
@@ -240,48 +232,39 @@
     padding-left: 16px;
 }
 
-.editor-list-ol {
+.editorListOl {
     padding: 0;
     margin: 0;
     margin-left: 16px;
 }
 
-.editor-list-ul {
+.editorListUl {
     padding: 0;
     margin: 0;
     margin-left: 16px;
 }
 
-.editor-listitem {
+.editorListitem {
     margin: 8px 32px 8px 32px;
 }
 
-.editor-nested-listitem {
+.editorNestedListitem {
     list-style-type: none;
 }
 
-/*pre::-webkit-scrollbar {*/
-/*    background: transparent;*/
-/*    width: 10px;*/
-/*}*/
-
-/*pre::-webkit-scrollbar-thumb {*/
-/*    background: #999;*/
-/*}*/
-
-.debug-timetravel-panel {
+.debugTimetravelPanel {
     overflow: hidden;
     padding: 0 0 10px 0;
     margin: auto;
     display: flex;
 }
 
-.debug-timetravel-panel-slider {
+.debugTimetravelPanelSlider {
     padding: 0;
     flex: 8;
 }
 
-.debug-timetravel-panel-button {
+.debugTimetravelPanelButton {
     padding: 0;
     border: 0;
     background: none;
@@ -290,11 +273,11 @@
     font-size: 12px;
 }
 
-.debug-timetravel-panel-button:hover {
+.debugTimetravelPanelButton:hover {
     text-decoration: underline;
 }
 
-.debug-timetravel-button {
+.debugTimetravelButton {
     border: 0;
     padding: 0;
     font-size: 12px;
@@ -305,7 +288,7 @@
     color: #fff;
 }
 
-.debug-timetravel-button:hover {
+.debugTimetravelButton:hover {
     text-decoration: underline;
 }
 
@@ -319,7 +302,7 @@
     vertical-align: middle;
 }
 
-.toolbar button.toolbar-item {
+.toolbarItem {
     border: 0;
     display: flex;
     background: none;
@@ -329,62 +312,33 @@
     vertical-align: middle;
 }
 
-.toolbar button.toolbar-item:disabled {
+.toolbarItem:disabled {
     cursor: not-allowed;
 }
 
-.toolbar button.toolbar-item.spaced {
+.toolbarItemSpaced {
     margin-right: 2px;
 }
 
-.toolbar button.toolbar-item i.format {
-    background-size: contain;
-    display: inline-block;
-    height: 18px;
-    width: 18px;
-    margin-top: 2px;
-    vertical-align: -0.25em;
-    display: flex;
-    opacity: 0.6;
-}
-
-.toolbar button.toolbar-item:disabled i.format {
-    opacity: 0.2;
-}
-
-.toolbar button.toolbar-item.active {
+.toolbarItemActive {
     background-color: rgba(223, 232, 250, 0.3);
 }
 
-.toolbar button.toolbar-item.active i {
+.toolbarItemActive i {
     opacity: 1;
 }
 
-.toolbar .toolbar-item:hover:not([disabled]) {
+.toolbarItem:hover:not([disabled]) {
     background-color: #eee;
 }
 
-.toolbar .divider {
+.divider {
     width: 1px;
     background-color: #eee;
     margin: 0 4px;
 }
 
-.toolbar .toolbar-item .text {
-    display: flex;
-    line-height: 20px;
-    width: 200px;
-    vertical-align: middle;
-    font-size: 14px;
-    color: #777;
-    text-overflow: ellipsis;
-    width: 70px;
-    overflow: hidden;
-    height: 20px;
-    text-align: left;
-}
-
-.toolbar .toolbar-item .icon {
+.icon {
     display: flex;
     width: 20px;
     height: 20px;
@@ -394,42 +348,42 @@
     background-size: contain;
 }
 
-i.undo {
+.iconUndo {
     background-image: url('/images/icons/arrow-counterclockwise.svg');
 }
 
-i.redo {
+.iconRedo {
     background-image: url('/images/icons/arrow-clockwise.svg');
 }
 
-i.bold {
+.iconBold {
     background-image: url('/images/icons/type-bold.svg');
 }
 
-i.italic {
+.iconItalic {
     background-image: url('/images/icons/type-italic.svg');
 }
 
-i.underline {
+.iconUnderline {
     background-image: url('/images/icons/type-underline.svg');
 }
 
-i.strikethrough {
+.iconStrikethrough {
     background-image: url('/images/icons/type-strikethrough.svg');
 }
 
-i.left-align {
+.iconLeftAlign {
     background-image: url('/images/icons/text-left.svg');
 }
 
-i.center-align {
+.iconCenterAlign {
     background-image: url('/icons/text-center.svg');
 }
 
-i.right-align {
+.iconRightAlign {
     background-image: url('/icons/text-right.svg');
 }
 
-i.justify-align {
+.iconJustifyAlign {
     background-image: url('/icons/justify.svg');
 }
