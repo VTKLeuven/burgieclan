@@ -1,5 +1,22 @@
 'use client'
 
+import {
+    AnnouncementApi,
+    CommentCategoryApi, Configuration,
+    CourseApi,
+    CourseCommentApi,
+    DocumentApi,
+    DocumentCategoryApi,
+    DocumentCommentApi,
+    LitusAuthenticationApi,
+    LoginCheckApi,
+    ModuleApi,
+    PageApi,
+    ProgramApi,
+    UserApi,
+    UserFavoritesApi
+} from "@/utils/sdk";
+
 export type ApiClientError = {
     title: string;
     detail: string;
@@ -72,3 +89,40 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, he
         throw error;
     }
 };
+
+class API {
+    public announcement: AnnouncementApi;
+    public commentCategory: CommentCategoryApi;
+    public course: CourseApi;
+    public courseComment: CourseCommentApi;
+    public document: DocumentApi;
+    public documentCategory: DocumentCategoryApi;
+    public documentComment: DocumentCommentApi;
+    public litusAuthentication: LitusAuthenticationApi;
+    public loginCheck: LoginCheckApi;
+    public module: ModuleApi;
+    public page: PageApi;
+    public program: ProgramApi;
+    public user: UserApi;
+    public userFavorites: UserFavoritesApi;
+
+    constructor() {
+        const config = new Configuration({ basePath: process.env.NEXT_PUBLIC_BACKEND_URL });
+        this.announcement = new AnnouncementApi();
+        this.commentCategory = new CommentCategoryApi();
+        this.course = new CourseApi();
+        this.courseComment = new CourseCommentApi();
+        this.document = new DocumentApi();
+        this.documentCategory = new DocumentCategoryApi();
+        this.documentComment = new DocumentCommentApi();
+        this.litusAuthentication = new LitusAuthenticationApi();
+        this.loginCheck = new LoginCheckApi();
+        this.module = new ModuleApi();
+        this.page = new PageApi(config);
+        this.program = new ProgramApi();
+        this.user = new UserApi();
+        this.userFavorites = new UserFavoritesApi();
+    }
+}
+
+export default API;
