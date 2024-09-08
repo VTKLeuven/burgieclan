@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate-sdk": "openapi-generator-cli generate -i https://dev.burgieclan.vtk.be/api/docs.jsonopenapi --generator-name typescript-fetch -o src/utils/sdk"
+    "generate-sdk": "openapi-generator-cli generate -i https://dev.burgieclan.vtk.be/api/docs.jsonopenapi --generator-name typescript-axios -o src/utils/sdk"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.18",
