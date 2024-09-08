@@ -1,9 +1,10 @@
 'use client';
 
-import API, {ApiClientError} from "@/utils/api";
-import {useEffect, useState} from "react";
+import api from "@/utils/api";
+import { useEffect, useState } from "react";
 import Loading from "@/app/loading";
 import ErrorPage from "@/components/error/ErrorPage";
+import { AxiosError } from "axios";
 
 /**
  * Displays pages from page management system.
@@ -11,20 +12,19 @@ import ErrorPage from "@/components/error/ErrorPage";
  * Each page is identified with a unique url_key. When visiting /[url_key], the page with that url_key is fetched
  * from the backend if it exists.
  */
-export default function Page({params}: { params: any }) {
-    const {url_key} = params;
+export default function Page({ params }: { params: any }) {
+    const { url_key } = params;
 
     const [page, setPage] = useState<any>(null);
-    const [error, setError] = useState<ApiClientError | null>(null);
+    const [error, setError] = useState<AxiosError | null>(null);
 
     useEffect(() => {
         const FetchData = async () => {
             try {
-                // const result = await ApiClient('GET', `/api/pages/${url_key}`);
-                const result = await new API().page.apiPagesUrlKeyGet({urlKey: url_key});
-                setPage(result);
-            } catch (err: any) {
-                console.log({err});
+                const { data: page} = await api.page.apiPagesUrlKeyGet(url_key);
+                console.log(page);
+                setPage(page);
+            } catch (err) {
                 setError(err);
             }
         };
@@ -33,7 +33,7 @@ export default function Page({params}: { params: any }) {
     }, [url_key]);
 
     if (error) {
-        return <ErrorPage status={error.response.status}/>;
+        return <ErrorPage status={String(error.response?.status)}/>;
     }
 
     if (!page) {
@@ -41,7 +41,7 @@ export default function Page({params}: { params: any }) {
     }
 
     // the page content is expected to be in html
-    const content = {__html: page.content};
+    const content = { __html: page.content };
 
     return (
         <div className="bg-white px-6 py-32 lg:px-8">

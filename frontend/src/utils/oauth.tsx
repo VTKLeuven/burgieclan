@@ -2,10 +2,12 @@ import crypto from "crypto";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { ReadonlyURLSearchParams } from "next/navigation";
 import axios from "axios";
-import {NextResponse} from "next/server";
+import { NextResponse } from "next/server";
+import api from "@/utils/api";
 
 interface JWTPayload {
     exp: number;
+
     [key: string]: any; // Allows other attributes of any type
 }
 
@@ -111,20 +113,11 @@ export const refreshLitusTokens = async (refreshToken: string) => {
  * Exchange Litus access token for JWT from backend
  */
 const requestJWT = async (accessToken: string): Promise<string> => {
-    const backendAuthUrl = process.env.NEXT_PUBLIC_BURGIECLAN_BACKEND_AUTH;
-
-    if (!backendAuthUrl) {
-        throw new Error("JWT request failed: BACKEND_AUTH_URL is not defined.");
-    }
-
     try {
-        const response = await axios.post(backendAuthUrl, { accessToken }, {
-            headers: {
-                'Accept': 'application/ld+json',
-                'Content-Type': 'application/ld+json'
-            }
-        });
-        return response.data.token;
+        const { data: { token } } = (await api.litusAuthentication.litusAuthentication({ accessToken })) as unknown as {
+            data: { token: string }
+        };
+        return token;
     } catch (error) {
         throw new Error(`Failed to exchange access token for JWT: ${error.response?.data?.message || error.message}`);
     }
@@ -139,7 +132,7 @@ const parseJWT = (jwt: string): JWTPayload => {
         const base64Str = base64Url.replace(/-/g, '+').replace(/_/g, '/');
         const decodedPayload = atob(base64Str);
         const parsedPayload = JSON.parse(decodedPayload);
-        if (typeof(parsedPayload.exp) !== 'number') {
+        if (typeof (parsedPayload.exp) !== 'number') {
             throw new Error("Failed to parse JWT: Expiration time is missing.");
         }
 
@@ -179,7 +172,7 @@ export const storeOAuthTokens = async (jwt: string, refreshToken?: string) => {
 /**
  * Add JWT, JWT expiration timestamp and Litus refresh token to a response as http-only cookies
  */
-export const addOAuthCookiesToResponse = (response : NextResponse, jwt: string, refreshToken?: string) => {
+export const addOAuthCookiesToResponse = (response: NextResponse, jwt: string, refreshToken?: string) => {
     const expirationTime = getJWTExpiration(jwt);
 
     if (!expirationTime) {
@@ -305,7 +298,10 @@ export const hasJwt = async (): Promise<boolean> => {
 /**
  * Refreshes JWT by exchanging the old Litus refresh token for new tokens.
  */
-export const LitusOAuthRefresh = async (oldRefreshToken: string): Promise<{ newJwt: string; newRefreshToken: string }> => {
+export const LitusOAuthRefresh = async (oldRefreshToken: string): Promise<{
+    newJwt: string;
+    newRefreshToken: string
+}> => {
     try {
         const { accessToken, refreshToken } = await refreshLitusTokens(oldRefreshToken);
         const newJwt = await requestJWT(accessToken);

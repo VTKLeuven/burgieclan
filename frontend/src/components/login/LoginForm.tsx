@@ -6,12 +6,11 @@ import LitusOAuthButton from "@/components/login/LitusOAuthButton";
 import Logo from "@/components/common/Logo";
 
 // Logic
-import React, {useState} from 'react';
-import {initiateLitusOAuthFlow, storeOAuthTokens} from "@/utils/oauth";
+import React, { useState } from 'react';
+import { initiateLitusOAuthFlow, storeOAuthTokens } from "@/utils/oauth";
 import ErrorPage from "@/components/error/ErrorPage";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from 'next/navigation'
-import { ApiClient } from "@/utils/api";
+import { useRouter, useSearchParams } from "next/navigation";
+import api from "@/utils/api";
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
@@ -48,11 +47,8 @@ export default function LoginForm() {
     const handleCredentialsLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
         try {
-            const response = await ApiClient('POST', `/api/auth/login`, {
-                username: username,
-                password: password,
-            });
-            await storeOAuthTokens(response.token);
+            const { data: { token } } = await api.login.loginCheckPost({ username, password });
+            await storeOAuthTokens(token);
             router.push('/');
         } catch (err: any) {
             setCredentialsError(err.detail || 'Bad credentials, please verify that your username/password are correctly set.');
@@ -60,7 +56,7 @@ export default function LoginForm() {
     };
 
     if (error) {
-        return <ErrorPage detail={ error.message } />;
+        return <ErrorPage detail={error.message}/>;
     }
 
     return (
@@ -78,7 +74,7 @@ export default function LoginForm() {
                     </div>
 
                     {/* Handles OAuth login via Litus */}
-                    <LitusOAuthButton loginHandler={ handleOAuthLogin }/>
+                    <LitusOAuthButton loginHandler={handleOAuthLogin}/>
 
                     <div
                         className="mt-4 w-full max-w-sm font-semibold text-center text-sm leading-6 text-vtk-blue-500 hover:text-vtk-blue-400 cursor-pointer flex items-center justify-center"
@@ -90,7 +86,7 @@ export default function LoginForm() {
                 </div>
                 <div
                     className={`flex flex-col items-center justify-center ${isOpen ? 'h-3/7 pb-2' : 'h-0'} overflow-hidden`}>
-                    <form onSubmit={ handleCredentialsLogin } className="w-full max-w-sm mt-10">
+                    <form onSubmit={handleCredentialsLogin} className="w-full max-w-sm mt-10">
                         <div>
                             <label htmlFor="username">
                                 <p className="mt-2 text-sm font-medium">Username</p>
@@ -127,8 +123,8 @@ export default function LoginForm() {
                             </div>
                         </div>
 
-                        { credentialsError && (
-                            <p className="mt-4 text-sm text-red-600">{ credentialsError }</p>
+                        {credentialsError && (
+                            <p className="mt-4 text-sm text-red-600">{credentialsError}</p>
                         )}
 
                         <div className="mt-5 w-full max-w-sm">
