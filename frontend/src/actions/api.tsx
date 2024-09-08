@@ -41,12 +41,6 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, he
 
         const response = await proxyRequest(method, url, body, headers);
 
-        // Handle redirect
-        if (response.redirected) {
-            window.location.href = response.url;
-            return;
-        }
-
         // Handle successful response
         if (!response.ok) {
             return await handleError(response);
