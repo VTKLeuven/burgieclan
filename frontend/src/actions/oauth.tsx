@@ -86,7 +86,7 @@ export const proxyTokenRequest = async (body: any): Promise<{ accessToken: strin
  *
  * Handles automatic JWT refreshing if it's expired, or redirects to the login page if refresh fails.
  */
-export const proxyRequest = async (method: string, url: string, body: any, customHeaders?: Headers): Promise<Response> => {
+export const proxyRequest = async (method: string, url: string, body: any, customHeaders?: Headers): Promise<Response | never> => {
     const cookieStore = cookies();
 
     let jwt = cookieStore.get('jwt')?.value || null;
@@ -113,11 +113,10 @@ export const proxyRequest = async (method: string, url: string, body: any, custo
         }
 
         // Check if JWT is expired and refresh if necessary
-        if (Date.now() > jwtExpiration * 1000) {
+        if (Date.now() > jwtExpiration * 1000 || true) {
             // If no refresh token is available, redirect to login page
             if (!refreshToken) {
                 redirectToLogin();
-                return;
             }
 
             // Refresh OAuth tokens
@@ -126,12 +125,9 @@ export const proxyRequest = async (method: string, url: string, body: any, custo
             // If refresh failed (e.g. refresh token expired), redirect to login page
             if (!newJwt || !newRefreshToken) {
                 redirectToLogin();
-                return;
             }
 
             jwt = newJwt;
-            refreshToken = newRefreshToken;
-            jwtUpdated = true;
         }
         headers.set('Authorization', `Bearer ${jwt}`);
     }
@@ -148,6 +144,7 @@ export const proxyRequest = async (method: string, url: string, body: any, custo
  * Redirects to the login page with the current URL as the redirect target.
  */
 function redirectToLogin() {
+    // TODO: not working
     const currentUrl = new URL(window.location.href);
     redirect(`/login?redirectTo=${encodeURIComponent(currentUrl.pathname)}`);
 }
