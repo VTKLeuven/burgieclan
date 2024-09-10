@@ -1,10 +1,9 @@
-import Editor from "@/components/editor/Editor";
+'use client'
+import TextEditor from "@/components/editor/Editor";
 
 const EditorPage = () => {
     return (
-        <div>
-            <Editor />
-        </div>
+        <TextEditor />
     )
 }
 
