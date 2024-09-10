@@ -1,76 +1,50 @@
 'use client'
 
-import styles from './editor.module.css'
+import { useEffect, useState } from 'react'
+import { EditorContent } from '@tiptap/react'
+import { Editor } from '@tiptap/core'
+import Document from '@tiptap/extension-document'
+import Paragraph from '@tiptap/extension-paragraph'
+import Text from '@tiptap/extension-text'
+import Heading from '@tiptap/extension-heading'
 
-import {$getRoot, $getSelection} from 'lexical';
-import {useEffect} from 'react';
+const TextEditor = () => {
+    const [editor, setEditor] = useState<Editor | null>(null)
 
-import {AutoFocusPlugin} from '@lexical/react/LexicalAutoFocusPlugin';
-import {LexicalComposer} from '@lexical/react/LexicalComposer';
-import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
-import {ContentEditable} from '@lexical/react/LexicalContentEditable';
-import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
-import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
-import ToolbarPlugin from './plugins/ToolbarPlugin';
-import TreeViewPlugin from './plugins/TreeViewPlugin';
-import EditorTheme from "@/components/editor/EditorTheme";
-import {CheckListPlugin} from "@lexical/react/LexicalCheckListPlugin";
-import {TablePlugin} from "@lexical/react/LexicalTablePlugin";
-import {TabIndentationPlugin} from "@lexical/react/LexicalTabIndentationPlugin";
-import {OnChangePlugin} from "@lexical/react/LexicalOnChangePlugin";
+    useEffect(() => {
+        const editorInstance = new Editor({
+            extensions: [
+                Document,
+                Paragraph,
+                Text,
+                Heading.configure({
+                    levels: [1, 2, 3],
+                }),
+            ],
+            content: '<p>Example Text</p>',
+            autofocus: true,
+            editable: true,
+            injectCSS: false,
+            editorProps: {
+                attributes: {
+                    class: 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl m-5 focus:outline-none',
+                },
+            },
+        })
 
-const placeholder = 'Enter something...';
+        setEditor(editorInstance)
 
-const editorConfig = {
-    namespace: 'Burgieclan Editor',
-    nodes: [],
-    // Handling of errors during update
-    onError(error: Error) {
-        throw error;
-    },
-    // The editor theme
-    theme: EditorTheme,
-};
+        // Cleanup the editor instance when the component is unmounted
+        return () => {
+            editorInstance.destroy()
+        }
+    }, [])
 
-// LexicalOnChangePlugin notifies about changes
-function onChange(editorState) {
-    editorState.read(() => {
-        // Read the contents of the EditorState here.
-        const root = $getRoot();
-        const selection = $getSelection();
+    if (!editor) {
+        return null // Render nothing until the editor is initialized
+    }
 
-        console.log(root, selection);
-    });
+    return <EditorContent editor={editor} />
 }
 
-const Editor = () => {
-    return (
-        <LexicalComposer initialConfig={editorConfig}>
-            <div className={styles.editorContainer}>
-                <ToolbarPlugin />
-                <div className={styles.editorInner}>
-                    <RichTextPlugin
-                        contentEditable={
-                            <ContentEditable
-                                className={styles.editorInput}
-                                aria-placeholder={placeholder}
-                                placeholder={
-                                    <div className={styles.editorPlaceholder}>{placeholder}</div>
-                                }
-                            />
-                        }
-                        ErrorBoundary={LexicalErrorBoundary}
-                    />
-                    <HistoryPlugin />
-                    <AutoFocusPlugin />
-                    <TreeViewPlugin />
-                    <CheckListPlugin />
-                    <TabIndentationPlugin />
-                    <OnChangePlugin onChange={onChange} />
-                </div>
-            </div>
-        </LexicalComposer>
-    );
-}
-
-export default Editor;
+export default TextEditor
