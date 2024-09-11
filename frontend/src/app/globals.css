@@ -67,7 +67,7 @@ ol li p {
     @apply mt-1 mb-1;
 }
 
-/* Styling elements inside the tiptap editor */
+/* TipTap editor */
 .tiptap {
     > :first-child {
         @apply mt-0;
@@ -112,4 +112,35 @@ ol li p {
     hr {
         @apply border-none border-t border-gray-200 my-8;
     }
+
+    .isActive {
+        @apply bg-gray-100;
+    }
+
+    .clickable {
+        @apply active:bg-gray-200 transition duration-300 ease-in-out
+    }
+
+    /* Mathematics extension */
+    .Tiptap-mathematics-editor {
+        @apply bg-gray-900 text-white font-mono px-2 py-1 rounded-md inline-block;
+    }
+
+    .Tiptap-mathematics-render {
+        @apply p-1 rounded-md inline-block;
+    }
+
+    .Tiptap-mathematics-render--editable {
+        @apply cursor-pointer transition-colors duration-200;
+
+        &:hover {
+            @apply bg-gray-200;
+        }
+    }
+
+    .Tiptap-mathematics-editor,
+    .Tiptap-mathematics-render {
+        @apply rounded-md inline-block;
+    }
+
 }
