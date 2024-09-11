@@ -223,7 +223,7 @@ const Editor = () => {
         autofocus: true,
         editorProps: {
             attributes: {
-                class: 'mx-auto h-32 border-l border-r border-b border-gray-900/10 rounded-b-md p-2',
+                class: 'tiptap overflow-auto mx-auto h-32 border-l border-r border-b border-gray-900/10 rounded-b-md p-3 focus:outline-none',
             },
         },
     })
