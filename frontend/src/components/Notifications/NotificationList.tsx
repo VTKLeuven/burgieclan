@@ -4,35 +4,39 @@ import React, {useEffect, useState} from 'react'
 import YellowOpenButton from '@/public/vectors/yellow_open_button.svg';
 import NotificationIcon from '@/public/vectors/notification_icon.svg';
 import {Notification} from 'pg'
+import {ApiClient, ApiClientError} from '@/utils/api'
+import ErrorPage from '@/components/error/ErrorPage'
 
 
 const NotificationList = () => {
-
     type NotificationProps = {
         title: string;
         detail: string;
         status: number;
     };
 
-    const [notifications, setNotifications] = useState<NotificationProps[]>([]);
+    /*const [notifications, setNotifications] = useState<NotificationProps[]>([]);
+    const [page, setPage] = useState<any>(null);
+    const [error, setError] = useState<ApiClientError | null>(null);
 
     useEffect(() => {
-        fetch('http://dev.burgieclan.vtk.be/api/notifications?page=1', {
-            headers: {
-                'accept': 'application/ld+json'
+        const FetchData = async () => {
+            try {
+                const result = await ApiClient('GET', `/api/notifications`);
+                console.log(result);
+                console.log(typeof result);
+                setPage(result);
+            } catch (err: any) {
+                setError(err);
             }
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Fetched data:', data); // Log the data to inspect its structure
-                if (Array.isArray(data)) {
-                    setNotifications(data);
-                } else {
-                    console.error('Fetched data is not an array:', data);
-                }
-            })
-            .catch(error => console.error('Error fetching notifications:', error));
-    }, []);
+        };
+
+        FetchData();
+    });
+
+    if (error) {
+        return <ErrorPage status={error.status} />;
+    }*/
 
     const Notification: React.FC<NotificationProps> = ({ title, detail, status}) => {
         return (
@@ -55,9 +59,9 @@ const NotificationList = () => {
 
     return (
         <div className="border border-[#EFF1F7] rounded-notificationBorder p-1 w-[30%] m-5">
-            {notifications.map((notification: NotificationProps, index: React.Key | null | undefined) => (
+            {/*notifications.map((notification: NotificationProps, index: React.Key | null | undefined) => (
                 <Notification key={index} title={notification.title} detail={notification.detail} status={notification.status}/>
-            ))}
+            ))*/}
             <Notification title="Notifications" detail="Lorem ipsum dolor sit amet" status={200}/>
             <Notification title="Notifications" detail="Lorem ipsum dolor sit amet" status={200}/>
             <Notification title="Notifications" detail="Lorem ipsum dolor sit amet" status={200}/>
