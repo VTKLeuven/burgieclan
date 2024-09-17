@@ -25,6 +25,9 @@ const config = {
         wireframe: {
             darkest: {
                 gray: "#4A5A71",
+            },
+            lightest: {
+                gray: "#F0F1F7",
             }
         }
   	}
