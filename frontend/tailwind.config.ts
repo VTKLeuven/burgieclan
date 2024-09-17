@@ -15,6 +15,11 @@ const config = {
             500: "#212347",  // dark blue vtk logo
             600: "#1b1d40",
           }
+        },
+        wireframe: {
+          lightest: {
+            gray: "#F0F1F7",
+          }
         }
       }
     },
