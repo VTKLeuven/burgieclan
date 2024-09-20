@@ -4,7 +4,6 @@ import 'katex/dist/katex.min.css'
 import { useEditor, EditorContent } from '@tiptap/react'
 import { TextSelection } from '@tiptap/pm/state'
 import { StarterKit } from "@tiptap/starter-kit";
-import { Color } from "@tiptap/extension-color";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { ListItem } from "@tiptap/extension-list-item";
 import { Mathematics } from '@tiptap-pro/extension-mathematics'
@@ -26,7 +25,9 @@ import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/
 import { Text, Code } from '@/components/ui/Text'
 import {useState} from "react";
 
-
+/**
+ * Dialog explaining how mathematical functions can be inserted
+ */
 const InfoDialog = ({isOpen, setIsOpen}) => {
     return (
         <Dialog open={isOpen} onClose={setIsOpen}>
@@ -222,7 +223,7 @@ const Editor = () => {
             handlePaste(view, event, slice) {
                 event.preventDefault()
                 const text = event.clipboardData.getData('text/plain')
-                view.dispatch(view.state.tr.insertText(text)) // insert plain text as a new paragraph in the editor
+                view.dispatch(view.state.tr.insertText(text)) // Insert plain text as a new paragraph in the editor
                 return true
             }
         },

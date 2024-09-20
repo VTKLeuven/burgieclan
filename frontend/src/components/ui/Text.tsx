@@ -1,9 +1,4 @@
-import * as Headless from '@headlessui/react'
-
 import clsx from "clsx";
-import NextLink, { type LinkProps } from 'next/link'
-import {forwardRef} from "react";
-
 
 export function Text({ className, ...props }: React.ComponentPropsWithoutRef<'p'>) {
     return (
@@ -11,17 +6,6 @@ export function Text({ className, ...props }: React.ComponentPropsWithoutRef<'p'
             data-slot="text"
             {...props}
             className={clsx(className)}
-        />
-    )
-}
-
-export function TextLink({ className }: React.ComponentPropsWithoutRef<typeof Link>) {
-    return (
-        <Link
-            className={clsx(
-                className,
-                'text-zinc-950 underline decoration-zinc-950/50 data-[hover]:decoration-zinc-950'
-            )}
         />
     )
 }
