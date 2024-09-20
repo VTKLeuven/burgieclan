@@ -39,7 +39,7 @@ const InfoDialog = ({isOpen, setIsOpen}) => {
                     block formulas.<br/>
                     <br/>
                     For an overview of the supported functions, refer to the
-                    <a href="https://katex.org/docs/supported" target="_blank"> documentation of Katex</a>,
+                    <a href="https://katex.org/docs/supported" target="_blank"> documentation of KaTeX</a>,
                     the underlying LaTeX interpreter.
                 </Text>
             </DialogBody>
