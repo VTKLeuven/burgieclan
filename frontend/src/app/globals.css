@@ -50,6 +50,10 @@ p {
     @apply text-base leading-6;
 }
 
+a {
+    @apply text-base leading-6 font-semibold;
+}
+
 ul {
     @apply list-disc list-inside;
 }
@@ -71,6 +75,10 @@ ol li p {
 .tiptap {
     > :first-child {
         @apply mt-0;
+    }
+
+    button {
+        @apply p-1 mx-2 rounded-md;
     }
 
     ul, ol {
@@ -114,11 +122,19 @@ ol li p {
     }
 
     .isActive {
-        @apply bg-gray-100;
+        @apply bg-gray-200;
     }
 
     .clickable {
-        @apply active:bg-gray-200 transition duration-300 ease-in-out
+        @apply hover:bg-gray-100 active:bg-gray-200;
+    }
+
+    .clickable:active {
+        @apply transition duration-200 ease-in-out;
+    }
+
+    .icon {
+        @apply w-5 h-5 text-gray-900;
     }
 
     /* Mathematics extension */
