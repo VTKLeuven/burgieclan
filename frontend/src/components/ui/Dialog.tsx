@@ -14,6 +14,9 @@ const sizes = {
     '5xl': 'sm:max-w-5xl',
 }
 
+/**
+ * A dialog modal that shows information in pop-up form
+ */
 export function Dialog({
    size = 'lg',
    className,
@@ -43,6 +46,9 @@ export function Dialog({
     )
 }
 
+/**
+ * A title for a dialog modal
+ */
 export function DialogTitle({ className, children }: { className?: string; children: React.ReactNode }) {
     return (
         <Headless.Dialog.Title
@@ -55,14 +61,14 @@ export function DialogTitle({ className, children }: { className?: string; child
 }
 
 /**
- * Component that forms the body of a dialog modal, takes any div props except for 'ref'
+ * A body of a dialog modal, takes any div props except for 'ref'
  */
 export function DialogBody({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
     return <div {...props} className={clsx(className, 'mt-6')} />
 }
 
 /**
- * Component that forms the body of a dialog modal, takes any div props except for 'ref'
+ * Component that takes and displays the actions for a dialog modal, takes any div props except for 'ref'
  */
 export function DialogActions({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
     return (
