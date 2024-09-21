@@ -49,7 +49,7 @@ export default function LoginForm() {
         try {
             const { data: { token } } = await api.login.loginCheckPost({ username, password });
             await storeOAuthTokens(token);
-            router.push('/');
+            router.push(redirectTo);
         } catch (err: any) {
             setCredentialsError(err.detail || 'Bad credentials, please verify that your username/password are correctly set.');
         }
@@ -74,7 +74,7 @@ export default function LoginForm() {
                     </div>
 
                     {/* Handles OAuth login via Litus */}
-                    <LitusOAuthButton loginHandler={handleOAuthLogin}/>
+                    <LitusOAuthButton loginHandler={ handleOAuthLogin }/>
 
                     <div
                         className="mt-4 w-full max-w-sm font-semibold text-center text-sm leading-6 text-vtk-blue-500 hover:text-vtk-blue-400 cursor-pointer flex items-center justify-center"
@@ -86,7 +86,7 @@ export default function LoginForm() {
                 </div>
                 <div
                     className={`flex flex-col items-center justify-center ${isOpen ? 'h-3/7 pb-2' : 'h-0'} overflow-hidden`}>
-                    <form onSubmit={handleCredentialsLogin} className="w-full max-w-sm mt-10">
+                    <form onSubmit={ handleCredentialsLogin } className="w-full max-w-sm mt-10">
                         <div>
                             <label htmlFor="username">
                                 <p className="mt-2 text-sm font-medium">Username</p>
@@ -123,8 +123,8 @@ export default function LoginForm() {
                             </div>
                         </div>
 
-                        {credentialsError && (
-                            <p className="mt-4 text-sm text-red-600">{credentialsError}</p>
+                        { credentialsError && (
+                            <p className="mt-4 text-sm text-red-600">{ credentialsError }</p>
                         )}
 
                         <div className="mt-5 w-full max-w-sm">

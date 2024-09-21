@@ -33,11 +33,11 @@ export default function Page({ params }: { params: any }) {
     }, [url_key]);
 
     if (error) {
-        return <ErrorPage status={String(error.response?.status)}/>;
+        return <ErrorPage status={error.response?.status}/>;
     }
 
     if (!page) {
-        return <Loading/>;
+        return <Loading />;
     }
 
     // the page content is expected to be in html

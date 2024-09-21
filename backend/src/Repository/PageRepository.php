@@ -21,6 +21,15 @@ class PageRepository extends ServiceEntityRepository
         parent::__construct($registry, Page::class);
     }
 
+    public function findAllPublicAvailable(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.publicAvailable = :public')
+            ->setParameter('public', true)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findOneByUrlKey(string $urlKey): ?Page
     {
         return $this->createQueryBuilder('p')
