@@ -1,9 +1,9 @@
 'use client'
 
 import "@/app/globals.css";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import Header from "@/components/header/Header";
-import {hasJwt} from "@/utils/oauth";
+import { hasJwt } from "@/actions/oauth";
 import Footer from "@/components/footer/Footer";
 
 export default function HeaderLayout({children,}: Readonly<{ children: React.ReactNode }>) {

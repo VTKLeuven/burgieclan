@@ -6,12 +6,12 @@ import LitusOAuthButton from "@/components/login/LitusOAuthButton";
 import Logo from "@/components/common/Logo";
 
 // Logic
-import React, {useState} from 'react';
-import {initiateLitusOAuthFlow, storeOAuthTokens} from "@/utils/oauth";
+import React, { useState } from 'react';
+import { initiateLitusOAuthFlow } from "@/utils/oauth";
+import { storeOAuthTokens } from "@/actions/oauth";
 import ErrorPage from "@/components/error/ErrorPage";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from 'next/navigation'
-import { ApiClient } from "@/utils/api";
+import { useRouter, useSearchParams } from "next/navigation";
+import api from "@/utils/api";
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
@@ -48,19 +48,16 @@ export default function LoginForm() {
     const handleCredentialsLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
         try {
-            const response = await ApiClient('POST', `/api/auth/login`, {
-                username: username,
-                password: password,
-            });
-            await storeOAuthTokens(response.token);
-            router.push('/');
+            const { data: { token } } = await api.login.loginCheckPost({ username, password });
+            await storeOAuthTokens(token);
+            router.push(redirectTo);
         } catch (err: any) {
             setCredentialsError(err.detail || 'Bad credentials, please verify that your username/password are correctly set.');
         }
     };
 
     if (error) {
-        return <ErrorPage detail={ error.message } />;
+        return <ErrorPage detail={error.message}/>;
     }
 
     return (

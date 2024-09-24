@@ -1,10 +1,11 @@
 'use client';
 
-import { ApiClient } from "@/utils/api";
+import api from "@/utils/api";
 import { useEffect, useState } from "react";
-import { ApiClientError } from "@/utils/api";
 import Loading from "@/app/loading";
 import ErrorPage from "@/components/error/ErrorPage";
+import { AxiosError } from "axios";
+import { ApiClient } from "@/actions/api";
 
 /**
  * Displays pages from page management system.
@@ -16,14 +17,14 @@ export default function Page({ params }: { params: any }) {
     const { url_key } = params;
 
     const [page, setPage] = useState<any>(null);
-    const [error, setError] = useState<ApiClientError | null>(null);
+    const [error, setError] = useState<AxiosError | null>(null);
 
     useEffect(() => {
         const FetchData = async () => {
             try {
-                const result = await ApiClient('GET', `/api/pages/${url_key}`);
-                setPage(result);
-            } catch (err: any) {
+                const { data: page } = await ApiClient(api.page.apiPagesUrlKeyGet.bind(api.page), url_key);
+                setPage(page);
+            } catch (err) {
                 setError(err);
             }
         };
@@ -32,7 +33,7 @@ export default function Page({ params }: { params: any }) {
     }, [url_key]);
 
     if (error) {
-        return <ErrorPage status={error.status} />;
+        return <ErrorPage status={error.response?.status}/>;
     }
 
     if (!page) {
