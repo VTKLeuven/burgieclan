@@ -18,6 +18,7 @@ use App\State\EntityClassDtoStateProvider;
 use App\State\DocumentProcessor;
 use ArrayObject;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -78,12 +79,15 @@ class DocumentApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
+    #[Groups('search')]
     public ?string $name = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[Groups('search')]
     public ?CourseApi $course;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[Groups('search')]
     public ?DocumentCategoryApi $category = null;
 
     #[Assert\Length(5)]
@@ -92,6 +96,7 @@ class DocumentApi
 
     #[ApiProperty(writable: false)]
     #[ApiFilter(BooleanFilter::class)]
+    #[Groups('search')]
     public bool $under_review = true;
 
     public ?string $contentUrl = null;
@@ -102,11 +107,14 @@ class DocumentApi
 
     #[ApiProperty(writable: false)]
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[Groups('search')]
     public ?UserApi $creator;
 
     #[ApiProperty(writable: false)]
+    #[Groups('search')]
     public string $createdAt;
 
     #[ApiProperty(writable: false)]
+    #[Groups('search')]
     public string $updatedAt;
 }
