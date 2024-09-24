@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Loading from "@/app/loading";
 import ErrorPage from "@/components/error/ErrorPage";
 import { AxiosError } from "axios";
+import { ApiClient } from "@/actions/api";
 
 /**
  * Displays pages from page management system.
@@ -21,8 +22,7 @@ export default function Page({ params }: { params: any }) {
     useEffect(() => {
         const FetchData = async () => {
             try {
-                const { data: page} = await api.page.apiPagesUrlKeyGet(url_key);
-                console.log(page);
+                const { data: page } = await ApiClient(api.page.apiPagesUrlKeyGet.bind(api.page), url_key);
                 setPage(page);
             } catch (err) {
                 setError(err);

@@ -1,54 +1,33 @@
-'use server'
+'use client'
 
-import {proxyRequest} from "@/actions/oauth";
-
-/**
- * Encodes an API error response from the backend server into a structured serializable format for the frontend.
- */
-const handleError = async (response: Response) => {
-    const errorData = await response.json();
-
-    switch (response.status) {
-        case 401:
-            return { error: { message: errorData.message || 'Unauthorized access. Please log in.', status: 401 } };
-        case 404:
-            return { error: { message: errorData.message || 'Resource not found.', status: 404 } };
-        case 500:
-            return { error: { message: errorData.message || 'Internal Server Error. Please try again later.', status: 500 } };
-        default:
-            return { error: { message: errorData.message || 'Unexpected Error.', status: response.status || 500 } };
-    }
-};
+import {getJWT} from "@/utils/dal";
+import {AxiosError, AxiosRequestConfig} from "axios";
 
 /**
  * API Client for authenticated or unauthenticated requests to the backend server.
  *
- * Two types of errors are handled:
- * - Network or other unexpected errors
- * - Backend error response messages
- * Both are encoded in a structured serializable format for easy handling in the calling component.
+ * @param sdkApiMethod The SDK method to call, see /utils/sdk/api.ts
+ * @param args The arguments to pass to the SDK method
  */
-export const ApiClient = async (method: string, endpoint: string, body?: any, headers?: Headers) => {
+export const ApiClient = async (sdkApiMethod: Function, ...args: any[]): Promise<any> => {
     try {
-        const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-        const frontendBaseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL;
+        // Get a valid JWT using the DAL
+        const jwt = await getJWT();
 
-        if (!backendBaseUrl || !frontendBaseUrl) {
-            throw new Error(`Missing environment variable for backend or frontend base URL`)
+        const options: AxiosRequestConfig = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: jwt ? `Bearer ${jwt}` : '',
+            },
+        };
+
+        // Call the desired API method from the SDK
+        return await sdkApiMethod(...args, options);
+    } catch (error) {
+        if (error instanceof AxiosError) {
+            throw error;
+        } else {
+            throw new Error("Failed to make an API call");
         }
-
-        const url = backendBaseUrl + endpoint;
-
-        const response = await proxyRequest(method, url, body, headers);
-
-        // Handle successful response
-        if (!response.ok) {
-            return await handleError(response);
-        }
-
-        return response.json();
-
-    } catch (error: any) {
-        return { error: { message: error.message || 'Unexpected API Error.', status: 500 } };
     }
-}
+};

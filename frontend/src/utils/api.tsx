@@ -17,6 +17,8 @@ import {
     UserApi,
     UserFavoritesApi
 } from "@/utils/sdk";
+import {getJWT} from "@/utils/dal";
+import {AxiosError} from "axios";
 
 /**
  * The `API` class serves as a centralized wrapper for various API classes generated from the OpenAPI specification.

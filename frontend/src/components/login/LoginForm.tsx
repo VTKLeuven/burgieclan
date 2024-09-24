@@ -7,7 +7,8 @@ import Logo from "@/components/common/Logo";
 
 // Logic
 import React, { useState } from 'react';
-import { initiateLitusOAuthFlow, storeOAuthTokens } from "@/utils/oauth";
+import { initiateLitusOAuthFlow } from "@/utils/oauth";
+import { storeOAuthTokens } from "@/actions/oauth";
 import ErrorPage from "@/components/error/ErrorPage";
 import { useRouter, useSearchParams } from "next/navigation";
 import api from "@/utils/api";

@@ -20,15 +20,17 @@ const getPublicAvailablePages = async () => {
  * Check if the page with the given URL key is public
  */
 const isPublicPage = async (urlKey: string) => {
+    // TODO: cache the list of public pages
     const pages = await getPublicAvailablePages();
     return pages.some((page: any) => page.urlKey === urlKey);
 };
 
 export default async function middleware(request: NextRequest) {
-    const isAuthenticated = request.cookies.has('jwt');
+    const hasJwt = request.cookies.has('jwt');
 
-    // Redirect to login if user is not authenticated and the page is not public
-    if (!isAuthenticated) {
+    // Redirect to login if user has no JWT (optimistic check)
+    if (!hasJwt) {
+        console.log("middleware detects not authenticated");
         const publicPage = await isPublicPage(request.nextUrl.pathname.slice(1));
         if (!publicPage) {
             return NextResponse.redirect(new URL(`/login?redirectTo=${encodeURIComponent(request.nextUrl.href)}`, request.url));

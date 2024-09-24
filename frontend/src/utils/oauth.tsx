@@ -1,10 +1,7 @@
 import crypto from "crypto";
-import axios from "axios";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { ReadonlyURLSearchParams } from "next/navigation";
 import { proxyTokenRequest, storeOAuthTokens } from "@/actions/oauth";
-import axios from "axios";
-import { NextResponse } from "next/server";
 import api from "@/utils/api";
 
 interface JWTPayload {
@@ -103,6 +100,7 @@ export const refreshLitusTokens = async (refreshToken: string) => {
  * Exchange Litus access token for JWT from backend
  */
 const requestJWT = async (accessToken: string): Promise<string> => {
+    console.log("requesting new jwt with access token", accessToken);
     try {
         const { data: { token } } = (await api.litusAuthentication.litusAuthentication({ accessToken })) as unknown as {
             data: { token: string }
@@ -219,6 +217,7 @@ export const LitusOAuthRefresh = async (oldRefreshToken: string): Promise<{
     newJwt: string;
     newRefreshToken: string
 }> => {
+    console.log("old refresh token", oldRefreshToken);
     try {
         const { accessToken, refreshToken } = await refreshLitusTokens(oldRefreshToken);
         const newJwt = await requestJWT(accessToken);
