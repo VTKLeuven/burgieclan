@@ -1,0 +1,150 @@
+'use server'
+
+import {cookies} from 'next/headers'
+import {getJWTExpiration, LitusOAuthRefresh} from '@/utils/oauth';
+import {redirect} from 'next/navigation';
+
+/**
+ * Store JWT and Litus refresh token in Http-only cookies for session management
+ */
+export const storeOAuthTokens = async (jwt: string, refreshToken?: string) => {
+    const expirationTime = getJWTExpiration(jwt);
+
+    if (!expirationTime) {
+        throw Error('JWT token is missing expiration time');
+    }
+
+    cookies().set({
+        name: 'jwt',
+        value: jwt,
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+    })
+
+    // Set JWT expiration time http-only cookie
+    // Stored separately so we don't have to do the decoding at every request to check if the JWT is expired
+    cookies().set({
+        name: 'jwt_expiration',
+        value: expirationTime.toString(), // Store the JWT expiration Unix timestamp as a string
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+    })
+
+    // Set Litus refresh token http-only cookie
+    if (refreshToken) {
+        cookies().set({
+            name: 'litus_refresh',
+            value: refreshToken,
+            path: '/',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+        })
+    }
+}
+
+/**
+ * Check the presence of a JWT in http-only cookie
+ */
+export const hasJwt = async (): Promise<boolean> => {
+    return !!cookies().get('jwt')?.value;
+}
+
+/**
+ * Proxies an outgoing token request to the Litus OAuth server.
+ *
+ * This is done by a Server Action to avoid CORS issues taking place when calling the Litus endpoint directly from the
+ * client.
+ */
+export const proxyTokenRequest = async (body: any): Promise<{ accessToken: string, refreshToken: string }> => {
+    if (!process.env.NEXT_PUBLIC_LITUS_OAUTH_TOKEN) {
+        throw new Error('Missing environment variable for Litus OAuth token endpoint')
+    }
+
+    const response = await fetch(process.env.NEXT_PUBLIC_LITUS_OAUTH_TOKEN!, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(body).toString(), // Format body as application/x-www-form-urlencoded
+    });
+
+    const responseData = await response.json();
+    return {
+        accessToken: responseData.access_token,
+        refreshToken: responseData.refresh_token,
+    };
+}
+
+/**
+ * Proxies an outgoing request, retrieves the JWT token from http-only cookie, and sets it as a bearer token in the
+ * authorization header before executing the request.
+ *
+ * Handles automatic JWT refreshing if it's expired, or redirects to the login page if refresh fails.
+ */
+export const proxyRequest = async (method: string, url: string, body: any, customHeaders?: Headers): Promise<Response | never> => {
+    const cookieStore = cookies();
+
+    let jwt = cookieStore.get('jwt')?.value || null;
+    let jwtUpdated = false;
+
+    const jwtExpirationCookie = cookieStore.get('jwt_expiration')?.value; // Unix timestamp as string
+    let jwtExpiration: number;
+
+    let refreshToken = cookieStore.get('litus_refresh')?.value;
+
+    const headers = new Headers(customHeaders);
+
+    // Backend expects content-type when including JWT
+    if (!headers.has('Content-Type')) {
+        headers.set('Content-Type', 'application/json');
+    }
+
+    if (jwt) {
+        // Retrieve JWT expiration timestamp from cookie or by decoding JWT
+        if (!jwtExpirationCookie) {
+            jwtExpiration = getJWTExpiration(jwt);
+        } else {
+            jwtExpiration = parseInt(jwtExpirationCookie);
+        }
+
+        // Check if JWT is expired and refresh if necessary
+        if (Date.now() > jwtExpiration * 1000 || true) {
+            // If no refresh token is available, redirect to login page
+            if (!refreshToken) {
+                redirectToLogin();
+            }
+
+            // Refresh OAuth tokens
+            const { newJwt, newRefreshToken } = await LitusOAuthRefresh(refreshToken);
+
+            // If refresh failed (e.g. refresh token expired), redirect to login page
+            if (!newJwt || !newRefreshToken) {
+                redirectToLogin();
+            }
+
+            jwt = newJwt;
+        }
+        headers.set('Authorization', `Bearer ${jwt}`);
+    }
+
+    // Forward request to the backend
+    return await fetch(url, {
+        method: method,
+        headers: headers,
+        body: JSON.stringify(body),
+    });
+}
+
+/**
+ * Redirects to the login page with the current URL as the redirect target.
+ */
+function redirectToLogin() {
+    // TODO: not working
+    const currentUrl = new URL(window.location.href);
+    redirect(`/login?redirectTo=${encodeURIComponent(currentUrl.pathname)}`);
+}
