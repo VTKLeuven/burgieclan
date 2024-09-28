@@ -1,0 +1,31 @@
+'use client'
+
+interface CoursePageSectionProps {
+    title: string;
+    description: string;
+}
+
+export default function CoursePageSection({ title, description }: CoursePageSectionProps) {
+
+    const YellowSectionButton = () => (
+        <div className="pt-10 pb-5">
+            <span className="bg-wireframe-primary-panache rounded-[3.64px] p-2">Button</span>
+        </div>
+    );
+
+    return (
+        <>
+            <div className="border border-[#E3E3E3] hover:border-wireframe-primary-blue rounded-[14.57px] transform hover:scale-[1.03] transition-transform duration-300">
+                <div className="pl-4 pt-2">
+                    <img src="/images/vectors/document_icon.svg" alt="Document Icon" className="w-8 h-8"/>
+
+                    <h2>{title}</h2>
+                    <p className="text-lg w-[85%]">
+                        {description}
+                    </p>
+                    <YellowSectionButton/>
+                </div>
+            </div>
+        </>
+    )
+}
