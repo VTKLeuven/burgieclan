@@ -9,7 +9,7 @@ export default function CoursePageSection({ title, description }: CoursePageSect
 
     const YellowSectionButton = () => (
         <div className="pt-10 pb-5">
-            <span className="bg-wireframe-primary-panache rounded-[3.64px] p-2">Button</span>
+            <span className="bg-wireframe-primary-panache rounded-[3.64px] p-2 hover:underline hover:cursor-pointer">Button</span>
         </div>
     );
 
@@ -19,7 +19,7 @@ export default function CoursePageSection({ title, description }: CoursePageSect
                 <div className="pl-4 pt-2">
                     <img src="/images/vectors/document_icon.svg" alt="Document Icon" className="w-8 h-8"/>
 
-                    <h2>{title}</h2>
+                    <h2 className="hover:underline hover:cursor-pointer">{title}</h2>
                     <p className="text-lg w-[85%]">
                         {description}
                     </p>
