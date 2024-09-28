@@ -6,7 +6,7 @@ import ErrorPage from "@/components/error/ErrorPage";
 import Loading from "@/app/loading";
 
 export default function DocumentPage({ params }: { params: any }) {
-    const { id, name } = params;
+    const { id } = params;
 
     const [document, setDocument] = useState<any>(null);
     const [error, setError] = useState<ApiClientError | null>(null);
