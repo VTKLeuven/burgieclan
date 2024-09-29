@@ -1,4 +1,5 @@
 import HomePage from '@/components/homepage'
+import React from 'react'
 
 
 export default function App() {
@@ -14,7 +15,20 @@ export default function App() {
               </div>
 
               <div className="w-[85vw]">
-                  <HomePage/>
+                  <HomePage
+                    topLeft={<div className="pl-5 pt-5">
+                                <h3>Pick up where you left off</h3>
+                            </div>}
+                    topRight={<div className="flex items-center justify-center h-full">
+                                <h3>Drag & drop bestanden</h3>
+                              </div>}
+                    bottomLeft={<div className="pt-5">
+                                    <h3>Nieuws</h3>
+                                </div>}
+                    bottomRight={<div className="pt-5">
+                                    <h3>Snel navigeren naar</h3>
+                                </div>}
+                  />
               </div>
           </div>
       </>
