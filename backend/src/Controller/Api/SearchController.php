@@ -14,21 +14,18 @@ use App\Entity\Program;
 use App\Repository\CourseRepository;
 use App\Repository\DocumentRepository;
 use App\Repository\ModuleRepository;
-use Psr\Log\LoggerInterface;
+use App\Repository\ProgramRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfonycasts\MicroMapper\MicroMapper;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 class SearchController extends AbstractController
 {
     public function __construct(
-        private readonly CourseRepository     $courseRepository,
-        private readonly ModuleRepository     $moduleRepository,
-        private readonly CourseRepository     $programRepository,
-        private readonly DocumentRepository   $documentRepository,
+        private readonly CourseRepository $courseRepository,
+        private readonly ModuleRepository $moduleRepository,
+        private readonly ProgramRepository $programRepository,
+        private readonly DocumentRepository $documentRepository,
         private readonly MicroMapperInterface $microMapper,
     ) {
     }
@@ -36,7 +33,7 @@ class SearchController extends AbstractController
     public function __invoke(Request $request)
     {
 
-        $searchText = $request->query->get('searchText');
+        $searchText = $request->query->get('searchText') ?? '';
         $courses = $this->courseRepository->findBySearchQuery($searchText);
         $modules = $this->moduleRepository->findBySearchQuery($searchText);
         $programs = $this->programRepository->findBySearchQuery($searchText);
