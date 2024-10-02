@@ -4,7 +4,6 @@ import {redirect} from "next/navigation";
 import {headers} from 'next/headers';
 import {getActiveJWT} from "@/utils/dal";
 
-
 /**
  * Encodes an API error response from the backend server into a structured serializable format for the frontend.
  */
@@ -23,11 +22,9 @@ const handleError = async (response: Response) => {
 
 /**
  * API Client for authenticated or unauthenticated requests to the backend server.
- *
- * Two types of errors are handled:
- * - Network or other unexpected errors
- * - Backend error response messages
- * Both are encoded in a structured serializable format for easy handling in the calling component.
+ * - Includes JWT if available and attempts automatic refresh if expired
+ * - Redirects to login page if 401 error is returned (JWT not available or expired and not refreshable)
+ * - Propagates errors in structured format to calling component
  */
 export const ApiClient = async (method: string, endpoint: string, body?: any, customHeaders?: Headers) => {
     const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -43,7 +40,7 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
         const jwt = await getActiveJWT();
 
         const requestHeaders = new Headers(customHeaders);
-        // Backend expects this
+        // Backend expects content-type to be application/json
         requestHeaders.set('Content-Type', 'application/json');
 
         if (jwt) {
@@ -72,7 +69,7 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
         return { error: { message: error.message || 'Unexpected API Error.', status: 500 } };
     }
 
-    // Handle 401s by redirecting (must be done outside try-catch block)
+    // Handle 401s by redirecting (must be done outside try-catch block because NextJS Redirect invoked via error)
     const headersList = headers();
     const refererUrl = headersList.get('referer') || "";
     const loginUrl = `${frontendBaseUrl}/login?redirectTo=${encodeURIComponent(refererUrl)}`;
