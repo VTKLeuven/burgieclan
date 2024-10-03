@@ -4,7 +4,7 @@ import {ApiClient} from "@/actions/api";
 import { useEffect, useState } from "react";
 import Loading from "@/app/loading";
 import ErrorPage from "@/components/error/ErrorPage";
-import {ApiError} from "@/utils/error/api";
+import {ApiError} from "@/utils/error/apiError";
 
 /**
  * Displays pages from page management system.

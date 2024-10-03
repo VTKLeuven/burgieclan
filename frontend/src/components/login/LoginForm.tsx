@@ -54,9 +54,9 @@ export default function LoginForm() {
                 password: password,
             });
             await storeOAuthTokens(response.token);
-            router.push('/');
+            router.push(redirectTo);
         } catch (err: any) {
-            setCredentialsError(err.detail || 'Bad credentials, please verify that your username/password are correctly set.');
+            setCredentialsError('Bad credentials, please verify that your username/password are correctly set.');
         }
     };
 
