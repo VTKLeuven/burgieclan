@@ -32,8 +32,8 @@ class DocumentCategoryCrudController extends AbstractCrudController
             IdField::new('id')->hideOnForm(),
             TextField::new('name', 'Category Name'),
             AssociationField::new('parent', 'Parent Category')
-            ->setRequired(false)
-            ->renderAsNativeWidget()
+                ->setRequired(false)
+                ->renderAsNativeWidget()
         ];
     }
 }
