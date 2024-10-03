@@ -2,7 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Notification;
+use App\Entity\Announcement;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
@@ -10,18 +10,18 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted(User::ROLE_ADMIN)]
-class NotificationCrudController extends AbstractCrudController
+class AnnouncementCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return Notification::class;
+        return Announcement::class;
     }
 
     public function createEntity(string $entityFqcn)
     {
         $user = $this->getUser();
         assert($user instanceof User);
-        return new Notification($user);
+        return new Announcement($user);
     }
 
     public function configureFields(string $pageName): iterable
