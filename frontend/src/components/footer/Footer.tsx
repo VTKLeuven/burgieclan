@@ -1,7 +1,7 @@
 import styles from "./styles.module.css";
 import Link from 'next/link'
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
-import {useEffect, useState} from "react";
+import {getCurrentYear} from "@/utils/date";
 
 type IconProps = React.SVGProps<SVGSVGElement>;
 
@@ -61,15 +61,7 @@ const navigation = [
 ]
 
 const Footer = () => {
-    const [currentYear, setCurrentYear] = useState('');
-
-    /**
-     * Get the current year
-     */
-    useEffect(() => {
-        const year = new Date().getFullYear();
-        setCurrentYear(year.toString());
-    }, []);
+    const currentYear = getCurrentYear();
 
     return (
         <footer aria-labelledby="footer-heading" className="bg-white">
