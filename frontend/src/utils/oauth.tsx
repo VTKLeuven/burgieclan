@@ -224,9 +224,10 @@ export const LitusOAuthCallback = async (router: AppRouterInstance, searchParams
 export const LitusOAuthRefresh = async (oldRefreshToken: string): Promise<{ newJwt: string; newRefreshToken: string }> => {
     try {
         const { accessToken, refreshToken } = await refreshLitusTokens(oldRefreshToken);
-        const newJwt = await requestJWT(accessToken);
+        const jwt = await requestJWT(accessToken);
+        await storeOAuthTokens(jwt, refreshToken);
         return {
-            newJwt: newJwt,
+            newJwt: jwt,
             newRefreshToken: refreshToken
         };
     } catch (error) {
