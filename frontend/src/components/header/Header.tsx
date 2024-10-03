@@ -46,7 +46,7 @@ export default async function Header({isAuthenticated} : {isAuthenticated: boole
                         <div className="flex md:hidden">
 
                             <a href="login" className="primary-button">
-                                Login <span aria-hidden="true">&rarr;</span>
+                                Login
                             </a>
 
                         </div>
@@ -68,7 +68,7 @@ export default async function Header({isAuthenticated} : {isAuthenticated: boole
                             Profile
                         </a> :
                         <a href="login" className="primary-button">
-                            Login <span aria-hidden="true">&rarr;</span>
+                            Login
                         </a>
                         }
                     </Suspense>
