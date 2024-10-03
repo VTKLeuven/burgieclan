@@ -4,7 +4,10 @@ namespace App\Mapper;
 
 use App\ApiResource\UserApi;
 use App\Entity\Course;
+use App\Entity\CourseCommentVote;
 use App\Entity\Document;
+use App\Entity\DocumentCommentVote;
+use App\Entity\DocumentVote;
 use App\Entity\Module;
 use App\Entity\Program;
 use App\Entity\User;
@@ -79,6 +82,32 @@ class UserApiToEntityMapper implements MapperInterface
             ]);
         }
         $this->propertyAccessor->setValue($to, 'favoriteDocuments', $favoriteDocuments);
+
+
+
+        $documentVotes = [];
+        foreach ($from->documentVotes as $documentVote) {
+            $documentVotes[] = $this->microMapper->map($documentVote, DocumentVote::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }
+        $this->propertyAccessor->setValue($to, 'documentVotes', $documentVotes);
+
+        $documentCommentVotes = [];
+        foreach ($from->documentCommentVotes as $documentCommentVote) {
+            $documentCommentVotes[] = $this->microMapper->map($documentCommentVote, DocumentCommentVote::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }
+        $this->propertyAccessor->setValue($to, 'documentCommentVotes', $documentCommentVotes);
+
+        $courseCommentVotes = [];
+        foreach ($from->courseCommentVotes as $courseCommentVote) {
+            $courseCommentVotes[] = $this->microMapper->map($courseCommentVote, CourseCommentVote::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }
+        $this->propertyAccessor->setValue($to, 'courseCommentVotes', $courseCommentVotes);
 
         return $to;
     }

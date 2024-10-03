@@ -13,6 +13,7 @@ use App\Entity\DocumentCommentVote;
 use App\Entity\DocumentVote;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +30,7 @@ class RemoveVoteFromUserController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly SerializerInterface    $serializer,
         private readonly IriConverterInterface  $iriConverter,
+        private readonly LoggerInterface        $logger,
     ) {
     }
 
@@ -38,14 +40,16 @@ class RemoveVoteFromUserController extends AbstractController
         assert($user instanceof User);
 
         $requestBody = json_decode($request->getContent(), true);
-        $votesToRemove = $requestBody['votes'] ?? [];
+        $documentVotes = $requestBody['documentVotes'] ?? [];
+        $documentCommentVotes = $requestBody['documentCommentVotes'] ?? [];
+        $courseCommentVotes = $requestBody['courseCommentVotes'] ?? [];
+
+        $votesToRemove = array_merge($documentVotes, $documentCommentVotes, $courseCommentVotes);
 
         foreach ($votesToRemove as $voteApiIri) {
-            // Convert the IRI "/api/courses/{id}" to an actual object
             $voteApi = $this->iriConverter->getResourceFromIri($voteApiIri);
             assert($voteApi instanceof AbstractVoteApi);
 
-            // Determine the type of vote and map to the correct subclass
             switch (true) {
                 case $voteApi instanceof CourseCommentVoteApi:
                     $voteEntityClass = CourseCommentVote::class;
@@ -57,17 +61,16 @@ class RemoveVoteFromUserController extends AbstractController
                     $voteEntityClass = DocumentVote::class;
                     break;
                 default:
-                    // Handle the case where no matching entity class is found
-                    continue 2; // Skip this vote if no matching entity class is found
+                    continue 2;
             }
 
-            // Convert the DTO to an Entity
             $vote = $this->microMapper->map($voteApi, $voteEntityClass, [
                 MicroMapperInterface::MAX_DEPTH => 0,
             ]);
 
-            // Remove the entity
             $user->removeVote($vote);
+
+            $this->entityManager->remove($vote);
         }
 
         $this->entityManager->persist($user);

@@ -14,6 +14,7 @@ class UserVoter extends Voter
     public const VIEW_USERNAME = 'VIEW_USERNAME';
     public const VIEW_EMAIL = 'VIEW_EMAIL';
     public const VIEW_FAVORITES = 'VIEW_FAVORITES';
+    public const VIEW_VOTES = 'VIEW_VOTES';
 
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
@@ -25,7 +26,7 @@ class UserVoter extends Voter
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
-        return in_array($attribute, [self::VIEW_USERNAME, self::VIEW_EMAIL, self::VIEW_FAVORITES])
+        return in_array($attribute, [self::VIEW_USERNAME, self::VIEW_EMAIL, self::VIEW_FAVORITES, self::VIEW_VOTES])
             && $subject instanceof UserApi;
     }
 
@@ -41,6 +42,7 @@ class UserVoter extends Voter
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
             case self::VIEW_FAVORITES:
+            case self::VIEW_VOTES:
             case self::VIEW_EMAIL:
             case self::VIEW_USERNAME:
                 $requestedUser = $this->microMapper->map($subject, User::class, [

@@ -121,9 +121,23 @@ class UserApi
     public array $favoriteDocuments = [];
 
     /**
-     * @var AbstractVoteApi[]
+     * @var DocumentVoteApi[]
      */
     #[Groups('user:votes')]
     #[ApiProperty(security: 'is_granted("VIEW_VOTES", object)')]
-    public array $votes = [];
+    public array $documentVotes = [];
+
+    /**
+     * @var DocumentCommentVoteApi[]
+     */
+    #[Groups('user:votes')]
+    #[ApiProperty(security: 'is_granted("VIEW_VOTES", object)')]
+    public array $documentCommentVotes = [];
+
+    /**
+     * @var CourseCommentVoteApi[]
+     */
+    #[Groups('user:votes')]
+    #[ApiProperty(security: 'is_granted("VIEW_VOTES", object)')]
+    public array $courseCommentVotes = [];
 }

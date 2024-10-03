@@ -21,6 +21,7 @@ use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Defines the properties of the User entity to represent the application users.
@@ -115,8 +116,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection
      */
-    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: AbstractVote::class, cascade: ['remove'], orphanRemoval: true)]
-    private Collection $votes;
+    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: DocumentVote::class, cascade: ['remove'], orphanRemoval: true)]
+    private Collection $documentVotes;
+
+    /**
+     * @var Collection
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'creator',
+        targetEntity: DocumentCommentVote::class,
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
+    private Collection $documentCommentVotes;
+
+    /**
+     * @var Collection
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'creator',
+        targetEntity: CourseCommentVote::class,
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
+    private Collection $courseCommentVotes;
+
+    private EntityManagerInterface $entityManager;
 
     public function __construct()
     {
@@ -124,7 +149,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->favoriteModules = new ArrayCollection();
         $this->favoriteCourses = new ArrayCollection();
         $this->favoriteDocuments = new ArrayCollection();
-        $this->votes = new ArrayCollection();
+        $this->documentVotes = new ArrayCollection();
+        $this->documentCommentVotes = new ArrayCollection();
+        $this->courseCommentVotes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -367,14 +394,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getVotes(): Collection
     {
-        return $this->votes;
+        $allVotes = new ArrayCollection();
+
+        foreach ($this->getDocumentVotes() as $vote) {
+            $allVotes->add($vote);
+        }
+
+        foreach ($this->getDocumentCommentVotes() as $vote) {
+            $allVotes->add($vote);
+        }
+
+        foreach ($this->getCourseCommentVotes() as $vote) {
+            $allVotes->add($vote);
+        }
+
+        return $allVotes;
     }
 
     public function addVote(AbstractVote $vote): self
     {
-        if (!$this->votes->contains($vote)) {
-            $this->votes->add($vote);
-            $vote->setCreator($this);
+        switch (true) {
+            case $vote instanceof DocumentVote:
+                $this->addDocumentVote($vote);
+                break;
+            case $vote instanceof DocumentCommentVote:
+                $this->addDocumentCommentVote($vote);
+                break;
+            case $vote instanceof CourseCommentVote:
+                $this->addCourseCommentVote($vote);
+                break;
         }
 
         return $this;
@@ -382,8 +430,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeVote(AbstractVote $vote): self
     {
-        if ($this->votes->removeElement($vote)) {
-            $vote->setCreator(null);
+        switch (true) {
+            case $vote instanceof DocumentVote:
+                $this->removeDocumentVote($vote);
+                break;
+            case $vote instanceof DocumentCommentVote:
+                $this->removeDocumentCommentVote($vote);
+                break;
+            case $vote instanceof CourseCommentVote:
+                $this->removeCourseCommentVote($vote);
+                break;
         }
 
         return $this;
@@ -391,16 +447,76 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getDocumentVotes(): Collection
     {
-        return $this->votes->filter(fn(AbstractVote $vote) => $vote instanceof DocumentVote);
+        return $this->documentVotes;
+    }
+
+    public function addDocumentVote(DocumentVote $documentVote): self
+    {
+        if (!$this->documentVotes->contains($documentVote)) {
+            $this->documentVotes->add($documentVote);
+
+            $documentVote->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDocumentVote(DocumentVote $documentVote): self
+    {
+        if ($this->documentVotes->contains($documentVote)) {
+            $this->documentVotes->removeElement($documentVote);
+        }
+
+        return $this;
     }
 
     public function getDocumentCommentVotes(): Collection
     {
-        return $this->votes->filter(fn(AbstractVote $vote) => $vote instanceof DocumentCommentVote);
+        return $this->documentCommentVotes;
+    }
+
+    public function addDocumentCommentVote(DocumentCommentVote $documentCommentVote): self
+    {
+        if (!$this->documentCommentVotes->contains($documentCommentVote)) {
+            $this->documentCommentVotes->add($documentCommentVote);
+
+            $documentCommentVote->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDocumentCommentVote(DocumentCommentVote $documentCommentVote): self
+    {
+        if ($this->documentCommentVotes->contains($documentCommentVote)) {
+            $this->documentCommentVotes->removeElement($documentCommentVote);
+        }
+
+        return $this;
     }
 
     public function getCourseCommentVotes(): Collection
     {
-        return $this->votes->filter(fn(AbstractVote $vote) => $vote instanceof CourseCommentVote);
+        return $this->courseCommentVotes;
+    }
+
+    public function addCourseCommentVote(CourseCommentVote $courseCommentVote): self
+    {
+        if (!$this->courseCommentVotes->contains($courseCommentVote)) {
+            $this->courseCommentVotes->add($courseCommentVote);
+
+            $courseCommentVote->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCourseCommentVote(CourseCommentVote $courseCommentVote): self
+    {
+        if ($this->courseCommentVotes->contains($courseCommentVote)) {
+            $this->courseCommentVotes->removeElement($courseCommentVote);
+        }
+
+        return $this;
     }
 }

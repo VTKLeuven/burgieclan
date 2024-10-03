@@ -3,12 +3,18 @@
 namespace App\Mapper;
 
 use App\ApiResource\CourseApi;
+use App\ApiResource\CourseCommentVoteApi;
 use App\ApiResource\DocumentApi;
+use App\ApiResource\DocumentCommentVoteApi;
+use App\ApiResource\DocumentVoteApi;
 use App\ApiResource\ModuleApi;
 use App\ApiResource\ProgramApi;
 use App\ApiResource\UserApi;
 use App\Entity\Course;
+use App\Entity\CourseCommentVote;
 use App\Entity\Document;
+use App\Entity\DocumentCommentVote;
+use App\Entity\DocumentVote;
 use App\Entity\Module;
 use App\Entity\Program;
 use App\Entity\User;
@@ -62,6 +68,21 @@ class UserEntityToApiMapper implements MapperInterface
                 MicroMapperInterface::MAX_DEPTH => 0,
             ]);
         }, $from->getFavoriteDocuments()->getValues());
+        $to->documentVotes = array_map(function (DocumentVote $documentVote) {
+            return $this->microMapper->map($documentVote, DocumentVoteApi::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }, $from->getDocumentVotes()->getValues());
+        $to->documentCommentVotes = array_map(function (DocumentCommentVote $documentCommentVote) {
+            return $this->microMapper->map($documentCommentVote, DocumentCommentVoteApi::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }, $from->getDocumentCommentVotes()->getValues());
+        $to->courseCommentVotes = array_map(function (CourseCommentVote $courseCommentVote) {
+            return $this->microMapper->map($courseCommentVote, CourseCommentVoteApi::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }, $from->getCourseCommentVotes()->getValues());
 
         return $to;
     }
