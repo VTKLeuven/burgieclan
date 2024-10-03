@@ -5,6 +5,7 @@ import { Dialog } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Logo from '@/components/common/Logo';
 import Input from '@/components/ui/Input';
+import SearchPopup from "@/components/search/SearchPopup";
 
 const navigation = [
     { name: 'Courses', href: '#' },
@@ -14,6 +15,7 @@ const navigation = [
 
 export default function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [searchPopupOpen, setSearchPopupOpen] = useState(false);
     const searchInputRef = useRef<HTMLInputElement | null>(null);
 
     /**
@@ -30,7 +32,7 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
             if (isCtrlF || isCmdF) {
                 event.preventDefault();
                 if (!searchInputRef.current) return;
-                searchInputRef.current.focus()
+                setSearchPopupOpen(true);
             }
         };
 
@@ -52,8 +54,9 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                         <Logo width={50} height={50}/>
                     </a>
                     <div className="flex">
-                        <Input ref={searchInputRef} id="search" name="search" type="search" placeholder="search"/>
+                        <Input ref={searchInputRef} id="search" name="search" type="search" placeholder="Search..." onClick={() => setSearchPopupOpen(true)}/>
                     </div>
+                    <SearchPopup open={searchPopupOpen} setOpen={setSearchPopupOpen}/>
                 </div>
 
                 {/* Mobile menu toggle button */}
