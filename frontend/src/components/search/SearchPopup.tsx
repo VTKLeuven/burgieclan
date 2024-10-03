@@ -12,6 +12,7 @@ import { FaceFrownIcon, GlobeAmericasIcon } from '@heroicons/react/24/outline'
 import { useEffect, useState } from 'react'
 import { ApiClient, ApiClientError } from "@/utils/api";
 import { ApiError } from "next/dist/server/api-utils";
+import FoldableSection from "@/components/common/FoldableSection";
 
 type SearchPopupProps = {
     open: boolean;
@@ -112,9 +113,12 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
 
                         {loading && (
                             <div className="flex justify-center py-12">
-                                <svg className="animate-spin h-8 w-8 text-gray-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                <svg className="animate-spin h-8 w-8 text-gray-900" xmlns="http://www.w3.org/2000/svg"
+                                     fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                            strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor"
+                                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                                 </svg>
                             </div>
                         )}
@@ -130,8 +134,9 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
                         {!error && query.length <= 2 && (
                             <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
                                 <GlobeAmericasIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true"/>
-                                <p className="mt-4 font-semibold text-gray-900">Search for clients and projects</p>
-                                <p className="mt-2 text-gray-500">Quickly access clients and projects by running a
+                                <p className="mt-4 font-semibold text-gray-900">Search for courses, modules, programs,
+                                    documents...</p>
+                                <p className="mt-2 text-gray-500">Quickly access any page by running a
                                     global search.</p>
                             </div>
                         )}
@@ -143,23 +148,24 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
                                 className="max-h-[calc(100vh-15rem)] scroll-pb-2 scroll-pt-11 space-y-2 overflow-y-auto pb-2"
                             >
                                 {Object.entries(items)
-                                    .filter(([category, results]) => results.length > 0)
+                                    .filter(([, results]) => results.length > 0)
                                     .map(([category, results]) => (
-                                    <li key={category} className="list-none">
-                                        <h2 className="bg-gray-100 px-4 py-2.5 text-xs font-semibold text-gray-900 capitalize">{category}</h2>
-                                        <ul className="mt-2 text-sm text-gray-800">
-                                            {results.map((item) => (
-                                                <ComboboxOption
-                                                    key={item['@id']}
-                                                    value={item}
-                                                    className="cursor-default select-none px-4 py-2 data-[focus]:bg-indigo-600 data-[focus]:text-white"
-                                                >
-                                                    {item.name}
-                                                </ComboboxOption>
-                                            ))}
-                                        </ul>
-                                    </li>
-                                ))}
+                                        <FoldableSection key={category} title={category} defaultOpen={true}>
+                                            <li className="list-none">
+                                                <ul className="mt-2 text-sm text-gray-800">
+                                                    {results.map((item) => (
+                                                        <ComboboxOption
+                                                            key={item['@id']}
+                                                            value={item}
+                                                            className="cursor-default select-none px-4 py-2 data-[focus]:bg-indigo-600 data-[focus]:text-white"
+                                                        >
+                                                            {item.name}
+                                                        </ComboboxOption>
+                                                    ))}
+                                                </ul>
+                                            </li>
+                                        </FoldableSection>
+                                    ))}
                             </ComboboxOptions>
                         )}
 
