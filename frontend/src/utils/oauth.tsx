@@ -1,8 +1,8 @@
 import crypto from "crypto";
+import axios from "axios";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { ReadonlyURLSearchParams } from "next/navigation";
-import axios from "axios";
-import {NextResponse} from "next/server";
+import { proxyTokenRequest, storeOAuthTokens } from "@/actions/oauth";
 
 interface JWTPayload {
     exp: number;
@@ -45,20 +45,9 @@ const generateCodeChallenge = (codeVerifier: string) => {
  * Make a POST request for tokens from the Litus authorization server
  */
 const requestTokens = async (data: Record<string, string>): Promise<{ accessToken: string; refreshToken: string }> => {
-    const frontendApiUri = process.env.NEXT_PUBLIC_FRONTEND_API_URL;
-
-    if (!frontendApiUri) {
-        throw new Error("Failed to make token request: FRONTEND_API_URL is not defined.");
-    }
-
-    const tokenProxyUri = `${frontendApiUri}/api/frontend/oauth/litus-token-proxy`;
-
     try {
-        const response = await axios.post(tokenProxyUri, data);
-        return {
-            accessToken: response.data.access_token,
-            refreshToken: response.data.refresh_token
-        };
+        return await proxyTokenRequest(data);
+
     } catch (error) {
         throw new Error(`Token request failed: ${error.response?.data?.message || error.message}`);
     }
@@ -158,71 +147,6 @@ export const getJWTExpiration = (jwt: string): number => {
 };
 
 /**
- * Store JWT and Litus refresh token in Http-only cookies for session management
- */
-export const storeOAuthTokens = async (jwt: string, refreshToken?: string) => {
-    const frontendApiUrl = process.env.NEXT_PUBLIC_FRONTEND_API_URL;
-
-    if (!frontendApiUrl) {
-        throw new Error("Failed to store tokens: FRONTEND_API_URL is not defined.");
-    }
-
-    const setOAuthCookiesUrl = `${frontendApiUrl}/api/frontend/oauth/set-oauth-cookies`;
-
-    try {
-        await axios.post(setOAuthCookiesUrl, { jwt, refreshToken });
-    } catch (error) {
-        throw new Error(`Failed to store tokens in cookies: ${error.response?.data?.message || error.message}`);
-    }
-};
-
-/**
- * Add JWT, JWT expiration timestamp and Litus refresh token to a response as http-only cookies
- */
-export const addOAuthCookiesToResponse = (response : NextResponse, jwt: string, refreshToken?: string) => {
-    const expirationTime = getJWTExpiration(jwt);
-
-    if (!expirationTime) {
-        return NextResponse.json({ error: 'JWT token is missing expiration time' }, { status: 400 });
-    }
-
-    // Set JWT http-only cookie
-    response.cookies.set({
-        name: 'jwt',
-        value: jwt,
-        path: '/',
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-    });
-
-    // Set JWT expiration time http-only cookie
-    // Stored separately so we don't have to do the decoding at every request to check if the JWT is expired
-    response.cookies.set({
-        name: 'jwt_expiration',
-        value: expirationTime.toString(), // Store the JWT expiration Unix timestamp as a string
-        path: '/',
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-    });
-
-    // Set Litus refresh token http-only cookie
-    if (refreshToken) {
-        response.cookies.set({
-            name: 'litus_refresh',
-            value: refreshToken,
-            path: '/',
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-        });
-    }
-
-    return response;
-}
-
-/**
  * Redirects the user to Litus where they should authenticate, after which the Litus authentication server
  * redirects back to the callback url.
  */
@@ -293,14 +217,6 @@ export const LitusOAuthCallback = async (router: AppRouterInstance, searchParams
 
     return null;
 };
-
-/**
- * Check the presence of a JWT in http-only cookie
- */
-export const hasJwt = async (): Promise<boolean> => {
-    const response = await axios.post('/api/frontend/oauth/has-jwt');
-    return response.data.isAuthenticated;
-}
 
 /**
  * Refreshes JWT by exchanging the old Litus refresh token for new tokens.
