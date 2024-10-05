@@ -92,6 +92,7 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
                     <Combobox
                         onChange={(item) => {
                             if (item) {
+                                // TODO replace with correct redirect
                                 // @ts-ignore
                                 window.location = item['@id'];
                             }
