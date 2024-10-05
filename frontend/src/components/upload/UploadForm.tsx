@@ -3,14 +3,19 @@
 import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog'
 import Form from '@/components/upload/Form'
 import { Text } from '@/components/ui/Text'
-import {useState} from "react";
+import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 
 /**
  * Upload form for uploading a document
  */
 const UploadForm = ({isOpen, setIsOpen}) => {
+    const handleSubmit = (formData) => {
+        console.log("Document sent", formData);
+        setIsOpen(false);
+    };
+
     return (
-        <Dialog open={isOpen} onClose={setIsOpen} size="3xl">
+        <Dialog isOpen={isOpen} onClose={() => setIsOpen(false)} size="3xl">
             <DialogTitle>
                 Upload document
             </DialogTitle>
@@ -19,24 +24,18 @@ const UploadForm = ({isOpen, setIsOpen}) => {
                     Upload your awesome document here. You can upload a PDF, Word, or Markdown file. We will check
                     if it follows the guidelines. Thanks for sharing your knowledge with the world!
                 </Text>
-                <Form/>
+                <Form onSubmit={handleSubmit}/>
             </DialogBody>
             <DialogActions>
                 <button
-                    type="button"
-                    onClick={() => SendDocument()}
+                    type="submit"
+                    form="upload-form"
                     className="primary-button">
-                    Send document
+                    <PaperAirplaneIcon className="w-5 h-5 mr-2" /> Send document
                 </button>
             </DialogActions>
         </Dialog>
     )
 }
-
-
-const SendDocument = () => {
-
-}
-
 
 export default UploadForm;

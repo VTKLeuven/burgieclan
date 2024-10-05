@@ -30,7 +30,7 @@ import {useState} from "react";
  */
 const InfoDialog = ({isOpen, setIsOpen}) => {
     return (
-        <Dialog open={isOpen} onClose={setIsOpen}>
+        <Dialog isOpen={isOpen} onClose={setIsOpen}>
             <DialogTitle>
                 Text Editor
             </DialogTitle>
