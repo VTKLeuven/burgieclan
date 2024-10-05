@@ -2,6 +2,7 @@
 
 namespace App\State;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Metadata\Operation;
 use App\ApiResource\PageApi;
@@ -24,8 +25,18 @@ class PageApiProvider implements ProviderInterface
     /*
      * Retrieves a page by unique urlKey and returns the converted PageApi object
      */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): PageApi
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): PageApi | array
     {
+
+        if ($operation instanceof CollectionOperationInterface) {
+            $pages = $this->pageRepository->findAllPublicAvailable();
+            $pagesApi = [];
+            foreach ($pages as $page) {
+                $pagesApi[] = $this->microMapper->map($page, PageApi::class);
+            }
+            return $pagesApi;
+        }
+
         $urlKey = $uriVariables['urlKey'] ?? null;
         if (!$urlKey) {
             throw new NotFoundHttpException('UrlKey is missing');
