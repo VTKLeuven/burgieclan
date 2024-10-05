@@ -63,7 +63,7 @@ class ModuleRepository extends ServiceEntityRepository
 
         /** @var Module[] $result */
         $result = $queryBuilder
-//            ->orderBy('m.publishedAt', 'DESC')
+            ->orderBy('m.name', 'ASC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult()

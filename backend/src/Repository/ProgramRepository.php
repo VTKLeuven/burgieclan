@@ -63,7 +63,7 @@ class ProgramRepository extends ServiceEntityRepository
 
         /** @var Program[] $result */
         $result = $queryBuilder
-//            ->orderBy('p.publishedAt', 'DESC')
+            ->orderBy('p.name', 'ASC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult()
