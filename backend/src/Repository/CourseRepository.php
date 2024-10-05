@@ -65,7 +65,7 @@ class CourseRepository extends ServiceEntityRepository
 
         /** @var Course[] $result */
         $result = $queryBuilder
-//            ->orderBy('c.publishedAt', 'DESC')
+            ->orderBy('c.name', 'ASC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult()
