@@ -1,9 +1,13 @@
 export type Course = {
+    id: number;
     name: string;
-    professors: [string, string, boolean][];
-    courseCode: string;
+    courseComments: string[];
+    modules: string[];
+    code: string;
     credits: number;
     location: string;
+    professors: string[];
+    semesters: string[];
     description_top: string;
     description_bottom: string;
 }
