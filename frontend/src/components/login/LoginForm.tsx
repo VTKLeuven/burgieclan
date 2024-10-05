@@ -7,11 +7,12 @@ import Logo from "@/components/common/Logo";
 
 // Logic
 import React, {useState} from 'react';
-import {initiateLitusOAuthFlow, storeOAuthTokens} from "@/utils/oauth";
+import {initiateLitusOAuthFlow} from "@/utils/oauth";
 import ErrorPage from "@/components/error/ErrorPage";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from 'next/navigation'
-import { ApiClient } from "@/utils/api";
+import { ApiClient } from "@/actions/api";
+import {storeOAuthTokens} from "@/actions/oauth";
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
@@ -53,9 +54,9 @@ export default function LoginForm() {
                 password: password,
             });
             await storeOAuthTokens(response.token);
-            router.push('/');
+            router.push(redirectTo);
         } catch (err: any) {
-            setCredentialsError(err.detail || 'Bad credentials, please verify that your username/password are correctly set.');
+            setCredentialsError('Bad credentials, please verify that your username/password are correctly set.');
         }
     };
 
