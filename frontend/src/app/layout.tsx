@@ -1,6 +1,7 @@
 import "./globals.css";
 import React from "react";
 import { Inter } from 'next/font/google'
+import CookieBanner from "@/components/cookie-banner/CookieBanner";
 
 // Inter as default font
 const inter = Inter({
@@ -21,7 +22,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.className} h-full`}>
-      <body className="h-full">{children}</body>
+      <body className="flex min-h-full">
+        <div className="w-full">
+          {children}
+          <CookieBanner />
+        </div>
+      </body>
     </html>
   );
 }

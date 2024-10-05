@@ -12,10 +12,10 @@
 namespace App\DataFixtures;
 
 use App\Entity\Comment;
-use App\Entity\Notification;
 use App\Entity\Post;
 use App\Entity\Tag;
 use App\Entity\User;
+use App\Factory\AnnouncementFactory;
 use App\Factory\CommentCategoryFactory;
 use App\Factory\CourseCommentFactory;
 use App\Factory\CourseFactory;
@@ -23,15 +23,16 @@ use App\Factory\DocumentCategoryFactory;
 use App\Factory\DocumentCommentFactory;
 use App\Factory\DocumentFactory;
 use App\Factory\ModuleFactory;
-use App\Factory\NotificationFactory;
 use App\Factory\PageFactory;
 use App\Factory\ProgramFactory;
+use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Exception;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\String\AbstractUnicodeString;
 use Symfony\Component\String\Slugger\SluggerInterface;
-
+use function array_slice;
 use function Symfony\Component\String\u;
 
 final class AppFixtures extends Fixture
@@ -51,7 +52,7 @@ final class AppFixtures extends Fixture
         ProgramFactory::createMany(10);
         ModuleFactory::createMany(30);
         CourseFactory::createMany(80);
-        NotificationFactory::createMany(10);
+        AnnouncementFactory::createMany(10);
         CommentCategoryFactory::createMany(5);
         CourseCommentFactory::createMany(100);
         DocumentCategoryFactory::createMany(5);
@@ -109,7 +110,7 @@ final class AppFixtures extends Fixture
                 $comment = new Comment();
                 $comment->setAuthor($commentAuthor);
                 $comment->setContent($this->getRandomText(random_int(255, 512)));
-                $comment->setPublishedAt(new \DateTime('now + ' . $i . 'seconds'));
+                $comment->setPublishedAt(new DateTime('now + ' . $i . 'seconds'));
 
                 $post->addComment($comment);
             }
@@ -152,14 +153,14 @@ final class AppFixtures extends Fixture
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      *
      * @return array<int, array{
      *     0: string,
      *     1: AbstractUnicodeString,
      *     2: string,
      *     3: string,
-     *     4: \DateTime,
+     *     4: DateTime,
      *     5: User,
      *     6: array<Tag>
      *     }>
@@ -178,7 +179,7 @@ final class AppFixtures extends Fixture
                 $this->slugger->slug($title)->lower(),
                 $this->getRandomText(),
                 $this->getPostContent(),
-                (new \DateTime('now - ' . $i . 'days'))
+                (new DateTime('now - ' . $i . 'days'))
                     ->setTime(random_int(8, 17), random_int(7, 49), random_int(0, 59)),
                 // Ensure that the first post is written by Jane Doe to simplify tests
                 $user,
@@ -282,7 +283,7 @@ final class AppFixtures extends Fixture
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      *
      * @return array<Tag>
      */
@@ -290,7 +291,7 @@ final class AppFixtures extends Fixture
     {
         $tagNames = $this->getTagData();
         shuffle($tagNames);
-        $selectedTags = \array_slice($tagNames, 0, random_int(2, 4));
+        $selectedTags = array_slice($tagNames, 0, random_int(2, 4));
 
         return array_map(function ($tagName) {
             /** @var Tag $tag */
