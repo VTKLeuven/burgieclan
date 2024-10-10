@@ -1,27 +1,33 @@
-import {
-    Combobox,
-    ComboboxInput,
-    ComboboxOption,
-    ComboboxOptions,
-    Dialog,
-    DialogBackdrop,
-    DialogPanel,
-} from '@headlessui/react'
+import { Combobox, ComboboxInput, ComboboxOptions, Dialog, DialogBackdrop, DialogPanel, } from '@headlessui/react'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { FaceFrownIcon, GlobeAmericasIcon } from '@heroicons/react/24/outline'
 import { useEffect, useState } from 'react'
 import { ApiClient, ApiClientError } from "@/utils/api";
 import { ApiError } from "next/dist/server/api-utils";
 import FoldableSection from "@/components/common/FoldableSection";
+import { Course, Document, Module, Program } from "@/utils/types";
+import {
+    CourseSearchResult,
+    DocumentSearchResult,
+    ModuleSearchResult,
+    ProgramSearchResult
+} from "@/components/search/SearchResult";
 
 type SearchPopupProps = {
     open: boolean;
     setOpen: (open: boolean) => void;
 };
 
+type SearchResults = {
+    courses: Course[];
+    modules: Module[];
+    programs: Program[];
+    documents: Document[];
+};
+
 export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
-    const [query, setQuery] = useState('');
-    const [items, setItems] = useState<Record<string, any[]>>({});
+    const [query, setQuery] = useState('mod');
+    const [items, setItems] = useState<SearchResults>({courses: [], modules: [], programs: [], documents: []});
     const [error, setError] = useState<ApiClientError | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -41,22 +47,59 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
      * @param obj - The object to clean
      * @returns The cleaned object
      */
-    function removeRedundantFields (obj: Record<string, any[]>): Record<string, any[]> {
-        if (typeof obj === 'object' && obj !== null) {
-            for (const key in obj) {
-                if (key.startsWith('@')) {
-                    delete obj[key];
-                }
-            }
-        }
-        return obj;
+    function convertToObjects (obj: Record<string, any[]>): SearchResults {
+        const items: SearchResults = {courses: [], modules: [], programs: [], documents: []};
+        obj['courses']?.forEach((course) => {
+            items.courses.push({
+                id: parseInt(course['@id'], undefined),
+                name: course['name'],
+                code: course['code'],
+                professors: course['professors'],
+                semesters: course['semesters'],
+                credits: course['credits'],
+                oldCourses: course['oldCourses'],
+                newCourses: course['newCourses'],
+                modules: course['modules'],
+                courseComments: course['courseComments'],
+            });
+        });
+        obj['modules']?.forEach((module) => {
+            items.modules.push({
+                id: parseInt(module['@id'], undefined),
+                name: module['name'],
+                courses: module['courses'],
+                modules: module['modules'],
+                program: module['program'],
+            });
+        });
+        obj['programs']?.forEach((program) => {
+            items.programs.push({
+                id: parseInt(program['@id'], undefined),
+                name: program['name'],
+                modules: program['modules'],
+            });
+        });
+        obj['documents']?.forEach((document) => {
+            items.documents.push({
+                id: parseInt(document['@id'], undefined),
+                createDate: new Date(document['createDate']),
+                updateDate: new Date(document['updateDate']),
+                name: document['name'],
+                course: document['course'],
+                category: document['category'],
+                underReview: document['underReview'],
+                contentUrl: document['contentUrl'],
+            });
+        });
+        return items;
     }
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const result = await fetchSearch(query);
-                setItems(removeRedundantFields(result));
+                setItems(convertToObjects(result));
+                console.log(items)
             } catch (err: any) {
                 setError(err);
             }
@@ -65,7 +108,7 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
         if (query.length > 2) {
             fetchData();
         } else {
-            setItems({});
+            setItems({courses: [], modules: [], programs: [], documents: []});
         }
     }, [query]);
 
@@ -143,31 +186,66 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
                         )}
 
                         {!error && query.length > 2 && Object.values(items).some(value => Array.isArray(value) && value.length > 0) && (
-                            <ComboboxOptions
-                                static
-                                as="ul"
-                                className="max-h-[calc(100vh-15rem)] scroll-pb-2 scroll-pt-11 space-y-2 overflow-y-auto pb-2"
-                            >
-                                {Object.entries(items)
-                                    .filter(([, results]) => results.length > 0)
-                                    .map(([category, results]) => (
-                                        <FoldableSection key={category} title={category} defaultOpen={true}>
+                            <div>
+                                <ComboboxOptions
+                                    static
+                                    as="ul"
+                                    className="max-h-[calc(100vh-15rem)] scroll-pb-2 scroll-pt-11 space-y-2 overflow-y-auto pb-2 pl-0"
+                                >
+                                    {items.courses.length > 0 &&
+                                        <FoldableSection key={'courses'} title={'Courses'} defaultOpen={true}>
                                             <li className="list-none">
-                                                <ul className="mt-2 text-sm text-gray-800">
-                                                    {results.map((item) => (
-                                                        <ComboboxOption
-                                                            key={item['@id']}
-                                                            value={item}
-                                                            className="cursor-default select-none px-4 py-2 data-[focus]:bg-indigo-600 data-[focus]:text-white"
-                                                        >
-                                                            {item.name}
-                                                        </ComboboxOption>
+                                                <ul
+                                                    className="mt-2 text-sm text-gray-800 pl-0"
+                                                >
+                                                    {items.courses.map((course) => (
+                                                        <CourseSearchResult key={course.id} course={course}/>
                                                     ))}
                                                 </ul>
                                             </li>
                                         </FoldableSection>
-                                    ))}
-                            </ComboboxOptions>
+                                    }
+                                    {items.modules.length > 0 &&
+                                        <FoldableSection key={'modules'} title={'Modules'} defaultOpen={true}>
+                                            <li className="list-none">
+                                                <ul
+                                                    className="mt-2 text-sm text-gray-800 pl-0"
+                                                >
+                                                    {items.modules.map((module) => (
+                                                        <ModuleSearchResult key={module.id} module={module}/>
+                                                    ))}
+                                                </ul>
+                                            </li>
+                                        </FoldableSection>
+                                    }
+                                    {items.programs.length > 0 &&
+                                        <FoldableSection key={'programs'} title={'Programs'} defaultOpen={true}>
+                                            <li className="list-none">
+                                                <ul
+                                                    className="mt-2 text-sm text-gray-800 pl-0"
+                                                >
+                                                    {items.programs.map((program) => (
+                                                        <ProgramSearchResult key={program.id} program={program}/>
+                                                    ))}
+                                                </ul>
+                                            </li>
+                                        </FoldableSection>
+                                    }
+                                    {items.documents.length > 0 &&
+                                        <FoldableSection key={'documents'} title={'Documents'} defaultOpen={true}>
+                                            <li className="list-none">
+                                                <ul
+                                                    className="mt-2 text-sm text-gray-800 pl-0"
+                                                >
+                                                    {items.documents.map((document) => (
+                                                        <DocumentSearchResult key={document.id} document={document}/>
+                                                    ))}
+                                                </ul>
+                                            </li>
+                                        </FoldableSection>
+                                    }
+                                </ComboboxOptions>
+                            </div>
                         )}
 
                         {!error && !loading && query.length > 2 && Object.values(items).every(value => Array.isArray(value) && value.length === 0) && (
