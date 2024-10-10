@@ -6,6 +6,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Logo from '@/components/common/Logo';
 import {Skeleton} from "@/components/ui/skeleton";
 import Search from "@/components/header/Search";
+import HeaderProfileButton from "@/components/header/HeaderProfileButton";
 
 const navigation = [
     { name: 'Courses', href: '#' },
@@ -13,8 +14,9 @@ const navigation = [
     { name: 'Overview', href: '#' },
 ];
 
-export default async function Header({isAuthenticated} : {isAuthenticated: boolean}) {
+export default async function Header({jwt} : {jwt: string | null}) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const isAuthenticated = jwt !== null;
 
     return (
         <header className="bg-white">
@@ -54,7 +56,7 @@ export default async function Header({isAuthenticated} : {isAuthenticated: boole
                 </Suspense>
 
                 {/* Whitespace and login/profile links */}
-                <div className="hidden md:flex md:gap-x-8">
+                <div className="hidden md:flex md:gap-x-8 md:items-center">
                     <Suspense fallback={<Skeleton width={100} height={20}/>}>
                         {isAuthenticated &&
                         navigation.map((item) => (
@@ -63,14 +65,7 @@ export default async function Header({isAuthenticated} : {isAuthenticated: boole
                             </a>
                         ))}
 
-                        {isAuthenticated ?
-                        <a href="account" className="text-sm font-semibold leading-6 text-gray-900">
-                            Profile
-                        </a> :
-                        <a href="login" className="primary-button">
-                            Login
-                        </a>
-                        }
+                        <HeaderProfileButton jwt={jwt}/>
                     </Suspense>
                 </div>
             </nav>
