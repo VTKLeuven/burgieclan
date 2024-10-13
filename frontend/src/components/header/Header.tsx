@@ -14,7 +14,7 @@ const navigation = [
     { name: 'Overview', href: '#' },
 ];
 
-export default async function Header({jwt} : {jwt: string | null}) {
+export default function Header({jwt} : {jwt: string | null}) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const isAuthenticated = jwt !== null;
 
