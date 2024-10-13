@@ -9,14 +9,15 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {CircleUserRound} from 'lucide-react';
-import {parseJWT} from "@/utils/oauth";
-import {redirect} from "next/navigation";
-import {logOut} from "@/actions/oauth";
+import { CircleUserRound } from 'lucide-react';
+import { parseJWT } from "@/utils/oauth";
+import { logOut } from "@/actions/oauth";
 import { useRouter } from 'next/navigation'
 
+/**
+ * Shows login button if unauthenticated, otherwise dropdown with profile options
+ */
 export default function HeaderProfileButton({jwt} : {jwt : string | null}) {
-
     const router = useRouter()
 
     const isAuthenticated = jwt !== null;
