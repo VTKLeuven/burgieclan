@@ -49,6 +49,9 @@ class DocumentCrudController extends AbstractCrudController
         yield BooleanField::new('under_review')
             ->setLabel('Under review')
             ->renderAsSwitch(false);
+        yield BooleanField::new('anonymous')
+            ->setLabel('Anonymous')
+            ->renderAsSwitch(false);
         yield TextField::new('file')
             ->setFormType(VichFileType::class)
             ->setFormTypeOptions([

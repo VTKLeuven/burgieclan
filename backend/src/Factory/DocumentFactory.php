@@ -72,6 +72,7 @@ final class DocumentFactory extends ModelFactory
             'course' => CourseFactory::randomOrCreate(),
             'name' => self::faker()->word(),
             'under_review' => self::faker()->boolean(),
+            'anonymous' => false,
             'creator' => UserFactory::randomOrCreate(),
         ];
     }
