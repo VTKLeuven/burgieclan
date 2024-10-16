@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Entity\Document;
+use App\State\DocumentApiProvider;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
 use App\State\DocumentProcessor;
@@ -23,8 +24,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     shortName: 'Document',
     operations: [
-        new Get(),
-        new GetCollection(),
+        new Get(
+            provider: DocumentApiProvider::class
+        ),
+        new GetCollection(
+            provider: DocumentApiProvider::class
+        ),
         new Post(
             inputFormats: ['multipart' => ['multipart/form-data']],
             openapi: new Model\Operation(
@@ -52,6 +57,9 @@ use Symfony\Component\Validator\Constraints as Assert;
                                         'type' => 'string',
                                         'format' => 'binary'
                                     ],
+                                    'anonymous' => [
+                                        'type' => 'boolean',
+                                    ],
                                 ]
                             ]
                         ]
@@ -60,8 +68,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             ),
             validationContext: ['groups' => ['Default', 'document_create']],
             deserialize: false,
-            processor: DocumentProcessor::class
-        )    ],
+            processor: DocumentProcessor::class,
+        )],
     outputFormats: ['jsonld' => ['application/ld+json']],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
@@ -85,6 +93,9 @@ class DocumentApi
     #[ApiProperty(writable: false)]
     #[ApiFilter(BooleanFilter::class)]
     public bool $under_review = true;
+
+    #[ApiFilter(BooleanFilter::class)]
+    public bool $anonymous;
 
     public ?string $contentUrl = null;
 
