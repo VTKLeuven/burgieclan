@@ -25,13 +25,13 @@ type SearchResults = {
     documents: Document[];
 };
 
-export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
-    const [query, setQuery] = useState('mod');
-    const [items, setItems] = useState<SearchResults>({courses: [], modules: [], programs: [], documents: []});
+export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
+    const [query, setQuery] = useState('');
+    const [items, setItems] = useState<SearchResults>({ courses: [], modules: [], programs: [], documents: [] });
     const [error, setError] = useState<ApiClientError | null>(null);
     const [loading, setLoading] = useState(false);
 
-    async function fetchSearch (query: string) {
+    async function fetchSearch(query: string) {
         setLoading(true);
         try {
             return await ApiClient('GET', `/api/search?searchText=${query}`);
@@ -47,8 +47,8 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
      * @param obj - The object to clean
      * @returns The cleaned object
      */
-    function convertToObjects (obj: Record<string, any[]>): SearchResults {
-        const items: SearchResults = {courses: [], modules: [], programs: [], documents: []};
+    function convertToObjects(obj: Record<string, any[]>): SearchResults {
+        const items: SearchResults = { courses: [], modules: [], programs: [], documents: [] };
         obj['courses']?.forEach((course) => {
             items.courses.push({
                 id: convertIriToId(course['@id']),
@@ -110,7 +110,6 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
             try {
                 const result = await fetchSearch(query);
                 setItems(convertToObjects(result));
-                console.log(items)
             } catch (err: any) {
                 setError(err);
             }
@@ -119,7 +118,7 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
         if (query.length > 2) {
             fetchData();
         } else {
-            setItems({courses: [], modules: [], programs: [], documents: []});
+            setItems({ courses: [], modules: [], programs: [], documents: [] });
         }
     }, [query]);
 
@@ -169,18 +168,18 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
                         {loading && (
                             <div className="flex justify-center py-12">
                                 <svg className="animate-spin h-8 w-8 text-gray-900" xmlns="http://www.w3.org/2000/svg"
-                                     fill="none" viewBox="0 0 24 24">
+                                    fill="none" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                            strokeWidth="4"></circle>
+                                        strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor"
-                                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                                 </svg>
                             </div>
                         )}
 
                         {error && (
                             <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
-                                <FaceFrownIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true"/>
+                                <FaceFrownIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
                                 <p className="mt-4 font-semibold text-gray-900">An error occurred</p>
                                 <p className="mt-2 text-gray-500">{error.detail}</p>
                             </div>
@@ -188,7 +187,7 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
 
                         {!error && query.length <= 2 && (
                             <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
-                                <GlobeAmericasIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true"/>
+                                <GlobeAmericasIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
                                 <p className="mt-4 font-semibold text-gray-900">Search for courses, modules, programs,
                                     documents...</p>
                                 <p className="mt-2 text-gray-500">Quickly access any page by running a
@@ -210,7 +209,7 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
                                                     className="mt-2 text-sm text-gray-800 pl-0"
                                                 >
                                                     {items.courses.map((course) => (
-                                                        <CourseSearchResult key={course.id} course={course}/>
+                                                        <CourseSearchResult key={course.id} course={course} />
                                                     ))}
                                                 </ul>
                                             </li>
@@ -223,7 +222,7 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
                                                     className="mt-2 text-sm text-gray-800 pl-0"
                                                 >
                                                     {items.modules.map((module) => (
-                                                        <ModuleSearchResult key={module.id} module={module}/>
+                                                        <ModuleSearchResult key={module.id} module={module} />
                                                     ))}
                                                 </ul>
                                             </li>
@@ -236,7 +235,7 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
                                                     className="mt-2 text-sm text-gray-800 pl-0"
                                                 >
                                                     {items.programs.map((program) => (
-                                                        <ProgramSearchResult key={program.id} program={program}/>
+                                                        <ProgramSearchResult key={program.id} program={program} />
                                                     ))}
                                                 </ul>
                                             </li>
@@ -249,7 +248,7 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
                                                     className="mt-2 text-sm text-gray-800 pl-0"
                                                 >
                                                     {items.documents.map((document) => (
-                                                        <DocumentSearchResult key={document.id} document={document}/>
+                                                        <DocumentSearchResult key={document.id} document={document} />
                                                     ))}
                                                 </ul>
                                             </li>
@@ -261,7 +260,7 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
 
                         {!error && !loading && query.length > 2 && Object.values(items).every(value => Array.isArray(value) && value.length === 0) && (
                             <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
-                                <FaceFrownIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true"/>
+                                <FaceFrownIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
                                 <p className="mt-4 font-semibold text-gray-900">No results found</p>
                                 <p className="mt-2 text-gray-500">We couldn’t find anything with that term. Please try
                                     again.</p>
