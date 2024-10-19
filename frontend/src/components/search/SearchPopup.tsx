@@ -51,7 +51,7 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
         const items: SearchResults = {courses: [], modules: [], programs: [], documents: []};
         obj['courses']?.forEach((course) => {
             items.courses.push({
-                id: parseInt(course['@id'], undefined),
+                id: convertIriToId(course['@id']),
                 name: course['name'],
                 code: course['code'],
                 professors: course['professors'],
@@ -65,7 +65,7 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
         });
         obj['modules']?.forEach((module) => {
             items.modules.push({
-                id: parseInt(module['@id'], undefined),
+                id: convertIriToId(module['@id']),
                 name: module['name'],
                 courses: module['courses'],
                 modules: module['modules'],
@@ -74,14 +74,14 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
         });
         obj['programs']?.forEach((program) => {
             items.programs.push({
-                id: parseInt(program['@id'], undefined),
+                id: convertIriToId(program['@id']),
                 name: program['name'],
                 modules: program['modules'],
             });
         });
         obj['documents']?.forEach((document) => {
             items.documents.push({
-                id: parseInt(document['@id'], undefined),
+                id: convertIriToId(document['@id']),
                 createDate: new Date(document['createDate']),
                 updateDate: new Date(document['updateDate']),
                 name: document['name'],
@@ -92,6 +92,17 @@ export default function SearchPopup ({open, setOpen}: SearchPopupProps) {
             });
         });
         return items;
+    }
+
+    /**
+     * Converts an IRI (Internationalized Resource Identifier) to an ID.
+     *
+     * @param {string} iri - The IRI string to be converted.
+     * @returns {number} - The extracted ID from the IRI as a number.
+     */
+    function convertIriToId(iri: string): number {
+        const match = iri.match(/\/(\d+)(?=$)/); // Regex to match the last number in the URL
+        return match ? parseInt(match[1], 10) : 0; // Convert to number or return 0 if not found
     }
 
     useEffect(() => {
