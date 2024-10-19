@@ -12,6 +12,7 @@ import {
     ModuleSearchResult,
     ProgramSearchResult
 } from "@/components/search/SearchResult";
+import { objectToCourse, objectToDocument, objectToModule, objectToProgram } from '@/utils/objectToTypeConvertor';
 
 type SearchPopupProps = {
     open: boolean;
@@ -48,61 +49,22 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
      * @returns The cleaned object
      */
     function convertToObjects(obj: Record<string, any[]>): SearchResults {
+        console.log(obj);
         const items: SearchResults = { courses: [], modules: [], programs: [], documents: [] };
         obj['courses']?.forEach((course) => {
-            items.courses.push({
-                id: convertIriToId(course['@id']),
-                name: course['name'],
-                code: course['code'],
-                professors: course['professors'],
-                semesters: course['semesters'],
-                credits: course['credits'],
-                oldCourses: course['oldCourses'],
-                newCourses: course['newCourses'],
-                modules: course['modules'],
-                courseComments: course['courseComments'],
-            });
+            items.courses.push(objectToCourse(course));
         });
         obj['modules']?.forEach((module) => {
-            items.modules.push({
-                id: convertIriToId(module['@id']),
-                name: module['name'],
-                courses: module['courses'],
-                modules: module['modules'],
-                program: module['program'],
-            });
+            items.modules.push(objectToModule(module));
         });
         obj['programs']?.forEach((program) => {
-            items.programs.push({
-                id: convertIriToId(program['@id']),
-                name: program['name'],
-                modules: program['modules'],
-            });
+            items.programs.push(objectToProgram(program));
         });
         obj['documents']?.forEach((document) => {
-            items.documents.push({
-                id: convertIriToId(document['@id']),
-                createDate: new Date(document['createDate']),
-                updateDate: new Date(document['updateDate']),
-                name: document['name'],
-                course: document['course'],
-                category: document['category'],
-                underReview: document['underReview'],
-                contentUrl: document['contentUrl'],
-            });
+            items.documents.push(objectToDocument(document));
         });
+        console.log(items);
         return items;
-    }
-
-    /**
-     * Converts an IRI (Internationalized Resource Identifier) to an ID.
-     *
-     * @param {string} iri - The IRI string to be converted.
-     * @returns {number} - The extracted ID from the IRI as a number.
-     */
-    function convertIriToId(iri: string): number {
-        const match = iri.match(/\/(\d+)(?=$)/); // Regex to match the last number in the URL
-        return match ? parseInt(match[1], 10) : 0; // Convert to number or return 0 if not found
     }
 
     useEffect(() => {
@@ -111,6 +73,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                 const result = await fetchSearch(query);
                 setItems(convertToObjects(result));
             } catch (err: any) {
+                console.log(err);
                 setError(err);
             }
         };
