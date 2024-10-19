@@ -5,6 +5,7 @@ import { Dialog } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Logo from '@/components/common/Logo';
 import Input from '@/components/ui/Input';
+import SearchPopup from "@/components/search/SearchPopup";
 
 const navigation = [
     { name: 'Courses', href: '#' },
@@ -14,6 +15,7 @@ const navigation = [
 
 export default function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [searchPopupOpen, setSearchPopupOpen] = useState(false);
     const searchInputRef = useRef<HTMLInputElement | null>(null);
 
     /**
@@ -30,7 +32,7 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
             if (isCtrlF || isCmdF) {
                 event.preventDefault();
                 if (!searchInputRef.current) return;
-                searchInputRef.current.focus()
+                setSearchPopupOpen(true);
             }
         };
 
@@ -51,16 +53,21 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                         <span className="sr-only">Burgieclan</span>
                         <Logo width={50} height={50}/>
                     </a>
-                    <div className="flex">
-                        <Input ref={searchInputRef} id="search" name="search" type="search" placeholder="search"/>
-                    </div>
-                </div>
+                    {isAuthenticated &&
+                        <><div className="flex">
+                            <Input ref={searchInputRef} id="search" name="search" type="search" placeholder="Search..."
+                                   onClick={() => setSearchPopupOpen(true)}/>
+                        </div>
+                        <SearchPopup open={searchPopupOpen} setOpen={setSearchPopupOpen}/>
+                        </>
+                }
+            </div>
 
-                {/* Mobile menu toggle button */}
-                <div className="flex md:hidden">
-                    <button
-                        type="button"
-                        onClick={() => setMobileMenuOpen(true)}
+            {/* Mobile menu toggle button */}
+            <div className="flex md:hidden">
+                <button
+                    type="button"
+                    onClick={() => setMobileMenuOpen(true)}
                         className="-m-1.5 p-1.5 w-[50px] h-[50px] inline-flex items-center justify-center rounded-md text-gray-700"
                     >
                         <span className="sr-only">Open main menu</span>
