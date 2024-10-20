@@ -44,14 +44,6 @@ const InfoDialog = ({isOpen, setIsOpen}) => {
                     the underlying LaTeX interpreter.
                 </Text>
             </DialogBody>
-            <DialogActions>
-                <button
-                    type="button"
-                    onClick={() => setIsOpen(false)}
-                    className="primary-button">
-                    Close
-                </button>
-            </DialogActions>
         </Dialog>
     )
 }

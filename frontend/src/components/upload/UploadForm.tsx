@@ -4,13 +4,22 @@ import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/
 import Form from '@/components/upload/Form'
 import { Text } from '@/components/ui/Text'
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
+import { ApiClient } from '@/actions/api';
+import {ApiError} from "@/utils/error/apiError";
+import {useState} from "react";
 
 /**
  * Upload form for uploading a document
  */
 const UploadForm = ({isOpen, setIsOpen}) => {
-    const handleSubmit = (formData) => {
-        console.log("Document sent", formData);
+    const [error, setError] = useState<ApiError | null>(null);
+
+    const handleSubmit = async (formData) => {
+        const result = await ApiClient('POST', `/api/document`);
+        if (result.error) {
+            setError(new ApiError(result.error.message, result.error.status));
+        }
+
         setIsOpen(false);
     };
 
@@ -31,7 +40,8 @@ const UploadForm = ({isOpen, setIsOpen}) => {
                     type="submit"
                     form="upload-form"
                     className="primary-button">
-                    <PaperAirplaneIcon className="w-5 h-5 mr-2" /> Send document
+                    <PaperAirplaneIcon className="mr-2 w-5 h-5" />
+                    Send document
                 </button>
             </DialogActions>
         </Dialog>
