@@ -15,11 +15,14 @@ const UploadForm = ({isOpen, setIsOpen}) => {
     const [error, setError] = useState<ApiError | null>(null);
 
     const handleSubmit = async (formData) => {
-        const result = await ApiClient('POST', `/api/document`);
+        console.log('ok')
+        console.log(formData)
+        const result = await ApiClient('POST', `/api/document`, formData);
+        console.log('okokok')
         if (result.error) {
             setError(new ApiError(result.error.message, result.error.status));
         }
-
+        console.log('okokokokok')
         setIsOpen(false);
     };
 
