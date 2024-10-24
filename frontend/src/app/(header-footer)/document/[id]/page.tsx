@@ -1,15 +1,16 @@
 'use client'
 
 import {useEffect, useState} from "react";
-import {ApiClient, ApiClientError} from "@/utils/api";
 import ErrorPage from "@/components/error/ErrorPage";
 import Loading from "@/app/loading";
+import {ApiError} from "@/utils/error/apiError";
+import {ApiClient} from "@/actions/api";
 
 export default function DocumentPage({ params }: { params: any }) {
     const { id } = params;
 
     const [document, setDocument] = useState<any>(null);
-    const [error, setError] = useState<ApiClientError | null>(null);
+    const [error, setError] = useState<ApiError | null>(null);
 
     useEffect(() => {
         const FetchData = async () => {
