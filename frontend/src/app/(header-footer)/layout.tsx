@@ -5,6 +5,15 @@ import React, { useEffect, useState } from "react";
 import Header from "@/components/header/Header";
 import { hasJwt } from "@/actions/oauth";
 import Footer from "@/components/footer/Footer";
+import Sidebar from "@/components/sidebar/Sidebar";
+import {Bars3Icon} from "@heroicons/react/24/outline";
+import {MagnifyingGlassIcon} from "@heroicons/react/16/solid";
+import {BellIcon, Menu} from "lucide-react";
+import {ChevronDownIcon} from "@heroicons/react/20/solid";
+
+function MenuButton(props: { className: string, children: ReactNode }) {
+    return null;
+}
 
 export default function HeaderLayout({children,}: Readonly<{ children: React.ReactNode }>) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -24,12 +33,15 @@ export default function HeaderLayout({children,}: Readonly<{ children: React.Rea
 
     return (
         <>
-            <div className="flex h-full flex-col min-h-full">
-                <Header isAuthenticated={isAuthenticated} />
-                <div className="grow">
-                    {children}
+            <div className="flex flex-col h-screen">
+                <Header isAuthenticated={isAuthenticated}/>
+                <div className="flex flex-1 ">
+                    <Sidebar />
+                    <main className="flex flex-1 p-4">
+                        {children}
+                    </main>
                 </div>
-                <Footer />
+                <Footer/>
             </div>
         </>
     );
