@@ -1,12 +1,21 @@
-'use server';
+import 'server-only'
 
 /**
  * DAL (Data Access Layer) centralizes authentication logic
  * https://nextjs.org/docs/app/building-your-application/authentication#creating-a-data-access-layer-dal
  */
 
-import {cookies} from "next/headers";
-import {getJWTExpiration, LitusOAuthRefresh} from "@/utils/oauth";
+import { cookies } from "next/headers";
+import {getJWTExpiration, LitusOAuthRefresh, parseJWT} from "@/utils/oauth";
+import {cache} from "react";
+
+export const isAuth = cache(async () => {
+    const jwt = await getActiveJWT();
+    if (jwt) {
+        console.log(parseJWT(jwt));
+    }
+    return jwt != null;
+})
 
 /**
  * Returns JWT if available, refreshes it first if expired, returns null if not available or not refreshable
