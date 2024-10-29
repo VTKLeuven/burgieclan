@@ -35,9 +35,9 @@ export default function HeaderLayout({children,}: Readonly<{ children: React.Rea
         <>
             <div className="flex flex-col">
                 <Header isAuthenticated={isAuthenticated}/>
-                <div className="flex flex-1 ">
+                <div className="flex flex-auto">
                     <Sidebar />
-                    <main className="flex flex-1">
+                    <main className="flex flex-auto">
                         {children}
                     </main>
                 </div>

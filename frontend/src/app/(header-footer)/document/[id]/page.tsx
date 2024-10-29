@@ -5,6 +5,8 @@ import ErrorPage from "@/components/error/ErrorPage";
 import Loading from "@/app/loading";
 import {ApiError} from "@/utils/error/apiError";
 import {ApiClient} from "@/actions/api";
+import DocumentComments from "@/components/document/DocumentComments";
+import DocumentPreview from "@/components/document/DocumentPreview";
 
 export default function DocumentPage({ params }: { params: any }) {
     const { id } = params;
@@ -35,15 +37,8 @@ export default function DocumentPage({ params }: { params: any }) {
     }
 
     return (
-        <div className="overflow-hidden rounded-lg bg-white shadow">
-            <div className="px-4 py-5 sm:px-6">
-                <h1 className="text-xl">pdfname.pdf</h1>
-                {/* Content goes here */}
-                {/* We use less vertical padding on card headers on desktop than on body sections */}
-            </div>
-            <div className="bg-gray-50 px-4 py-5 sm:p-6">
-                {/* Content goes here */}
-            </div>
-        </div>
+        <>
+            <DocumentPreview />
+        </>
     );
 }
