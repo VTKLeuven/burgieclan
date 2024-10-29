@@ -23,27 +23,27 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    @apply text-4xl sm:text-5xl font-bold tracking-tight my-4;
+    @apply text-4xl sm:text-5xl font-bold tracking-tight;
 }
 
 h2 {
-    @apply text-3xl sm:text-4xl font-semibold my-3;
+    @apply text-3xl sm:text-4xl font-semibold;
 }
 
 h3 {
-    @apply text-2xl sm:text-3xl font-semibold my-2;
+    @apply text-2xl sm:text-3xl font-semibold;
 }
 
 h4 {
-    @apply text-xl sm:text-2xl font-medium my-2;
+    @apply text-xl sm:text-2xl font-medium;
 }
 
 h5 {
-    @apply text-lg sm:text-xl font-medium my-1;
+    @apply text-lg sm:text-xl font-medium;
 }
 
 h6 {
-    @apply text-base sm:text-lg font-medium my-1;
+    @apply text-base sm:text-lg font-medium;
 }
 
 p {
