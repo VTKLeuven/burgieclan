@@ -122,7 +122,7 @@ const requestJWT = async (accessToken: string): Promise<string> => {
 /**
  * Decode and parse JWT
  */
-const parseJWT = (jwt: string): JWTPayload => {
+export const parseJWT = (jwt: string): JWTPayload => {
     try {
         const base64Url = jwt.split('.')[1];
         const base64Str = base64Url.replace(/-/g, '+').replace(/_/g, '/');
