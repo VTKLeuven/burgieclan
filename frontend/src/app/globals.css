@@ -57,3 +57,8 @@ ul {
 ol {
     @apply list-decimal list-inside pl-4;
 }
+
+@layer base {
+  :root {
+
+        --radius: 0.5rem}}
