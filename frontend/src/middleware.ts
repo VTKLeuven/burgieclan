@@ -28,13 +28,12 @@ export default async function middleware(request: NextRequest) {
     const isAuthenticated = request.cookies.has('jwt');
 
     // Redirect to login if user is not authenticated and the page is not public
-    // TODO: uncomment
-    // if (!isAuthenticated) {
-    //     const publicPage = await isPublicPage(request.nextUrl.pathname.slice(1));
-    //     if (!publicPage) {
-    //         return NextResponse.redirect(new URL(`/login?redirectTo=${encodeURIComponent(request.nextUrl.href)}`, request.url));
-    //     }
-    // }
+    if (!isAuthenticated) {
+        const publicPage = await isPublicPage(request.nextUrl.pathname.slice(1));
+        if (!publicPage) {
+            return NextResponse.redirect(new URL(`/login?redirectTo=${encodeURIComponent(request.nextUrl.href)}`, request.url));
+        }
+    }
 
     // Allow access
     return NextResponse.next();
