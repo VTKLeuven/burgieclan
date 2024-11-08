@@ -2,7 +2,6 @@ import { Combobox, ComboboxInput, ComboboxOptions, Dialog, DialogBackdrop, Dialo
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { FaceFrownIcon, GlobeAmericasIcon } from '@heroicons/react/24/outline'
 import { useEffect, useState } from 'react'
-import { ApiClient, ApiClientError } from "@/utils/api";
 import { ApiError } from "next/dist/server/api-utils";
 import FoldableSection from "@/components/common/FoldableSection";
 import { Course, Document, Module, Program } from "@/utils/types";
@@ -13,6 +12,7 @@ import {
     ProgramSearchResult
 } from "@/components/search/SearchResult";
 import { objectToCourse, objectToDocument, objectToModule, objectToProgram } from '@/utils/objectToTypeConvertor';
+import { ApiClient } from '@/actions/api';
 
 type SearchPopupProps = {
     open: boolean;
@@ -29,7 +29,7 @@ type SearchResults = {
 export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
     const [query, setQuery] = useState('');
     const [items, setItems] = useState<SearchResults>({ courses: [], modules: [], programs: [], documents: [] });
-    const [error, setError] = useState<ApiClientError | null>(null);
+    const [error, setError] = useState<ApiError | null>(null);
     const [loading, setLoading] = useState(false);
 
     async function fetchSearch(query: string) {
@@ -49,7 +49,6 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
      * @returns The cleaned object
      */
     function convertToObjects(obj: Record<string, any[]>): SearchResults {
-        console.log(obj);
         const items: SearchResults = { courses: [], modules: [], programs: [], documents: [] };
         obj['courses']?.forEach((course) => {
             items.courses.push(objectToCourse(course));
@@ -63,7 +62,6 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
         obj['documents']?.forEach((document) => {
             items.documents.push(objectToDocument(document));
         });
-        console.log(items);
         return items;
     }
 
@@ -73,7 +71,6 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                 const result = await fetchSearch(query);
                 setItems(convertToObjects(result));
             } catch (err: any) {
-                console.log(err);
                 setError(err);
             }
         };
@@ -106,11 +103,9 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                     className="mx-auto max-w-xl transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
                 >
                     <Combobox
-                        onChange={(item) => {
-                            if (item) {
-                                // TODO replace with correct redirect
-                                // @ts-ignore
-                                window.location = item['@id'];
+                        onChange={({ redirect }: { redirect: Location | (string & Location) }) => {
+                            if (redirect) {
+                                window.location = redirect;
                             }
                         }}
                     >
@@ -144,7 +139,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                             <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
                                 <FaceFrownIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
                                 <p className="mt-4 font-semibold text-gray-900">An error occurred</p>
-                                <p className="mt-2 text-gray-500">{error.detail}</p>
+                                <p className="mt-2 text-gray-500">{error.message}</p>
                             </div>
                         )}
 
