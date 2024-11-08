@@ -1,7 +1,7 @@
 'use client'
 
 import React, { Suspense, useState } from 'react';
-import { Dialog } from '@headlessui/react';
+import { Dialog, Input } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Logo from '@/components/common/Logo';
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,7 +13,7 @@ const navigation = [
     { name: 'Overview', href: '#' },
 ];
 
-export default async function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
+export default function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
@@ -26,9 +26,7 @@ export default async function Header({ isAuthenticated }: { isAuthenticated: boo
                         <span className="sr-only">Burgieclan</span>
                         <Logo width={50} height={50} />
                     </a>
-                    <div className="flex">
-                        <Input ref={searchInputRef} id="search" name="search" type="search" placeholder="search" />
-                    </div>
+                    {isAuthenticated && <Search />}
                 </div>
 
                 {/* Mobile menu toggle button */}
@@ -45,7 +43,7 @@ export default async function Header({ isAuthenticated }: { isAuthenticated: boo
 
                 {/* Whitespace and login/profile links */}
                 <div className="hidden md:flex md:gap-x-8">
-                    <Suspense fallback={<Skeleton width={100} height={20} />}>
+                    <Suspense fallback={<Skeleton style={{ width: 100, height: 20 }} />}>
                         {isAuthenticated &&
                             navigation.map((item) => (
                                 <a key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-gray-900">

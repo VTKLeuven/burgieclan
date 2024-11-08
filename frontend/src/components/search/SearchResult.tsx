@@ -10,7 +10,7 @@ type SearchResultProps = {
 
 export default function SearchResult({ mainResult, extraInfo, redirect }: SearchResultProps) {
     return <ComboboxOption
-        value={redirect}
+        value={{ redirect }}
         className="cursor-default select-none px-4 py-2 data-[focus]:bg-amber-600 data-[focus]:text-white"
     >
         {({ focus }) => (<div className="flex justify-between">

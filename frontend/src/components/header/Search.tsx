@@ -1,10 +1,13 @@
 'use client'
 
 import Input from "@/components/ui/Input";
-import React, {useEffect, useRef} from "react";
+import React, { useEffect, useRef, useState } from "react";
+import SearchPopup from "../search/SearchPopup";
 
 export default function Search() {
     const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+    const [searchPopupOpen, setSearchPopupOpen] = useState(false);
 
     /**
      * Ctrl+F or Cmd+F to focus on search input (not in mobile mode)
@@ -20,7 +23,7 @@ export default function Search() {
             if (isCtrlF || isCmdF) {
                 event.preventDefault();
                 if (!searchInputRef.current) return;
-                searchInputRef.current.focus()
+                setSearchPopupOpen(true);
             }
         };
 
@@ -33,7 +36,9 @@ export default function Search() {
 
     return (
         <div className="flex">
-            <Input ref={searchInputRef} id="search" name="search" type="search" placeholder="search"/>
+            <Input ref={searchInputRef} id="search" name="search" type="search" placeholder="Search..."
+                onClick={() => setSearchPopupOpen(true)} />
+            <SearchPopup open={searchPopupOpen} setOpen={setSearchPopupOpen} />
         </div>
     )
 }
