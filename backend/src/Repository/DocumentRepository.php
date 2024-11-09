@@ -11,6 +11,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Course;
 use App\Entity\Document;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -49,6 +50,20 @@ class DocumentRepository extends ServiceEntityRepository
         } catch (NoResultException | NonUniqueResultException $e) {
             return 0;
         }
+    }
+
+    /**
+     * @param Course $course
+     * @return Document[]
+     */
+    public function findByCourseAndHasFile(Course $course): array
+    {
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.course = :course')
+            ->andWhere('d.file_name IS NOT NULL')
+            ->setParameter('course', $course)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
