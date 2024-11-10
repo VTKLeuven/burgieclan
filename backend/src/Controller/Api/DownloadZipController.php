@@ -31,10 +31,10 @@ final class DownloadZipController extends AbstractController
         $modules = $this->mapEntities($zipApi->modules, Module::class);
         $courses = $this->mapEntities($zipApi->courses, Course::class);
 
-        $content = $this->generateContentHash($programs, $modules, $courses);
+        $contentHash = $this->generateContentHash($programs, $modules, $courses);
 
-        if (!empty($content)) {
-            $fileName = $this->createZipFile($content, $programs, $modules, $courses);
+        if ($contentHash !== md5('')) {
+            $fileName = $this->createZipFile($contentHash, $programs, $modules, $courses);
             return $this->createFileResponse($fileName);
         }
 
