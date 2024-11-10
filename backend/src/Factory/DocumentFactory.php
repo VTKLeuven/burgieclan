@@ -73,7 +73,9 @@ final class DocumentFactory extends ModelFactory
             'name' => self::faker()->word(),
             'under_review' => self::faker()->boolean(),
             'creator' => UserFactory::randomOrCreate(),
-            'year' => $this->generateYear(),
+            // Selects a random file from the 'data/documents' directory and assigns its basename to 'file_name'.
+            // Uses the 'glob' function to get all files in the directory and 'randomElement' to pick one randomly.
+            'file_name' => basename(self::faker()->randomElement(glob('data/documents/*'))),                'year' => $this->generateYear(),
         ];
     }
 
