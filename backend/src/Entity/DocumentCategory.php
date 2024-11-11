@@ -43,7 +43,7 @@ class DocumentCategory
 
     public function __toString(): string
     {
-        return $this->parent ? $this->parent . ' > ' . $this->name : $this->name;
+        return $this->parent ? $this->parent->getName() . ' > ' . $this->name : $this->name;
     }
 
     public function setName(string $name): self
@@ -72,7 +72,7 @@ class DocumentCategory
 
     public function addSubcategory(self $subcategory): self
     {
-        if (!$this->subcategories->contains($subcategory)) {
+        if (!$this->subcategories->contains($subcategory) && !$this->isAncestorOf($subcategory)) {
             $this->subcategories->add($subcategory);
             $subcategory->setParent($this);
         }
@@ -89,5 +89,17 @@ class DocumentCategory
         }
 
         return $this;
+    }
+
+    public function isAncestorOf(self $category): bool
+    {
+        $parent = $category->getParent();
+        while ($parent !== null) {
+            if ($parent === $this) {
+                return true;
+            }
+            $parent = $parent->getParent();
+        }
+        return false;
     }
 }
