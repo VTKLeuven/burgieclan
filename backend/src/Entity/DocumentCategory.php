@@ -18,6 +18,19 @@ class DocumentCategory
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'subcategories')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?self $parent = null;
+
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
+    private Collection $subcategories;
+
+
+    public function __construct()
+    {
+        $this->subcategories = new ArrayCollection();
+    }
+
     #[ORM\OneToMany(targetEntity: Document::class, mappedBy: 'category')]
     private Collection $documents;
 
@@ -57,6 +70,7 @@ class DocumentCategory
         return $this;
     }
 
+
     public function __toString(): string
     {
         return $this->getName();
@@ -67,5 +81,55 @@ class DocumentCategory
         $this->name = $name;
 
         return $this;
+    }
+
+    public function getParent(): ?self
+    {
+        return $this->parent;
+    }
+
+    public function setParent(?self $parent): self
+    {
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    public function getSubcategories(): Collection
+    {
+        return $this->subcategories;
+    }
+
+    public function addSubcategory(self $subcategory): self
+    {
+        if (!$this->subcategories->contains($subcategory) && !$this->isAncestorOf($subcategory)) {
+            $this->subcategories->add($subcategory);
+            $subcategory->setParent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubcategory(self $subcategory): self
+    {
+        if ($this->subcategories->removeElement($subcategory)) {
+            if ($subcategory->getParent() === $this) {
+                $subcategory->setParent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isAncestorOf(self $category): bool
+    {
+        $parent = $category->getParent();
+        while ($parent !== null) {
+            if ($parent === $this) {
+                return true;
+            }
+            $parent = $parent->getParent();
+        }
+        return false;
     }
 }
