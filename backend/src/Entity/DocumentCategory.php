@@ -68,6 +68,4 @@ class DocumentCategory
 
         return $this;
     }
-
-
 }

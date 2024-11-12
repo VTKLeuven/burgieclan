@@ -28,7 +28,8 @@ class DocumentCategoryController extends AbstractController
                 'id' => $document->getId(),
                 'name' => $document->getName(),
             ], $category->getDocuments()->toArray()),
-            'subcategories' => array_map(fn($subcategory) => $this->buildCategoryTree($subcategory, $repository), $subcategories),
+            'subcategories' => array_map(fn($subcategory)
+            => $this->buildCategoryTree($subcategory, $repository), $subcategories),
         ];
 
         return $tree;
