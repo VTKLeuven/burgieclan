@@ -25,14 +25,13 @@ class DocumentCategory
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
     private Collection $subcategories;
 
+    #[ORM\OneToMany(targetEntity: Document::class, mappedBy: 'category')]
+    private Collection $documents;
 
     public function __construct()
     {
         $this->subcategories = new ArrayCollection();
     }
-
-    #[ORM\OneToMany(targetEntity: Document::class, mappedBy: 'category')]
-    private Collection $documents;
 
     public function getId(): ?int
     {
