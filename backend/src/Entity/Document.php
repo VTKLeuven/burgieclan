@@ -23,7 +23,7 @@ class Document extends Node
     #[ORM\JoinColumn(nullable: false)]
     private ?Course $course = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(targetEntity: DocumentCategory::class, inversedBy: 'documents')]
     #[ORM\JoinColumn(nullable: false)]
     private ?DocumentCategory $category = null;
 
