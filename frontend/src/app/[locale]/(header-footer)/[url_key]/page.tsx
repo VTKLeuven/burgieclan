@@ -1,10 +1,10 @@
 'use client';
 
-import {ApiClient} from "@/actions/api";
+import { ApiClient } from "@/actions/api";
 import { useEffect, useState } from "react";
-import Loading from "@/app/loading";
+import Loading from "@/app/[locale]/loading";
 import ErrorPage from "@/components/error/ErrorPage";
-import {ApiError} from "@/utils/error/apiError";
+import { ApiError } from "@/utils/error/apiError";
 
 /**
  * Displays pages from page management system.
@@ -45,7 +45,7 @@ export default function Page({ params }: { params: any }) {
         <div className="bg-white px-6 py-32 lg:px-8">
             <div className="mx-auto max-w-3xl text-base leading-7 text-gray-700">
                 <h1>{page.name}</h1>
-                <div dangerouslySetInnerHTML={content}/>
+                <div dangerouslySetInnerHTML={content} />
             </div>
         </div>
     );

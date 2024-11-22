@@ -1,4 +1,4 @@
-import "./globals.css";
+import "../globals.css";
 import React from "react";
 import { Inter } from 'next/font/google'
 import CookieBanner from "@/components/cookie-banner/CookieBanner";
