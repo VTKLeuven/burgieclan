@@ -4,5 +4,17 @@
     "sign_in": "Sign in to your account",
     "or_log_in_manually": "Or log in manually",
     "username": "Username",
-    "password": "Password"
+    "password": "Password",
+    "account": "Account",
+    "profile": "Profile",
+    "unexpected_error": "Unexpected error",
+    "go_home": "Go back home",
+    "contact_support    ": "Contact support",
+    "report_issue": "Report an issue",
+    "contribute_github": "Contribute on Github",
+    "open_menu": "Open menu",
+    "close_menu": "Close menu",
+    "courses": "Courses",
+    "FAQ": "FAQ",
+    "overview": "Overview"
 }

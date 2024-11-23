@@ -4,5 +4,17 @@
     "sign_in": "Meld je aan bij je account",
     "or_log_in_manually": "Of log handmatig in",
     "username": "Gebruikersnaam",
-    "password": "Wachtwoord"
+    "password": "Wachtwoord",
+    "account": "Account",
+    "profile": "Profiel",
+    "unexpected_error": "Onverwachte fout",
+    "go_home": "Ga terug naar de startpagina",
+    "contact_support": "Neem contact op met de ondersteuning",
+    "report_issue": "Meld een probleem",
+    "contribute_github": "Bijdragen op Github",
+    "open_menu": "Open menu",
+    "close_menu": "Sluit menu",
+    "courses": "Vakken",
+    "FAQ": "FAQ",
+    "overview": "Overzicht"
 }
