@@ -5,6 +5,9 @@ import { useEffect, useState } from "react";
 import Loading from "@/app/[locale]/loading";
 import ErrorPage from "@/components/error/ErrorPage";
 import { ApiError } from "@/utils/error/apiError";
+import initTranslations from "@/app/i18n";
+import TranslationsProvider from "@/components/TranslationProvider";
+import type { Resource } from "i18next";
 
 /**
  * Displays pages from page management system.
@@ -12,14 +15,18 @@ import { ApiError } from "@/utils/error/apiError";
  * Each page is identified with a unique url_key. When visiting /[url_key], the page with that url_key is fetched
  * from the backend if it exists.
  */
-export default function Page({ params }: { params: any }) {
-    const { url_key } = params;
-
+export default function Page({ params: { locale, url_key } }: { params: { locale: string, url_key: string } }) {
     const [page, setPage] = useState<any>(null);
     const [error, setError] = useState<ApiError | null>(null);
+    const [t, setTranslations] = useState<any>(null);
+    const [resources, setTranslationResources] = useState<Resource | null>(null);
 
     useEffect(() => {
         const FetchData = async () => {
+            const { t, resources } = await initTranslations(locale);
+            setTranslations(t);
+            setTranslationResources(resources);
+
             const result = await ApiClient('GET', `/api/pages/${url_key}`);
             if (result.error) {
                 setError(new ApiError(result.error.message, result.error.status));
@@ -28,10 +35,15 @@ export default function Page({ params }: { params: any }) {
         };
 
         FetchData();
-    }, [url_key]);
+    }, [locale, url_key]);
 
     if (error) {
-        return <ErrorPage status={error.status} detail={error.message} />;
+        return (
+            <TranslationsProvider
+                locale={locale}
+                resources={resources!}>
+                <ErrorPage status={error.status} detail={error.message} />
+            </TranslationsProvider>);
     }
 
     if (!page) {

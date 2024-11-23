@@ -6,15 +6,18 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Logo from '@/components/common/Logo';
 import { Skeleton } from "@/components/ui/skeleton";
 import Search from "@/components/header/Search";
-
-const navigation = [
-    { name: 'Courses', href: '#' },
-    { name: 'FAQ', href: '#' },
-    { name: 'Overview', href: '#' },
-];
+import { useTranslation } from 'react-i18next';
 
 export default function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const { t } = useTranslation();
+
+    const navigation = [
+        { name: t('courses'), href: '#' },
+        { name: t('FAQ'), href: '#' },
+        { name: t('overview'), href: '#' },
+    ];
 
     return (
         <header className="bg-white">
@@ -38,7 +41,7 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                                 onClick={() => setMobileMenuOpen(true)}
                                 className="-m-1.5 p-1.5 w-[50px] h-[50px] rounded-md text-gray-700 justify-center items-center flex"
                             >
-                                <span className="sr-only">Open menu</span>
+                                <span className="sr-only">{t('open_menu')}</span>
                                 <Bars3Icon aria-hidden="true" className="h-6 w-6" />
                             </button>
                         </div>
@@ -46,7 +49,7 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                         <div className="flex md:hidden">
 
                             <a href="login" className="primary-button">
-                                Login
+                                {t('login')}
                             </a>
 
                         </div>
@@ -65,10 +68,10 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
 
                         {isAuthenticated ?
                             <a href="account" className="text-sm font-semibold leading-6 text-gray-900">
-                                Profile
+                                {t('profile')}
                             </a> :
                             <a href="login" className="primary-button">
-                                Login
+                                {t('login')}
                             </a>
                         }
                     </Suspense>
@@ -98,7 +101,7 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                             onClick={() => setMobileMenuOpen(false)}
                             className="-m-1.5 p-1.5 w-[50px] h-[50px] rounded-md text-gray-700 justify-center items-center flex"
                         >
-                            <span className="sr-only">Close menu</span>
+                            <span className="sr-only">{t('close_menu')}</span>
                             <XMarkIcon aria-hidden="true" className="h-6 w-6" />
                         </button>
                     </div>
@@ -119,7 +122,7 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                             </div>
                             <div className="py-6">
                                 <a href="account" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
-                                    Profile
+                                    {t('profile')}
                                 </a>
                             </div>
                         </div>

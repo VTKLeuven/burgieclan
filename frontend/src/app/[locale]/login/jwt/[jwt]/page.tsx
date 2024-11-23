@@ -1,17 +1,18 @@
-'use client'
-
-import {useEffect, useState} from "react";
-import {useRouter} from "next/navigation";
-import {storeOAuthTokens} from "@/actions/oauth";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { storeOAuthTokens } from "@/actions/oauth";
 import ErrorPage from "@/components/error/ErrorPage";
+import TranslationsProvider from "@/components/TranslationProvider";
+import initTranslations from "@/app/i18n";
 
 /**
  * Component allows for manually storing jwt as a http-only cookie. Can be used later to authenticate requests to the backend.
  */
-export default function Page({ params }: { params: any }) {
+export default async function Page({ params: { locale, jwt } }: { params: { locale: string, jwt: string } }) {
     const router = useRouter();
-    const { jwt } = params;
     const [error, setError] = useState<Error | null>(null);
+
+    const { t, resources } = await initTranslations(locale);
 
     useEffect(() => {
         (async () => {
@@ -26,6 +27,12 @@ export default function Page({ params }: { params: any }) {
     }, [jwt, router]);
 
     if (error) {
-        return <ErrorPage />;
+        return (
+            <TranslationsProvider
+                locale={locale}
+                resources={resources}>
+                <ErrorPage />
+            </TranslationsProvider>
+        );
     }
 }

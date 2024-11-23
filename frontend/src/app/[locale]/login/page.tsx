@@ -10,5 +10,6 @@ export default async function Page({ params: { locale } }: { params: { locale: s
             locale={locale}
             resources={resources}>
             < LoginForm />
-        </TranslationsProvider>);
+        </TranslationsProvider>
+    );
 }
