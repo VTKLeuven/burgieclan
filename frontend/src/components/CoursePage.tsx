@@ -10,7 +10,8 @@ import FavoriteStar from '/public/images/vectors/favorite_star.svg';
 import {useEffect, useState} from "react";
 import {ApiClient} from "@/actions/api";
 import {ApiError} from "next/dist/server/api-utils";
-
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import { faShare } from '@fortawesome/free-solid-svg-icons';
 
 
 export default function CoursePage({courseId, breadcrumb}: {courseId: number, breadcrumb: Breadcrumb}) {
@@ -53,16 +54,15 @@ export default function CoursePage({courseId, breadcrumb}: {courseId: number, br
     return (
         <>
             <div className="w-full h-full">
-                <div className="h-[40%] bg-wireframe-lightest-gray relative p-10">
+                <div className="min-h-[35%] md:h-[40%] bg-wireframe-lightest-gray relative p-10 pt-5 md:pt-10">
                     <div>
                         {/* Breadcrumb */}
-                        <div className="flex space-x-2">
+                        <div className="flex flex-col md:flex-row space-x-2">
                             {breadcrumb.breadcrumb.map((item, index) => (
                                 <div key={item} className="inline-block hover:cursor-pointer">
-                                    {index > 0 ? (
+                                    {index+1 < breadcrumb.breadcrumb.length ? (
                                         <>
-                                            <span>/ </span>
-                                            <span className="hover:underline">{item}</span>
+                                            <span className="hover:underline text-wireframe-mid-gray">{item} / </span>
                                         </>
                                     ) : (
                                         <span className="hover:underline">{item}</span>
@@ -71,18 +71,18 @@ export default function CoursePage({courseId, breadcrumb}: {courseId: number, br
                             ))}
                         </div>
 
-                        <div className="flex items-center space-x-2">
-                            <Image src={DocumentIcon} alt="Document Icon" width={40} height={40}/>
-                            <h1 className="text-5xl mb-4">{course.name}</h1>
+                        <div className="flex items-center space-x-2 mt-3">
+                            <Image src={DocumentIcon} alt="Document Icon" className="w-[24px] h-[24px] md:w-[40px] md:h-[40px]"/>
+                            <h1 className="md:text-5xl text-4xl mb-4 text-wireframe-primary-blue">{course.name}</h1>
                         </div>
 
-                        <div className="flex space-x-2 mt-4 mb-4 gap-14">
+                        <div className="flex flex-col md:flex-row md:mt-4 mb-4 md:gap-14 gap-2">
                             <div className="flex items-center space-x-1 gap-2">
-                                <Image src={FolderIcon} alt="Folder Icon" width={24} height={24}/>
+                                <Image src={FolderIcon} alt="Folder Icon" className="w-[24px] h-[24px]"/>
                                 <p className="text-lg">{course.code}</p>
                             </div>
                             <div className="flex items-center space-x-1 gap-2">
-                            <Image src={PiechartIcon} alt="Piechart Icon" width={24} height={24}/>
+                                <Image src={PiechartIcon} alt="Piechart Icon" width={24} height={24}/>
                                 <p className="text-lg">{course.credits} studiepunten</p>
                             </div>
                             <div className="flex items-center space-x-1 gap-2">
@@ -91,19 +91,31 @@ export default function CoursePage({courseId, breadcrumb}: {courseId: number, br
                             </div>
                         </div>
 
-                        <p className="text-lg w-[60%]"> {/*Description top*/}
+                        <p className="pt-3 md:pt-0 text-lg md:w-[60%] mb-5"> {/*Description top*/}
                             Lorem ipsum dolor sit amet consectetur.
                             At orci quis morbi vulputate nibh interdum lectus quam nec.
                             Ipsum feugiat viverra justo consectetur. Odio commodo aliquet elit.
                         </p>
 
 
-                        <div className="absolute bottom-0 space-x-2 bg-white rounded-[28px] pl-3 pr-3 pt-1 pb-1 mb-5 border border-transparent hover:scale-105 hover:border-wireframe-primary-blue hover:cursor-pointer transition-transform duration-300 flex items-center">
-                            <div className="inline-block">
-                                <Image src={FavoriteStar} alt="Favorites star" width={17} height={17}/>
+                        <div className="absolute bottom-0 flex space-x-4 mt-5 mb-5">
+                            <div
+                                className="bg-white rounded-[28px] pl-5 pr-5 pt-2 pb-2 border border-transparent hover:scale-105 hover:border-wireframe-primary-blue hover:cursor-pointer transition-transform duration-300 flex items-center">
+                                <div className="inline-block mr-2">
+                                    <Image src={FavoriteStar} alt="Favorites star" width={17} height={17}/>
+                                </div>
+                                <div className="inline-block">
+                                    <p className="text-lg text-wireframe-mid-gray">Favoriet</p>
+                                </div>
                             </div>
-                            <div className="inline-block">
-                                <p className="text-lg text-wireframe-mid-gray">Favoriet</p>
+                            <div
+                                className="bg-white rounded-[28px] pl-5 pr-5 pt-2 pb-2 border border-transparent hover:scale-105 hover:border-wireframe-primary-blue hover:cursor-pointer transition-transform duration-300 flex items-center">
+                                <div className="inline-block mr-2">
+                                    <FontAwesomeIcon icon={faShare} className="text-wireframe-primary-panache"/>
+                                </div>
+                                <div className="inline-block">
+                                    <p className="text-lg text-wireframe-mid-gray">Delen</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -111,10 +123,10 @@ export default function CoursePage({courseId, breadcrumb}: {courseId: number, br
 
                 </div>
 
-                <div className="flex p-10 space-x-2">
-                <div className="w-[60%]">
+                <div className="flex flex-col md:flex-row md:p-10 pt-7 pl-7 pr-7 md:space-x-2">
+                    <div className="md:w-[60%] mb-4 md:mb-0">
                         <h2>Over het vak</h2>
-                        <p className="text-lg w-[76%]"> {/*Description bottom*/}
+                        <p className="text-lg md:w-[76%]"> {/*Description bottom*/}
                             Lorem ipsum dolor sit amet consectetur.
                             At orci quis morbi vulputate nibh interdum lectus quam nec.
                             Ipsum feugiat viverra justo consectetur.
@@ -122,9 +134,9 @@ export default function CoursePage({courseId, breadcrumb}: {courseId: number, br
                             Venenatis amet ullamcorper pharetra congue arcu at non mi quam.
                         </p>
                     </div>
-                    <div>
+                    <div className="mb-2 md:mb-0">
                         <h2>Docenten</h2>
-                        <div className="grid grid-cols-2 grid-rows-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {course.professors.map((p, index) => (
                                 <ProfessorDiv key={index} unumber={p} index={index}/>
                             ))}
@@ -132,9 +144,9 @@ export default function CoursePage({courseId, breadcrumb}: {courseId: number, br
                     </div>
                 </div>
 
-                <div className="p-10">
+                <div className="md:p-10 p-7">
                     <h2>Bestanden</h2>
-                    <div className="grid grid-cols-4 gap-4 mt-5 transform scale-90 origin-left">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:mt-5 transform scale-90 origin-left">
                         <CoursePageSection title="Samenvattingen" description="Lorem ipsum dolor sit amet"/>
                         <CoursePageSection title="Werkcollege" description="Lorem ipsum dolor sit amet"/>
                         <CoursePageSection title="Examens" description="Lorem ipsum dolor sit amet"/>
