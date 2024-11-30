@@ -1,0 +1,48 @@
+/* Sidebar Container */
+.sidebar {
+    width: 300px;
+    background-color: #f8f9fa;
+    border-right: 1px solid #ddd;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* Sidebar Section */
+.sidebar-section {
+    margin-bottom: 20px;
+}
+
+/* Section Header */
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    background-color: darkgoldenrod;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.sidebar-header:hover {
+    background-color: darkgoldenrod;
+}
+
+/* Collapsible List */
+.sidebar-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 10px 0 0 15px;
+}
+
+.sidebar-list li {
+    margin: 5px 0;
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.sidebar-list li:hover {
+    background-color: #f1f1f1;
+    border-radius: 4px;
+}
