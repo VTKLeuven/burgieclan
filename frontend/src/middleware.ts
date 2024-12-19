@@ -37,7 +37,7 @@ export default async function middleware(request: NextRequest) {
 
     // Redirect to login if user is not authenticated and the page is not public
     if (!isAuthenticated && !request.nextUrl.pathname.startsWith(loginUrl) && request.nextUrl.pathname !== homeUrl) {
-        const pathWithoutLocale = locale ? request.nextUrl.pathname.slice(3) : request.nextUrl.pathname.slice(1);
+        const pathWithoutLocale = locale ? request.nextUrl.pathname.slice(3).replace(/^\/|\/$/g, '') : request.nextUrl.pathname.slice(1).replace(/^\/|\/$/g, '');
         const publicPage = await isPublicPage(pathWithoutLocale);
         if (!publicPage) {
             return NextResponse.redirect(new URL(`${loginUrl}?redirectTo=${encodeURIComponent(request.nextUrl.href)}`, request.url));
