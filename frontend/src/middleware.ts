@@ -33,9 +33,10 @@ export default async function middleware(request: NextRequest) {
     const localeMatch = request.nextUrl.pathname.match(/^\/([a-z]{2})(?:\/|$)/);
     const locale = localeMatch ? localeMatch[1] : '';
     const loginUrl = locale ? `/${locale}/login` : '/login';
+    const homeUrl = locale ? `/${locale}` : '/';
 
     // Redirect to login if user is not authenticated and the page is not public
-    if (!isAuthenticated && !request.nextUrl.pathname.startsWith(loginUrl)) {
+    if (!isAuthenticated && !request.nextUrl.pathname.startsWith(loginUrl) && request.nextUrl.pathname !== homeUrl) {
         const pathWithoutLocale = locale ? request.nextUrl.pathname.slice(3) : request.nextUrl.pathname.slice(1);
         const publicPage = await isPublicPage(pathWithoutLocale);
         if (!publicPage) {
