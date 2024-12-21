@@ -1,8 +1,10 @@
 {
     "homepage": "Startpagina",
     "login": "Inloggen",
+    "login_vtk": "Log in met VTK",
     "sign_in": "Meld je aan bij je account",
     "or_log_in_manually": "Of log handmatig in",
+    "login_invalid_credentials": "Ongeldige inloggegevens, controleer of je gebruikersnaam/wachtwoord correct zijn.",
     "username": "Gebruikersnaam",
     "password": "Wachtwoord",
     "account": "Account",
@@ -16,5 +18,7 @@
     "close_menu": "Sluit menu",
     "courses": "Vakken",
     "FAQ": "FAQ",
-    "overview": "Overzicht"
+    "overview": "Overzicht",
+    "cookie_banner_text": "Deze website gebruikt alleen functionele cookies om je een soepele ervaring te bieden. Er worden geen andere cookies gebruikt.",
+    "cookie_banner_accept": "Ik begrijp het"
 }

@@ -1,8 +1,10 @@
 {
     "homepage": "Homepage",
     "login": "Login",
+    "login_vtk": "Log in with VTK",
     "sign_in": "Sign in to your account",
     "or_log_in_manually": "Or log in manually",
+    "login_invalid_credentials": "Bad credentials, please verify that your username/password are correctly set.",
     "username": "Username",
     "password": "Password",
     "account": "Account",
@@ -16,5 +18,7 @@
     "close_menu": "Close menu",
     "courses": "Courses",
     "FAQ": "FAQ",
-    "overview": "Overview"
+    "overview": "Overview",
+    "cookie_banner_text": "This website only uses functional cookies to provide you a smooth experience. No other cookies are used.",
+    "cookie_banner_accept": "I understand"
 }
