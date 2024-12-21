@@ -59,7 +59,7 @@ export default function LoginForm() {
             await storeOAuthTokens(response.token);
             router.push(redirectTo);
         } catch (err: any) {
-            setCredentialsError('Bad credentials, please verify that your username/password are correctly set.');
+            setCredentialsError(t('login_invalid_credentials'));
         }
     };
 
