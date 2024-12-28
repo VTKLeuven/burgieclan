@@ -36,6 +36,9 @@ class Document extends Node
     #[ORM\Column(nullable: true)]
     private ?string $file_name = null;
 
+    #[ORM\Column(length: 5, nullable: true)]
+    private ?string $year = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,5 +122,17 @@ class Document extends Node
     public function __toString(): string
     {
         return $this->getName();
+    }
+
+    public function getYear(): ?string
+    {
+        return $this->year;
+    }
+
+    public function setYear(?string $year): static
+    {
+        $this->year = $year;
+
+        return $this;
     }
 }

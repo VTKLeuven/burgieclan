@@ -11,6 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Vich\UploaderBundle\Form\Type\VichFileType;
 
@@ -39,13 +40,16 @@ class DocumentCrudController extends AbstractCrudController
     {
         yield TextField::new('name');
         yield DateTimeField::new('createDate')
-        ->hideOnForm();
+            ->hideOnForm();
         yield DateTimeField::new('updateDate')
-        ->hideOnForm();
+            ->hideOnForm();
         yield AssociationField::new('course')
             ->autocomplete();
         yield AssociationField::new('category')
-        ->autocomplete();
+            ->autocomplete();
+        yield ChoiceField::new('year')
+            ->setChoices($this->getAcademicYearChoices())
+            ->setLabel('Academic Year');
         yield BooleanField::new('under_review')
             ->setLabel('Under review')
             ->renderAsSwitch(false);
@@ -58,5 +62,18 @@ class DocumentCrudController extends AbstractCrudController
             ->hideOnIndex();
         yield TextField::new('file_name')
             ->onlyOnIndex();
+    }
+
+    private function getAcademicYearChoices(): array
+    {
+        $currentYear = (int)date('Y');
+        $choices = [];
+        for ($i = 0; $i < 10; $i++) {
+            $startYear = $currentYear - $i;
+            $endYear = $startYear + 1;
+            $formattedYear = sprintf('%02d-%02d', $startYear % 100, $endYear % 100);
+            $choices[$formattedYear] = $formattedYear;
+        }
+        return $choices;
     }
 }
