@@ -22,7 +22,7 @@ const config = {
           lightest: {
             gray: "#F0F1F7",
           },
-          mid:{
+          mid: {
             gray: "#959EAC",
           },
           primary: {
@@ -31,7 +31,7 @@ const config = {
           }
         }
       },
-      typography: (theme) => ({
+      typography: (theme: any) => ({
         DEFAULT: {
           css: {
             h1: { fontFamily: theme('fontFamily.roboto').join(', ') },

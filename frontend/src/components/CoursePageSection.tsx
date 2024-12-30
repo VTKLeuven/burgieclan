@@ -1,5 +1,7 @@
 'use client'
 
+import Image from 'next/image';
+
 interface CoursePageSectionProps {
     title: string;
     description: string;
@@ -17,13 +19,13 @@ export default function CoursePageSection({ title, description }: CoursePageSect
         <>
             <div className="border border-[#E3E3E3] hover:border-wireframe-primary-blue rounded-[14.57px] transform hover:scale-[1.03] transition-transform duration-300">
                 <div className="pl-4 pt-2">
-                    <img src="/images/vectors/document_icon.svg" alt="Document Icon" className="w-8 h-8"/>
+                    <Image src="/images/vectors/document_icon.svg" alt="Document Icon" width={32} height={32} className="w-8 h-8" />
 
                     <h2 className="hover:underline hover:cursor-pointer">{title}</h2>
                     <p className="text-lg w-[85%]">
                         {description}
                     </p>
-                    <YellowSectionButton/>
+                    <YellowSectionButton />
                 </div>
             </div>
         </>
