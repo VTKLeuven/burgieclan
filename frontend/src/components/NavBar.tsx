@@ -1,12 +1,14 @@
 'use client'
 
+import Image from 'next/image';
+
 export default function NavBar() {
 
     return (
         <>
             <div className="h-[8vh] bg-white flex">
                 <div className="w-[10%] flex items-center justify-center">
-                    <img src="/images/logos/vtk-logo-black.svg" alt="VTK Logo"/>
+                    <Image src="/images/logos/vtk-logo-black.svg" alt="VTK Logo" />
                 </div>
                 <div className="w-[20%] flex items-center justify-center">
                     <h4>Search</h4>
