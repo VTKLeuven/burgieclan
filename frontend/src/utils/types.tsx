@@ -48,3 +48,13 @@ export interface Document extends NodeEntity {
     underReview: boolean;
     contentUrl: string;
 }
+
+export interface User extends BaseEntity {
+    fullName: string;
+    username: string;
+    email: string;
+    favoriteCourses: Course[];
+    favoriteModules: Module[];
+    favoritePrograms: Program[];
+    favoriteDocuments: Document[];
+}
