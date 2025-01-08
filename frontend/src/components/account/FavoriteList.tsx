@@ -20,7 +20,9 @@ const FavoriteList: React.FC<FavoriteListProps> = ({ title, items, emptyMessage 
         <div className="mt-6 border rounded-lg shadow-sm">
             <button onClick={toggleCollapse} className="w-full text-left focus:outline-none">
                 <div className="flex justify-between items-center px-4 py-1 bg-gray-100 rounded-t-lg">
-                    <h3 className="text-xl font-semibold">{title}</h3>
+                    <h3 className="text-xl font-semibold">
+                        {title} <span className="text-sm">({items.length})</span>
+                    </h3>
                     <FontAwesomeIcon icon={isCollapsed ? faChevronDown : faChevronUp} className="text-vtk-blue-500" />
                 </div>
             </button>
