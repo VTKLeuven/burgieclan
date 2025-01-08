@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 interface FavoriteListProps {
     title: string;
-    items: { name: string, '@type': string, '@id': string }[];
+    items: { name: string, code: string, '@type': string, '@id': string }[];
     emptyMessage: string;
 }
 
@@ -37,7 +37,7 @@ const FavoriteList: React.FC<FavoriteListProps> = ({ title, items, emptyMessage 
                                 return (
                                     <li key={index} className="bg-gray-200 px-4 py-2 rounded-md shadow-sm">
                                         <Link href={`/${item['@type'].toLowerCase()}/${id}`} className="hover:underline">
-                                            {item.name}
+                                            {item.name} <span className="text-sm text-gray-500">[{item.code}]</span>
                                         </Link>
                                     </li>
                                 );

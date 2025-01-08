@@ -38,7 +38,7 @@ class CourseApi
     #[Assert\NotBlank]
     #[Assert\Length(6)]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups('search')]
+    #[Groups(['search', 'user'])]
     public ?string $code = null;
 
     #[Groups('search')]
