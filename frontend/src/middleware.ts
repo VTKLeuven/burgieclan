@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getJWTExpiration } from "./utils/oauth";
 import { i18nRouter } from 'next-i18n-router';
 import { i18nConfig } from '../i18nConfig';
 
@@ -27,7 +28,8 @@ const isPublicPage = async (urlKey: string) => {
 };
 
 export default async function middleware(request: NextRequest) {
-    const isAuthenticated = request.cookies.has('jwt');
+    let jwt = request.cookies.get('jwt')?.value || null;
+    let isAuthenticated = jwt && Date.now() <= getJWTExpiration(jwt) * 1000;
 
     // Match and extract the locale from the URL path
     const localeMatch = request.nextUrl.pathname.match(/^\/([a-z]{2})(?:\/|$)/);
