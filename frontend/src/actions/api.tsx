@@ -42,8 +42,13 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
         const requestHeaders = new Headers(customHeaders || {});
         // If body is FormData, don't set content-type (usefull for file uploads)
         if (!(body instanceof FormData)) {
-            // Backend expects content-type to be application/json
-            requestHeaders.set('Content-Type', 'application/json');
+            if (method === 'PATCH') {
+                // Backend expects content-type to be application/merge-patch+json for PATCH requests
+                requestHeaders.set('Content-Type', 'application/merge-patch+json');
+            } else {
+                // Backend expects content-type to be application/json
+                requestHeaders.set('Content-Type', 'application/json');
+            }
         }
 
         if (jwt) {
@@ -51,7 +56,7 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
         }
 
         const response = await fetch(url, {
-            method: method,
+            method,
             headers: requestHeaders,
             // If body is FormData, send it as is, otherwise stringify it (again, useful for file uploads)
             body: body instanceof FormData ? body : JSON.stringify(body),
