@@ -3,7 +3,7 @@ import React from "react";
 import Footer from "@/components/footer/Footer";
 import HeaderWrapper from "@/components/header/HeaderWrapper";
 
-export default async function HeaderLayout({ children, params: { locale } }: Readonly<{ children: React.ReactNode, params: { locale: string } }>) {
+export default async function HeaderLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
         <div className="flex h-full flex-col min-h-full">
             <HeaderWrapper />
