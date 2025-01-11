@@ -1,8 +1,8 @@
 'use server'
 
-import {redirect} from "next/navigation";
-import {headers} from 'next/headers';
-import {getActiveJWT} from "@/utils/dal";
+import { redirect } from "next/navigation";
+import { headers } from 'next/headers';
+import { getActiveJWT } from "@/utils/dal";
 
 /**
  * Encodes an API error response from the backend server into a structured serializable format for the frontend.
@@ -69,11 +69,22 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
         return { error: { message: error.message || 'Unexpected API Error.', status: 500 } };
     }
 
+    // Handle 401s for login endpoint
+    // This is a special case where we don't want to redirect to login page, because we are already there
+    if (endpoint === '/api/auth/login') {
+        throw new Error('401 Error logging in');
+    }
+
+
     // Handle 401s by redirecting (must be done outside try-catch block because NextJS Redirect invoked via error)
     const headersList = headers();
     const refererUrl = headersList.get('referer') || "";
-    const loginUrl = `${frontendBaseUrl}/login?redirectTo=${encodeURIComponent(refererUrl)}`;
-    redirect(loginUrl);
+    const loginUrl = `${frontendBaseUrl}/login`;
+
+    // Only set the redirectTo query parameter if the referer URL is not the login page
+    const redirectTo = refererUrl && !refererUrl.startsWith(loginUrl) ? `?redirectTo=${encodeURIComponent(refererUrl)}` : "";
+    const finalLoginUrl = `${loginUrl}${redirectTo}`;
+    redirect(finalLoginUrl);
 
     return;
 }
