@@ -18,7 +18,7 @@ export default function Page({ params: { locale, url_key } }: { params: { locale
 
     useEffect(() => {
         const FetchData = async () => {
-            const result = await ApiClient('GET', `/api/pages/${url_key}`);
+            const result = await ApiClient('GET', `/api/pages/${url_key}?lang=${locale}`);
             if (result.error) {
                 setError(new ApiError(result.error.message, result.error.status));
             }
