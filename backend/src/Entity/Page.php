@@ -47,12 +47,11 @@ class Page
     private ?string $content_en = null;
 
     /**
-     * @param string $name
      * @param string|null $urlKey
      */
-    public function __construct(string $name, ?string $urlKey = null)
+    public function __construct(?string $urlKey = null)
     {
-        $this->urlKey = is_null($urlKey) ? self::createUrlKey($name): self::createUrlKey($urlKey);
+        $this->urlKey = self::createUrlKey($urlKey);
     }
 
     public function getId(): ?int
