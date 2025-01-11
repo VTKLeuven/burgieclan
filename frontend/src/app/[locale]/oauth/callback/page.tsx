@@ -1,10 +1,10 @@
 'use client'
 
-import {LitusOAuthCallback} from "@/utils/oauth";
-import React, {useEffect, useState} from "react";
-import {useRouter, useSearchParams} from "next/navigation";
+import { LitusOAuthCallback } from "@/utils/oauth";
+import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import ErrorPage from "@/components/error/ErrorPage";
-import Loading from "@/app/loading";
+import Loading from "@/app/[locale]/loading";
 
 export default function OAuthCallbackPage() {
     const router = useRouter();
