@@ -17,13 +17,41 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'Page',
     operations: [
         new Get(
+            openapiContext: [
+                'parameters' => [
+                    [
+                        'name' => 'lang',
+                        'in' => 'query',
+                        'required' => false,
+                        'schema' => [
+                            'type' => 'string',
+                            'enum' => ['nl', 'en'],
+                            'default' => 'nl'
+                        ],
+                        'description' => 'The language in which to retrieve the page content'
+                    ]
+                ]
+            ],
             security: 'is_granted("VIEW", object)', // Handled by the src/Security/Voter/PageVoter
-            provider: PageApiProvider::class,
+            provider: PageApiProvider::class
         ),
         new GetCollection(
             openapiContext: [
                 'summary' => 'Retrieves the collection of publicly available Page resources.',
-                'description' => 'Retrieves the collection of publicly available Page resources.'
+                'description' => 'Retrieves the collection of publicly available Page resources.',
+                'parameters' => [
+                    [
+                        'name' => 'lang',
+                        'in' => 'query',
+                        'required' => false,
+                        'schema' => [
+                            'type' => 'string',
+                            'enum' => ['nl', 'en'],
+                            'default' => 'nl'
+                        ],
+                        'description' => 'The language in which to retrieve the page content'
+                    ]
+                ]
             ],
             paginationEnabled: false,
             provider: PageApiProvider::class,

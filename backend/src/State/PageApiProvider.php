@@ -6,7 +6,10 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Metadata\Operation;
 use App\ApiResource\PageApi;
+use App\Entity\Page;
+use App\Entity\PageTranslation;
 use App\Repository\PageRepository;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -19,6 +22,7 @@ class PageApiProvider implements ProviderInterface
     public function __construct(
         private readonly PageRepository $pageRepository,
         private readonly MicroMapperInterface $microMapper,
+        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -27,12 +31,13 @@ class PageApiProvider implements ProviderInterface
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): PageApi | array
     {
-
+        $request = $this->requestStack->getCurrentRequest();
+        $lang = $request->query->get('lang', Page::$DEFAULT_LANGUAGE);
         if ($operation instanceof CollectionOperationInterface) {
             $pages = $this->pageRepository->findAllPublicAvailable();
             $pagesApi = [];
             foreach ($pages as $page) {
-                $pagesApi[] = $this->microMapper->map($page, PageApi::class);
+                $pagesApi[] = $this->microMapper->map($page, PageApi::class, ["lang"=>$lang]);
             }
             return $pagesApi;
         }
@@ -48,7 +53,7 @@ class PageApiProvider implements ProviderInterface
         }
 
         //$pageApiObject = $this->mapper->map($page, PageApi::class);
-        $pageApiObject = $this->microMapper->map($page, PageApi::class);
+        $pageApiObject = $this->microMapper->map($page, PageApi::class, ["lang"=>$lang]);
         if (!$pageApiObject instanceof PageApi) {
             throw new HttpException(500, 'Page could not be converted to PageApi object');
         }
