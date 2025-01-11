@@ -8,7 +8,7 @@ import ErrorPage from "@/components/error/ErrorPage";
 /**
  * Component allows for manually storing jwt as a http-only cookie. Can be used later to authenticate requests to the backend.
  */
-export default function Page({ params: { locale, jwt } }: { params: { locale: string, jwt: string } }) {
+export default function Page({ params: { jwt } }: { params: { jwt: string } }) {
     const router = useRouter();
     const [error, setError] = useState<Error | null>(null);
 

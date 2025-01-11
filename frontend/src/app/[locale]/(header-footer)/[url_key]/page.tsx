@@ -26,7 +26,7 @@ export default function Page({ params: { locale, url_key } }: { params: { locale
         };
 
         FetchData();
-    }, [locale, url_key]);
+    }, [locale, url_key]); //TODO: use locale in the request, in backend add translated pages
 
     if (error) {
         return <ErrorPage status={error.status} detail={error.message} />;
