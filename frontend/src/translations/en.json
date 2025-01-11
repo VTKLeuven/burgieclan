@@ -2,6 +2,7 @@
     "homepage": "Homepage",
     "login": "Login",
     "login_vtk": "Log in with VTK",
+    "logout": "Logout",
     "sign_in": "Sign in to your account",
     "or_log_in_manually": "Or log in manually",
     "login_invalid_credentials": "Bad credentials, please verify that your username/password are correctly set.",
@@ -116,5 +117,20 @@
             "search": "Search...",
             "no_results": "No results found"
         }
-    }
+    },
+    "cookie_banner_accept": "I understand",
+    "account_greeting": "Hi, {{name}}!",
+    "account_welcome_text": "Welcome to your account page. Here you will find some information about your profile and your favorites.<br/>Your profile details come from the VTK website, you can edit them there.",
+    "account_details": "Account details",
+    "account_name": "Name",
+    "account_rnumber": "R-number",
+    "account_email": "Email",
+    "account_favorite_courses": "Favorite courses",
+    "account_favorite_modules": "Favorite modules",
+    "account_favorite_programs": "Favorite programs",
+    "account_favorite_documents": "Favorite documents",
+    "account_no_favorite_courses": "You have no favorite courses yet.",
+    "account_no_favorite_modules": "You have no favorite modules yet.",
+    "account_no_favorite_programs": "You have no favorite programs yet.",
+    "account_no_favorite_documents": "You have no favorite documents yet."
 }
