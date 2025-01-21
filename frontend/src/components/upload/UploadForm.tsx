@@ -13,17 +13,45 @@ import {useState} from "react";
  */
 const UploadForm = ({isOpen, setIsOpen}) => {
     const [error, setError] = useState<ApiError | null>(null);
+    const [isLoading, setIsLoading] = useState(false); // Add loading state
 
-    const handleSubmit = async (formData) => {
-        console.log('ok')
-        console.log(formData)
-        const result = await ApiClient('POST', `/api/document`, formData);
-        console.log('okokok')
-        if (result.error) {
-            setError(new ApiError(result.error.message, result.error.status));
+    const handleSubmit = async (data) => {
+        setIsLoading(true);
+        try {
+            const formData = new FormData();
+
+            // Add file under the key 'files'
+            formData.append('file', data.file);
+
+            // Add JSON data under separate keys
+            formData.append('name', data.name);
+            formData.append('course', data.course);
+            formData.append('category', data.category);
+            // formData.append('year', data.year);
+
+            // Log the formData entries for debugging
+            console.log('FormData contents:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}:`, value);
+            }
+
+            const result = await ApiClient('POST', `/api/documents`, formData);
+
+            console.log('API Response:', result); // Add this to see the response
+
+            if (result.error) {
+                console.error('Error details:', result.error); // Add this for error details
+                setError(new ApiError(result.error.message, result.error.status));
+                return;
+            }
+
+            setIsOpen(false);
+        } catch (err) {
+            console.error('Full error:', err); // Add this to see full error
+            setError(new ApiError(err.message || 'Upload failed', 500));
+        } finally {
+            setIsLoading(false);
         }
-        console.log('okokokokok')
-        setIsOpen(false);
     };
 
     return (
@@ -42,9 +70,19 @@ const UploadForm = ({isOpen, setIsOpen}) => {
                 <button
                     type="submit"
                     form="upload-form"
+                    disabled={isLoading}
                     className="primary-button">
-                    <PaperAirplaneIcon className="mr-2 w-5 h-5" />
-                    Send document
+                    {isLoading ? (
+                        <>
+                            <span className="spinner mr-2"/>
+                            Uploading...
+                        </>
+                    ) : (
+                        <>
+                            <PaperAirplaneIcon className="mr-2 w-5 h-5"/>
+                            Send document
+                        </>
+                    )}
                 </button>
             </DialogActions>
         </Dialog>
