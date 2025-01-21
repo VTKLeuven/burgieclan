@@ -7,6 +7,8 @@ import { ApiError } from "@/utils/error/apiError";
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { fileTypeFromBlob } from 'file-type';
 
+
+// TODO: Add the following code to a central configuration file
 const allowedMimeTypes = [
     'application/pdf',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -21,7 +23,8 @@ const schema = yup.object().shape({
     category: yup.string().required('Category is required'),
     year: yup.string().required('Year is required'),
     file: yup.mixed().required('File is required').test('fileType', 'Unsupported file format', async (value) => {
-        if (!value) return false;
+        if (!value || value.length === 0) return false;
+        console.log('File:', value);
         const type = await fileTypeFromBlob(value as Blob);
         return allowedMimeTypes.includes(type?.mime || '');
     })
@@ -44,7 +47,7 @@ export default function Form({ onSubmit }) {
         if (file) {
             setSelectedFileName(file.name);
             setFileSize((file.size / 1024 / 1024).toFixed(2) + ' MB');
-            setValue('file', file);
+            setValue('file', file, { shouldValidate: true }); // Add validation
             const icon = await getFileIcon(file);
             setFileIcon(icon);
         }
@@ -53,7 +56,7 @@ export default function Form({ onSubmit }) {
     const handleButtonClick = () => {
         setSelectedFileName('');
         setFileSize('');
-        setValue('file', null);
+        setValue('file', null, { shouldValidate: true }); // Add validation
         setFileIcon(null);
     };
 
@@ -63,7 +66,7 @@ export default function Form({ onSubmit }) {
         if (file) {
             setSelectedFileName(file.name);
             setFileSize((file.size / 1024 / 1024).toFixed(2) + ' MB');
-            setValue('file', file);
+            setValue('file', file, { shouldValidate: true }); // Add validation
             const icon = await getFileIcon(file);
             setFileIcon(icon);
         }
@@ -91,34 +94,49 @@ export default function Form({ onSubmit }) {
         const fetchData = async () => {
             try {
                 const courseResponse = await ApiClient('GET', `/api/courses`);
-                const categoryResponse = await ApiClient('GET', `/api/document_categories`);
-
                 if (courseResponse.error) {
-                    setError(new ApiError(courseResponse.error.message, courseResponse.error.status));
+                    throw new ApiError(courseResponse.error.message, courseResponse.error.status);
                 }
+                // Access the member array and map to get the proper references
+                const courses = (courseResponse['hydra:member'] || []).map(course => ({
+                    id: course['@id'], // Use the full IRI from the response
+                    name: course.name
+                }));
+                setCourses(courses);
+
+                const categoryResponse = await ApiClient('GET', `/api/document_categories`);
                 if (categoryResponse.error) {
-                    setError(new ApiError(categoryResponse.error.message, categoryResponse.error.status));
+                    throw new ApiError(categoryResponse.error.message, categoryResponse.error.status);
                 }
-
-                if (courseResponse['hydra:member'] === undefined) {
-                    setCourses([{id: 1, name: 'Course 1'}, {id: 2, name: 'Course 2'}]);
-                } else {
-                    setCourses(courseResponse['hydra:member']);
-                }
-
-                if (categoryResponse['hydra:member'] === undefined) {
-                    setCategories([{id: 1, name: 'Category 1'}, {id: 2, name: 'Category 2'}]);
-                } else {
-                    setCategories(categoryResponse['hydra:member']);
-                }
+                // Access the member array and map to get the proper references
+                const categories = (categoryResponse['hydra:member'] || []).map(category => ({
+                    id: category['@id'], // Use the full IRI from the response
+                    name: category.name
+                }));
+                setCategories(categories);
 
             } catch (err) {
-                setError(err);
+                console.error('Failed to fetch form data:', err);
+                setError(err instanceof ApiError ? err : new ApiError('Failed to load form data', 500));
+                setCourses([]);
+                setCategories([]);
             }
         };
 
         fetchData();
     }, []);
+
+    // Add a form watcher to debug selected values
+    const { watch } = useForm({
+        resolver: yupResolver(schema)
+    });
+
+    useEffect(() => {
+        const subscription = watch((value, { name, type }) =>
+            console.log('Form value changed:', name, value)
+        );
+        return () => subscription.unsubscribe();
+    }, [watch]);
 
     return (
         <form id="upload-form" onSubmit={handleSubmit(onSubmit)}>
@@ -213,7 +231,8 @@ export default function Form({ onSubmit }) {
 
                     <div className="col-span-full">
                         <div className="flex items-center justify-between">
-                            <label htmlFor="file-upload" className="block text-sm font-medium leading-6 text-gray-900">
+                            <label htmlFor="file-upload" className="block tex
+                            sm font-medium leading-6 text-gray-900">
                                 File
                             </label>
                             {errors.file && <p className="text-red-500 text-xs mt-1">{errors.file.message}</p>}
@@ -231,7 +250,16 @@ export default function Form({ onSubmit }) {
                                             className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
                                         >
                                             <span>Upload a file</span>
-                                            <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleFileChange} />
+                                            <input
+                                                id="file-upload"
+                                                {...register('file')} // Add this
+                                                name="file-upload"
+                                                type="file"
+                                                className="sr-only"
+                                                onChange={async (e) => {
+                                                    await handleFileChange(e);
+                                                }}
+                                            />
                                         </label>
                                         <p className="pl-1 sm:block hidden">or drag and drop</p>
                                     </div>

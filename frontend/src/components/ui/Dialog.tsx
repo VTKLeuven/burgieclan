@@ -1,6 +1,6 @@
 import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
-import type React from 'react'
+import React from 'react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 
 const sizes = {
@@ -18,38 +18,50 @@ const sizes = {
 /**
  * A dialog modal that shows information in pop-up form
  */
-export function Dialog({
-       isOpen,
-       onClose,
-       size = 'lg',
-       className,
-       children,
-       ...props
-}: {isOpen: boolean, onClose: () => void, size?: keyof typeof sizes; className?: string; children: React.ReactNode} & Omit<
-    Headless.DialogProps<any>,
-    'as' | 'className'
->) {
+export function Dialog({isOpen, onClose, size = 'lg', className, children, ...props}) {
     return (
         <Headless.Dialog open={isOpen} onClose={onClose} {...props}>
-            <Headless.Dialog.Backdrop
-                transition
-                className="fixed inset-0 backdrop-blur-sm bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-700 data-[leave]:duration-500 data-[enter]:ease-out data-[leave]:ease-in" />
-
-            <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-                <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <Headless.Dialog.Panel
-                        transition
-                        className={clsx(
-                            className,
-                            sizes[size],
-                            "relative transform overflow-hidden rounded-3xl bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:p-6 data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
-                        )}
+            <Headless.Transition show={isOpen} as={React.Fragment}>
+                <div className="fixed inset-0 z-10 overflow-y-auto">
+                    {/* Backdrop */}
+                    <Headless.Transition.Child
+                        as={React.Fragment}
+                        enter="ease-out duration-700"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-500"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
                     >
-                        <DialogCloseButton onClose={onClose} />
-                        {children}
-                    </Headless.Dialog.Panel>
+                        <Headless.Dialog.Backdrop
+                            className="fixed inset-0 backdrop-blur-sm bg-gray-500 bg-opacity-75"
+                        />
+                    </Headless.Transition.Child>
+
+                    <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                        <Headless.Transition.Child
+                            as={React.Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            enterTo="opacity-100 translate-y-0 sm:scale-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        >
+                            <Headless.Dialog.Panel
+                                className={clsx(
+                                    className,
+                                    sizes[size],
+                                    "relative transform overflow-hidden rounded-3xl bg-white px-4 pb-4 pt-5 text-left shadow-xl sm:my-8 sm:p-6"
+                                )}
+                            >
+                                <DialogCloseButton onClose={onClose} />
+                                {children}
+                            </Headless.Dialog.Panel>
+                        </Headless.Transition.Child>
+                    </div>
                 </div>
-            </div>
+            </Headless.Transition>
         </Headless.Dialog>
     )
 }
