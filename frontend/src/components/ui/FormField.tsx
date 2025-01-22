@@ -9,17 +9,19 @@ interface FormFieldProps {
     placeholder?: string;
     registration: UseFormRegisterReturn;
     className?: string;
+    prefill?: { id: string; name: string } | null;
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
     label,
     error,
     type = 'text',
+    prefill = null,
     options = [],
     placeholder,
     registration,
     className = ''
-    }) => {
+}) => {
     const inputClassName = `
     block w-full rounded-md border-0 py-1.5 px-3
     text-gray-900 shadow-sm ring-1 ring-inset
@@ -46,7 +48,13 @@ export const FormField: React.FC<FormFieldProps> = ({
                         {...registration}
                         className={inputClassName}
                     >
-                        <option value="">Select {label.toLowerCase()}</option>
+                        {prefill ? (
+                            <option value={prefill.id}>
+                                {prefill.name}
+                            </option>
+                        ) : (
+                            <option value="">Select {label.toLowerCase()}</option>
+                        )}
                         {options.map((option) => (
                             <option key={option.id} value={option.id}>
                                 {option.name}
