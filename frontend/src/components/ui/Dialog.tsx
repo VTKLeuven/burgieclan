@@ -1,3 +1,4 @@
+// components/ui/Dialog.tsx
 import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
 import React from 'react'
@@ -15,29 +16,28 @@ const sizes = {
     '5xl': 'sm:max-w-5xl',
 }
 
-/**
- * A dialog modal that shows information in pop-up form
- */
 export function Dialog({isOpen, onClose, size = 'lg', className, children, ...props}) {
     return (
-        <Headless.Dialog open={isOpen} onClose={onClose} {...props}>
-            <Headless.Transition show={isOpen} as={React.Fragment}>
-                <div className="fixed inset-0 z-10 overflow-y-auto">
-                    {/* Backdrop */}
-                    <Headless.Transition.Child
-                        as={React.Fragment}
-                        enter="ease-out duration-700"
-                        enterFrom="opacity-0"
-                        enterTo="opacity-100"
-                        leave="ease-in duration-500"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                    >
-                        <Headless.Dialog.Backdrop
-                            className="fixed inset-0 backdrop-blur-sm bg-gray-500 bg-opacity-75"
-                        />
-                    </Headless.Transition.Child>
+        <Headless.Transition appear show={isOpen} as={React.Fragment}>
+            <Headless.Dialog
+                as="div"
+                className="relative z-10"
+                onClose={onClose}
+                {...props}
+            >
+                <Headless.Transition.Child
+                    as={React.Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <div className="fixed inset-0 backdrop-blur-sm bg-gray-500 bg-opacity-75" />
+                </Headless.Transition.Child>
 
+                <div className="fixed inset-0 z-10 overflow-y-auto">
                     <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                         <Headless.Transition.Child
                             as={React.Fragment}
@@ -52,7 +52,7 @@ export function Dialog({isOpen, onClose, size = 'lg', className, children, ...pr
                                 className={clsx(
                                     className,
                                     sizes[size],
-                                    "relative transform overflow-hidden rounded-3xl bg-white px-4 pb-4 pt-5 text-left shadow-xl sm:my-8 sm:p-6"
+                                    "relative transform overflow-hidden rounded-3xl bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:p-6 w-full"
                                 )}
                             >
                                 <DialogCloseButton onClose={onClose} />
@@ -61,14 +61,11 @@ export function Dialog({isOpen, onClose, size = 'lg', className, children, ...pr
                         </Headless.Transition.Child>
                     </div>
                 </div>
-            </Headless.Transition>
-        </Headless.Dialog>
+            </Headless.Dialog>
+        </Headless.Transition>
     )
 }
 
-/**
- * A title for a dialog modal
- */
 export function DialogTitle({className, children}: { className?: string; children: React.ReactNode }) {
     return (
         <Headless.Dialog.Title
@@ -80,16 +77,10 @@ export function DialogTitle({className, children}: { className?: string; childre
     )
 }
 
-/**
- * A body of a dialog modal, takes any div props except for 'ref'
- */
 export function DialogBody({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
     return <div {...props} className={clsx(className, 'mt-6 px-10')} />
 }
 
-/**
- * Component that takes and displays the actions for a dialog modal, takes any div props except for 'ref'
- */
 export function DialogActions({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
     return (
         <div
