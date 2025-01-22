@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react';
-import UploadForm from '@/components/upload/UploadForm';
+import UploadDialog from '@/components/upload/UploadDialog';
 
 export default function Homepage() {
   const [isUploadFormOpen, setIsUploadFormOpen] = useState(false);
@@ -11,7 +11,7 @@ export default function Homepage() {
       <button onClick={() => setIsUploadFormOpen(true)} className="primary-button">
         Open Upload Form
       </button>
-      <UploadForm isOpen={isUploadFormOpen} setIsOpen={setIsUploadFormOpen} />
+      <UploadDialog isOpen={isUploadFormOpen} setIsOpen={setIsUploadFormOpen} />
     </div>
   );
 }
