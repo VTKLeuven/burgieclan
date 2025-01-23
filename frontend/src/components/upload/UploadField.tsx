@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { UseFormSetValue } from 'react-hook-form';
+import {FieldError, FieldErrorsImpl, UseFormSetValue} from 'react-hook-form';
 import { UploadFormData } from '@/types/upload';
 import { ALLOWED_MIME_TYPES } from '@/utils/constants/upload';
 import { fileTypeFromBlob } from 'file-type';
+import {Merge} from "type-fest";
 
 interface FileUploadProps {
-    error?: string;
+    error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
     setValue: UseFormSetValue<UploadFormData>;
     initialFile: File | null;
 }
@@ -35,9 +36,10 @@ export const UploadField: React.FC<FileUploadProps> = ({ error, setValue, initia
     };
 
     const handleFileChange = async (file: File | null) => {
+        // When a file is removed
         if (!file) {
             setFilePreview(null);
-            setValue('file', null, { shouldValidate: true });
+            setValue('file', null, { shouldValidate: false });
             return;
         }
 
@@ -82,7 +84,7 @@ export const UploadField: React.FC<FileUploadProps> = ({ error, setValue, initia
                 <label htmlFor="file-upload" className="block text-sm font-medium text-gray-900">
                     File
                 </label>
-                {error && <p className="text-red-500 text-xs">{error}</p>}
+                {error && <p className="text-red-500 text-xs">{`${error?.message}`}</p>}
             </div>
 
             {!filePreview ? (

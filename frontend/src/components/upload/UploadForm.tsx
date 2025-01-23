@@ -16,14 +16,8 @@ interface FormProps {
 }
 
 export default function UploadForm({ onSubmit, isLoading = false, isOpen, initialFile }: FormProps) {
-    const {
-        register,
-        handleSubmit,
-        setValue,
-        formState: { errors }
-    } = useForm<UploadFormData>({
-        resolver: yupResolver(documentSchema)
-    });
+    const {register, handleSubmit, setValue, formState: { errors }
+    } = useForm<UploadFormData>({resolver: yupResolver(documentSchema)});
 
     const { courses, categories, isLoading: isLoadingFields, error } = useFormFields(isOpen);
 
@@ -46,7 +40,7 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
                 <div className="col-span-full">
                     <FormField
                         label="Name"
-                        error={errors.name?.message}
+                        error={errors.name}
                         placeholder="Choose a document name"
                         registration={register('name')}
                         disabled={isLoading || isLoadingFields}
@@ -58,7 +52,7 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
                         label="Course"
                         type="select"
                         options={courses}
-                        error={errors.course?.message}
+                        error={errors.course}
                         registration={register('course')}
                         disabled={isLoading || isLoadingFields}
                     />
@@ -69,7 +63,7 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
                         label="Category"
                         type="select"
                         options={categories}
-                        error={errors.category?.message}
+                        error={errors.category}
                         registration={register('category')}
                         disabled={isLoading || isLoadingFields}
                     />
@@ -80,7 +74,7 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
                         label="Academic Year"
                         type="select"
                         options={[{ id: '2024-2025', name: '2024 - 2025' }]}
-                        error={errors.year?.message}
+                        error={errors.year}
                         registration={register('year')}
                         disabled={isLoading || isLoadingFields}
                     />
@@ -88,7 +82,7 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
 
                 <div className="col-span-full">
                     <UploadField
-                        error={errors.file?.message}
+                        error={errors.file}
                         setValue={setValue}
                         initialFile={initialFile}
                     />

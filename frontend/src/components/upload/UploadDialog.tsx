@@ -1,5 +1,3 @@
-'use client';
-
 import { useCallback } from 'react';
 import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog';
 import UploadForm from '@/components/upload/UploadForm';
@@ -7,7 +5,7 @@ import { Text } from '@/components/ui/Text';
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { useDocumentUpload } from '@/hooks/useDocumentUpload';
 import { UploadFormData } from '@/types/upload';
-import { StatusMessage } from '@/components/ui/StatusMessage';
+import { useToast } from '@/components/ui/Toast';
 
 interface UploadDialogProps {
     isOpen: boolean;
@@ -21,6 +19,7 @@ const UploadDialog = ({
                           initialFile
                       }: UploadDialogProps) => {
     const { uploadDocument, isLoading, status, resetStatus } = useDocumentUpload();
+    const { showToast } = useToast();
 
     const handleClose = useCallback(() => {
         onClose();
@@ -30,7 +29,10 @@ const UploadDialog = ({
     const handleSubmit = async (data: UploadFormData) => {
         const success = await uploadDocument(data);
         if (success) {
-            setTimeout(handleClose, 2000);
+            showToast('Document uploaded successfully!', 'success');
+            setTimeout(handleClose, 500);
+        } else {
+            showToast('Failed to upload document. Please try again.', 'error');
         }
     };
 
@@ -44,13 +46,6 @@ const UploadDialog = ({
                 Upload document
             </DialogTitle>
             <DialogBody>
-                {status.message && status.type && (
-                    <StatusMessage
-                        message={status.message}
-                        type={status.type}
-                    />
-                )}
-
                 <Text>
                     Upload your awesome document here. You can upload a PDF, Word, or Markdown file.
                     We will check if it follows the guidelines. Thanks for sharing your knowledge with the world!

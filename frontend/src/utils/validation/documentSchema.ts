@@ -2,6 +2,10 @@ import * as yup from 'yup';
 import {ALLOWED_MIME_TYPES, FILE_SIZE_LIMIT, FILE_SIZE_MB} from '../constants/upload';
 import { fileTypeFromBlob } from 'file-type';
 
+const isAllowedMimeType = (mime: string): mime is typeof ALLOWED_MIME_TYPES[number] => {
+    return ALLOWED_MIME_TYPES.includes(mime as typeof ALLOWED_MIME_TYPES[number]);
+};
+
 export const documentSchema = yup.object().shape({
     name: yup
         .string()
@@ -26,12 +30,13 @@ export const documentSchema = yup.object().shape({
         .mixed()
         .required('File is required')
         .test('fileSize', `File size must be less than ${ FILE_SIZE_MB }MB`, (value) => {
-            if (!value || value.length === 0) return false;
+            if (!value) return false;
             return value instanceof File && value.size <= FILE_SIZE_LIMIT;
         })
         .test('fileType', 'Unsupported file format', async (value) => {
-            if (!value || value.length === 0) return false;
+            if (!value) return false;
             const type = await fileTypeFromBlob(value as Blob);
-            return ALLOWED_MIME_TYPES.includes(type?.mime || '');
+            if (!type?.mime) return false;
+            return isAllowedMimeType(type.mime);
         })
 });
