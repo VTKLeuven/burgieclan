@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils';
 import { DocumentIcon } from '@heroicons/react/24/outline';
 import { ALLOWED_MIME_TYPES } from '@/utils/constants/upload';
 
+type AllowedMimeType = typeof ALLOWED_MIME_TYPES[number];
+
 interface DragDropZoneProps {
     onFileDrop: (file: File) => void;
     className?: string;
@@ -22,7 +24,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
         setIsDragging(false);
 
         const file = e.dataTransfer.files[0];
-        if (file && ALLOWED_MIME_TYPES.includes(file.type)) {
+        if (file && ALLOWED_MIME_TYPES.includes(file.type as AllowedMimeType)) {
             onFileDrop(file);
         }
     }, [onFileDrop]);
@@ -43,7 +45,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
 
     const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file && ALLOWED_MIME_TYPES.includes(file.type)) {
+        if (file && ALLOWED_MIME_TYPES.includes(file.type as AllowedMimeType)) {
             onFileDrop(file);
         }
     };

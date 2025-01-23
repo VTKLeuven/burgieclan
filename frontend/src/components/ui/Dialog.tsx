@@ -16,14 +16,22 @@ const sizes = {
     '5xl': 'sm:max-w-5xl',
 }
 
-export function Dialog({isOpen, onClose, size = 'lg', className, children, ...props}) {
+interface DialogProps {
+    isOpen: boolean;
+    onClose: () => void;
+    size?: keyof typeof sizes;
+    className?: string;
+    children?: React.ReactNode;
+}
+
+export function Dialog({isOpen, onClose, size = 'lg', className, children}: DialogProps) {
     return (
         <Headless.Transition appear show={isOpen} as={React.Fragment}>
             <Headless.Dialog
                 as="div"
                 className="relative z-10"
-                onClose={onClose}
-                {...props}
+                onClose={() => onClose()}
+                open={isOpen}
             >
                 <Headless.Transition.Child
                     as={React.Fragment}
@@ -66,7 +74,12 @@ export function Dialog({isOpen, onClose, size = 'lg', className, children, ...pr
     )
 }
 
-export function DialogTitle({className, children}: { className?: string; children: React.ReactNode }) {
+interface DialogTitleProps {
+    className?: string;
+    children: React.ReactNode;
+}
+
+export function DialogTitle({ className, children }: DialogTitleProps) {
     return (
         <Headless.Dialog.Title
             as="h3"
@@ -77,11 +90,19 @@ export function DialogTitle({className, children}: { className?: string; childre
     )
 }
 
-export function DialogBody({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+interface DialogBodyProps extends React.ComponentPropsWithoutRef<'div'> {
+    className?: string;
+}
+
+export function DialogBody({ className, ...props }: DialogBodyProps) {
     return <div {...props} className={clsx(className, 'mt-6 px-10')} />
 }
 
-export function DialogActions({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+interface DialogActionsProps extends React.ComponentPropsWithoutRef<'div'> {
+    className?: string;
+}
+
+export function DialogActions({ className, ...props }: DialogActionsProps) {
     return (
         <div
             {...props}
@@ -93,7 +114,11 @@ export function DialogActions({ className, ...props }: React.ComponentPropsWitho
     )
 }
 
-export function DialogCloseButton({ onClose }: { onClose: () => void }) {
+interface DialogCloseButtonProps {
+    onClose: () => void;
+}
+
+export function DialogCloseButton({ onClose }: DialogCloseButtonProps) {
     return (
         <button
             type="button"
