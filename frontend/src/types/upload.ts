@@ -3,7 +3,7 @@ export interface UploadFormData {
     course: string;
     category: string;
     year: string;
-    file: File | null;
+    file: any;
 }
 
 export interface Course {
