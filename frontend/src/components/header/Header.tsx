@@ -1,45 +1,23 @@
-'use client';
+'use client'
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Logo from '@/components/common/Logo';
-import Input from '@/components/ui/Input';
-
-const navigation = [
-    { name: 'Courses', href: '#' },
-    { name: 'FAQ', href: '#' },
-    { name: 'Overview', href: '#' },
-];
+import { Skeleton } from "@/components/ui/skeleton";
+import Search from "@/components/header/Search";
+import { useTranslation } from 'react-i18next';
 
 export default function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const searchInputRef = useRef<HTMLInputElement | null>(null);
 
-    /**
-     * Ctrl+F or Cmd+F to focus on search input (not in mobile mode)
-     *
-     * TODO: change to ctrl+K/cmd+k and open search popup (solve in BUR-75)
-     */
-    useEffect(() => {
-        const handleKeydown = (event: KeyboardEvent) => {
-            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-            const isCtrlF = event.ctrlKey && event.key === 'f';
-            const isCmdF = isMac && event.metaKey && event.key === 'f';
+    const { t } = useTranslation();
 
-            if (isCtrlF || isCmdF) {
-                event.preventDefault();
-                if (!searchInputRef.current) return;
-                searchInputRef.current.focus()
-            }
-        };
-
-        document.addEventListener('keydown', handleKeydown);
-
-        return () => {
-            document.removeEventListener('keydown', handleKeydown);
-        };
-    }, []);
+    const navigation = [
+        { name: t('courses'), href: '#' },
+        { name: t('FAQ'), href: '#' },
+        { name: t('overview'), href: '#' },
+    ];
 
     return (
         <header className="bg-white">
@@ -49,41 +27,54 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                 <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
                     <a href="/" className="-m-1.5 p-1.5 flex-shrink-0">
                         <span className="sr-only">Burgieclan</span>
-                        <Logo width={50} height={50}/>
+                        <Logo width={50} height={50} />
                     </a>
-                    <div className="flex">
-                        <Input ref={searchInputRef} id="search" name="search" type="search" placeholder="search"/>
-                    </div>
+                    {isAuthenticated && <Search />}
                 </div>
 
                 {/* Mobile menu toggle button */}
-                <div className="flex md:hidden">
-                    <button
-                        type="button"
-                        onClick={() => setMobileMenuOpen(true)}
-                        className="-m-1.5 p-1.5 w-[50px] h-[50px] inline-flex items-center justify-center rounded-md text-gray-700"
-                    >
-                        <span className="sr-only">Open main menu</span>
-                        <Bars3Icon aria-hidden="true" className="h-6 w-6"/>
-                    </button>
-                </div>
+                <Suspense fallback={<Skeleton style={{ width: 100, height: 20 }} />}>
+                    {isAuthenticated ?
+                        <div className="flex md:hidden">
+                            <button
+                                type="button"
+                                onClick={() => setMobileMenuOpen(true)}
+                                className="-m-1.5 p-1.5 w-[50px] h-[50px] rounded-md text-gray-700 justify-center items-center flex"
+                            >
+                                <span className="sr-only">{t('open_menu')}</span>
+                                <Bars3Icon aria-hidden="true" className="h-6 w-6" />
+                            </button>
+                        </div>
+                        :
+                        <div className="flex md:hidden">
+
+                            <a href="login" className="primary-button">
+                                {t('login')}
+                            </a>
+
+                        </div>
+                    }
+                </Suspense>
 
                 {/* Whitespace and login/profile links */}
                 <div className="hidden md:flex md:gap-x-8">
-                    {navigation.map((item) => (
-                        <a key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-gray-900">
-                            {item.name}
-                        </a>
-                    ))}
-                    {/*TODO: move logic to global state (redux or react context)*/}
-                    {isAuthenticated ?
-                        <a href="account" className="text-sm font-semibold leading-6 text-gray-900">
-                            Profile <span aria-hidden="true">&rarr;</span>
-                        </a> :
-                        <a href="login" className="text-sm font-semibold leading-6 text-gray-900">
-                            Login <span aria-hidden="true">&rarr;</span>
-                        </a>
-                    }
+                    <Suspense fallback={<Skeleton style={{ width: 100, height: 20 }} />}>
+                        {isAuthenticated &&
+                            navigation.map((item) => (
+                                <a key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-gray-900">
+                                    {item.name}
+                                </a>
+                            ))}
+
+                        {isAuthenticated ?
+                            <a href="account" className="text-sm font-semibold leading-6 text-gray-900">
+                                {t('profile')}
+                            </a> :
+                            <a href="login" className="primary-button">
+                                {t('login')}
+                            </a>
+                        }
+                    </Suspense>
                 </div>
             </nav>
 
@@ -97,10 +88,10 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                         <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
                             <a href="/" className="-m-1.5 p-1.5 flex-shrink-0 flex sm:hidden">
                                 <span className="sr-only">Burgieclan</span>
-                                <Logo width={50} height={50}/>
+                                <Logo width={50} height={50} />
                             </a>
                             <div className="flex sm:hidden">
-                                <Input id="search" name="search" type="search" placeholder="search"/>
+                                <Search />
                             </div>
                         </div>
 
@@ -110,8 +101,8 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                             onClick={() => setMobileMenuOpen(false)}
                             className="-m-1.5 p-1.5 w-[50px] h-[50px] rounded-md text-gray-700 justify-center items-center flex"
                         >
-                            <span className="sr-only">Close menu</span>
-                            <XMarkIcon aria-hidden="true" className="h-6 w-6"/>
+                            <span className="sr-only">{t('close_menu')}</span>
+                            <XMarkIcon aria-hidden="true" className="h-6 w-6" />
                         </button>
                     </div>
 
@@ -130,19 +121,15 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                                 ))}
                             </div>
                             <div className="py-6">
-                                {isAuthenticated ?
-                                    <a href="account" className="text-sm font-semibold leading-6 text-gray-900">
-                                        Profile <span aria-hidden="true">&rarr;</span>
-                                    </a> :
-                                    <a href="login" className="text-sm font-semibold leading-6 text-gray-900">
-                                        Login <span aria-hidden="true">&rarr;</span>
-                                    </a>
-                                }
+                                <a href="account" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                    {t('profile')}
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
             </Dialog>
+
         </header>
     );
 }

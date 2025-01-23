@@ -1,7 +1,10 @@
+'use client'
+
 import styles from "./styles.module.css";
 import Link from 'next/link'
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
-import {useEffect, useState} from "react";
+import { getCurrentYear } from "@/utils/date";
+import { useTranslation } from "react-i18next";
 
 type IconProps = React.SVGProps<SVGSVGElement>;
 
@@ -60,16 +63,9 @@ const navigation = [
     },
 ]
 
-const Footer = () => {
-    const [currentYear, setCurrentYear] = useState('');
-
-    /**
-     * Get the current year
-     */
-    useEffect(() => {
-        const year = new Date().getFullYear();
-        setCurrentYear(year.toString());
-    }, []);
+export default function Footer() {
+    const currentYear = getCurrentYear();
+    const { t } = useTranslation();
 
     return (
         <footer aria-labelledby="footer-heading" className="bg-white">
@@ -81,7 +77,7 @@ const Footer = () => {
                         {navigation.map((item) => (
                             <a key={item.name} href={item.href} className="text-gray-400 hover:text-gray-500">
                                 <span className="sr-only">{item.name}</span>
-                                <item.icon aria-hidden="true" className="h-6 w-6"/>
+                                <item.icon aria-hidden="true" className="h-6 w-6" />
                             </a>
                         ))}
                     </div>
@@ -89,11 +85,11 @@ const Footer = () => {
                     {/* Contribution / Issue Reporting Section */}
                     <div className="mt-2 flex space-x-4 md:order-2  md:mt-0">
                         <Link href="/support" prefetch={true} className={styles.footerLink}>
-                            Report an issue
+                            {t('report_issue')}
                         </Link>
                         <p className={styles.footerText}>{" or "}</p>
                         <a href="https://github.com/VTKLeuven/burgieclan" className={styles.footerLink}>
-                            Contribute on Github<span><ArrowTopRightOnSquareIcon className="h-3 w-3 inline-block ml-0.5 mb-1 text-gray-500" aria-hidden="true" /></span>
+                            {t('contribute_github')}<span><ArrowTopRightOnSquareIcon className="h-3 w-3 inline-block ml-0.5 mb-1 text-gray-500" aria-hidden="true" /></span>
                         </a>
                     </div>
 
@@ -108,5 +104,3 @@ const Footer = () => {
         </footer>
     )
 }
-
-export default Footer;
