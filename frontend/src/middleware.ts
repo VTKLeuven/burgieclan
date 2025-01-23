@@ -1,4 +1,6 @@
-import {NextRequest, NextResponse} from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { i18nRouter } from 'next-i18n-router';
+import { i18nConfig } from '../i18nConfig';
 
 /**
  * Fetches the list of public pages from the backend
@@ -27,30 +29,35 @@ const isPublicPage = async (urlKey: string) => {
 export default async function middleware(request: NextRequest) {
     const isAuthenticated = request.cookies.has('jwt');
 
+    // Match and extract the locale from the URL path
+    const localeMatch = request.nextUrl.pathname.match(/^\/([a-z]{2})(?:\/|$)/);
+    const locale = localeMatch ? localeMatch[1] : '';
+    const loginUrl = locale ? `/${locale}/login` : '/login';
+    const homeUrl = locale ? `/${locale}` : '/';
+
     // Redirect to login if user is not authenticated and the page is not public
-    // TODO: uncomment
-    // if (!isAuthenticated) {
-    //     const publicPage = await isPublicPage(request.nextUrl.pathname.slice(1));
-    //     if (!publicPage) {
-    //         return NextResponse.redirect(new URL(`/login?redirectTo=${encodeURIComponent(request.nextUrl.href)}`, request.url));
-    //     }
-    // }
+    if (!isAuthenticated && !request.nextUrl.pathname.startsWith(loginUrl) && request.nextUrl.pathname !== homeUrl) {
+        const pathWithoutLocale = locale ? request.nextUrl.pathname.slice(3).replace(/^\/|\/$/g, '') : request.nextUrl.pathname.slice(1).replace(/^\/|\/$/g, '');
+        const publicPage = await isPublicPage(pathWithoutLocale);
+        if (!publicPage) {
+            return NextResponse.redirect(new URL(`${loginUrl}?redirectTo=${encodeURIComponent(request.nextUrl.href)}`, request.url));
+        }
+    }
 
     // Allow access
-    return NextResponse.next();
+    return i18nRouter(request, i18nConfig);
 }
 
 export const config = {
     matcher: [
         /*
          * Match all request paths except for the ones starting with:
-         * - login (login page)
          * - oauth (OAuth callback)
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - public/images (public images)
          * - favicon.ico, sitemap.xml, robots.txt (metadata files)
          */
-        '/((?!login|oauth|_next/static|_next/image|images|favicon.ico|sitemap.xml|robots.txt).*)',
+        '/((?!oauth|_next/static|_next/image|images|favicon.ico|sitemap.xml|robots.txt).*)',
     ],
 }

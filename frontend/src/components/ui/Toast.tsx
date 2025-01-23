@@ -1,10 +1,10 @@
-
+// src/components/ui/Toast/ToastProvider.tsx
+'use client'
 
 import React, { createContext, useContext, useCallback, useState } from 'react';
 import { Transition } from '@headlessui/react';
 import { ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 
-// Types
 type ToastType = 'success' | 'error';
 
 interface Toast {
@@ -17,46 +17,10 @@ interface ToastContextType {
     showToast: (message: string, type: ToastType) => void;
 }
 
-// Create Context
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
-// Toast Provider Component
-export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
-    const [toasts, setToasts] = useState<Toast[]>([]);
-
-    const showToast = useCallback((message: string, type: ToastType) => {
-        const id = Date.now();
-        setToasts(prev => [...prev, { id, message, type }]);
-
-        setTimeout(() => {
-            setToasts(prev => prev.filter(toast => toast.id !== id));
-        }, 3000);
-    }, []);
-
-    return (
-        <ToastContext.Provider value={{ showToast }}>
-            {children}
-            <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2">
-                {toasts.map(toast => (
-                    <ToastMessage
-                        key={toast.id}
-                        message={toast.message}
-                        type={toast.type}
-                    />
-                ))}
-            </div>
-        </ToastContext.Provider>
-    );
-};
-
 // Toast Message Component
-const ToastMessage = ({
-                          message,
-                          type
-                      }: {
-    message: string;
-    type: ToastType;
-}) => {
+const ToastMessage = ({ message, type }: { message: string; type: ToastType }) => {
     const styles = {
         success: {
             bg: 'bg-green-50',
@@ -98,13 +62,39 @@ const ToastMessage = ({
     );
 };
 
+export function ToastProvider({ children }: { children: React.ReactNode }) {
+    const [toasts, setToasts] = useState<Toast[]>([]);
+
+    const showToast = useCallback((message: string, type: ToastType) => {
+        const id = Date.now();
+        setToasts(prev => [...prev, { id, message, type }]);
+
+        setTimeout(() => {
+            setToasts(prev => prev.filter(toast => toast.id !== id));
+        }, 3000);
+    }, []);
+
+    return (
+        <ToastContext.Provider value={{ showToast }}>
+            {children}
+            <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2">
+                {toasts.map(toast => (
+                    <ToastMessage
+                        key={toast.id}
+                        message={toast.message}
+                        type={toast.type}
+                    />
+                ))}
+            </div>
+        </ToastContext.Provider>
+    );
+}
+
 // Custom Hook
-export const useToast = () => {
+export function useToast() {
     const context = useContext(ToastContext);
     if (context === undefined) {
         throw new Error('useToast must be used within a ToastProvider');
     }
     return context;
-};
-
-export default ToastProvider;
+}
