@@ -3,7 +3,8 @@
 import React, { useCallback, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { DocumentIcon } from '@heroicons/react/24/outline';
-import { ALLOWED_MIME_TYPES } from '@/utils/constants/upload';
+import { ALLOWED_MIME_TYPES, FILE_SIZE_LIMIT, FILE_SIZE_MB } from '@/utils/constants/upload';
+import { useToast } from '@/components/ui/Toast';
 
 type AllowedMimeType = typeof ALLOWED_MIME_TYPES[number];
 
@@ -18,16 +19,36 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
                                                           }) => {
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { showToast } = useToast();
+
+    const validateFile = (file: File): boolean => {
+        if (!ALLOWED_MIME_TYPES.includes(file.type as AllowedMimeType)) {
+            showToast('Unsupported file format. Please upload a PDF, Word, JPG, PNG, or ZIP file.', 'error');
+            return false;
+        }
+
+        if (file.size > FILE_SIZE_LIMIT) {
+            showToast(`File size exceeds ${FILE_SIZE_MB}MB limit. Please choose a smaller file.`, 'error');
+            return false;
+        }
+
+        return true;
+    };
 
     const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsDragging(false);
 
         const file = e.dataTransfer.files[0];
-        if (file && ALLOWED_MIME_TYPES.includes(file.type as AllowedMimeType)) {
+        if (!file) {
+            showToast('No file detected. Please try again.', 'error');
+            return;
+        }
+
+        if (validateFile(file)) {
             onFileDrop(file);
         }
-    }, [onFileDrop]);
+    }, [onFileDrop, showToast]);
 
     const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -45,7 +66,12 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
 
     const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file && ALLOWED_MIME_TYPES.includes(file.type as AllowedMimeType)) {
+        if (!file) {
+            showToast('No file selected. Please try again.', 'error');
+            return;
+        }
+
+        if (validateFile(file)) {
             onFileDrop(file);
         }
     };
@@ -82,7 +108,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
                 Drag & drop your files here
             </p>
             <p className="text-sm text-gray-400 mt-1">
-                Supported formats: PDF, Word, JPG, PNG
+                Supported formats: PDF, Word, JPG, PNG, ZIP (max {FILE_SIZE_MB}MB)
             </p>
         </div>
     );
