@@ -30,7 +30,7 @@ const UploadDialog = ({
         const success = await uploadDocument(data);
         if (success) {
             showToast('Document uploaded successfully!', 'success');
-            setTimeout(handleClose, 500);
+            handleClose();
         } else {
             showToast('Failed to upload document. Please try again.', 'error');
         }
