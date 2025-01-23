@@ -1,4 +1,3 @@
-// components/upload/Form.tsx
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FormField } from '@/components/ui/FormField';
@@ -7,14 +6,16 @@ import { UploadFormData } from '@/types/upload';
 import { documentSchema } from '@/utils/validation/documentSchema';
 import { useFormFields } from '@/hooks/useFormFields';
 import { Text } from '@/components/ui/Text';
+import { useEffect } from 'react';
 
 interface FormProps {
     onSubmit: (data: UploadFormData) => Promise<void>;
     isLoading?: boolean;
     isOpen: boolean;
+    initialFile: File | null;
 }
 
-export default function UploadForm({ onSubmit, isLoading = false, isOpen }: FormProps) {
+export default function UploadForm({ onSubmit, isLoading = false, isOpen, initialFile }: FormProps) {
     const {
         register,
         handleSubmit,
@@ -26,7 +27,13 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen }: Form
 
     const { courses, categories, isLoading: isLoadingFields, error } = useFormFields(isOpen);
 
-    // Show form immediately, even while loading
+    // Handle initial file when component mounts or when initialFile changes
+    useEffect(() => {
+        if (initialFile) {
+            setValue('file', initialFile, { shouldValidate: true });
+        }
+    }, [initialFile, setValue]);
+
     return (
         <form id="upload-form" onSubmit={handleSubmit(onSubmit)} className="py-6 space-y-6">
             {error && (
@@ -83,9 +90,10 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen }: Form
                     <UploadField
                         error={errors.file?.message}
                         setValue={setValue}
+                        initialFile={initialFile}
                     />
                 </div>
             </div>
         </form>
     );
-};
+}

@@ -1,17 +1,20 @@
-'use client'
+import React from 'react';
+import HomePage from '@/components/homepage/HomePage';
 
-import { useState } from 'react';
-import UploadDialog from '@/components/upload/UploadDialog';
+export default function App() {
+    return (
+        <div className="h-screen flex flex-col">
+            {/* Main Content */}
+            <div className="flex flex-1 h-[calc(100vh-4rem)] overflow-hidden">
+                {/* Sidebar */}
+                <aside className="w-64 border-r overflow-y-auto">
+                    <div className="p-4">
+                        Sidebar content
+                    </div>
+                </aside>
 
-export default function Homepage() {
-  const [isUploadFormOpen, setIsUploadFormOpen] = useState(false);
-
-  return (
-    <div>
-      <button onClick={() => setIsUploadFormOpen(true)} className="primary-button">
-        Open Upload Form
-      </button>
-      <UploadDialog isOpen={isUploadFormOpen} setIsOpen={setIsUploadFormOpen} />
-    </div>
-  );
+                <HomePage />
+            </div>
+        </div>
+    );
 }

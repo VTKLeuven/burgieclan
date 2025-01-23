@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { UseFormSetValue } from 'react-hook-form';
 import { UploadFormData } from '@/types/upload';
@@ -8,6 +8,7 @@ import { fileTypeFromBlob } from 'file-type';
 interface FileUploadProps {
     error?: string;
     setValue: UseFormSetValue<UploadFormData>;
+    initialFile: File | null;
 }
 
 interface FilePreview {
@@ -16,7 +17,7 @@ interface FilePreview {
     icon: JSX.Element | null;
 }
 
-export const UploadField: React.FC<FileUploadProps> = ({ error, setValue }) => {
+export const UploadField: React.FC<FileUploadProps> = ({ error, setValue, initialFile }) => {
     const [filePreview, setFilePreview] = useState<FilePreview | null>(null);
 
     const getFileIcon = async (file: File): Promise<JSX.Element> => {
@@ -48,6 +49,13 @@ export const UploadField: React.FC<FileUploadProps> = ({ error, setValue }) => {
         });
         setValue('file', file, { shouldValidate: true });
     };
+
+    // Handle initial file when component mounts or when initialFile changes
+    useEffect(() => {
+        if (initialFile) {
+            handleFileChange(initialFile);
+        }
+    }, [initialFile]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -108,9 +116,9 @@ export const UploadField: React.FC<FileUploadProps> = ({ error, setValue }) => {
             ) : (
                 <div className="mt-2 overflow-hidden rounded-lg bg-gray-100 h-16">
                     <div className="p-4 flex items-center">
-            <span className="mr-3 min-h-8 min-w-8">
-              {filePreview.icon}
-            </span>
+                        <span className="mr-3 min-h-8 min-w-8">
+                            {filePreview.icon}
+                        </span>
                         <div className="flex-grow overflow-hidden whitespace-nowrap max-w-full">
                             <p className="text-sm">{filePreview.name}</p>
                             <p className="text-xs text-gray-400">{filePreview.size}</p>

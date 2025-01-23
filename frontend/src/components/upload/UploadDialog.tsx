@@ -1,31 +1,35 @@
-'use client'
+'use client';
 
-import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog'
-import UploadForm from '@/components/upload/UploadForm'
-import { Text } from '@/components/ui/Text'
-import { PaperAirplaneIcon } from '@heroicons/react/24/outline'
-import { useDocumentUpload } from '@/hooks/useDocumentUpload'
-import { UploadFormData } from '@/types/upload'
-import { StatusMessage } from '@/components/ui/StatusMessage'
-import { useCallback } from 'react'
+import { useCallback } from 'react';
+import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog';
+import UploadForm from '@/components/upload/UploadForm';
+import { Text } from '@/components/ui/Text';
+import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
+import { useDocumentUpload } from '@/hooks/useDocumentUpload';
+import { UploadFormData } from '@/types/upload';
+import { StatusMessage } from '@/components/ui/StatusMessage';
 
-interface UploadFormProps {
+interface UploadDialogProps {
     isOpen: boolean;
-    setIsOpen: (isOpen: boolean) => void;
+    onClose: () => void;
+    initialFile: File | null;
 }
 
-const UploadDialog = ({ isOpen, setIsOpen }: UploadFormProps) => {
+const UploadDialog = ({
+                          isOpen,
+                          onClose,
+                          initialFile
+                      }: UploadDialogProps) => {
     const { uploadDocument, isLoading, status, resetStatus } = useDocumentUpload();
 
     const handleClose = useCallback(() => {
-        setIsOpen(false);
+        onClose();
         resetStatus();
-    }, [setIsOpen, resetStatus]);
+    }, [onClose, resetStatus]);
 
     const handleSubmit = async (data: UploadFormData) => {
         const success = await uploadDocument(data);
         if (success) {
-            // Wait for 2 seconds to show success message before closing
             setTimeout(handleClose, 2000);
         }
     };
@@ -46,14 +50,17 @@ const UploadDialog = ({ isOpen, setIsOpen }: UploadFormProps) => {
                         type={status.type}
                     />
                 )}
+
                 <Text>
                     Upload your awesome document here. You can upload a PDF, Word, or Markdown file.
                     We will check if it follows the guidelines. Thanks for sharing your knowledge with the world!
                 </Text>
+
                 <UploadForm
                     onSubmit={handleSubmit}
                     isLoading={isLoading}
                     isOpen={isOpen}
+                    initialFile={initialFile}
                 />
             </DialogBody>
             <DialogActions>
