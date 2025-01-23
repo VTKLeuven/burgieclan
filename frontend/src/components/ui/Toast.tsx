@@ -1,3 +1,5 @@
+
+
 import React, { createContext, useContext, useCallback, useState } from 'react';
 import { Transition } from '@headlessui/react';
 import { ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
@@ -34,7 +36,6 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
     return (
         <ToastContext.Provider value={{ showToast }}>
             {children}
-            {/* Toast Container - Added top-4 to make it visible */}
             <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2">
                 {toasts.map(toast => (
                     <ToastMessage
