@@ -135,4 +135,17 @@ class Document extends Node
 
         return $this;
     }
+
+    public static function getAcademicYearChoices(): array
+    {
+        $currentYear = (int)date('Y');
+        $choices = [];
+        for ($i = 0; $i < 10; $i++) {
+            $startYear = $currentYear - $i;
+            $endYear = $startYear + 1;
+            $formattedYear = sprintf('%02d-%02d', $startYear % 100, $endYear % 100);
+            $choices[$formattedYear] = $formattedYear;
+        }
+        return $choices;
+    }
 }

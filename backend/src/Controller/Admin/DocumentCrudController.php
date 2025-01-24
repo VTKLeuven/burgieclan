@@ -48,7 +48,7 @@ class DocumentCrudController extends AbstractCrudController
         yield AssociationField::new('category')
             ->autocomplete();
         yield ChoiceField::new('year')
-            ->setChoices($this->getAcademicYearChoices())
+            ->setChoices(Document::getAcademicYearChoices())
             ->setLabel('Academic Year');
         yield BooleanField::new('under_review')
             ->setLabel('Under review')
@@ -62,18 +62,5 @@ class DocumentCrudController extends AbstractCrudController
             ->hideOnIndex();
         yield TextField::new('file_name')
             ->onlyOnIndex();
-    }
-
-    private function getAcademicYearChoices(): array
-    {
-        $currentYear = (int)date('Y');
-        $choices = [];
-        for ($i = 0; $i < 10; $i++) {
-            $startYear = $currentYear - $i;
-            $endYear = $startYear + 1;
-            $formattedYear = sprintf('%02d-%02d', $startYear % 100, $endYear % 100);
-            $choices[$formattedYear] = $formattedYear;
-        }
-        return $choices;
     }
 }
