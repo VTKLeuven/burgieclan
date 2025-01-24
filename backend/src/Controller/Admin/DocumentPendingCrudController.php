@@ -7,6 +7,7 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
@@ -74,8 +75,9 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->autocomplete();
         yield AssociationField::new('course')
             ->autocomplete();
-        yield AssociationField::new('category')
-            ->autocomplete();
+        yield ChoiceField::new('year')
+            ->setChoices(Document::getAcademicYearChoices())
+            ->setLabel('Academic Year');
         yield BooleanField::new('under_review')
             ->setLabel('Under review')
             ->renderAsSwitch(false)
