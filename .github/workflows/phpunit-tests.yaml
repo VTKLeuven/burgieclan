@@ -51,7 +51,9 @@ jobs:
           bin/console doctrine:schema:create --env=test
 
       - name: Run PHPUnit tests
-        run: backend/vendor/bin/phpunit backend/tests # Runs PHPUnit tests located in the backend/tests directory
+        run: |
+          cd backend
+          APP_ENV=test vendor/bin/phpunit tests
 
       - name: Block merge if tests fail
         if: failure() # This step runs only if the previous steps failed
