@@ -36,7 +36,10 @@ jobs:
           php-version: "8.1"
 
       - name: Install dependencies
-        run: cd backend && composer install # Installs PHP dependencies
+        run: |
+          cd backend
+          composer install
+          php bin/console lexik:jwt:generate-keypair
 
       - name: Wait for MySQL to be ready
         run: |
