@@ -46,8 +46,9 @@ jobs:
 
       - name: Backend - Create database
         run: |
-          cd backend && bin/console doctrine:database:create --if-not-exists --env=test
-          cd backend && bin/console doctrine:schema:create --env=test
+          cd backend
+          bin/console doctrine:database:create --if-not-exists --env=test
+          bin/console doctrine:schema:create --env=test
 
       - name: Run PHPUnit tests
         run: backend/vendor/bin/phpunit backend/tests # Runs PHPUnit tests located in the backend/tests directory
