@@ -9,7 +9,7 @@ on:
       - "**"
 
 jobs:
-  build:
+  npm-build:
     runs-on: ubuntu-latest
 
     steps:
