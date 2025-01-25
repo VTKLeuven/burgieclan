@@ -22,13 +22,13 @@ jobs:
           php-version: "8.0" # Specifies PHP version 8.0
 
       - name: Install dependencies
-        run: cd ${{ secrets.WORK_DIR_BACKEND }} && composer install --no-dev --optimize-autoloader # Installs PHP dependencies without dev dependencies
+        run: cd backend && composer install --no-dev --optimize-autoloader # Installs PHP dependencies without dev dependencies
 
       - name: Backend - Update migrations
-        run: cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console doctrine:migrations:migrate
+        run: cd backend && bin/console doctrine:migrations:migrate
 
       - name: Run PHPUnit tests
-        run: ${{ secrets.WORK_DIR_BACKEND }}/vendor/bin/phpunit ${{ secrets.WORK_DIR_BACKEND }}/tests # Runs PHPUnit tests located in the backend/tests directory
+        run: backend/vendor/bin/phpunit backend/tests # Runs PHPUnit tests located in the backend/tests directory
 
       - name: Block merge if tests fail
         if: failure() # This step runs only if the previous steps failed
