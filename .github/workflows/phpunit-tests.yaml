@@ -9,7 +9,7 @@ on:
       - "**"
 
 jobs:
-  phpunit:
+  php-unit:
     runs-on: ubuntu-latest # The job runs on the latest version of Ubuntu
 
     steps:
