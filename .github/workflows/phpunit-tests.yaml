@@ -49,12 +49,6 @@ jobs:
           composer install
           php bin/console lexik:jwt:generate-keypair
 
-      - name: Wait for MySQL to be ready
-        run: |
-          while ! mysqladmin ping -h"127.0.0.1" --silent; do
-            sleep 1
-          done
-
       - name: Backend - Create database
         run: |
           cd backend
