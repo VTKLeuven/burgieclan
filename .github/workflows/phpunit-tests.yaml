@@ -30,6 +30,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2 # Checks out the repository code
 
+      - name: Cache Composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: backend/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
       - name: Set up PHP
         uses: shivammathur/setup-php@v2 # Sets up the specified PHP version
         with:
