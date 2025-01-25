@@ -1,0 +1,36 @@
+name: NPM Build
+
+on:
+  push:
+    branches:
+      - release/**
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "22" # Specify the Node.js version
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Run build
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Block merge if build fails
+        if: failure()
+        run: exit 1
