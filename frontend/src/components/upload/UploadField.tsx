@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import {FieldError, FieldErrorsImpl, UseFormSetValue} from 'react-hook-form';
+import { FieldError, FieldErrorsImpl, UseFormSetValue } from 'react-hook-form';
 import { UploadFormData } from '@/types/upload';
-import {ALLOWED_MIME_TYPES, FILE_SIZE_MB} from '@/utils/constants/upload';
+import { ALLOWED_MIME_TYPES, FILE_SIZE_MB } from '@/utils/constants/upload';
 import { fileTypeFromBlob } from 'file-type';
-import {Merge} from "type-fest";
+import { Merge } from "type-fest";
 import { useTranslation } from 'react-i18next';
 
 interface FileUploadProps {
@@ -23,7 +24,7 @@ export const UploadField: React.FC<FileUploadProps> = ({ error, setValue, initia
     const [filePreview, setFilePreview] = useState<FilePreview | null>(null);
     const { t } = useTranslation();
 
-    const getFileIcon = async (file: File): Promise<JSX.Element> => {
+    const getFileIcon = useCallback(async (file: File): Promise<JSX.Element> => {
         const type = await fileTypeFromBlob(file);
         const iconMap: Record<string, string> = {
             'application/pdf': '/images/icons/PDF.svg',
@@ -34,10 +35,19 @@ export const UploadField: React.FC<FileUploadProps> = ({ error, setValue, initia
         };
 
         const iconSrc = iconMap[type?.mime || ''] || '/images/icons/default.svg';
-        return <img src={iconSrc} alt={`${type?.mime || 'File'} icon`} className="h-8 w-8" />;
-    };
+        return (
+            <Image
+                src={iconSrc}
+                alt={`${type?.mime || 'File'} icon`}
+                width={32}
+                height={32}
+                className="h-8 w-8"
+                priority
+            />
+        );
+    }, []);
 
-    const handleFileChange = async (file: File | null) => {
+    const handleFileChange = useCallback(async (file: File | null) => {
         // When a file is removed
         if (!file) {
             setFilePreview(null);
@@ -52,14 +62,14 @@ export const UploadField: React.FC<FileUploadProps> = ({ error, setValue, initia
             icon
         });
         setValue('file', file, { shouldValidate: true });
-    };
+    }, [setValue, getFileIcon]);
 
     // Handle initial file when component mounts or when initialFile changes
     useEffect(() => {
         if (initialFile) {
             handleFileChange(initialFile);
         }
-    }, [initialFile]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [initialFile, handleFileChange]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
