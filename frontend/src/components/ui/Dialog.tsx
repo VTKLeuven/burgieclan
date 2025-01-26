@@ -3,6 +3,7 @@ import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
 import React from 'react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
+import { useTranslation } from 'react-i18next';
 
 const sizes = {
     xs: 'sm:max-w-xs',
@@ -119,13 +120,15 @@ interface DialogCloseButtonProps {
 }
 
 export function DialogCloseButton({ onClose }: DialogCloseButtonProps) {
+    const { t } = useTranslation();
+
     return (
         <button
             type="button"
             onClick={onClose}
             className="absolute top-4 right-4 p-1.5 text-gray-700 justify-center items-center flex"
         >
-            <span className="sr-only">Close menu</span>
+            <span className="sr-only">{t('dialog.close')}</span>
             <XMarkIcon aria-hidden="true" className="h-6 w-6"/>
         </button>
     )
