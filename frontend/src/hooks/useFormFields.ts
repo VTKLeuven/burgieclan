@@ -1,5 +1,5 @@
 // hooks/useFormFields.ts
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Course, Category } from '@/types/upload';
 import { ApiClient } from '@/actions/api';
 
@@ -10,54 +10,62 @@ export const useFormFields = (isOpen: boolean) => {
     const [shouldShowLoading, setShouldShowLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const fetchData = useCallback(async () => {
+        try {
+            const [courseResponse, categoryResponse] = await Promise.all([
+                ApiClient('GET', `/api/courses`),
+                ApiClient('GET', `/api/document_categories`)
+            ]);
+
+            if (courseResponse.error) throw new Error(courseResponse.error.message);
+            if (categoryResponse.error) throw new Error(categoryResponse.error.message);
+
+            setCourses(courseResponse['hydra:member']?.map((course: any) => ({
+                id: course['@id'],
+                name: course.name
+            })) || []);
+
+            setCategories(categoryResponse['hydra:member']?.map((category: any) => ({
+                id: category['@id'],
+                name: category.name
+            })) || []);
+        } catch (err) {
+            setError('Failed to load form data. Please try again.');
+            console.error('Failed to fetch form data:', err);
+        } finally {
+            setIsLoading(false);
+            setShouldShowLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
-        if (!isOpen) return;
+        if (!isOpen) {
+            setIsLoading(false);
+            setShouldShowLoading(false);
+            return;
+        }
 
-        setIsLoading(true);
+        let loadingTimeout: NodeJS.Timeout;
 
-        // Only show loading state if it takes longer than 400ms
-        const loadingTimeout = setTimeout(() => {
-            if (isLoading) {
+        const initiateFetch = async () => {
+            setIsLoading(true);
+
+            // Only show loading state if it takes longer than 400ms
+            loadingTimeout = setTimeout(() => {
                 setShouldShowLoading(true);
-            }
-        }, 400);
+            }, 400);
 
-        const fetchData = async () => {
-            try {
-                const [courseResponse, categoryResponse] = await Promise.all([
-                    ApiClient('GET', `/api/courses`),
-                    ApiClient('GET', `/api/document_categories`)
-                ]);
-
-                if (courseResponse.error) throw new Error(courseResponse.error.message);
-                if (categoryResponse.error) throw new Error(categoryResponse.error.message);
-
-                setCourses(courseResponse['hydra:member']?.map((course: any) => ({
-                    id: course['@id'],
-                    name: course.name
-                })) || []);
-
-                setCategories(categoryResponse['hydra:member']?.map((category: any) => ({
-                    id: category['@id'],
-                    name: category.name
-                })) || []);
-            } catch (err) {
-                setError('Failed to load form data. Please try again.');
-                console.error('Failed to fetch form data:', err);
-            } finally {
-                setIsLoading(false);
-                setShouldShowLoading(false);
-            }
+            await fetchData();
         };
 
-        fetchData();
+        initiateFetch();
 
         return () => {
             clearTimeout(loadingTimeout);
             setIsLoading(false);
             setShouldShowLoading(false);
         };
-    }, [isOpen]);
+    }, [isOpen, fetchData]);
 
     return {
         courses,

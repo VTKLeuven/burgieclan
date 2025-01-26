@@ -23,7 +23,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
     const { showToast } = useToast();
     const { t } = useTranslation();
 
-    const validateFile = (file: File): boolean => {
+    const validateFile = useCallback((file: File): boolean => {
         if (!ALLOWED_MIME_TYPES.includes(file.type as AllowedMimeType)) {
             showToast(t('upload.errors.unsupported_format'), 'error');
             return false;
@@ -35,7 +35,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
         }
 
         return true;
-    };
+    }, [showToast, t]);
 
     const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -50,7 +50,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
         if (validateFile(file)) {
             onFileDrop(file);
         }
-    }, [onFileDrop, showToast, t]);
+    }, [onFileDrop, showToast, t, validateFile]);
 
     const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -66,7 +66,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
         fileInputRef.current?.click();
     };
 
-    const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) {
             showToast(t('upload.errors.no_file_selected'), 'error');
@@ -76,7 +76,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
         if (validateFile(file)) {
             onFileDrop(file);
         }
-    };
+    }, [onFileDrop, showToast, t, validateFile]);
 
     return (
         <div

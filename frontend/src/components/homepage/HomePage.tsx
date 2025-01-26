@@ -21,7 +21,7 @@ export default function HomePage() {
         <main className="flex-1 flex flex-col">
             <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 md:px-8 py-4">
                 {/* Header */}
-                <div className="mb-4">
+                <div className="mb-8">
                     <h2 className="text-black">{t('home.title')}</h2>
                     <Text className="text-wireframe-darkest-gray max-w-4xl text-justify">
                         {t('home.description')}
