@@ -1,5 +1,6 @@
 import React from 'react';
 import {FieldError, UseFormRegisterReturn} from 'react-hook-form';
+import {useTranslation} from 'react-i18next';
 
 interface FormFieldProps {
     label: string;
@@ -24,6 +25,7 @@ export const FormField: React.FC<FormFieldProps> = ({
     className = '',
     disabled
 }) => {
+    const {t} = useTranslation();
     const inputClassName = `
     block w-full rounded-md border-0 py-1.5 px-3
     text-gray-900 shadow-sm ring-1 ring-inset
@@ -57,7 +59,7 @@ export const FormField: React.FC<FormFieldProps> = ({
                                 {prefill.name}
                             </option>
                         ) : (
-                            <option value="">Select {label.toLowerCase()}</option>
+                            <option value="">{ t('select') } {label.toLowerCase()}</option>
                         )}
                         {options.map((option) => (
                             <option key={option.id} value={option.id}>

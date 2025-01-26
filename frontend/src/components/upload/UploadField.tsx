@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import {FieldError, FieldErrorsImpl, UseFormSetValue} from 'react-hook-form';
 import { UploadFormData } from '@/types/upload';
-import { ALLOWED_MIME_TYPES } from '@/utils/constants/upload';
+import {ALLOWED_MIME_TYPES, FILE_SIZE_MB} from '@/utils/constants/upload';
 import { fileTypeFromBlob } from 'file-type';
 import {Merge} from "type-fest";
+import { useTranslation } from 'react-i18next';
 
 interface FileUploadProps {
     error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
@@ -20,6 +21,7 @@ interface FilePreview {
 
 export const UploadField: React.FC<FileUploadProps> = ({ error, setValue, initialFile }) => {
     const [filePreview, setFilePreview] = useState<FilePreview | null>(null);
+    const { t } = useTranslation();
 
     const getFileIcon = async (file: File): Promise<JSX.Element> => {
         const type = await fileTypeFromBlob(file);
@@ -82,7 +84,7 @@ export const UploadField: React.FC<FileUploadProps> = ({ error, setValue, initia
         <div>
             <div className="flex items-center justify-between">
                 <label htmlFor="file-upload" className="block text-sm font-medium text-gray-900">
-                    File
+                    {t('upload.field.label')}
                 </label>
                 {error && <p className="text-red-500 text-xs">{`${error?.message}`}</p>}
             </div>
@@ -99,7 +101,7 @@ export const UploadField: React.FC<FileUploadProps> = ({ error, setValue, initia
                                 htmlFor="file-upload"
                                 className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
                             >
-                                <span>Upload a file</span>
+                                <span>{t('upload.field.upload_button')}</span>
                                 <input
                                     id="file-upload"
                                     type="file"
@@ -108,10 +110,10 @@ export const UploadField: React.FC<FileUploadProps> = ({ error, setValue, initia
                                     accept={ALLOWED_MIME_TYPES.join(',')}
                                 />
                             </label>
-                            <p className="pl-1 sm:block hidden">or drag and drop</p>
+                            <p className="pl-1 sm:block hidden">{t('upload.field.drag_drop_text')}</p>
                         </div>
                         <p className="text-xs leading-5 text-gray-400">
-                            .pdf, .docx, .jpg, .png, .zip up to 10MB
+                            {t('upload.supported_formats', { size: FILE_SIZE_MB })}
                         </p>
                     </div>
                 </div>

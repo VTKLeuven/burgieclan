@@ -11,7 +11,7 @@
 }
 
 body {
-    @apply m-0 p-0 h-full
+    @apply leading-relaxed m-0 p-0 h-full
 }
 
 a {
@@ -55,7 +55,7 @@ a {
 }
 
 ul {
-    @apply list-disc list-inside;
+    @apply list-disc list-inside pl-4;
 }
 
 ol {

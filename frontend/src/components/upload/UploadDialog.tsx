@@ -6,6 +6,7 @@ import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { useDocumentUpload } from '@/hooks/useDocumentUpload';
 import { UploadFormData } from '@/types/upload';
 import { useToast } from '@/components/ui/Toast';
+import { useTranslation } from 'react-i18next';
 
 interface UploadDialogProps {
     isOpen: boolean;
@@ -20,6 +21,7 @@ const UploadDialog = ({
                       }: UploadDialogProps) => {
     const { uploadDocument, isLoading, status, resetStatus } = useDocumentUpload();
     const { showToast } = useToast();
+    const { t } = useTranslation();
 
     const handleClose = useCallback(() => {
         onClose();
@@ -29,10 +31,10 @@ const UploadDialog = ({
     const handleSubmit = async (data: UploadFormData) => {
         const success = await uploadDocument(data);
         if (success) {
-            showToast('Document uploaded successfully!', 'success');
+            showToast(t('upload.dialog.success'), 'success');
             handleClose();
         } else {
-            showToast('Failed to upload document. Please try again.', 'error');
+            showToast(t('upload.dialog.error'), 'error');
         }
     };
 
@@ -43,12 +45,11 @@ const UploadDialog = ({
             size="3xl"
         >
             <DialogTitle>
-                Upload document
+                {t('upload.dialog.title')}
             </DialogTitle>
             <DialogBody>
                 <Text>
-                    Upload your awesome document here. You can upload a PDF, Word, or Markdown file.
-                    We will check if it follows the guidelines. Thanks for sharing your knowledge with the world!
+                    {t('upload.dialog.description')}
                 </Text>
 
                 <UploadForm
@@ -68,12 +69,12 @@ const UploadDialog = ({
                     {isLoading ? (
                         <>
                             <span className="spinner mr-2"/>
-                            Uploading...
+                            {t('upload.dialog.button.uploading')}
                         </>
                     ) : (
                         <>
                             <PaperAirplaneIcon className="mr-2 w-5 h-5"/>
-                            Send document
+                            {t('upload.dialog.button.send')}
                         </>
                     )}
                 </button>

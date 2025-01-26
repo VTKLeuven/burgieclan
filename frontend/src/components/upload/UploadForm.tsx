@@ -7,6 +7,7 @@ import { documentSchema } from '@/utils/validation/documentSchema';
 import { useFormFields } from '@/hooks/useFormFields';
 import { Text } from '@/components/ui/Text';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface FormProps {
     onSubmit: (data: UploadFormData) => Promise<void>;
@@ -16,8 +17,15 @@ interface FormProps {
 }
 
 export default function UploadForm({ onSubmit, isLoading = false, isOpen, initialFile }: FormProps) {
-    const {register, handleSubmit, setValue, formState: { errors }
-    } = useForm<UploadFormData>({resolver: yupResolver(documentSchema)});
+    const { t } = useTranslation();
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        formState: { errors }
+    } = useForm<UploadFormData>({
+        resolver: yupResolver(documentSchema(t))
+    });
 
     const { courses, categories, isLoading: isLoadingFields, error } = useFormFields(isOpen);
 
@@ -39,9 +47,9 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
             <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
                 <div className="col-span-full">
                     <FormField
-                        label="Name"
+                        label={t('upload.form.name.label')}
                         error={errors.name}
-                        placeholder="Choose a document name"
+                        placeholder={t('upload.form.name.placeholder')}
                         registration={register('name')}
                         disabled={isLoading || isLoadingFields}
                     />
@@ -49,7 +57,7 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
 
                 <div className="sm:col-span-full">
                     <FormField
-                        label="Course"
+                        label={t('upload.form.course.label')}
                         type="select"
                         options={courses}
                         error={errors.course}
@@ -60,7 +68,7 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
 
                 <div className="sm:col-span-3">
                     <FormField
-                        label="Category"
+                        label={t('upload.form.category.label')}
                         type="select"
                         options={categories}
                         error={errors.category}
@@ -71,9 +79,12 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
 
                 <div className="sm:col-span-3">
                     <FormField
-                        label="Academic Year"
+                        label={t('upload.form.year.label')}
                         type="select"
-                        options={[{ id: '2024-2025', name: '2024 - 2025' }]}
+                        options={[{
+                            id: '2024-2025',
+                            name: '2024 - 2025'
+                        }]}
                         error={errors.year}
                         registration={register('year')}
                         disabled={isLoading || isLoadingFields}
