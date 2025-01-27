@@ -20,5 +20,96 @@
     "FAQ": "FAQ",
     "overview": "Overzicht",
     "cookie_banner_text": "Deze website gebruikt alleen functionele cookies om je een soepele ervaring te bieden. Er worden geen andere cookies gebruikt.",
-    "cookie_banner_accept": "Ik begrijp het"
+    "cookie_banner_accept": "Ik begrijp het",
+    "select": "Selecteer",
+    "network_error": "Verbindingsproblemen gedetecteerd. Controleer je internetverbinding en probeer het opnieuw.",
+    "cors_error": "Er was een beveiligingsprobleem met de upload. Probeer het opnieuw of neem contact op met de ondersteuning als het probleem zich blijft voordoen.",
+    "token_expired": "Je sessie is verlopen. Log opnieuw in om door te gaan.",
+    "unexpected": "Er is een onverwachte fout opgetreden. Probeer het opnieuw.",
+    "dialog": {
+        "close": "Menu sluiten"
+    },
+    "upload": {
+        "drag_drop_title": "Sleep & zet je bestanden hier neer",
+        "supported_formats": ".pdf, .docx, .jpg, .png, .zip (max {{size}}MB)",
+        "errors": {
+            "unsupported_format": "Niet-ondersteund bestandsformaat. Upload een PDF-, Word-, JPG-, PNG- of ZIP-bestand.",
+            "file_too_large": "Bestandsgrootte overschrijdt de limiet van {{size}}MB. Kies een kleiner bestand.",
+            "no_file": "Geen bestand gedetecteerd. Probeer het opnieuw.",
+            "no_file_selected": "Geen bestand geselecteerd. Probeer het opnieuw.",
+            "unusable_body": "Er is een probleem opgetreden bij het verwerken van je document. Probeer opnieuw te uploaden.",
+            "payload_too_large": "De bestandsgrootte overschrijdt de limiet van {{size}}MB. Comprimeer je bestand of upload een kleiner bestand.",
+            "rate_limit": "Te veel uploadpogingen. Wacht even voordat je het opnieuw probeert."
+        },
+        "success": {
+            "upload": "Document succesvol geüpload!"
+        },
+        "dialog": {
+            "title": "Document uploaden",
+            "description": "Upload hier je geweldige document. Je kunt een PDF-, Word- of Markdown-bestand uploaden. We controleren of het voldoet aan de richtlijnen. Bedankt voor het delen van je kennis met de wereld!",
+            "button": {
+                "send": "Document verzenden",
+                "uploading": "Uploaden..."
+            },
+            "success": "Document succesvol geüpload!",
+            "error": "Document uploaden mislukt. Probeer het opnieuw."
+        },
+        "field": {
+            "label": "Bestand",
+            "upload_button": "Upload een bestand",
+            "drag_drop_text": "of sleep en zet neer",
+            "icons": {
+                "alt": "{{type}} icoon"
+            }
+        },
+        "form": {
+            "name": {
+                "label": "Naam",
+                "placeholder": "Kies een documentnaam"
+            },
+            "course": {
+                "label": "Vak"
+            },
+            "category": {
+                "label": "Categorie"
+            },
+            "year": {
+                "label": "Academiejaar"
+            },
+            "validation": {
+                "name": {
+                    "required": "Naam is verplicht",
+                    "min": "Naam moet minimaal {{min}} tekens bevatten",
+                    "max": "Naam mag niet langer zijn dan {{max}} tekens"
+                },
+                "course": {
+                    "required": "Vak is verplicht"
+                },
+                "category": {
+                    "required": "Categorie is verplicht"
+                },
+                "year": {
+                    "required": "Academiejaar is verplicht",
+                    "format": "Academiejaar moet in het formaat JJJJ-JJJJ zijn"
+                },
+                "file": {
+                    "required": "Bestand is verplicht",
+                    "size": "Bestand moet kleiner zijn dan {{size}}MB",
+                    "type": "Bestandstype wordt niet ondersteund"
+                }
+            }
+        }
+    },
+    "home": {
+        "title": "Home",
+        "description": "Welkom bij Burgieclan! Je beste vriend bij het studeren voor examens. We bieden een platform waar studenten hun studiemateriaal met elkaar kunnen delen. Op deze manier kunnen jullie elkaar helpen en wordt studeren een stuk makkelijker. Dus waar wacht je nog op? Duik in de wereld van Burgieclan en begin met het delen van je kennis!",
+        "recent_activities": "Ga verder waar je gebleven was",
+        "news": "Nieuws",
+        "navigate_to": "Navigeer naar"
+    },
+    "form": {
+        "errors": {
+            "fetch_failed": "Gegevens laden mislukt. Probeer het opnieuw."
+        }
+    }
 }

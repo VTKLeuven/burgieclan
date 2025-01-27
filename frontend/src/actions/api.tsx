@@ -39,9 +39,12 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
 
         const jwt = await getActiveJWT();
 
-        const requestHeaders = new Headers(customHeaders);
-        // Backend expects content-type to be application/json
-        requestHeaders.set('Content-Type', 'application/json');
+        const requestHeaders = new Headers(customHeaders || {});
+        // If body is FormData, don't set content-type (usefull for file uploads)
+        if (!(body instanceof FormData)) {
+            // Backend expects content-type to be application/json
+            requestHeaders.set('Content-Type', 'application/json');
+        }
 
         if (jwt) {
             requestHeaders.set('Authorization', `Bearer ${jwt}`);
@@ -50,7 +53,8 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
         const response = await fetch(url, {
             method: method,
             headers: requestHeaders,
-            body: JSON.stringify(body),
+            // If body is FormData, send it as is, otherwise stringify it (again, useful for file uploads)
+            body: body instanceof FormData ? body : JSON.stringify(body),
         });
 
         const res = await response.json();
