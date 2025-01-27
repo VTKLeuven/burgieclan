@@ -106,5 +106,10 @@
         "recent_activities": "Pick up where you left off",
         "news": "News",
         "navigate_to": "Navigate to"
+    },
+    "form": {
+        "errors": {
+            "fetch_failed": "Failed to load form data. Please try again."
+        }
     }
 }

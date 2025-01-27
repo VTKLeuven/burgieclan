@@ -10,17 +10,12 @@ export default function HeaderLayout({
     children: React.ReactNode
 }>) {
     return (
-        // The root layout.tsx (the one in [locale]) is a Server Component by default in Next.js, as indicated by the
-        // async function. However, ToastProvider is explicitly marked with 'use client'
-        // and uses React hooks (useState, useContext) which can only run on the client side.
-        <ToastProvider>
-            <div className="flex h-full flex-col min-h-full">
-                <HeaderWrapper />
-                <div className="grow">
-                    {children}
-                </div>
-                <Footer />
+        <div className="flex h-full flex-col min-h-full">
+            <HeaderWrapper />
+            <div className="grow">
+                {children}
             </div>
-        </ToastProvider>
+            <Footer />
+        </div>
     );
 }
