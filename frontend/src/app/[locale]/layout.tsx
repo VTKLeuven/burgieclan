@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google'
 import CookieBanner from "@/components/cookie-banner/CookieBanner";
 import TranslationsProvider from "@/components/TranslationProvider";
 import initTranslations from "@/app/i18n";
+import {ToastProvider} from "@/components/ui/Toast";
 
 // Inter as default font
 const inter = Inter({
@@ -27,15 +28,19 @@ export default async function RootLayout({
   const { resources } = await initTranslations(locale);
 
   return (
+    // TranslationsProvider is a server component designed for root-level wrapping.
     <TranslationsProvider
       locale={locale}
       resources={resources}>
       <html lang="en" className={`${inter.className} h-full`}>
         <body className="flex min-h-full">
-          <div className="w-full">
-            {children}
-            <CookieBanner />
-          </div>
+          {/* ToastProvider uses client-side hooks (useState, useContext) so must be placed inside body tags */}
+          <ToastProvider>
+            <div className="w-full">
+              {children}
+              <CookieBanner />
+            </div>
+          </ToastProvider>
         </body>
       </html>
     </TranslationsProvider>
