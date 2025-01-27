@@ -7,10 +7,10 @@ import Logo from '@/components/common/Logo';
 import { Skeleton } from "@/components/ui/skeleton";
 import Search from "@/components/header/Search";
 import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '@/components/header/LanguageSwitcher';
 
 export default function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
     const { t } = useTranslation();
 
     const navigation = [
@@ -65,6 +65,8 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                                     {item.name}
                                 </a>
                             ))}
+
+                        <LanguageSwitcher />
 
                         {isAuthenticated ?
                             <a href="account" className="text-sm font-semibold leading-6 text-gray-900">
@@ -130,6 +132,6 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                 </div>
             </Dialog>
 
-        </header>
+        </header >
     );
 }
