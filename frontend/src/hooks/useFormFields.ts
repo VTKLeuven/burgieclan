@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Course, Category } from '@/types/upload';
 import { ApiClient } from '@/actions/api';
+import { useTranslation } from 'react-i18next';
 
 export const useFormFields = (isOpen: boolean) => {
     const [courses, setCourses] = useState<Course[]>([]);
@@ -9,6 +10,7 @@ export const useFormFields = (isOpen: boolean) => {
     const [isLoading, setIsLoading] = useState(false);
     const [shouldShowLoading, setShouldShowLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { t } = useTranslation();
 
     const fetchData = useCallback(async () => {
         try {
@@ -30,13 +32,13 @@ export const useFormFields = (isOpen: boolean) => {
                 name: category.name
             })) || []);
         } catch (err) {
-            setError('Failed to load form data. Please try again.');
+            setError(t('form.errors.fetch_failed'));
             console.error('Failed to fetch form data:', err);
         } finally {
             setIsLoading(false);
             setShouldShowLoading(false);
         }
-    }, []);
+    }, [t]); // Add t to dependency array
 
     useEffect(() => {
         if (!isOpen) {

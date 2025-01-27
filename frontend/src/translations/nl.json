@@ -106,5 +106,10 @@
         "recent_activities": "Ga verder waar je gebleven was",
         "news": "Nieuws",
         "navigate_to": "Navigeer naar"
+    },
+    "form": {
+        "errors": {
+            "fetch_failed": "Gegevens laden mislukt. Probeer het opnieuw."
+        }
     }
 }
