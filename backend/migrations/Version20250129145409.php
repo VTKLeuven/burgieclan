@@ -43,8 +43,9 @@ final class Version20250129145409 extends AbstractMigration
         $this->addSql('ALTER TABLE favorite_user_module DROP FOREIGN KEY FK_AA647856A76ED395');
         $this->addSql('ALTER TABLE favorite_user_program DROP FOREIGN KEY FK_25F66BE1A76ED395');
 
-        $this->addSql('DROP TABLE burgieclan_user');
         $this->addSql('CREATE TABLE user (id INT AUTO_INCREMENT NOT NULL, full_name VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, roles JSON NOT NULL, accesstoken JSON DEFAULT NULL, UNIQUE INDEX UNIQ_8D93D649F85E0677 (username), UNIQUE INDEX UNIQ_8D93D649E7927C74 (email), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('INSERT INTO user (id, full_name, username, email, password, roles, accesstoken) SELECT id, full_name, username, email, password, roles, accesstoken FROM burgieclan_user');
+        $this->addSql('DROP TABLE burgieclan_user');
 
         $this->addSql('ALTER TABLE announcement ADD CONSTRAINT FK_4DB9D91C61220EA6 FOREIGN KEY (creator_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE course_comment ADD CONSTRAINT FK_9CB7578061220EA6 FOREIGN KEY (creator_id) REFERENCES user (id)');
@@ -63,8 +64,9 @@ final class Version20250129145409 extends AbstractMigration
         $this->addSql('ALTER TABLE course_course DROP FOREIGN KEY FK_B8A6AEF4F1B2BE3E');
         $this->addSql('ALTER TABLE course_course DROP FOREIGN KEY FK_B8A6AEF4E857EEB1');
 
-        $this->addSql('DROP TABLE burgieclan_course');
         $this->addSql('CREATE TABLE course (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, code VARCHAR(255) NOT NULL, professors JSON DEFAULT NULL, semesters JSON DEFAULT NULL, credits INT DEFAULT NULL, UNIQUE INDEX UNIQ_169E6FB977153098 (code), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('INSERT INTO course (id, name, code, professors, semesters, credits) SELECT id, name, code, professors, semesters, credits FROM burgieclan_course');
+        $this->addSql('DROP TABLE burgieclan_course');
 
         $this->addSql('ALTER TABLE course_comment ADD CONSTRAINT FK_9CB75780591CC992 FOREIGN KEY (course_id) REFERENCES course (id)');
         $this->addSql('ALTER TABLE document ADD CONSTRAINT FK_D8698A76591CC992 FOREIGN KEY (course_id) REFERENCES course (id)');
