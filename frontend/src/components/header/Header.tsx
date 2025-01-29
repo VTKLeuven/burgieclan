@@ -1,20 +1,23 @@
 'use client'
 
 import React, { Suspense, useState } from 'react';
-import { Dialog, Input } from '@headlessui/react';
+import { Dialog } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Logo from '@/components/common/Logo';
 import { Skeleton } from "@/components/ui/skeleton";
 import Search from "@/components/header/Search";
-
-const navigation = [
-    { name: 'Courses', href: '#' },
-    { name: 'FAQ', href: '#' },
-    { name: 'Overview', href: '#' },
-];
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '@/components/header/LanguageSwitcher';
 
 export default function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const { t } = useTranslation();
+
+    const navigation = [
+        { name: t('courses'), href: '#' },
+        { name: t('FAQ'), href: '#' },
+        { name: t('overview'), href: '#' },
+    ];
 
     return (
         <header className="bg-white">
@@ -30,16 +33,28 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                 </div>
 
                 {/* Mobile menu toggle button */}
-                <div className="flex md:hidden">
-                    <button
-                        type="button"
-                        onClick={() => setMobileMenuOpen(true)}
-                        className="-m-1.5 p-1.5 w-[50px] h-[50px] inline-flex items-center justify-center rounded-md text-gray-700"
-                    >
-                        <span className="sr-only">Open main menu</span>
-                        <Bars3Icon aria-hidden="true" className="h-6 w-6" />
-                    </button>
-                </div>
+                <Suspense fallback={<Skeleton style={{ width: 100, height: 20 }} />}>
+                    {isAuthenticated ?
+                        <div className="flex md:hidden">
+                            <button
+                                type="button"
+                                onClick={() => setMobileMenuOpen(true)}
+                                className="-m-1.5 p-1.5 w-[50px] h-[50px] rounded-md text-gray-700 justify-center items-center flex"
+                            >
+                                <span className="sr-only">Open menu</span>
+                                <Bars3Icon aria-hidden="true" className="h-6 w-6" />
+                            </button>
+                        </div>
+                        :
+                        <div className="flex md:hidden">
+
+                            <a href="login" className="primary-button">
+                                Login
+                            </a>
+
+                        </div>
+                    }
+                </Suspense>
 
                 {/* Whitespace and login/profile links */}
                 <div className="hidden md:flex md:gap-x-8">
@@ -50,6 +65,8 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                                     {item.name}
                                 </a>
                             ))}
+
+                        <LanguageSwitcher />
 
                         {isAuthenticated ?
                             <a href="account" className="text-sm font-semibold leading-6 text-gray-900">
@@ -115,6 +132,6 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                 </div>
             </Dialog>
 
-        </header>
+        </header >
     );
 }

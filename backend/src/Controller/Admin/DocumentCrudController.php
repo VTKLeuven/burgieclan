@@ -11,6 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Vich\UploaderBundle\Form\Type\VichFileType;
 
@@ -39,13 +40,22 @@ class DocumentCrudController extends AbstractCrudController
     {
         yield TextField::new('name');
         yield DateTimeField::new('createDate')
-        ->hideOnForm();
+            ->hideOnForm();
         yield DateTimeField::new('updateDate')
-        ->hideOnForm();
+            ->hideOnForm();
         yield AssociationField::new('course')
             ->autocomplete();
         yield AssociationField::new('category')
-        ->autocomplete();
+            ->autocomplete();
+        $instance = $this->getContext()->getEntity()->getInstance();
+        $firstYear = $instance ? $instance->getYear() : null;
+        yield ChoiceField::new('year')
+            ->setChoices(Document::getAcademicYearChoices(firstYear: $firstYear))
+            ->setLabel('Academic Year')
+            ->onlyOnForms();
+        yield TextField::new('year')
+            ->setLabel('Academic Year')
+            ->hideOnForm();
         yield BooleanField::new('under_review')
             ->setLabel('Under review')
             ->renderAsSwitch(false);
