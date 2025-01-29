@@ -49,6 +49,10 @@ use Symfony\Component\Validator\Constraints as Assert;
                                         "format" => "iri-reference",
                                         "example" => "/api/document_categories/1"
                                     ],
+                                    "year" => [
+                                        "type" => "string",
+                                        "example" => "24-25"
+                                    ],
                                     'file' => [
                                         'type' => 'string',
                                         'format' => 'binary'
@@ -85,6 +89,10 @@ class DocumentApi
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Groups('search')]
     public ?DocumentCategoryApi $category = null;
+
+    #[Assert\Length(5)]
+    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
+    public ?string $year = null;
 
     #[ApiProperty(writable: false)]
     #[ApiFilter(BooleanFilter::class)]

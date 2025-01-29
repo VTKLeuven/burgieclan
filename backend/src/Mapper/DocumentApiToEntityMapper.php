@@ -50,6 +50,7 @@ class DocumentApiToEntityMapper implements MapperInterface
         $to->setCategory($this->microMapper->map($from->category, DocumentCategory::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]));
+        $to->setYear($from->year);
         $to->setUnderReview($from->under_review);
 
         return $to;
