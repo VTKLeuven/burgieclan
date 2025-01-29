@@ -140,7 +140,6 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                     </div>
                 </div>
             </Dialog>
-
         </header >
     );
 }
