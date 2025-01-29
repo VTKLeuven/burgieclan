@@ -53,7 +53,7 @@ export const useDocumentUpload = () => {
             }
 
             // Pre-upload validations
-            if (data.file.size > 10 * 1024 * 1024) {
+            if (data.file.size > FILE_SIZE_MB * 1024 * 1024) {
                 throw new Error('Payload Too Large');
             }
 
