@@ -11,11 +11,5 @@ services:
       MYSQL_USER: burgieclan_db_user
       MYSQL_PASSWORD: burgieclan_db_pass
 
-  mailcatcher:
-    image: schickling/mailcatcher
-    ports:
-      - '1025:1025'
-      - '1080:1080'
-
 volumes:
   burgieclan-db: {}
