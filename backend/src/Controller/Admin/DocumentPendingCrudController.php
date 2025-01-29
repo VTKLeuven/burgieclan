@@ -75,9 +75,15 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->autocomplete();
         yield AssociationField::new('course')
             ->autocomplete();
+        $instance = $this->getContext()->getEntity()->getInstance();
+        $firstYear = $instance ? $instance->getYear() : null;
         yield ChoiceField::new('year')
-            ->setChoices(Document::getAcademicYearChoices())
-            ->setLabel('Academic Year');
+            ->setChoices(Document::getAcademicYearChoices(firstYear: $firstYear))
+            ->setLabel('Academic Year')
+            ->onlyOnForms();
+        yield TextField::new('year')
+            ->setLabel('Academic Year')
+            ->hideOnForm();
         yield BooleanField::new('under_review')
             ->setLabel('Under review')
             ->renderAsSwitch(false)
