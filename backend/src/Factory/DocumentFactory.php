@@ -73,7 +73,15 @@ final class DocumentFactory extends ModelFactory
             'name' => self::faker()->word(),
             'under_review' => self::faker()->boolean(),
             'creator' => UserFactory::randomOrCreate(),
+            'year' => $this->generateYear(),
         ];
+    }
+
+    private function generateYear(): string
+    {
+        $startYear = self::faker()->numberBetween(15, 24);
+        $endYear = $startYear + 1;
+        return sprintf('%02d-%02d', $startYear, $endYear);
     }
 
     /**
