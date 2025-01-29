@@ -28,18 +28,18 @@ export interface FormFieldProps {
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
-                                                        label,
-                                                        error,
-                                                        type = 'text',
-                                                        options = [],
-                                                        placeholder,
-                                                        registration,
-                                                        control,
-                                                        name,
-                                                        className = '',
-                                                        disabled,
-                                                        visibleOptions,
-                                                    }) => {
+    label,
+    error,
+    type = 'text',
+    options = [],
+    placeholder,
+    registration,
+    control,
+    name,
+    className = '',
+    disabled,
+    visibleOptions,
+}) => {
     const { t } = useTranslation();
 
     // For text fields, use the registration props to bind RHF.

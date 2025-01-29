@@ -104,10 +104,10 @@ class UserResourceTest extends ApiTestCase
             ->assertJsonMatches('length(favoriteModules)', 1)
             ->assertJsonMatches('length(favoritePrograms)', 1)
             ->assertJsonMatches('length(favoriteDocuments)', 1)
-            ->assertJsonMatches('favoriteCourses[0]', '/api/courses/' . $course->getId())
-            ->assertJsonMatches('favoriteModules[0]', '/api/modules/' . $module->getId())
-            ->assertJsonMatches('favoritePrograms[0]', '/api/programs/' . $program->getId())
-            ->assertJsonMatches('favoriteDocuments[0]', '/api/documents/' . $document->getId())
+            ->assertJsonMatches('favoriteCourses[0]."@id"', '/api/courses/' . $course->getId())
+            ->assertJsonMatches('favoriteModules[0]."@id"', '/api/modules/' . $module->getId())
+            ->assertJsonMatches('favoritePrograms[0]."@id"', '/api/programs/' . $program->getId())
+            ->assertJsonMatches('favoriteDocuments[0]."@id"', '/api/documents/' . $document->getId())
             ->get('/api/users/' . $user->getId() . '/favorites', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $userToken
