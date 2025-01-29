@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { ApiClient } from "@/actions/api";
 import { ApiError } from "@/utils/error/apiError";
-import { User } from '@/utils/types';
+import type { User } from '@/types/entities';
 
 interface UserContextType {
     user: User | null;

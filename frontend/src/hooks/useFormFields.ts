@@ -1,6 +1,6 @@
 // hooks/useFormFields.ts
 import { useState, useEffect, useCallback } from 'react';
-import { Course, Category } from '@/types/upload';
+import type { Category, Course } from '@/types/entities';
 import { ApiClient } from '@/actions/api';
 import { useTranslation } from 'react-i18next';
 
