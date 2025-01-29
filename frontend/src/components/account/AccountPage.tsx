@@ -97,7 +97,7 @@ export default function AccountPage() {
                     {t('account_greeting', { name: user!.fullName })}
                 </h1>
             </div>
-            <p className="pt-3 md:pt-0 text-lg md:w-[60%] mb-5" dangerouslySetInnerHTML={{ __html: t('account_welcome_text') }} />
+            <p className="pt-3 md:pt-0 text-lg mb-5" dangerouslySetInnerHTML={{ __html: t('account_welcome_text') }} />
 
             <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
                 <div className="md:w-[60%]">
