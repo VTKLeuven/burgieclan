@@ -51,7 +51,7 @@ use Symfony\Component\Validator\Constraints as Assert;
                                     ],
                                     "year" => [
                                         "type" => "string",
-                                        "example" => "24-25"
+                                        "example" => "2024 - 2025"
                                     ],
                                     'file' => [
                                         'type' => 'string',

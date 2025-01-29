@@ -20,11 +20,11 @@ interface FormProps {
 }
 
 export default function UploadForm({
-                                       onSubmit,
-                                       isLoading = false,
-                                       isOpen,
-                                       initialFile,
-                                   }: FormProps) {
+    onSubmit,
+    isLoading = false,
+    isOpen,
+    initialFile,
+}: FormProps) {
     const { t } = useTranslation();
     const {
         register,
