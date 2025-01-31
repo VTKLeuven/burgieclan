@@ -58,3 +58,11 @@ export interface User extends BaseEntity {
     favoritePrograms: Program[];
     favoriteDocuments: Document[];
 }
+
+
+export interface Page extends BaseEntity {
+    name: string;
+    content: string;
+    urlKey: string;
+    isPublic: boolean;
+}

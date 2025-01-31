@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getJWTExpiration } from "./utils/oauth";
+import { getJWTExpiration } from "@/utils/oauth";
 import { i18nRouter } from 'next-i18n-router';
 import { i18nConfig } from '../i18nConfig';
+import type { Page } from "@/types/entities";
 
 /**
  * Fetches the list of public pages from the backend
  */
-const getPublicAvailablePages = async () => {
+const getPublicAvailablePages = async (): Promise<Page[]> => {
     const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     if (!backendBaseUrl) {
         throw new Error(`Missing environment variable for backend base URL`)
@@ -14,9 +15,17 @@ const getPublicAvailablePages = async () => {
     const url = backendBaseUrl + '/api/pages';
     const response = await fetch(url, {
         method: 'GET'
-    })
+    });
     const data = await response.json();
-    return data['hydra:member'];
+
+    const pages: Page[] = data['hydra:member'].map((page: any) => ({
+        id: page['@id'],
+        title: page.title,
+        content: page.content,
+        urlKey: page.urlKey,
+        isPublic: page.public_available
+    }));
+    return pages;
 }
 
 /**
@@ -24,7 +33,7 @@ const getPublicAvailablePages = async () => {
  */
 const isPublicPage = async (urlKey: string) => {
     const pages = await getPublicAvailablePages();
-    return pages.some((page: any) => page.urlKey === urlKey);
+    return pages.some((page: Page) => page.urlKey === urlKey);
 };
 
 export default async function middleware(request: NextRequest) {
