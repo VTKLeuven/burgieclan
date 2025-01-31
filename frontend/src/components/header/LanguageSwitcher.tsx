@@ -35,7 +35,7 @@ const LanguageSwitcher = () => {
         <div className="relative flex items-center bg-gray-100 rounded-full p-0.5 h-6">
             {/* Background slider */}
             <div
-                className={`absolute h-5 w-9 bg-orange-500 rounded-full transition-all duration-300 ease-in-out ${
+                className={`absolute h-5 w-9 bg-amber-600 rounded-full transition-all duration-300 ease-in-out ${
                     currentLocale === 'nl' ? 'left-0.5' : 'left-[48%]'
                 }`}
             />
