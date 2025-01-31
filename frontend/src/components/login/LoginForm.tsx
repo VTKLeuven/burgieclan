@@ -14,6 +14,7 @@ import { useSearchParams } from 'next/navigation'
 import { ApiClient } from "@/actions/api";
 import { storeOAuthTokens } from "@/actions/oauth";
 import { useTranslation } from 'react-i18next';
+import Link from 'next/link';
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
@@ -72,10 +73,10 @@ export default function LoginForm() {
             <div className="min-h-screen px-6 py-10 lg:px-8">
                 <div className="flex flex-col items-center justify-center mt-[10vh]">
                     <div className="w-full max-w-sm">
-                        <a href="/">
+                        <Link href="/">
                             <span className="sr-only">Burgieclan</span>
                             <Logo width={100} height={100} />
-                        </a>
+                        </Link>
                         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-vtk-blue-500">
                             {t('sign_in')}
                         </h2>
