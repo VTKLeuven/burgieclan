@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\GetCollection;
 use App\Entity\DocumentCategory;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -31,5 +32,6 @@ class DocumentCategoryApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
+    #[Groups(['document:get'])]
     public ?string $name = null;
 }
