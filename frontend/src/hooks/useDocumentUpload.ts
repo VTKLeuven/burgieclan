@@ -60,8 +60,8 @@ export const useDocumentUpload = () => {
             const formData = new FormData();
             formData.append('file', data.file);
             formData.append('name', data.name);
-            formData.append('course', data.course);
-            formData.append('category', data.category);
+            formData.append('course', `/api/courses/${data.course}`);
+            formData.append('category', `/api/document_categories/${data.category}`);
             formData.append('year', data.year);
 
             const result = await ApiClient('POST', '/api/documents', formData);

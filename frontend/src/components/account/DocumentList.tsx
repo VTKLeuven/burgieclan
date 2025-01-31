@@ -16,9 +16,9 @@ const DocumentList: React.FC = () => {
                         {documents.map((document) => (
                             <li key={document.id} className="border p-4 rounded-md shadow-sm">
                                 <h3 className="text-xl font-semibold">{document.name}</h3>
-                                <p className="text-gray-700">Course: {document.course.name}</p>
-                                <p className="text-gray-700">Category: {document.category.name}</p>
-                                <p className="text-gray-700">Uploaded on: {new Date(document.createDate).toLocaleString('en-GB', {
+                                <p className="text-gray-700">Course: {document.course!.name}</p>
+                                <p className="text-gray-700">Category: {document.category!.name}</p>
+                                <p className="text-gray-700">Uploaded on: {new Date(document.createDate!).toLocaleString('en-GB', {
                                     day: '2-digit',
                                     month: '2-digit',
                                     year: 'numeric',

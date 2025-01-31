@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 interface FavoriteListProps {
     title: string;
-    items: { name: string, code?: string, redirectUrl: string }[];
+    items: { name?: string, code?: string, redirectUrl: string }[];
     updateFavorite: (index: number, isFavorite: boolean) => void;
     emptyMessage: string;
 }
