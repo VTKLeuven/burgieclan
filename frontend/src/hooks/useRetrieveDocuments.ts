@@ -21,8 +21,8 @@ const useRetrieveDocuments = () => {
 
                 const documents: Document[] = response['hydra:member'].map((doc: any) => ({
                     id: parseInt(doc['@id'].split('/').pop()),
-                    createDate: doc.createdAt,
-                    updateDate: doc.updatedAt,
+                    createDate: new Date(doc.createdAt),
+                    updateDate: new Date(doc.updatedAt),
                     name: doc.name,
                     course: doc.course,
                     category: doc.category,
