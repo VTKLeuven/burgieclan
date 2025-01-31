@@ -9,9 +9,10 @@ import Search from "@/components/header/Search";
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/components/header/LanguageSwitcher';
 
+
 export default function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const navigation = [
         { name: t('courses'), href: '#' },
@@ -25,7 +26,7 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
 
                 {/* Logo and search */}
                 <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
-                    <a href="/" className="-m-1.5 p-1.5 flex-shrink-0">
+                    <a href={`/${i18n.language}`} className="-m-1.5 p-1.5 flex-shrink-0">
                         <span className="sr-only">Burgieclan</span>
                         <Logo width={50} height={50} />
                     </a>
@@ -88,7 +89,7 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
 
                         {/* Logo and search */}
                         <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
-                            <a href="/" className="-m-1.5 p-1.5 flex-shrink-0 flex sm:hidden">
+                            <a href={`/${i18n.language}`} className="-m-1.5 p-1.5 flex-shrink-0 flex sm:hidden">
                                 <span className="sr-only">Burgieclan</span>
                                 <Logo width={50} height={50} />
                             </a>
