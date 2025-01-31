@@ -3,6 +3,7 @@ import { Document } from '@/types/entities';
 import { useUser } from '@/components/UserContext';
 import { ApiClient } from '@/actions/api';
 import { ApiError } from '@/utils/error/apiError';
+import { convertToDocument } from '@/utils/convertToEntity';
 
 const useRetrieveDocuments = () => {
     const { user } = useUser();
@@ -19,17 +20,7 @@ const useRetrieveDocuments = () => {
                     throw new ApiError(response.error.message, response.error.status);
                 }
 
-                const documents: Document[] = response['hydra:member'].map((doc: any) => ({
-                    id: parseInt(doc['@id'].split('/').pop()),
-                    createDate: new Date(doc.createdAt),
-                    updateDate: new Date(doc.updatedAt),
-                    name: doc.name,
-                    course: doc.course,
-                    category: doc.category,
-                    underReview: doc.under_review,
-                    creator: doc.creator,
-                    contentUrl: doc.contentUrl
-                }));
+                const documents: Document[] = response['hydra:member'].map(convertToDocument);
                 setDocuments(documents);
             } catch (err) {
                 setError(err.message);

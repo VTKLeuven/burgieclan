@@ -76,19 +76,19 @@ export default function AccountPage() {
     }
 
     async function updateFavoriteCourse(index: number, isFavorite: boolean) {
-        updateFavorite(user!.favoriteCourses[index].id, "courses", isFavorite);
+        updateFavorite(user!.favoriteCourses![index].id, "courses", isFavorite);
     }
 
     async function updateFavoriteModule(index: number, isFavorite: boolean) {
-        updateFavorite(user!.favoriteModules[index].id, "modules", isFavorite);
+        updateFavorite(user!.favoriteModules![index].id, "modules", isFavorite);
     }
 
     async function updateFavoriteProgram(index: number, isFavorite: boolean) {
-        updateFavorite(user!.favoritePrograms[index].id, "programs", isFavorite);
+        updateFavorite(user!.favoritePrograms![index].id, "programs", isFavorite);
     }
 
     async function updateFavoriteDocument(index: number, isFavorite: boolean) {
-        updateFavorite(user!.favoriteDocuments[index].id, "documents", isFavorite);
+        updateFavorite(user!.favoriteDocuments![index].id, "documents", isFavorite);
     }
 
     return (
@@ -137,25 +137,25 @@ export default function AccountPage() {
 
             <FavoriteList
                 title={t('account.favorite.courses')}
-                items={mapCoursesToItems(user!.favoriteCourses)}
+                items={mapCoursesToItems(user!.favoriteCourses!)}
                 emptyMessage={t('account.favorite.no_courses')}
                 updateFavorite={updateFavoriteCourse}
             />
             <FavoriteList
                 title={t('account.favorite.modules')}
-                items={mapModulesToItems(user!.favoriteModules)}
+                items={mapModulesToItems(user!.favoriteModules!)}
                 emptyMessage={t('account.favorite.no_modules')}
                 updateFavorite={updateFavoriteModule}
             />
             <FavoriteList
                 title={t('account.favorite.programs')}
-                items={mapProgramsToItems(user!.favoritePrograms)}
+                items={mapProgramsToItems(user!.favoritePrograms!)}
                 emptyMessage={t('account.favorite.no_programs')}
                 updateFavorite={updateFavoriteProgram}
             />
             <FavoriteList
                 title={t('account.favorite.documents')}
-                items={mapDocumentsToItems(user!.favoriteDocuments)}
+                items={mapDocumentsToItems(user!.favoriteDocuments!)}
                 emptyMessage={t('account.favorite.no_documents')}
                 updateFavorite={updateFavoriteDocument}
             />

@@ -3,6 +3,7 @@ import { getJWTExpiration } from "@/utils/oauth";
 import { i18nRouter } from 'next-i18n-router';
 import { i18nConfig } from '../i18nConfig';
 import type { Page } from "@/types/entities";
+import { convertToPage } from "@/utils/convertToEntity";
 
 /**
  * Fetches the list of public pages from the backend
@@ -18,13 +19,7 @@ const getPublicAvailablePages = async (): Promise<Page[]> => {
     });
     const data = await response.json();
 
-    const pages: Page[] = data['hydra:member'].map((page: any) => ({
-        id: page['@id'],
-        title: page.title,
-        content: page.content,
-        urlKey: page.urlKey,
-        isPublic: page.public_available
-    }));
+    const pages: Page[] = data['hydra:member'].map(convertToPage);
     return pages;
 }
 
