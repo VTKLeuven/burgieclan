@@ -28,6 +28,15 @@ const getPublicAvailablePages = async (): Promise<Page[]> => {
     return pages;
 }
 
+const startsWithAllowedPath = (pathWithoutLocale: string): boolean => {
+    const allowedPaths = [
+        'login',
+        'oauth',
+    ];
+
+    return allowedPaths.some((path) => pathWithoutLocale.startsWith(path));
+}
+
 /**
  * Check if the page with the given URL key is public
  */
@@ -43,13 +52,14 @@ export default async function middleware(request: NextRequest) {
     // Match and extract the locale from the URL path
     const localeMatch = request.nextUrl.pathname.match(/^\/([a-z]{2})(?:\/|$)/);
     const locale = localeMatch ? localeMatch[1] : '';
-    const loginUrl = locale ? `/${locale}/login` : '/login';
+    const pathWithoutLocale = locale ? request.nextUrl.pathname.slice(3).replace(/^\/|\/$/g, '') : request.nextUrl.pathname.slice(1).replace(/^\/|\/$/g, '');
 
     // Redirect to login if user is not authenticated and the page is not public
-    if (!isAuthenticated && !request.nextUrl.pathname.startsWith(loginUrl)) {
-        const pathWithoutLocale = locale ? request.nextUrl.pathname.slice(3).replace(/^\/|\/$/g, '') : request.nextUrl.pathname.slice(1).replace(/^\/|\/$/g, '');
+    if (!isAuthenticated && !startsWithAllowedPath(pathWithoutLocale)) {
         const publicPage = await isPublicPage(pathWithoutLocale);
         if (!publicPage) {
+            const loginUrl = locale ? `/${locale}/login` : '/login';
+            await new Promise(resolve => setTimeout(resolve, 10000));
             return NextResponse.redirect(new URL(`${loginUrl}?redirectTo=${encodeURIComponent(request.nextUrl.href)}`, request.url));
         }
     }
@@ -62,12 +72,11 @@ export const config = {
     matcher: [
         /*
          * Match all request paths except for the ones starting with:
-         * - oauth (OAuth callback)
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - public/images (public images)
          * - favicon.ico, sitemap.xml, robots.txt (metadata files)
          */
-        '/((?!oauth|_next/static|_next/image|images|favicon.ico|sitemap.xml|robots.txt).*)',
+        '/((?!_next/static|_next/image|images|favicon.ico|sitemap.xml|robots.txt).*)',
     ],
 }
