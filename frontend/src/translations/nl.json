@@ -135,5 +135,9 @@
             "no_programs": "Je hebt nog geen favoriete opleidingen.",
             "no_documents": "Je hebt nog geen favoriete documenten."
         }
+    },
+    "document": {
+        "under_review": "In behandeling",
+        "approved": "Goedgekeurd"
     }
 }

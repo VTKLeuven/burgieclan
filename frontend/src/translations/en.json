@@ -135,5 +135,9 @@
             "no_programs": "You have no favorite programs yet.",
             "no_documents": "You have no favorite documents yet."
         }
+    },
+    "document": {
+        "under_review": "Under review",
+        "approved": "Approved"
     }
 }
