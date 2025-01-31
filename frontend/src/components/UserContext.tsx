@@ -20,7 +20,7 @@ export const UserProvider = ({ children, userId }: { children: ReactNode, userId
         async function fetchUser() {
             try {
                 if (!userId) {
-                    throw new ApiError("User not found", 404);
+                    return;
                 }
                 const userData = await ApiClient('GET', `/api/users/${userId}`);
                 const convertedUserData: User = {
