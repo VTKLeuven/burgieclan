@@ -102,39 +102,6 @@ export default function AccountPage() {
 
             <DocumentList />
 
-            <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
-                <div className="md:w-[60%]">
-                    <h3 className="text-xl font-semibold mb-4">{t('account.details')}</h3>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">{t('account.name')}</label>
-                        <input
-                            type="text"
-                            value={user!.fullName}
-                            disabled
-                            className="block w-full rounded-md py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-gray-200"
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">{t('account.rnumber')}</label>
-                        <input
-                            type="text"
-                            value={user!.username}
-                            disabled
-                            className="block w-full rounded-md py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-gray-200"
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">{t('account.email')}</label>
-                        <input
-                            type="text"
-                            value={user!.email}
-                            disabled
-                            className="block w-full rounded-md py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-gray-200"
-                        />
-                    </div>
-                </div>
-            </div>
-
             <FavoriteList
                 title={t('account.favorite.courses')}
                 items={mapCoursesToItems(user!.favoriteCourses!)}
