@@ -134,10 +134,17 @@
             "no_modules": "Je hebt nog geen favoriete modules.",
             "no_programs": "Je hebt nog geen favoriete opleidingen.",
             "no_documents": "Je hebt nog geen favoriete documenten."
+        },
+        "documents": {
+            "no_uploads": "Je hebt nog geen documenten geüpload."
         }
     },
     "document": {
         "under_review": "In behandeling",
         "approved": "Goedgekeurd"
+    },
+    "pagination": {
+        "previous": "Vorige",
+        "next": "Volgende"
     }
 }

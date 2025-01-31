@@ -134,10 +134,17 @@
             "no_modules": "You have no favorite modules yet.",
             "no_programs": "You have no favorite programs yet.",
             "no_documents": "You have no favorite documents yet."
+        },
+        "documents": {
+            "no_uploads": "You haven't uploaded any documents yet."
         }
     },
     "document": {
         "under_review": "Under review",
         "approved": "Approved"
+    },
+    "pagination": {
+        "previous": "Previous",
+        "next": "Next"
     }
 }
