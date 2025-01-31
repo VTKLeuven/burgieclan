@@ -6,10 +6,10 @@ export function convertToUser(user: any): User {
         fullName: user.fullName,
         username: user.username,
         email: user.email,
-        favoriteCourses: user.favoriteCourses.map(convertToCourse),
-        favoriteModules: user.favoriteModules.map(convertToModule),
-        favoritePrograms: user.favoritePrograms.map(convertToProgram),
-        favoriteDocuments: user.favoriteDocuments.map(convertToDocument)
+        favoriteCourses: user.favoriteCourses?.map(convertToCourse),
+        favoriteModules: user.favoriteModules?.map(convertToModule),
+        favoritePrograms: user.favoritePrograms?.map(convertToProgram),
+        favoriteDocuments: user.favoriteDocuments?.map(convertToDocument)
     };
 }
 
@@ -24,10 +24,10 @@ export function convertToCourse(course: any): Course {
         professors: course.professors,
         semesters: course.semesters,
         credits: course.credits,
-        oldCourses: course.oldCourses.map(convertToCourse),
-        newCourses: course.newCourses.map(convertToCourse),
-        modules: course.modules.map(convertToModule),
-        courseComments: course.courseComments.map(convertToCourseComment)
+        oldCourses: course.oldCourses?.map(convertToCourse),
+        newCourses: course.newCourses?.map(convertToCourse),
+        modules: course.modules?.map(convertToModule),
+        courseComments: course.courseComments?.map(convertToCourseComment)
     };
 }
 
@@ -38,9 +38,9 @@ export function convertToModule(module: any): Module {
     return {
         id: parseId(module['@id']),
         name: module.name,
-        courses: module.courses.map(convertToCourse),
-        modules: module.modules.map(convertToModule),
-        program: convertToProgram(module.program)
+        courses: module.courses?.map(convertToCourse),
+        modules: module.modules?.map(convertToModule),
+        program: module.program ? convertToProgram(module.program) : undefined
     };
 }
 
@@ -51,7 +51,7 @@ export function convertToProgram(program: any): Program {
     return {
         id: parseId(program['@id']),
         name: program.name,
-        modules: program.modules.map(convertToModule)
+        modules: program.modules?.map(convertToModule)
     };
 }
 
@@ -88,8 +88,8 @@ export function convertToCourseComment(comment: any): CourseComment {
     }
     return {
         id: parseId(comment['@id']),
-        course: convertToCourse(comment.course),
-        commentCategory: convertToCategory(comment.category)
+        course: comment.course ? convertToCourse(comment.course) : undefined,
+        commentCategory: comment.category ? convertToCategory(comment.category) : undefined
     };
 }
 
