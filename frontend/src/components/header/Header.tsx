@@ -9,9 +9,10 @@ import Search from "@/components/header/Search";
 import { useUser } from '@/components/UserContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/components/header/LanguageSwitcher';
+import Link from 'next/link';
 
 
-export default function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
+export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { user } = useUser();
     const isAuthenticated = user !== null;
@@ -31,10 +32,10 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
 
                 {/* Logo and search */}
                 <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
-                    <a href={`/${i18n.language}`} className="-m-1.5 p-1.5 flex-shrink-0">
+                    <Link href={`/${i18n.language}`} className="-m-1.5 p-1.5 flex-shrink-0">
                         <span className="sr-only">Burgieclan</span>
                         <Logo width={50} height={50} />
-                    </a>
+                    </Link>
                     {isAuthenticated && <Search />}
                 </div>
 
@@ -54,9 +55,9 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                         :
                         <div className="flex md:hidden">
 
-                            <a href="login" className="primary-button">
+                            <Link href="login" className="primary-button">
                                 {t('login')}
-                            </a>
+                            </Link>
 
                         </div>
                     }
@@ -67,22 +68,22 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                     <Suspense fallback={<Skeleton style={{ width: 100, height: 20 }} />}>
                         {isAuthenticated &&
                             navigation.map((item) => (
-                                <a key={item.name} href={item.href}
+                                <Link key={item.name} href={item.href}
                                     className="text-sm font-semibold leading-6 text-gray-900">
                                     {item.name}
-                                </a>
+                                </Link>
                             ))}
 
                         <div className="flex items-center gap-x-6"> {/* Added this wrapper div with alignment */}
                             <LanguageSwitcher />
 
                             {isAuthenticated ?
-                                <a href="account" className="text-sm font-semibold leading-6 text-gray-900">
+                                <Link href="account" className="text-sm font-semibold leading-6 text-gray-900">
                                     {t('profile')}
-                                </a> :
-                                <a href="login" className="primary-button min-w-28">
+                                </Link> :
+                                <Link href="login" className="primary-button min-w-28">
                                     {t('login')}
-                                </a>
+                                </Link>
                             }
                         </div>
                     </Suspense>
@@ -97,10 +98,10 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
 
                         {/* Logo and search */}
                         <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
-                            <a href={`/${i18n.language}`} className="-m-1.5 p-1.5 flex-shrink-0 flex sm:hidden">
+                            <Link href={`/${i18n.language}`} className="-m-1.5 p-1.5 flex-shrink-0 flex sm:hidden">
                                 <span className="sr-only">Burgieclan</span>
                                 <Logo width={50} height={50} />
-                            </a>
+                            </Link>
                             <div className="flex sm:hidden">
                                 <Search />
                             </div>
@@ -122,19 +123,19 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                         <div className="-my-6 divide-y divide-gray-500/10">
                             <div className="space-y-2 py-6">
                                 {navigation.map((item) => (
-                                    <a
+                                    <Link
                                         key={item.name}
                                         href={item.href}
                                         className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
                                         {item.name}
-                                    </a>
+                                    </Link>
                                 ))}
                             </div>
                             <div className="py-6">
-                                <a href="account" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                <Link href="account" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
                                     {t('profile')}
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     </div>
