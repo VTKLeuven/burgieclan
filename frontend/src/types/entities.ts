@@ -3,6 +3,7 @@ interface BaseEntity {
 }
 
 interface NodeEntity extends BaseEntity {
+    creator: User,
     createDate: Date;
     updateDate: Date;
 }

@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useUser } from "@/components/UserContext";
 import { ApiError } from "@/utils/error/apiError";
 import FavoriteList from "@/components/account/FavoriteList";
+import DocumentList from "./DocumentList";
 
 const mapCoursesToItems = (courses: Course[]) => {
     return courses.map(course => ({
@@ -97,7 +98,9 @@ export default function AccountPage() {
                     {t('account.greeting', { name: user!.fullName })}
                 </h1>
             </div>
-            <p className="pt-3 md:pt-0 text-lg mb-5" dangerouslySetInnerHTML={{ __html: t('account_welcome_text') }} />
+            <p className="pt-3 md:pt-0 text-lg mb-5" dangerouslySetInnerHTML={{ __html: t('account.welcome_text') }} />
+
+            <DocumentList />
 
             <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
                 <div className="md:w-[60%]">
