@@ -8,7 +8,6 @@
     "login_invalid_credentials": "Ongeldige inloggegevens, controleer of je gebruikersnaam/wachtwoord correct zijn.",
     "username": "Gebruikersnaam",
     "password": "Wachtwoord",
-    "account": "Account",
     "profile": "Profiel",
     "unexpected_error": "Onverwachte fout",
     "go_home": "Ga terug naar de startpagina",
@@ -118,19 +117,23 @@
             "no_results": "Geen resultaten gevonden"
         }
     },
-    "cookie_banner_accept": "Ik begrijp het",
-    "account_greeting": "Hey, {{name}}!",
-    "account_welcome_text": "Welkom bij je accountpagina. Hier vind je wat informatie over je profiel en je favorieten.<br/>Je profielgegevens komen van de VTK-website, je kan ze daar aanpassen.",
-    "account_details": "Accountgegevens",
-    "account_name": "Naam",
-    "account_rnumber": "R-nummer",
-    "account_email": "E-mail",
-    "account_favorite_courses": "Favoriete vakken",
-    "account_favorite_modules": "Favoriete modules",
-    "account_favorite_programs": "Favoriete opleidingen",
-    "account_favorite_documents": "Favoriete documenten",
-    "account_no_favorite_courses": "Je hebt nog geen favoriete vakken.",
-    "account_no_favorite_modules": "Je hebt nog geen favoriete modules.",
-    "account_no_favorite_programs": "Je hebt nog geen favoriete opleidingen.",
-    "account_no_favorite_documents": "Je hebt nog geen favoriete documenten."
+    "account": {
+        "account": "Account",
+        "greeting": "Hey, {{name}}!",
+        "welcome_text": "Welkom bij je accountpagina. Hier vind je wat informatie over je favorieten en je bijdrages aan Burgieclan.",
+        "details": "Accountgegevens",
+        "name": "Naam",
+        "rnumber": "R-nummer",
+        "email": "E-mail",
+        "favorite": {
+            "courses": "Favoriete vakken",
+            "modules": "Favoriete modules",
+            "programs": "Favoriete opleidingen",
+            "documents": "Favoriete documenten",
+            "no_courses": "Je hebt nog geen favoriete vakken.",
+            "no_modules": "Je hebt nog geen favoriete modules.",
+            "no_programs": "Je hebt nog geen favoriete opleidingen.",
+            "no_documents": "Je hebt nog geen favoriete documenten."
+        }
+    }
 }

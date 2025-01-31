@@ -94,16 +94,16 @@ export default function AccountPage() {
         <div className="bg-white p-6 md:p-10 mx-auto max-w-7xl">
             <div className="flex items-center space-x-4 mt-3">
                 <h1 className="md:text-5xl text-4xl mb-4 text-wireframe-primary-blue">
-                    {t('account_greeting', { name: user!.fullName })}
+                    {t('account.greeting', { name: user!.fullName })}
                 </h1>
             </div>
             <p className="pt-3 md:pt-0 text-lg mb-5" dangerouslySetInnerHTML={{ __html: t('account_welcome_text') }} />
 
             <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
                 <div className="md:w-[60%]">
-                    <h3 className="text-xl font-semibold mb-4">{t('account_details')}</h3>
+                    <h3 className="text-xl font-semibold mb-4">{t('account.details')}</h3>
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">{t('account_name')}</label>
+                        <label className="block text-sm font-medium text-gray-700">{t('account.name')}</label>
                         <input
                             type="text"
                             value={user!.fullName}
@@ -112,7 +112,7 @@ export default function AccountPage() {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">{t('account_rnumber')}</label>
+                        <label className="block text-sm font-medium text-gray-700">{t('account.rnumber')}</label>
                         <input
                             type="text"
                             value={user!.username}
@@ -121,7 +121,7 @@ export default function AccountPage() {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">{t('account_email')}</label>
+                        <label className="block text-sm font-medium text-gray-700">{t('account.email')}</label>
                         <input
                             type="text"
                             value={user!.email}
@@ -133,27 +133,27 @@ export default function AccountPage() {
             </div>
 
             <FavoriteList
-                title={t('account_favorite_courses')}
+                title={t('account.favorite.courses')}
                 items={mapCoursesToItems(user!.favoriteCourses)}
-                emptyMessage={t('account_no_favorite_courses')}
+                emptyMessage={t('account.favorite.no_courses')}
                 updateFavorite={updateFavoriteCourse}
             />
             <FavoriteList
-                title={t('account_favorite_modules')}
+                title={t('account.favorite.modules')}
                 items={mapModulesToItems(user!.favoriteModules)}
-                emptyMessage={t('account_no_favorite_modules')}
+                emptyMessage={t('account.favorite.no_modules')}
                 updateFavorite={updateFavoriteModule}
             />
             <FavoriteList
-                title={t('account_favorite_programs')}
+                title={t('account.favorite.programs')}
                 items={mapProgramsToItems(user!.favoritePrograms)}
-                emptyMessage={t('account_no_favorite_programs')}
+                emptyMessage={t('account.favorite.no_programs')}
                 updateFavorite={updateFavoriteProgram}
             />
             <FavoriteList
-                title={t('account_favorite_documents')}
+                title={t('account.favorite.documents')}
                 items={mapDocumentsToItems(user!.favoriteDocuments)}
-                emptyMessage={t('account_no_favorite_documents')}
+                emptyMessage={t('account.favorite.no_documents')}
                 updateFavorite={updateFavoriteDocument}
             />
             <button
