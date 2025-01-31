@@ -13,7 +13,10 @@ const DocumentList: React.FC = () => {
     return (
         <CollapsibleSection header={<h3 className="text-xl font-semibold">Uploaded Documents</h3>}>
             <div className="rounded-lg shadow-sm">
-                {loading ? <LoaderCircle className="animate-spin text-vtk-blue-500" size={48} />
+                {loading ?
+                    <div className="flex justify-center items-center h-full">
+                        <LoaderCircle className="animate-spin text-vtk-blue-500" size={48} />
+                    </div>
                     : documents.length === 0 ? (
                         <p>No documents uploaded yet.</p>
                     ) : (
