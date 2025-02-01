@@ -61,10 +61,7 @@ class Course
     private Collection $courseComments;
 
     // This is the self-referential many-to-many relationship
-    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: "IdenticalCourses")]
-    #[ORM\JoinTable(name: "identical_courses")]
-    #[ORM\JoinColumn(name: "course_id", referencedColumnName: "id")]
-    #[ORM\InverseJoinColumn(name: "identical_course_id", referencedColumnName: "id")]
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: "identicalCourses")]
     private Collection $identicalCourses;
 
     public function __construct()
