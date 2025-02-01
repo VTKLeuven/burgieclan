@@ -74,7 +74,8 @@
                 "label": "Categorie"
             },
             "year": {
-                "label": "Academiejaar"
+                "label": "Academiejaar",
+                "placeholder": "Selecteer academiejaar..."
             },
             "validation": {
                 "name": {
@@ -90,7 +91,7 @@
                 },
                 "year": {
                     "required": "Academiejaar is verplicht",
-                    "format": "Academiejaar moet in het formaat JJJJ-JJJJ zijn"
+                    "format": "Academiejaar moet in het formaat JJJJ - JJJJ zijn"
                 },
                 "file": {
                     "required": "Bestand is verplicht",
@@ -110,6 +111,10 @@
     "form": {
         "errors": {
             "fetch_failed": "Gegevens laden mislukt. Probeer het opnieuw."
+        },
+        "combo": {
+            "search": "Zoeken...",
+            "no_results": "Geen resultaten gevonden"
         }
     }
 }
