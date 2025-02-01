@@ -11,8 +11,8 @@ export interface YearOption {
 export function useYearOptions(): YearOption[] {
     return useMemo(() => {
         const now = new Date();
-        // Use the current year if month is July or later; otherwise use last year.
-        const currentYear = now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1;
+        // Use the current year if month is September or later; otherwise use last year.
+        const currentYear = now.getMonth() >= 9 ? now.getFullYear() : now.getFullYear() - 1;
         return Array.from({ length: MAX_YEARS_HISTORY }, (_, i) => {
             const year = currentYear - i;
             return {
