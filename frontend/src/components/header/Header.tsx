@@ -9,9 +9,10 @@ import Search from "@/components/header/Search";
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/components/header/LanguageSwitcher';
 
+
 export default function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const navigation = [
         { name: t('courses'), href: '#' },
@@ -21,19 +22,20 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
 
     return (
         <header className="bg-white">
-            <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between border-b border-gray-900/10 p-6 lg:px-8">
+            <nav aria-label="Global"
+                 className="mx-auto flex max-w-7xl items-center justify-between border-b border-gray-900/10 p-6 lg:px-8">
 
                 {/* Logo and search */}
                 <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
-                    <a href="/" className="-m-1.5 p-1.5 flex-shrink-0">
+                    <a href={`/${i18n.language}`} className="-m-1.5 p-1.5 flex-shrink-0">
                         <span className="sr-only">Burgieclan</span>
-                        <Logo width={50} height={50} />
+                        <Logo width={50} height={50}/>
                     </a>
-                    {isAuthenticated && <Search />}
+                    {isAuthenticated && <Search/>}
                 </div>
 
                 {/* Mobile menu toggle button */}
-                <Suspense fallback={<Skeleton style={{ width: 100, height: 20 }} />}>
+                <Suspense fallback={<Skeleton style={{width: 100, height: 20}}/>}>
                     {isAuthenticated ?
                         <div className="flex md:hidden">
                             <button
@@ -42,7 +44,7 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                                 className="-m-1.5 p-1.5 w-[50px] h-[50px] rounded-md text-gray-700 justify-center items-center flex"
                             >
                                 <span className="sr-only">{t('open_menu')}</span>
-                                <Bars3Icon aria-hidden="true" className="h-6 w-6" />
+                                <Bars3Icon aria-hidden="true" className="h-6 w-6"/>
                             </button>
                         </div>
                         :
@@ -57,25 +59,28 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                 </Suspense>
 
                 {/* Whitespace and login/profile links */}
-                <div className="hidden md:flex md:gap-x-8">
-                    <Suspense fallback={<Skeleton style={{ width: 100, height: 20 }} />}>
+                <div className="hidden md:flex md:gap-x-8 items-center"> {/* Added items-center here */}
+                    <Suspense fallback={<Skeleton style={{width: 100, height: 20}}/>}>
                         {isAuthenticated &&
                             navigation.map((item) => (
-                                <a key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-gray-900">
+                                <a key={item.name} href={item.href}
+                                   className="text-sm font-semibold leading-6 text-gray-900">
                                     {item.name}
                                 </a>
                             ))}
 
-                        <LanguageSwitcher />
+                        <div className="flex items-center gap-x-6"> {/* Added this wrapper div with alignment */}
+                            <LanguageSwitcher/>
 
-                        {isAuthenticated ?
-                            <a href="account" className="text-sm font-semibold leading-6 text-gray-900">
-                                {t('profile')}
-                            </a> :
-                            <a href="login" className="primary-button">
-                                {t('login')}
-                            </a>
-                        }
+                            {isAuthenticated ?
+                                <a href="account" className="text-sm font-semibold leading-6 text-gray-900">
+                                    {t('profile')}
+                                </a> :
+                                <a href="login" className="primary-button min-w-28">
+                                    {t('login')}
+                                </a>
+                            }
+                        </div>
                     </Suspense>
                 </div>
             </nav>
@@ -88,12 +93,12 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
 
                         {/* Logo and search */}
                         <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
-                            <a href="/" className="-m-1.5 p-1.5 flex-shrink-0 flex sm:hidden">
+                            <a href={`/${i18n.language}`} className="-m-1.5 p-1.5 flex-shrink-0 flex sm:hidden">
                                 <span className="sr-only">Burgieclan</span>
-                                <Logo width={50} height={50} />
+                                <Logo width={50} height={50}/>
                             </a>
                             <div className="flex sm:hidden">
-                                <Search />
+                            <Search />
                             </div>
                         </div>
 
