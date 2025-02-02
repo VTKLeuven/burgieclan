@@ -48,4 +48,5 @@ RUN mkdir -p var/cache var/log var/sessions && \
 
 EXPOSE 8000
 
-CMD ["symfony", "server:start", "--port=8000", "--no-tls"]
+# Changed command to use server:start with --allow-all-ip
+CMD ["symfony", "server:start", "--port=8000", "--no-tls", "--allow-all-ip"]
