@@ -37,8 +37,10 @@ RUN composer install --no-scripts
 # Copy existing application directory
 COPY . .
 
-# Set permissions
-RUN chown -R www-data:www-data var
+# Create var directory and set permissions
+RUN mkdir -p var && \
+    chown -R www-data:www-data var && \
+    chmod -R 777 var
 
 EXPOSE 8000
 
