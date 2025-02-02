@@ -18,8 +18,10 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     volumes:
-      - ./backend:/var/www/html
-      - /var/www/html/vendor
+      - ./backend:/var/www/html:cached
+      - backend-vendor:/var/www/html/vendor
+      - backend-var:/var/www/html/var:delegated
+      - ./php.dev.ini:/usr/local/etc/php/conf.d/php.dev.ini:ro
     ports:
       - "8000:8000"
     depends_on:
@@ -36,9 +38,9 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
+      - ./frontend:/app:cached
+      - frontend-node-modules:/app/node_modules
+      - frontend-next:/app/.next:delegated
     ports:
       - "3000:3000"
     environment:
@@ -55,3 +57,7 @@ networks:
 
 volumes:
   burgieclan-db: {}
+  backend-vendor: {}
+  backend-var: {}
+  frontend-node-modules: {}
+  frontend-next: {}
