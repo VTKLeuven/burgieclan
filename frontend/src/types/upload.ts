@@ -3,6 +3,7 @@ export interface UploadFormData {
     course: string;
     category: string;
     year: string;
+    anonymous: boolean;
     file: any;
 }
 
@@ -14,9 +15,4 @@ export interface Course {
 export interface Category {
     id: string;
     name: string;
-}
-
-export interface UploadFormProps {
-    isOpen: boolean;
-    onClose: () => void;
 }

@@ -8,6 +8,7 @@ import { useFormFields } from '@/hooks/useFormFields';
 import { Text } from '@/components/ui/Text';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import {Checkbox} from "@/components/ui/Checkbox";
 
 interface FormProps {
     onSubmit: (data: UploadFormData) => Promise<void>;
@@ -24,7 +25,10 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
         setValue,
         formState: { errors }
     } = useForm<UploadFormData>({
-        resolver: yupResolver(documentSchema(t))
+        resolver: yupResolver(documentSchema(t)),
+        defaultValues: {
+            anonymous: false // TODO: Set the initial value of the checkbox based on anonymous user setting
+        }
     });
 
     const { courses, categories, isLoading: isLoadingFields, error } = useFormFields(isOpen);
@@ -37,7 +41,7 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
     }, [initialFile, setValue]);
 
     return (
-        <form id="upload-form" onSubmit={handleSubmit(onSubmit)} className="py-6 space-y-6">
+        <form id="upload-form" onSubmit={handleSubmit(onSubmit)} className="pt-6 space-y-6">
             {error && (
                 <div className="mb-4">
                     <Text className="text-red-600">{error}</Text>
@@ -96,6 +100,15 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
                         error={errors.file}
                         setValue={setValue}
                         initialFile={initialFile}
+                    />
+                </div>
+
+                <div className="col-span-full mt-4 gap-3 pb-2">
+                    <Checkbox
+                        label={t('upload.form.anonymous.label')}
+                        {...register('anonymous')}
+                        disabled={isLoading || isLoadingFields}
+                        className="justify-end"
                     />
                 </div>
             </div>

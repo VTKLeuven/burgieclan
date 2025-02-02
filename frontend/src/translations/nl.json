@@ -76,6 +76,10 @@
             "year": {
                 "label": "Academiejaar"
             },
+            "anonymous": {
+                "label": "Anoniem",
+                "description": "Wil je dit document anoniem uploaden?"
+            },
             "validation": {
                 "name": {
                     "required": "Naam is verplicht",

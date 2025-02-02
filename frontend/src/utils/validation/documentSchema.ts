@@ -26,6 +26,10 @@ export const documentSchema = (t: any) => yup.object().shape({
         .required(t('upload.form.validation.year.required'))
         .matches(/^\d{4}-\d{4}$/, t('upload.form.validation.year.format')),
 
+    anonymous: yup
+        .boolean()
+        .default(false),
+
     file: yup
         .mixed()
         .required(t('upload.form.validation.file.required'))

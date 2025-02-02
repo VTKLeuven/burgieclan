@@ -76,6 +76,10 @@
             "year": {
                 "label": "Academic Year"
             },
+            "anonymous": {
+                "label": "Anonymous",
+                "description": "Do you want to upload this document anonymously?"
+            },
             "validation": {
                 "name": {
                     "required": "Name is required",
