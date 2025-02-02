@@ -22,3 +22,6 @@ export const ALLOWED_MIME_TYPES = parseAllowedMimeTypes();
 
 export const FILE_SIZE_MB = parseInt(process.env.NEXT_PUBLIC_MAX_FILE_SIZE_MB ?? '10');
 export const FILE_SIZE_LIMIT = FILE_SIZE_MB * 1024 * 1024;
+
+export const VISIBLE_YEARS = 5;
+export const MAX_YEARS_HISTORY = 20;
