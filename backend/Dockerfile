@@ -22,6 +22,10 @@ RUN docker-php-ext-install \
     intl \
     xml
 
+# Install Symfony CLI
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | bash && \
+    apt-get install symfony-cli
+
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -37,11 +41,11 @@ RUN composer install --no-scripts
 # Copy existing application directory
 COPY . .
 
-# Create var directory and set permissions
-RUN mkdir -p var && \
+# Create var directory with proper permissions
+RUN mkdir -p var/cache var/log var/sessions && \
     chown -R www-data:www-data var && \
-    chmod -R 777 var
+    chmod -R 775 var
 
 EXPOSE 8000
 
-CMD ["php", "bin/console", "server:run", "0.0.0.0:8000"]
+CMD ["symfony", "server:start", "--port=8000", "--no-tls"]
