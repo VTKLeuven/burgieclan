@@ -48,7 +48,7 @@ const UploadDialog = ({
                 {t('upload.dialog.title')}
             </DialogTitle>
             <DialogBody>
-                <Text>
+                <Text className={'text-justify'}>
                     {t('upload.dialog.description')}
                 </Text>
 
