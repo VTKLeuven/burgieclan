@@ -59,7 +59,7 @@ const UploadDialog = ({
                     initialFile={initialFile}
                 />
             </DialogBody>
-            <DialogActions>
+            <DialogActions className="mt-0 gap-0">
                 <button
                     type="submit"
                     form="upload-form"
