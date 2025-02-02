@@ -2,11 +2,11 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install dependencies only when needed
-COPY package.json package-lock.json* ./
+# Install dependencies
+COPY package*.json ./
 RUN npm ci
 
-# Copy the rest of the application code
+# Copy the rest of the application
 COPY . .
 
 EXPOSE 3000
