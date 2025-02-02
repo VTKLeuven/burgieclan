@@ -27,6 +27,7 @@ services:
     environment:
       DATABASE_URL: "mysql://burgieclan_db_user:burgieclan_db_pass@db:3306/burgieclan_db?serverVersion=8.0"
       APP_ENV: dev
+      PHP_IDE_CONFIG: "serverName=backend"
     networks:
       - burgieclan-network
 
