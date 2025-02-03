@@ -19,6 +19,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend:/var/www/html:cached
+      - ./.git:/var/www/html/.git:cached
       - backend-vendor:/var/www/html/vendor
       - backend-var:/var/www/html/var:delegated
       - ./php.dev.ini:/usr/local/etc/php/conf.d/php.dev.ini:ro
