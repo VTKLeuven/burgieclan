@@ -55,7 +55,7 @@ export default function HomePage() {
                         <div className="rounded-lg border border-gray-200 h-full">
                             <div className="p-4">
                                 <h3 className="text-xl text-gray-900">{t('home.navigate_to')}</h3>
-                                <Link href={`/course/${3}`} className="text-blue-500 hover:underline">
+                                <Link href={`/course/${29}`} className="text-blue-500 hover:underline">
                                     Go to Course 3
                                 </Link>
                             </div>

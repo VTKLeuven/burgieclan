@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import CoursePage from '@/components/CoursePage';
+import CoursePage from '@/components/coursepage/CoursePage';
 import {Breadcrumb} from '@/types'
 import initTranslations from '@/app/i18n'
 import HomePage from '@/components/homepage/HomePage'

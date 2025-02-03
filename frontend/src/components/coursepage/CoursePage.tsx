@@ -1,5 +1,5 @@
 'use client'
-import CoursePageSection from "@/components/CoursePageSection";
+import CoursePageSection from "@/components/coursepage/CoursePageSection";
 import { Course, Breadcrumb } from "@/types";
 import Image from 'next/image';
 import DocumentIcon from '/public/images/vectors/document_icon.svg';
