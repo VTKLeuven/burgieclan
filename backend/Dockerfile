@@ -40,8 +40,7 @@ COPY grumphp.yml ./
 # Install dependencies
 RUN composer install --no-scripts
 
-# Initialize GrumPHP
-RUN vendor/bin/grumphp git:init
+RUN git config --global --add safe.directory /var/www/html && vendor/bin/grumphp git:init
 
 # Set up directory permissions
 RUN mkdir -p var/cache var/log var/sessions && \
