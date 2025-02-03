@@ -40,7 +40,8 @@ COPY grumphp.yml ./
 # Install dependencies
 RUN composer install --no-scripts
 
-RUN git config --global --add safe.directory /var/www/html && vendor/bin/grumphp git:init
+# Initialize GrumPHP
+RUN vendor/bin/grumphp git:init
 
 # Set up directory permissions
 RUN mkdir -p var/cache var/log var/sessions && \
@@ -49,4 +50,4 @@ RUN mkdir -p var/cache var/log var/sessions && \
 
 EXPOSE 8000
 
-CMD ["symfony", "server:start", "--port=8000", "--no-tls", "--allow-all-ip"]
+CMD ["sh", "-c", "symfony server:stop || true && symfony server:start --port=8000 --no-tls --allow-all-ip"]
