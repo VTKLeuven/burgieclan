@@ -22,6 +22,7 @@ services:
       - backend-vendor:/var/www/html/vendor
       - backend-var:/var/www/html/var:delegated
       - ./php.dev.ini:/usr/local/etc/php/conf.d/php.dev.ini:ro
+      - ./.git:/var/www/html/.git:cached
     ports:
       - "8000:8000"
     depends_on:
