@@ -5,7 +5,7 @@ parameters:
     run_psalm: false # Enable after installing the psalm preset
     run_security_advisories: false # Enable after installing the security advisories preset
     phpunit.parallel: false # Decide if it is possible to run phpunit tests in parallel or not.
-    grumhp_exec_command: php
+    grumhp_exec_command: 'docker-compose run --rm backend php'
     # Personal preferences
     stop_on_first_failure: false
 
@@ -28,3 +28,4 @@ grumphp:
         git_commit_message:
             matchers:
                 Must contain JIRA issue number: /BUR-\d+/
+
