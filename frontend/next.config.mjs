@@ -4,6 +4,15 @@ import {withSentryConfig} from "@sentry/nextjs";
 const nextConfig = {
     output: "standalone",
     reactStrictMode: false,
+
+    // Add webpack watching configuration
+    webpackDevMiddleware: config => {
+        config.watchOptions = {
+            poll: 1000,
+            aggregateTimeout: 300,
+        }
+        return config
+    },
 };
 
 export default withSentryConfig(nextConfig, {
