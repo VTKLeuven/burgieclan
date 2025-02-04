@@ -6,6 +6,8 @@
     "sign_in": "Meld je aan bij je account",
     "or_log_in_manually": "Of log handmatig in",
     "login_invalid_credentials": "Ongeldige inloggegevens, controleer of je gebruikersnaam/wachtwoord correct zijn.",
+    "login_failed": "Login gefaald, probeer opnieuw.",
+    "login_success": "Succesvolle login!",
     "username": "Gebruikersnaam",
     "password": "Wachtwoord",
     "profile": "Profiel",
