@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Announcement;
 use App\Entity\CommentCategory;
 use App\Entity\Course;
 use App\Entity\CourseComment;
@@ -9,7 +10,6 @@ use App\Entity\Document;
 use App\Entity\DocumentCategory;
 use App\Entity\DocumentComment;
 use App\Entity\Module;
-use App\Entity\Notification;
 use App\Entity\Page;
 use App\Entity\Program;
 use App\Entity\User;
@@ -35,7 +35,7 @@ class DashboardController extends AbstractDashboardController
     {
         $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
 
-        return $this->redirect($adminUrlGenerator->setController(PostCrudController::class)->generateUrl());
+        return $this->redirect($adminUrlGenerator->setController(DocumentPendingCrudController::class)->generateUrl());
     }
 
     public function configureDashboard(): Dashboard
@@ -62,7 +62,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Users', 'fa fa-users', User::class)
             ->setPermission(User::ROLE_SUPER_ADMIN);
 
-        yield MenuItem::linkToCrud('Notifications', "fa-solid fa-bell", Notification::class)
+        yield MenuItem::linkToCrud('Announcement', "fa-solid fa-bullhorn", Announcement::class)
             ->setPermission(User::ROLE_ADMIN);
 
         yield MenuItem::linkToCrud('Programs', 'fa fa-briefcase', Program::class)
