@@ -56,7 +56,7 @@ class DocumentApiProvider implements ProviderInterface
         $documentApi = $this->microMapper->map($document, DocumentApi::class);
 
         if ($document->isAnonymous()) {
-            $documentApi->creator = null;
+            unset($documentApi->creator); // Remove author in GET-requests if document is anonymous
         }
 
         return $documentApi;
