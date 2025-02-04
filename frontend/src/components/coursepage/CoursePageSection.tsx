@@ -21,8 +21,8 @@ export default function CoursePageSection({ title, description }: CoursePageSect
                 <div className="pl-4 pt-2">
                     <Image src="/images/vectors/document_icon.svg" alt="Document Icon" width={32} height={32} className="w-8 h-8" />
 
-                    <h2 className="hover:underline hover:cursor-pointer">{title}</h2>
-                    <p className="text-lg w-[85%]">
+                    <h3 className="hover:underline hover:cursor-pointer">{title}</h3>
+                    <p className="text-s w-[85%]">
                         {description}
                     </p>
                     <YellowSectionButton />

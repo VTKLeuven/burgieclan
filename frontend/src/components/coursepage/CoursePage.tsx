@@ -158,7 +158,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                     </div>
                 </div>
 
-                <div className="md:p-10 p-7">
+                <div className="md:p-10 p-7 mb-10">
                     <h2>Bestanden</h2>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:mt-5 transform scale-90 origin-left">
                         <CoursePageSection title="Samenvattingen" description="Lorem ipsum dolor sit amet" />
