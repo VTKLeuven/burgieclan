@@ -392,7 +392,9 @@ class DocumentResourceTest extends ApiTestCase
      */
     public function testNonAnonymousDocumentHasCreator(): void
     {
-        $document = DocumentFactory::createOne(); // Default is non-anonymous
+        $document = DocumentFactory::createOne([
+            'anonymous' => false
+        ]);
 
         $json = $this->browser()
             ->get('/api/documents/' . $document->getId(), [
