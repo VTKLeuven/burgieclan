@@ -44,8 +44,8 @@ final class DocumentProcessor implements ProcessorInterface
             throw new BadRequestHttpException('"category" is required'));
         $dto->category = $category;
 
-        /** @var bool $anonymous */
-        $anonymous = $request->get('anonymous');
+        $anonymous = $request->get('anonymous') === 'true';
+        $dto->anonymous = $anonymous;
 
         // Convert the documentDto to an actual Document.
         $document = $this->microMapper->map($dto, Document::class);
@@ -57,8 +57,6 @@ final class DocumentProcessor implements ProcessorInterface
         }
 
         $document->setFile($uploadedFile);
-
-        $document->setAnonymous($anonymous);
 
         // Persist the document to the database.
         $this->persistProcessor->process($document, $operation, $uriVariables, $context);
