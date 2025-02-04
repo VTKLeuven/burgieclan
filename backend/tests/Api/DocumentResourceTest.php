@@ -38,6 +38,7 @@ class DocumentResourceTest extends ApiTestCase
             'category',
             'year',
             'under_review',
+            'anonymous',
             'creator',
             'createdAt',
             'updatedAt',
@@ -345,6 +346,11 @@ class DocumentResourceTest extends ApiTestCase
         unlink(__DIR__ . '/../../data/documents/' . $filename);
     }
 
+    /**
+     * Test that an anonymous document does not have a creator field in the GET-response
+     * (it should always have one just when GET is called when anonymous, it should give
+     * no creator field (deleted inside DocumentApiProvider)).
+     */
     public function testAnonymousDocumentDoesNotHaveCreator(): void
     {
         $document = DocumentFactory::createOne([
@@ -359,15 +365,34 @@ class DocumentResourceTest extends ApiTestCase
                 ]
             ])
             ->assertJson()
+            ->assertJsonMatches('"@id"', '/api/documents/' . $document->getId())
             ->json();
 
         $this->assertArrayNotHasKey('creator', $json->decoded());
+
+        // Check that if the creator is set to non-anonymous later on, the creator is given in the GET-response.
+        $document->setAnonymous(false);
+        $document->save();
+
+        $json = $this->browser()
+            ->get('/api/documents/' . $document->getId(), [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->assertJsonMatches('"@id"', '/api/documents/' . $document->getId())
+            ->json();
+
+        $this->assertArrayHasKey('creator', $json->decoded());
     }
 
+    /**
+     * Test that a non-anonymous document has a creator field in the GET-response.
+     */
     public function testNonAnonymousDocumentHasCreator(): void
     {
-        $document = DocumentFactory::createOne();
-        $document->setAnonymous(true);
+        $document = DocumentFactory::createOne(); // Default is non-anonymous
 
         $json = $this->browser()
             ->get('/api/documents/' . $document->getId(), [
@@ -380,6 +405,22 @@ class DocumentResourceTest extends ApiTestCase
             ->json();
 
         $this->assertArrayHasKey('creator', $json->decoded());
+
+        // Check that if the creator is set to anonymous later on, no creator field is given on GET.
+        $document->setAnonymous(true);
+        $document->save();
+
+        $json = $this->browser()
+            ->get('/api/documents/' . $document->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->assertJsonMatches('"@id"', '/api/documents/' . $document->getId())
+            ->json();
+
+        $this->assertArrayNotHasKey('creator', $json->decoded());
     }
 
 }
