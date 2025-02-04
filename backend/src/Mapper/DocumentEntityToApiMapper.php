@@ -45,6 +45,7 @@ class DocumentEntityToApiMapper implements MapperInterface
         ]);
         $to->year = $from->getYear();
         $to->under_review = $from->isUnderReview();
+        $to->anonymous = $from->isAnonymous();
         $to->creator = $this->microMapper->map($from->getCreator(), UserApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);
