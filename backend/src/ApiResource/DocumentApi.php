@@ -103,7 +103,7 @@ class DocumentApi
     public bool $under_review = true;
 
     #[ApiFilter(BooleanFilter::class)]
-    public bool $anonymous;
+    public bool $anonymous = false;
 
     public ?string $contentUrl = null;
 
