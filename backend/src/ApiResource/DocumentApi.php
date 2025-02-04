@@ -63,6 +63,7 @@ use Symfony\Component\Validator\Constraints as Assert;
                                     ],
                                     'anonymous' => [
                                         'type' => 'boolean',
+                                        'example' => false
                                     ],
                                 ]
                             ]
