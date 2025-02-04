@@ -43,7 +43,6 @@ final class DocumentProcessor implements ProcessorInterface
         $category = $this->iriConverter->getResourceFromIri($request->get('category') ??
             throw new BadRequestHttpException('"category" is required'));
         $dto->category = $category;
-        $dto->under_review = $request->get('under_review') ?? false;
 
         /** @var bool $anonymous */
         $anonymous = $request->get('anonymous');
