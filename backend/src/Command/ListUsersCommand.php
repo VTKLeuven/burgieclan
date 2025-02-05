@@ -46,8 +46,6 @@ use Symfony\Component\Mime\Email;
 final class ListUsersCommand extends Command
 {
     public function __construct(
-        private readonly MailerInterface $mailer,
-        private readonly string $emailSender,
         private readonly UserRepository $users
     ) {
         parent::__construct();
@@ -65,9 +63,6 @@ final class ListUsersCommand extends Command
                 results to display with the <comment>--max-results</comment> option:
 
                   <info>php %command.full_name%</info> <comment>--max-results=2000</comment>
-
-                In addition to displaying the user list, you can also send this information to
-                the email address specified in the <comment>--send-to</comment> option:
 
                   <info>php %command.full_name%</info> <comment>--send-to=fabien@symfony.com</comment>
                 HELP
@@ -131,27 +126,6 @@ final class ListUsersCommand extends Command
         $usersAsATable = $bufferedOutput->fetch();
         $output->write($usersAsATable);
 
-        /** @var string|null $email */
-        $email = $input->getOption('send-to');
-
-        if (null !== $email) {
-            $this->sendReport($usersAsATable, $email);
-        }
-
         return Command::SUCCESS;
-    }
-
-    /**
-     * Sends the given $contents to the $recipient email address.
-     */
-    private function sendReport(string $contents, string $recipient): void
-    {
-        $email = (new Email())
-            ->from($this->emailSender)
-            ->to($recipient)
-            ->subject(sprintf('app:list-users report (%s)', date('Y-m-d H:i:s')))
-            ->text($contents);
-
-        $this->mailer->send($email);
     }
 }
