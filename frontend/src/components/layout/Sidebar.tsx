@@ -1,13 +1,55 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, Home, File, FolderClosed, Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronDown, ChevronRight, Home, File, FolderClosed, Plus, PanelLeftClose, PanelLeft } from 'lucide-react';
 
 const NavigationSidebar = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     subjects: true,
-    documents: false
+    documents: false,
+    programs: false
   });
+  const [subjects, setSubjects] = useState([]);
+  const [documents, setDocuments] = useState([]);
+  const [programs, setPrograms] = useState([]);
 
-  const toggleSection = (section: string) => {
+  // Fetch data when component mounts
+  useEffect(() => {
+    fetchSubjects();
+    fetchDocuments();
+    fetchPrograms();
+  }, []);
+
+  const fetchSubjects = async () => {
+    try {
+      const response = await fetch('YOUR_LITUS_API_ENDPOINT/subjects');
+      const data = await response.json();
+      setSubjects(data);
+    } catch (error) {
+      console.error('Error fetching subjects:', error);
+    }
+  };
+
+  const fetchDocuments = async () => {
+    try {
+      const response = await fetch('YOUR_LITUS_API_ENDPOINT/documents');
+      const data = await response.json();
+      setDocuments(data);
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+    }
+  };
+
+  const fetchPrograms = async () => {
+    try {
+      const response = await fetch('YOUR_LITUS_API_ENDPOINT/programs');
+      const data = await response.json();
+      setPrograms(data);
+    } catch (error) {
+      console.error('Error fetching programs:', error);
+    }
+  };
+
+  const toggleSection = (section) => {
     setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section]
@@ -15,12 +57,20 @@ const NavigationSidebar = () => {
   };
 
   return (
-      <div className="w-64 h-screen bg-white border-r border-gray-200 flex flex-col">
+      <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-screen bg-white border-r border-gray-200 flex flex-col`}>
+        {/* Collapse Toggle Button */}
+        <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="absolute -right-3 top-4 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100"
+        >
+          {isCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
+        </button>
+
         {/* Top Navigation */}
         <nav className="p-4 space-y-2">
           <a href="#" className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2">
             <Home size={20} />
-            <span>Home</span>
+            {!isCollapsed && <span>Home</span>}
           </a>
           <button
               className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 rounded p-2"
@@ -28,9 +78,9 @@ const NavigationSidebar = () => {
           >
             <div className="flex items-center space-x-2">
               <FolderClosed size={20} />
-              <span>Mijn Vakken</span>
+              {!isCollapsed && <span>Mijn Vakken</span>}
             </div>
-            {expandedSections.subjects ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            {!isCollapsed && (expandedSections.subjects ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
           </button>
           <button
               className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 rounded p-2"
@@ -38,35 +88,44 @@ const NavigationSidebar = () => {
           >
             <div className="flex items-center space-x-2">
               <File size={20} />
-              <span>Mijn documenten</span>
+              {!isCollapsed && <span>Mijn documenten</span>}
             </div>
-            {expandedSections.documents ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            {!isCollapsed && (expandedSections.documents ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
           </button>
         </nav>
 
         {/* Add Document Button */}
         <button className="mx-4 my-2 flex items-center justify-center space-x-2 bg-indigo-600 text-white rounded-md py-2 px-4 hover:bg-indigo-700">
           <Plus size={16} />
-          <span>Document toevoegen</span>
+          {!isCollapsed && <span>Document toevoegen</span>}
         </button>
 
         {/* Subjects List */}
-        {expandedSections.subjects && (
+        {!isCollapsed && expandedSections.subjects && (
             <div className="p-4 space-y-2">
               <div className="text-sm font-medium text-gray-500">Mijn vakken</div>
               <ul className="space-y-2">
-                <li className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2">
-                  <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
-                  <span>Wiskunde</span>
-                </li>
-                <li className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2">
-                  <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
-                  <span>Algemeen vormende opleidingsonderdelen</span>
-                </li>
-                <li className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2">
-                  <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
-                  <span>Energie & materie</span>
-                </li>
+                {subjects.map((subject, index) => (
+                    <li key={subject.id || index} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2">
+                      <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
+                      <span>{subject.name}</span>
+                    </li>
+                ))}
+              </ul>
+            </div>
+        )}
+
+        {/* Documents List */}
+        {!isCollapsed && expandedSections.documents && (
+            <div className="p-4 space-y-2">
+              <div className="text-sm font-medium text-gray-500">Mijn documenten</div>
+              <ul className="space-y-2">
+                {documents.map((doc, index) => (
+                    <li key={doc.id || index} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2">
+                      <File size={16} />
+                      <span>{doc.name}</span>
+                    </li>
+                ))}
               </ul>
             </div>
         )}
@@ -79,16 +138,18 @@ const NavigationSidebar = () => {
                 alt="User avatar"
                 className="w-8 h-8 rounded-full"
             />
-            <span className="text-sm text-gray-700">A. Hendrickx</span>
+            {!isCollapsed && <span className="text-sm text-gray-700">A. Hendrickx</span>}
           </div>
-          <div className="px-4 pb-2 space-y-2">
-            <a href="vtk.be" className="block text-sm text-gray-600 hover:text-gray-800">
-              Go to vtk.be
-            </a>
-            <button className="block text-sm text-gray-600 hover:text-gray-800">
-              Log out
-            </button>
-          </div>
+          {!isCollapsed && (
+              <div className="px-4 pb-2 space-y-2">
+                <a href="vtk.be" className="block text-sm text-gray-600 hover:text-gray-800">
+                  Go to vtk.be
+                </a>
+                <button className="block text-sm text-gray-600 hover:text-gray-800">
+                  Log out
+                </button>
+              </div>
+          )}
         </div>
       </div>
   );
