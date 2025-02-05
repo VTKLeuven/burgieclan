@@ -6,6 +6,7 @@ import { DragDropZone } from '@/components/upload/DragDropZone';
 import { useUploadFlow } from '@/hooks/useUploadFlow';
 import UploadDialog from '@/components/upload/UploadDialog'
 import { useTranslation } from 'react-i18next';
+import AnnouncementSlideShow from '@/components/announcement/AnnouncementSlideShow'
 
 export default function HomePage() {
     const {
@@ -17,9 +18,17 @@ export default function HomePage() {
 
     const { t } = useTranslation();
 
+    const testAnnouncements = [
+        { priority: 1, title: 'Announcement 1', description: 'Description for announcement 1' },
+        { priority: 2, title: 'Announcement 2', description: 'Description for announcement 2' },
+        { priority: 1, title: 'Announcement 3', description: 'Description for announcement 3' }
+    ];
+
     return (
         <main className="flex-1 flex flex-col">
             <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 md:px-8 py-4">
+                <AnnouncementSlideShow announcements={testAnnouncements} />
+
                 {/* Header */}
                 <div className="mb-8">
                     <h2 className="text-black">{t('home.title')}</h2>
