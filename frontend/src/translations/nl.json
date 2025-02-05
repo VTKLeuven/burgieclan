@@ -5,6 +5,7 @@
     "sign_in": "Meld je aan bij je account",
     "or_log_in_manually": "Of log handmatig in",
     "login_invalid_credentials": "Ongeldige inloggegevens, controleer of je gebruikersnaam/wachtwoord correct zijn.",
+    "log_out": "Uitloggen",
     "username": "Gebruikersnaam",
     "password": "Wachtwoord",
     "account": "Account",
@@ -116,5 +117,19 @@
             "search": "Zoeken...",
             "no_results": "Geen resultaten gevonden"
         }
+    },
+    "sidebar": {
+        "home": "Home",
+        "upload": "Upload",
+        "my_courses": "Mijn Vakken",
+        "courses": "Vakken",
+        "my_documents": "Mijn Documenten",
+        "documents": "Documenten",
+        "add_document": "Voeg document toe",
+        "profile": "Profiel",
+        "log_out": "Uitloggen",
+        "add_doc": "Voeg document toe",
+        "go_to_vtk": "Ga naar VTK",
+        "user_avatar": "Gebruikersavatar"
     }
 }
