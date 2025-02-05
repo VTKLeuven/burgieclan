@@ -5,6 +5,7 @@
     "sign_in": "Sign in to your account",
     "or_log_in_manually": "Or log in manually",
     "login_invalid_credentials": "Bad credentials, please verify that your username/password are correctly set.",
+    "log_out": "Log out",
     "username": "Username",
     "password": "Password",
     "account": "Account",
@@ -116,5 +117,19 @@
             "search": "Search...",
             "no_results": "No results found"
         }
+    },
+    "sidebar": {
+        "home": "Home",
+        "upload": "Upload",
+        "my_courses": "My Courses",
+        "courses": "Courses",
+        "my_documents": "My Documents",
+        "add_document": "Add Document",
+        "documents": "Documents",
+        "profile": "Profile",
+        "log_out": "Log Out",
+        "add_doc": "Add Document",
+        "go_to_vtk": "Go to VTK",
+        "user_avatar": "User avatar"
     }
 }
