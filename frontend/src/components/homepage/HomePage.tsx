@@ -1,11 +1,14 @@
 'use client';
 
+import { ApiClient } from '@/actions/api';
 import AnnouncementSlideShow from '@/components/announcement/AnnouncementSlideShow';
 import { QuickLinks } from '@/components/homepage/QuickLinks';
 import { Text } from '@/components/ui/Text';
 import { DragDropZone } from '@/components/upload/DragDropZone';
 import UploadDialog from '@/components/upload/UploadDialog';
 import { useUploadFlow } from '@/hooks/useUploadFlow';
+import { ApiError } from "next/dist/server/api-utils";
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function HomePage() {
@@ -17,17 +20,30 @@ export default function HomePage() {
     } = useUploadFlow();
 
     const { t } = useTranslation();
+    const [announcements, setAnnouncements] = useState([]);
 
-    const testAnnouncements = [
-        { priority: 1, title: 'Announcement 1', description: 'Description for announcement 1', datePosted: "10/02/2025 | 12:53"},
-        { priority: 2, title: 'Announcement 2', description: 'Description for announcement 2', datePosted: "7/05/2024 | 18:22" },
-        { priority: 1, title: 'Announcement 3', description: 'Description for announcement 3', datePosted: "18/01/2025 | 10:42" }
-    ];
+    async function fetchAnnouncements() {
+        try {
+            const response = await ApiClient('GET', `/api/announcements?page=1`);
+            const announcements = response['hydra:member']; // Extract the hydra:member array
+            return announcements;
+        } catch (err) {
+            throw new ApiError(500, err.message);
+        }
+    }
+
+    useEffect(() => {
+        async function loadAnnouncements() {
+            const fetchedAnnouncements = await fetchAnnouncements();
+            setAnnouncements(fetchedAnnouncements);
+        }
+        loadAnnouncements();
+    }, []);
 
     return (
         <main className="flex-1 flex flex-col">
             <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 md:px-8 py-4">
-                <AnnouncementSlideShow announcements={testAnnouncements} />
+                <AnnouncementSlideShow announcements={announcements} />
 
                 {/* Header */}
                 <div className="mb-8">

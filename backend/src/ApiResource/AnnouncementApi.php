@@ -30,10 +30,16 @@ class AnnouncementApi
     public ?int $id = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    public ?string $title = null;
+    public ?string $title_nl = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    public ?string $content = null;
+    public ?string $content_nl = null;
+
+    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
+    public ?string $title_en = null;
+
+    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
+    public ?string $content_en = null;
 
     public ?UserApi $creator;
 
@@ -48,4 +54,7 @@ class AnnouncementApi
 
     #[ApiProperty(writable: false)]
     public string $updatedAt;
+
+    #[ApiProperty(writable: false)]
+    public bool $priority;
 }

@@ -1,14 +1,22 @@
 import Announcement from '@/components/announcement/Announcement';
 import { useEffect, useState } from 'react';
 
-interface AnnouncementProps {
-    priority: number;
-    title: string;
-    description: string;
-    datePosted: string;
+export interface Announcement {
+    id: string;
+    type: string;
+    content_en: string;
+    content_nl: string;
+    createdAt: string;
+    creator: string;
+    endTime: string;
+    priority: boolean;
+    startTime: string;
+    title_en: string;
+    title_nl: string;
+    updatedAt: string;
 }
 
-export default function AnnouncementSlideShow({ announcements }: { announcements: AnnouncementProps[] }) {
+export default function AnnouncementSlideShow({ announcements }: { announcements: Announcement[] }) {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
