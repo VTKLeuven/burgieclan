@@ -16,6 +16,9 @@ class Announcement extends Node
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private ?bool $priority = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $title_nl = null;
 
@@ -112,6 +115,18 @@ class Announcement extends Node
     public function setContentEn(string $content): static
     {
         $this->content_en = $content;
+
+        return $this;
+    }
+
+    public function isPriority(): bool
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(bool $priority): static
+    {
+        $this->priority = $priority;
 
         return $this;
     }

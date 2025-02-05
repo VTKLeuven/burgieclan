@@ -33,8 +33,11 @@ class AnnouncementEntityToApiMapper implements MapperInterface
         assert($from instanceof Announcement);
         assert($to instanceof AnnouncementApi);
 
-        $to->title = $from->getTitle();
-        $to->content = $from->getContent();
+        $to->title_nl = $from->getTitleNl();
+        $to->content_nl = $from->getContentNl();
+        $to->title_en = $from->getTitleEn();
+        $to->content_en = $from->getContentEn();
+        $to->priority = $from->isPriority();
 
         $to->creator = $this->microMapper->map($from->getCreator(), UserApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
