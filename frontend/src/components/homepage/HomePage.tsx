@@ -19,9 +19,9 @@ export default function HomePage() {
     const { t } = useTranslation();
 
     const testAnnouncements = [
-        { priority: 1, title: 'Announcement 1', description: 'Description for announcement 1' },
-        { priority: 2, title: 'Announcement 2', description: 'Description for announcement 2' },
-        { priority: 1, title: 'Announcement 3', description: 'Description for announcement 3' }
+        { priority: 1, title: 'Announcement 1', description: 'Description for announcement 1', datePosted: "10/02/2025 | 12:53"},
+        { priority: 2, title: 'Announcement 2', description: 'Description for announcement 2', datePosted: "7/05/2024 | 18:22" },
+        { priority: 1, title: 'Announcement 3', description: 'Description for announcement 3', datePosted: "18/01/2025 | 10:42" }
     ];
 
     return (

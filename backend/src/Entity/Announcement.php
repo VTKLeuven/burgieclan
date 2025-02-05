@@ -16,8 +16,17 @@ class Announcement extends Node
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $title_nl = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $title_en = null;
+
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $content = null;
+    private ?string $content_nl = null;
+
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $content_en = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\GreaterThanOrEqual('now Europe/Brussels')]
@@ -27,24 +36,16 @@ class Announcement extends Node
     #[Assert\GreaterThan(propertyPath: 'startTime')]
     private DateTime $endTime;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $title = null;
+    public static array $AVAILABLE_LANGUAGES = [
+        'nl' => 'Dutch',
+        'en' => 'English',
+    ];
+
+    public static string $DEFAULT_LANGUAGE = 'nl';
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getContent(): ?string
-    {
-        return $this->content;
-    }
-
-    public function setContent(string $content): static
-    {
-        $this->content = $content;
-
-        return $this;
     }
 
     public function getStartTime(): DateTime
@@ -67,14 +68,50 @@ class Announcement extends Node
         $this->endTime = $endTime;
     }
 
-    public function getTitle(): ?string
+    public function getTitleNl(): ?string
     {
-        return $this->title;
+        return $this->title_nl;
     }
 
-    public function setTitle(?string $title): static
+    public function setTitleNl(?string $title): static
     {
-        $this->title = $title;
+        $this->title_nl = $title;
+
+        return $this;
+    }
+
+    public function getTitleEn(): ?string
+    {
+        return $this->title_en;
+    }
+
+    public function setTitleEn(?string $title): static
+    {
+        $this->title_en = $title;
+
+        return $this;
+    }
+
+    public function getContentEn(): ?string
+    {
+        return $this->content_en;
+    }
+
+    public function getContentNl(): ?string
+    {
+        return $this->content_nl;
+    }
+
+    public function setContentNl(string $content): static
+    {
+        $this->content_nl = $content;
+
+        return $this;
+    }
+
+    public function setContentEn(string $content): static
+    {
+        $this->content_en = $content;
 
         return $this;
     }
