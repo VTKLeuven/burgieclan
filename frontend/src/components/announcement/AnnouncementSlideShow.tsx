@@ -5,6 +5,7 @@ interface AnnouncementProps {
     priority: number;
     title: string;
     description: string;
+    datePosted: string;
 }
 
 export default function AnnouncementSlideShow({ announcements }: { announcements: AnnouncementProps[] }) {
@@ -24,13 +25,13 @@ export default function AnnouncementSlideShow({ announcements }: { announcements
 
     return (
         <div className="relative">
-            <div className="p-2 pl-5 rounded-lg border border-gray-200 h-full bg-wireframe-lightest-gray">
+            <div className="p-2 pl-8 rounded-lg border border-gray-200 h-full bg-wireframe-lightest-gray">
                 <Announcement {...announcements[currentIndex]} />
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                <div className="absolute top-1/2 right-0 transform -translate-y-1/2 flex flex-col space-y-2">
                     {announcements.map((_, index) => (
                         <button
                             key={index}
-                            className={`w-2 h-2 mb-2 rounded-full ${index === currentIndex ? 'bg-gray-800' : 'bg-gray-400'}`}
+                            className={`w-2 h-2 mr-2 rounded-full ${index === currentIndex ? 'bg-gray-800' : 'bg-gray-400'}`}
                             onClick={() => handleDotClick(index)}
                         />
                     ))}
