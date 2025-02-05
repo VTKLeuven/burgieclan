@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Announcement;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
@@ -27,6 +28,10 @@ class AnnouncementCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+        yield BooleanField::new('priority')
+            ->renderAsSwitch(false)
+            ->setLabel('Priority');
+
         yield TextField::new('title_nl')
             ->setRequired(true)
             ->setLabel('Title (Dutch)');
