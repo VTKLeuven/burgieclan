@@ -26,6 +26,7 @@ export default function HomePage() {
         try {
             const response = await ApiClient('GET', `/api/announcements?page=1`);
             const announcements = response['hydra:member']; // Extract the hydra:member array
+            console.log(announcements)
             return announcements;
         } catch (err) {
             throw new ApiError(500, err.message);
