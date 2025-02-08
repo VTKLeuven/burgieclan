@@ -35,7 +35,7 @@ export default function ErrorPage({ status, detail }: { status?: number; detail?
                         <button
                             type="button"
                             onClick={redirectHome}
-                            className="primary-button flex-1">
+                            className="primary-button flex-1 w-full">
                             Go back home
                         </button>
                         <button

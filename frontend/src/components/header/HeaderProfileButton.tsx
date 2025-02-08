@@ -51,7 +51,7 @@ export default function HeaderProfileButton({jwt} : {jwt : string | null}) {
                     </DropdownMenuContent>
                 </DropdownMenu>
                 :
-                <a href="login" className="primary-button">
+                <a href="login" className="primary-button w-full">
                     Login
                 </a>
             }

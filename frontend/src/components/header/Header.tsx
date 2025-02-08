@@ -47,7 +47,7 @@ export default function Header({jwt} : {jwt: string | null}) {
                         :
                         <div className="flex md:hidden">
 
-                            <a href="login" className="primary-button">
+                            <a href="login" className="primary-button w-full">
                                 Login
                             </a>
 
