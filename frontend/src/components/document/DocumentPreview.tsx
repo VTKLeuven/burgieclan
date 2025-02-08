@@ -1,8 +1,11 @@
 import { Calendar, CircleUser, File, Package, RefreshCcw } from "lucide-react";
 import VoteButton from "@/components/ui/VoteButton";
 import DocumentInfoField from "@/components/document/DocumentInfoField";
+import dynamic from "next/dynamic";
 
 export default function DocumentPreview () {
+    const PDFViewer = dynamic(() => import("@/components/pdf/PDFViewer"), { ssr: false, });
+
     return (
         <div className="p-8 flex-auto text-sm">
             {/* Filename */}
@@ -29,6 +32,8 @@ export default function DocumentPreview () {
                 <VoteButton/>
                 <DocumentInfoField className="text-gray-500" icon={RefreshCcw} value={"Last updated 20/10/2024 at 15:35"} />
             </div>
+
+            <PDFViewer fileArg="/documents/test.pdf"/>
 
         </div>
     )
