@@ -1,4 +1,4 @@
-.PHONY: up down test prod clean build rebuild
+.PHONY: up down test prod clean build rebuild db admin
 
 # Development (default)
 up:
@@ -45,3 +45,13 @@ backend-shell:
 # Frontend shell
 frontend-shell:
 	docker compose exec frontend sh
+
+# Database setup
+db:
+	docker compose exec backend php bin/console doctrine:migrations:migrate --no-interaction
+	docker compose exec backend php bin/console doctrine:fixtures:load --no-interaction
+	docker compose exec backend symfony console app:add-user --admin
+
+# Create admin user
+admin:
+	docker compose exec backend symfony console app:add-user --admin

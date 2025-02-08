@@ -47,9 +47,6 @@ COPY grumphp.yml ./
 # Install dependencies
 RUN composer install --no-scripts
 
-# Copy the rest of the application
-COPY . .
-
 # Initialize GrumPHP
 RUN vendor/bin/grumphp git:init
 
