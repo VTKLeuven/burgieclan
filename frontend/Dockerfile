@@ -1,23 +1,23 @@
 # Base stage with common setup
-FROM node:18-alpine as base
+FROM node:18-alpine AS base
 WORKDIR /app
 COPY package*.json ./
 
 # Development stage
-FROM base as dev
+FROM base AS dev
 ENV WATCHPACK_POLLING=true
 ENV CHOKIDAR_USEPOLLING=true
 RUN npm i
 CMD ["npm", "run", "dev"]
 
 # Test stage
-FROM base as test
+FROM base AS test
 RUN npm ci
 COPY . .
 CMD ["npm", "run", "test"]
 
 # Production stage
-FROM base as prod
+FROM base AS prod
 RUN npm ci
 COPY . .
 RUN npm run build
