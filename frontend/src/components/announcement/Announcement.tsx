@@ -13,8 +13,8 @@ export default function Announcement(props: AnnouncementType) {
     return (
         <div className="flex mt-2 mb-2">
             <div className="flex items-center justify-end mr-4">
-                {priority && <Bell size={32} className="text-wireframe-content" />}
-                {!priority && <AlertTriangle size={32} className="text-wireframe-content" />}
+                {!priority && <Bell size={32} className="text-wireframe-content" />}
+                {priority && <AlertTriangle size={32} className="text-wireframe-content" />}
             </div>
             <div className="pl-5 flex flex-col justify-center">
                 <h3 className="text-xl text-wireframe-content m-0">{title}</h3>
