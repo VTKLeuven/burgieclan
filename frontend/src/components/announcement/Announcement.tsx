@@ -16,8 +16,8 @@ export default function Announcement(props: AnnouncementType) {
     return (
         <div className="flex mt-2 mb-2">
             <div className="flex items-center justify-end mr-4">
-                {priority && <FontAwesomeIcon icon={faBell} size="2x" className="text-wireframe-content" />}
-                {!priority && <FontAwesomeIcon icon={faTriangleExclamation} size="2x" className="text-wireframe-content" />}
+                {!priority && <FontAwesomeIcon icon={faBell} size="2x" className="text-wireframe-content" />}
+                {priority && <FontAwesomeIcon icon={faTriangleExclamation} size="2x" className="text-wireframe-content" />}
             </div>
             <div className="pl-5 flex flex-col justify-center">
                 <h3 className="text-xl text-wireframe-content m-0">{title}</h3>
