@@ -5,9 +5,6 @@ const config = {
   ],
   theme: {
   	extend: {
-		fontFamily: {
-			roboto: ["Roboto", "sans-serif"],
-		},
   		screens: {
   			xs: '320px'
   		},
@@ -41,24 +38,10 @@ const config = {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   	},
-	  typography: (theme: any) => ({
-		  DEFAULT: {
-			  css: {
-				  h1: { fontFamily: theme("fontFamily.roboto").join(", ") },
-				  h2: { fontFamily: theme("fontFamily.roboto").join(", ") },
-				  h3: { fontFamily: theme("fontFamily.roboto").join(", ") },
-				  h4: { fontFamily: theme("fontFamily.roboto").join(", ") },
-				  h5: { fontFamily: theme("fontFamily.roboto").join(", ") },
-				  h6: { fontFamily: theme("fontFamily.roboto").join(", ") },
-				  p: { fontFamily: theme("fontFamily.roboto").join(", ") },
-			  },
-		  },
-	  }),
   },
   plugins: [
       require('@tailwindcss/forms'),
       require("tailwindcss-animate"),
-	  require("@tailwindcss/typography"),
   ],
 };
 export default config;
