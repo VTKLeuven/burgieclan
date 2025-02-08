@@ -22,6 +22,8 @@ export default function VoteButton({
 }: VoteButtonProps) {
     const [voteState, setVoteState] = useState<VoteDirection>(initialVote || VoteDirection.NONE);
     const [voteCount, setVoteCount] = useState(initialVotes);
+    const [isUpvoteHovered, setIsUpvoteHovered] = useState(false);
+    const [isDownvoteHovered, setIsDownvoteHovered] = useState(false);
 
     const handleVote = async (direction) => {
         if (disabled || direction == VoteDirection.NONE) return;
@@ -58,30 +60,34 @@ export default function VoteButton({
       border-gray-500`}
         >
       <ArrowBigUpIcon
-          size={20}
-          strokeWidth="1.5"
+          size={24}
+          strokeWidth={isUpvoteHovered ? '2' : '1.5'}
+          onMouseEnter={() => setIsUpvoteHovered(true)}
+          onMouseLeave={() => setIsUpvoteHovered(false)}
           onClick={() => handleVote(VoteDirection.UP)}
           className={`
-          ${disabled ? '' : 'hover:text-blue-500'}
-          ${voteState === VoteDirection.UP ? 'text-blue-500 fill-blue-500' : 'text-gray-500'}
+          ${disabled ? '' : 'hover:text-amber-600'}
+          ${voteState === VoteDirection.UP ? 'text-amber-600 fill-amber-600' : 'text-gray-500'}
         `}
       />
       <div className={`text-sm ${
           voteState === VoteDirection.UP
-              ? 'text-blue-500'
+              ? 'text-amber-600'
               : voteState === VoteDirection.DOWN
-                  ? 'text-amber-600'
+                  ? 'text-blue-500'
                   : ''
       }`}>
         {voteCount}
       </div>
       <ArrowBigDownIcon
-          size={20}
-          strokeWidth="1.5"
+          size={24}
+          strokeWidth={isDownvoteHovered ? '2' : '1.5'}
+          onMouseEnter={() => setIsDownvoteHovered(true)}
+          onMouseLeave={() => setIsDownvoteHovered(false)}
           onClick={() => handleVote(VoteDirection.DOWN)}
           className={`
-          ${disabled ? '' : 'hover:text-amber-600'}
-          ${voteState === VoteDirection.DOWN ? 'text-amber-600 fill-amber-600' : 'text-gray-500'}
+          ${disabled ? '' : 'hover:text-blue-500'}
+          ${voteState === VoteDirection.DOWN ? 'text-blue-500 fill-blue-500' : 'text-gray-500'}
         `}
       />
     </span>

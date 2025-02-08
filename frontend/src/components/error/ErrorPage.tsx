@@ -41,7 +41,7 @@ export default function ErrorPage({ status, detail }: { status?: number; detail?
                         <button
                             type="button"
                             onClick={redirectSupport}
-                            className="white-button flex-1 min-w-max">
+                            className="white-button w-full flex-1 min-w-max">
                             Contact support <span aria-hidden="true">&rarr;</span>
                         </button>
                     </div>
