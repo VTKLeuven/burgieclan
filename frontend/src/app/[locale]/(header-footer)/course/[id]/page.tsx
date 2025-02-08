@@ -5,6 +5,7 @@ import CoursePage from '@/components/coursepage/CoursePage';
 import {Breadcrumb} from '@/types'
 import initTranslations from '@/app/i18n'
 import React from 'react'
+import Loading from '@/app/[locale]/loading'
 
 const CoursePageWrapper = () => {
     const { locale, id } = useParams();
@@ -14,7 +15,11 @@ const CoursePageWrapper = () => {
     };
 
     if (!id) {
-        return <p>Loading...</p>;
+        return (
+            <div className="flex items-center justify-center h-full w-full">
+                <Loading/>
+            </div>
+        )
     }
 
     return (

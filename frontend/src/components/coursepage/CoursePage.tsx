@@ -12,9 +12,12 @@ import { ApiClient } from "@/actions/api";
 import { ApiError } from "next/dist/server/api-utils";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShare } from '@fortawesome/free-solid-svg-icons';
+import Loading from '@/app/[locale]/loading'
+import {useTranslation} from 'react-i18next'
 
 export default function CoursePage({ courseId, breadcrumb }: { courseId: number, breadcrumb: Breadcrumb }) {
     const [course, setCourse] = useState<Course | null>(null);
+    const { t } = useTranslation();
 
     async function fetchCourse(query: number) {
         try {
@@ -35,6 +38,28 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
     const ProfessorDiv = ({ unumber, index }: { unumber: string, index: number }) => {
         const sanitizedUnumber = unumber.replace(/\D/g, '');
         const [imgSrc, setImgSrc] = useState(`https://www.kuleuven.be/wieiswie/nl/person/0${sanitizedUnumber}/photo`);
+        const [professorName, setProfessorName] = useState("N.");
+
+        async function fetchProfessorName(): Promise<string> {
+            try {
+                const response = await fetch(`https://dataservice.kuleuven.be/employee/_doc/0${sanitizedUnumber}`);
+                if (!response.ok) throw new Error();
+
+                const data = await response.json();
+                if (data._source?.firstName && data._source?.surname) {
+                    return `${data._source.firstName[0]}. ${data._source.surname}`;
+                }
+            } catch {}
+            return "N.";
+        }
+
+        useEffect(() => {
+            async function loadProfessorName() {
+                const name = await fetchProfessorName();
+                setProfessorName(name);
+            }
+            loadProfessorName();
+        }, []);
 
         const handleError = () => {
             setImgSrc('/images/proffen/generic_profile.png');
@@ -53,16 +78,20 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                     />
                 </div>
                 <div className="flex flex-col items-start justify-center ml-4 h-full">
-                    <p className="text-lg hover:underline hover:cursor-pointer">L. Beirnaert</p>
-                    {index == 0 && <p className="text-sm text-gray-600">Coördinator</p>}
-                    {!(index == 0) && <p className="text-sm text-gray-600">Professor</p>}
+                    <p className="text-lg hover:underline hover:cursor-pointer"> {professorName} </p>
+                    {index == 0 && <p className="text-sm text-gray-600"> {t('course-page.coordinator')} </p>}
+                    {!(index == 0) && <p className="text-sm text-gray-600"> {t('course-page.professor')} </p>}
                 </div>
             </div>
         );
     };
 
     if (!course) {
-        return <p>Loading...</p>;
+        return (
+            <div className="flex items-center justify-center h-full w-full">
+                <Loading/>
+            </div>
+        )
     }
 
     return (
@@ -73,20 +102,17 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                         {/* Breadcrumb */}
                         <div className="flex flex-col md:flex-row space-x-2">
                             {breadcrumb.breadcrumb.map((item, index) => (
-                                <div key={item} className="inline-block hover:cursor-pointer">
-                                    {index + 1 < breadcrumb.breadcrumb.length ? (
-                                        <>
-                                            <span className="hover:underline text-wireframe-mid-gray">{item} / </span>
-                                        </>
-                                    ) : (
-                                        <span className="hover:underline">{item}</span>
+                                <div key={item} className="inline-block">
+                                    <span className="hover:underline hover:cursor-pointer text-wireframe-mid-gray">{item}</span>
+                                    {index + 1 < breadcrumb.breadcrumb.length && (
+                                        <span className="text-wireframe-mid-gray"> / </span>
                                     )}
                                 </div>
                             ))}
                         </div>
 
                         <div className="flex items-center space-x-2 mt-3">
-                            <Image src={DocumentIcon} alt="Document Icon" className="w-[24px] h-[24px] md:w-[40px] md:h-[40px]" />
+                            <Image src={DocumentIcon} alt="Document Icon" className="w-[24px] h-[24px] md:w-[40px] md:h-[40px]"/>
                             <h1 className="md:text-5xl text-4xl mb-4 text-wireframe-primary-blue">{course.name}</h1>
                         </div>
 
@@ -97,7 +123,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                             </div>
                             <div className="flex items-center space-x-1 gap-2">
                                 <Image src={PiechartIcon} alt="Piechart Icon" width={24} height={24} />
-                                <p className="text-lg">{course.credits} studiepunten</p>
+                                <p className="text-lg">{course.credits} {t('credits')}</p>
                             </div>
                             <div className="flex items-center space-x-1 gap-2">
                                 <Image src={HomeIcon} alt="Home Icon" width={24} height={24} />
@@ -119,7 +145,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                                     <Image src={FavoriteStar} alt="Favorites star" width={17} height={17} />
                                 </div>
                                 <div className="inline-block">
-                                    <p className="text-lg text-wireframe-mid-gray">Favoriet</p>
+                                    <p className="text-lg text-wireframe-mid-gray"> {t('favorite')} </p>
                                 </div>
                             </div>
                             <div
@@ -128,7 +154,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                                     <FontAwesomeIcon icon={faShare} className="text-wireframe-primary-panache" />
                                 </div>
                                 <div className="inline-block">
-                                    <p className="text-lg text-wireframe-mid-gray">Delen</p>
+                                    <p className="text-lg text-wireframe-mid-gray"> {t('share')} </p>
                                 </div>
                             </div>
                         </div>
@@ -139,7 +165,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
 
                 <div className="flex flex-col md:flex-row md:p-10 pt-7 pl-7 pr-7 md:space-x-2">
                     <div className="md:w-[60%] mb-4 md:mb-0">
-                        <h2>Over het vak</h2>
+                        <h2> {t('course-page.about')} </h2>
                         <p className="text-lg md:w-[76%]"> {/*Description bottom*/}
                             Lorem ipsum dolor sit amet consectetur.
                             At orci quis morbi vulputate nibh interdum lectus quam nec.
@@ -149,7 +175,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                         </p>
                     </div>
                     <div className="mb-2 md:mb-0">
-                        <h2>Docenten</h2>
+                        <h2> {t('course-page.teachers')} </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {course.professors.map((p, index) => (
                                 <ProfessorDiv key={index} unumber={p} index={index} />
@@ -159,11 +185,11 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                 </div>
 
                 <div className="md:p-10 p-7 mb-10">
-                    <h2>Bestanden</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:mt-5 transform scale-90 origin-left">
-                        <CoursePageSection title="Samenvattingen" description="Lorem ipsum dolor sit amet" />
-                        <CoursePageSection title="Werkcollege" description="Lorem ipsum dolor sit amet" />
-                        <CoursePageSection title="Examens" description="Lorem ipsum dolor sit amet" />
+                    <h2> {t('course-page.files')} </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:mt-5 transform scale-90 origin-left ">
+                        <CoursePageSection title={t('course-page.summaries')} description={t('course-page.summaries-description')} />
+                        <CoursePageSection title={t('course-page.exercise-session')} description={t('course-page.exercise-session-description')} />
+                        <CoursePageSection title={t('course-page.exams')} description={t('course-page.exams-description')} />
                     </div>
                 </div>
             </div>
