@@ -1,3 +1,4 @@
+# docker-compose.yml (base development config)
 services:
   db:
     image: mysql:8.0
@@ -17,6 +18,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      target: dev
     volumes:
       - ./backend:/var/www/html:cached
       - ./.git:/var/www/html/.git:cached
@@ -34,10 +36,29 @@ services:
     networks:
       - burgieclan-network
 
+  backend-test:
+    profiles: ["test"]
+    extends:
+      service: backend
+    build:
+      target: test
+    environment:
+      APP_ENV: test
+
+  backend-prod:
+    profiles: ["prod"]
+    extends:
+      service: backend
+    build:
+      target: prod
+    environment:
+      APP_ENV: prod
+
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: dev
     volumes:
       - ./frontend:/app:cached
       - frontend-node-modules:/app/node_modules
@@ -53,6 +74,24 @@ services:
       - backend
     networks:
       - burgieclan-network
+
+  frontend-test:
+    profiles: ["test"]
+    extends:
+      service: frontend
+    build:
+      target: test
+    environment:
+      NODE_ENV: test
+
+  frontend-prod:
+    profiles: ["prod"]
+    extends:
+      service: frontend
+    build:
+      target: prod
+    environment:
+      NODE_ENV: production
 
 networks:
   burgieclan-network:
