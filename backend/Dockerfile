@@ -1,6 +1,6 @@
-FROM php:8.1-apache
+# Base stage with common dependencies
+FROM php:8.1-apache as base
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -20,24 +20,24 @@ RUN docker-php-ext-install \
     intl \
     xml
 
-# Install Symfony CLI
+# Get latest Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+# Development stage
+FROM base as dev
+
+# Install Symfony CLI for development
 RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | bash && \
     apt-get update && apt-get install -y symfony-cli && \
     rm -rf /var/lib/apt/lists/*
 
-# Get latest Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Set working directory
-WORKDIR /var/www/html
-
-# Copy composer files first
+# Copy composer files
 COPY composer.json composer.lock ./
-
-# Copy GrumPHP configuration
 COPY grumphp.yml ./
 
-# Install dependencies
+# Install all dependencies
 RUN composer install --no-scripts
 
 # Initialize GrumPHP
@@ -48,6 +48,35 @@ RUN mkdir -p var/cache var/log var/sessions && \
     chown -R www-data:www-data var && \
     chmod -R 775 var
 
-EXPOSE 8000
-
 CMD ["sh", "-c", "symfony server:stop || true && symfony server:start --port=8000 --no-tls --allow-all-ip"]
+
+# Test stage
+FROM base as test
+
+COPY composer.json composer.lock ./
+
+# Install dependencies including dev dependencies
+RUN composer install
+
+# Set up directory permissions
+RUN mkdir -p var/cache var/log var/sessions && \
+    chown -R www-data:www-data var && \
+    chmod -R 775 var
+
+CMD ["php", "bin/phpunit"]
+
+# Production stage
+FROM base as prod
+
+# Copy composer files
+COPY composer.json composer.lock ./
+
+# Install dependencies without dev packages
+RUN composer install --no-dev --optimize-autoloader
+
+# Set up directory permissions
+RUN mkdir -p var/cache var/log var/sessions && \
+    chown -R www-data:www-data var && \
+    chmod -R 775 var
+
+CMD ["apache2-foreground"]
