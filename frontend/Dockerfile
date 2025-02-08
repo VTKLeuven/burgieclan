@@ -1,15 +1,24 @@
-FROM node:18-alpine
-
+# Base stage with common setup
+FROM node:18-alpine as base
 WORKDIR /app
+COPY package*.json ./
 
-# Add this for hot reloading in Docker (can be removed in production)
+# Development stage
+FROM base as dev
 ENV WATCHPACK_POLLING=true
 ENV CHOKIDAR_USEPOLLING=true
-
-# Install dependencies
-COPY package*.json ./
-RUN npm i       # Install dependencies (change to npm ci once stable production)
-
-EXPOSE 3000
-
+RUN npm i
 CMD ["npm", "run", "dev"]
+
+# Test stage
+FROM base as test
+RUN npm ci
+COPY . .
+CMD ["npm", "run", "test"]
+
+# Production stage
+FROM base as prod
+RUN npm ci
+COPY . .
+RUN npm run build
+CMD ["npm", "start"]
