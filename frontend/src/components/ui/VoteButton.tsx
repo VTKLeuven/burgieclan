@@ -8,16 +8,10 @@ export enum VoteDirection {
 }
 
 export interface VoteButtonProps {
-    initialVotes: number;
-    initialVote?: VoteDirection;
-    onVote: (delta : number) => Promise<void>;
-    disabled?: boolean;
-}
-
-interface VoteButtonState {
-    voteState: VoteDirection;
-    voteCount: number;
-    isLoading: boolean;
+    initialVotes: number;                       // The initial number of votes
+    initialVote?: VoteDirection;                // The initial vote direction
+    onVote: (delta : number) => Promise<void>;  // Callback when the vote button is clicked
+    disabled?: boolean;                         // Whether the vote button is disabled (unclickable)
 }
 
 export default function VoteButton({
