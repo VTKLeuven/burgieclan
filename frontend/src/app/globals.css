@@ -7,7 +7,7 @@
 }
 
 .white-button {
-    @apply flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900
+    @apply flex justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900
 }
 
 body {

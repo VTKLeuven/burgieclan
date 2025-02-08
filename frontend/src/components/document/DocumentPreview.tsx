@@ -1,7 +1,9 @@
 import { Calendar, CircleUser, File, Package, RefreshCcw } from "lucide-react";
-import VoteButton, {VoteDirection} from "@/components/ui/VoteButton";
+import VoteButton, {VoteDirection} from "@/components/ui/buttons/VoteButton";
 import DocumentInfoField from "@/components/document/DocumentInfoField";
 import dynamic from "next/dynamic";
+import {FavoriteButton} from "@/components/ui/buttons/FavoriteButton";
+import {DownloadButton} from "@/components/ui/buttons/DownloadButton";
 
 export default function DocumentPreview () {
     const PDFViewer = dynamic(() => import("@/components/pdf/PDFViewer"), { ssr: false, });
@@ -9,6 +11,14 @@ export default function DocumentPreview () {
     const handleVote = async (delta : number) => {
         console.log('vote registered:', delta);
     };
+
+    const handleFavorite = async (isFavorite: boolean) => {
+        console.log('favorite status changed:', isFavorite);
+    }
+
+    const handleDownload = async () => {
+        console.log('download started');
+    }
 
     return (
         <div className="p-8 flex-auto text-sm">
@@ -38,7 +48,11 @@ export default function DocumentPreview () {
                     initialVote={VoteDirection.UP}
                     onVote={handleVote}
                 />
-                <DocumentInfoField className="text-gray-500" icon={RefreshCcw} value={"Last updated 20/10/2024 at 15:35"} />
+                {/*<DocumentInfoField className="text-gray-500" icon={RefreshCcw} value={"Last updated 20/10/2024 at 15:35"} />*/}
+                <div className="flex space-x-2">
+                    <DownloadButton  onDownload={handleDownload} fileSize="3.6 MB" />
+                    <FavoriteButton  onFavorite={handleFavorite} />
+                </div>
             </div>
 
             <PDFViewer fileArg="/documents/test.pdf"/>
