@@ -119,12 +119,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $defaultAnonymous = true;
 
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserDocumentView::class)]
+    private Collection $viewedDocuments;
+
     public function __construct()
     {
         $this->favoritePrograms = new ArrayCollection();
         $this->favoriteModules = new ArrayCollection();
         $this->favoriteCourses = new ArrayCollection();
         $this->favoriteDocuments = new ArrayCollection();
+        $this->viewedDocuments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -373,6 +377,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDefaultAnonymous(bool $defaultAnonymous): static
     {
         $this->defaultAnonymous = $defaultAnonymous;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserDocumentView>
+     */
+    public function getViewedDocuments(): Collection
+    {
+        return $this->viewedDocuments;
+    }
+
+    public function addViewedDocument(UserDocumentView $viewedDocument): static
+    {
+        if (!$this->viewedDocuments->contains($viewedDocument)) {
+            $this->viewedDocuments->add($viewedDocument);
+            $viewedDocument->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeViewedDocument(UserDocumentView $viewedDocument): static
+    {
+        if ($this->viewedDocuments->removeElement($viewedDocument)) {
+            $this->viewedDocuments->removeElement($viewedDocument);
+        }
 
         return $this;
     }
