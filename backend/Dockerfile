@@ -1,6 +1,7 @@
-# Base stage with common dependencies
-FROM php:8.1-apache as base
+# backend/Dockerfile
+FROM php:8.1-apache AS base
 
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -25,58 +26,51 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Development stage
-FROM base as dev
+# Copy composer files first
+COPY composer.json composer.lock ./
 
-# Install Symfony CLI for development
+# Base directory setup
+RUN mkdir -p var/cache var/log var/sessions && \
+    chown -R www-data:www-data var && \
+    chmod -R 775 var
+
+FROM base AS dev
+
+# Install Symfony CLI
 RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | bash && \
     apt-get update && apt-get install -y symfony-cli && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy composer files
-COPY composer.json composer.lock ./
+# Copy GrumPHP config
 COPY grumphp.yml ./
 
-# Install all dependencies
+# Install dependencies
 RUN composer install --no-scripts
+
+# Copy the rest of the application
+COPY . .
 
 # Initialize GrumPHP
 RUN vendor/bin/grumphp git:init
 
-# Set up directory permissions
-RUN mkdir -p var/cache var/log var/sessions && \
-    chown -R www-data:www-data var && \
-    chmod -R 775 var
-
 CMD ["sh", "-c", "symfony server:stop || true && symfony server:start --port=8000 --no-tls --allow-all-ip"]
 
-# Test stage
-FROM base as test
+FROM base AS test
 
-COPY composer.json composer.lock ./
+# Install dependencies with dev packages
+RUN composer install --no-scripts
 
-# Install dependencies including dev dependencies
-RUN composer install
-
-# Set up directory permissions
-RUN mkdir -p var/cache var/log var/sessions && \
-    chown -R www-data:www-data var && \
-    chmod -R 775 var
+# Copy the rest of the application
+COPY . .
 
 CMD ["php", "bin/phpunit"]
 
-# Production stage
-FROM base as prod
-
-# Copy composer files
-COPY composer.json composer.lock ./
+FROM base AS prod
 
 # Install dependencies without dev packages
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Set up directory permissions
-RUN mkdir -p var/cache var/log var/sessions && \
-    chown -R www-data:www-data var && \
-    chmod -R 775 var
+# Copy the rest of the application
+COPY . .
 
 CMD ["apache2-foreground"]
