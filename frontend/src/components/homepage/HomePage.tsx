@@ -7,8 +7,6 @@ import { useUploadFlow } from '@/hooks/useUploadFlow';
 import UploadDialog from '@/components/upload/UploadDialog'
 import { useTranslation } from 'react-i18next';
 import AnnouncementSlideShow from '@/components/announcement/AnnouncementSlideShow'
-import {ApiClient} from '@/actions/api'
-import { ApiError } from "next/dist/server/api-utils";
 
 export default function HomePage() {
     const {
@@ -19,31 +17,11 @@ export default function HomePage() {
     } = useUploadFlow();
 
     const { t } = useTranslation();
-    const [announcements, setAnnouncements] = useState([]);
-
-    async function fetchAnnouncements() {
-        try {
-            const response = await ApiClient('GET', `/api/announcements?page=1`);
-            const announcements = response['hydra:member']; // Extract the hydra:member array
-            console.log(announcements)
-            return announcements;
-        } catch (err) {
-            throw new ApiError(500, err.message);
-        }
-    }
-
-    useEffect(() => {
-        async function loadAnnouncements() {
-            const fetchedAnnouncements = await fetchAnnouncements();
-            setAnnouncements(fetchedAnnouncements);
-        }
-        loadAnnouncements();
-    }, []);
 
     return (
         <main className="flex-1 flex flex-col">
             <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 md:px-8 py-4">
-                <AnnouncementSlideShow announcements={announcements} />
+                <AnnouncementSlideShow />
 
                 {/* Header */}
                 <div className="mb-8">
