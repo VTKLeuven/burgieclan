@@ -11,7 +11,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: UserDocumentViewRepository::class)]
 #[ORM\Index(columns: ['last_viewed'])]
 #[ORM\UniqueConstraint(columns: ['user_id', 'document_id'])]
-#[ApiResource]
 class UserDocumentView
 {
     #[ORM\Id]

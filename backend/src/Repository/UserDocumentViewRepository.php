@@ -36,18 +36,25 @@ class UserDocumentViewRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function recordView(User $user, Document $document): UserDocumentView
-    {
+    public function recordView(
+        User $user,
+        Document $document,
+        \DateTimeInterface $viewedAt,
+        bool $flush = true
+    ): UserDocumentView {
         $view = $this->findOneBy(['user' => $user, 'document' => $document]);
 
         if (!$view) {
-            $view = new UserDocumentView($user, $document, new \DateTime());
+            $view = new UserDocumentView($user, $document, $viewedAt);
             $this->getEntityManager()->persist($view);
         } else {
-            $view->setLastViewedAt(new \DateTime());
+            $view->setLastViewedAt($viewedAt);
         }
 
-        $this->getEntityManager()->flush();
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+
         return $view;
     }
 
