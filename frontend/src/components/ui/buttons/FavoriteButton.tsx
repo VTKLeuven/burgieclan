@@ -7,7 +7,7 @@ interface FavoriteButtonProps {
     disabled?: boolean;                                 // Whether the button is disabled
 }
 
-export function FavoriteButton({
+export default function FavoriteButton({
     initialState = false,
     onFavorite,
     disabled = false

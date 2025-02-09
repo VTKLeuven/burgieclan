@@ -12,7 +12,6 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
-const MAXWIDTH = 800;
 const PAGES_PER_LOAD = 10;
 
 type PDFFile = string | File | null;
@@ -28,7 +27,7 @@ const options = {
     standardFontDataUrl: '/standard_fonts/',
 };
 
-export default function PDFViewer({ fileArg }: { fileArg: PDFFile }): JSX.Element {
+export default function PDFViewer({ fileArg, width }: { fileArg: PDFFile, width: number }): JSX.Element {
     // PDF file to display
     const [file, setFile] = useState<PDFFile>(fileArg);
 
@@ -37,24 +36,6 @@ export default function PDFViewer({ fileArg }: { fileArg: PDFFile }): JSX.Elemen
 
     // Number of pages currently displayed
     const [displayedPages, setDisplayedPages] = useState<number>(PAGES_PER_LOAD);
-
-    // Used to scale pdf width to fit its parent container
-    const [containerWidth, setContainerWidth] = useState<number>(0);
-
-    useEffect(() => {
-        const updateWidth = () => {
-            const width = window.innerWidth;
-            // Account for padding on mobile
-            setContainerWidth(width > 768 ? Math.min(width * 0.9, MAXWIDTH) : width - 32);
-        };
-
-        // Set initial width
-        updateWidth();
-
-        // Update width on resize
-        window.addEventListener('resize', updateWidth);
-        return () => window.removeEventListener('resize', updateWidth);
-    }, []);
 
     function onDocumentLoadSuccess({ numPages: nextNumPages }: PDFDocumentProxy): void {
         setNumPages(nextNumPages);
@@ -68,35 +49,33 @@ export default function PDFViewer({ fileArg }: { fileArg: PDFFile }): JSX.Elemen
     }
 
     return (
-        <div className="w-full px-4 md:px-8">
-            <div className="mx-auto max-w-screen-md">
-                <Document
-                    file={file}
-                    onLoadSuccess={onDocumentLoadSuccess}
-                    options={options}
-                    className="flex flex-col items-center"
-                >
-                    {Array.from(new Array(displayedPages), (_el, index) => (
-                        <Page
-                            key={`page_${index + 1}`}
-                            pageNumber={index + 1}
-                            width={containerWidth}
-                            className="my-4 shadow-md shadow-black/50"
-                        />
-                    ))}
-                </Document>
+        <div className="w-full">
+            <Document
+                file={file}
+                onLoadSuccess={onDocumentLoadSuccess}
+                options={options}
+                className="flex flex-col items-center"
+            >
+                {Array.from(new Array(displayedPages), (_el, index) => (
+                    <Page
+                        key={`page_${index + 1}`}
+                        pageNumber={index + 1}
+                        width={width}
+                        className="my-4 shadow-md shadow-black/50"
+                    />
+                ))}
+            </Document>
 
-                {numPages && displayedPages < numPages && (
-                    <div className="flex justify-center my-8">
-                        <button
-                            onClick={loadMorePages}
-                            className="white-button border border-vtk-blue-600 hover:bg-vtk-blue-600 hover:text-white"
-                        >
-                            Load More Pages ({displayedPages} of {numPages})
-                        </button>
-                    </div>
-                )}
-            </div>
+            {numPages && displayedPages < numPages && (
+                <div className="flex justify-center my-8">
+                    <button
+                        onClick={loadMorePages}
+                        className="white-button border border-vtk-blue-600 hover:bg-vtk-blue-600 hover:text-white"
+                    >
+                        Load More Pages ({displayedPages} of {numPages})
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

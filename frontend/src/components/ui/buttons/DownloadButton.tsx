@@ -7,7 +7,7 @@ interface DownloadButtonProps {
     disabled?: boolean;               // Whether the button is disabled
 }
 
-export function DownloadButton({
+export default function DownloadButton({
     onDownload,
     fileSize,
     disabled = false,
