@@ -4,8 +4,9 @@ import React, {useEffect, useState} from 'react'
 import Image from 'next/image';
 import YellowOpenButton from '/public/images/icons/yellow_open_button.svg';
 import NotificationIcon from '/public/images/icons/notification_icon.svg';
+import NotificationModal from '@/components/notifications/NotificationModal'
 
-const NotificationList = () => {
+export default function NotificationList(){
     type NotificationProps = {
         title: string;
         detail: string;
@@ -36,6 +37,8 @@ const NotificationList = () => {
     }*/
 
     const Notification: React.FC<NotificationProps> = ({ title, detail, status}) => {
+        const [isModalOpen, setIsModalOpen] = React.useState(false);
+
         const truncateText = (text: string, maxLength: number) => {
             if (text.length > maxLength) {
                 return text.substring(0, maxLength) + '...';
@@ -44,7 +47,7 @@ const NotificationList = () => {
         };
 
         return (
-            <div className="grid grid-cols-[50px_1fr_50px] pt-5 pb-5 h-[100px]">
+            <div className="grid grid-cols-[50px_1fr_50px] pt-2 pb-2 h-[70px]">
                 <div className="flex justify-center items-center justify-self-start ml-1">
                     <Image src={NotificationIcon} alt="Notification Icon" className="h-[22px] w-[22px]"/>
                 </div>
@@ -56,9 +59,17 @@ const NotificationList = () => {
                     </p>
                 </div>
 
-                <div className="flex justify-center items-center justify-self-end mr-1">
+                <div className="flex justify-center items-center justify-self-end mr-1 hover:cursor-pointer"
+                     onClick={() => setIsModalOpen(true)}>
                     <Image src={YellowOpenButton} alt="Yellow open button" className="h-[35px] w-[35px]"/>
                 </div>
+
+                <NotificationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                    <div>
+                        <h2 className="text-xl font-bold mb-4">{title}</h2>
+                        <p>{detail}</p>
+                    </div>
+                </NotificationModal>
             </div>
         );
     };
@@ -68,11 +79,10 @@ const NotificationList = () => {
             {/*notifications.map((notification: NotificationProps, index: React.Key | null | undefined) => (
                 <Notification key={index} title={notification.title} detail={notification.detail} status={notification.status}/>
             ))*/}
-            <Notification title="Notifications" detail="Lorem ipsum dolor sit amet" status={200}/>
-            <Notification title="Notifications" detail="Lorem ipsum dolor sit amet" status={200}/>
-            <Notification title="Notifications" detail="Lorem ipsum dolor sit amet" status={200}/>
+            <Notification title="Notification 1" detail="Lorem ipsum dolor sit amet" status={200} />
+            <Notification title="Notification 2" detail="Consectetur adipiscing elit" status={200} />
+            <Notification title="Notification 3" detail="Sed do eiusmod tempor incididunt" status={200} />
+            <Notification title="Notification 4" detail="Ut labore et dolore magna aliqua" status={200} />
         </div>
     )
 }
-
-export default NotificationList;
