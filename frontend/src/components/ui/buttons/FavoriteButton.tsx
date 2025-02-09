@@ -35,7 +35,7 @@ export default function FavoriteButton({
 
     return (
         <button
-            className={`inline-flex items-center p-1.5 border rounded-2xl border-gray-500
+            className={`inline-flex items-center p-1 border rounded-2xl border-gray-500
             ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
         `}
             onMouseEnter={() => setIsHovered(true)}
