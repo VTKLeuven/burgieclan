@@ -38,15 +38,12 @@ class UserDocumentViewProvider implements ProviderInterface
             $documentViews = $this->viewRepository->findRecentDocumentsByUser($user);
 
             // Map the document views to the API representation
-            $documentViewsApi = [];
-            foreach ($documentViews as $view) {
-                $documentViewsApi[] = $this->microMapper->map($view, UserDocumentViewApi::class, [
-                    MicroMapperInterface::MAX_DEPTH => 2, // TODO: This should be checked
+            return array_map(function ($view) {
+                return $this->microMapper->map($view, UserDocumentViewApi::class, [
+                    // Depth: document (0), document props (1), course (2), course props (3)
+                    MicroMapperInterface::MAX_DEPTH => 3,
                 ]);
-            }
-
-            // Return the document views
-            return $documentViewsApi;
+            }, $documentViews);
         }
 
         // If the operation is not a collection operation, throw an exception

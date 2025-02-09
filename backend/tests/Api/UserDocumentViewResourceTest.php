@@ -2,6 +2,7 @@
 
 namespace App\Tests\Api;
 
+use App\Factory\CourseFactory;
 use App\Factory\DocumentFactory;
 use App\Factory\UserDocumentViewFactory;
 use App\Factory\UserFactory;
@@ -18,7 +19,10 @@ class UserDocumentViewResourceTest extends ApiTestCase
         $user = UserFactory::createOne(['plainPassword' => 'password']);
         $userToken = $this->getToken($user->getUsername(), 'password');
 
-        $document1 = DocumentFactory::createOne();
+        $course = CourseFactory::createOne();
+        $document1 = DocumentFactory::createOne([
+            'course' => $course,
+        ]);
         $document2 = DocumentFactory::createOne();
 
         UserDocumentViewFactory::createOne([
@@ -43,8 +47,9 @@ class UserDocumentViewResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->assertJsonMatches('"hydra:member"[0].document', '/api/documents/' . $document1->getId())
-            ->assertJsonMatches('"hydra:member"[1].document', '/api/documents/' . $document2->getId());
+            ->assertJsonMatches('"hydra:member"[0].document."@id"', '/api/documents/' . $document1->getId())
+            ->assertJsonMatches('"hydra:member"[0].document.course."@id"', '/api/courses/' . $course->getId())
+            ->assertJsonMatches('"hydra:member"[1].document."@id"', '/api/documents/' . $document2->getId());
     }
 
     public function testBatchAddDocumentViews(): void
@@ -88,8 +93,8 @@ class UserDocumentViewResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->assertJsonMatches('"hydra:member"[0].document', '/api/documents/' . $document1->getId())
-            ->assertJsonMatches('"hydra:member"[1].document', '/api/documents/' . $document2->getId());
+            ->assertJsonMatches('"hydra:member"[0].document."@id"', '/api/documents/' . $document1->getId())
+            ->assertJsonMatches('"hydra:member"[1].document."@id"', '/api/documents/' . $document2->getId());
     }
 
     public function testUpdateExistingDocumentView(): void
@@ -135,7 +140,7 @@ class UserDocumentViewResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->assertJsonMatches('"hydra:member"[0].document', '/api/documents/' . $document->getId())
+            ->assertJsonMatches('"hydra:member"[0].document."@id"', '/api/documents/' . $document->getId())
             ->assertJsonMatches('"hydra:member"[0].lastViewed', '2024-01-02T10:00:00+00:00');
     }
 }
