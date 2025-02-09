@@ -3,11 +3,8 @@
 namespace App\Mapper;
 
 use App\ApiResource\DocumentApi;
-use App\ApiResource\UserApi;
 use App\ApiResource\UserDocumentViewApi;
 use App\Entity\UserDocumentView;
-use App\Repository\UserDocumentViewRepository;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -36,6 +33,7 @@ class UserDocumentViewEntityToApiMapper implements MapperInterface
         assert($to instanceof UserDocumentViewApi);
 
         $to->document = $this->microMapper->map($from->getDocument(), DocumentApi::class, [
+            // Depth: document (0), course (1), course props (2)
             MicroMapperInterface::MAX_DEPTH => 2,
         ]);
         $to->lastViewed = $from->getLastViewedAt();

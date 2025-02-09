@@ -59,8 +59,8 @@ final class UserDocumentViewFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'user' => UserFactory::random(),
-            'document' => DocumentFactory::random(),
+            'user' => UserFactory::randomOrCreate(),
+            'document' => DocumentFactory::randomOrCreate(),
             'lastViewed' => self::faker()->dateTimeBetween('-1 month'),
         ];
     }
