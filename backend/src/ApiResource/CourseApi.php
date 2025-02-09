@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Course;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -31,6 +32,7 @@ class CourseApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
+    #[Groups('user:document_views')]
     public ?string $name = null;
 
     #[Assert\NotBlank]
