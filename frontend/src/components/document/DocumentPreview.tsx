@@ -89,23 +89,25 @@ export default function DocumentPreview() {
             )}
 
 
-            <div className="flex flex-row space-x-4 w-full">
-                <div style={{ width: containerWidth }} className="py-2.5">
-                    <div className="flex flex-row justify-between place-items-center">
-                        <VoteButton
-                            initialVotes={10}
-                            initialVote={VoteDirection.UP}
-                            onVote={handleVote}
-                            className="border-gray-500"
-                        />
-                        {/*<DocumentInfoField className="text-gray-500" icon={RefreshCcw} value={"Last updated 20/10/2024 at 15:35"} />*/}
-                        <div className="flex space-x-2">
-                            <DownloadButton onDownload={handleDownload} fileSize="3.6 MB"/>
-                            <FavoriteButton onFavorite={handleFavorite}/>
+            <div className="flex flex-row space-x-4 w-full justify-center">
+                <div className="">
+                    <div style={{ width: containerWidth }} className="py-2.5">
+                        <div className="flex flex-row h-8 justify-between place-items-center">
+                            <VoteButton
+                                initialVotes={10}
+                                initialVote={VoteDirection.UP}
+                                onVote={handleVote}
+                                className="border-gray-500"
+                            />
+                            {/*<DocumentInfoField className="text-gray-500" icon={RefreshCcw} value={"Last updated 20/10/2024 at 15:35"} />*/}
+                            <div className="flex space-x-2">
+                                <DownloadButton onDownload={handleDownload} fileSize="3.6 MB"/>
+                                <FavoriteButton onFavorite={handleFavorite}/>
+                            </div>
                         </div>
-                    </div>
 
-                    <PDFViewer fileArg="/documents/test.pdf" width={containerWidth}/>
+                        <PDFViewer fileArg="/documents/test.pdf" width={containerWidth}/>
+                    </div>
                 </div>
                 <DocumentCommentSection/>
             </div>

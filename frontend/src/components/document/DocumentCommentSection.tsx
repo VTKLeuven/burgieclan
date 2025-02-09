@@ -1,5 +1,5 @@
 import DocumentComment from "@/components/document/DocumentComment";
-import AddCommentBox from "@/components/document/AddCommentBox";
+import AddDocumentCommentBox from "@/components/document/AddDocumentCommentBox";
 
 const sampleData = {
     names: [
@@ -36,16 +36,19 @@ export default function DocumentCommentSection() {
     }));
 
     return (
-        <div className="space-y-4 py-2.5">
-            <AddCommentBox />
-            {comments.map((comment, index) => (
-                <DocumentComment
-                    key={index}
-                    author={comment.author}
-                    content={comment.content}
-                    initialVotes={comment.initialVotes}
-                />
-            ))}
-        </div>
+        <>
+            <div className="space-y-4 py-2.5">
+                <div className="h-8"></div>
+                <AddDocumentCommentBox />
+                {comments.map((comment, index) => (
+                    <DocumentComment
+                        key={index}
+                        author={comment.author}
+                        content={comment.content}
+                        initialVotes={comment.initialVotes}
+                    />
+                ))}
+            </div>
+        </>
     );
 }

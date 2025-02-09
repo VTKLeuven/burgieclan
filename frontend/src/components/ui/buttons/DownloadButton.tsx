@@ -31,7 +31,7 @@ export default function DownloadButton({
     return (
         <button
             className={`
-                inline-flex items-center px-3 py-1.5 border rounded-2xl
+                inline-flex items-center px-3 py-1 border rounded-2xl
                 transition-all duration-300 ease-in-out
                 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                 border-gray-500 relative
