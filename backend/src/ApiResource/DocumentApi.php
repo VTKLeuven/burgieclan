@@ -18,6 +18,7 @@ use App\State\EntityClassDtoStateProvider;
 use App\State\DocumentProcessor;
 use ArrayObject;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -78,9 +79,11 @@ class DocumentApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
+    #[Groups('user:document_views')]
     public ?string $name = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[Groups('user:document_views')]
     public ?CourseApi $course;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
