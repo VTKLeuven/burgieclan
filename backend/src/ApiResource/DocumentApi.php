@@ -129,11 +129,11 @@ class DocumentApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups(['search', 'user', 'document:get', 'document:create'])]
+    #[Groups(['search', 'user', 'document:get', 'document:create', 'user:document_views'])]
     public ?string $name = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
-    #[Groups(['search', 'user', 'document:get', 'document:create'])]
+    #[Groups(['search', 'user', 'document:get', 'document:create', 'user:document_views'])]
     public ?CourseApi $course;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]

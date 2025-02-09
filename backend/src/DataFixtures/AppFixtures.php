@@ -24,6 +24,7 @@ use App\Factory\PageFactory;
 use App\Factory\ProgramFactory;
 use App\Factory\QuickLinkFactory;
 use App\Factory\TagFactory;
+use App\Factory\UserDocumentViewFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -51,6 +52,7 @@ final class AppFixtures extends Fixture
         DocumentCommentFactory::createMany(400);
         PageFactory::createMany(20);
         QuickLinkFactory::createMany(10);
+        UserDocumentViewFactory::createMany(10);
     }
 
     private function loadUsers(ObjectManager $manager): void
