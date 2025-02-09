@@ -38,7 +38,7 @@ class DocumentEntityToApiMapper implements MapperInterface
 
         $to->name = $from->getName();
         $to->course = $this->microMapper->map($from->getCourse(), CourseApi::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
+            MicroMapperInterface::MAX_DEPTH => 1,
         ]);
         $to->category = $this->microMapper->map($from->getCategory(), DocumentCategoryApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,

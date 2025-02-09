@@ -6,8 +6,6 @@ use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
-use App\Controller\Api\AddDocumentViewToUserController;
 use App\Entity\UserDocumentView;
 use App\State\UserDocumentViewProvider;
 use DateTimeInterface;
@@ -19,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(
             uriTemplate: 'document_views',
-            denormalizationContext: ['groups' => ['user:document_views']],
+            normalizationContext: ['groups' => ['user:document_views']],
             provider: UserDocumentViewProvider::class,
         ),
     ],
