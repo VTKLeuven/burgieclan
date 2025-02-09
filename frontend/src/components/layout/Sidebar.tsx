@@ -3,23 +3,22 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronRight, Home, File, FolderClosed, Plus, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import UploadDialog from '@/components/upload/UploadDialog';
 
 const NavigationSidebar = () => {
   const { t, i18n } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     courses: true,
-    documents: false,
-    programs: false
+    documents: false
   });
   const [courses, setCourses] = useState([]);
   const [documents, setDocuments] = useState([]);
-  const [programs, setPrograms] = useState([]);
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchCourses();
     fetchDocuments();
-    fetchPrograms();
   }, []);
 
   const fetchCourses = async () => {
@@ -42,21 +41,19 @@ const NavigationSidebar = () => {
     }
   };
 
-  const fetchPrograms = async () => {
-    try {
-      const response = await fetch('YOUR_LITUS_API_ENDPOINT/programs');
-      const data = await response.json();
-      setPrograms(data);
-    } catch (error) {
-      console.error('Error fetching programs:', error);
-    }
-  };
-
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section]
     }));
+  };
+
+  const handleUploadButtonClick = () => {
+    setIsUploadDialogOpen(true);
+  };
+
+  const handleUploadDialogClose = () => {
+    setIsUploadDialogOpen(false);
   };
 
   return (
@@ -104,6 +101,7 @@ const NavigationSidebar = () => {
         <button
             className={`mx-4 my-2 flex items-center justify-center space-x-2 ${isCollapsed ? 'bg-transparent' : 'bg-indigo-600'} text-white rounded-md py-2 px-4 hover:${isCollapsed ? 'bg-transparant' : 'bg-indigo-700'}`}
             aria-label={t('sidebar.add_document')}
+            onClick={handleUploadButtonClick}
         >
           <Plus size={16} />
           {!isCollapsed && <span>{t('sidebar.add_document')}</span>}
@@ -160,6 +158,13 @@ const NavigationSidebar = () => {
               </div>
           )}
         </div>
+
+        {/* Upload Dialog */}
+        <UploadDialog
+            isOpen={isUploadDialogOpen}
+            onClose={handleUploadDialogClose}
+            initialFile={null}
+        />
       </div>
   );
 };
