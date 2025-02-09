@@ -5,10 +5,8 @@ import ErrorPage from "@/components/error/ErrorPage";
 import Loading from "@/app/loading";
 import {ApiError} from "@/utils/error/apiError";
 import {ApiClient} from "@/actions/api";
-import DocumentComments from "@/components/document/DocumentComments";
+import DocumentCommentSection from "@/components/document/DocumentCommentSection";
 import DocumentPreview from "@/components/document/DocumentPreview";
-
-
 
 export default function DocumentPage({ params }: { params: any }) {
     const { id } = params;

@@ -10,15 +10,17 @@ export enum VoteDirection {
 export interface VoteButtonProps {
     initialVotes: number;                       // The initial number of votes
     initialVote?: VoteDirection;                // The initial vote direction
-    onVote: (delta : number) => Promise<void>;  // Callback when the vote button is clicked
+    onVote: (delta: number) => Promise<(vote: number) => void>; // Callback when the vote button is clicked
     disabled?: boolean;                         // Whether the vote button is disabled (unclickable)
+    className?: string;                         // Custom classes for the outer span element
 }
 
 export default function VoteButton({
     initialVotes = 0,
     initialVote = VoteDirection.NONE,
     onVote,
-    disabled = false
+    disabled = false,
+    className = ''
 }: VoteButtonProps) {
     const [voteState, setVoteState] = useState<VoteDirection>(initialVote || VoteDirection.NONE);
     const [voteCount, setVoteCount] = useState(initialVotes);
@@ -56,40 +58,40 @@ export default function VoteButton({
 
     return (
         <span className={`inline-flex items-center p-1 border rounded-2xl space-x-1.5 
-      ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-      border-gray-500`}
+            ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+            ${className}`}
         >
-      <ArrowBigUpIcon
-          size={24}
-          strokeWidth={isUpvoteHovered ? '2' : '1.5'}
-          onMouseEnter={() => setIsUpvoteHovered(true)}
-          onMouseLeave={() => setIsUpvoteHovered(false)}
-          onClick={() => handleVote(VoteDirection.UP)}
-          className={`
-          ${disabled ? '' : 'hover:text-amber-600'}
-          ${voteState === VoteDirection.UP ? 'text-amber-600 fill-amber-600' : 'text-gray-500'}
-        `}
-      />
-      <div className={`text-sm ${
-          voteState === VoteDirection.UP
-              ? 'text-amber-600'
-              : voteState === VoteDirection.DOWN
-                  ? 'text-blue-500'
-                  : ''
-      }`}>
-        {voteCount}
-      </div>
-      <ArrowBigDownIcon
-          size={24}
-          strokeWidth={isDownvoteHovered ? '2' : '1.5'}
-          onMouseEnter={() => setIsDownvoteHovered(true)}
-          onMouseLeave={() => setIsDownvoteHovered(false)}
-          onClick={() => handleVote(VoteDirection.DOWN)}
-          className={`
-          ${disabled ? '' : 'hover:text-blue-500'}
-          ${voteState === VoteDirection.DOWN ? 'text-blue-500 fill-blue-500' : 'text-gray-500'}
-        `}
-      />
-    </span>
+            <ArrowBigUpIcon
+                size={20}
+                strokeWidth={isUpvoteHovered ? '2' : '1.5'}
+                onMouseEnter={() => setIsUpvoteHovered(true)}
+                onMouseLeave={() => setIsUpvoteHovered(false)}
+                onClick={() => handleVote(VoteDirection.UP)}
+                className={`
+                    ${disabled ? '' : 'hover:text-amber-600'}
+                    ${voteState === VoteDirection.UP ? 'text-amber-600 fill-amber-600' : 'text-gray-500'}
+                `}
+            />
+            <div className={`text-sm ${
+                voteState === VoteDirection.UP
+                    ? 'text-amber-600'
+                    : voteState === VoteDirection.DOWN
+                        ? 'text-blue-500'
+                        : ''
+            }`}>
+                {voteCount}
+            </div>
+            <ArrowBigDownIcon
+                size={20}
+                strokeWidth={isDownvoteHovered ? '2' : '1.5'}
+                onMouseEnter={() => setIsDownvoteHovered(true)}
+                onMouseLeave={() => setIsDownvoteHovered(false)}
+                onClick={() => handleVote(VoteDirection.DOWN)}
+                className={`
+                    ${disabled ? '' : 'hover:text-blue-500'}
+                    ${voteState === VoteDirection.DOWN ? 'text-blue-500 fill-blue-500' : 'text-gray-500'}
+                `}
+            />
+        </span>
     );
 }
