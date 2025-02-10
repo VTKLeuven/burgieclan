@@ -1,12 +1,9 @@
+// components/ui/Dialog.tsx
 import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
-import type React from 'react'
-
-/**
- * The dialog component is a pop-up modal
- *
- * This is a Catalyst UI component: https://catalyst.tailwindui.com/docs/dialog
- */
+import React from 'react'
+import { XMarkIcon } from '@heroicons/react/24/outline'
+import { useTranslation } from 'react-i18next';
 
 const sizes = {
     xs: 'sm:max-w-xs',
@@ -22,74 +19,119 @@ const sizes = {
     '7xl': 'sm:max-w-7xl',
 }
 
-/**
- * A dialog modal that shows information in pop-up form
- */
-export function Dialog({
-   size = 'lg',
-   className,
-   children,
-   ...props
-}: { size?: keyof typeof sizes; className?: string; children: React.ReactNode } & Omit<
-    Headless.DialogProps<any>,
-    'as' | 'className'
->) {
-    return (
-        <Headless.Dialog {...props}>
-            <Headless.Dialog.Backdrop
-                transition
-                className="fixed inset-0 backdrop-blur-sm bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-700 data-[leave]:duration-500 data-[enter]:ease-out data-[leave]:ease-in" />
+interface DialogProps {
+    isOpen: boolean;
+    onClose: () => void;
+    size?: keyof typeof sizes;
+    className?: string;
+    children?: React.ReactNode;
+}
 
-            <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-                <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <Headless.Dialog.Panel
-                        transition
-                        className={clsx(
-                            className,
-                            sizes[size],
-                            "relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:p-6 data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
-                        )}
-                    >
-                        {children}
-                    </Headless.Dialog.Panel>
+export function Dialog({isOpen, onClose, size = 'lg', className, children}: DialogProps) {
+    return (
+        <Headless.Transition appear show={isOpen} as={React.Fragment}>
+            <Headless.Dialog
+                as="div"
+                className="relative z-10"
+                onClose={() => onClose()}
+                open={isOpen}
+            >
+                <Headless.Transition.Child
+                    as={React.Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <div className="fixed inset-0 backdrop-blur-sm bg-gray-500 bg-opacity-75" />
+                </Headless.Transition.Child>
+
+                <div className="fixed inset-0 z-10 overflow-y-auto">
+                    <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                        <Headless.Transition.Child
+                            as={React.Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            enterTo="opacity-100 translate-y-0 sm:scale-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        >
+                            <Headless.Dialog.Panel
+                                className={clsx(
+                                    className,
+                                    sizes[size],
+                                    "relative transform overflow-hidden rounded-3xl bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:p-6 w-full"
+                                )}
+                            >
+                                <DialogCloseButton onClose={onClose} />
+                                {children}
+                            </Headless.Dialog.Panel>
+                        </Headless.Transition.Child>
+                    </div>
                 </div>
-            </div>
-        </Headless.Dialog>
+            </Headless.Dialog>
+        </Headless.Transition>
     )
 }
 
-/**
- * A title for a dialog modal
- */
-export function DialogTitle({ className, children }: { className?: string; children: React.ReactNode }) {
+interface DialogTitleProps {
+    className?: string;
+    children: React.ReactNode;
+}
+
+export function DialogTitle({ className, children }: DialogTitleProps) {
     return (
         <Headless.Dialog.Title
             as="h3"
-            className={clsx(className)}
+            className={clsx(className, 'px-10')}
         >
             {children}
         </Headless.Dialog.Title>
     )
 }
 
-/**
- * A body of a dialog modal, takes any div props except for 'ref'
- */
-export function DialogBody({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
-    return <div {...props} className={clsx(className, 'mt-6')} />
+interface DialogBodyProps extends React.ComponentPropsWithoutRef<'div'> {
+    className?: string;
 }
 
-/**
- * Component that takes and displays the actions for a dialog modal, takes any div props except for 'ref'
- */
-export function DialogActions({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+export function DialogBody({ className, ...props }: DialogBodyProps) {
+    return <div {...props} className={clsx(className, 'mt-6 px-10')} />
+}
+
+interface DialogActionsProps extends React.ComponentPropsWithoutRef<'div'> {
+    className?: string;
+}
+
+export function DialogActions({ className, ...props }: DialogActionsProps) {
     return (
         <div
             {...props}
             className={clsx(
                 className,
-                'mt-8 flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto'
+                'mt-4 flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto px-10'
             )}
         />
+    )
+}
+
+interface DialogCloseButtonProps {
+    onClose: () => void;
+}
+
+export function DialogCloseButton({ onClose }: DialogCloseButtonProps) {
+    const { t } = useTranslation();
+
+    return (
+        <button
+            type="button"
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1.5 text-gray-700 justify-center items-center flex"
+        >
+            <span className="sr-only">{t('dialog.close')}</span>
+            <XMarkIcon aria-hidden="true" className="h-6 w-6"/>
+        </button>
     )
 }

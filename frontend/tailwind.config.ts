@@ -21,11 +21,16 @@ const config = {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
-  	},
+  		},
+        wireframe: {
+            darkest: {
+                gray: "#4A5A71",
+            }
+        }
+  	}
   },
   plugins: [
-    require('@tailwindcss/forms'),
+      require('@tailwindcss/forms'),
       require("tailwindcss-animate")
 ],
 };
