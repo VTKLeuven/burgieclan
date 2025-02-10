@@ -64,7 +64,7 @@ const Toolbar = ({editor}) => {
     }
 
     return (
-        <div className="tiptap flex justify-between border border-gray-900/10 rounded-t-md p-2 items-center">
+        <div className="tiptap flex justify-between p-2 items-center border-b border-gray-900/10">
             <div>
                 <button
                     onClick={() => editor?.chain().focus().toggleBold().run()}
@@ -197,12 +197,16 @@ const Toolbar = ({editor}) => {
     )
 }
 
+export interface EditorProps {
+    className?: string;
+}
+
 /**
  * TipTap Editor which can be used to insert rich text and mathematics:
  * - https://tiptap.dev/docs/editor/getting-started/overview
  * - https://tiptap.dev/docs/editor/extensions/functionality/mathematics
  */
-const Editor = () => {
+const Editor = ({className = ''} : EditorProps) => {
     // Create the editor instance
     const editor = useEditor({
         extensions: [
@@ -217,7 +221,7 @@ const Editor = () => {
         autofocus: true,
         editorProps: {
             attributes: {
-                class: 'tiptap overflow-auto mx-auto h-32 border-l border-r border-b border-gray-900/10 rounded-b-md p-3 focus:outline-none',
+                class: 'tiptap overflow-auto mx-auto h-32 p-3 focus:outline-none',
             },
             // Strip styling from pasted content
             handlePaste(view, event, slice) {
@@ -230,7 +234,7 @@ const Editor = () => {
     })
 
     return (
-        <div className="editor-container max-w-3xl mx-auto p-8">
+        <div className={`editor-container border border-gray-900/10 rounded-md h-fit ${className}`}>
             <Toolbar editor={editor}/>
             <EditorContent
                 editor={editor}
