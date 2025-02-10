@@ -38,7 +38,7 @@ export default function AddDocumentCommentModal({isOpen, setIsOpen}) {
                 />
             </div>
             <div className="border-t border-gray-200 mt-2">
-                <Editor className="p-4"/>
+                <Editor/>
             </div>
         </Dialog>
     );
