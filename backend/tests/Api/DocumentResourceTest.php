@@ -36,6 +36,7 @@ class DocumentResourceTest extends ApiTestCase
             'name',
             'course',
             'category',
+            'year',
             'under_review',
             'creator',
             'createdAt',
@@ -248,6 +249,54 @@ class DocumentResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 8)
             ->assertJsonMatches('length("hydra:member")', 8)
+        ;
+    }
+
+    public function testGetDocumentFilterByYear(): void
+    {
+        DocumentFactory::createMany(1, [
+            'year' => '24-25',
+        ]);
+        DocumentFactory::createMany(1, [
+            'year' => '25-26',
+        ]);
+        DocumentFactory::createMany(5, [
+            'year' => '26-27',
+        ]);
+
+        $this->browser()
+            ->get('/api/documents?year=24-25', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('length("hydra:member")', 1)
+            ->get('/api/documents?year=24', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('length("hydra:member")', 1)
+            ->get('/api/documents?year=25', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 2)
+            ->assertJsonMatches('length("hydra:member")', 2)
+            ->get('/api/documents?year=26', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 6)
+            ->assertJsonMatches('length("hydra:member")', 6)
         ;
     }
 
