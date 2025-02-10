@@ -11,7 +11,7 @@
 }
 
 body {
-    @apply leading-relaxed m-0 p-0 h-full
+    @apply m-0 p-0 h-full
 }
 
 a {
@@ -19,7 +19,7 @@ a {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    @apply text-gray-900;
+    @apply leading-tight text-gray-900;
 }
 
 h1 {
@@ -47,15 +47,118 @@ h6 {
 }
 
 p {
-    @apply text-base leading-7
+    @apply text-base leading-6;
+}
+
+a {
+    @apply text-base leading-6 font-semibold;
 }
 
 ul {
-    @apply list-disc list-inside pl-4;
+    @apply list-disc list-inside;
 }
 
 ol {
-    @apply list-decimal list-inside pl-4;
+    @apply list-decimal list-inside;
+}
+
+ul, ol {
+    @apply px-4 my-1 ml-1;
+}
+
+ul li p,
+ol li p {
+    @apply mt-1 mb-1;
+}
+
+/* TipTap editor */
+.tiptap {
+    > :first-child {
+        @apply mt-0;
+    }
+
+    button {
+        @apply p-1 mx-2 rounded-md;
+    }
+
+    ul, ol {
+        @apply list-outside;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        @apply mt-4 break-words;
+    }
+
+    h1, h2 {
+        @apply mt-2 mb-1;
+    }
+
+    h1 {
+        @apply text-xl;
+    }
+
+    h2 {
+        @apply text-lg;
+    }
+
+    code {
+        @apply bg-gray-100 rounded-sm text-sm px-1 py-0.5;
+    }
+
+    pre {
+        @apply bg-black text-white font-mono rounded-lg my-6 p-4;
+    }
+
+    pre code {
+        @apply bg-none text-inherit text-xs p-0;
+    }
+
+    blockquote {
+        @apply border-l-4 border-gray-300 my-6 pl-4;
+    }
+
+    hr {
+        @apply border-none border-t border-gray-200 my-8;
+    }
+
+    .isActive {
+        @apply bg-gray-200;
+    }
+
+    .clickable {
+        @apply hover:bg-gray-100 active:bg-gray-200;
+    }
+
+    .clickable:active {
+        @apply transition duration-200 ease-in-out;
+    }
+
+    .icon {
+        @apply w-5 h-5 text-gray-900;
+    }
+
+    /* Mathematics extension */
+    .Tiptap-mathematics-editor {
+        @apply bg-gray-900 text-white font-mono px-2 py-1 rounded-md inline-block;
+    }
+
+    .Tiptap-mathematics-render {
+        @apply p-1 rounded-md inline-block;
+    }
+
+    .Tiptap-mathematics-render--editable {
+        @apply cursor-pointer transition-colors duration-200;
+
+        &:hover {
+            @apply bg-gray-200;
+        }
+    }
+
+    .Tiptap-mathematics-editor,
+    .Tiptap-mathematics-render {
+        @apply rounded-md inline-block;
+    }
+
 }
 
 @layer base {
