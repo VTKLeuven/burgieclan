@@ -72,9 +72,10 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: DocumentProcessor::class
         )    ],
     outputFormats: ['jsonld' => ['application/ld+json']],
+    order: ['updateDate' => 'DESC'],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
-    stateOptions: new Options(entityClass: Document::class),
+    stateOptions: new Options(entityClass: Document::class)
 )]
 class DocumentApi
 {
