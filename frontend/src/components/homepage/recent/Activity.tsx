@@ -23,7 +23,7 @@ export const Activity: React.FC<ActivityProps> = ({
                                                       link
 }) => {
     return (
-        <Link className="flex items-start space-x-4 p-2 hover:bg-gray-50" href={link}>
+        <Link className="flex items-start space-x-4 p-2 pl-3 hover:bg-gray-50" href={link}>
             <div className="flex-shrink-0">
                 <Clock className="mt-0.5 h-5 w-5 text-gray-500"/>
                 <p className="text-xs text-gray-400 mt-0.5 text-center">
