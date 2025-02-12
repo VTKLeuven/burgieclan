@@ -74,7 +74,8 @@
                 "label": "Category"
             },
             "year": {
-                "label": "Academic Year"
+                "label": "Academic Year",
+                "placeholder": "Select academic year..."
             },
             "validation": {
                 "name": {
@@ -90,7 +91,7 @@
                 },
                 "year": {
                     "required": "Academic year is required",
-                    "format": "Academic year must be in format YYYY-YYYY"
+                    "format": "Academic year must be in format YYYY - YYYY"
                 },
                 "file": {
                     "required": "File is required",
@@ -110,6 +111,10 @@
     "form": {
         "errors": {
             "fetch_failed": "Failed to load form data. Please try again."
+        },
+        "combo": {
+            "search": "Search...",
+            "no_results": "No results found"
         }
     }
 }

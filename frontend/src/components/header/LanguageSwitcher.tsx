@@ -1,40 +1,68 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { i18nConfig } from "../../../i18nConfig";
 
 const LanguageSwitcher = () => {
     const { i18n } = useTranslation();
-    const selectedLanguage = i18n.language;
+    const router = useRouter();
     const pathname = usePathname();
-    const query = useSearchParams();
+    const searchParams = useSearchParams();
+    const currentLocale = i18n.language;
+    const [isTransitioning, setIsTransitioning] = useState(false);
+
     const locales = i18nConfig.locales.join('|');
     const regex = new RegExp(`^/(${locales})(/|$)`);
     const pathnameNoLocale = pathname.replace(regex, '/');
 
+    const switchLanguage = async (newLocale: string) => {
+        if (newLocale === currentLocale) return;
+
+        setIsTransitioning(true);
+
+        const newPathname = `/${newLocale}${pathnameNoLocale}`;
+        const newUrl = `${newPathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+
+        await i18n.changeLanguage(newLocale);
+        window.history.replaceState(null, '', newUrl);
+
+        setTimeout(() => {
+            setIsTransitioning(false);
+        }, 300);
+    };
+
     return (
-        <div className="flex items-center bg-gray-100 rounded-full p-0.5 w-24 h-6 text-sm mr-3">
-            <Link
-                href={`/nl${pathnameNoLocale}?${query}`}
-                className={`flex-1 flex items-center justify-center rounded-full transition-all duration-300 ${
-                    selectedLanguage === 'nl'
-                        ? 'bg-orange-500 text-white'
+        <div className="relative flex items-center bg-gray-100 rounded-full p-0.5 h-6">
+            {/* Background slider */}
+            <div
+                className={`absolute h-5 w-9 bg-amber-600 rounded-full transition-all duration-300 ease-in-out ${
+                    currentLocale === 'nl' ? 'left-0.5' : 'left-[48%]'
+                }`}
+            />
+
+            {/* Buttons */}
+            <button
+                onClick={() => !isTransitioning && switchLanguage('nl')}
+                className={`relative z-10 flex-1 flex items-center justify-center rounded-full transition-all duration-300 ${
+                    currentLocale === 'nl'
+                        ? 'text-white'
                         : 'text-gray-600 hover:text-gray-900'
                 }`}
+                disabled={isTransitioning}
             >
-                <span className="px-2">NL</span>
-            </Link>
-            <Link
-                href={`/en${pathnameNoLocale}?${query}`}
-                className={`flex-1 flex items-center justify-center rounded-full transition-all duration-300 ${
-                    selectedLanguage === 'en'
-                        ? 'bg-orange-500 text-white'
+                <span className="px-2 text-sm font-medium">NL</span>
+            </button>
+            <button
+                onClick={() => !isTransitioning && switchLanguage('en')}
+                className={`relative z-10 flex-1 flex items-center justify-center rounded-full transition-all duration-300 ${
+                    currentLocale === 'en'
+                        ? 'text-white'
                         : 'text-gray-600 hover:text-gray-900'
                 }`}
+                disabled={isTransitioning}
             >
-                <span className="px-2">EN</span>
-            </Link>
+                <span className="px-2 text-sm font-medium">EN</span>
+            </button>
         </div>
     );
 };
