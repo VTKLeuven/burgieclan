@@ -50,16 +50,16 @@ const DocumentList: React.FC = () => {
                                     >
                                         <div className="border p-4 rounded-md shadow-sm relative hover:shadow-md transition-shadow cursor-pointer">
                                             <div className="flex justify-between items-center">
-                                                <h3 className="text-xl font-semibold">{document.name}</h3>
+                                                <h3 className="text-xl font-semibold truncate">{document.name}</h3>
                                                 {document.underReview ? (
                                                     <Badge text={t('document.under_review')} color="yellow" />
                                                 ) : (
                                                     <Badge text={t('document.approved')} color="green" />
                                                 )}
                                             </div>
-                                            <p className="text-gray-700">{document.course!.name}</p>
+                                            <p className="text-gray-700 truncate max-w-[75%]">{document.course!.name}</p>
                                             {/* TODO add rating */}
-                                            <p className="text-gray-700">{document.category!.name}</p>
+                                            <p className="text-gray-700 truncate max-w-[65%]">{document.category!.name}</p>
                                             <p className="text-gray-500 text-xs absolute bottom-2 right-2">{new Date(document.createDate!).toLocaleString('en-GB', {
                                                 day: '2-digit',
                                                 month: '2-digit',
