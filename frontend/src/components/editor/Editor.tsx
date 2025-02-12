@@ -23,14 +23,30 @@ import {
 } from "lucide-react";
 import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog'
 import { Text, Code } from '@/components/ui/Text'
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 /**
  * Dialog explaining how mathematical functions can be inserted
  */
-const InfoDialog = ({isOpen, setIsOpen}) => {
+const InfoDialog = ({isOpen, setIsOpen, parentDialogOpen}) => {
+    // Close this dialog when parent dialog closes
+    useEffect(() => {
+        if (!parentDialogOpen) {
+            setIsOpen(false);
+        }
+    }, [parentDialogOpen, setIsOpen]);
+
+    // Stop event propagation to prevent affecting parent dialog
+    const handleClose = (e) => {
+        e.stopPropagation();
+        setIsOpen(false);
+    };
+
     return (
-        <Dialog open={isOpen} onClose={setIsOpen}>
+        <Dialog
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+        >
             <DialogTitle>
                 Text Editor
             </DialogTitle>
@@ -56,12 +72,17 @@ const InfoDialog = ({isOpen, setIsOpen}) => {
     )
 }
 
-const Toolbar = ({editor}) => {
-    let [isInfoOpen, setIsInfoOpen] = useState(false);
+const Toolbar = ({ editor, parentDialogOpen }) => {
+    const [isInfoOpen, setIsInfoOpen] = useState(false);
 
     if (!editor) {
         return null
     }
+
+    const handleButtonClick = (e, action) => {
+        e.stopPropagation();
+        action();
+    };
 
     return (
         <div className="tiptap flex justify-between p-2 items-center border-b border-gray-900/10">
@@ -199,6 +220,7 @@ const Toolbar = ({editor}) => {
 
 export interface EditorProps {
     className?: string;
+    parentDialogOpen?: boolean;
 }
 
 /**
@@ -206,8 +228,7 @@ export interface EditorProps {
  * - https://tiptap.dev/docs/editor/getting-started/overview
  * - https://tiptap.dev/docs/editor/extensions/functionality/mathematics
  */
-const Editor = ({className = ''} : EditorProps) => {
-    // Create the editor instance
+const Editor = ({ className = '', parentDialogOpen = true }: EditorProps) => {    // Create the editor instance
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -235,10 +256,8 @@ const Editor = ({className = ''} : EditorProps) => {
 
     return (
         <div className={`editor-container border border-gray-900/10 rounded-md h-fit ${className}`}>
-            <Toolbar editor={editor}/>
-            <EditorContent
-                editor={editor}
-            />
+            <Toolbar editor={editor} parentDialogOpen={parentDialogOpen} />
+            <EditorContent editor={editor} />
         </div>
     )
 }

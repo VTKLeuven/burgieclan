@@ -20,7 +20,7 @@ export default function AddDocumentCommentBox({ author, content, initialVotes })
                 onClick={() => setIsModalOpen(true)}>
                 Add comment...
             </button>
-            <AddDocumentCommentModal isOpen={isModalOpen} setIsOpen={setIsModalOpen}/>
+            <AddDocumentCommentModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}/>
             <p className="text-sm">{content}</p>
         </div>
     );

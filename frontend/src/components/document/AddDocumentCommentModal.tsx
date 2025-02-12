@@ -3,7 +3,7 @@ import {Dialog} from "@/components/ui/Dialog";
 import PDFViewer from "@/components/pdf/PDFViewer";
 import {useEffect, useState, useRef} from "react";
 
-export default function AddDocumentCommentModal({isOpen, setIsOpen}) {
+export default function AddDocumentCommentModal({isModalOpen, setIsModalOpen}) {
     const [containerWidth, setContainerWidth] = useState<number>(0);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -25,8 +25,8 @@ export default function AddDocumentCommentModal({isOpen, setIsOpen}) {
         <Dialog
             size="6xl"
             className="flex flex-col max-h-[80vh] w-full max-w-4xl"
-            open={isOpen}
-            onClose={setIsOpen}
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
         >
             <div
                 ref={containerRef}
@@ -38,7 +38,7 @@ export default function AddDocumentCommentModal({isOpen, setIsOpen}) {
                 />
             </div>
             <div className="border-t border-gray-200 mt-2">
-                <Editor/>
+                <Editor parentDialogOpen={isModalOpen} />
             </div>
         </Dialog>
     );
