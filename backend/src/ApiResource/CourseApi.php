@@ -38,6 +38,10 @@ class CourseApi
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     public ?string $code = null;
 
+    #[Assert\NotBlank]
+    #[Assert\Choice(choices: ['nl', 'en'], message: 'Choose a valid language.')]
+    public ?string $language = null;
+
     public array $professors = [];
 
     public array $semesters = [];

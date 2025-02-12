@@ -14,10 +14,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShare } from '@fortawesome/free-solid-svg-icons';
 import Loading from '@/app/[locale]/loading'
 import {useTranslation} from 'react-i18next'
+import initTranslations from "@/app/i18n";
 
 export default function CoursePage({ courseId, breadcrumb }: { courseId: number, breadcrumb: Breadcrumb }) {
     const [course, setCourse] = useState<Course | null>(null);
-    const { t } = useTranslation();
+    const [t, setT] = useState<any>(() => (key: string) => key); // Default translation function
 
     async function fetchCourse(query: number) {
         try {
@@ -31,6 +32,9 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
         async function getCourse() {
             const courseData = await fetchCourse(courseId);
             setCourse(courseData);
+
+            const { t } = await initTranslations(courseData.language);
+            setT(() => t);
         }
         getCourse().catch(console.error);
     }, [courseId]);

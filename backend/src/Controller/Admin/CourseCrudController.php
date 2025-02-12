@@ -26,6 +26,11 @@ class CourseCrudController extends AbstractCrudController
         yield IdField::new('id')->onlyOnDetail();
         yield TextField::new('name');
         yield TextField::new('code');
+        yield ChoiceField::new('language')
+            ->setChoices([
+                'Dutch' => 'nl',
+                'English' => 'en',
+            ]);
         yield AssociationField::new('modules')
             ->setFormTypeOption('by_reference', false);
         yield ArrayField::new('professors');
