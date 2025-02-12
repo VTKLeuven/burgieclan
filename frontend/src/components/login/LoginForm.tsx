@@ -138,7 +138,7 @@ export default function LoginForm() {
                         <div className="mt-5 w-full max-w-sm">
                             <button
                                 type="submit"
-                                className="primary-button"
+                                className="primary-button w-full"
                             >
                                 {t('login')}
                             </button>

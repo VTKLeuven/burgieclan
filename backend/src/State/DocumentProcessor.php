@@ -10,6 +10,7 @@ use App\ApiResource\CourseApi;
 use App\ApiResource\DocumentApi;
 use App\ApiResource\DocumentCategoryApi;
 use App\Entity\Document;
+use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -42,6 +43,10 @@ final class DocumentProcessor implements ProcessorInterface
         $category = $this->iriConverter->getResourceFromIri($request->get('category') ??
             throw new BadRequestHttpException('"category" is required'));
         $dto->category = $category;
+        $dto->under_review = $request->get('under_review') ?? false;
+
+        /** @var bool $anonymous */
+        $anonymous = $request->get('anonymous');
 
         // Convert the documentDto to an actual Document.
         $document = $this->microMapper->map($dto, Document::class);
@@ -53,6 +58,8 @@ final class DocumentProcessor implements ProcessorInterface
         }
 
         $document->setFile($uploadedFile);
+
+        $document->setAnonymous($anonymous);
 
         // Persist the document to the database.
         $this->persistProcessor->process($document, $operation, $uriVariables, $context);

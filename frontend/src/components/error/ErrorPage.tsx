@@ -37,13 +37,13 @@ export default function ErrorPage({ status, detail }: { status?: number; detail?
                         <button
                             type="button"
                             onClick={redirectHome}
-                            className="primary-button flex-1">
+                            className="primary-button w-full flex-1">
                             {t('go_home')}
                         </button>
                         <button
                             type="button"
                             onClick={redirectSupport}
-                            className="white-button flex-1 min-w-max">
+                            className="white-button w-full flex-1 min-w-max">
                             {t('contact_support')} <span aria-hidden="true">&rarr;</span>
                         </button>
                     </div>
