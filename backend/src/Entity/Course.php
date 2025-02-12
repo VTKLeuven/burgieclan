@@ -44,6 +44,11 @@ class Course
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private array $semesters = [];
 
+    #[ORM\Column(type: Types::STRING, length: 7)]
+    #[Assert\NotBlank]
+    #[Assert\Choice(choices: ['nl', 'en'], message: 'Choose a valid language.')]
+    private ?string $language = null;
+
     #[ORM\Column(nullable: true)]
     #[Assert\Positive]
     private ?int $credits = null;
@@ -122,6 +127,18 @@ class Course
     public function setSemesters(?array $semesters): self
     {
         $this->semesters = $semesters;
+
+        return $this;
+    }
+
+    public function getLanguage(): ?string
+    {
+        return $this->language;
+    }
+
+    public function setLanguage(string $language): self
+    {
+        $this->language = $language;
 
         return $this;
     }
