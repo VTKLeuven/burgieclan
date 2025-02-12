@@ -136,7 +136,8 @@
             "no_documents": "You have no favorite documents yet."
         },
         "documents": {
-            "no_uploads": "You haven't uploaded any documents yet."
+            "no_uploads": "You haven't uploaded any documents yet.",
+            "my": "My documents"
         }
     },
     "document": {

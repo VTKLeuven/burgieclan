@@ -136,7 +136,8 @@
             "no_documents": "Je hebt nog geen favoriete documenten."
         },
         "documents": {
-            "no_uploads": "Je hebt nog geen documenten geüpload."
+            "no_uploads": "Je hebt nog geen documenten geüpload.",
+            "my": "Mijn documenten"
         }
     },
     "document": {

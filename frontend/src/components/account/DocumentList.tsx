@@ -32,7 +32,7 @@ const DocumentList: React.FC = () => {
     }, []);
 
     return (
-        <CollapsibleSection header={<h3 className="text-xl font-semibold">Uploaded Documents <span className="text-sm">({totalItems})</span></h3>}>
+        <CollapsibleSection header={<h3 className="text-xl font-semibold">{t('account.documents.my')} <span className="text-sm">({totalItems})</span></h3>}>
             <div className="rounded-lg shadow-sm">
                 {loading ?
                     <div className="flex justify-center items-center h-full">
