@@ -7,29 +7,58 @@ import DownloadButton from "@/components/ui/buttons/DownloadButton";
 import {ExclamationTriangleIcon} from "@heroicons/react/16/solid";
 import {useEffect, useState} from "react";
 import DocumentCommentSection from "@/components/document/DocumentCommentSection";
+import LoadingPage from "@/components/loading/LoadingPage";
+import Error from "@/app/[locale]/error";
+import ErrorPage from "@/components/error/ErrorPage";
+import {ApiClient} from "@/actions/api";
 
-export default function DocumentPreview() {
+interface DocumentData {
+    "@context": string;
+    "@id": string;
+    "@type": string;
+    name: string;
+    course: string;
+    category: string;
+    year: string;
+    under_review: boolean;
+    creator: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export default function DocumentPreview({id}: { id: string }) {
     const PDFViewer = dynamic(() => import("@/components/pdf/PDFViewer"), {ssr: false,});
+
+    // Document data state
+    const [documentData, setDocumentData] = useState<DocumentData | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     // Used to scale pdf width to fit its parent container
     const [containerWidth, setContainerWidth] = useState<number>(0);
-
-    const [underReview, setUnderReview] = useState(false);
     const [isAnonymous, setIsAnonymous] = useState(false);
 
     const MAXWIDTH = 1000;
 
     useEffect(() => {
+        const fetchDocumentData = async () => {
+            const result = await ApiClient('GET', `/api/documents/${id}`); // Adjust the endpoint as needed
+            console.log(result);
+            if (result.error) setError('Failed to fetch document data');
+            setDocumentData(result);
+            setIsLoading(false);
+        };
+        console.log("fetching document")
+        fetchDocumentData();
+    }, []);
+
+    useEffect(() => {
         const updateWidth = () => {
             const width = window.innerWidth;
-            // Account for padding on mobile
             setContainerWidth(width > 768 ? Math.min(width * 0.9, MAXWIDTH) : width - 32);
         };
 
-        // Set initial width
         updateWidth();
-
-        // Update width on resize
         window.addEventListener('resize', updateWidth);
         return () => window.removeEventListener('resize', updateWidth);
     }, []);
@@ -48,32 +77,43 @@ export default function DocumentPreview() {
         console.log('download started');
     }
 
+    if (isLoading) return <LoadingPage />;
+    if (error) {
+        console.error(error);
+        return <ErrorPage />;
+    }
+    if (!documentData) return <div>No document data available</div>;
+
+    // Format the date for display
+    const formattedDate = new Date(documentData.createdAt).toLocaleDateString();
+
     return (
         <div className="p-8 flex-auto text-sm">
             {/* Filename */}
             <span className="inline-flex items-center space-x-4">
-                        <File/>
-                        <h3>Title of document</h3>
-                    </span>
+                <File/>
+                <h3>{documentData.name}</h3>
+            </span>
 
             {/* Description */}
             <div className="flex flex-row justify-between py-5">
                 <div className="flex space-x-8">
-                    <DocumentInfoField icon={Calendar} value="2021-01-01"/>
+                    <DocumentInfoField icon={Calendar} value={formattedDate}/>
                     <DocumentInfoField icon={Package} value="4 MB"/>
-                    <DocumentInfoField icon={ChartPie} value="Year 1 - sem 2"/>
+                    <DocumentInfoField icon={ChartPie} value={documentData.year}/>
                 </div>
                 <div>
-                    <DocumentInfoField icon={CircleUser} value={
-                        isAnonymous ? "Anonymous" : "Dries Vanspauwen"
-                    }/>
+                    <DocumentInfoField
+                        icon={CircleUser}
+                        value={isAnonymous ? "Anonymous" : documentData.creator}
+                    />
                 </div>
             </div>
 
             {/* Divider */}
             <div className="w-full border-t border-vtk-blue-600 pb-5"/>
 
-            {underReview && (
+            {documentData.under_review && (
                 <div className="rounded-xl bg-yellow-50 p-4">
                     <div className="flex">
                         <div className="shrink-0">
@@ -88,10 +128,9 @@ export default function DocumentPreview() {
                 </div>
             )}
 
-
             <div className="flex flex-row space-x-4 w-full justify-center">
                 <div className="">
-                    <div style={{ width: containerWidth }} className="py-2.5">
+                    <div style={{ width: containerWidth }} className="py-5">
                         <div className="flex flex-row h-8 justify-between place-items-center">
                             <VoteButton
                                 initialVotes={10}
@@ -99,7 +138,6 @@ export default function DocumentPreview() {
                                 onVote={handleVote}
                                 className="border-gray-500"
                             />
-                            {/*<DocumentInfoField className="text-gray-500" icon={RefreshCcw} value={"Last updated 20/10/2024 at 15:35"} />*/}
                             <div className="flex space-x-2">
                                 <DownloadButton onDownload={handleDownload} fileSize="3.6 MB"/>
                                 <FavoriteButton onFavorite={handleFavorite}/>
@@ -112,6 +150,5 @@ export default function DocumentPreview() {
                 <DocumentCommentSection/>
             </div>
         </div>
-
     )
 }
