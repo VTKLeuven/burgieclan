@@ -38,7 +38,7 @@ const DocumentList: React.FC = () => {
                     <div className="flex justify-center items-center h-full">
                         <LoaderCircle className="animate-spin text-vtk-blue-500" size={48} />
                     </div>
-                    : documents.length !== 0 ? (
+                    : documents.length === 0 ? (
                         <p className='p-4'>{t('account.documents.no_uploads')}</p>
                     ) : (
                         <div>
