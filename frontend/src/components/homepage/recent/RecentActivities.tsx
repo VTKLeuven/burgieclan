@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { Activity } from "@/components/homepage/recent/Activity";
-import { getRecentActivities } from "@/utils/localStorage";
+import { ApiClient } from "@/actions/api";
 
 const transformToActivityFormat = (apiResponse) => {
     if (!apiResponse || !apiResponse["hydra:member"]) {
@@ -23,9 +23,18 @@ export const RecentActivities = () => {
     const [activities, setActivities] = useState([]);
 
     useEffect(() => {
-        const storedActivities = getRecentActivities();
-        const formattedActivities = transformToActivityFormat(storedActivities);
-        setActivities(formattedActivities);
+        const fetchActivities = async () => {
+            try{
+                const storedActivities = await ApiClient('GET', `/api/document_views`);
+                const formattedActivities = transformToActivityFormat(storedActivities);
+                setActivities(formattedActivities);
+            } catch (error) {
+                console.error('Failed to fetch recent activities:', error);
+
+            }
+        };
+        fetchActivities();
+
     }, []);
 
     return (
