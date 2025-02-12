@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { i18nRouter } from 'next-i18n-router';
 import { i18nConfig } from '../i18nConfig';
 
+const PUBLIC_FILE = /\.(.*)$/;
+
 /**
  * Fetches the list of public pages from the backend
  */
@@ -27,6 +29,15 @@ const isPublicPage = async (urlKey: string) => {
 };
 
 export default async function middleware(request: NextRequest) {
+    // Skip middleware for static files and API routes
+    if (
+        request.nextUrl.pathname.startsWith('/_next') ||
+        request.nextUrl.pathname.includes('/api/') ||
+        PUBLIC_FILE.test(request.nextUrl.pathname)
+    ) {
+        return;
+    }
+
     const isAuthenticated = request.cookies.has('jwt');
 
     // Match and extract the locale from the URL path
@@ -58,6 +69,6 @@ export const config = {
          * - public/images (public images)
          * - favicon.ico, sitemap.xml, robots.txt (metadata files)
          */
-        '/((?!oauth|_next/static|_next/image|images|favicon.ico|sitemap.xml|robots.txt).*)',
+        '/((?!oauth|_next/static|_next/image|images|documents|favicon.ico|sitemap.xml|robots.txt).*)',
     ],
 }
