@@ -1,45 +1,37 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useUser } from "@/components/UserContext";
 import { ChevronDown, ChevronRight, Home, File, FolderClosed, Plus, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import UploadDialog from '@/components/upload/UploadDialog';
+import Loading from "@/app/[locale]/loading";
+import type { Course, Document } from "@/types/entities";
+
+const mapCoursesToItems = (courses: Course[]) => {
+  return courses.map(course => ({
+    name: course.name,
+    code: course.code,
+    redirectUrl: `/courses/${course.id}`
+  }));
+};
+
+const mapDocumentsToItems = (documents: Document[]) => {
+  return documents.map(document => ({
+    name: document.name,
+    redirectUrl: `/documents/${document.id}`
+  }));
+};
 
 const NavigationSidebar = () => {
+  const { user, loading } = useUser();
   const { t, i18n } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     courses: true,
     documents: false
   });
-  const [courses, setCourses] = useState([]);
-  const [documents, setDocuments] = useState([]);
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
-
-  useEffect(() => {
-    fetchCourses();
-    fetchDocuments();
-  }, []);
-
-  const fetchCourses = async () => {
-    try {
-      const response = await fetch('YOUR_LITUS_API_ENDPOINT/courses');
-      const data = await response.json();
-      setCourses(data);
-    } catch (error) {
-      console.error('Error fetching courses:', error);
-    }
-  };
-
-  const fetchDocuments = async () => {
-    try {
-      const response = await fetch('YOUR_LITUS_API_ENDPOINT/documents');
-      const data = await response.json();
-      setDocuments(data);
-    } catch (error) {
-      console.error('Error fetching documents:', error);
-    }
-  };
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
@@ -56,9 +48,16 @@ const NavigationSidebar = () => {
     setIsUploadDialogOpen(false);
   };
 
+  if (loading) {
+    return <Loading />;
+  }
+
+  const favoriteCourses = user?.favoriteCourses ? mapCoursesToItems(user.favoriteCourses) : [];
+  const favoriteDocuments = user?.favoriteDocuments ? mapDocumentsToItems(user.favoriteDocuments) : [];
+
   return (
       <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-screen bg-white border-r border-gray-200 flex flex-col`}>
-      {/* Collapse Toggle Button */}
+        {/* Collapse Toggle Button */}
         <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="absolute -right-3 top-4 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100"
@@ -99,7 +98,7 @@ const NavigationSidebar = () => {
 
         {/* Add Document Button */}
         <button
-            className={`mx-4 my-2 flex items-center justify-center space-x-2 ${isCollapsed ? 'bg-transparent' : 'bg-indigo-600'} text-white rounded-md py-2 px-4 hover:${isCollapsed ? 'bg-transparant' : 'bg-indigo-700'}`}
+            className={`mx-4 my-2 flex items-center justify-center space-x-2 ${isCollapsed ? 'bg-transparent' : 'bg-indigo-600'} text-white rounded-md py-2 px-4 hover:${isCollapsed ? 'bg-transparent' : 'bg-indigo-700'}`}
             aria-label={t('sidebar.add_document')}
             onClick={handleUploadButtonClick}
         >
@@ -107,32 +106,43 @@ const NavigationSidebar = () => {
           {!isCollapsed && <span>{t('sidebar.add_document')}</span>}
         </button>
 
-        {/* Courses List */}
+        {/* Favorite Courses List */}
         {!isCollapsed && expandedSections.courses && (
             <div className="p-4 space-y-2">
-              <div className="text-sm font-medium text-gray-500">{t('sidebar.courses')}</div>
+              <div className="text-sm font-medium text-gray-500">{t('sidebar.favorite_courses')}</div>
               <ul className="space-y-2">
-                {courses.map((course, index) => (
-                    <li key={course.id || index} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2">
+                {favoriteCourses.map((course, index) => (
+                    <li key={index} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2">
                       <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
-                      <span>{course.name}</span>
+                      <a href={course.redirectUrl} className="flex-1 hover:underline">
+                        {course.name}
+                        {course.code && <span className="text-sm text-gray-500 ml-1">[{course.code}]</span>}
+                      </a>
                     </li>
                 ))}
+                {favoriteCourses.length === 0 && (
+                    <li className="text-sm text-gray-500">{t('sidebar.no_favorite_courses')}</li>
+                )}
               </ul>
             </div>
         )}
 
-        {/* Documents List */}
+        {/* Favorite Documents List */}
         {!isCollapsed && expandedSections.documents && (
             <div className="p-4 space-y-2">
-              <div className="text-sm font-medium text-gray-500">{t('sidebar.documents')}</div>
+              <div className="text-sm font-medium text-gray-500">{t('sidebar.favorite_documents')}</div>
               <ul className="space-y-2">
-                {documents.map((doc, index) => (
-                    <li key={doc.id || index} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2">
+                {favoriteDocuments.map((doc, index) => (
+                    <li key={index} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2">
                       <File size={16} />
-                      <span>{doc.name}</span>
+                      <a href={doc.redirectUrl} className="flex-1 hover:underline">
+                        {doc.name}
+                      </a>
                     </li>
                 ))}
+                {favoriteDocuments.length === 0 && (
+                    <li className="text-sm text-gray-500">{t('sidebar.no_favorite_documents')}</li>
+                )}
               </ul>
             </div>
         )}
@@ -141,11 +151,11 @@ const NavigationSidebar = () => {
         <div className="mt-auto border-t border-gray-200">
           <div className="p-4 flex items-center space-x-3">
             <img
-                //src= {/* user avatar */} TODO
+                src={user?.avatar || '/placeholder-avatar.png'}
                 alt={t('sidebar.user_avatar')}
                 className="w-8 h-8 rounded-full"
             />
-            {!isCollapsed && <span className="text-sm text-gray-700"> {/* User Name TODO */ } </span>}
+            {!isCollapsed && <span className="text-sm text-gray-700">{user?.fullName}</span>}
           </div>
           {!isCollapsed && (
               <div className="px-4 pb-2 space-y-2">
@@ -168,4 +178,5 @@ const NavigationSidebar = () => {
       </div>
   );
 };
+
 export default NavigationSidebar;
