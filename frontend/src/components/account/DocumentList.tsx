@@ -44,29 +44,32 @@ const DocumentList: React.FC = () => {
                         <div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
                                 {documents.map((document) => (
-                                    <div key={document.id} className="border p-4 rounded-md shadow-sm">
-                                        <div className="flex justify-between items-center">
-                                            <h3 className="text-xl font-semibold">{document.name}</h3>
-                                            {document.underReview ? (
-                                                <Badge text={t('document.under_review')} color="yellow" />
-                                            ) : (
-                                                <Badge text={t('document.approved')} color="green" />
-                                            )}
+                                    <Link
+                                        href={`/document/${document.id}`}
+                                        key={document.id}
+                                    >
+                                        <div className="border p-4 rounded-md shadow-sm relative hover:shadow-md transition-shadow cursor-pointer">
+                                            <div className="flex justify-between items-center">
+                                                <h3 className="text-xl font-semibold">{document.name}</h3>
+                                                {document.underReview ? (
+                                                    <Badge text={t('document.under_review')} color="yellow" />
+                                                ) : (
+                                                    <Badge text={t('document.approved')} color="green" />
+                                                )}
+                                            </div>
+                                            <p className="text-gray-700">{document.course!.name}</p>
+                                            {/* TODO add rating */}
+                                            <p className="text-gray-700">{document.category!.name}</p>
+                                            <p className="text-gray-500 text-xs absolute bottom-2 right-2">{new Date(document.createDate!).toLocaleString('en-GB', {
+                                                day: '2-digit',
+                                                month: '2-digit',
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                                hour12: false
+                                            })}</p>
                                         </div>
-                                        <p className="text-gray-700">Course: {document.course!.name}</p>
-                                        <p className="text-gray-700">Category: {document.category!.name}</p>
-                                        <p className="text-gray-700">Uploaded on: {new Date(document.createDate!).toLocaleString('en-GB', {
-                                            day: '2-digit',
-                                            month: '2-digit',
-                                            year: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                            hour12: false
-                                        })}</p>
-                                        <Link href={`/document/${document.id}`} className="text-blue-500 hover:underline">
-                                            View Document
-                                        </Link>
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
                             <Pagination totalAmount={totalItems} currentPage={page} itemsPerPage={itemsPerPage} onPageChange={setPage} />
