@@ -15,18 +15,21 @@ const config = {
   					'500': '#212347',
   					'600': '#1b1d40'
   				}
-  			}
+  			},
+			wireframe: {
+				darkest: {
+					gray: "#4A5A71",
+				},
+				mid: {
+					gray: "#959EAC"
+				}
+			}
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
-        wireframe: {
-            darkest: {
-                gray: "#4A5A71",
-            }
-        }
   	}
   },
   plugins: [
