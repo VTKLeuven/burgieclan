@@ -25,7 +25,7 @@ export default function AddDocumentCommentModal({isOpen, setIsOpen}) {
         <Dialog
             size="6xl"
             className="flex flex-col max-h-[80vh] w-full max-w-4xl"
-            open={isOpen}
+            isOpen={isOpen}
             onClose={setIsOpen}
         >
             <div

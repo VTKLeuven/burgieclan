@@ -41,8 +41,8 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
 
         const requestHeaders = new Headers(customHeaders || {});
         // If body is FormData, don't set content-type (usefull for file uploads)
-        if (!(body instanceof FormData)) {
-            // Backend expects content-type to be application/json
+        if (!(body instanceof FormData) && !customHeaders?.get('Content-Type')) {
+            // Set default content type to application/json if not specified
             requestHeaders.set('Content-Type', 'application/json');
         }
 

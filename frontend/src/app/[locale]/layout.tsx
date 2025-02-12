@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google'
 import CookieBanner from "@/components/cookie-banner/CookieBanner";
 import TranslationsProvider from "@/components/TranslationProvider";
 import initTranslations from "@/app/i18n";
-import {ToastProvider} from "@/components/ui/Toast";
+import { ToastProvider } from "@/components/ui/Toast";
 
 // Inter as default font
 const inter = Inter({

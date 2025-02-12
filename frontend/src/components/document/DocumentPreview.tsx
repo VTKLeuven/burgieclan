@@ -1,11 +1,13 @@
+'use client'
+
 import {Calendar, CircleUser, File, Package, ChartPie} from "lucide-react";
-import VoteButton, {VoteDirection} from "@/components/ui/buttons/VoteButton";
+import VoteButton, { VoteDirection } from "@/components/ui/buttons/VoteButton";
 import DocumentInfoField from "@/components/document/DocumentInfoField";
 import dynamic from "next/dynamic";
 import FavoriteButton from "@/components/ui/buttons/FavoriteButton";
 import DownloadButton from "@/components/ui/buttons/DownloadButton";
 import {ExclamationTriangleIcon} from "@heroicons/react/16/solid";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import DocumentCommentSection from "@/components/document/DocumentCommentSection";
 
 export default function DocumentPreview() {

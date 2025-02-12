@@ -1,12 +1,13 @@
 'use client'
 
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import ErrorPage from "@/components/error/ErrorPage";
-import {ApiError} from "@/utils/error/apiError";
-import {ApiClient} from "@/actions/api";
+import { ApiError } from "@/utils/error/apiError";
+import { ApiClient } from "@/actions/api";
 import DocumentCommentSection from "@/components/document/DocumentCommentSection";
 import DocumentPreview from "@/components/document/DocumentPreview";
 import LoadingPage from "@/components/loading/LoadingPage";
+import { logDocumentView, getDocument } from "@/hooks/logDocumentView";
 
 export default function DocumentPage({ params }: { params: any }) {
     const { id } = params;
@@ -15,11 +16,16 @@ export default function DocumentPage({ params }: { params: any }) {
     const [error, setError] = useState<ApiError | null>(null);
 
     useEffect(() => {
+        logDocumentView(id);
+    }, [id]);
+
+    useEffect(() => {
         const FetchData = async () => {
             try {
                 const result = await ApiClient('GET', `/api/documents/${id}`);
                 console.log(result);
                 setDocument(result);
+
             } catch (err: any) {
                 setError(err);
             }
