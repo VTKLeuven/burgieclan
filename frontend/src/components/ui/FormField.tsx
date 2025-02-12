@@ -1,13 +1,12 @@
-// components/ui/FormField.tsx
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import { FieldError, UseFormRegisterReturn } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 import ComboboxController from './ComboboxController';
 import { useTranslation } from 'react-i18next';
 
 export interface Option {
-    id: string;
-    name: string;
+    id: number | string;
+    name?: string;
 }
 
 export interface FormFieldProps {
