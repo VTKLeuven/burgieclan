@@ -2,20 +2,21 @@ import "@/app/globals.css";
 import React from "react";
 import Footer from "@/components/footer/Footer";
 import HeaderWrapper from "@/components/header/HeaderWrapper";
-import { ToastProvider } from "@/components/ui/Toast";
+import Sidebar from "@/components/sidebar/Sidebar";
 
-export default function HeaderLayout({
-                                         children
-                                     }: Readonly<{
-    children: React.ReactNode
-}>) {
+export default function HeaderLayout({children,}: Readonly<{ children: React.ReactNode }>) {
     return (
-        <div className="flex h-full flex-col min-h-full">
-            <HeaderWrapper />
-            <div className="grow">
-                {children}
+        <>
+            <div className="flex flex-col">
+                <HeaderWrapper />
+                <div className="flex flex-auto">
+                    <Sidebar />
+                    <main className="flex flex-auto">
+                        {children}
+                    </main>
+                </div>
+                <Footer/>
             </div>
-            <Footer />
-        </div>
+        </>
     );
 }
