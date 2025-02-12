@@ -51,7 +51,6 @@ class DocumentApiToEntityMapper implements MapperInterface
             MicroMapperInterface::MAX_DEPTH => 0,
         ]));
         $to->setYear($from->year);
-        $to->setUnderReview($from->under_review);
 
         return $to;
     }

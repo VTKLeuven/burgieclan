@@ -37,7 +37,6 @@ class DocumentResourceTest extends ApiTestCase
             'course',
             'category',
             'year',
-            'under_review',
             'creator',
             'createdAt',
             'updatedAt',
@@ -328,12 +327,10 @@ class DocumentResourceTest extends ApiTestCase
                     'name' => 'Document name',
                     'course' => '/api/courses/' . $course->getId(),
                     'category' => '/api/document_categories/' . $category->getId(),
-                    'under_review' => true,
-                    'anonymous' => true,
                 ],
                 'files' => [
                     'file' => $file,
-                ],
+                ]
             ])
             ->assertStatus(201)
             ->assertJsonMatches('name', 'Document name')
@@ -345,42 +342,4 @@ class DocumentResourceTest extends ApiTestCase
         // Delete saved file to clean up.
         unlink(__DIR__ . '/../../data/documents/' . $filename);
     }
-
-    public function testAnonymousDocumentDoesNotHaveCreator(): void
-    {
-        $document = DocumentFactory::createOne([
-            'anonymous' => true,
-            'creator' => UserFactory::createOne(),
-        ]);
-
-        $json = $this->browser()
-            ->get('/api/documents/' . $document->getId(), [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
-            ])
-            ->assertJson()
-            ->json();
-
-        $this->assertArrayNotHasKey('creator', $json->decoded());
-    }
-
-    public function testNonAnonymousDocumentHasCreator(): void
-    {
-        $document = DocumentFactory::createOne();
-        $document->setAnonymous(true);
-
-        $json = $this->browser()
-            ->get('/api/documents/' . $document->getId(), [
-                'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
-                ]
-            ])
-            ->assertJson()
-            ->assertJsonMatches('"@id"', '/api/documents/' . $document->getId())
-            ->json();
-
-        $this->assertArrayHasKey('creator', $json->decoded());
-    }
-
 }
