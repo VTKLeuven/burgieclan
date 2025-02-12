@@ -1,3 +1,5 @@
+'use client'
+
 import DocumentPreview from "@/components/document/DocumentPreview";
 import type { Metadata } from "next";
 
