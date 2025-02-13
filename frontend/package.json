@@ -28,10 +28,11 @@
     "react-dom": "^18",
     "react-hook-form": "^7.53.1",
     "react-hotkeys-hook": "^4.5.0",
+    "react-i18next": "^15.1.1",
+    "sharp": "^0.33.5",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
-    "yup": "^1.4.0",
-    "react-i18next": "^15.1.1"
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@types/node": "^20",
