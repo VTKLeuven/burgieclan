@@ -19,7 +19,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-      target: dev
     volumes:
       - ./backend:/var/www/html:cached
       - ./.git:/var/www/html/.git:cached
@@ -41,7 +40,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: dev
     volumes:
       - ./frontend:/app:cached
       - frontend-node-modules:/app/node_modules
