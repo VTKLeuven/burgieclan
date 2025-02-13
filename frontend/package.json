@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@headlessui/react": "^1.7.18",
+    "@headlessui/react": "^2.1.8",
     "@heroicons/react": "^2.1.3",
     "@hookform/resolvers": "^3.9.0",
     "@sentry/nextjs": "^8.22.0",
