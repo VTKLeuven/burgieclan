@@ -8,8 +8,11 @@ use App\Entity\Module;
 use App\Entity\Program;
 use App\Repository\DocumentRepository;
 use DateTime;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 use Vich\UploaderBundle\Storage\StorageInterface;
@@ -154,12 +157,69 @@ final class DownloadZipController extends AbstractController
 
     private function createFileResponse(string $fileName): Response
     {
-        $response = new Response(file_get_contents($fileName));
+        if (!file_exists($fileName)) {
+            throw new RuntimeException('File not found');
+        }
+
+        $fileSize = filesize($fileName);
+        // TODO check if this works on a proper production server. With big files (5GB) it fills up the memory.
+        // This could be because of the symfony development server
+        $response = new StreamedResponse(function () use ($fileName, $fileSize) {
+            $handle = fopen($fileName, 'rb');
+
+            if ($handle === false) {
+                throw new RuntimeException('Could not open file for reading');
+            }
+
+            $length = $fileSize;
+            $request = Request::createFromGlobals();
+
+            // Handle range requests
+            if ($request->headers->has('Range')) {
+                $range = $request->headers->get('Range');
+                if (preg_match('/bytes=(\d+)-(\d+)?/', $range, $matches)) {
+                    $start = intval($matches[1]);
+                    $length = isset($matches[2]) ? (intval($matches[2]) - $start + 1) : ($fileSize - $start);
+                    fseek($handle, $start);
+                }
+            }
+
+            $remaining = $length;
+            $chunkSize = 8192; // 8KB chunks
+
+            while ($remaining > 0 && !feof($handle)) {
+                $readSize = min($chunkSize, $remaining);
+                $buffer = fread($handle, $readSize);
+                if ($buffer === false) {
+                    break;
+                }
+                echo $buffer;
+                flush();
+                $remaining -= strlen($buffer);
+            }
+
+            fclose($handle);
+        });
+
         $response->headers->set('Content-Type', 'application/zip');
         $response->headers->set('Content-Disposition', 'attachment;filename="document-export-' .
             (new DateTime())->format('Y-m-d') . '.zip"');
-        $response->headers->set('Content-length', filesize($fileName));
+        $response->headers->set('Accept-Ranges', 'bytes');
+        $response->headers->set('Content-Length', $fileSize);
+        // disables FastCGI buffering in nginx only for this response
+        $response->headers->set('X-Accel-Buffering', 'no');
 
+        $request = Request::createFromGlobals();
+        if ($request->headers->has('Range')) {
+            $response->setStatusCode(Response::HTTP_PARTIAL_CONTENT);
+            $range = $request->headers->get('Range');
+            if (preg_match('/bytes=(\d+)-(\d+)?/', $range, $matches)) {
+                $start = intval($matches[1]);
+                $end = isset($matches[2]) ? intval($matches[2]) : ($fileSize - 1);
+                $response->headers->set('Content-Range', sprintf('bytes %d-%d/%d', $start, $end, $fileSize));
+                $response->headers->set('Content-Length', $end - $start + 1);
+            }
+        }
         return $response;
     }
 }
