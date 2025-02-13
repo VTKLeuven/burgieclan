@@ -31,69 +31,15 @@
             <header>
                 <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
                     <div class="container">
-                        <a class="navbar-brand" href="{{ path('homepage') }}">
-                            Symfony Demo
+                        <a class="navbar-brand" href="{{ path('admin') }}">
+                            Burgieclan - Admin
                         </a>
-                        <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#appNavbar" aria-controls="appNavbar" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                        </button>
-
-                        <div class="navbar-collapse collapse" id="appNavbar">
-                            <ul class="navbar-nav ml-auto">
-                                {% block header_navigation_links %}
-                                    {% if is_granted('ROLE_MODERATOR') %}
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{ path('admin') }}">
-                                                <i class="fa fa-lock" aria-hidden="true"></i> {{ 'menu.admin'|trans }}
-                                            </a>
-                                        </li>
-                                    {% endif %}
-                                {% endblock %}
-
-                                {% if app.user %}
-                                    <li class="nav-item dropdown">
-                                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="user">
-                                            <i class="fa fa-user" aria-hidden="true"></i>
-                                            <span class="caret"></span>
-                                            <span class="sr-only">{{ app.user.fullname }}</span>
-                                        </a>
-                                        <div class="dropdown-menu user" role="menu" aria-labelledby="user">
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="{{ logout_path() }}">
-                                                <i class="fa fa-sign-out" aria-hidden="true"></i> {{ 'menu.logout'|trans }}
-                                            </a>
-                                        </div>
-                                    </li>
-                                {% endif %}
-
-                                <li class="nav-item dropdown">
-                                    <a href="#" class="nav-link dropdown-toggle" data-toggle="modal" data-target="#locale-selector-modal" role="button" id="locales">
-                                        <i class="fa fa-solid fa-globe" aria-hidden="true"></i>
-                                        <span class="caret"></span>
-                                        <span class="sr-only">{{ 'menu.choose_language'|trans }}</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+{#                        <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#appNavbar" aria-controls="appNavbar" aria-expanded="false" aria-label="Toggle navigation">#}
+{#                        <span class="navbar-toggler-icon"></span>#}
+{#                        </button>#}
                     </div>
                 </nav>
             </header>
-
-            <div id="locale-selector-modal" class="modal" tabindex="-1" aria-hidden="true">
-                <div class="modal-lg modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <p class="modal-title" lang="en">
-                                {# display this title always in English to make the language selector easier to use #}
-                                Choose your language
-                            </p>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         {% endblock %}
 
         <div class="container body-container">
@@ -117,20 +63,22 @@
             <footer>
                 <div class="container">
                     <div class="row">
-                        <div id="footer-copyright" class="col-md-6">
-                            <p>&copy; {{ 'now'|date('Y') }} - The Symfony Project</p>
-                            <p>{{ 'mit_license'|trans }}</p>
+                        <div id="footer-copyright" class="col-12 col-md-6 d-flex align-items-center mb-2 mb-md-0">
+                            <p class="mb-0">&copy; {{ 'now'|date('Y') }} - Vlaamse Technische Kring</p>
                         </div>
-                        <div id="footer-resources" class="col-md-6">
+                        <div id="footer-resources" class="col-12 col-md-6">
                             <p>
-                                <a href="https://twitter.com/symfony" title="Symfony Twitter">
-                                    <i class="fa fa-twitter" aria-hidden="true"></i>
-                                </a>
-                                <a href="https://www.facebook.com/SensioLabs" title="SensioLabs Facebook">
+                                <a href="https://www.facebook.com/VTKLeuven" title="VTK Facebook">
                                     <i class="fa fa-facebook" aria-hidden="true"></i>
                                 </a>
-                                <a href="https://symfony.com/blog/" title="Symfony Blog">
-                                    <i class="fa fa-rss" aria-hidden="true"></i>
+                                <a href="https://instagram.com/vtkleuven" title="VTK Twitter">
+                                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                                </a>
+                                <a href="https://www.youtube.com/VTKLeuven" title="VTK Youtube">
+                                    <i class="fa fa-youtube" aria-hidden="true"></i>
+                                </a>
+                                <a href="https://www.tiktok.com/@vtkleuven" title="VTK TikTok">
+                                    <i class="fa fa-tiktok" aria-hidden="true"></i>
                                 </a>
                             </p>
                         </div>
