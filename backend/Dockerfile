@@ -1,5 +1,4 @@
-# backend/Dockerfile
-FROM php:8.1-apache AS base
+FROM php:8.1-apache
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -34,8 +33,6 @@ RUN mkdir -p var/cache var/log var/sessions && \
     chown -R www-data:www-data var && \
     chmod -R 775 var
 
-FROM base AS dev
-
 # Install Symfony CLI
 RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | bash && \
     apt-get update && apt-get install -y symfony-cli && \
@@ -51,23 +48,3 @@ RUN composer install --no-scripts
 RUN vendor/bin/grumphp git:init
 
 CMD ["sh", "-c", "symfony server:stop || true && symfony server:start --port=8000 --no-tls --allow-all-ip"]
-
-FROM base AS test
-
-# Install dependencies with dev packages
-RUN composer install --no-scripts
-
-# Copy the rest of the application
-COPY . .
-
-CMD ["php", "bin/phpunit"]
-
-FROM base AS prod
-
-# Install dependencies without dev packages
-RUN composer install --no-dev --optimize-autoloader --no-scripts
-
-# Copy the rest of the application
-COPY . .
-
-CMD ["apache2-foreground"]

@@ -1,26 +1,49 @@
 'use client'
 
 import Input from "@/components/ui/Input";
-import React, {useEffect, useRef} from "react";
+import React, { useEffect, useRef, useState } from "react";
+import SearchPopup from "../search/SearchPopup";
 
 export default function Search() {
     const searchInputRef = useRef<HTMLInputElement | null>(null);
+    const blurTargetRef = useRef<HTMLButtonElement>(null);
+    const [searchPopupOpen, setSearchPopupOpen] = useState(false);
+    const [placeholder, setPlaceholder] = useState('Search...');
+
 
     /**
-     * Ctrl+F or Cmd+F to focus on search input (not in mobile mode)
-     *
-     * TODO: change to ctrl+K/cmd+k and open search popup (solve in BUR-75)
+     * Show the keyboard shortcut in the placeholder only on larger screens
+     */
+    useEffect(() => {
+        const updatePlaceholder = () => {
+            if (window.innerWidth < 768) {
+                setPlaceholder('Search...');
+            } else {
+                const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+                setPlaceholder(`Search... (${isMac ? '⌘' : 'Ctrl'}+K)`);
+            }
+        };
+
+        updatePlaceholder();
+        window.addEventListener('resize', updatePlaceholder);
+
+        return () => {
+            window.removeEventListener('resize', updatePlaceholder);
+        };
+    }, []);
+
+    /**
+     * Ctrl+K or Cmd+K to open search popup (not in mobile mode)
      */
     useEffect(() => {
         const handleKeydown = (event: KeyboardEvent) => {
             const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-            const isCtrlF = event.ctrlKey && event.key === 'f';
-            const isCmdF = isMac && event.metaKey && event.key === 'f';
+            const isCtrlK = event.ctrlKey && event.key === 'k';
+            const isCmdK = isMac && event.metaKey && event.key === 'k';
 
-            if (isCtrlF || isCmdF) {
+            if (isCtrlK || isCmdK) {
                 event.preventDefault();
-                if (!searchInputRef.current) return;
-                searchInputRef.current.focus()
+                setSearchPopupOpen(true);
             }
         };
 
@@ -33,7 +56,23 @@ export default function Search() {
 
     return (
         <div className="flex">
-            <Input ref={searchInputRef} id="search" name="search" type="search" placeholder="search"/>
+            <button
+                ref={blurTargetRef}
+                tabIndex={-1}
+                style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}
+                aria-hidden="true"
+            />
+            <Input
+                ref={searchInputRef}
+                id="search"
+                name="search"
+                type="search"
+                placeholder={placeholder}
+                autoComplete="off"
+                readOnly
+                passive
+                onClick={() => setSearchPopupOpen(true)} />
+            <SearchPopup open={searchPopupOpen} setOpen={setSearchPopupOpen} />
         </div>
     )
 }
