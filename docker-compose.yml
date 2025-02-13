@@ -1,7 +1,7 @@
-# docker-compose.yml (base development config)
 services:
   db:
     image: mysql:8.0
+    container_name: burgieclan-db
     volumes:
       - burgieclan-db:/var/lib/mysql
     ports:
@@ -15,10 +15,10 @@ services:
       - burgieclan-network
 
   backend:
+    container_name: burgieclan-backend
     build:
       context: ./backend
       dockerfile: Dockerfile
-      target: dev
     volumes:
       - ./backend:/var/www/html:cached
       - ./.git:/var/www/html/.git:cached
@@ -32,33 +32,14 @@ services:
     environment:
       DATABASE_URL: "mysql://burgieclan_db_user:burgieclan_db_pass@db:3306/burgieclan_db?serverVersion=8.0"
       APP_ENV: dev
-      PHP_IDE_CONFIG: "serverName=backend"
     networks:
       - burgieclan-network
 
-  backend-test:
-    profiles: ["test"]
-    extends:
-      service: backend
-    build:
-      target: test
-    environment:
-      APP_ENV: test
-
-  backend-prod:
-    profiles: ["prod"]
-    extends:
-      service: backend
-    build:
-      target: prod
-    environment:
-      APP_ENV: prod
-
   frontend:
+    container_name: burgieclan-frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: dev
     volumes:
       - ./frontend:/app:cached
       - frontend-node-modules:/app/node_modules
@@ -66,32 +47,12 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_BACKEND_URL=http://backend:8000
-      - NEXT_PUBLIC_FRONTEND_URL=http://localhost:3000
-      - WATCHPACK_POLLING=true
-      - CHOKIDAR_USEPOLLING=true
+      - NEXT_PUBLIC_BACKEND_URL=http://burgieclan-backend:8000
+      - NEXT_PUBLIC_FRONTEND_URL=http://burgieclan-frontend:3000
     depends_on:
       - backend
     networks:
       - burgieclan-network
-
-  frontend-test:
-    profiles: ["test"]
-    extends:
-      service: frontend
-    build:
-      target: test
-    environment:
-      NODE_ENV: test
-
-  frontend-prod:
-    profiles: ["prod"]
-    extends:
-      service: frontend
-    build:
-      target: prod
-    environment:
-      NODE_ENV: production
 
 networks:
   burgieclan-network:
