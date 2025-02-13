@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Pedro Devogelaere <pedro.devogelaere@vtk.be>
  */
 #[ORM\Entity(repositoryClass: CourseRepository::class)]
-#[ORM\Table(name: 'burgieclan_course')]
+#[ORM\Table(name: 'course')]
 class Course
 {
     final public const SEMESTERS = [
