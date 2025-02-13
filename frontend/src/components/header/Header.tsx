@@ -51,7 +51,7 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                         <div className="flex md:hidden">
 
                             <a href="login" className="primary-button">
-                                Login
+                                {t('login')}
                             </a>
 
                         </div>
@@ -108,7 +108,7 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                             onClick={() => setMobileMenuOpen(false)}
                             className="-m-1.5 p-1.5 w-[50px] h-[50px] rounded-md text-gray-700 justify-center items-center flex"
                         >
-                            <span className="sr-only">Close menu</span>
+                            <span className="sr-only">{t('close_menu')}</span>
                             <XMarkIcon aria-hidden="true" className="h-6 w-6" />
                         </button>
                     </div>
@@ -129,7 +129,7 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
                             </div>
                             <div className="py-6">
                                 <a href="account" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
-                                    Profile
+                                    {t('profile')}
                                 </a>
                             </div>
                         </div>
