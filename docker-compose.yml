@@ -2,6 +2,7 @@
 services:
   db:
     image: mysql:8.0
+    container_name: burgieclan-db
     volumes:
       - burgieclan-db:/var/lib/mysql
     ports:
@@ -15,6 +16,7 @@ services:
       - burgieclan-network
 
   backend:
+    container_name: burgieclan-backend
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -55,6 +57,7 @@ services:
       APP_ENV: prod
 
   frontend:
+    container_name: burgieclan-frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
