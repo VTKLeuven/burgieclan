@@ -17,7 +17,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
-
+use Psr\Log\LoggerInterface;
 use function Symfony\Component\String\u;
 
 /**
@@ -30,8 +30,10 @@ use function Symfony\Component\String\u;
  */
 class DocumentRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry                  $registry,
+        private readonly LoggerInterface $logger
+    ) {
         parent::__construct($registry, Document::class);
     }
 
@@ -47,7 +49,10 @@ class DocumentRepository extends ServiceEntityRepository
                 ->setParameter('under_review', false)
                 ->getQuery()
                 ->getSingleScalarResult() ?? 0;
-        } catch (NoResultException | NonUniqueResultException $e) {
+        } catch (NoResultException|NonUniqueResultException $e) {
+            $this->logger->warning('Error counting pending documents', [
+                'error' => $e->getMessage()
+            ]);
             return 0;
         }
     }
