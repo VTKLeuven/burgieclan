@@ -22,6 +22,7 @@ interface DocumentData {
     under_review: boolean;
     contentUrl: string;
     mimetype: string;
+    filename : string;
     creator: string;
     createdAt: string;
     updatedAt: string;
@@ -29,7 +30,7 @@ interface DocumentData {
 
 export default function DocumentPreview({id}: { id: string }) {
     // Lazy load PDFViewer component
-    const PDFViewer = dynamic(() => import("@/components/pdf/PDFViewer"), {ssr: false,});
+    const PDFViewer = dynamic(() => import("@/components/document/pdf/PDFViewer"), {ssr: false,});
 
     // Document data state
     const [documentData, setDocumentData] = useState<DocumentData | null>(null);
@@ -81,10 +82,6 @@ export default function DocumentPreview({id}: { id: string }) {
 
     const handleFavorite = async (isFavorite: boolean) => {
         console.log('favorite status changed:', isFavorite);
-    }
-
-    const handleDownload = async () => {
-        console.log('download started');
     }
 
     if (isLoading) return <LoadingPage />;
@@ -141,7 +138,11 @@ export default function DocumentPreview({id}: { id: string }) {
                             className="border-gray-500"
                         />
                         <div className="flex space-x-2">
-                            <DownloadButton onDownload={handleDownload} fileSize="3.6 MB"/>
+                            <DownloadButton
+                                contentUrl={documentData.contentUrl}
+                                fileName={documentData.filename}
+                                fileSize="3.6 MB"
+                            />
                             <FavoriteButton onFavorite={handleFavorite}/>
                         </div>
                     </div>

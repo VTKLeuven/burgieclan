@@ -1,6 +1,6 @@
 import Editor from "@/components/editor/Editor";
 import {Dialog} from "@/components/ui/Dialog";
-import PDFViewer from "@/components/pdf/PDFViewer";
+import PDFViewer from "@/components/document/pdf/PDFViewer";
 import {useEffect, useState, useRef} from "react";
 
 export default function AddDocumentCommentModal({isModalOpen, setIsModalOpen}) {
