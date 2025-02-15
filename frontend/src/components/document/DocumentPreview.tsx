@@ -4,13 +4,12 @@ import DocumentInfoField from "@/components/document/DocumentInfoField";
 import dynamic from "next/dynamic";
 import FavoriteButton from "@/components/ui/buttons/FavoriteButton";
 import DownloadButton from "@/components/ui/buttons/DownloadButton";
-import {ExclamationTriangleIcon} from "@heroicons/react/16/solid";
 import {useEffect, useState} from "react";
 import DocumentCommentSection from "@/components/document/DocumentCommentSection";
 import LoadingPage from "@/components/loading/LoadingPage";
-import Error from "@/app/[locale]/error";
 import ErrorPage from "@/components/error/ErrorPage";
 import {ApiClient} from "@/actions/api";
+import UnderReviewBox from "@/components/document/UnderReviewBox";
 
 interface DocumentData {
     "@context": string;
@@ -21,12 +20,15 @@ interface DocumentData {
     category: string;
     year: string;
     under_review: boolean;
+    contentUrl: string;
+    mimetype: string;
     creator: string;
     createdAt: string;
     updatedAt: string;
 }
 
 export default function DocumentPreview({id}: { id: string }) {
+    // Lazy load PDFViewer component
     const PDFViewer = dynamic(() => import("@/components/pdf/PDFViewer"), {ssr: false,});
 
     // Document data state
@@ -42,16 +44,24 @@ export default function DocumentPreview({id}: { id: string }) {
 
     useEffect(() => {
         const fetchDocumentData = async () => {
-            const result = await ApiClient('GET', `/api/documents/${id}`); // Adjust the endpoint as needed
-            console.log(result);
-            if (result.error) setError('Failed to fetch document data');
-            setDocumentData(result);
-            setIsLoading(false);
+            try {
+                const result = await ApiClient('GET', `/api/documents/${id}`);
+                if (result.error) {
+                    setError('Failed to fetch document data');
+                    return;
+                }
+                setDocumentData(result);
+                setIsLoading(false);
+            } catch (err) {
+                setError('Failed to fetch document data');
+                setIsLoading(false);
+            }
         };
-        console.log("fetching document")
-        fetchDocumentData();
-    }, []);
 
+        fetchDocumentData();
+    }, [id]);
+
+    // Update container width on mount and window resize, necessary to resize PDFViewer
     useEffect(() => {
         const updateWidth = () => {
             const width = window.innerWidth;
@@ -78,10 +88,12 @@ export default function DocumentPreview({id}: { id: string }) {
     }
 
     if (isLoading) return <LoadingPage />;
+
     if (error) {
         console.error(error);
         return <ErrorPage />;
     }
+
     if (!documentData) return <div>No document data available</div>;
 
     // Format the date for display
@@ -110,42 +122,36 @@ export default function DocumentPreview({id}: { id: string }) {
                 </div>
             </div>
 
-            {/* Divider */}
+            {/* Horizontal divider */}
             <div className="w-full border-t border-vtk-blue-600 pb-5"/>
 
+            {/* Under review box */}
             {documentData.under_review && (
-                <div className="rounded-xl bg-yellow-50 p-4">
-                    <div className="flex">
-                        <div className="shrink-0">
-                            <ExclamationTriangleIcon aria-hidden="true" className="size-5 text-yellow-400"/>
-                        </div>
-                        <div className="ml-3">
-                            <h3 className="text-sm font-medium text-yellow-800">
-                                This document is currently under review, so it is only visible to you.
-                            </h3>
-                        </div>
-                    </div>
-                </div>
+                <UnderReviewBox />
             )}
 
+            {/* Document preview & comment section */}
             <div className="flex flex-row space-x-4 w-full justify-center">
-                <div className="">
-                    <div style={{ width: containerWidth }} className="py-5">
-                        <div className="flex flex-row h-8 justify-between place-items-center">
-                            <VoteButton
-                                initialVotes={10}
-                                initialVote={VoteDirection.UP}
-                                onVote={handleVote}
-                                className="border-gray-500"
-                            />
-                            <div className="flex space-x-2">
-                                <DownloadButton onDownload={handleDownload} fileSize="3.6 MB"/>
-                                <FavoriteButton onFavorite={handleFavorite}/>
-                            </div>
+                <div style={{ width: containerWidth }} className="py-5">
+                    <div className="flex flex-row h-8 justify-between place-items-center">
+                        <VoteButton
+                            initialVotes={10}
+                            initialVote={VoteDirection.UP}
+                            onVote={handleVote}
+                            className="border-gray-500"
+                        />
+                        <div className="flex space-x-2">
+                            <DownloadButton onDownload={handleDownload} fileSize="3.6 MB"/>
+                            <FavoriteButton onFavorite={handleFavorite}/>
                         </div>
-
-                        <PDFViewer fileArg="/documents/test.pdf" width={containerWidth}/>
                     </div>
+                    {(documentData && documentData.mimetype == "application/pdf") ? (
+                        <PDFViewer fileArg={process.env.NEXT_PUBLIC_BACKEND_URL + documentData.contentUrl} width={containerWidth} />
+                    ) : (
+                        <div className="w-full h-96 flex items-center justify-center">
+                            <p>No preview available</p>
+                        </div>
+                    )}
                 </div>
                 <DocumentCommentSection/>
             </div>

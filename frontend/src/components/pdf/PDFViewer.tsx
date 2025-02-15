@@ -2,8 +2,8 @@
 
 /**
  * PDF Viewer using react-pdf
- * 
- * Based on sample: https://github.com/wojtekmaj/react-pdf/tree/main/sample/next-app/app 
+ *
+ * Based on sample: https://github.com/wojtekmaj/react-pdf/tree/main/sample/next-app/app
  */
 
 import { useState, useEffect } from 'react';
@@ -22,11 +22,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
     import.meta.url,
 ).toString();
 
-const options = {
-    cMapUrl: '/cmaps/',
-    standardFontDataUrl: '/standard_fonts/',
-};
-
 export default function PDFViewer({ fileArg, width }: { fileArg: PDFFile, width: number }): JSX.Element {
     // PDF file to display
     const [file, setFile] = useState<PDFFile>(fileArg);
@@ -36,6 +31,17 @@ export default function PDFViewer({ fileArg, width }: { fileArg: PDFFile, width:
 
     // Number of pages currently displayed
     const [displayedPages, setDisplayedPages] = useState<number>(PAGES_PER_LOAD);
+
+    // Options for GET requests to PDF files
+    const options = {
+        cMapUrl: '/cmaps/',
+        standardFontDataUrl: '/standard_fonts/',
+        httpHeaders: {
+            // Backend requires authentication to access PDFs
+            'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1]}`,
+        },
+        withCredentials: true,
+    };
 
     function onDocumentLoadSuccess({ numPages: nextNumPages }: PDFDocumentProxy): void {
         setNumPages(nextNumPages);
