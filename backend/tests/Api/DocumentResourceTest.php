@@ -383,4 +383,115 @@ class DocumentResourceTest extends ApiTestCase
         $this->assertArrayHasKey('creator', $json->decoded());
     }
 
+    public function testGetDocumentReturnsCorrectMimeType(): void
+    {
+        // Create a temporary file with minimal PDF content
+        $tempFile = tempnam(sys_get_temp_dir(), 'test_') . '.pdf';
+        $pdfContent = "%PDF-1.7\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF";
+        file_put_contents($tempFile, $pdfContent);
+
+        // Create an actual uploaded file
+        $uploadedFile = new UploadedFile(
+            $tempFile,
+            'test.pdf',
+            'application/pdf',
+            null,
+            true
+        );
+
+        // Create document through normal upload process
+        $document = DocumentFactory::new()->withoutPersisting()->create();
+        $document->object()->setFile($uploadedFile);
+        $document->save();
+
+        $this->browser()
+            ->get('/api/documents/' . $document->getId(), [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->assertJsonMatches('mimetype', 'application/pdf');
+
+        // Safe cleanup
+        if (file_exists($tempFile)) {
+            unlink($tempFile);
+        }
+    }
+
+    public function testGetCollectionReturnsCorrectMimeTypes(): void
+    {
+        // Create temp files
+        $pdfTempFile = tempnam(sys_get_temp_dir(), 'test_') . '.pdf';
+        $txtTempFile = tempnam(sys_get_temp_dir(), 'test_') . '.txt';
+
+        // Create minimal valid PDF content
+        $pdfContent = "%PDF-1.7\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF";
+        file_put_contents($pdfTempFile, $pdfContent);
+        file_put_contents($txtTempFile, 'Text content');
+
+        // Create actual uploaded files
+        $pdfFile = new UploadedFile(
+            $pdfTempFile,
+            'document.pdf',
+            'application/pdf',
+            null,
+            true
+        );
+
+        $txtFile = new UploadedFile(
+            $txtTempFile,
+            'notes.txt',
+            'text/plain',
+            null,
+            true
+        );
+
+        // Create documents with actual files
+        $pdfDocument = DocumentFactory::new()->withoutPersisting()->create();
+        $pdfDocument->object()->setFile($pdfFile);
+        $pdfDocument->save();
+
+        $txtDocument = DocumentFactory::new()->withoutPersisting()->create();
+        $txtDocument->object()->setFile($txtFile);
+        $txtDocument->save();
+
+        $json = $this->browser()
+            ->get('/api/documents', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->json();
+
+        $documents = $json->decoded()['hydra:member'];
+
+        // Find our test documents
+        $pdfResponse = null;
+        $txtResponse = null;
+        foreach ($documents as $doc) {
+            if ($doc['@id'] === '/api/documents/' . $pdfDocument->getId()) {
+                $pdfResponse = $doc;
+            }
+            if ($doc['@id'] === '/api/documents/' . $txtDocument->getId()) {
+                $txtResponse = $doc;
+            }
+        }
+
+        // Assert mime types
+        $this->assertNotNull($pdfResponse, 'PDF document not found in collection');
+        $this->assertNotNull($txtResponse, 'Text document not found in collection');
+        $this->assertEquals('application/pdf', $pdfResponse['mimetype']);
+        $this->assertEquals('text/plain', $txtResponse['mimetype']);
+
+        // Safe cleanup
+        if (file_exists($pdfTempFile)) {
+            unlink($pdfTempFile);
+        }
+        if (file_exists($txtTempFile)) {
+            unlink($txtTempFile);
+        }
+    }
+
 }
