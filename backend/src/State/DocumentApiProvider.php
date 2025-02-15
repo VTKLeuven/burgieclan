@@ -52,8 +52,9 @@ class DocumentApiProvider implements ProviderInterface
             $documentApi->creator = null;
         }
 
-        // Add mimetype detection using the actual file path
         if ($document->getFileName()) {
+            $documentApi->filename = $document->getFileName();
+
             try {
                 $filePath = $this->storage->resolvePath($document, 'file');
                 if ($filePath) {

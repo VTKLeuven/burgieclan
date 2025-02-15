@@ -110,6 +110,9 @@ class DocumentApi
     #[ApiProperty(writable: false)]
     public ?string $mimetype = null;
 
+    #[ApiProperty(writable: false)]
+    public ?string $filename = null;
+
     #[Assert\NotNull(groups: ['document_create'])]
     #[ApiProperty(readable: false)]
     public ?File $file = null;
