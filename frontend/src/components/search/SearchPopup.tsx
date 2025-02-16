@@ -4,7 +4,7 @@ import { FaceFrownIcon, GlobeAmericasIcon } from '@heroicons/react/24/outline'
 import { useEffect, useState } from 'react'
 import { ApiError } from "next/dist/server/api-utils";
 import FoldableSection from "@/components/common/FoldableSection";
-import { Course, Document, Module, Program } from "@/utils/types";
+import type { Course, Document, Module, Program } from '@/types/entities';
 import {
     CourseSearchResult,
     DocumentSearchResult,
