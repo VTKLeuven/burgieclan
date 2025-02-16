@@ -65,9 +65,13 @@ git clone https://github.com/VTKLeuven/burgieclan.git
 cd burgieclan
 make up
 
+# Generate JWT keypair
+make backend-shell
+php bin/console lexik:jwt:generate-keypair
+exit
+
 # Initialize database and admin user
 make db
-make admin
 ```
 
 > 📝 For detailed setup instructions and available commands, see our [Development Guide](docs/DEVELOPMENT.md)

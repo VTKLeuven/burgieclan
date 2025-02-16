@@ -1,14 +1,16 @@
-# Docker Development Guide
+# Development Guide
 
-## Prerequisites
+## Docker
 
-- Docker Desktop for Windows
+### Prerequisites
+
+- Docker Desktop / Docker Engine
 - Git
 - Make 
   - Windows: Install via Chocolatey ([install guide](https://chocolatey.org/install)) using `choco install make`
   - Mac/Linux: Pre-installed by default
 
-## Quick Start
+### Quick Start
 
 **Note**: If you haven't set up SSH for GitHub yet, follow [this guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
 
@@ -18,18 +20,24 @@ git clone https://github.com/VTKLeuven/burgieclan.git
 cd burgieclan
 
 # Start all services
-make up
+make up                 
+# (or run "docker compose up -d --build" if you don't use make)
 
 # Generate JWT keypair
 make backend-shell
 php bin/console lexik:jwt:generate-keypair
 exit
+# (or run "docker compose exec backend php bin/console lexik:jwt:generate-keypair" instead if you don't use make)
 
 # Initialize database and admin user
 make db
+# If you don't use make run following commands:
+# docker compose exec backend php bin/console doctrine:migrations:migrate --no-interaction
+# docker compose exec backend php bin/console doctrine:fixtures:load --no-interaction
+# docker compose exec backend symfony console app:add-user --admin
 ```
 
-## Make Commands
+### Make Commands
 
 | Command | Description |
 |---------|-------------|
@@ -41,17 +49,17 @@ make db
 | `make backend-shell` | Access backend container |
 | `make frontend-shell` | Access frontend container |
 
-## Services
+### Services
 
-### Backend (Symfony)
+#### Backend (Symfony)
 - URL: http://localhost:8000/admin
 - API: http://localhost:8000/api
 
-### Frontend (Next.js)
+#### Frontend (Next.js)
 - URL: http://localhost:3000
 - Hot reload enabled
 
-### Database
+#### Database
 - Host: localhost:3306
 - Database: burgieclan_db
 - User: burgieclan_db_user
@@ -59,9 +67,9 @@ make db
 
 **Security Note**: These are development credentials only. Never use these in production.
 
-## Troubleshooting
+### Troubleshooting
 
-### Port Conflicts
+#### Port Conflicts
 If you see errors about ports being in use:
 ```powershell
 # Check running containers
@@ -71,5 +79,8 @@ docker ps
 docker stop <container-id>
 ```
 
-### Common Issues
+#### Common Issues
 TBC
+
+## Virtual Machine
+
