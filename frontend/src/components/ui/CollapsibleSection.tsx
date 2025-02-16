@@ -22,10 +22,12 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ header, childre
                     <FontAwesomeIcon icon={isCollapsed ? faChevronDown : faChevronUp} className="text-vtk-blue-500" />
                 </div>
             </button>
-            {!isCollapsed && (<div>
+            <div
+                className={`transition-all duration-300 ease-in-out origin-top ${isCollapsed ? 'scale-y-0 h-0' : 'scale-y-100 h-auto'
+                    }`}
+            >
                 {children}
             </div>
-            )}
         </div>
     );
 };

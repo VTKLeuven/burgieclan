@@ -5,7 +5,7 @@ import type { Course, Document, Module, Program } from "@/types/entities";
 import { useTranslation } from "react-i18next";
 import { useUser } from "@/components/UserContext";
 import FavoriteList from "@/components/account/FavoriteList";
-import DocumentList from "./DocumentList";
+import DocumentList from "@/components/account/DocumentList";
 import { useFavorites } from "@/hooks/useFavorites";
 
 const mapCoursesToItems = (courses: Course[]) => {
