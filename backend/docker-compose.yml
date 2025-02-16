@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mysql:8.0
+    volumes:
+      - burgieclan-db:/var/lib/mysql
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: burgieclan_db_root
+      MYSQL_DATABASE: burgieclan_db
+      MYSQL_USER: burgieclan_db_user
+      MYSQL_PASSWORD: burgieclan_db_pass
+
+volumes:
+  burgieclan-db: {}

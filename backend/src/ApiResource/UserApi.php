@@ -12,7 +12,7 @@ use App\Controller\Api\RemoveFavoriteFromUserController;
 use App\Entity\User;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(),
         new Patch(),
     ],
+    normalizationContext: ['groups' => ['user']],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: User::class),
@@ -51,46 +52,50 @@ use Symfony\Component\Validator\Constraints as Assert;
 class UserApi
 {
     #[ApiProperty(readable: false, writable: false, identifier: true)]
+    #[Groups('user')]
     public ?int $id = null;
 
     #[Assert\NotBlank]
     #[ApiProperty(writable: false)]
+    #[Groups('user')]
     public ?string $fullName = null;
 
     #[Assert\NotBlank]
     #[Assert\Length(min: 2, max: 50)]
     #[ApiProperty(writable: false, security: 'is_granted("VIEW_USERNAME", object)')]
+    #[Groups('user')]
     public ?string $username = null;
 
     #[Assert\Email]
     #[ApiProperty(writable: false, security: 'is_granted("VIEW_EMAIL", object)')]
+    #[Groups('user')]
     public ?string $email = null;
 
     /**
      * @var CourseApi[]
      */
-    #[Groups('user:favorites')]
+    #[Groups(['user', 'user:favorites'])]
     #[ApiProperty(security: 'is_granted("VIEW_FAVORITES", object)')]
     public array $favoriteCourses = [];
 
     /**
      * @var ModuleApi[]
      */
-    #[Groups('user:favorites')]
+    #[Groups(['user', 'user:favorites'])]
     #[ApiProperty(security: 'is_granted("VIEW_FAVORITES", object)')]
     public array $favoriteModules = [];
 
     /**
      * @var ProgramApi[]
      */
-    #[Groups('user:favorites')]
+    #[Groups(['user', 'user:favorites'])]
     #[ApiProperty(security: 'is_granted("VIEW_FAVORITES", object)')]
     public array $favoritePrograms = [];
 
     /**
      * @var DocumentApi[]
      */
-    #[Groups('user:favorites')]
+    #[Groups(['user', 'user:favorites'])]
     #[ApiProperty(security: 'is_granted("VIEW_FAVORITES", object)')]
     public array $favoriteDocuments = [];
 }

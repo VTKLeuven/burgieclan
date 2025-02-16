@@ -32,7 +32,7 @@ class ProgramApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups('search')]
+    #[Groups(['search', 'user'])]
     public ?string $name = null;
 
     /**

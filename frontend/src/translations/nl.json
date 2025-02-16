@@ -2,12 +2,12 @@
     "homepage": "Startpagina",
     "login": "Inloggen",
     "login_vtk": "Log in met VTK",
+    "logout": "Uitloggen",
     "sign_in": "Meld je aan bij je account",
     "or_log_in_manually": "Of log handmatig in",
     "login_invalid_credentials": "Ongeldige inloggegevens, controleer of je gebruikersnaam/wachtwoord correct zijn.",
     "username": "Gebruikersnaam",
     "password": "Wachtwoord",
-    "account": "Account",
     "profile": "Profiel",
     "unexpected_error": "Onverwachte fout",
     "go_home": "Ga terug naar de startpagina",
@@ -116,5 +116,36 @@
             "search": "Zoeken...",
             "no_results": "Geen resultaten gevonden"
         }
+    },
+    "account": {
+        "account": "Account",
+        "greeting": "Hey, {{name}}!",
+        "welcome_text": "Welkom bij je accountpagina. Hier vind je wat informatie over je favorieten en je bijdrages aan Burgieclan.",
+        "details": "Accountgegevens",
+        "name": "Naam",
+        "rnumber": "R-nummer",
+        "email": "E-mail",
+        "favorite": {
+            "courses": "Favoriete vakken",
+            "modules": "Favoriete modules",
+            "programs": "Favoriete opleidingen",
+            "documents": "Favoriete documenten",
+            "no_courses": "Je hebt nog geen favoriete vakken.",
+            "no_modules": "Je hebt nog geen favoriete modules.",
+            "no_programs": "Je hebt nog geen favoriete opleidingen.",
+            "no_documents": "Je hebt nog geen favoriete documenten."
+        },
+        "documents": {
+            "no_uploads": "Je hebt nog geen documenten geüpload.",
+            "my": "Mijn documenten"
+        }
+    },
+    "document": {
+        "under_review": "In behandeling",
+        "approved": "Goedgekeurd"
+    },
+    "pagination": {
+        "previous": "Vorige",
+        "next": "Volgende"
     }
 }
