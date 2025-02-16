@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faStar as faStarOutline } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
+import { faStar } from '@fortawesome/free-solid-svg-icons';
+import { faStar as faStarOutline } from '@fortawesome/free-regular-svg-icons';
 
 interface FavoriteListProps {
     title: string;
@@ -44,7 +45,7 @@ const FavoriteList: React.FC<FavoriteListProps> = ({ title, items, emptyMessage,
                     </ul>
                 </div>
             ) : (
-                <p>No items available</p>
+                <p>{emptyMessage}</p>
             )}
         </CollapsibleSection>
     );
