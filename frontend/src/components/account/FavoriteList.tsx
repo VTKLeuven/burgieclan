@@ -29,8 +29,8 @@ const FavoriteList: React.FC<FavoriteListProps> = ({ title, items, emptyMessage,
                 </h3>
             }
         >
-            {items && items.length > 0 ? (
-                <div className='p-4'>
+            <div className='p-4'>
+                {items && items.length > 0 ? (
                     <ul className="space-y-4 list-none">
                         {items.map((item, index) => (
                             <li key={index} className="bg-gray-200 px-4 py-2 rounded-md shadow-sm flex justify-between items-center">
@@ -43,10 +43,10 @@ const FavoriteList: React.FC<FavoriteListProps> = ({ title, items, emptyMessage,
                             </li>
                         ))}
                     </ul>
-                </div>
-            ) : (
-                <p>{emptyMessage}</p>
-            )}
+                ) : (
+                    <p>{emptyMessage}</p>
+                )}
+            </div>
         </CollapsibleSection>
     );
 };
