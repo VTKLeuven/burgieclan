@@ -6,13 +6,19 @@ import { ChevronDown, ChevronRight, Home, File, FolderClosed, Plus, PanelLeftClo
 import { useTranslation } from 'react-i18next';
 import UploadDialog from '@/components/upload/UploadDialog';
 import Loading from "@/app/[locale]/loading";
+import ItemList from '@/components/layout/ItemList';
 import type { Course, Document } from "@/types/entities";
+import {useFavorites} from "@/hooks/useFavorites";
 
 const mapCoursesToItems = (courses: Course[]) => {
   return courses.map(course => ({
     name: course.name,
     code: course.code,
-    redirectUrl: `/courses/${course.id}`
+    redirectUrl: `/courses/${course.id}<itemList
+                title={t('account.favorite.courses')}
+                items={mapCoursesToItems(user!.favoriteCourses!)}
+                emptyMessage={t('account.favorite.no_courses')}
+      />`
   }));
 };
 
@@ -23,6 +29,10 @@ const mapDocumentsToItems = (documents: Document[]) => {
   }));
 };
 
+function handleLogout() {
+  // TODO implement logout
+}
+
 const NavigationSidebar = () => {
   const { user, loading } = useUser();
   const { t, i18n } = useTranslation();
@@ -32,6 +42,10 @@ const NavigationSidebar = () => {
     documents: false
   });
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const {
+    updateFavoriteCourse,
+    updateFavoriteDocument
+  } = useFavorites(user);
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
@@ -98,52 +112,35 @@ const NavigationSidebar = () => {
 
         {/* Add Document Button */}
         <button
-            className={`mx-4 my-2 flex items-center justify-center space-x-2 ${isCollapsed ? 'bg-transparent' : 'bg-indigo-600'} text-white rounded-md py-2 px-4 hover:${isCollapsed ? 'bg-transparent' : 'bg-indigo-700'}`}
+            className={`mx-4 my-2 flex items-center space-x-2 ${isCollapsed ? 'bg-transparent' : 'bg-indigo-600'} text-white rounded-md py-2 px-4 hover:${isCollapsed ? 'bg-transparent' : 'bg-indigo-700'}`}
             aria-label={t('sidebar.add_document')}
             onClick={handleUploadButtonClick}
         >
-          <Plus size={16} />
+          <Plus size={20} />
           {!isCollapsed && <span>{t('sidebar.add_document')}</span>}
         </button>
 
         {/* Favorite Courses List */}
         {!isCollapsed && expandedSections.courses && (
+
             <div className="p-4 space-y-2">
-              <div className="text-sm font-medium text-gray-500">{t('sidebar.favorite_courses')}</div>
-              <ul className="space-y-2">
-                {favoriteCourses.map((course, index) => (
-                    <li key={index} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2">
-                      <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
-                      <a href={course.redirectUrl} className="flex-1 hover:underline">
-                        {course.name}
-                        {course.code && <span className="text-sm text-gray-500 ml-1">[{course.code}]</span>}
-                      </a>
-                    </li>
-                ))}
-                {favoriteCourses.length === 0 && (
-                    <li className="text-sm text-gray-500">{t('sidebar.no_favorite_courses')}</li>
-                )}
-              </ul>
+              <ItemList
+                  items={mapCoursesToItems(user!.favoriteCourses!)}
+                  emptyMessage={t('account.favorite.no_courses')}
+                  updateFavorite={updateFavoriteCourse}
+              />
             </div>
+
         )}
 
         {/* Favorite Documents List */}
         {!isCollapsed && expandedSections.documents && (
             <div className="p-4 space-y-2">
-              <div className="text-sm font-medium text-gray-500">{t('sidebar.favorite_documents')}</div>
-              <ul className="space-y-2">
-                {favoriteDocuments.map((doc, index) => (
-                    <li key={index} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2">
-                      <File size={16} />
-                      <a href={doc.redirectUrl} className="flex-1 hover:underline">
-                        {doc.name}
-                      </a>
-                    </li>
-                ))}
-                {favoriteDocuments.length === 0 && (
-                    <li className="text-sm text-gray-500">{t('sidebar.no_favorite_documents')}</li>
-                )}
-              </ul>
+              <ItemList
+                  items={mapDocumentsToItems(user!.favoriteDocuments!)}
+                  emptyMessage={t('account.favorite.no_documents')}
+                  updateFavorite={updateFavoriteDocument}
+              />
             </div>
         )}
 
@@ -151,7 +148,7 @@ const NavigationSidebar = () => {
         <div className="mt-auto border-t border-gray-200">
           <div className="p-4 flex items-center space-x-3">
             <img
-                src={user?.avatar || '/placeholder-avatar.png'}
+                src={user?.avatar || '/images/icons/empty_profile.png'}
                 alt={t('sidebar.user_avatar')}
                 className="w-8 h-8 rounded-full"
             />
@@ -162,7 +159,9 @@ const NavigationSidebar = () => {
                 <a href="vtk.be" className="block text-sm text-gray-600 hover:text-gray-800">
                   {t('sidebar.go_to_vtk')}
                 </a>
-                <button className="block text-sm text-gray-600 hover:text-gray-800">
+                <button  onClick={handleLogout}
+                         className="bg-red-500 text-white px-4 py-2 rounded mt-8 hover:bg-red-600 active:bg-red-700 transition duration-150 ease-in-out"
+                >
                   {t('sidebar.log_out')}
                 </button>
               </div>
