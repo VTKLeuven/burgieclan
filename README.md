@@ -74,9 +74,25 @@ exit
 make db
 ```
 
-> 📝 For detailed setup instructions and available commands, see our [Development Guide](docs/DEVELOPMENT.md)
+> 📝 For detailed setup instructions, alternative setup options and available commands, see our [Development Guide](docs/DEVELOPMENT.md)
 
 ## Contributing
+
+There are many ways in which you can participate in this project, for example:
+
+* [Submit bugs and feature requests](https://github.com/microsoft/vscode/issues), and help us verify as they are checked in
+* Review [source code changes](https://github.com/microsoft/vscode/pulls)
+* Review the [documentation](https://github.com/microsoft/vscode-docs) and make pull requests for anything from typos to additional and new content
+
+If you are interested in fixing issues and contributing directly to the code base,
+please see the document [Contribution Guide](docs/CONTRIBUTE.md), which covers the following:
+
+* The development workflow, including debugging and running tests
+* Coding guidelines
+* Submitting pull requests
+* Finding an issue to work on
+* Contributing to translations
+
 
 ## Setting up your own Burgieclan
 
