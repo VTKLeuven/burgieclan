@@ -1,8 +1,9 @@
 // hooks/useFormFields.ts
 import { useState, useEffect, useCallback } from 'react';
-import { Course, Category } from '@/types/upload';
+import type { Category, Course } from '@/types/entities';
 import { ApiClient } from '@/actions/api';
 import { useTranslation } from 'react-i18next';
+import { convertToCategory, convertToCourse } from '@/utils/convertToEntity';
 
 export const useFormFields = (isOpen: boolean) => {
     const [courses, setCourses] = useState<Course[]>([]);
@@ -22,15 +23,9 @@ export const useFormFields = (isOpen: boolean) => {
             if (courseResponse.error) throw new Error(courseResponse.error.message);
             if (categoryResponse.error) throw new Error(categoryResponse.error.message);
 
-            setCourses(courseResponse['hydra:member']?.map((course: any) => ({
-                id: course['@id'],
-                name: course.name
-            })) || []);
+            setCourses(courseResponse['hydra:member']?.map(convertToCourse) || []);
 
-            setCategories(categoryResponse['hydra:member']?.map((category: any) => ({
-                id: category['@id'],
-                name: category.name
-            })) || []);
+            setCategories(categoryResponse['hydra:member']?.map(convertToCategory) || []);
         } catch (err) {
             setError(t('form.errors.fetch_failed'));
             console.error('Failed to fetch form data:', err);
