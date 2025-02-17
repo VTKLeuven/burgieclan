@@ -1,11 +1,5 @@
-import initTranslations from "@/app/i18n";
+import AccountPage from "@/components/account/AccountPage";
 
-export default async function AccountPage({ params: { locale } }: { params: { locale: string } }) {
-    const { t } = await initTranslations(locale);
-
-    return (
-        <main>
-            {t('account')}
-        </main>
-    );
+export default function Page() {
+    return <AccountPage />;
 }

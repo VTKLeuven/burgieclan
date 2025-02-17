@@ -31,7 +31,7 @@ export const documentSchema = (t: any) => yup.object().shape({
         .required(t('upload.form.validation.file.required'))
         .test('fileSize', t('upload.form.validation.file.size', { size: FILE_SIZE_MB }),
             (value) => !value || (value instanceof File && value.size <= FILE_SIZE_LIMIT))
-        .test('fileType', t('upload.form.validation.file.type'),  async (value) => {
+        .test('fileType', t('upload.form.validation.file.type'), async (value) => {
             if (!value) return false;
             const type = await fileTypeFromBlob(value as Blob);
             if (!type?.mime) return false;

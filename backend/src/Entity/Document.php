@@ -37,8 +37,8 @@ class Document extends Node
     #[ORM\Column(nullable: true)]
     private ?string $file_name = null;
 
-    #[ORM\Column(length: 5, nullable: true)]
-    private ?string $year = null;
+    #[ORM\Column(length: 11, nullable: true)]
+    private ?string $year = null; // Ex. 2024 - 2025
 
     public function getId(): ?int
     {
@@ -142,7 +142,7 @@ class Document extends Node
      *
      * @param int $amountOfYears The number of years to generate choices for, default is 10
      * @param string|null $firstYear The first year to start generating choices from, default is null
-     * @return array The array of academic year choices
+     * @return array The array of academic year choices, formatted like '2024 - 2025' => '2024 - 2025'
      */
     public static function getAcademicYearChoices(int $amountOfYears = 10, string $firstYear = null): array
     {
@@ -157,16 +157,15 @@ class Document extends Node
         }
 
         if (!is_null($firstYear)) {
-            $firstYear = (int)substr($firstYear, 0, 2);
-            $firstYear += ($firstYear > (int)date('y')) ? 1900 : 2000; // TODO fix this Y2.1K bug
+            $firstYear = (int)substr($firstYear, 0, 4);
             $amountOfYears = max($amountOfYears, $currentYear - $firstYear + 1);
         }
 
-            $choices = [];
+        $choices = [];
         for ($i = 0; $i < $amountOfYears; $i++) {
             $startYear = $currentYear - $i;
             $endYear = $startYear + 1;
-            $formattedYear = sprintf('%02d-%02d', $startYear % 100, $endYear % 100);
+            $formattedYear = sprintf('%d - %d', $startYear, $endYear);
             $choices[$formattedYear] = $formattedYear;
         }
         return $choices;
