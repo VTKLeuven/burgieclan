@@ -97,6 +97,18 @@ const NavigationSidebar = () => {
             </div>
             {!isCollapsed && (expandedSections.courses ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
           </button>
+          {/* Favorite Courses List */}
+          {!isCollapsed && expandedSections.courses && (
+
+              <div className="p-4 space-y-2">
+                <ItemList
+                    items={mapCoursesToItems(user!.favoriteCourses!)}
+                    emptyMessage={t('account.favorite.no_courses')}
+                    updateFavorite={updateFavoriteCourse}
+                />
+              </div>
+
+          )}
           <button
               className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 rounded p-2"
               onClick={() => toggleSection('documents')}
@@ -107,7 +119,18 @@ const NavigationSidebar = () => {
               {!isCollapsed && <span>{t('sidebar.my_documents')}</span>}
             </div>
             {!isCollapsed && (expandedSections.documents ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+
           </button>
+          {/* Favorite Documents List */}
+          {!isCollapsed && expandedSections.documents && (
+              <div className="p-4 space-y-2">
+                <ItemList
+                    items={mapDocumentsToItems(user!.favoriteDocuments!)}
+                    emptyMessage={t('account.favorite.no_documents')}
+                    updateFavorite={updateFavoriteDocument}
+                />
+              </div>
+          )}
         </nav>
 
         {/* Add Document Button */}
@@ -120,29 +143,6 @@ const NavigationSidebar = () => {
           {!isCollapsed && <span>{t('sidebar.add_document')}</span>}
         </button>
 
-        {/* Favorite Courses List */}
-        {!isCollapsed && expandedSections.courses && (
-
-            <div className="p-4 space-y-2">
-              <ItemList
-                  items={mapCoursesToItems(user!.favoriteCourses!)}
-                  emptyMessage={t('account.favorite.no_courses')}
-                  updateFavorite={updateFavoriteCourse}
-              />
-            </div>
-
-        )}
-
-        {/* Favorite Documents List */}
-        {!isCollapsed && expandedSections.documents && (
-            <div className="p-4 space-y-2">
-              <ItemList
-                  items={mapDocumentsToItems(user!.favoriteDocuments!)}
-                  emptyMessage={t('account.favorite.no_documents')}
-                  updateFavorite={updateFavoriteDocument}
-              />
-            </div>
-        )}
 
         {/* User Profile - Fixed at Bottom */}
         <div className="mt-auto border-t border-gray-200">
