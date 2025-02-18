@@ -144,7 +144,7 @@ const NavigationSidebar = () => {
         {/* User Profile - Fixed at Bottom #TODO add avatar input*/}
         <div className="mt-auto border-t border-gray-200">
           <div className="p-4 flex items-center space-x-3">
-            <image
+            <img
                 src={'/images/icons/empty_profile.png'}
                 alt={t('sidebar.user_avatar')}
                 className="w-8 h-8 rounded-full"
