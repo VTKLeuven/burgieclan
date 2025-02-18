@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useUser } from "@/components/UserContext";
 import { ChevronDown, ChevronRight, Home, File, FolderClosed, Plus, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +47,7 @@ const NavigationSidebar = () => {
     updateFavoriteDocument
   } = useFavorites(user);
 
-  const toggleSection = (section) => {
+  const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section]
@@ -65,9 +65,6 @@ const NavigationSidebar = () => {
   if (loading) {
     return <Loading />;
   }
-
-  const favoriteCourses = user?.favoriteCourses ? mapCoursesToItems(user.favoriteCourses) : [];
-  const favoriteDocuments = user?.favoriteDocuments ? mapDocumentsToItems(user.favoriteDocuments) : [];
 
   return (
       <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-screen bg-white border-r border-gray-200 flex flex-col`}>
@@ -144,11 +141,11 @@ const NavigationSidebar = () => {
         </button>
 
 
-        {/* User Profile - Fixed at Bottom */}
+        {/* User Profile - Fixed at Bottom #TODO add avatar input*/}
         <div className="mt-auto border-t border-gray-200">
           <div className="p-4 flex items-center space-x-3">
-            <img
-                src={user?.avatar || '/images/icons/empty_profile.png'}
+            <image
+                src={'/images/icons/empty_profile.png'}
                 alt={t('sidebar.user_avatar')}
                 className="w-8 h-8 rounded-full"
             />
