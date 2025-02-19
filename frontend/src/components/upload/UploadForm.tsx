@@ -1,14 +1,17 @@
+// components/upload/UploadForm.tsx
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { FormField } from '@/components/ui/FormField';
+import FormField from '@/components/ui/FormField';
 import { UploadField } from '@/components/upload/UploadField';
 import { UploadFormData } from '@/types/upload';
 import { documentSchema } from '@/utils/validation/documentSchema';
 import { useFormFields } from '@/hooks/useFormFields';
 import { Text } from '@/components/ui/Text';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {Checkbox} from "@/components/ui/Checkbox";
+import { useYearOptions } from '@/hooks/useYearOptions';
+import { VISIBLE_YEARS } from "@/utils/constants/upload";
+import { Checkbox } from "@/components/ui/Checkbox";
 
 interface FormProps {
     onSubmit: (data: UploadFormData) => Promise<void>;
@@ -17,28 +20,39 @@ interface FormProps {
     initialFile: File | null;
 }
 
-export default function UploadForm({ onSubmit, isLoading = false, isOpen, initialFile }: FormProps) {
+export default function UploadForm({
+    onSubmit,
+    isLoading = false,
+    isOpen,
+    initialFile,
+}: FormProps) {
     const { t } = useTranslation();
     const {
         register,
         handleSubmit,
         setValue,
-        formState: { errors }
+        control,
+        formState: { errors },
     } = useForm<UploadFormData>({
-        resolver: yupResolver(documentSchema(t)),
+        resolver: yupResolver(documentSchema(t)),,
         defaultValues: {
             anonymous: false // TODO: Set the initial value of the checkbox based on anonymous user setting
         }
     });
 
     const { courses, categories, isLoading: isLoadingFields, error } = useFormFields(isOpen);
+    const yearOptions = useYearOptions();
 
-    // Handle initial file when component mounts or when initialFile changes
+    // Set initial file on mount if provided.
     useEffect(() => {
         if (initialFile) {
             setValue('file', initialFile, { shouldValidate: true });
         }
     }, [initialFile, setValue]);
+
+    const handleFormSubmit = async (data: UploadFormData) => {
+        await onSubmit(data);
+    };
 
     return (
         <form id="upload-form" onSubmit={handleSubmit(onSubmit)} className="pt-6 space-y-6">
@@ -54,6 +68,7 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
                         label={t('upload.form.name.label')}
                         error={errors.name}
                         placeholder={t('upload.form.name.placeholder')}
+                        name="name"
                         registration={register('name')}
                         disabled={isLoading || isLoadingFields}
                     />
@@ -62,10 +77,11 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
                 <div className="sm:col-span-full">
                     <FormField
                         label={t('upload.form.course.label')}
-                        type="select"
+                        type="combobox"
                         options={courses}
                         error={errors.course}
-                        registration={register('course')}
+                        name="course"
+                        control={control}
                         disabled={isLoading || isLoadingFields}
                     />
                 </div>
@@ -73,10 +89,11 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
                 <div className="sm:col-span-3">
                     <FormField
                         label={t('upload.form.category.label')}
-                        type="select"
+                        type="combobox"
                         options={categories}
                         error={errors.category}
-                        registration={register('category')}
+                        name="category"
+                        control={control}
                         disabled={isLoading || isLoadingFields}
                     />
                 </div>
@@ -84,14 +101,13 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
                 <div className="sm:col-span-3">
                     <FormField
                         label={t('upload.form.year.label')}
-                        type="select"
-                        options={[{
-                            id: '2024-2025',
-                            name: '2024 - 2025'
-                        }]}
+                        type="combobox"
+                        options={yearOptions}
                         error={errors.year}
-                        registration={register('year')}
+                        name="year"
+                        control={control}
                         disabled={isLoading || isLoadingFields}
+                        visibleOptions={VISIBLE_YEARS}
                     />
                 </div>
 
@@ -100,6 +116,15 @@ export default function UploadForm({ onSubmit, isLoading = false, isOpen, initia
                         error={errors.file}
                         setValue={setValue}
                         initialFile={initialFile}
+                    />
+                </div>
+
+                <div className="col-span-full mt-4 gap-3 pb-2">
+                    <Checkbox
+                        label={t('upload.form.anonymous.label')}
+                        {...register('anonymous')}
+                        disabled={isLoading || isLoadingFields}
+                        className="justify-end"
                     />
                 </div>
 

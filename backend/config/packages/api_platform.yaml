@@ -14,6 +14,8 @@ api_platform:
         extra_properties:
             standard_put: true
             rfc_7807_compliant_errors: true
+        pagination_maximum_items_per_page: 30
+        pagination_client_items_per_page: true
     event_listeners_backward_compatibility_layer: false
     keep_legacy_inflector: false
     swagger:

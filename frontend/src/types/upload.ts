@@ -7,12 +7,7 @@ export interface UploadFormData {
     file: any;
 }
 
-export interface Course {
-    id: string;
-    name: string;
-}
-
-export interface Category {
-    id: string;
-    name: string;
+export interface UploadFormProps {
+    isOpen: boolean;
+    onClose: () => void;
 }
