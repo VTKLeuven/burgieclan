@@ -13,12 +13,15 @@ import { ApiError } from "next/dist/server/api-utils";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShare } from '@fortawesome/free-solid-svg-icons';
 import Loading from '@/app/[locale]/loading'
-import {useTranslation} from 'react-i18next'
+import { useToast } from '@/components/ui/Toast';
 import initTranslations from "@/app/i18n";
+import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 
 export default function CoursePage({ courseId, breadcrumb }: { courseId: number, breadcrumb: Breadcrumb }) {
     const [course, setCourse] = useState<Course | null>(null);
     const [t, setT] = useState<any>(() => (key: string) => key); // Default translation function
+    const { showToast } = useToast();
+    const [error, setError] = useState<boolean>(false);
 
     async function fetchCourse(query: number) {
         try {
@@ -30,65 +33,31 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
 
     useEffect(() => {
         async function getCourse() {
-            const courseData = await fetchCourse(courseId);
-            setCourse(courseData);
+            try {
+                const courseData = await fetchCourse(courseId);
+                setCourse(courseData);
 
-            const { t } = await initTranslations(courseData.language);
-            setT(() => t);
+                // This is used to set the page language depending on the language of the course, and not the global website language set by the user
+                const { t } = await initTranslations(courseData.language);
+                setT(() => t);
+                console.log("Course data: ", courseData);
+            } catch {
+                console.log('Error fetching course');
+                setError(true);
+                showToast(t('course.error-fetching'), 'error');
+            }
         }
-        getCourse().catch(console.error);
+        console.log("Course ID: ", courseId);
+        getCourse();
     }, [courseId]);
 
-    const ProfessorDiv = ({ unumber, index }: { unumber: string, index: number }) => {
-        const sanitizedUnumber = unumber.replace(/\D/g, '');
-        const [imgSrc, setImgSrc] = useState(`https://www.kuleuven.be/wieiswie/nl/person/0${sanitizedUnumber}/photo`);
-        const [professorName, setProfessorName] = useState("N.");
-
-        async function fetchProfessorName(): Promise<string> {
-            try {
-                const response = await fetch(`https://dataservice.kuleuven.be/employee/_doc/0${sanitizedUnumber}`);
-                if (!response.ok) throw new Error();
-
-                const data = await response.json();
-                if (data._source?.firstName && data._source?.surname) {
-                    return `${data._source.firstName[0]}. ${data._source.surname}`;
-                }
-            } catch {}
-            return "N.";
-        }
-
-        useEffect(() => {
-            async function loadProfessorName() {
-                const name = await fetchProfessorName();
-                setProfessorName(name);
-            }
-            loadProfessorName();
-        }, []);
-
-        const handleError = () => {
-            setImgSrc('/images/proffen/generic_profile.png');
-        };
-
+    if (error) {
         return (
-            <div className="flex items-start h-full">
-                <div className="relative w-16 h-16 overflow-hidden rounded-full border border-yellow-500">
-                    <Image
-                        src={imgSrc}
-                        onError={handleError}
-                        className="absolute top-1/2 left-0 transform -translate-y-1/2 w-full h-auto"
-                        alt={unumber}
-                        width={64}
-                        height={64}
-                    />
-                </div>
-                <div className="flex flex-col items-start justify-center ml-4 h-full">
-                    <p className="text-lg hover:underline hover:cursor-pointer"> {professorName} </p>
-                    {index == 0 && <p className="text-sm text-gray-600"> {t('course-page.coordinator')} </p>}
-                    {!(index == 0) && <p className="text-sm text-gray-600"> {t('course-page.professor')} </p>}
-                </div>
+            <div className="flex items-center justify-center h-full w-full">
+                <p>{t('course.error-fetching')}</p>
             </div>
         );
-    };
+    }
 
     if (!course) {
         return (
@@ -182,7 +151,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                         <h2> {t('course-page.teachers')} </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {course.professors.map((p, index) => (
-                                <ProfessorDiv key={index} unumber={p} index={index} />
+                                <ProfessorDiv key={index} unumber={p} index={index} t={t}/>
                             ))}
                         </div>
                     </div>
