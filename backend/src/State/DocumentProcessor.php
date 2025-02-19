@@ -48,6 +48,8 @@ final class DocumentProcessor implements ProcessorInterface
         /** @var bool $anonymous */
         $anonymous = $request->get('anonymous');
 
+        $dto->year = $request->get('year');
+
         // Convert the documentDto to an actual Document.
         $document = $this->microMapper->map($dto, Document::class);
         assert($document instanceof Document);
