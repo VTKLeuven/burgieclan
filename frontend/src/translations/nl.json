@@ -131,6 +131,7 @@
         "exercise-session": "Oefenzittingen",
         "exercise-session-description": "Lorem ipsum dolor sit amet",
         "exams": "Examens",
-        "exams-description": "Lorem ipsum dolor sit amet"
+        "exams-description": "Lorem ipsum dolor sit amet",
+        "error-fetching": "Er is een fout opgetreden bij het ophalen van de vakgegevens: "
     }
 }
