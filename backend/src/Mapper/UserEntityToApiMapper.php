@@ -44,22 +44,22 @@ class UserEntityToApiMapper implements MapperInterface
         $to->email = $from->getEmail();
         $to->favoriteCourses = array_map(function (Course $course) {
             return $this->microMapper->map($course, CourseApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                MicroMapperInterface::MAX_DEPTH => 1,
             ]);
         }, $from->getFavoriteCourses()->getValues());
         $to->favoriteModules = array_map(function (Module $module) {
             return $this->microMapper->map($module, ModuleApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                MicroMapperInterface::MAX_DEPTH => 1,
             ]);
         }, $from->getFavoriteModules()->getValues());
         $to->favoritePrograms = array_map(function (Program $program) {
             return $this->microMapper->map($program, ProgramApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                MicroMapperInterface::MAX_DEPTH => 1,
             ]);
         }, $from->getFavoritePrograms()->getValues());
         $to->favoriteDocuments = array_map(function (Document $document) {
             return $this->microMapper->map($document, DocumentApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                MicroMapperInterface::MAX_DEPTH => 1,
             ]);
         }, $from->getFavoriteDocuments()->getValues());
 
