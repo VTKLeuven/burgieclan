@@ -34,7 +34,7 @@ export default function UploadForm({
         control,
         formState: { errors },
     } = useForm<UploadFormData>({
-        resolver: yupResolver(documentSchema(t)),,
+        resolver: yupResolver(documentSchema(t)),
         defaultValues: {
             anonymous: false // TODO: Set the initial value of the checkbox based on anonymous user setting
         }
