@@ -19,15 +19,18 @@ use App\State\EntityClassDtoStateProvider;
 use App\State\DocumentProcessor;
 use ArrayObject;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'Document',
     operations: [
         new Get(
+            normalizationContext: ['groups' => ['document:get']],
             provider: DocumentApiProvider::class
         ),
         new GetCollection(
+            normalizationContext: ['groups' => ['document:get']],
             provider: DocumentApiProvider::class
         ),
         new Post(
@@ -55,7 +58,7 @@ use Symfony\Component\Validator\Constraints as Assert;
                                     ],
                                     "year" => [
                                         "type" => "string",
-                                        "example" => "24-25"
+                                        "example" => "2024 - 2025"
                                     ],
                                     'file' => [
                                         'type' => 'string',
@@ -71,14 +74,15 @@ use Symfony\Component\Validator\Constraints as Assert;
                     ])
                 )
             ),
-            validationContext: ['groups' => ['Default', 'document_create']],
+            validationContext: ['groups' => ['document:create']],
             deserialize: false,
             processor: DocumentProcessor::class,
         )],
     outputFormats: ['jsonld' => ['application/ld+json']],
+    order: ['updateDate' => 'DESC'],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
-    stateOptions: new Options(entityClass: Document::class),
+    stateOptions: new Options(entityClass: Document::class)
 )]
 class DocumentApi
 {
@@ -87,38 +91,48 @@ class DocumentApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
+    #[Groups(['search', 'user', 'document:get', 'document:create'])]
     public ?string $name = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[Groups(['search', 'document:get', 'document:create'])]
     public ?CourseApi $course;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[Groups(['search', 'document:get', 'document:create'])]
     public ?DocumentCategoryApi $category = null;
 
     #[Assert\Length(5)]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
+    #[Groups(['document:get', 'document:create'])]
     public ?string $year = null;
 
     #[ApiProperty(writable: false)]
     #[ApiFilter(BooleanFilter::class)]
+    #[Groups(['search', 'document:get'])]
     public bool $under_review = true;
 
     #[ApiFilter(BooleanFilter::class)]
+    #[Groups(['document:get'])]
     public bool $anonymous = false;
 
+    #[Groups(['document:get'])]
     public ?string $contentUrl = null;
 
-    #[Assert\NotNull(groups: ['document_create'])]
+    #[Assert\NotNull(groups: ['document:create'])]
     #[ApiProperty(readable: false)]
     public ?File $file = null;
 
     #[ApiProperty(writable: false)]
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[Groups(['search', 'document:get'])]
     public ?UserApi $creator;
 
     #[ApiProperty(writable: false)]
+    #[Groups(['search', 'document:get'])]
     public string $createdAt;
 
     #[ApiProperty(writable: false)]
+    #[Groups(['search', 'document:get'])]
     public string $updatedAt;
 }

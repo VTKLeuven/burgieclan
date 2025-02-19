@@ -24,7 +24,7 @@ export const documentSchema = (t: any) => yup.object().shape({
     year: yup
         .string()
         .required(t('upload.form.validation.year.required'))
-        .matches(/^\d{4}-\d{4}$/, t('upload.form.validation.year.format')),
+        .matches(/^\d{4} - \d{4}$/, t('upload.form.validation.year.format')),
 
     anonymous: yup
         .boolean()
@@ -35,7 +35,7 @@ export const documentSchema = (t: any) => yup.object().shape({
         .required(t('upload.form.validation.file.required'))
         .test('fileSize', t('upload.form.validation.file.size', { size: FILE_SIZE_MB }),
             (value) => !value || (value instanceof File && value.size <= FILE_SIZE_LIMIT))
-        .test('fileType', t('upload.form.validation.file.type'),  async (value) => {
+        .test('fileType', t('upload.form.validation.file.type'), async (value) => {
             if (!value) return false;
             const type = await fileTypeFromBlob(value as Blob);
             if (!type?.mime) return false;
