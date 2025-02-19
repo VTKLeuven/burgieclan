@@ -71,7 +71,7 @@ const NavigationSidebar = () => {
         {/* Collapse Toggle Button */}
         <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="absolute -right-3 top-4 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100"
+            className="absolute -right-3 top-4 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100 "
             aria-label={'toggle'}
         >
           {isCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
@@ -79,12 +79,12 @@ const NavigationSidebar = () => {
 
         {/* Top Navigation */}
         <nav className="p-4 space-y-2">
-          <a href={`/${i18n.language}`} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2">
+          <a href={`/${i18n.language}`} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2 transition-all duration-200 hover:scale-[1.01]">
             <Home size={20} />
             {!isCollapsed && <span>{t('sidebar.home')}</span>}
           </a>
           <button
-              className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 rounded p-2"
+              className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-2"
               onClick={() => toggleSection('courses')}
               aria-label={t('sidebar.toggle_courses')}
           >
@@ -97,7 +97,7 @@ const NavigationSidebar = () => {
           {/* Favorite Courses List */}
           {!isCollapsed && expandedSections.courses && (
 
-              <div className="p-4 space-y-2">
+              <div>
                 <ItemList
                     items={mapCoursesToItems(user!.favoriteCourses!)}
                     emptyMessage={t('account.favorite.no_courses')}
@@ -107,7 +107,7 @@ const NavigationSidebar = () => {
 
           )}
           <button
-              className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 rounded p-2"
+              className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-2"
               onClick={() => toggleSection('documents')}
               aria-label={t('sidebar.toggle_documents')}
           >
@@ -120,7 +120,7 @@ const NavigationSidebar = () => {
           </button>
           {/* Favorite Documents List */}
           {!isCollapsed && expandedSections.documents && (
-              <div className="p-4 space-y-2">
+              <div>
                 <ItemList
                     items={mapDocumentsToItems(user!.favoriteDocuments!)}
                     emptyMessage={t('account.favorite.no_documents')}
@@ -132,7 +132,8 @@ const NavigationSidebar = () => {
 
         {/* Add Document Button */}
         <button
-            className={`mx-4 my-2 flex items-center space-x-2 ${isCollapsed ? 'bg-transparent' : 'bg-indigo-600'} text-white rounded-md py-2 px-4 hover:${isCollapsed ? 'bg-transparent' : 'bg-indigo-700'}`}
+
+            className={`mx-4 my-2 flex items-center space-x-2 ${isCollapsed ? 'bg-transparent' : 'bg-indigo-600 hover:bg-indigo-700 transition-all duration-200 hover:scale-[1.01]'} text-white rounded-md py-2 px-4 hover:${isCollapsed ? 'bg-transparent' : 'bg-indigo-700'}`}
             aria-label={t('sidebar.add_document')}
             onClick={handleUploadButtonClick}
         >
