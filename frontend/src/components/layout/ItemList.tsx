@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
-import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarOutline } from '@fortawesome/free-regular-svg-icons';
 
@@ -12,7 +11,8 @@ interface ItemListProps {
 }
 
 const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, updateFavorite }) => {
-    const [favorites, setFavorites] = useState(items.map(item => true)); // Assuming all items are initially favorites
+    const [favorites, setFavorites] = useState(items.map(item => true));
+
     const toggleFavoriteStatus = (index: number) => {
         const newFavorites = [...favorites];
         newFavorites[index] = !newFavorites[index];
@@ -21,24 +21,42 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, updateFavorite
     };
 
     return (
-            <div className='p-4'>
-                {items && items.length > 0 ? (
-                    <ul className="space-y-4 list-none">
-                        {items.map((item, index) => (
-                            <li key={index} className="bg-gray-200 px-4 py-2 rounded-md shadow-sm flex justify-between items-center">
-                                <Link href={item.redirectUrl} className="hover:underline flex-1">
-                                    {item.name} {item.code && <span className="text-sm text-gray-500">[{item.code}]</span>}
+        <div>
+            {items && items.length > 0 ? (
+                <ul className="space-y-1 list-none p-0">
+                    {items.map((item, index) => (
+                        <li
+                            key={index}
+                            className="bg-gray-50 rounded hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01]"
+                        >
+                            <div className="flex items-center p-2 w-full">
+                                <Link
+                                    href={item.redirectUrl}
+                                    className="hover:underline flex-1 min-w-0"
+                                >
+                                    <div className="flex items-center overflow-hidden">
+                                        <span className="truncate">
+                                            {item.name}
+                                        </span>
+                                    </div>
                                 </Link>
-                                <button onClick={() => toggleFavoriteStatus(index)} className="ml-2 text-red-500">
-                                    <FontAwesomeIcon icon={favorites[index] ? faStar : faStarOutline} className="text-vtk-yellow-500" />
+                                <button
+                                    onClick={() => toggleFavoriteStatus(index)}
+                                    className="ml-2 hover:text-yellow-600 flex-shrink-0"
+                                >
+                                    <FontAwesomeIcon
+                                        icon={favorites[index] ? faStar : faStarOutline}
+                                        className="w-4 h-4 text-yellow-500"
+                                    />
                                 </button>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>{emptyMessage}</p>
-                )}
-            </div>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <p>{emptyMessage}</p>
+            )}
+        </div>
     );
 };
 
