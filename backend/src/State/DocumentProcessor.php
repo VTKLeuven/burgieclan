@@ -10,7 +10,6 @@ use App\ApiResource\CourseApi;
 use App\ApiResource\DocumentApi;
 use App\ApiResource\DocumentCategoryApi;
 use App\Entity\Document;
-use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
