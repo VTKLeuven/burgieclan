@@ -127,15 +127,6 @@ export default function UploadForm({
                         className="justify-end"
                     />
                 </div>
-
-                <div className="col-span-full mt-4 gap-3 pb-2">
-                    <Checkbox
-                        label={t('upload.form.anonymous.label')}
-                        {...register('anonymous')}
-                        disabled={isLoading || isLoadingFields}
-                        className="justify-end"
-                    />
-                </div>
             </div>
         </form>
     );
