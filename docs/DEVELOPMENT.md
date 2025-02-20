@@ -5,14 +5,13 @@
 ### Prerequisites
 
 - Docker Desktop / Docker Engine
-- Git
-- Make 
+- Make (optional)
   - Windows: Install via Chocolatey ([install guide](https://chocolatey.org/install)) using `choco install make`
   - Mac/Linux: Pre-installed by default
 
 ### Quick Start
 
-**Note**: If you haven't set up SSH for GitHub yet, follow [this guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
+> **Note**: If you haven't set up SSH for GitHub yet, follow [this guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
 
 ```powershell
 # Clone repository (SSH)
@@ -65,22 +64,7 @@ make db
 - User: burgieclan_db_user
 - Password: burgieclan_db_pass
 
-**Security Note**: These are development credentials only. Never use these in production.
-
-### Troubleshooting
-
-#### Port Conflicts
-If you see errors about ports being in use:
-```powershell
-# Check running containers
-docker ps
-
-# Stop conflicting containers
-docker stop <container-id>
-```
+> **Security Note**: These are development credentials only. Never use these in production.
 
 #### Common Issues
 TBC
-
-## Virtual Machine
-

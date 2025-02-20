@@ -55,7 +55,8 @@ The Burgieclan web app is divided in a frontend and a backend part. This decisio
 ## Local development setup
 
 ### Prerequisites
-- Docker and Docker Compose
+- Docker Desktop / Docker Engine
+- Git
 - Make (optional)
 
 ### Setup
@@ -74,7 +75,11 @@ exit
 make db
 ```
 
-> 📝 For detailed setup instructions, alternative setup options and available commands, see our [Development Guide](docs/DEVELOPMENT.md)
+<div style="padding: 1em 1em 0; border: 1px solid #ddd; border-radius: 4px; background-color:rgb(22, 25, 29); border-color: rgb(67, 99, 131)">
+
+📝 For detailed setup instructions, alternative setup options and available commands, see our [Development Guide](docs/DEVELOPMENT.md).
+
+</div>
 
 ## Contributing
 
@@ -84,15 +89,17 @@ There are many ways in which you can participate in this project, for example:
 * Review [source code changes](https://github.com/microsoft/vscode/pulls)
 * Review the [documentation](https://github.com/microsoft/vscode-docs) and make pull requests for anything from typos to additional and new content
 
-If you are interested in fixing issues and contributing directly to the code base,
-please see the document [Contribution Guide](docs/CONTRIBUTE.md), which covers the following:
+<div style="padding: 1em 1em 0; border: 1px solid #ddd; border-radius: 4px; background-color:rgb(22, 25, 29); border-color: rgb(67, 99, 131)">
+
+📝 If you are interested in fixing issues and contributing directly to the code base,
+please see the document [Contribution Guide](docs/CONTRIBUTE.md), which covers:
 
 * The development workflow, including debugging and running tests
 * Coding guidelines
 * Submitting pull requests
 * Finding an issue to work on
 * Contributing to translations
-
+</div>
 
 ## Setting up your own Burgieclan
 
