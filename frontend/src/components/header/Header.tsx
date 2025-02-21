@@ -15,10 +15,11 @@ import Link from 'next/link';
 
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const { user } = useUser();
-    const isAuthenticated = user !== null;
 
     const { t, i18n } = useTranslation();
+
+    const { user } = useUser();
+    const isAuthenticated = user !== null;
 
     const navigation = [
         { name: t('courses'), href: '#' },
@@ -79,7 +80,7 @@ export default function Header() {
                             <LanguageSwitcher />
 
                             {isAuthenticated
-                                ?   <HeaderProfileButton jwt={jwt}/>
+                                ?   <HeaderProfileButton />
                                 :   <Link href="login" className="primary-button min-w-28">
                                         {t('login')}
                                     </Link>
