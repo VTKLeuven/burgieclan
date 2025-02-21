@@ -4,7 +4,9 @@ import { Inter } from 'next/font/google'
 import CookieBanner from "@/components/cookie-banner/CookieBanner";
 import TranslationsProvider from "@/components/TranslationProvider";
 import initTranslations from "@/app/i18n";
-import {ToastProvider} from "@/components/ui/Toast";
+import { ToastProvider } from "@/components/ui/Toast";
+import { UserProvider } from "@/components/UserContext";
+import { getUserId } from "@/utils/dal";
 
 // Inter as default font
 const inter = Inter({
@@ -18,31 +20,31 @@ export const metadata: { description: string; title: string } = {
   description: "Vlaamse Technische Kring Leuven Burgieclan",
 };
 
-export default async function RootLayout({
-  children,
-  params: { locale },
-}: Readonly<{
-  children: React.ReactNode;
-  params: { locale: string };
-}>) {
-  const { resources } = await initTranslations(locale);
+export default async function RootLayout({ children, params: { locale }, }: Readonly<{ children: React.ReactNode; params: { locale: string }; }>) {
+  const [translations, userId] = await Promise.all([
+    initTranslations(locale),
+    getUserId()
+  ]);
+  const { resources } = translations;
 
   return (
-    // TranslationsProvider is a server component designed for root-level wrapping.
-    <TranslationsProvider
-      locale={locale}
-      resources={resources}>
-      <html lang="en" className={`${inter.className} h-full`}>
-        <body className="flex min-h-full">
-          {/* ToastProvider uses client-side hooks (useState, useContext) so must be placed inside body tags */}
-          <ToastProvider>
-            <div className="w-full">
-              {children}
-              <CookieBanner />
-            </div>
-          </ToastProvider>
-        </body>
-      </html>
-    </TranslationsProvider>
+    // UserProvider and TranslationsProvider are server components designed for root-level wrapping.
+    <UserProvider userId={userId}>
+      <TranslationsProvider
+        locale={locale}
+        resources={resources}>
+        <html lang={locale} className={`${inter.className} h-full`}>
+          <body className="flex min-h-full">
+            {/* ToastProvider uses client-side hooks (useState, useContext) so must be placed inside body tags */}
+            <ToastProvider>
+              <div className="w-full">
+                {children}
+                <CookieBanner />
+              </div>
+            </ToastProvider>
+          </body>
+        </html>
+      </TranslationsProvider>
+    </UserProvider>
   );
 }

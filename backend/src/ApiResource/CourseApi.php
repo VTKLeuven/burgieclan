@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Course;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -31,22 +32,27 @@ class CourseApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
+    #[Groups(['search', 'user', 'document:get'])]
     public ?string $name = null;
 
     #[Assert\NotBlank]
     #[Assert\Length(6)]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
+    #[Groups(['search', 'user', 'document:get'])]
     public ?string $code = null;
 
     #[Assert\NotBlank]
     #[Assert\Choice(choices: ['nl', 'en'], message: 'Choose a valid language.')]
     public ?string $language = null;
 
+    #[Groups('search')]
     public array $professors = [];
 
+    #[Groups('search')]
     public array $semesters = [];
 
     #[Assert\Positive]
+    #[Groups('search')]
     public ?int $credits = null;
 
     /**

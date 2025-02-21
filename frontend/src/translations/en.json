@@ -2,12 +2,12 @@
     "homepage": "Homepage",
     "login": "Login",
     "login_vtk": "Log in with VTK",
+    "logout": "Logout",
     "sign_in": "Sign in to your account",
     "or_log_in_manually": "Or log in manually",
     "login_invalid_credentials": "Bad credentials, please verify that your username/password are correctly set.",
     "username": "Username",
     "password": "Password",
-    "account": "Account",
     "profile": "Profile",
     "unexpected_error": "Unexpected error",
     "go_home": "Go back home",
@@ -17,6 +17,9 @@
     "open_menu": "Open menu",
     "close_menu": "Close menu",
     "courses": "Courses",
+    "modules": "Modules",
+    "programs": "Programs",
+    "documents": "Documents",
     "credits": "ECTS credits",
     "FAQ": "FAQ",
     "favorite": "Favorite",
@@ -133,5 +136,43 @@
         "exams": "Exams",
         "exams-description": "Lorem ipsum dolor sit amet",
         "error-fetching": "An error occurred while fetching the course data: "
+    },
+    "account": {
+        "account": "Account",
+        "greeting": "Hi, {{name}}!",
+        "welcome_text": "Welcome to your account page. Here you will find some information about your favorites and your contributions to Burgieclan.",
+        "details": "Account details",
+        "name": "Name",
+        "rnumber": "R-number",
+        "email": "Email",
+        "favorite": {
+            "courses": "Favorite courses",
+            "modules": "Favorite modules",
+            "programs": "Favorite programs",
+            "documents": "Favorite documents",
+            "no_courses": "You have no favorite courses yet.",
+            "no_modules": "You have no favorite modules yet.",
+            "no_programs": "You have no favorite programs yet.",
+            "no_documents": "You have no favorite documents yet."
+        },
+        "documents": {
+            "no_uploads": "You haven't uploaded any documents yet.",
+            "my": "My documents"
+        }
+    },
+    "document": {
+        "under_review": "Under review",
+        "approved": "Approved"
+    },
+    "pagination": {
+        "previous": "Previous",
+        "next": "Next"
+    },
+    "search": {
+        "placeholder": "Search...",
+        "info": "Search for courses, modules, programs, documents...",
+        "info_sub": "Quickly access any page by running a global search.",
+        "no_results": "No results found",
+        "no_results_sub": "Try searching for something else or check your spelling."
     }
 }
