@@ -1,55 +1,94 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star } from "lucide-react";
+import { useUser } from "@/components/UserContext";
+import {FavoriteType, useFavorites} from '@/hooks/useFavorites';
+import type { Course, Module, Program, Document } from '@/types/entities';
 
 interface FavoriteButtonProps {
-    initialFavorited?: boolean;                         // Whether the item is initially favorited
-    onFavorite: (isFavorite: boolean) => Promise<void>;  // Callback when the favorite status changes
-    disabled?: boolean;                                 // Whether the button is disabled
+    disabled?: boolean;
+    favoriteType: FavoriteType;
+    resourceId: number;
+    onFavoriteChange?: (isFavorited: boolean) => void;
+}
+
+type FavoriteResources = {
+    courses: Course[] | undefined;
+    modules: Module[] | undefined;
+    programs: Program[] | undefined;
+    documents: Document[] | undefined;
 }
 
 export default function FavoriteButton({
-    initialState = false,
-    onFavorite,
-    disabled = false
+    disabled = false,
+    favoriteType,
+    resourceId,
+    onFavoriteChange
 }: FavoriteButtonProps) {
-    const [isFavorite, setIsFavorite] = useState(initialState);
+    const { user, loading } = useUser();
+    const { updateFavorite } = useFavorites(user);
+    const [isFavorite, setIsFavorite] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
 
+    // Determine initial favorite state from user context
+    useEffect(() => {
+        if (!user || loading) return;
+
+        const favoritesList: FavoriteResources = {
+            courses: user.favoriteCourses,
+            modules: user.favoriteModules,
+            programs: user.favoritePrograms,
+            documents: user.favoriteDocuments
+        };
+
+        const currentList = favoritesList[favoriteType];
+        const isResourceFavorited = currentList?.some(
+            resource => resource.id === resourceId
+        );
+
+        setIsFavorite(!!isResourceFavorited);
+    }, [user, loading, favoriteType, resourceId]);
+
     const handleFavorite = async () => {
-        if (disabled) return;
+        if (disabled || !user) return;
+
+        // Update UI immediately
+        const newState = !isFavorite;
+        setIsFavorite(newState);
+        onFavoriteChange?.(newState);
 
         try {
-            const newState = !isFavorite;
-
-            // Call parent handler
-            await onFavorite(newState);
-
-            // Update local state
-            setIsFavorite(newState);
+            updateFavorite(resourceId, favoriteType, newState);
         } catch (error) {
-            // Revert on error
-            setIsFavorite(isFavorite);
-            console.error('Favorite action failed:', error);
+            // Revert UI state if the operation fails
+            console.error('Failed to update favorite status:', error);
+            setIsFavorite(!newState);
+            onFavoriteChange?.(!newState);
         }
     };
+
+    if (loading || !user) {
+        return null;
+    }
 
     return (
         <button
             className={`inline-flex items-center p-1 border rounded-2xl border-gray-500
-            ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-        `}
+                ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+            `}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={handleFavorite}
             disabled={disabled}
+            aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
         >
             <Star
                 size={20}
                 strokeWidth={isHovered ? '2' : '1.5'}
                 className={`
-                ${disabled ? '' : (isHovered ? 'text-yellow-400' : '')}
-                ${isFavorite ? 'text-yellow-400 fill-yellow-400' : 'text-gray-500'}
-            `}
+                    ${disabled ? '' : (isHovered ? 'text-yellow-400' : '')}
+                    ${isFavorite ? 'text-yellow-400 fill-yellow-400' : 'text-gray-500'}
+                    transition-colors duration-200
+                `}
             />
         </button>
     );

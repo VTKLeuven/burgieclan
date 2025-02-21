@@ -10,6 +10,7 @@ import LoadingPage from "@/components/loading/LoadingPage";
 import ErrorPage from "@/components/error/ErrorPage";
 import {ApiClient} from "@/actions/api";
 import UnderReviewBox from "@/components/document/UnderReviewBox";
+import {useUser} from "@/components/UserContext";
 
 interface DocumentData {
     "@context": string;
@@ -40,6 +41,9 @@ export default function DocumentPreview({id}: { id: string }) {
     // Used to scale pdf width to fit its parent container
     const [containerWidth, setContainerWidth] = useState<number>(0);
     const [isAnonymous, setIsAnonymous] = useState(false);
+
+    // User data
+    const { user } = useUser();
 
     const MAXWIDTH = 1000;
 
@@ -143,7 +147,14 @@ export default function DocumentPreview({id}: { id: string }) {
                                 fileName={documentData.filename}
                                 fileSize="3.6 MB"
                             />
-                            <FavoriteButton onFavorite={handleFavorite}/>
+                            <FavoriteButton
+                                disabled={!user}
+                                favoriteType="documents"
+                                resourceId={Number(id)}
+                                onFavoriteChange={(isFavorited) => {
+                                    console.log('Favorite status changed:', isFavorited);
+                                }}
+                            />
                         </div>
                     </div>
                     {(documentData && documentData.mimetype == "application/pdf") ? (
