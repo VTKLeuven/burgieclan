@@ -11,7 +11,7 @@ import {cache} from "react";
 
 export const isAuth = cache(async () => {
     const jwt = await getActiveJWT();
-    
+
     return jwt != null;
 })
 

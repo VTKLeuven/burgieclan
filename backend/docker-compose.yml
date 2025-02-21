@@ -1,5 +1,3 @@
-version: '3.5'
-
 services:
   db:
     image: mysql:8.0
@@ -12,12 +10,6 @@ services:
       MYSQL_DATABASE: burgieclan_db
       MYSQL_USER: burgieclan_db_user
       MYSQL_PASSWORD: burgieclan_db_pass
-
-  mailcatcher:
-    image: schickling/mailcatcher
-    ports:
-      - '1025:1025'
-      - '1080:1080'
 
 volumes:
   burgieclan-db: {}

@@ -69,8 +69,10 @@ final class PageFactory extends ModelFactory
     {
         $name = self::faker()->text(20);
         return [
-            'name' => $name,
-            'content' => self::faker()->text(2000),
+            'name_nl' => $name,
+            'content_nl' => self::faker()->text(2000),
+            'name_en' => $name . ' (en)',
+            'content_en' => '(en) ' . self::faker()->text(2000),
             'urlKey' => Page::createUrlKey($name),
             'publicAvailable' => self::faker()->boolean(),
         ];
