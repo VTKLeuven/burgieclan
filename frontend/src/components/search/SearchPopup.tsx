@@ -13,6 +13,7 @@ import {
 } from "@/components/search/SearchResult";
 import { objectToCourse, objectToDocument, objectToModule, objectToProgram } from '@/utils/objectToTypeConvertor';
 import { ApiClient } from '@/actions/api';
+import { useTranslation } from 'react-i18next';
 
 type SearchPopupProps = {
     open: boolean;
@@ -31,6 +32,8 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
     const [items, setItems] = useState<SearchResults>({ courses: [], modules: [], programs: [], documents: [] });
     const [error, setError] = useState<ApiError | null>(null);
     const [loading, setLoading] = useState(false);
+
+    const { t } = useTranslation();
 
     async function fetchSearch(query: string) {
         setLoading(true);
@@ -117,7 +120,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                             <ComboboxInput
                                 autoFocus
                                 className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
-                                placeholder="Search..."
+                                placeholder={t('search.placeholder')}
                                 onChange={(event) => setQuery(event.target.value)}
                                 onBlur={() => setQuery('')}
                             />
@@ -138,7 +141,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                         {error && (
                             <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
                                 <FaceFrownIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
-                                <p className="mt-4 font-semibold text-gray-900">An error occurred</p>
+                                <p className="mt-4 font-semibold text-gray-900">{t('unexpected_error')}</p>
                                 <p className="mt-2 text-gray-500">{error.message}</p>
                             </div>
                         )}
@@ -146,10 +149,8 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                         {!error && query.length <= 2 && (
                             <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
                                 <GlobeAmericasIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
-                                <p className="mt-4 font-semibold text-gray-900">Search for courses, modules, programs,
-                                    documents...</p>
-                                <p className="mt-2 text-gray-500">Quickly access any page by running a
-                                    global search.</p>
+                                <p className="mt-4 font-semibold text-gray-900">{t('search.info')}</p>
+                                <p className="mt-2 text-gray-500">{t('search.info_sub')}</p>
                             </div>
                         )}
 
@@ -161,7 +162,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                     className="max-h-[calc(100vh-15rem)] scroll-pb-2 scroll-pt-11 space-y-2 overflow-y-auto pb-2 pl-0"
                                 >
                                     {items.courses.length > 0 &&
-                                        <FoldableSection key={'courses'} title={'Courses'} defaultOpen={true}>
+                                        <FoldableSection key={'courses'} title={t('courses')} defaultOpen={true}>
                                             <li className="list-none">
                                                 <ul
                                                     className="mt-2 text-sm text-gray-800 pl-0"
@@ -174,7 +175,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                         </FoldableSection>
                                     }
                                     {items.modules.length > 0 &&
-                                        <FoldableSection key={'modules'} title={'Modules'} defaultOpen={true}>
+                                        <FoldableSection key={'modules'} title={t('modules')} defaultOpen={true}>
                                             <li className="list-none">
                                                 <ul
                                                     className="mt-2 text-sm text-gray-800 pl-0"
@@ -187,7 +188,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                         </FoldableSection>
                                     }
                                     {items.programs.length > 0 &&
-                                        <FoldableSection key={'programs'} title={'Programs'} defaultOpen={true}>
+                                        <FoldableSection key={'programs'} title={t('programs')} defaultOpen={true}>
                                             <li className="list-none">
                                                 <ul
                                                     className="mt-2 text-sm text-gray-800 pl-0"
@@ -200,7 +201,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                         </FoldableSection>
                                     }
                                     {items.documents.length > 0 &&
-                                        <FoldableSection key={'documents'} title={'Documents'} defaultOpen={true}>
+                                        <FoldableSection key={'documents'} title={t('documents')} defaultOpen={true}>
                                             <li className="list-none">
                                                 <ul
                                                     className="mt-2 text-sm text-gray-800 pl-0"
@@ -219,9 +220,8 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                         {!error && !loading && query.length > 2 && Object.values(items).every(value => Array.isArray(value) && value.length === 0) && (
                             <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
                                 <FaceFrownIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
-                                <p className="mt-4 font-semibold text-gray-900">No results found</p>
-                                <p className="mt-2 text-gray-500">We couldn’t find anything with that term. Please try
-                                    again.</p>
+                                <p className="mt-4 font-semibold text-gray-900">{t('search.no_results')}</p>
+                                <p className="mt-2 text-gray-500">{t('search.no_results_sub')}</p>
                             </div>
                         )}
                     </Combobox>

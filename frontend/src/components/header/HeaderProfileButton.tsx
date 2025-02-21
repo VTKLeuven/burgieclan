@@ -22,6 +22,7 @@ export default function HeaderProfileButton() {
     const router = useRouter()
 
     const { user } = useUser();
+    const isAuthenticated = user !== null;
 
     const onClickLogout = async () => {
         await logOut();
@@ -30,7 +31,7 @@ export default function HeaderProfileButton() {
 
     return(
         <>
-            {user ?
+            {isAuthenticated ?
                 <DropdownMenu>
                     <DropdownMenuTrigger>
                         <CircleUserRound className="" size={28} strokeWidth={1.5}/>
