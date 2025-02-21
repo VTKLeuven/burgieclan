@@ -7,20 +7,18 @@
  */
 
 import { useState, useMemo } from 'react';
-import { pdfjs, Document, Page } from 'react-pdf';
+import { Document, Page } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
+import * as pdfjsLib from "pdfjs-dist";
 
 const PAGES_PER_LOAD = 10;
 
 type PDFFile = string | File | null;
 
 // PDF worker from pdfjs-dist
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    'pdfjs-dist/build/pdf.worker.min.mjs',
-    import.meta.url,
-).toString();
+pdfjsLib.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/build/pdf.worker.min.mjs").toString();
 
 export default function PDFViewer({ fileArg, width }: { fileArg: PDFFile, width: number }): JSX.Element {
     // PDF file to display
