@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\DocumentRepository;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -35,6 +36,9 @@ class Document extends Node
 
     #[ORM\Column(nullable: true)]
     private ?string $file_name = null;
+
+    #[ORM\Column(length: 5, nullable: true)]
+    private ?string $year = null;
 
     public function getId(): ?int
     {
@@ -119,5 +123,52 @@ class Document extends Node
     public function __toString(): string
     {
         return $this->getName();
+    }
+
+    public function getYear(): ?string
+    {
+        return $this->year;
+    }
+
+    public function setYear(?string $year): static
+    {
+        $this->year = $year;
+
+        return $this;
+    }
+
+    /**
+     * Get the academic year choices based on the current year and the first year
+     *
+     * @param int $amountOfYears The number of years to generate choices for, default is 10
+     * @param string|null $firstYear The first year to start generating choices from, default is null
+     * @return array The array of academic year choices
+     */
+    public static function getAcademicYearChoices(int $amountOfYears = 10, string $firstYear = null): array
+    {
+        $currentYear = (int)date('Y');
+        // Calculate the date of the last Monday of September
+        $lastMondayOfSeptember = new DateTime('last monday of september ' . $currentYear);
+        $today = new DateTime();
+
+        if ($today <= $lastMondayOfSeptember) {
+            // If today is before the last Monday of September, we are still in the previous academic year
+            $currentYear--;
+        }
+
+        if (!is_null($firstYear)) {
+            $firstYear = (int)substr($firstYear, 0, 2);
+            $firstYear += ($firstYear > (int)date('y')) ? 1900 : 2000; // TODO fix this Y2.1K bug
+            $amountOfYears = max($amountOfYears, $currentYear - $firstYear + 1);
+        }
+
+            $choices = [];
+        for ($i = 0; $i < $amountOfYears; $i++) {
+            $startYear = $currentYear - $i;
+            $endYear = $startYear + 1;
+            $formattedYear = sprintf('%02d-%02d', $startYear % 100, $endYear % 100);
+            $choices[$formattedYear] = $formattedYear;
+        }
+        return $choices;
     }
 }
