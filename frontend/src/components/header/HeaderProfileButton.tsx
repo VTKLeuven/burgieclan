@@ -10,7 +10,6 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { CircleUserRound } from 'lucide-react';
-import { parseJWT } from "@/utils/oauth";
 import { logOut } from "@/actions/oauth";
 import { useRouter } from 'next/navigation'
 import {useUser} from "@/components/UserContext";
