@@ -30,8 +30,7 @@ security:
         files:
             pattern: ^/files
             stateless: true
-            jwt:
-                provider: database_users
+            jwt: ~
 
         api:
             pattern: ^/api
