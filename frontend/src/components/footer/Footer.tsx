@@ -75,10 +75,10 @@ export default function Footer() {
                     {/* Social Links Section */}
                     <div className="flex space-x-6 md:order-3  md:mt-0">
                         {navigation.map((item) => (
-                            <a key={item.name} href={item.href} className="text-gray-400 hover:text-gray-500">
+                            <Link key={item.name} href={item.href} className="text-gray-400 hover:text-gray-500">
                                 <span className="sr-only">{item.name}</span>
                                 <item.icon aria-hidden="true" className="h-6 w-6" />
-                            </a>
+                            </Link>
                         ))}
                     </div>
 
@@ -88,9 +88,9 @@ export default function Footer() {
                             {t('report_issue')}
                         </Link>
                         <p className={styles.footerText}>{" or "}</p>
-                        <a href="https://github.com/VTKLeuven/burgieclan" className={styles.footerLink}>
+                        <Link href="https://github.com/VTKLeuven/burgieclan" className={styles.footerLink}>
                             {t('contribute_github')}<span><ArrowTopRightOnSquareIcon className="h-3 w-3 inline-block ml-0.5 mb-1 text-gray-500" aria-hidden="true" /></span>
-                        </a>
+                        </Link>
                     </div>
 
                     {/* Copyright Section */}
