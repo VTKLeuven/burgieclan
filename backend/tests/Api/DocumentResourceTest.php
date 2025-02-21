@@ -38,6 +38,7 @@ class DocumentResourceTest extends ApiTestCase
             'category',
             'year',
             'under_review',
+            'contentUrl',
             'creator',
             'createdAt',
             'updatedAt',
