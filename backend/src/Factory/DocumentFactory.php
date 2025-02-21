@@ -82,9 +82,9 @@ final class DocumentFactory extends ModelFactory
 
     private function generateYear(): string
     {
-        $startYear = self::faker()->numberBetween(15, 24);
+        $startYear = self::faker()->numberBetween(1999, 2024);
         $endYear = $startYear + 1;
-        return sprintf('%02d-%02d', $startYear, $endYear);
+        return sprintf('%d - %d', $startYear, $endYear);
     }
 
     /**

@@ -3,6 +3,7 @@
 import Input from "@/components/ui/Input";
 import React, { useEffect, useRef, useState } from "react";
 import SearchPopup from "../search/SearchPopup";
+import { useTranslation } from "react-i18next";
 
 export default function Search() {
     const searchInputRef = useRef<HTMLInputElement | null>(null);
@@ -10,6 +11,7 @@ export default function Search() {
     const [searchPopupOpen, setSearchPopupOpen] = useState(false);
     const [placeholder, setPlaceholder] = useState('Search...');
 
+    const { t } = useTranslation();
 
     /**
      * Show the keyboard shortcut in the placeholder only on larger screens
@@ -17,10 +19,10 @@ export default function Search() {
     useEffect(() => {
         const updatePlaceholder = () => {
             if (window.innerWidth < 768) {
-                setPlaceholder('Search...');
+                setPlaceholder(t('search.placeholder'));
             } else {
                 const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-                setPlaceholder(`Search... (${isMac ? '⌘' : 'Ctrl'}+K)`);
+                setPlaceholder(`${t('search.placeholder')} (${isMac ? '⌘' : 'Ctrl'}+K)`);
             }
         };
 
@@ -30,7 +32,7 @@ export default function Search() {
         return () => {
             window.removeEventListener('resize', updatePlaceholder);
         };
-    }, []);
+    }, [t]);
 
     /**
      * Ctrl+K or Cmd+K to open search popup (not in mobile mode)

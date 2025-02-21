@@ -1,4 +1,4 @@
-import type { Course, Module, Program, Document } from "./types";
+import type { Course, Module, Program, Document } from "@/types/entities";
 
 export function objectToCourse(obj: Record<string, any>): Course {
     return {
