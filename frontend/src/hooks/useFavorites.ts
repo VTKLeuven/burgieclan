@@ -2,7 +2,7 @@ import { ApiClient } from "@/actions/api";
 import { ApiError } from "@/utils/error/apiError";
 import { User } from "@/types/entities";
 
-type FavoriteType = "courses" | "modules" | "programs" | "documents";
+export type FavoriteType = "courses" | "modules" | "programs" | "documents";
 
 export function useFavorites(user: User | null) {
     const updateFavorite = async (id: number, type: FavoriteType, isFavorite: boolean) => {
