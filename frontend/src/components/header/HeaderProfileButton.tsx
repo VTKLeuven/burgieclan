@@ -13,21 +13,16 @@ import { CircleUserRound } from 'lucide-react';
 import { parseJWT } from "@/utils/oauth";
 import { logOut } from "@/actions/oauth";
 import { useRouter } from 'next/navigation'
+import {useUser} from "@/components/UserContext";
 
 /**
  * Shows login button if unauthenticated, otherwise dropdown with profile options
  */
-export default function HeaderProfileButton({jwt} : {jwt : string | null}) {
+export default function HeaderProfileButton() {
     const router = useRouter()
 
-    const isAuthenticated = jwt !== null;
-    let fullName : string;
-    let username : string;
-
-    if (jwt != null) {
-        fullName = parseJWT(jwt).fullName;
-        username = parseJWT(jwt).username;
-    }
+    const { user } = useUser();
+    const isAuthenticated = user !== null;
 
     const onClickLogout = async () => {
         await logOut();
@@ -42,8 +37,8 @@ export default function HeaderProfileButton({jwt} : {jwt : string | null}) {
                         <CircleUserRound className="" size={28} strokeWidth={1.5}/>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuLabel className="pt-1.5 pb-1">{fullName}</DropdownMenuLabel>
-                        <DropdownMenuLabel className="text-gray-600 pt-0 pb-1.5 text-xs">{username}</DropdownMenuLabel>
+                        <DropdownMenuLabel className="pt-1.5 pb-1">{user?.fullName}</DropdownMenuLabel>
+                        <DropdownMenuLabel className="text-gray-600 pt-0 pb-1.5 text-xs">{user?.username}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem><a className="font-normal" href="profile">Profile</a></DropdownMenuItem>
                         <DropdownMenuItem><a className="font-normal" href="https://vtk.be/account/">My VTK</a></DropdownMenuItem>
