@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 interface ComboboxControllerProps {
     value: string | undefined;
-    onChange: (value: string) => void;
+    onChange: (value: string | number) => void;
     onBlur: () => void;
     options: Option[];
     placeholder?: string;
@@ -17,15 +17,15 @@ interface ComboboxControllerProps {
 }
 
 const ComboboxController: React.FC<ComboboxControllerProps> = ({
-                                                                   value,
-                                                                   onChange,
-                                                                   onBlur,
-                                                                   options,
-                                                                   placeholder,
-                                                                   disabled,
-                                                                   visibleOptions,
-                                                                   name,
-                                                               }) => {
+    value,
+    onChange,
+    onBlur,
+    options,
+    placeholder,
+    disabled,
+    visibleOptions,
+    name,
+}) => {
     const { t } = useTranslation();
     // Maintain a query for filtering the options.
     const [query, setQuery] = useState('');
@@ -40,7 +40,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
     const filteredOptions = useMemo(() => {
         if (!query) return options;
         return options.filter((option) =>
-            option.name.toLowerCase().includes(query.toLowerCase())
+            option.name?.toLowerCase().includes(query.toLowerCase())
         );
     }, [options, query]);
 

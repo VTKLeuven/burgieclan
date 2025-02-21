@@ -128,7 +128,7 @@ export const parseJWT = (jwt: string): JWTPayload => {
         const base64Str = base64Url.replace(/-/g, '+').replace(/_/g, '/');
         const decodedPayload = atob(base64Str);
         const parsedPayload = JSON.parse(decodedPayload);
-        if (typeof(parsedPayload.exp) !== 'number') {
+        if (typeof (parsedPayload.exp) !== 'number') {
             throw new Error("Failed to parse JWT: Expiration time is missing.");
         }
 
@@ -145,6 +145,11 @@ export const getJWTExpiration = (jwt: string): number => {
     const parsedJWT = parseJWT(jwt);
     return parsedJWT?.exp;
 };
+
+export const getJWTUserId = (jwt: string): number => {
+    const parsedJWT = parseJWT(jwt);
+    return parsedJWT?.id;
+}
 
 /**
  * Redirects the user to Litus where they should authenticate, after which the Litus authentication server

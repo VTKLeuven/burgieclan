@@ -43,6 +43,8 @@ final class DocumentProcessor implements ProcessorInterface
             throw new BadRequestHttpException('"category" is required'));
         $dto->category = $category;
 
+        $dto->year = $request->get('year');
+
         // Convert the documentDto to an actual Document.
         $document = $this->microMapper->map($dto, Document::class);
         assert($document instanceof Document);
