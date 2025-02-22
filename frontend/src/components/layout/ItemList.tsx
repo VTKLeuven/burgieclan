@@ -21,13 +21,12 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, updateFavorite
         setFavorites(newFavorites);
         updateFavorite(index, newFavorites[index]);
     };
-    const startIndex = currentPage * itemsPerList;
-    const displayedItems = items.slice(startIndex, startIndex + itemsPerList);
+    const displayedItems = items.slice(0, itemsPerList);
 
     return (
         <div>
             {items && items.length > 0 ? (
-                <ul className="space-y-0.5 list-none p-0">
+                <ul className="space-y-0 list-none p-0">
                     {displayedItems.map((item, index) => (
                         <li
                             key={index}
@@ -41,10 +40,11 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, updateFavorite
                                     <div className="flex items-center overflow-hidden">
                                         <span className="truncate text-gray-700 text-sm font-normal">
                                             {item.name}
-                                            {item.code && <span className="text-gray-400 ml-1">({item.code})</span>}
+                                            {item.code && <span className="text-gray-400 ml-1 text-xs">({item.code})</span>}
                                         </span>
                                     </div>
                                 </Link>
+                                {/*#TODO add function to unfavorite with clicking the star*/}
                                 <button
                                     onClick={() => toggleFavoriteStatus(index)}
                                     className="ml-2 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-100"
@@ -61,24 +61,16 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, updateFavorite
             ) : (
                 <p>{emptyMessage}</p>
             )}
-            <div className="flex justify-center mt-2 space-x-4">
-                {currentPage > 0 && (
-                    <button
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                        className="py-1 px-2 rounded-md bg-indigo-600 text-white transition-all duration-200 hover:scale-[1.01] hover:bg-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed"
+            {items.length > itemsPerList && (
+                <div className="flex justify-center mt-3">
+                    <Link
+                        href="/en/account"
+                        className="py-1 px-2 rounded text-gray-600 text-sm hover:bg-gray-100 transition-colors duration-100"
                     >
-                        Back
-                    </button>
-                )}
-                {items.length > (currentPage + 1) * itemsPerList && (
-                    <button
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                        className="py-1 px-2 rounded-md bg-indigo-600 text-white transition-all duration-200 hover:scale-[1.01] hover:bg-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Next
-                    </button>
-                )}
-            </div>
+                        View All
+                    </Link>
+                </div>
+            )}
         </div>
     );
 };
