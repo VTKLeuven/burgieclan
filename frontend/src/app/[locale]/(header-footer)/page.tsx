@@ -11,12 +11,7 @@ export default async function Homepage({ params: { locale } }: { params: { local
             {/* Main Content */}
             <div className="flex flex-1">
                 {/* Sidebar */}
-                <aside className="w-64 border-r">
-                    <div className="p-4">
-                        <Sidebar/>
-                    </div>
-                </aside>
-
+                    <Sidebar/>
                 <HomePage/>
             </div>
         </div>

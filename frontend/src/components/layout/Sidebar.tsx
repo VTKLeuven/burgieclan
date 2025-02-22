@@ -8,17 +8,15 @@ import UploadDialog from '@/components/upload/UploadDialog';
 import Loading from "@/app/[locale]/loading";
 import ItemList from '@/components/layout/ItemList';
 import type { Course, Document } from "@/types/entities";
-import {useFavorites} from "@/hooks/useFavorites";
+import { useFavorites } from "@/hooks/useFavorites";
+import Link from 'next/link';
+import Image from 'next/image';
 
 const mapCoursesToItems = (courses: Course[]) => {
   return courses.map(course => ({
     name: course.name,
     code: course.code,
-    redirectUrl: `/courses/${course.id}<itemList
-                title={t('account.favorite.courses')}
-                items={mapCoursesToItems(user!.favoriteCourses!)}
-                emptyMessage={t('account.favorite.no_courses')}
-      />`
+    redirectUrl: `/courses/${course.id}`
   }));
 };
 
@@ -48,7 +46,7 @@ const NavigationSidebar = () => {
   } = useFavorites(user);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
-    setExpandedSections(prev => ({
+    setExpandedSections((prev) => ({
       ...prev,
       [section]: !prev[section]
     }));
@@ -67,112 +65,115 @@ const NavigationSidebar = () => {
   }
 
   return (
-      <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-screen bg-white border-r border-gray-200 flex flex-col`}>
-        {/* Collapse Toggle Button */}
-        <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="absolute -right-3 top-4 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100 "
-            aria-label={'toggle'}
-        >
-          {isCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
-        </button>
-
-        {/* Top Navigation */}
-        <nav className="p-4 space-y-2">
-          <a href={`/${i18n.language}`} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2 transition-all duration-200 hover:scale-[1.01]">
-            <Home size={20} />
-            {!isCollapsed && <span>{t('sidebar.home')}</span>}
-          </a>
+      <aside className="w-64 border-r">
+        <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-screen bg-white border-r border-gray-200 flex flex-col`}>
+          {/* Collapse Toggle Button */}
           <button
-              className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-2"
-              onClick={() => toggleSection('courses')}
-              aria-label={t('sidebar.toggle_courses')}
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="absolute -right-3 top-4 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100"
+              aria-label={'toggle'}
           >
-            <div className="flex items-center space-x-2">
-              <FolderClosed size={20} />
-              {!isCollapsed && <span>{t('sidebar.my_courses')}</span>}
-            </div>
-            {!isCollapsed && (expandedSections.courses ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+            {isCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
           </button>
-          {/* Favorite Courses List */}
-          {!isCollapsed && expandedSections.courses && (
 
-              <div>
+          {/* Top Navigation */}
+          <nav className="p-4 space-y-2">
+            <Link href={`/${i18n.language}`} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2 transition-all duration-200 hover:scale-[1.01]">
+              <button
+                onClick ={() => setIsCollapsed(false)}
+                >
+                <Home size={20} />
+              </button>
+              {!isCollapsed && <span>{t('sidebar.home')}</span>}
+            </Link>
+            <button
+                className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-2"
+                onClick={() => {
+                  toggleSection('courses');
+                  setIsCollapsed(false);
+            }}
+                aria-label={t('sidebar.toggle_courses')}
+            >
+              <div className="flex items-center space-x-2">
+                <FolderClosed size={20} />
+                {!isCollapsed && <span>{t('sidebar.my_courses')}</span>}
+              </div>
+              {!isCollapsed && (expandedSections.courses ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+            </button>
+            {/* Favorite Courses List */}
+            {!isCollapsed && expandedSections.courses && (
                 <ItemList
                     items={mapCoursesToItems(user!.favoriteCourses!)}
                     emptyMessage={t('account.favorite.no_courses')}
                     updateFavorite={updateFavoriteCourse}
                 />
+            )}
+            <button
+                className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-2"
+                onClick={() => {
+                  toggleSection('documents');
+                  setIsCollapsed(false);
+                }}
+                aria-label={t('sidebar.toggle_documents')}
+            >
+              <div className="flex items-center space-x-2">
+                <File size={20} />
+                {!isCollapsed && <span>{t('sidebar.my_favorite_documents')}</span>}
               </div>
-
-          )}
-          <button
-              className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-2"
-              onClick={() => toggleSection('documents')}
-              aria-label={t('sidebar.toggle_documents')}
-          >
-            <div className="flex items-center space-x-2">
-              <File size={20} />
-              {!isCollapsed && <span>{t('sidebar.my_documents')}</span>}
-            </div>
-            {!isCollapsed && (expandedSections.documents ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
-
-          </button>
-          {/* Favorite Documents List */}
-          {!isCollapsed && expandedSections.documents && (
-              <div>
+              {!isCollapsed && (expandedSections.documents ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+            </button>
+            {/* Favorite Documents List */}
+            {!isCollapsed && expandedSections.documents && (
                 <ItemList
                     items={mapDocumentsToItems(user!.favoriteDocuments!)}
                     emptyMessage={t('account.favorite.no_documents')}
                     updateFavorite={updateFavoriteDocument}
                 />
-              </div>
-          )}
-        </nav>
+            )}
+          </nav>
 
-        {/* Add Document Button */}
-        <button
+          {/* Add Document Button */}
+          <button
+              className={`mx-4 my-2 flex items-center space-x-2 ${isCollapsed ? 'bg-transparent' : 'bg-indigo-600 hover:bg-indigo-700 transition-all duration-200 hover:scale-[1.01]'} text-white rounded-md py-2 px-4 hover:${isCollapsed ? 'bg-transparent' : 'bg-indigo-700'}`}
+              aria-label={t('sidebar.add_document')}
+              onClick={handleUploadButtonClick}
+          >
+            <Plus size={20} />
+            {!isCollapsed && <span>{t('sidebar.add_document')}</span>}
+          </button>
 
-            className={`mx-4 my-2 flex items-center space-x-2 ${isCollapsed ? 'bg-transparent' : 'bg-indigo-600 hover:bg-indigo-700 transition-all duration-200 hover:scale-[1.01]'} text-white rounded-md py-2 px-4 hover:${isCollapsed ? 'bg-transparent' : 'bg-indigo-700'}`}
-            aria-label={t('sidebar.add_document')}
-            onClick={handleUploadButtonClick}
-        >
-          <Plus size={20} />
-          {!isCollapsed && <span>{t('sidebar.add_document')}</span>}
-        </button>
-
-
-        {/* User Profile - Fixed at Bottom #TODO add avatar input*/}
-        <div className="mt-auto border-t border-gray-200">
-          <div className="p-4 flex items-center space-x-3">
-            <img
-                src={'/images/icons/empty_profile.png'}
-                alt={t('sidebar.user_avatar')}
-                className="w-8 h-8 rounded-full"
-            />
-            {!isCollapsed && <span className="text-sm text-gray-700">{user?.fullName}</span>}
+          {/* User Profile - Fixed at Bottom #TODO add avatar input */}
+          <div className="mt-auto border-t border-gray-200">
+            <div className="p-4 flex items-center space-x-3">
+              <Image
+                  src={'/images/icons/empty_profile.png'}
+                  alt={t('sidebar.user_avatar')}
+                  className="w-8 h-8 rounded-full"
+                  width={32}
+                  height={32}
+              />
+              {!isCollapsed && <span className="text-sm text-gray-700">{user?.fullName}</span>}
+            </div>
+            {!isCollapsed && (
+                <div className="px-4 pb-2 space-y-2">
+                  <Link href="vtk.be" className="block text-sm text-gray-600 hover:text-gray-800">
+                    {t('sidebar.go_to_vtk')}
+                  </Link>
+                  <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded mt-8 hover:bg-red-600 active:bg-red-700 transition duration-150 ease-in-out">
+                    {t('sidebar.log_out')}
+                  </button>
+                </div>
+            )}
           </div>
-          {!isCollapsed && (
-              <div className="px-4 pb-2 space-y-2">
-                <a href="vtk.be" className="block text-sm text-gray-600 hover:text-gray-800">
-                  {t('sidebar.go_to_vtk')}
-                </a>
-                <button  onClick={handleLogout}
-                         className="bg-red-500 text-white px-4 py-2 rounded mt-8 hover:bg-red-600 active:bg-red-700 transition duration-150 ease-in-out"
-                >
-                  {t('sidebar.log_out')}
-                </button>
-              </div>
-          )}
-        </div>
 
-        {/* Upload Dialog */}
-        <UploadDialog
-            isOpen={isUploadDialogOpen}
-            onClose={handleUploadDialogClose}
-            initialFile={null}
-        />
-      </div>
+          {/* Upload Dialog */}
+          <UploadDialog
+              isOpen={isUploadDialogOpen}
+              onClose={handleUploadDialogClose}
+              initialFile={null}
+          />
+        </div>
+      </aside>
   );
 };
 

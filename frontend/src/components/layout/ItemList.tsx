@@ -12,6 +12,8 @@ interface ItemListProps {
 
 const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, updateFavorite }) => {
     const [favorites, setFavorites] = useState(items.map(item => true));
+    const itemsPerList = 5;
+    const [currentPage, setCurrentPage] = useState(0);
 
     const toggleFavoriteStatus = (index: number) => {
         const newFavorites = [...favorites];
@@ -19,34 +21,37 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, updateFavorite
         setFavorites(newFavorites);
         updateFavorite(index, newFavorites[index]);
     };
+    const startIndex = currentPage * itemsPerList;
+    const displayedItems = items.slice(startIndex, startIndex + itemsPerList);
 
     return (
         <div>
             {items && items.length > 0 ? (
-                <ul className="space-y-1 list-none p-0">
-                    {items.map((item, index) => (
+                <ul className="space-y-0.5 list-none p-0">
+                    {displayedItems.map((item, index) => (
                         <li
                             key={index}
-                            className="bg-gray-50 rounded hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01]"
+                            className="group rounded-sm hover:bg-gray-100 transition-colors duration-100"
                         >
-                            <div className="flex items-center p-2 w-full">
+                            <div className="flex items-center py-1.5 px-2 w-full">
                                 <Link
                                     href={item.redirectUrl}
-                                    className="hover:underline flex-1 min-w-0"
+                                    className="flex-1 min-w-0"
                                 >
                                     <div className="flex items-center overflow-hidden">
-                                        <span className="truncate">
+                                        <span className="truncate text-gray-700 text-sm font-normal">
                                             {item.name}
+                                            {item.code && <span className="text-gray-400 ml-1">({item.code})</span>}
                                         </span>
                                     </div>
                                 </Link>
                                 <button
                                     onClick={() => toggleFavoriteStatus(index)}
-                                    className="ml-2 hover:text-yellow-600 flex-shrink-0"
+                                    className="ml-2 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-100"
                                 >
                                     <FontAwesomeIcon
                                         icon={favorites[index] ? faStar : faStarOutline}
-                                        className="w-4 h-4 text-yellow-500"
+                                        className="w-3.5 h-3.5"
                                     />
                                 </button>
                             </div>
@@ -56,6 +61,24 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, updateFavorite
             ) : (
                 <p>{emptyMessage}</p>
             )}
+            <div className="flex justify-center mt-3 space-x-2">
+                {currentPage > 0 && (
+                    <button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        className="py-1 px-2 rounded text-gray-600 text-sm hover:bg-gray-100 transition-colors duration-100"
+                    >
+                        Back
+                    </button>è
+                )}
+                {items.length > (currentPage + 1) * itemsPerList && (
+                    <button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        className="py-1 px-2 rounded text-gray-600 text-sm hover:bg-gray-100 transition-colors duration-100"
+                    >
+                        Next
+                    </button>
+                )}
+            </div>
         </div>
     );
 };
