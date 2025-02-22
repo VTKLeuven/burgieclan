@@ -77,7 +77,7 @@ const NavigationSidebar = () => {
           </button>
 
           {/* Top Navigation */}
-          <nav className="p-4 space-y-2">
+          <nav className="p-4 flex flex-col gap-2">
             <Link href={`/${i18n.language}`} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2 transition-all duration-200 hover:scale-[1.01]">
               <button
                 onClick ={() => setIsCollapsed(false)}
@@ -86,12 +86,13 @@ const NavigationSidebar = () => {
               </button>
               {!isCollapsed && <span>{t('sidebar.home')}</span>}
             </Link>
+            <div className="border-t border-gray-300" />
             <button
-                className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-2"
+                className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0"
                 onClick={() => {
                   toggleSection('courses');
                   setIsCollapsed(false);
-            }}
+                }}
                 aria-label={t('sidebar.toggle_courses')}
             >
               <div className="flex items-center space-x-2">
@@ -108,8 +109,9 @@ const NavigationSidebar = () => {
                     updateFavorite={updateFavoriteCourse}
                 />
             )}
+            <div className="border-t border-gray-300" />
             <button
-                className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-2"
+                className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0"
                 onClick={() => {
                   toggleSection('documents');
                   setIsCollapsed(false);
@@ -134,7 +136,7 @@ const NavigationSidebar = () => {
 
           {/* Add Document Button */}
           <button
-              className={`mx-4 my-2 flex items-center space-x-2 ${isCollapsed ? 'bg-transparent' : 'bg-indigo-600 hover:bg-indigo-700 transition-all duration-200 hover:scale-[1.01]'} text-white rounded-md py-2 px-4 hover:${isCollapsed ? 'bg-transparent' : 'bg-indigo-700'}`}
+              className={`mx-4 my-2 flex items-center space-x-2 ${isCollapsed ? 'bg-transparent' : 'bg-amber-600 hover:bg-amber-700 transition-all duration-200 hover:scale-[1.01]'} text-white rounded-md py-2 px-4 hover:${isCollapsed ? 'bg-transparent' : 'bg-indigo-700'}`}
               aria-label={t('sidebar.add_document')}
               onClick={handleUploadButtonClick}
           >
