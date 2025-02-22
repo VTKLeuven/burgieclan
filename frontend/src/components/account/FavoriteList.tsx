@@ -21,7 +21,6 @@ const FavoriteList: React.FC<FavoriteListProps> = ({ title, items, emptyMessage,
         updateFavorite(index, newFavorites[index]);
     };
 
-
     return (
         <CollapsibleSection
             header={
