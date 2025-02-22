@@ -61,19 +61,19 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, updateFavorite
             ) : (
                 <p>{emptyMessage}</p>
             )}
-            <div className="flex justify-center mt-3 space-x-2">
+            <div className="flex justify-center mt-2 space-x-4">
                 {currentPage > 0 && (
                     <button
                         onClick={() => setCurrentPage(currentPage - 1)}
-                        className="py-1 px-2 rounded text-gray-600 text-sm hover:bg-gray-100 transition-colors duration-100"
+                        className="py-1 px-2 rounded-md bg-indigo-600 text-white transition-all duration-200 hover:scale-[1.01] hover:bg-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Back
-                    </button>è
+                    </button>
                 )}
                 {items.length > (currentPage + 1) * itemsPerList && (
                     <button
                         onClick={() => setCurrentPage(currentPage + 1)}
-                        className="py-1 px-2 rounded text-gray-600 text-sm hover:bg-gray-100 transition-colors duration-100"
+                        className="py-1 px-2 rounded-md bg-indigo-600 text-white transition-all duration-200 hover:scale-[1.01] hover:bg-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Next
                     </button>
