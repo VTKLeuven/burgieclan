@@ -42,8 +42,8 @@ final class DocumentProcessor implements ProcessorInterface
         $category = $this->iriConverter->getResourceFromIri($request->get('category') ??
             throw new BadRequestHttpException('"category" is required'));
         $dto->category = $category;
-        $dto->under_review = $request->get('under_review') ??
-            throw new BadRequestHttpException('"under_review" is required');
+
+        $dto->year = $request->get('year');
 
         // Convert the documentDto to an actual Document.
         $document = $this->microMapper->map($dto, Document::class);

@@ -1,5 +1,6 @@
 "use client"
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export function cookieConsentGiven() {
     return localStorage.getItem('cookie_consent') ?? 'undecided';
@@ -7,6 +8,8 @@ export function cookieConsentGiven() {
 
 const CookieBanner = () => {
     const [consentGiven, setConsentGiven] = useState('');
+
+    const { t } = useTranslation();
 
     useEffect(() => {
         // We want this to only run once the client loads
@@ -25,16 +28,14 @@ const CookieBanner = () => {
                 <div
                     className="pointer-events-auto ml-auto max-w-xl rounded-xl bg-white p-6 shadow-lg ring-1 ring-gray-900/10">
                     <p className="text-sm leading-6 text-gray-900">
-                        This website only uses functional cookies to provide you a smooth experience. No other
-                        cookies
-                        are used.
+                        {t('cookie_banner_text')}
                     </p>
                     <div className="mt-4 flex items-center gap-x-5">
                         <button
                             type="button"
                             onClick={handleAcceptCookies}
                             className="primary-button">
-                            I understand
+                            {t('cookie_banner_accept')}
                         </button>
                     </div>
                 </div>
