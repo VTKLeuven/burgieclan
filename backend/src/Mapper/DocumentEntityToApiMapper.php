@@ -38,14 +38,15 @@ class DocumentEntityToApiMapper implements MapperInterface
 
         $to->name = $from->getName();
         $to->course = $this->microMapper->map($from->getCourse(), CourseApi::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
+            MicroMapperInterface::MAX_DEPTH => 2,
         ]);
         $to->category = $this->microMapper->map($from->getCategory(), DocumentCategoryApi::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
+            MicroMapperInterface::MAX_DEPTH => 2,
         ]);
+        $to->year = $from->getYear();
         $to->under_review = $from->isUnderReview();
         $to->creator = $this->microMapper->map($from->getCreator(), UserApi::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
+            MicroMapperInterface::MAX_DEPTH => 2,
         ]);
         $to->createdAt = $from->getCreateDate()->format('Y-m-d H:i:s');
         $to->updatedAt = $from->getUpdateDate()->format('Y-m-d H:i:s');

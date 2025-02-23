@@ -36,7 +36,9 @@ class DocumentResourceTest extends ApiTestCase
             'name',
             'course',
             'category',
+            'year',
             'under_review',
+            'contentUrl',
             'creator',
             'createdAt',
             'updatedAt',
@@ -251,6 +253,54 @@ class DocumentResourceTest extends ApiTestCase
         ;
     }
 
+    public function testGetDocumentFilterByYear(): void
+    {
+        DocumentFactory::createMany(1, [
+            'year' => '2024 - 2025',
+        ]);
+        DocumentFactory::createMany(1, [
+            'year' => '2025 - 2026',
+        ]);
+        DocumentFactory::createMany(5, [
+            'year' => '2026 - 2027',
+        ]);
+
+        $this->browser()
+            ->get('/api/documents?year=2024 - 2025', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('length("hydra:member")', 1)
+            ->get('/api/documents?year=24', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('length("hydra:member")', 1)
+            ->get('/api/documents?year=25', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 2)
+            ->assertJsonMatches('length("hydra:member")', 2)
+            ->get('/api/documents?year=26', [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 6)
+            ->assertJsonMatches('length("hydra:member")', 6)
+        ;
+    }
+
     public function testPostToCreateDocument(): void
     {
         $course = CourseFactory::createOne();
@@ -279,7 +329,6 @@ class DocumentResourceTest extends ApiTestCase
                     'name' => 'Document name',
                     'course' => '/api/courses/' . $course->getId(),
                     'category' => '/api/document_categories/' . $category->getId(),
-                    'under_review' => true,
                 ],
                 'files' => [
                     'file' => $file,

@@ -1,16 +1,22 @@
 import { useRouter } from "next/navigation";
 import { STATUS_CODES } from 'http';
-import {getHttpStatusDescription} from "@/utils/httpStatusDescriptions";
+import { getHttpStatusDescription } from "@/utils/error/httpStatusDescriptions";
+import { useTranslation } from "react-i18next";
 
 /**
  * Displays an error page with a status code, brief standard description and a longer custom description (which is
  * either given by `detail`, retrieved from the httpStatusDescriptions.ts file or left empty).
  */
-export default function ErrorPage({ status, detail }: { status?: string; detail?: string }) {
+export default function ErrorPage({ status, detail }: { status?: number; detail?: string }) {
     const router = useRouter();
+    const { t } = useTranslation();
 
-    const statusDescription = status ? STATUS_CODES[status] || 'Unexpected error' : 'Unexpected error';  // short standard description
-    const customDescription = detail || getHttpStatusDescription(Number(status)) || "";  // longer custom description
+    if (!status) {
+        status = 500;
+    }
+
+    const statusDescription = STATUS_CODES[status] || t('unexpected_error')  // short standard description
+    const customDescription = detail || getHttpStatusDescription(status) || "";  // longer custom description
 
     const redirectHome = () => {
         router.push('/');
@@ -32,13 +38,13 @@ export default function ErrorPage({ status, detail }: { status?: string; detail?
                             type="button"
                             onClick={redirectHome}
                             className="primary-button flex-1">
-                            Go back home
+                            {t('go_home')}
                         </button>
                         <button
                             type="button"
                             onClick={redirectSupport}
                             className="white-button flex-1 min-w-max">
-                            Contact support <span aria-hidden="true">&rarr;</span>
+                            {t('contact_support')} <span aria-hidden="true">&rarr;</span>
                         </button>
                     </div>
                 </div>

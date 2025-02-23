@@ -1,0 +1,161 @@
+{
+    "homepage": "Homepage",
+    "login": "Login",
+    "login_vtk": "Log in with VTK",
+    "logout": "Logout",
+    "sign_in": "Sign in to your account",
+    "or_log_in_manually": "Or log in manually",
+    "login_invalid_credentials": "Bad credentials, please verify that your username/password are correctly set.",
+    "username": "Username",
+    "password": "Password",
+    "profile": "Profile",
+    "unexpected_error": "Unexpected error",
+    "go_home": "Go back home",
+    "contact_support": "Contact support",
+    "report_issue": "Report an issue",
+    "contribute_github": "Contribute on Github",
+    "open_menu": "Open menu",
+    "close_menu": "Close menu",
+    "courses": "Courses",
+    "modules": "Modules",
+    "programs": "Programs",
+    "documents": "Documents",
+    "FAQ": "FAQ",
+    "overview": "Overview",
+    "cookie_banner_text": "This website only uses functional cookies to provide you a smooth experience. No other cookies are used.",
+    "cookie_banner_accept": "I understand",
+    "select": "Select",
+    "network_error": "Connection issues detected. Please check your internet connection and try again.",
+    "cors_error": "There was a security issue with the upload. Please try again or contact support if the problem persists.",
+    "token_expired": "Your session has expired. Please log in again to continue.",
+    "unexpected": "An unexpected error occurred. Please try again.",
+    "dialog": {
+        "close": "Close menu"
+    },
+    "upload": {
+        "drag_drop_title": "Drag & drop your files here",
+        "supported_formats": ".pdf, .docx, .jpg, .png, .zip (max {{size}}MB)",
+        "errors": {
+            "unsupported_format": "Unsupported file format. Please upload a PDF, Word, JPG, PNG, or ZIP file.",
+            "file_too_large": "File size exceeds {{size}}MB limit. Please choose a smaller file.",
+            "no_file": "No file detected. Please try again.",
+            "no_file_selected": "No file selected. Please try again.",
+            "unusable_body": "There was an issue processing your document. Please try uploading again.",
+            "payload_too_large": "The file size exceeds the {{size}}MB limit. Please compress your file or upload a smaller one.",
+            "rate_limit": "Too many upload attempts. Please wait a moment before trying again."
+        },
+        "success": {
+            "upload": "Document uploaded successfully!"
+        },
+        "dialog": {
+            "title": "Upload document",
+            "description": "Upload your awesome document here. You can upload a PDF, Word, or Markdown file. We will check if it follows the guidelines. Thanks for sharing your knowledge with the world!",
+            "button": {
+                "send": "Send document",
+                "uploading": "Uploading..."
+            },
+            "success": "Document uploaded successfully!",
+            "error": "Failed to upload document. Please try again."
+        },
+        "field": {
+            "label": "File",
+            "upload_button": "Upload a file",
+            "drag_drop_text": "or drag and drop",
+            "icons": {
+                "alt": "{{type}} icon"
+            }
+        },
+        "form": {
+            "name": {
+                "label": "Name",
+                "placeholder": "Choose a document name"
+            },
+            "course": {
+                "label": "Course"
+            },
+            "category": {
+                "label": "Category"
+            },
+            "year": {
+                "label": "Academic Year",
+                "placeholder": "Select academic year..."
+            },
+            "validation": {
+                "name": {
+                    "required": "Name is required",
+                    "min": "Name must be at least {{min}} characters",
+                    "max": "Name must be less than {{max}} characters"
+                },
+                "course": {
+                    "required": "Course is required"
+                },
+                "category": {
+                    "required": "Category is required"
+                },
+                "year": {
+                    "required": "Academic year is required",
+                    "format": "Academic year must be in format YYYY - YYYY"
+                },
+                "file": {
+                    "required": "File is required",
+                    "size": "File must be smaller than {{size}}MB",
+                    "type": "File type is not supported"
+                }
+            }
+        }
+    },
+    "home": {
+        "title": "Home",
+        "description": "Welcome to Burgieclan! Your best friend in studying for exams. We provide a platform where students can share their study materials with each other. This way, you can help each other out and make studying a lot easier. So, what are you waiting for? Dive into the world of Burgieclan and start sharing your knowledge!",
+        "recent_activities": "Pick up where you left off",
+        "news": "News",
+        "navigate_to": "Navigate to"
+    },
+    "form": {
+        "errors": {
+            "fetch_failed": "Failed to load form data. Please try again."
+        },
+        "combo": {
+            "search": "Search...",
+            "no_results": "No results found"
+        }
+    },
+    "account": {
+        "account": "Account",
+        "greeting": "Hi, {{name}}!",
+        "welcome_text": "Welcome to your account page. Here you will find some information about your favorites and your contributions to Burgieclan.",
+        "details": "Account details",
+        "name": "Name",
+        "rnumber": "R-number",
+        "email": "Email",
+        "favorite": {
+            "courses": "Favorite courses",
+            "modules": "Favorite modules",
+            "programs": "Favorite programs",
+            "documents": "Favorite documents",
+            "no_courses": "You have no favorite courses yet.",
+            "no_modules": "You have no favorite modules yet.",
+            "no_programs": "You have no favorite programs yet.",
+            "no_documents": "You have no favorite documents yet."
+        },
+        "documents": {
+            "no_uploads": "You haven't uploaded any documents yet.",
+            "my": "My documents"
+        }
+    },
+    "document": {
+        "under_review": "Under review",
+        "approved": "Approved"
+    },
+    "pagination": {
+        "previous": "Previous",
+        "next": "Next"
+    },
+    "search": {
+        "placeholder": "Search...",
+        "info": "Search for courses, modules, programs, documents...",
+        "info_sub": "Quickly access any page by running a global search.",
+        "no_results": "No results found",
+        "no_results_sub": "Try searching for something else or check your spelling."
+    }
+}
