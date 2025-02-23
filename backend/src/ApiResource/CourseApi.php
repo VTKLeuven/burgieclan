@@ -73,6 +73,4 @@ class CourseApi
      * @var CourseCommentApi[]
      */
     public array $courseComments = [];
-
-
 }
