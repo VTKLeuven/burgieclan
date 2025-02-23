@@ -74,9 +74,4 @@ class CourseApi
      */
     public array $courseComments = [];
 
-    /**
-     * @var CourseApi[]
-     */
-    public array $identicalCourses = [];
-
 }
