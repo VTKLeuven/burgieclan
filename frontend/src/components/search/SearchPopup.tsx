@@ -1,86 +1,25 @@
-import { Combobox, ComboboxInput, ComboboxOptions, Dialog, DialogBackdrop, DialogPanel, } from '@headlessui/react'
-import { Frown, Globe, Search as SearchIcon } from 'lucide-react';
-import { useEffect, useState } from 'react'
 import FoldableSection from "@/components/common/FoldableSection";
-import type { Course, Document, Module, Program } from '@/types/entities';
 import {
     CourseSearchResult,
     DocumentSearchResult,
     ModuleSearchResult,
     ProgramSearchResult
 } from "@/components/search/SearchResult";
-import { objectToCourse, objectToDocument, objectToModule, objectToProgram } from '@/utils/objectToTypeConvertor';
+import { useSearch } from '@/hooks/useSearch';
+import { Combobox, ComboboxInput, ComboboxOptions, Dialog, DialogBackdrop, DialogPanel, } from '@headlessui/react';
+import { Frown, Globe, Search as SearchIcon } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useApi } from '@/hooks/useApi';
 
 type SearchPopupProps = {
     open: boolean;
     setOpen: (open: boolean) => void;
 };
 
-type SearchResults = {
-    courses: Course[];
-    modules: Module[];
-    programs: Program[];
-    documents: Document[];
-};
-
 export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
     const [query, setQuery] = useState('');
-    const [debouncedQuery, setDebouncedQuery] = useState('');
-    const [items, setItems] = useState<SearchResults>({ courses: [], modules: [], programs: [], documents: [] });
-    const { error, loading, isRedirecting, request } = useApi();
+    const { items, loading, error } = useSearch({ query });
     const { t } = useTranslation();
-
-    /**
-     * Remove all fields starting with '@' from the object
-     * @param obj - The object to clean
-     * @returns The cleaned object
-     */
-    function convertToObjects(obj: Record<string, any[]>): SearchResults {
-        const items: SearchResults = { courses: [], modules: [], programs: [], documents: [] };
-        obj['courses']?.forEach((course) => {
-            items.courses.push(objectToCourse(course));
-        });
-        obj['modules']?.forEach((module) => {
-            items.modules.push(objectToModule(module));
-        });
-        obj['programs']?.forEach((program) => {
-            items.programs.push(objectToProgram(program));
-        });
-        obj['documents']?.forEach((document) => {
-            items.documents.push(objectToDocument(document));
-        });
-        return items;
-    }
-
-    // Setup debouncing for query
-    useEffect(() => {
-        // Wait 300ms after typing stops before executing search
-        const timer = setTimeout(() => {
-            setDebouncedQuery(query);
-        }, 300);
-
-        // Clean up timeout if query changes before timer completes
-        return () => clearTimeout(timer);
-    }, [query]);
-
-    // Fetch data when debounced query changes
-    useEffect(() => {
-        const fetchData = async () => {
-            if (debouncedQuery.length <= 2) {
-                setItems({ courses: [], modules: [], programs: [], documents: [] });
-                return;
-            }
-
-            const result = await request('GET', `/api/search?searchText=${debouncedQuery}`);
-            if (result) {
-                setItems(convertToObjects(result));
-            }
-        };
-
-        fetchData();
-    }, [debouncedQuery, request]);
 
     return (
         <Dialog
@@ -136,30 +75,15 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                 </div>
                             )}
 
-                            {/* Show redirecting state */}
-                            {isRedirecting && (
-                                <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
-                                    <svg className="mx-auto animate-spin h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg"
-                                        fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                            strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                                    </svg>
-                                    <p className="mt-4 font-semibold text-gray-900">{t('redirecting')}</p>
-                                    <p className="mt-2 text-gray-500">{t('session_expired')}</p>
-                                </div>
-                            )}
-
-                            {error && !isRedirecting && (
+                            {error && (
                                 <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
                                     <Frown className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
-                                    <p className="mt-4 font-semibold text-gray-900">{t('unexpected')}</p>
-                                    <p className="mt-2 text-gray-500">{error.message}</p>
+                                    <p className="mt-4 font-semibold text-gray-900">{t('unexpected_error')}</p>
+                                    <p className="mt-2 text-gray-500">{error}</p>
                                 </div>
                             )}
 
-                            {!error && !isRedirecting && query.length <= 2 && (
+                            {!error && query.length <= 2 && (
                                 <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
                                     <Globe className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
                                     <p className="mt-4 font-semibold text-gray-900">{t('search.info')}</p>
@@ -167,7 +91,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                 </div>
                             )}
 
-                            {!error && !isRedirecting && query.length > 2 && Object.values(items).some(value => Array.isArray(value) && value.length > 0) && (
+                            {!error && query.length > 2 && Object.values(items).some(value => Array.isArray(value) && value.length > 0) && (
                                 <div>
                                     <ComboboxOptions
                                         static
@@ -230,7 +154,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                 </div>
                             )}
 
-                            {!error && !loading && !isRedirecting && query.length > 2 && Object.values(items).every(value => Array.isArray(value) && value.length === 0) && (
+                            {!error && !loading && query.length > 2 && Object.values(items).every(value => Array.isArray(value) && value.length === 0) && (
                                 <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
                                     <Frown className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
                                     <p className="mt-4 font-semibold text-gray-900">{t('search.no_results')}</p>

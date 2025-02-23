@@ -1,10 +1,11 @@
+import SearchField from '@/components/search/SearchField';
 import { Checkbox } from "@/components/ui/Checkbox";
 import FormField from '@/components/ui/FormField';
 import { Text } from '@/components/ui/Text';
 import { UploadField } from '@/components/upload/UploadField';
 import UploadTagFilter from '@/components/upload/UploadTagFilter';
 import { useUser } from '@/components/UserContext';
-import { useFormFields } from '@/hooks/useFormFields';
+import { useUploadFormFields } from '@/hooks/useUploadFormFields';
 import { useYearOptions } from '@/hooks/useYearOptions';
 import { UploadFormData } from '@/types/upload';
 import { VISIBLE_YEARS } from "@/utils/constants/upload";
@@ -49,7 +50,7 @@ export default function UploadForm({
         }
     });
 
-    const { courses, categories, isLoading: isLoadingFields, error } = useFormFields(isOpen);
+    const { categories, isLoading: isLoadingFields, error } = useUploadFormFields(isOpen);
     const yearOptions = useYearOptions();
 
     // Watch the file and name fields
@@ -102,13 +103,12 @@ export default function UploadForm({
                     />
                 </div>
 
-                <div className="sm:col-span-3">
-                    <FormField
+                <div className="sm:col-span-full">
+                    <SearchField
                         label={t('upload.form.course.label')}
-                        type="combobox"
-                        options={courses}
                         error={errors.course}
                         name="course"
+                        entities={['courses']}
                         control={control}
                         disabled={isLoading || isLoadingFields}
                     />
