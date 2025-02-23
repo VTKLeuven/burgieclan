@@ -18,6 +18,7 @@ use App\Repository\ProgramRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
+use function Symfony\Component\VarDumper\dump;
 
 class SearchController extends AbstractController
 {
@@ -32,12 +33,35 @@ class SearchController extends AbstractController
 
     public function __invoke(Request $request)
     {
-
         $searchText = $request->query->get('searchText') ?? '';
-        $courses = $this->courseRepository->findBySearchQuery($searchText);
-        $modules = $this->moduleRepository->findBySearchQuery($searchText);
-        $programs = $this->programRepository->findBySearchQuery($searchText);
-        $documents = $this->documentRepository->findBySearchQuery($searchText);
+        $defaultEntities = ['courses', 'modules', 'programs', 'documents'];
+        $entities = (
+            $filtered = array_intersect((array)($request->query->all()['entities'] ?? $defaultEntities), $defaultEntities)
+        )? $filtered : $defaultEntities;
+
+        if (in_array('courses', $entities)) {
+            $courses = $this->courseRepository->findBySearchQuery($searchText);
+        } else {
+            $courses = [];
+        }
+
+        if (in_array('modules', $entities)) {
+            $modules = $this->moduleRepository->findBySearchQuery($searchText);
+        } else {
+            $modules = [];
+        }
+
+        if (in_array('programs', $entities)) {
+            $programs = $this->programRepository->findBySearchQuery($searchText);
+        } else {
+            $programs = [];
+        }
+
+        if (in_array('documents', $entities)) {
+            $documents = $this->documentRepository->findBySearchQuery($searchText);
+        } else {
+            $documents = [];
+        }
 
         $searchApi = new SearchApi();
         $searchApi->courses = array_map(function (Course $course) {
