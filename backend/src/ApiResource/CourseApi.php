@@ -51,6 +51,9 @@ class CourseApi
     #[Groups('search')]
     public ?int $credits = null;
 
+    #[Groups(['course:read', 'course:write'])]
+    public array $identicalCourses = [];
+
     /**
      * @var CourseApi[]
      */
@@ -70,4 +73,10 @@ class CourseApi
      * @var CourseCommentApi[]
      */
     public array $courseComments = [];
+
+    /**
+     * @var CourseApi[]
+     */
+    public array $identicalCourses = [];
+
 }
