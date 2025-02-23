@@ -6,9 +6,10 @@ import FormField from '@/components/ui/FormField';
 import { UploadField } from '@/components/upload/UploadField';
 import { UploadFormData } from '@/types/upload';
 import { documentSchema } from '@/utils/validation/documentSchema';
-import { useFormFields } from '@/hooks/useFormFields';
 import { Text } from '@/components/ui/Text';
 import { useTranslation } from 'react-i18next';
+import { useUploadFormFields } from '@/hooks/useUploadFormFields';
+import SearchField from '@/components/search/SearchField';
 import { useYearOptions } from '@/hooks/useYearOptions';
 import { VISIBLE_YEARS } from "@/utils/constants/upload";
 
@@ -36,7 +37,7 @@ export default function UploadForm({
         resolver: yupResolver(documentSchema(t)),
     });
 
-    const { courses, categories, isLoading: isLoadingFields, error } = useFormFields(isOpen);
+    const { categories, isLoading: isLoadingFields, error } = useUploadFormFields(isOpen);
     const yearOptions = useYearOptions();
 
     // Set initial file on mount if provided.
@@ -71,12 +72,11 @@ export default function UploadForm({
                 </div>
 
                 <div className="sm:col-span-full">
-                    <FormField
+                    <SearchField
                         label={t('upload.form.course.label')}
-                        type="combobox"
-                        options={courses}
                         error={errors.course}
                         name="course"
+                        entities={['courses']}
                         control={control}
                         disabled={isLoading || isLoadingFields}
                     />

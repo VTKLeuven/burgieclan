@@ -2,17 +2,14 @@ import { Combobox, ComboboxInput, ComboboxOptions, Dialog, DialogBackdrop, Dialo
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { FaceFrownIcon, GlobeAmericasIcon } from '@heroicons/react/24/outline'
 import { useEffect, useState } from 'react'
-import { ApiError } from "next/dist/server/api-utils";
 import FoldableSection from "@/components/common/FoldableSection";
-import type { Course, Document, Module, Program } from '@/types/entities';
 import {
     CourseSearchResult,
     DocumentSearchResult,
     ModuleSearchResult,
     ProgramSearchResult
 } from "@/components/search/SearchResult";
-import { objectToCourse, objectToDocument, objectToModule, objectToProgram } from '@/utils/objectToTypeConvertor';
-import { ApiClient } from '@/actions/api';
+import { useSearch } from '@/hooks/useSearch';
 import { useTranslation } from 'react-i18next';
 
 type SearchPopupProps = {
@@ -20,70 +17,10 @@ type SearchPopupProps = {
     setOpen: (open: boolean) => void;
 };
 
-type SearchResults = {
-    courses: Course[];
-    modules: Module[];
-    programs: Program[];
-    documents: Document[];
-};
-
 export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
     const [query, setQuery] = useState('');
-    const [items, setItems] = useState<SearchResults>({ courses: [], modules: [], programs: [], documents: [] });
-    const [error, setError] = useState<ApiError | null>(null);
-    const [loading, setLoading] = useState(false);
-
+    const { items, loading, error } = useSearch({ query });
     const { t } = useTranslation();
-
-    async function fetchSearch(query: string) {
-        setLoading(true);
-        try {
-            return await ApiClient('GET', `/api/search?searchText=${query}`);
-        } catch (err) {
-            throw new ApiError(500, err.message);
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    /**
-     * Remove all fields starting with '@' from the object
-     * @param obj - The object to clean
-     * @returns The cleaned object
-     */
-    function convertToObjects(obj: Record<string, any[]>): SearchResults {
-        const items: SearchResults = { courses: [], modules: [], programs: [], documents: [] };
-        obj['courses']?.forEach((course) => {
-            items.courses.push(objectToCourse(course));
-        });
-        obj['modules']?.forEach((module) => {
-            items.modules.push(objectToModule(module));
-        });
-        obj['programs']?.forEach((program) => {
-            items.programs.push(objectToProgram(program));
-        });
-        obj['documents']?.forEach((document) => {
-            items.documents.push(objectToDocument(document));
-        });
-        return items;
-    }
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const result = await fetchSearch(query);
-                setItems(convertToObjects(result));
-            } catch (err: any) {
-                setError(err);
-            }
-        };
-
-        if (query.length > 2) {
-            fetchData();
-        } else {
-            setItems({ courses: [], modules: [], programs: [], documents: [] });
-        }
-    }, [query]);
 
     return (
         <Dialog
@@ -142,7 +79,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                             <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
                                 <FaceFrownIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
                                 <p className="mt-4 font-semibold text-gray-900">{t('unexpected_error')}</p>
-                                <p className="mt-2 text-gray-500">{error.message}</p>
+                                <p className="mt-2 text-gray-500">{error}</p>
                             </div>
                         )}
 

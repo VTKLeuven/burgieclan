@@ -5,12 +5,12 @@ import clsx from "clsx";
 type SearchResultProps = {
     mainResult: string;
     extraInfo?: string;
-    redirect: string;
+    value: string;
 };
 
-export default function SearchResult({ mainResult, extraInfo, redirect }: SearchResultProps) {
+export default function SearchResult({ mainResult, extraInfo, value }: SearchResultProps) {
     return <ComboboxOption
-        value={{ redirect }}
+        value={{ value }}
         className="cursor-default select-none px-4 py-2 data-[focus]:bg-amber-600 data-[focus]:text-white"
     >
         {({ focus }) => (<div className="flex justify-between">
@@ -25,19 +25,19 @@ export default function SearchResult({ mainResult, extraInfo, redirect }: Search
 
 export function CourseSearchResult({ course }: { course: Course }) {
     return <SearchResult mainResult={course.name!} extraInfo={course.code}
-        redirect={"/course/" + course.id} />
+        value={"/course/" + course.id} />
 }
 
 export function ModuleSearchResult({ module }: { module: Module }) {
     return <SearchResult mainResult={module.name!} extraInfo={module.program!.name}
-        redirect={"/module/" + module.id} />
+        value={"/module/" + module.id} />
 }
 
 export function ProgramSearchResult({ program }: { program: Program }) {
-    return <SearchResult mainResult={program.name!} redirect={"/program/" + program.id} />
+    return <SearchResult mainResult={program.name!} value={"/program/" + program.id} />
 }
 
 export function DocumentSearchResult({ document }: { document: Document }) {
     return <SearchResult mainResult={document.name!} extraInfo={document.course!.name}
-        redirect={"/document/" + document.id} />
+        value={"/document/" + document.id} />
 }
