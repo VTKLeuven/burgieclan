@@ -66,7 +66,7 @@ const NavigationSidebar = () => {
 
   return (
       <aside className="w-64 border-r">
-        <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-screen bg-white border-r border-gray-200 flex flex-col`}>
+        <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-full bg-white border-r border-gray-200 flex flex-col`}>
           {/* Collapse Toggle Button */}
           <button
               onClick={() => setIsCollapsed(!isCollapsed)}
@@ -78,7 +78,7 @@ const NavigationSidebar = () => {
 
           {/* Top Navigation */}
           <nav className="p-4 flex flex-col gap-2">
-            <Link href={`/${i18n.language}`} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-2 transition-all duration-200 hover:scale-[1.01]">
+            <Link href={`/${i18n.language}`} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-1 transition-all duration-200 hover:scale-[1.01]">
               <button
                 onClick ={() => setIsCollapsed(false)}
                 >
@@ -88,7 +88,7 @@ const NavigationSidebar = () => {
             </Link>
             <div className="border-t border-gray-300" />
             <button
-                className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0"
+                className="flex items-center justify-between w-full p-1 text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0"
                 onClick={() => {
                   toggleSection('courses');
                   setIsCollapsed(false);
@@ -111,7 +111,7 @@ const NavigationSidebar = () => {
             )}
             <div className="border-t border-gray-300" />
             <button
-                className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0"
+                className="flex items-center justify-between w-full p-1 text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0"
                 onClick={() => {
                   toggleSection('documents');
                   setIsCollapsed(false);
@@ -158,7 +158,7 @@ const NavigationSidebar = () => {
             </div>
             {!isCollapsed && (
                 <div className="px-4 pb-2 space-y-2">
-                  <Link href="vtk.be" className="block text-sm text-gray-600 hover:text-gray-800">
+                  <Link href="https://vtk.be" className="block text-sm text-gray-600 hover:text-gray-800">
                     {t('sidebar.go_to_vtk')}
                   </Link>
                   <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded mt-8 hover:bg-red-600 active:bg-red-700 transition duration-150 ease-in-out">
