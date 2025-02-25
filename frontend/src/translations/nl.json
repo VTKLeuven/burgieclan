@@ -17,6 +17,9 @@
     "open_menu": "Open menu",
     "close_menu": "Sluit menu",
     "courses": "Vakken",
+    "modules": "Modules",
+    "programs": "Richtingen",
+    "documents": "Documenten",
     "FAQ": "FAQ",
     "overview": "Overzicht",
     "cookie_banner_text": "Deze website gebruikt alleen functionele cookies om je een soepele ervaring te bieden. Er worden geen andere cookies gebruikt.",
@@ -147,6 +150,13 @@
     "pagination": {
         "previous": "Vorige",
         "next": "Volgende"
+    },
+    "search": {
+        "placeholder": "Zoeken...",
+        "info": "Zoek naar vakken, modules, opleidingen, documenten...",
+        "info_sub": "Krijg snel toegang tot elke pagina door een globale zoekopdracht uit te voeren.",
+        "no_results": "Geen resultaten gevonden",
+        "no_results_sub": "Probeer een andere zoekopdracht of navigeer naar een andere pagina."
     },
     "sidebar": {
         "home": "Home",
