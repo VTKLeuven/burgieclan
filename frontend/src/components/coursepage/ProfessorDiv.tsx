@@ -7,33 +7,33 @@ export default function ProfessorDiv({ unumber, index, t }: { unumber: string, i
     const [imgSrc, setImgSrc] = useState(`https://www.kuleuven.be/wieiswie/nl/person/0${sanitizedUnumber}/photo`);
     const [professorName, setProfessorName] = useState("N.");
 
-    async function fetchProfessorName(): Promise<string> {
-        try {
-            const response = await fetch(`https://dataservice.kuleuven.be/employee/_doc/0${sanitizedUnumber}`);
-
-            const data = await response.json();
-            if (data._source?.firstName && data._source?.surname) {
-                return `${data._source.firstName[0]}. ${data._source.surname}`;
-            }
-        } catch {}
-        return "N.";
-    }
-
     useEffect(() => {
+        async function fetchProfessorName(): Promise<string> {
+            try {
+                const response = await fetch(`https://dataservice.kuleuven.be/employee/_doc/0${sanitizedUnumber}`);
+
+                const data = await response.json();
+                if (data._source?.firstName && data._source?.surname) {
+                    return `${data._source.firstName[0]}. ${data._source.surname}`;
+                }
+            } catch {}
+            return "N.";
+        }
+
         async function loadProfessorName() {
             const name = await fetchProfessorName();
             setProfessorName(name);
         }
         loadProfessorName();
-    }, []);
+    }, [sanitizedUnumber]);
 
     const handleError = () => {
-        setImgSrc('/images/proffen/generic_profile.png');
+        setImgSrc('/images/default_prof_pic/generic_profile.png');
     };
 
     return (
-        <div className="flex items-start h-full">
-            <div className="relative w-16 h-16 overflow-hidden rounded-full border border-yellow-500">
+        <div className="flex items-start h-<full">
+            <div className="relative w-16 h-16 overflow-hidden rounded-full border border-wireframe-primary-panache">
                 <Image
                     src={imgSrc}
                     onError={handleError}
