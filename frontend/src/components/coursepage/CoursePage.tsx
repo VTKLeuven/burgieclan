@@ -1,6 +1,6 @@
 'use client'
 import CoursePageSection from "@/components/coursepage/CoursePageSection";
-import { Course, Breadcrumb } from "@/types";
+import { Course, Breadcrumb } from "@/types/entities";
 import Image from 'next/image';
 import DocumentIcon from '/public/images/icons/document_icon.svg';
 import FolderIcon from '/public/images/icons/folder.svg';
@@ -148,7 +148,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                     <div className="mb-2 md:mb-0">
                         <h2> {t('course-page.teachers')} </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {course.professors.map((p, index) => (
+                            {course?.professors?.map((p, index) => (
                                 <ProfessorDiv key={index} unumber={p} index={index} t={t}/>
                             ))}
                         </div>
