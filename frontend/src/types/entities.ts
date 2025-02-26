@@ -10,14 +10,17 @@ interface NodeEntity extends BaseEntity {
 
 export interface Course extends BaseEntity {
     name?: string;
+    courseComments?: CourseComment[];
+    modules?: string[];
     code?: string;
+    credits?: number;
+    location?: string;
     professors?: string[];
     semesters?: string[];
-    credits?: number;
+    description_top?: string;
+    description_bottom?: string;
     oldCourses?: Course[];
     newCourses?: Course[];
-    modules?: Module[];
-    courseComments?: CourseComment[];
 }
 
 export interface Module extends BaseEntity {
@@ -66,4 +69,8 @@ export interface Page extends BaseEntity {
     content?: string;
     urlKey?: string;
     isPublic?: boolean;
+}
+
+export interface Breadcrumb extends BaseEntity {
+    breadcrumb: string[];
 }
