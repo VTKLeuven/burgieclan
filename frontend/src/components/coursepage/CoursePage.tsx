@@ -38,16 +38,15 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                 setCourse(courseData);
 
                 // This is used to set the page language depending on the language of the course, and not the global website language set by the user
-                const { t } = await initTranslations(courseData.language);
-                setT(() => t);
+                const { t: translationFunction } = await initTranslations(courseData.language);
+                setT(() => translationFunction);
             } catch {
                 setError(true);
                 showToast(t('course.error-fetching'), 'error');
             }
         }
-        console.log("Course ID: ", courseId);
         getCourse();
-    }, [courseId, showToast, t]);
+    }, [courseId, showToast]);
 
     if (error) {
         return (
