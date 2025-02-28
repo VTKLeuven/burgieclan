@@ -56,8 +56,11 @@ export default async function middleware(request: NextRequest) {
         if (!publicPage) {
             const loginUrl = locale ? `/${locale}/login` : '/login';
             // Use pathname instead of href to avoid localhost:3000
-            return NextResponse.redirect(new URL(`${loginUrl}?redirectTo=${encodeURIComponent(request.nextUrl.pathname)}`, baseUrl));
-        }
+            // Only add redirectTo if pathname is not root
+            const redirectUrl = request.nextUrl.pathname === '/' || request.nextUrl.pathname === '' 
+                ? loginUrl 
+                : `${loginUrl}?redirectTo=${encodeURIComponent(request.nextUrl.pathname)}`;
+            return NextResponse.redirect(new URL(redirectUrl, baseUrl));        }
     }
 
     // Allow access
