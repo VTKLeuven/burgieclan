@@ -80,6 +80,10 @@
                 "label": "Academic Year",
                 "placeholder": "Select academic year..."
             },
+            "anonymous": {
+                "label": "Anonymous",
+                "description": "Do you want to upload this document anonymously?"
+            },
             "validation": {
                 "name": {
                     "required": "Name is required",

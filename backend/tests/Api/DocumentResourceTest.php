@@ -17,7 +17,9 @@ class DocumentResourceTest extends ApiTestCase
 
     public function testGetCollectionOfDocuments(): void
     {
-        DocumentFactory::createMany(5);
+        DocumentFactory::createMany(5, [
+            'anonymous' => false,
+        ]);
         $json = $this->browser()
             ->get('/api/documents', [
                 'headers' => [
@@ -46,18 +48,76 @@ class DocumentResourceTest extends ApiTestCase
         ]);
     }
 
-    public function testGetOneDocument(): void
+    public function testGetCollectionOfAnonymousDocuments(): void
     {
-        $comment = DocumentFactory::createOne();
-
-        $this->browser()
-            ->get('/api/documents/' . $comment->getId(), [
+        DocumentFactory::createMany(5, [
+            'anonymous' => true,
+        ]);
+        $json = $this->browser()
+            ->get('/api/documents', [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]
             ])
             ->assertJson()
-            ->assertJsonMatches('"@id"', '/api/documents/' . $comment->getId());
+            ->assertJsonMatches('"hydra:totalItems"', 5)
+            ->assertJsonMatches('length("hydra:member")', 5)
+            ->json()
+        ;
+
+        $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
+            '@id',
+            '@type',
+            'name',
+            'course',
+            'category',
+            'year',
+            'under_review',
+            'anonymous',
+            'contentUrl',
+            'createdAt',
+            'updatedAt',
+        ]); // Notice that creator is not included in the response.
+    }
+
+    public function testGetOneDocument(): void
+    {
+        $document = DocumentFactory::createOne(
+            [
+                'anonymous' => false,
+            ]
+        );
+
+        $this->browser()
+            ->get('/api/documents/' . $document->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->assertJsonMatches('"@id"', '/api/documents/' . $document->getId())
+            ->assertJsonMatches('anonymous', false)
+            ->assertJsonMatches('creator', '/api/users/' . $document->getCreator()->getId());
+    }
+
+    public function testGetOneAnonymousDocument(): void
+    {
+        $document = DocumentFactory::createOne(
+            [
+                'anonymous' => true,
+            ]
+        );
+
+        $this->browser()
+            ->get('/api/documents/' . $document->getId(), [
+                'headers' => [
+                    'Authorization' =>'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->assertJsonMatches('"@id"', '/api/documents/' . $document->getId())
+            ->assertJsonMatches('anonymous', true)
+            ->assertJsonMatches('creator', null);
     }
 
     public function testGetDocumentFilterByName(): void
@@ -393,7 +453,9 @@ class DocumentResourceTest extends ApiTestCase
      */
     public function testNonAnonymousDocumentHasCreator(): void
     {
-        $document = DocumentFactory::createOne(); // Default is non-anonymous
+        $document = DocumentFactory::createOne([
+            'anonymous' => false
+        ]);
 
         $json = $this->browser()
             ->get('/api/documents/' . $document->getId(), [
