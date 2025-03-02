@@ -17,6 +17,9 @@
     "open_menu": "Open menu",
     "close_menu": "Close menu",
     "courses": "Courses",
+    "modules": "Modules",
+    "programs": "Programs",
+    "documents": "Documents",
     "FAQ": "FAQ",
     "overview": "Overview",
     "cookie_banner_text": "This website only uses functional cookies to provide you a smooth experience. No other cookies are used.",
@@ -151,5 +154,26 @@
     "pagination": {
         "previous": "Previous",
         "next": "Next"
+    },
+    "search": {
+        "placeholder": "Search...",
+        "info": "Search for courses, modules, programs, documents...",
+        "info_sub": "Quickly access any page by running a global search.",
+        "no_results": "No results found",
+        "no_results_sub": "Try searching for something else or check your spelling."
+    },
+    "sidebar": {
+        "home": "Home",
+        "upload": "Upload",
+        "my_courses": "My Courses",
+        "courses": "Courses",
+        "add_document": "Add Document",
+        "documents": "Documents",
+        "profile": "Profile",
+        "log_out": "Log Out",
+        "add_doc": "Add Document",
+        "go_to_vtk": "Go to VTK",
+        "user_avatar": "User avatar",
+        "my_favorite_documents": "Favorite Documents"
     }
 }
