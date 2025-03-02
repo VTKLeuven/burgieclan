@@ -80,6 +80,10 @@
                 "label": "Academiejaar",
                 "placeholder": "Selecteer academiejaar..."
             },
+            "anonymous": {
+                "label": "Anoniem",
+                "description": "Wil je dit document anoniem uploaden?"
+            },
             "validation": {
                 "name": {
                     "required": "Naam is verplicht",
