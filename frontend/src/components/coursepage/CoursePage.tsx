@@ -6,7 +6,8 @@ import DocumentIcon from '/public/images/icons/document_icon.svg';
 import FolderIcon from '/public/images/icons/folder.svg';
 import PiechartIcon from '/public/images/icons/studiepunten.svg';
 import HomeIcon from '/public/images/icons/home.svg';
-import FavoriteStar from '/public/images/icons/favorite_star.svg';
+import FavoriteStarFilled from '/public/images/icons/favorite_star_filled.svg';
+import FavoriteStarOutline from '/public/images/icons/favorite_star_outline.svg';
 import { useEffect, useState } from "react";
 import { ApiClient } from "@/actions/api";
 import { ApiError } from "next/dist/server/api-utils";
@@ -16,12 +17,17 @@ import Loading from '@/app/[locale]/loading'
 import { useToast } from '@/components/ui/Toast';
 import initTranslations from "@/app/i18n";
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
+import { useFavorites } from '@/hooks/useFavorites';
+import { useUser } from '@/components/UserContext';
 
 export default function CoursePage({ courseId, breadcrumb }: { courseId: number, breadcrumb: Breadcrumb }) {
     const [course, setCourse] = useState<Course | null>(null);
     const [t, setT] = useState<any>(() => (key: string) => key); // Default translation function
     const { showToast } = useToast();
     const [error, setError] = useState<boolean>(false);
+    const { user, loading } = useUser();
+    const { updateFavoriteCourse } = useFavorites(user);
+    const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
     async function fetchCourse(query: number) {
         try {
@@ -40,13 +46,28 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                 // This is used to set the page language depending on the language of the course, and not the global website language set by the user
                 const { t: translationFunction } = await initTranslations(courseData.language);
                 setT(() => translationFunction);
+
+                // Set initial favorite state
+                console.log(user);
+                console.log(user?.favoriteCourses?.some(favCourse => favCourse.id === courseId))
+                setIsFavorite(user?.favoriteCourses?.some(favCourse => favCourse.id === courseId) || false);
             } catch {
                 setError(true);
                 showToast(t('course.error-fetching'), 'error');
             }
         }
-        getCourse();
-    }, [courseId, showToast]);
+
+        if (!loading) {
+            getCourse();
+        }
+    }, [courseId, showToast, user, loading]);
+
+    const handleFavoriteClick = async () => {
+        if (!course) return;
+        const newFavoriteState = !isFavorite;
+        await updateFavoriteCourse(course.id, newFavoriteState);
+        setIsFavorite(newFavoriteState);
+    };
 
     if (error) {
         return (
@@ -107,12 +128,13 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                             Ipsum feugiat viverra justo consectetur. Odio commodo aliquet elit.
                         </p>
 
-
                         <div className="absolute bottom-0 flex space-x-4 mt-5 mb-5">
                             <div
-                                className="bg-white rounded-[28px] pl-5 pr-5 pt-2 pb-2 border border-transparent hover:scale-105 hover:border-wireframe-primary-blue hover:cursor-pointer transition-transform duration-300 flex items-center">
+                                className="bg-white rounded-[28px] pl-5 pr-5 pt-2 pb-2 border border-transparent hover:scale-105 hover:border-wireframe-primary-blue hover:cursor-pointer transition-transform duration-300 flex items-center"
+                                onClick={handleFavoriteClick}>
                                 <div className="inline-block mr-2">
-                                    <Image src={FavoriteStar} alt="Favorites star" width={17} height={17} />
+                                    <Image src={isFavorite ? FavoriteStarFilled : FavoriteStarOutline}
+                                           alt="Favorites star" width={17} height={17}/>
                                 </div>
                                 <div className="inline-block">
                                     <p className="text-lg text-wireframe-mid-gray"> {t('favorite')} </p>
@@ -129,8 +151,6 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                             </div>
                         </div>
                     </div>
-
-
                 </div>
 
                 <div className="flex flex-col md:flex-row md:p-10 pt-7 pl-7 pr-7 md:space-x-2">
