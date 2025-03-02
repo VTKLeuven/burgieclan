@@ -52,6 +52,7 @@ class DocumentApiToEntityMapper implements MapperInterface
         ]));
         $to->setYear($from->year);
         $to->setUnderReview($from->under_review);
+        $to->setAnonymous($from->anonymous);
 
         return $to;
     }
