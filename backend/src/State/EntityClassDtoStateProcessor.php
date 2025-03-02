@@ -35,15 +35,6 @@ class EntityClassDtoStateProcessor implements ProcessorInterface
 
         $entity = $this->mapDtoToEntity($data, $entityClass);
 
-        // Handle identical courses mapping
-        if ($data->identicalCourses) {
-            foreach ($data->identicalCourses as $identicalCourseDto) {
-                // Assuming identicalCourseDto contains the ID of the course to link
-                $identicalCourse = $this->microMapper->map($identicalCourseDto, $entityClass);
-                $entity->addIdenticalCourse($identicalCourse);
-            }
-        }
-
         if ($operation instanceof DeleteOperationInterface) {
             $this->removeProcessor->process($entity, $operation, $uriVariables, $context);
 
