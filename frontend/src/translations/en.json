@@ -2,12 +2,12 @@
     "homepage": "Homepage",
     "login": "Login",
     "login_vtk": "Log in with VTK",
+    "logout": "Logout",
     "sign_in": "Sign in to your account",
     "or_log_in_manually": "Or log in manually",
     "login_invalid_credentials": "Bad credentials, please verify that your username/password are correctly set.",
     "username": "Username",
     "password": "Password",
-    "account": "Account",
     "profile": "Profile",
     "unexpected_error": "Unexpected error",
     "go_home": "Go back home",
@@ -17,6 +17,9 @@
     "open_menu": "Open menu",
     "close_menu": "Close menu",
     "courses": "Courses",
+    "modules": "Modules",
+    "programs": "Programs",
+    "documents": "Documents",
     "FAQ": "FAQ",
     "overview": "Overview",
     "cookie_banner_text": "This website only uses functional cookies to provide you a smooth experience. No other cookies are used.",
@@ -74,7 +77,8 @@
                 "label": "Category"
             },
             "year": {
-                "label": "Academic Year"
+                "label": "Academic Year",
+                "placeholder": "Select academic year..."
             },
             "validation": {
                 "name": {
@@ -90,7 +94,7 @@
                 },
                 "year": {
                     "required": "Academic year is required",
-                    "format": "Academic year must be in format YYYY-YYYY"
+                    "format": "Academic year must be in format YYYY - YYYY"
                 },
                 "file": {
                     "required": "File is required",
@@ -110,6 +114,62 @@
     "form": {
         "errors": {
             "fetch_failed": "Failed to load form data. Please try again."
+        },
+        "combo": {
+            "search": "Search...",
+            "no_results": "No results found"
         }
+    },
+    "account": {
+        "account": "Account",
+        "greeting": "Hi, {{name}}!",
+        "welcome_text": "Welcome to your account page. Here you will find some information about your favorites and your contributions to Burgieclan.",
+        "details": "Account details",
+        "name": "Name",
+        "rnumber": "R-number",
+        "email": "Email",
+        "favorite": {
+            "courses": "Favorite courses",
+            "modules": "Favorite modules",
+            "programs": "Favorite programs",
+            "documents": "Favorite documents",
+            "no_courses": "You have no favorite courses yet.",
+            "no_modules": "You have no favorite modules yet.",
+            "no_programs": "You have no favorite programs yet.",
+            "no_documents": "You have no favorite documents yet."
+        },
+        "documents": {
+            "no_uploads": "You haven't uploaded any documents yet.",
+            "my": "My documents"
+        }
+    },
+    "document": {
+        "under_review": "Under review",
+        "approved": "Approved"
+    },
+    "pagination": {
+        "previous": "Previous",
+        "next": "Next"
+    },
+    "search": {
+        "placeholder": "Search...",
+        "info": "Search for courses, modules, programs, documents...",
+        "info_sub": "Quickly access any page by running a global search.",
+        "no_results": "No results found",
+        "no_results_sub": "Try searching for something else or check your spelling."
+    },
+    "sidebar": {
+        "home": "Home",
+        "upload": "Upload",
+        "my_courses": "My Courses",
+        "courses": "Courses",
+        "add_document": "Add Document",
+        "documents": "Documents",
+        "profile": "Profile",
+        "log_out": "Log Out",
+        "add_doc": "Add Document",
+        "go_to_vtk": "Go to VTK",
+        "user_avatar": "User avatar",
+        "my_favorite_documents": "Favorite Documents"
     }
 }
