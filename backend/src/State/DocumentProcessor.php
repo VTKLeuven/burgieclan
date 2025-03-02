@@ -10,6 +10,7 @@ use App\ApiResource\CourseApi;
 use App\ApiResource\DocumentApi;
 use App\ApiResource\DocumentCategoryApi;
 use App\Entity\Document;
+use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -44,6 +45,9 @@ final class DocumentProcessor implements ProcessorInterface
         $dto->category = $category;
 
         $dto->year = $request->get('year');
+
+        $anonymous = $request->get('anonymous') === 'true';
+        $dto->anonymous = $anonymous;
 
         // Convert the documentDto to an actual Document.
         $document = $this->microMapper->map($dto, Document::class);
