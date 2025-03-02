@@ -39,6 +39,7 @@ class DocumentResourceTest extends ApiTestCase
             'year',
             'under_review',
             'anonymous',
+            'contentUrl',
             'creator',
             'createdAt',
             'updatedAt',
@@ -256,17 +257,17 @@ class DocumentResourceTest extends ApiTestCase
     public function testGetDocumentFilterByYear(): void
     {
         DocumentFactory::createMany(1, [
-            'year' => '24-25',
+            'year' => '2024 - 2025',
         ]);
         DocumentFactory::createMany(1, [
-            'year' => '25-26',
+            'year' => '2025 - 2026',
         ]);
         DocumentFactory::createMany(5, [
-            'year' => '26-27',
+            'year' => '2026 - 2027',
         ]);
 
         $this->browser()
-            ->get('/api/documents?year=24-25', [
+            ->get('/api/documents?year=2024 - 2025', [
                 'headers' => [
                     'Authorization' =>'Bearer ' . $this->token
                 ]

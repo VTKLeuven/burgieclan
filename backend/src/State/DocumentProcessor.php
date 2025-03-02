@@ -44,6 +44,8 @@ final class DocumentProcessor implements ProcessorInterface
             throw new BadRequestHttpException('"category" is required'));
         $dto->category = $category;
 
+        $dto->year = $request->get('year');
+
         $anonymous = $request->get('anonymous') === 'true';
         $dto->anonymous = $anonymous;
 
