@@ -6,6 +6,8 @@
     "sign_in": "Sign in to your account",
     "or_log_in_manually": "Or log in manually",
     "login_invalid_credentials": "Bad credentials, please verify that your username/password are correctly set.",
+    "login_failed": "Login failed, please try again.",
+    "login_success": "Successful login!",
     "username": "Username",
     "password": "Password",
     "profile": "Profile",
