@@ -53,17 +53,6 @@ class EntityClassDtoStateProvider implements ProviderInterface
 
     private function mapEntityToDto(object $entity, string $resourceClass): object
     {
-        /** @var CourseApi $dto */
-        $dto = $this->microMapper->map($entity, $resourceClass);
-
-        // Map identicalCourses manually
-        if ($entity instanceof \App\Entity\Course) {
-            $dto->identicalCourses = array_map(
-                fn($course) => $this->microMapper->map($course, CourseApi::class),
-                $entity->getIdenticalCourses()->toArray()
-            );
-        }
-
-        return $dto;
+        return $this->microMapper->map($entity, $resourceClass);
     }
 }
