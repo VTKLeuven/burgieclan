@@ -68,7 +68,8 @@ export function convertToDocument(doc: any): Document {
         category: doc.category,
         underReview: doc.under_review,
         creator: doc.creator,
-        contentUrl: doc.contentUrl
+        contentUrl: doc.contentUrl,
+        anonymous: doc.anonymous
     };
 }
 
