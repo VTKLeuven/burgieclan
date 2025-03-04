@@ -83,7 +83,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
             className={cn(
                 "h-full w-full flex flex-col items-center justify-center p-6",
                 "border-2 border-dashed rounded-lg",
-                isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300",
+                isDragging ? "border-amber-600 bg-amber-50" : "border-gray-300",
                 "transition-colors duration-200 cursor-pointer",
                 className
             )}
@@ -103,7 +103,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
             <DocumentIcon
                 className={cn(
                     "w-16 h-16 mb-4",
-                    isDragging ? "text-blue-500" : "text-gray-400"
+                    isDragging ? "text-amber-600" : "text-gray-400", "transition-colors duration-200"
                 )}
             />
             <p className="text-lg font-semibold text-gray-900 mb-1">

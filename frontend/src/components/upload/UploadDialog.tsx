@@ -48,7 +48,7 @@ const UploadDialog = ({
                 {t('upload.dialog.title')}
             </DialogTitle>
             <DialogBody>
-                <Text>
+                <Text className={'text-justify'}>
                     {t('upload.dialog.description')}
                 </Text>
 
@@ -59,7 +59,7 @@ const UploadDialog = ({
                     initialFile={initialFile}
                 />
             </DialogBody>
-            <DialogActions>
+            <DialogActions className="!mt-0"> {/* !mt-0 removes the top margin */}
                 <button
                     type="submit"
                     form="upload-form"
