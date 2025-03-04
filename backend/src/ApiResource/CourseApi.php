@@ -54,6 +54,11 @@ class CourseApi
     /**
      * @var CourseApi[]
      */
+    public array $identicalCourses = [];
+
+    /**
+     * @var CourseApi[]
+     */
     public array $oldCourses = [];
 
     /**
