@@ -43,14 +43,9 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                 const courseData = await fetchCourse(courseId);
                 setCourse(courseData);
 
-                // This is used to set the page language depending on the language of the course, and not the global website language set by the user
+                // Initialize translations based on course language
                 const { t: translationFunction } = await initTranslations(courseData.language);
                 setT(() => translationFunction);
-
-                // Set initial favorite state
-                console.log(user);
-                console.log(user?.favoriteCourses?.some(favCourse => favCourse.id === courseId))
-                setIsFavorite(user?.favoriteCourses?.some(favCourse => favCourse.id === courseId) || false);
             } catch {
                 setError(true);
                 showToast(t('course.error-fetching'), 'error');
@@ -60,12 +55,21 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
         if (!loading) {
             getCourse();
         }
-    }, [courseId, showToast, user, loading]);
+    }, [courseId, showToast, loading]); // Fetch course only when `loading` is done
+
+// Separate useEffect to handle user updates
+    useEffect(() => {
+        if (user?.favoriteCourses) {
+            setIsFavorite(user.favoriteCourses.some(favCourse => favCourse.id === courseId));
+        }
+    }, [user, courseId]); // Runs when `user` updates
 
     const handleFavoriteClick = async () => {
-        if (!course) return;
+        if (!courseId || !user || !user.favoriteCourses) return;
+        const courseIndex = user.favoriteCourses.findIndex(favCourse => favCourse.id === courseId);
+        if (courseIndex === -1) return; // Course not found in favorites
         const newFavoriteState = !isFavorite;
-        await updateFavoriteCourse(course.id, newFavoriteState);
+        await updateFavoriteCourse(courseIndex, newFavoriteState);
         setIsFavorite(newFavoriteState);
     };
 
