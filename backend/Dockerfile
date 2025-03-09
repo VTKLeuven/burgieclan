@@ -28,6 +28,9 @@ WORKDIR /var/www/html
 # Copy composer files first
 COPY composer.json composer.lock ./
 
+# Set PHP memory limit
+RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/custom.ini
+
 # Base directory setup
 RUN mkdir -p var/cache var/log var/sessions && \
     chown -R www-data:www-data var && \
