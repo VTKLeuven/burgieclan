@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
-import { faStar } from '@fortawesome/free-solid-svg-icons';
-import { faStar as faStarOutline } from '@fortawesome/free-regular-svg-icons';
+import { Star } from 'lucide-react';
 
 interface FavoriteListProps {
     title: string;
@@ -38,7 +36,7 @@ const FavoriteList: React.FC<FavoriteListProps> = ({ title, items, emptyMessage,
                                     {item.name} {item.code && <span className="text-sm text-gray-500">[{item.code}]</span>}
                                 </Link>
                                 <button onClick={() => toggleFavoriteStatus(index)} className="ml-2 text-red-500">
-                                    <FontAwesomeIcon icon={favorites[index] ? faStar : faStarOutline} className="text-vtk-yellow-500" />
+                                    <Star className='text-vtk-yellow-500' fill={favorites[index] ? "currentColor" : "none"} />
                                 </button>
                             </li>
                         ))}

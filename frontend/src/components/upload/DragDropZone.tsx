@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { DocumentIcon } from '@heroicons/react/24/outline';
+import { FileText } from 'lucide-react';
 import { ALLOWED_MIME_TYPES, FILE_SIZE_LIMIT, FILE_SIZE_MB } from '@/utils/constants/upload';
 import { useToast } from '@/components/ui/Toast';
 import { useTranslation } from 'react-i18next';
@@ -15,9 +15,9 @@ interface DragDropZoneProps {
 }
 
 export const DragDropZone: React.FC<DragDropZoneProps> = ({
-                                                              onFileDrop,
-                                                              className
-                                                          }) => {
+    onFileDrop,
+    className
+}) => {
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { showToast } = useToast();
@@ -100,7 +100,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
                 onChange={handleFileInput}
                 accept={ALLOWED_MIME_TYPES.join(',')}
             />
-            <DocumentIcon
+            <FileText
                 className={cn(
                     "w-16 h-16 mb-4",
                     isDragging ? "text-amber-600" : "text-gray-400", "transition-colors duration-200"
