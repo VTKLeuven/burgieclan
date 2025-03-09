@@ -72,8 +72,20 @@ final class DocumentFactory extends ModelFactory
             'course' => CourseFactory::randomOrCreate(),
             'name' => self::faker()->word(),
             'under_review' => self::faker()->boolean(),
+            'anonymous' => self::faker()->boolean(),
             'creator' => UserFactory::randomOrCreate(),
+            // Selects a random file from the 'data/documents' directory and assigns its basename to 'file_name'.
+            // Uses the 'glob' function to get all files in the directory and 'randomElement' to pick one randomly.
+            'file_name' => basename(self::faker()->randomElement(glob('data/documents/*'))),
+            'year' => $this->generateYear(),
         ];
+    }
+
+    private function generateYear(): string
+    {
+        $startYear = self::faker()->numberBetween(1999, 2024);
+        $endYear = $startYear + 1;
+        return sprintf('%d - %d', $startYear, $endYear);
     }
 
     /**
