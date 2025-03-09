@@ -11,11 +11,14 @@
 
 namespace App\Repository;
 
+use App\Entity\Course;
 use App\Entity\Document;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
+use function Symfony\Component\String\u;
 
 /**
  * @extends ServiceEntityRepository<Document>
@@ -27,8 +30,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class DocumentRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry                  $registry,
+        private readonly LoggerInterface $logger
+    ) {
         parent::__construct($registry, Document::class);
     }
 
@@ -45,7 +50,72 @@ class DocumentRepository extends ServiceEntityRepository
                 ->getQuery()
                 ->getSingleScalarResult() ?? 0;
         } catch (NoResultException|NonUniqueResultException $e) {
+            $this->logger->warning('Error counting pending documents', [
+                'error' => $e->getMessage()
+            ]);
             return 0;
         }
+    }
+
+    /**
+     * @param Course $course
+     * @return Document[]
+     */
+    public function findByCourseAndHasFile(Course $course): array
+    {
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.course = :course')
+            ->andWhere('d.file_name IS NOT NULL')
+            ->setParameter('course', $course)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Document[]
+     */
+    public function findBySearchQuery(string $query, int $limit = 20): array
+    {
+        $searchTerms = $this->extractSearchTerms($query);
+
+        if (0 === \count($searchTerms)) {
+            return [];
+        }
+
+        $queryBuilder = $this->createQueryBuilder('d');
+
+        foreach ($searchTerms as $key => $term) {
+            $queryBuilder
+                ->orWhere('d.name LIKE :t_' . $key)
+                ->orWhere('d.file_name LIKE :t_' . $key)
+                ->setParameter('t_' . $key, '%' . $term . '%')
+            ;
+        }
+
+        /** @var Document[] $result */
+        $result = $queryBuilder
+            ->orderBy('d.updateDate', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return $result;
+    }
+
+    /**
+     * Transforms the search string into an array of search terms.
+     *
+     * @return string[]
+     */
+    private function extractSearchTerms(string $searchQuery): array
+    {
+        $searchQuery = u($searchQuery)->replaceMatches('/[[:space:]]+/', ' ')->trim();
+        $terms = array_unique($searchQuery->split(' '));
+
+        // ignore the search terms that are too short
+        return array_filter($terms, static function ($term) {
+            return 2 <= $term->length();
+        });
     }
 }
