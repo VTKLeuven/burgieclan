@@ -4,6 +4,16 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig = {
     output: "standalone",
     reactStrictMode: false,
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'www.kuleuven.be',
+                port: '',
+                pathname: '/wieiswie/**',
+            },
+        ],
+    },
 };
 
 export default withSentryConfig(nextConfig, {

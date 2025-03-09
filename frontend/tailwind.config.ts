@@ -14,11 +14,21 @@ const config = {
 						'400': '#353761',
 						'500': '#212347',
 						'600': '#1b1d40'
+					}
+				},
+				wireframe: {
+					darkest: {
+						gray: "#4A5A71",
 					},
-					yellow: {
-						'400': '#fce400',
-						'500': '#ffd400',
-						'600': '#febc00'
+					lightest: {
+						gray: "#F0F1F7",
+					},
+					mid: {
+						gray: "#959EAC",
+					},
+					primary: {
+						blue: "#1A1F4A",
+						panache: "#FFD400",
 					},
 				}
 			},
@@ -27,11 +37,6 @@ const config = {
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
 			},
-			wireframe: {
-				darkest: {
-					gray: "#4A5A71",
-				}
-			}
 		}
 	},
 	plugins: [
