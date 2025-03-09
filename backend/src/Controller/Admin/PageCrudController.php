@@ -27,24 +27,24 @@ class PageCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield Textfield::new('name_nl')
-            ->setRequired(true)
-            ->setLabel('Name');
         yield Textfield::new('urlKey')
             ->setHelp('The URL key is used to generate the URL of the page.');
         yield BooleanField::new('publicAvailable')
             ->renderAsSwitch(false);
+        yield Textfield::new('name_nl')
+            ->setRequired(true)
+            ->setLabel('Name (NL)');
         yield TextEditorField::new('content_nl')
-            ->setLabel('Content')
+            ->setLabel('Content (NL)')
             ->setTemplatePath('admin/text_editor.html.twig');
 
         yield FormField::addPanel('English Content')->setIcon('fa fa-language')
             ->collapsible()
             ->renderCollapsed();
         yield Textfield::new('name_en')
-        ->setLabel('Name');
+            ->setLabel('Name (EN)');
         yield TextEditorField::new('content_en')
-            ->setLabel('Content')
+            ->setLabel('Content (EN)')
             ->setTemplatePath('admin/text_editor.html.twig');
     }
 }
