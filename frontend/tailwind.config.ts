@@ -20,7 +20,16 @@ const config = {
 						'500': '#ffd400',
 						'600': '#febc00'
 					},
-				}
+				},
+				wireframe: {
+					content: "#1A1F4A",
+					darkest: {
+						gray: "#4A5A71",
+					},
+					lightest: {
+						gray: "#EFF1F6",
+					},
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
