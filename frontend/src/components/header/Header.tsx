@@ -78,7 +78,12 @@ export default function Header() {
 
                         <div className="flex items-center gap-x-6">
                             <LanguageSwitcher />
-                            <HeaderProfileButton />
+                            {isAuthenticated
+                                ?   <HeaderProfileButton />
+                                :   <Link href="login" className="primary-button">
+                                        {t('login')}
+                                    </Link>
+                            }
                         </div>
                     </Suspense>
                 </div>

@@ -34,25 +34,19 @@ export default function HeaderProfileButton() {
 
     return(
         <>
-            {isAuthenticated ?
-                <DropdownMenu>
-                    <DropdownMenuTrigger>
-                        <CircleUserRound className="" size={28} strokeWidth={1.5}/>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuLabel className="pt-1.5 pb-1">{user?.fullName}</DropdownMenuLabel>
-                        <DropdownMenuLabel className="text-gray-600 pt-0 pb-1.5 text-xs">{user?.username}</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem><Link className="font-normal text-sm" href="account">{t('account.account')}</Link></DropdownMenuItem>
-                        <DropdownMenuItem><Link className="font-normal text-sm" href="https://vtk.be/account/">{t('header.my_vtk')}</Link></DropdownMenuItem>
-                        <DropdownMenuItem><button className="text-sm leading-6 text-gray-900" onClick={async () => onClickLogout()}>{t('logout')}</button></DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-                :
-                <Link href="login" className="primary-button">
-                    {t('login')}
-                </Link>
-            }
+            <DropdownMenu>
+                <DropdownMenuTrigger>
+                    <CircleUserRound className="" size={28} strokeWidth={1.5}/>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                    <DropdownMenuLabel className="pt-1.5 pb-1">{user?.fullName}</DropdownMenuLabel>
+                    <DropdownMenuLabel className="text-gray-600 pt-0 pb-1.5 text-xs">{user?.username}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem><Link className="font-normal text-sm" href="account">{t('account.account')}</Link></DropdownMenuItem>
+                    <DropdownMenuItem><Link className="font-normal text-sm" href="https://vtk.be/account/">{t('header.my_vtk')}</Link></DropdownMenuItem>
+                    <DropdownMenuItem><button className="text-sm leading-6 text-gray-900" onClick={async () => onClickLogout()}>{t('logout')}</button></DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </>
     )
 }
