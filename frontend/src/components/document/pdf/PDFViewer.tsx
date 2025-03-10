@@ -57,6 +57,11 @@ export default function PDFViewer({ fileArg, width }: { fileArg: PDFFile, width:
                 onLoadSuccess={onDocumentLoadSuccess}
                 options={options}
                 className="flex flex-col items-center"
+                loading={
+                    <div className="p-4 text-italic">
+                        Bringing your document to life...
+                    </div>
+                }
             >
                 {Array.from(new Array(displayedPages), (_el, index) => (
                     <Page
@@ -64,6 +69,7 @@ export default function PDFViewer({ fileArg, width }: { fileArg: PDFFile, width:
                         pageNumber={index + 1}
                         width={width}
                         className="my-4 shadow-md shadow-black/50"
+                        loading={null}
                     />
                 ))}
             </Document>

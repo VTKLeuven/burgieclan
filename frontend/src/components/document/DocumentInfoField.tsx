@@ -2,7 +2,11 @@ import { LucideIcon } from "lucide-react";
 import React from "react";
 
 /**
- * Inline component to display a field with an icon and a value
+ * Inline component to display an information field consisting of an icon and a value
+ * @param Icon
+ * @param value
+ * @param className
+ * @constructor
  */
 export default function DocumentInfoField({icon: Icon, value, className}: {
     icon: LucideIcon;

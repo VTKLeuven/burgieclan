@@ -10,7 +10,7 @@ export enum VoteDirection {
 export interface VoteButtonProps {
     initialVotes: number;                       // The initial number of votes
     initialVote?: VoteDirection;                // The initial vote direction
-    onVote: (delta: number) => Promise<(vote: number) => void>; // Callback when the vote button is clicked
+    onVote?: (delta: number) => Promise<(vote: number) => void>; // Callback when the vote button is clicked
     disabled?: boolean;                         // Whether the vote button is disabled (unclickable)
     className?: string;                         // Custom classes for the outer span element
 }
@@ -36,7 +36,9 @@ export default function VoteButton({
             const delta = calculateVoteDelta(voteState, newVoteState);
 
             // Run callback
-            await onVote(delta);
+            if (onVote) {
+                await onVote(delta);
+            }
 
             // TODO: Update vote count in backend (awaiting backend fix)
 
