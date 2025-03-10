@@ -65,7 +65,7 @@ const NavigationSidebar = () => {
   }
 
   return (
-      <aside className="w-64 border-r">
+      <aside>
         <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-full bg-white border-r border-gray-200 flex flex-col`}>
           {/* Collapse Toggle Button */}
           <button
