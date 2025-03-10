@@ -10,7 +10,11 @@ export default function HeaderLayout({ children }: Readonly<{ children: React.Re
             <Header />
             <div className="grow flex flex-1">
                 <Sidebar />
-                {children}
+                <main className="flex-1 flex justify-center px-4">
+                    <div className="w-full max-w-6xl">
+                        {children}
+                    </div>
+                </main>
             </div>
             <Footer />
         </div>
