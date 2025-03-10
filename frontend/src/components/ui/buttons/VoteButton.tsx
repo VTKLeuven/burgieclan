@@ -35,8 +35,10 @@ export default function VoteButton({
 
             const delta = calculateVoteDelta(voteState, newVoteState);
 
-            // Call parent handler
+            // Run callback
             await onVote(delta);
+
+            // TODO: Update vote count in backend (awaiting backend fix)
 
             // Update local state
             setVoteCount(prev => prev + delta);
@@ -45,10 +47,10 @@ export default function VoteButton({
             // Revert on error
             setVoteCount(voteCount);
             setVoteState(voteState);
-            console.error('Vote failed:', error);
         }
     };
 
+    // Calculate the vote delta (change in amount of votes) based on the old and new vote states
     const calculateVoteDelta = (oldVote, newVote) => {
         if (oldVote === newVote) return 0;
         if (newVote === VoteDirection.NONE) return oldVote === VoteDirection.UP ? -1 : 1;

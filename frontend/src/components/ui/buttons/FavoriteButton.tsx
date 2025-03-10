@@ -5,10 +5,10 @@ import {FavoriteType, useFavorites} from '@/hooks/useFavorites';
 import type { Course, Module, Program, Document } from '@/types/entities';
 
 interface FavoriteButtonProps {
-    disabled?: boolean;
-    favoriteType: FavoriteType;
-    resourceId: number;
-    onFavoriteChange?: (isFavorited: boolean) => void;
+    favoriteType: FavoriteType;                         // The type of resource to favorite
+    resourceId: number;                                 // The ID of the resource to favorite
+    onFavoriteChange?: (isFavorited: boolean) => void;  // Callback when favorite state changes
+    disabled?: boolean;                                 // Whether the button is disabled
 }
 
 type FavoriteResources = {
@@ -19,10 +19,10 @@ type FavoriteResources = {
 }
 
 export default function FavoriteButton({
-    disabled = false,
     favoriteType,
     resourceId,
-    onFavoriteChange
+    onFavoriteChange,
+    disabled = false
 }: FavoriteButtonProps) {
     const { user, loading } = useUser();
     const { updateFavorite } = useFavorites(user);
@@ -33,15 +33,15 @@ export default function FavoriteButton({
     useEffect(() => {
         if (!user || loading) return;
 
-        const favoritesList: FavoriteResources = {
+        const userFavoritesList: FavoriteResources = {
             courses: user.favoriteCourses,
             modules: user.favoriteModules,
             programs: user.favoritePrograms,
             documents: user.favoriteDocuments
         };
 
-        const currentList = favoritesList[favoriteType];
-        const isResourceFavorited = currentList?.some(
+        const favoritesList = userFavoritesList[favoriteType];
+        const isResourceFavorited = favoritesList?.some(
             resource => resource.id === resourceId
         );
 
@@ -60,7 +60,6 @@ export default function FavoriteButton({
             updateFavorite(resourceId, favoriteType, newState);
         } catch (error) {
             // Revert UI state if the operation fails
-            console.error('Failed to update favorite status:', error);
             setIsFavorite(!newState);
             onFavoriteChange?.(!newState);
         }
