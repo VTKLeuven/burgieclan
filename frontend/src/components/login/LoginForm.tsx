@@ -4,6 +4,7 @@
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import LitusOAuthButton from "@/components/login/LitusOAuthButton";
 import Logo from "@/components/common/Logo";
+import { useToast } from "@/components/ui/Toast";
 
 // Logic
 import React, { useState } from 'react';
@@ -28,6 +29,7 @@ export default function LoginForm() {
 
     const [isOpen, setIsOpen] = useState(false);
     const [error, setError] = useState<Error | null>(null);
+    const { showToast } = useToast();
 
     const redirectTo = searchParams.get('redirectTo') || '/';
 
@@ -57,7 +59,14 @@ export default function LoginForm() {
                 username: username,
                 password: password,
             });
+
+            if (response?.error) {
+                showToast(t('login_failed'), 'error');
+                return;
+            }
+
             await storeOAuthTokens(response.token);
+            showToast(t('login_success'), 'success');
             router.push(redirectTo);
         } catch (err: any) {
             setCredentialsError(t('login_invalid_credentials'));
