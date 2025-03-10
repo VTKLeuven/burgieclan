@@ -6,6 +6,8 @@
     "sign_in": "Meld je aan bij je account",
     "or_log_in_manually": "Of log handmatig in",
     "login_invalid_credentials": "Ongeldige inloggegevens, controleer of je gebruikersnaam/wachtwoord correct zijn.",
+    "login_failed": "Login gefaald, probeer opnieuw.",
+    "login_success": "Succesvolle login!",
     "username": "Gebruikersnaam",
     "password": "Wachtwoord",
     "profile": "Profiel",
@@ -79,6 +81,10 @@
             "year": {
                 "label": "Academiejaar",
                 "placeholder": "Selecteer academiejaar..."
+            },
+            "anonymous": {
+                "label": "Anoniem",
+                "description": "Wil je dit document anoniem uploaden?"
             },
             "validation": {
                 "name": {
@@ -160,5 +166,19 @@
     },
     "header": {
         "my_vtk": "Mijn VTK"
+    },
+    "sidebar": {
+        "home": "Home",
+        "upload": "Upload",
+        "my_courses": "Mijn Vakken",
+        "courses": "Vakken",
+        "my_favorite_documents": "Favoriete Documenten",
+        "documents": "Documenten",
+        "add_document": "Voeg document toe",
+        "profile": "Profiel",
+        "log_out": "Uitloggen",
+        "add_doc": "Voeg document toe",
+        "go_to_vtk": "Ga naar VTK",
+        "user_avatar": "Gebruikersavatar"
     }
 }

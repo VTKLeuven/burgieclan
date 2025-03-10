@@ -7,11 +7,13 @@ import { ALLOWED_MIME_TYPES, FILE_SIZE_MB } from '@/utils/constants/upload';
 import { fileTypeFromBlob } from 'file-type';
 import { Merge } from "type-fest";
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 
 interface FileUploadProps {
     error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
     setValue: UseFormSetValue<UploadFormData>;
     initialFile: File | null;
+    className?: string;
 }
 
 interface FilePreview {
@@ -20,7 +22,13 @@ interface FilePreview {
     icon: JSX.Element | null;
 }
 
-export const UploadField: React.FC<FileUploadProps> = ({ error, setValue, initialFile }) => {
+export const UploadField: React.FC<FileUploadProps> = ({
+                                                           error,
+                                                           setValue,
+                                                           initialFile,
+                                                           className
+}) => {
+    const [isDragging, setIsDragging] = useState(false);
     const [filePreview, setFilePreview] = useState<FilePreview | null>(null);
     const { t } = useTranslation();
 
@@ -78,12 +86,20 @@ export const UploadField: React.FC<FileUploadProps> = ({ error, setValue, initia
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
+        setIsDragging(false);
+
         const file = e.dataTransfer.files[0];
         handleFileChange(file || null);
     };
 
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setIsDragging(false);
     };
 
     const handleRemoveFile = () => {
@@ -101,17 +117,24 @@ export const UploadField: React.FC<FileUploadProps> = ({ error, setValue, initia
 
             {!filePreview ? (
                 <div
-                    className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-3 h-16"
+                    className={cn(
+                        "mt-2 flex justify-center rounded-lg border ",
+                        "border-dashed border-gray-900/25 px-6 py-3 h-16",
+                        isDragging ? "border-amber-600 bg-amber-50" : "border-gray-300",
+                        "transition-colors duration-100",
+                        className
+                    )}
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
                 >
                     <div className="text-center">
                         <div className="flex text-sm leading-6 text-gray-600">
                             <label
                                 htmlFor="file-upload"
-                                className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                                className="relative cursor-pointer rounded-md bg-white font-semibold text-amber-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-amber-600 focus-within:ring-offset-2 hover:text-amber-500"
                             >
-                                <span>{t('upload.field.upload_button')}</span>
+                                <p className={'text-sm'}>{t('upload.field.upload_button')}</p>
                                 <input
                                     id="file-upload"
                                     type="file"
@@ -120,7 +143,7 @@ export const UploadField: React.FC<FileUploadProps> = ({ error, setValue, initia
                                     accept={ALLOWED_MIME_TYPES.join(',')}
                                 />
                             </label>
-                            <p className="pl-1 sm:block hidden">{t('upload.field.drag_drop_text')}</p>
+                            <p className="pl-1 sm:block hidden text-sm">{t('upload.field.drag_drop_text')}</p>
                         </div>
                         <p className="text-xs leading-5 text-gray-400">
                             {t('upload.supported_formats', { size: FILE_SIZE_MB })}

@@ -31,6 +31,9 @@ class Document extends Node
     #[ORM\Column]
     private ?bool $under_review = null;
 
+    #[ORM\Column]
+    private ?bool $anonymous = null;
+
     #[Vich\UploadableField(mapping: 'document_object', fileNameProperty: 'file_name')]
     private ?File $file = null;
 
@@ -88,6 +91,18 @@ class Document extends Node
     public function setUnderReview(bool $under_review): static
     {
         $this->under_review = $under_review;
+
+        return $this;
+    }
+
+    public function isAnonymous(): ?bool
+    {
+        return $this->anonymous;
+    }
+
+    public function setAnonymous(bool $anonymous): static
+    {
+        $this->anonymous = $anonymous;
 
         return $this;
     }
