@@ -12,6 +12,12 @@ import {ApiClient} from "@/actions/api";
 import UnderReviewBox from "@/components/document/UnderReviewBox";
 import {useUser} from "@/components/UserContext";
 
+/**
+ * TODO:
+ * -
+ * -
+ */
+
 interface DocumentData {
     "@context": string;
     "@id": string;
@@ -78,21 +84,11 @@ export default function DocumentPreview({id}: { id: string }) {
         return () => window.removeEventListener('resize', updateWidth);
     }, []);
 
-    const handleVote = async (delta: number) => {
-        return (vote: number) => {
-            console.log('vote registered:', delta, 'new vote:', vote);
-        };
-    };
-
-    const handleFavorite = async (isFavorite: boolean) => {
-        console.log('favorite status changed:', isFavorite);
-    }
-
-    if (isLoading) return <LoadingPage />;
+    if (isLoading) return <LoadingPage className="w-full"/>
 
     if (error) {
         console.error(error);
-        return <ErrorPage />;
+        return <ErrorPage className="w-full"/>;
     }
 
     if (!documentData) return <div>No document data available</div>;
@@ -101,7 +97,7 @@ export default function DocumentPreview({id}: { id: string }) {
     const formattedDate = new Date(documentData.createdAt).toLocaleDateString();
 
     return (
-        <div className="p-8 flex-auto text-sm">
+        <div className="p-8 flex-auto text-sm w-full">
             {/* Filename */}
             <span className="inline-flex items-center space-x-4">
                 <File/>
@@ -112,7 +108,7 @@ export default function DocumentPreview({id}: { id: string }) {
             <div className="flex flex-row justify-between py-5">
                 <div className="flex space-x-8">
                     <DocumentInfoField icon={Calendar} value={formattedDate}/>
-                    <DocumentInfoField icon={Package} value="4 MB"/>
+                    <DocumentInfoField icon={Package} value="4 MB"/>  {/*TODO: retrieve from api endpoint or calculate here*/}
                     <DocumentInfoField icon={ChartPie} value={documentData.year}/>
                 </div>
                 <div>
@@ -155,6 +151,8 @@ export default function DocumentPreview({id}: { id: string }) {
                             />
                         </div>
                     </div>
+
+                    {/*TODO: expand preview to other file types*/}
                     {(documentData && documentData.mimetype == "application/pdf") ? (
                         <PDFViewer fileArg={process.env.NEXT_PUBLIC_BACKEND_URL + documentData.contentUrl} width={containerWidth} />
                     ) : (

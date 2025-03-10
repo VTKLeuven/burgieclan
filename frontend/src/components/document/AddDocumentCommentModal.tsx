@@ -3,6 +3,11 @@ import {Dialog} from "@/components/ui/Dialog";
 import PDFViewer from "@/components/document/pdf/PDFViewer";
 import {useEffect, useState, useRef} from "react";
 
+/**
+ * TODO: improve layout, add submit button layout and functionality (sending comment to backend)
+ * TODO: Rethink if this modal is really necessary or if we can just use the editor directly
+ */
+
 export default function AddDocumentCommentModal({isModalOpen, setIsModalOpen}) {
     const [containerWidth, setContainerWidth] = useState<number>(0);
     const containerRef = useRef<HTMLDivElement>(null);

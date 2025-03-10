@@ -1,6 +1,10 @@
 import DocumentComment from "@/components/document/DocumentComment";
 import AddDocumentCommentBox from "@/components/document/AddDocumentCommentBox";
 
+/**
+ * TODO: retrieve documents from server instead of hardcoding
+ */
+
 const sampleData = {
     names: [
         "Alex Thompson",
@@ -39,7 +43,10 @@ export default function DocumentCommentSection() {
         <>
             <div className="space-y-4 py-2.5">
                 <div className="h-8"></div>
+                {/*Allow users to add comments*/}
                 <AddDocumentCommentBox />
+
+                {/*Display existing comments*/}
                 {comments.map((comment, index) => (
                     <DocumentComment
                         key={index}
