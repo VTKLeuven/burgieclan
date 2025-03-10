@@ -11,11 +11,11 @@ interface DownloadButtonProps {
 }
 
 export default function DownloadButton({
-                                           contentUrl,
-                                           fileName,
-                                           fileSize,
-                                           disabled = false,
-                                       }: DownloadButtonProps) {
+    contentUrl,
+    fileName,
+    fileSize,
+    disabled = false,
+}: DownloadButtonProps) {
     const [isDownloading, setIsDownloading] = useState(false);
     const [isHovered, setIsHovered] = useState(false); // Used to show file size on hover
 

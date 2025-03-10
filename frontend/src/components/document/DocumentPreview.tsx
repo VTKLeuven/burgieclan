@@ -138,7 +138,7 @@ export default function DocumentPreview({id}: { id: string }) {
                         <VoteButton
                             initialVotes={10}
                             initialVote={VoteDirection.UP}
-                            onVote={handleVote}
+                            disabled={!user}
                             className="border-gray-500"
                         />
                         <div className="flex space-x-2">
@@ -146,14 +146,12 @@ export default function DocumentPreview({id}: { id: string }) {
                                 contentUrl={documentData.contentUrl}
                                 fileName={documentData.filename}
                                 fileSize="3.6 MB"
+                                disabled={!user}
                             />
                             <FavoriteButton
-                                disabled={!user}
                                 favoriteType="documents"
                                 resourceId={Number(id)}
-                                onFavoriteChange={(isFavorited) => {
-                                    console.log('Favorite status changed:', isFavorited);
-                                }}
+                                disabled={!user}
                             />
                         </div>
                     </div>
