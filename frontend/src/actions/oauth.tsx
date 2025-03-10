@@ -32,13 +32,6 @@ export const storeOAuthTokens = async (jwt: string, refreshToken?: string) => {
 }
 
 /**
- * Check the presence of a JWT in http-only cookie
- */
-export const hasJwt = async (): Promise<boolean> => {
-    return !!cookies().get('jwt')?.value;
-}
-
-/**
  * Proxies an outgoing token request to the Litus OAuth server.
  *
  * This is done by a Server Action to avoid CORS issues taking place when calling the Litus endpoint directly from the
@@ -62,4 +55,9 @@ export const proxyTokenRequest = async (body: any): Promise<{ accessToken: strin
         accessToken: responseData.access_token,
         refreshToken: responseData.refresh_token,
     };
+}
+
+export const logOut = async () => {
+    cookies().delete('jwt');
+    cookies().delete('litus_refresh');
 }
