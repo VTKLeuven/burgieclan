@@ -9,11 +9,6 @@ import { cookies } from "next/headers";
 import { getJWTExpiration, getJWTUserId, LitusOAuthRefresh } from "@/utils/oauth";
 import { cache } from "react";
 
-export const isAuth = cache(async () => {
-    const jwt = await getActiveJWT();
-    return jwt != null;
-})
-
 export const getUserId = cache(async () => {
     const jwt = await getActiveJWT();
     return jwt ? getJWTUserId(jwt) : null;

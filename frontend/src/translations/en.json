@@ -164,6 +164,9 @@
         "no_results": "No results found",
         "no_results_sub": "Try searching for something else or check your spelling."
     },
+    "header": {
+        "my_vtk": "My VTK"
+    },
     "sidebar": {
         "home": "Home",
         "upload": "Upload",

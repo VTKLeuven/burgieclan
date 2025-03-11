@@ -164,6 +164,9 @@
         "no_results": "Geen resultaten gevonden",
         "no_results_sub": "Probeer een andere zoekopdracht of navigeer naar een andere pagina."
     },
+    "header": {
+        "my_vtk": "Mijn VTK"
+    },
     "sidebar": {
         "home": "Home",
         "upload": "Upload",
