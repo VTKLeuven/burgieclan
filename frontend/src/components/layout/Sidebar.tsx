@@ -45,6 +45,10 @@ const NavigationSidebar = () => {
     updateFavoriteDocument
   } = useFavorites(user);
 
+  if (!user) {
+    return null;
+  }
+
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections((prev) => ({
       ...prev,
