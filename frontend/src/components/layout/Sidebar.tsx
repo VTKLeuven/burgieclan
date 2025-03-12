@@ -45,6 +45,10 @@ const NavigationSidebar = () => {
     updateFavoriteDocument
   } = useFavorites(user);
 
+  if (!user) {
+    return null;
+  }
+
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections((prev) => ({
       ...prev,
@@ -65,16 +69,16 @@ const NavigationSidebar = () => {
   }
 
   return (
-    <aside className="w-64 border-r">
-      <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-full bg-white border-r border-gray-200 flex flex-col`}>
-        {/* Collapse Toggle Button */}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-4 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100"
-          aria-label={'toggle'}
-        >
-          {isCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
-        </button>
+      <aside>
+        <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-full bg-white border-r border-gray-200 flex flex-col`}>
+          {/* Collapse Toggle Button */}
+          <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="absolute -right-3 top-4 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100"
+              aria-label={'toggle'}
+          >
+            {isCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
+          </button>
 
         {/* Top Navigation */}
         <nav className="p-4 flex flex-col gap-2">
