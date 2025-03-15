@@ -70,7 +70,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * This variable contains the plaintext password during creation. It is needed for the @see UserFactory
      * This isn't saved in the database.
      */
-    private ?string $plainPassword;
+    private ?string $plainPassword = null;
 
     /**
      * @var string[]
