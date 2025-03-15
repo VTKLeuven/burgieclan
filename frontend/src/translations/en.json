@@ -22,7 +22,10 @@
     "modules": "Modules",
     "programs": "Programs",
     "documents": "Documents",
+    "credits": "ECTS credits",
     "FAQ": "FAQ",
+    "favorite": "Favorite",
+    "share": "Share",
     "overview": "Overview",
     "cookie_banner_text": "This website only uses functional cookies to provide you a smooth experience. No other cookies are used.",
     "cookie_banner_accept": "I understand",
@@ -125,6 +128,20 @@
             "search": "Search...",
             "no_results": "No results found"
         }
+    },
+    "course-page": {
+        "about": "About this course",
+        "teachers": "Teachers",
+        "coordinator": "Coordinator",
+        "professor": "Professor",
+        "files": "Files",
+        "summaries": "Summaries",
+        "summaries-description": "Lorem ipsum dolor sit amet",
+        "exercise-session": "Exercise sessions",
+        "exercise-session-description": "Lorem ipsum dolor sit amet",
+        "exams": "Exams",
+        "exams-description": "Lorem ipsum dolor sit amet",
+        "error-fetching": "An error occurred while fetching the course data: "
     },
     "account": {
         "account": "Account",

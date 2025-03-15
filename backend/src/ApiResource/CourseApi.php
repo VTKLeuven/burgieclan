@@ -41,6 +41,10 @@ class CourseApi
     #[Groups(['search', 'user', 'document:get'])]
     public ?string $code = null;
 
+    #[Assert\NotBlank]
+    #[Assert\Choice(choices: ['nl', 'en'], message: 'Choose a valid language.')]
+    public ?string $language = null;
+
     #[Groups('search')]
     public array $professors = [];
 
