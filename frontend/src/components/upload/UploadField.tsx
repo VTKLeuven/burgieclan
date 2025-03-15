@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { X } from 'lucide-react';
 import { FieldError, FieldErrorsImpl, UseFormSetValue } from 'react-hook-form';
 import { UploadFormData } from '@/types/upload';
 import { ALLOWED_MIME_TYPES, FILE_SIZE_MB } from '@/utils/constants/upload';
@@ -165,7 +165,7 @@ export const UploadField: React.FC<FileUploadProps> = ({
                             onClick={handleRemoveFile}
                             className="min-h-5 min-w-5"
                         >
-                            <XMarkIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" aria-hidden="true" />
+                            <X className="h-5 w-5 text-gray-400 hover:text-gray-600" aria-hidden="true" />
                         </button>
                     </div>
                 </div>
