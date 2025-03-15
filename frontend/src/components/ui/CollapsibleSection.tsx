@@ -1,6 +1,5 @@
 import React, { useState, ReactNode } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface CollapsibleSectionProps {
     header: ReactNode;
@@ -19,7 +18,11 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ header, childre
             <button onClick={toggleCollapse} className="w-full text-left focus:outline-none">
                 <div className="flex justify-between items-center px-4 py-1 bg-gray-100 rounded-t-lg">
                     {header}
-                    <FontAwesomeIcon icon={isCollapsed ? faChevronDown : faChevronUp} className="text-vtk-blue-500" />
+                    <ChevronDown
+                        className={`text-vtk-blue-500 transform transition-transform duration-400 ${isCollapsed ? 'rotate-0' : '-rotate-180'
+                            }`}
+                        aria-hidden="true"
+                    />
                 </div>
             </button>
             <div
