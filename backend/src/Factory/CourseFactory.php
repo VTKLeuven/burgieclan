@@ -13,46 +13,47 @@ namespace App\Factory;
 
 use App\Entity\Course;
 use App\Repository\CourseRepository;
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
-use Zenstruck\Foundry\RepositoryProxy;
+use Doctrine\ORM\EntityRepository;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 
 /**
- * @extends ModelFactory<Course>
+ * @extends PersistentProxyObjectFactory<Course>
  *
- * @method        Course|Proxy                     create(array|callable $attributes = [])
- * @method static Course|Proxy                     createOne(array $attributes = [])
- * @method static Course|Proxy                     find(object|array|mixed $criteria)
- * @method static Course|Proxy                     findOrCreate(array $attributes)
- * @method static Course|Proxy                     first(string $sortedField = 'id')
- * @method static Course|Proxy                     last(string $sortedField = 'id')
- * @method static Course|Proxy                     random(array $attributes = [])
- * @method static Course|Proxy                     randomOrCreate(array $attributes = [])
- * @method static CourseRepository|RepositoryProxy repository()
- * @method static Course[]|Proxy[]                 all()
- * @method static Course[]|Proxy[]                 createMany(int $number, array|callable $attributes = [])
- * @method static Course[]|Proxy[]                 createSequence(iterable|callable $sequence)
- * @method static Course[]|Proxy[]                 findBy(array $attributes)
- * @method static Course[]|Proxy[]                 randomRange(int $min, int $max, array $attributes = [])
- * @method static Course[]|Proxy[]                 randomSet(int $number, array $attributes = [])
+ * @method        Course|Proxy                              create(array|callable $attributes = [])
+ * @method static Course|Proxy                              createOne(array $attributes = [])
+ * @method static Course|Proxy                              find(object|array|mixed $criteria)
+ * @method static Course|Proxy                              findOrCreate(array $attributes)
+ * @method static Course|Proxy                              first(string $sortedField = 'id')
+ * @method static Course|Proxy                              last(string $sortedField = 'id')
+ * @method static Course|Proxy                              random(array $attributes = [])
+ * @method static Course|Proxy                              randomOrCreate(array $attributes = [])
+ * @method static CourseRepository|ProxyRepositoryDecorator repository()
+ * @method static Course[]|Proxy[]                          all()
+ * @method static Course[]|Proxy[]                          createMany(int $number, array|callable $attributes = [])
+ * @method static Course[]|Proxy[]                          createSequence(iterable|callable $sequence)
+ * @method static Course[]|Proxy[]                          findBy(array $attributes)
+ * @method static Course[]|Proxy[]                          randomRange(int $min, int $max, array $attributes = [])
+ * @method static Course[]|Proxy[]                          randomSet(int $number, array $attributes = [])
  *
- * @phpstan-method        Proxy<Course> create(array|callable $attributes = [])
- * @phpstan-method static Proxy<Course> createOne(array $attributes = [])
- * @phpstan-method static Proxy<Course> find(object|array|mixed $criteria)
- * @phpstan-method static Proxy<Course> findOrCreate(array $attributes)
- * @phpstan-method static Proxy<Course> first(string $sortedField = 'id')
- * @phpstan-method static Proxy<Course> last(string $sortedField = 'id')
- * @phpstan-method static Proxy<Course> random(array $attributes = [])
- * @phpstan-method static Proxy<Course> randomOrCreate(array $attributes = [])
- * @phpstan-method static RepositoryProxy<Course> repository()
- * @phpstan-method static list<Proxy<Course>> all()
- * @phpstan-method static list<Proxy<Course>> createMany(int $number, array|callable $attributes = [])
- * @phpstan-method static list<Proxy<Course>> createSequence(iterable|callable $sequence)
- * @phpstan-method static list<Proxy<Course>> findBy(array $attributes)
- * @phpstan-method static list<Proxy<Course>> randomRange(int $min, int $max, array $attributes = [])
- * @phpstan-method static list<Proxy<Course>> randomSet(int $number, array $attributes = [])
+ * @phpstan-method        Course&Proxy<Course> create(array|callable $attributes = [])
+ * @phpstan-method static Course&Proxy<Course> createOne(array $attributes = [])
+ * @phpstan-method static Course&Proxy<Course> find(object|array|mixed $criteria)
+ * @phpstan-method static Course&Proxy<Course> findOrCreate(array $attributes)
+ * @phpstan-method static Course&Proxy<Course> first(string $sortedField = 'id')
+ * @phpstan-method static Course&Proxy<Course> last(string $sortedField = 'id')
+ * @phpstan-method static Course&Proxy<Course> random(array $attributes = [])
+ * @phpstan-method static Course&Proxy<Course> randomOrCreate(array $attributes = [])
+ * @phpstan-method static ProxyRepositoryDecorator<Course, EntityRepository> repository()
+ * @phpstan-method static list<Course&Proxy<Course>> all()
+ * @phpstan-method static list<Course&Proxy<Course>> createMany(int $number, array|callable $attributes = [])
+ * @phpstan-method static list<Course&Proxy<Course>> createSequence(iterable|callable $sequence)
+ * @phpstan-method static list<Course&Proxy<Course>> findBy(array $attributes)
+ * @phpstan-method static list<Course&Proxy<Course>> randomRange(int $min, int $max, array $attributes = [])
+ * @phpstan-method static list<Course&Proxy<Course>> randomSet(int $number, array $attributes = [])
  */
-final class CourseFactory extends ModelFactory
+final class CourseFactory extends PersistentProxyObjectFactory
 {
     private const COURSES = [
         'H00S2A' => 'Sensoren en meetsystemen',
@@ -111,10 +112,15 @@ final class CourseFactory extends ModelFactory
         parent::__construct();
     }
 
+    public static function class(): string
+    {
+        return Course::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      */
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         $code = self::faker()->randomKey(self::COURSES);
 
@@ -144,15 +150,10 @@ final class CourseFactory extends ModelFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
             // ->afterInstantiate(function(Course $course): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Course::class;
     }
 }
