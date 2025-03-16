@@ -4,6 +4,12 @@ twig:
         - 'form/layout.html.twig'
         - 'form/fields.html.twig'
 
+twig_component:
+    anonymous_template_directory: "components/"
+    defaults:
+        # Namespace & directory for components
+        App\Twig\Components\: 'components/'
+
 when@test:
     twig:
         strict_variables: true
