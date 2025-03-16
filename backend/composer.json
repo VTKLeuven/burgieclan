@@ -81,8 +81,8 @@
         "symfony/phpunit-bridge": "^6.4",
         "symfony/stopwatch": "^6.4",
         "symfony/web-profiler-bundle": "^6.4",
-        "zenstruck/browser": "^1.8",
-        "zenstruck/foundry": "^1.37"
+        "zenstruck/browser": "^1.9",
+        "zenstruck/foundry": "^2.0"
     },
     "config": {
         "allow-plugins": {
