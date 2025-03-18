@@ -18,7 +18,7 @@ use App\State\EntityClassDtoStateProvider;
 use App\State\DocumentProcessor;
 use ArrayObject;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
