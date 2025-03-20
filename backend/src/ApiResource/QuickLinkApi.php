@@ -2,9 +2,7 @@
 
 namespace App\ApiResource;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -16,8 +14,40 @@ use App\State\EntityClassDtoStateProvider;
 #[ApiResource(
     shortName: 'Quick Link',
     operations: [
-        new Get(),
-        new GetCollection(),
+        new Get(
+            openapiContext: [
+                'parameters' => [
+                    [
+                        'name' => 'lang',
+                        'in' => 'query',
+                        'required' => false,
+                        'schema' => [
+                            'type' => 'string',
+                            'enum' => ['nl', 'en'],
+                            'default' => 'nl'
+                        ],
+                        'description' => 'The language in which to retrieve the page content'
+                    ]
+                ]
+            ]
+        ),
+        new GetCollection(
+            openapiContext: [
+                'parameters' => [
+                    [
+                        'name' => 'lang',
+                        'in' => 'query',
+                        'required' => false,
+                        'schema' => [
+                            'type' => 'string',
+                            'enum' => ['nl', 'en'],
+                            'default' => 'nl'
+                        ],
+                        'description' => 'The language in which to retrieve the page content'
+                    ]
+                ]
+            ]
+        ),
     ],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
@@ -28,9 +58,7 @@ class QuickLinkApi
     #[ApiProperty(readable: false, writable: false, identifier: true)]
     public ?int $id = null;
 
-    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     public ?string $name = null;
 
-    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     public ?string $linkTo = null;
 }
