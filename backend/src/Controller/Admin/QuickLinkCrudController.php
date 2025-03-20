@@ -18,8 +18,10 @@ class QuickLinkCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-            yield TextField::new('name')
-                ->setLabel('Name (displayed as)');
+            yield TextField::new('name_nl')
+                ->setLabel('Name (NL)');
+            yield TextField::new('name_en')
+            ->setLabel('Name (EN)');
             yield UrlField::new('linkTo')
                 ->setLabel('Link to (url)')
                 ->setFormTypeOption('default_protocol', 'https')
