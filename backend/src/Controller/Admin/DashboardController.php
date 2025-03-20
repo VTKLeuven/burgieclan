@@ -12,6 +12,7 @@ use App\Entity\DocumentComment;
 use App\Entity\Module;
 use App\Entity\Page;
 use App\Entity\Program;
+use App\Entity\QuickLink;
 use App\Entity\User;
 use App\Repository\DocumentRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -97,6 +98,9 @@ class DashboardController extends AbstractDashboardController
         yield $documentsMenu;
         yield MenuItem::linkToCrud('Pages', 'fa-solid fa-newspaper', Page::Class)
             ->setPermission(User::ROLE_ADMIN);
+        yield MenuItem::linkToCrud('Quick Links', 'fa-solid fa-link', QuickLink::class)
+            ->setPermission(User::ROLE_ADMIN);
+
         yield MenuItem::section('Frontend');
         yield MenuItem::linkToUrl('Home', 'fa fa-window-maximize', '/');
     }
