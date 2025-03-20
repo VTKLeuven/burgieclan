@@ -25,7 +25,9 @@ class QuickLinkEntityToApiMapper implements MapperInterface
         assert($from instanceof QuickLink);
         assert($to instanceof QuickLinkApi);
 
-        $to->name = $from->getName();
+        $lang = $context['lang'] ?? QuickLink::$DEFAULT_LANGUAGE;
+
+        $to->name = $from->getName($lang);
         $to->linkTo = $from->getLinkTo();
 
         return $to;
