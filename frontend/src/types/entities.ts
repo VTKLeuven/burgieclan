@@ -61,10 +61,14 @@ export interface User extends BaseEntity {
     favoriteDocuments?: Document[];
 }
 
-
 export interface Page extends BaseEntity {
     name?: string;
     content?: string;
     urlKey?: string;
     isPublic?: boolean;
+}
+
+export interface QuickLink extends BaseEntity {
+    name?: string;
+    linkTo: string;
 }
