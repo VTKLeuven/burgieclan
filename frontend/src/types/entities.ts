@@ -64,7 +64,6 @@ export interface User extends BaseEntity {
     favoriteDocuments?: Document[];
 }
 
-
 export interface Page extends BaseEntity {
     name?: string;
     content?: string;
@@ -74,4 +73,9 @@ export interface Page extends BaseEntity {
 
 export interface Breadcrumb extends BaseEntity {
     breadcrumb: string[];
+}
+
+export interface QuickLink extends BaseEntity {
+    name?: string;
+    linkTo: string;
 }
