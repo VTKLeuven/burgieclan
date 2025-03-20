@@ -1,4 +1,4 @@
-import { type Category, type Course, type CourseComment, type Document, type Module, type Page, type Program, type User } from '@/types/entities';
+import { type Category, type Course, type CourseComment, type Document, type Module, type Page, type Program, type QuickLink, type User } from '@/types/entities';
 
 export function convertToUser(user: any): User {
     return {
@@ -99,6 +99,14 @@ export function convertToCategory(category: any): Category {
         id: parseId(category['@id']),
         name: category.name,
         description: category.description
+    };
+}
+
+export function convertToQuickLink(link: any): QuickLink {
+    return {
+        id: parseId(link['@id']),
+        name: link.name,
+        linkTo: link.linkTo
     };
 }
 
