@@ -67,9 +67,11 @@ final class QuickLinkFactory extends ModelFactory
      */
     protected function getDefaults(): array
     {
+        $name = self::faker()->text(20);
         return [
-            'name' => self::faker()->words(self::faker()->numberBetween(0, 4), true),
-            'linkTo' => self::faker()->text(255),
+            'name_nl' => $name,
+            'name_en' => $name . ' (en)',
+            'linkTo' => self::faker()->url(),
         ];
     }
 
