@@ -16,6 +16,7 @@ import { ApiClient } from "@/actions/api";
 import { storeOAuthTokens } from "@/actions/oauth";
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
+import { LoaderCircle } from 'lucide-react';
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
@@ -36,6 +37,7 @@ export default function LoginForm() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [credentialsError, setCredentialsError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const { t } = useTranslation();
 
@@ -54,6 +56,7 @@ export default function LoginForm() {
 
     const handleCredentialsLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
+        setIsLoading(true);
         try {
             const response = await ApiClient('POST', `/api/auth/login`, {
                 username: username,
@@ -70,6 +73,8 @@ export default function LoginForm() {
             router.push(redirectTo);
         } catch (err: any) {
             setCredentialsError(t('login_invalid_credentials'));
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -151,9 +156,10 @@ export default function LoginForm() {
                         <div className="mt-5 w-full max-w-sm">
                             <button
                                 type="submit"
-                                className="primary-button"
+                                className="primary-button flex items-center justify-center gap-2"
+                                disabled={isLoading}
                             >
-                                {t('login')}
+                                {isLoading ? <LoaderCircle className="animate-spin" /> : t('login')}
                             </button>
                         </div>
                     </form>
