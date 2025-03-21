@@ -10,13 +10,25 @@ import { getActiveJWT } from "@/utils/dal";
 const handleError = async (response: Response) => {
     const errorData = await response.json();
 
-    switch (response.status) {
+    // Get the error message with priority order
+    const errorMessage =
+        errorData.detail ||
+        errorData['hydra:description'] ||
+        errorData.message ||
+        errorData['hydra:title'] ||
+        errorData.title ||
+        'Unexpected Error.';
+
+    // Use status from the error object if available, otherwise use response status
+    const status = errorData.status || response.status || 500;
+
+    switch (status) {
         case 404:
-            return { error: { message: errorData.message || 'Resource not found.', status: 404 } };
+            return { error: { message: errorMessage || 'Resource not found.', status: 404 } };
         case 500:
-            return { error: { message: errorData.message || 'Internal Server Error. Please try again later.', status: 500 } };
+            return { error: { message: errorMessage || 'Internal Server Error. Please try again later.', status: 500 } };
         default:
-            return { error: { message: errorData.message || 'Unexpected Error.', status: response.status || 500 } };
+            return { error: { message: errorMessage || 'Unexpected Error.', status } };
     }
 };
 
@@ -40,7 +52,7 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
         const jwt = await getActiveJWT();
 
         const requestHeaders = new Headers(customHeaders || {});
-        // If body is FormData, don't set content-type (usefull for file uploads)
+        // If body is FormData, don't set content-type (useful for file uploads)
         if (!(body instanceof FormData)) {
             if (method === 'PATCH') {
                 // Backend expects content-type to be application/merge-patch+json for PATCH requests
