@@ -62,11 +62,9 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
             body: body instanceof FormData ? body : JSON.stringify(body),
         });
 
-        const res = await response.json();
-
         // Handle successful response
         if (response.ok) {
-            return res;
+            return response.json();
         }
 
         // Handle errors (except 401s)
@@ -94,6 +92,4 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
     const redirectTo = refererUrl && !refererUrl.startsWith(loginUrl) ? `?redirectTo=${encodeURIComponent(refererUrl)}` : "";
     const finalLoginUrl = `${loginUrl}${redirectTo}`;
     redirect(finalLoginUrl);
-
-    return;
 }
