@@ -6,10 +6,13 @@ import { useTranslation } from "react-i18next";
 /**
  * Displays an error page with a status code, brief standard description and a longer custom description (which is
  * either given by `detail`, retrieved from the httpStatusDescriptions.ts file or left empty).
+ * In development mode, shows detailed error information.
+ * In production mode, shows a general error message to avoid exposing sensitive details.
  */
 export default function ErrorPage({ status, detail }: { status?: number; detail?: string }) {
     const router = useRouter();
     const { t } = useTranslation();
+    const isDevelopment = process.env.NODE_ENV === 'development';
 
     if (!status) {
         status = 500;
@@ -30,9 +33,20 @@ export default function ErrorPage({ status, detail }: { status?: number; detail?
         <>
             <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
                 <div className="text-center">
-                    <p className="text-base font-semibold text-amber-700">{status}</p>
-                    <h1 className="mt-4">{statusDescription}</h1>
-                    <p className="mt-6 text-gray-600">{customDescription}</p>
+                    {isDevelopment ? (
+                        // Show detailed error information in development
+                        <>
+                            <p className="text-base font-semibold text-amber-700">{status}</p>
+                            <h1 className="mt-4">{statusDescription}</h1>
+                            <p className="mt-6 text-gray-600">{customDescription}</p>
+                        </>
+                    ) : (
+                        // Show general error message in production
+                        <>
+                            <p className="text-base font-semibold text-amber-700">{status}</p>
+                            <h1 className="mt-4">{statusDescription}</h1>
+                        </>
+                    )}
                     <div className="mt-10 flex items-center justify-center space-x-6">
                         <button
                             type="button"
