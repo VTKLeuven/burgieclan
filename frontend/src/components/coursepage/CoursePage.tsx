@@ -25,8 +25,8 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
     const [t, setT] = useState<any>(() => (key: string) => key); // Default translation function
     const { showToast } = useToast();
     const [error, setError] = useState<boolean>(false);
-    const { user, loading } = useUser();
-    const { updateFavoriteCourse } = useFavorites(user);
+    const { user, loading, refreshUser } = useUser();
+    const { updateFavorite } = useFavorites(user);
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
     async function fetchCourse(query: number) {
@@ -57,20 +57,21 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
         }
     }, [courseId, showToast, loading]); // Fetch course only when `loading` is done
 
-// Separate useEffect to handle user updates
     useEffect(() => {
         if (user?.favoriteCourses) {
             setIsFavorite(user.favoriteCourses.some(favCourse => favCourse.id === courseId));
         }
-    }, [user, courseId]); // Runs when `user` updates
+    }, [user, courseId]);
+
 
     const handleFavoriteClick = async () => {
-        if (!courseId || !user || !user.favoriteCourses) return;
-        const courseIndex = user.favoriteCourses.findIndex(favCourse => favCourse.id === courseId);
-        if (courseIndex === -1) return; // Course not found in favorites
-        const newFavoriteState = !isFavorite;
-        await updateFavoriteCourse(courseIndex, newFavoriteState);
+        if (!courseId || !user) return;
+
+        const isCurrentlyFavorite = user.favoriteCourses?.some(favCourse => favCourse.id === courseId);
+        const newFavoriteState = !isCurrentlyFavorite;
         setIsFavorite(newFavoriteState);
+        await updateFavorite(courseId, "courses", newFavoriteState);
+        await refreshUser();
     };
 
     if (error) {
@@ -107,17 +108,24 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                         </div>
 
                         <div className="flex items-center space-x-2 mt-3">
-                            <Image src={DocumentIcon} alt="Document Icon" className="w-[24px] h-[24px] md:w-[40px] md:h-[40px]"/>
+                            <div
+                                className="hover:scale-110 hover:border-wireframe-primary-blue hover:cursor-pointer transition-transform duration-300 flex items-center"
+                                onClick={handleFavoriteClick}>
+                                <div className="inline-block mr-2">
+                                    <Image src={isFavorite ? FavoriteStarFilled : FavoriteStarOutline}
+                                           alt="Favorites star" width={40} height={40}/>
+                                </div>
+                            </div>
                             <h1 className="md:text-5xl text-4xl mb-4 text-wireframe-primary-blue">{course.name}</h1>
                         </div>
 
                         <div className="flex flex-col md:flex-row md:mt-4 mb-4 md:gap-14 gap-2">
                             <div className="flex items-center space-x-1 gap-2">
-                                <Image src={FolderIcon} alt="Folder Icon" className="w-[24px] h-[24px]" />
+                                <Image src={FolderIcon} alt="Folder Icon" className="w-[24px] h-[24px]"/>
                                 <p className="text-lg">{course.code}</p>
                             </div>
                             <div className="flex items-center space-x-1 gap-2">
-                                <Image src={PiechartIcon} alt="Piechart Icon" width={24} height={24} />
+                                <Image src={PiechartIcon} alt="Piechart Icon" width={24} height={24}/>
                                 <p className="text-lg">{course.credits} {t('credits')}</p>
                             </div>
                             <div className="flex items-center space-x-1 gap-2">
@@ -131,29 +139,6 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                             At orci quis morbi vulputate nibh interdum lectus quam nec.
                             Ipsum feugiat viverra justo consectetur. Odio commodo aliquet elit.
                         </p>
-
-                        <div className="absolute bottom-0 flex space-x-4 mt-5 mb-5">
-                            <div
-                                className="bg-white rounded-[28px] pl-5 pr-5 pt-2 pb-2 border border-transparent hover:scale-105 hover:border-wireframe-primary-blue hover:cursor-pointer transition-transform duration-300 flex items-center"
-                                onClick={handleFavoriteClick}>
-                                <div className="inline-block mr-2">
-                                    <Image src={isFavorite ? FavoriteStarFilled : FavoriteStarOutline}
-                                           alt="Favorites star" width={17} height={17}/>
-                                </div>
-                                <div className="inline-block">
-                                    <p className="text-lg text-wireframe-mid-gray"> {t('favorite')} </p>
-                                </div>
-                            </div>
-                            <div
-                                className="bg-white rounded-[28px] pl-5 pr-5 pt-2 pb-2 border border-transparent hover:scale-105 hover:border-wireframe-primary-blue hover:cursor-pointer transition-transform duration-300 flex items-center">
-                                <div className="inline-block mr-2">
-                                    <FontAwesomeIcon icon={faShare} className="text-wireframe-primary-panache" />
-                                </div>
-                                <div className="inline-block">
-                                    <p className="text-lg text-wireframe-mid-gray"> {t('share')} </p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
