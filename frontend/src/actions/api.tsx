@@ -3,11 +3,12 @@
 import { redirect } from "next/navigation";
 import { headers } from 'next/headers';
 import { getActiveJWT } from "@/utils/dal";
+import type { ErrorResponse } from "@/types/error";
 
 /**
  * Encodes an API error response from the backend server into a structured serializable format for the frontend.
  */
-const handleError = async (response: Response) => {
+const handleError = async (response: Response): Promise<ErrorResponse> => {
     const errorData = await response.json();
 
     // Get the error message with priority order
@@ -16,19 +17,34 @@ const handleError = async (response: Response) => {
         errorData['hydra:description'] ||
         errorData.message ||
         errorData['hydra:title'] ||
-        errorData.title ||
-        'Unexpected Error.';
+        errorData.title
+        '';
 
     // Use status from the error object if available, otherwise use response status
     const status = errorData.status || response.status || 500;
 
     switch (status) {
         case 404:
-            return { error: { message: errorMessage || 'Resource not found.', status: 404 } };
+            return {
+                status: 404,
+                generalMessage: 'Resource not found.',
+                detailedMessage: errorMessage,
+                stackTrace: Array.isArray(errorData.trace) ? JSON.stringify(errorData.trace) : '',
+            };
         case 500:
-            return { error: { message: errorMessage || 'Internal Server Error. Please try again later.', status: 500 } };
+            return {
+                status: 500,
+                generalMessage: 'Internal Server Error. Please try again later.',
+                detailedMessage: errorMessage,
+                stackTrace: Array.isArray(errorData.trace) ? JSON.stringify(errorData.trace) : '',
+            };
         default:
-            return { error: { message: errorMessage || 'Unexpected Error.', status } };
+            return {
+                status,
+                generalMessage: 'Unexpected Error.',
+                detailedMessage: errorMessage,
+                stackTrace: Array.isArray(errorData.trace) ? JSON.stringify(errorData.trace) : '',
+            };
     }
 };
 
@@ -81,7 +97,8 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
 
         // Handle errors (except 401s)
         if (!(response.status === 401)) {
-            return await handleError(response);
+            const error = await handleError(response);
+            return { error };
         }
 
     } catch (error: any) {

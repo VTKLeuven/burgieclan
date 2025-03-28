@@ -16,6 +16,7 @@ import { ApiClient } from "@/actions/api";
 import { storeOAuthTokens } from "@/actions/oauth";
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
+import type { ErrorResponse } from "@/types/error";
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
@@ -74,7 +75,13 @@ export default function LoginForm() {
     };
 
     if (error) {
-        return <ErrorPage detail={error.message} />;
+        const errorResponse: ErrorResponse = {
+            status: 500,
+            generalMessage: 'Unexpected Error.',
+            detailedMessage: error.message,
+            stackTrace: error.stack || '',
+        };
+        return <ErrorPage error={errorResponse} />;
     }
 
     return (

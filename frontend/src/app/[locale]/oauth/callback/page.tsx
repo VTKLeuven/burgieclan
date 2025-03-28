@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ErrorPage from "@/components/error/ErrorPage";
 import Loading from "@/app/[locale]/loading";
+import type { ErrorResponse } from "@/types/error";
 
 export default function OAuthCallbackPage() {
     const router = useRouter();
@@ -29,7 +30,13 @@ export default function OAuthCallbackPage() {
     }, [router, searchParams]);
 
     if (error) {
-        return <ErrorPage detail={error.message} />;
+        const errorResponse: ErrorResponse = {
+            status: 500,
+            generalMessage: 'Unexpected Error.',
+            detailedMessage: error.message,
+            stackTrace: error.stack || '',
+        };
+        return <ErrorPage error={errorResponse} />;
     }
 
     return (

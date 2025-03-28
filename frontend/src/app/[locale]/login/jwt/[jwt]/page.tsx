@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { storeOAuthTokens } from "@/actions/oauth";
 import ErrorPage from "@/components/error/ErrorPage";
+import type { ErrorResponse } from "@/types/error";
 
 /**
  * Component allows for manually storing jwt as a http-only cookie. Can be used later to authenticate requests to the backend.
@@ -24,7 +25,13 @@ export default function Page({ params: { jwt } }: { params: { jwt: string } }) {
         })();
     }, [jwt, router]);
 
+    const errorResponse: ErrorResponse = {
+        status: 500,
+        generalMessage: 'Unexpected Error.',
+        detailedMessage: error?.message || '',
+        stackTrace: error?.stack || '',
+    };
     if (error) {
-        return <ErrorPage />;
+        return <ErrorPage error={errorResponse}/>;
     }
 }

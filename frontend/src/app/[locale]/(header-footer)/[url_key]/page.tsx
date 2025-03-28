@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Loading from "@/app/[locale]/loading";
 import ErrorPage from "@/components/error/ErrorPage";
 import { ApiError } from "@/utils/error/apiError";
+import type { ErrorResponse } from "@/types/error";
 
 /**
  * Displays pages from page management system.
@@ -14,13 +15,13 @@ import { ApiError } from "@/utils/error/apiError";
  */
 export default function Page({ params: { locale, url_key } }: { params: { locale: string, url_key: string } }) {
     const [page, setPage] = useState<any>(null);
-    const [error, setError] = useState<ApiError | null>(null);
+    const [error, setError] = useState<ErrorResponse | null>(null);
 
     useEffect(() => {
         const FetchData = async () => {
             const result = await ApiClient('GET', `/api/pages/${url_key}?lang=${locale}`);
             if (result.error) {
-                setError(new ApiError(result.error.message, result.error.status));
+                setError(result.error);
             }
             setPage(result);
         };
@@ -29,7 +30,7 @@ export default function Page({ params: { locale, url_key } }: { params: { locale
     }, [locale, url_key]); //TODO: use locale in the request, in backend add translated pages
 
     if (error) {
-        return <ErrorPage status={error.status} detail={error.message} />;
+        return <ErrorPage error={error} />;
     }
 
     if (!page) {
