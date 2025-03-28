@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Entity\Document;
+use App\State\DocumentApiProvider;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
 use App\State\DocumentProcessor;
@@ -26,9 +27,11 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(
             normalizationContext: ['groups' => ['document:get']],
+            provider: DocumentApiProvider::class
         ),
         new GetCollection(
             normalizationContext: ['groups' => ['document:get']],
+            provider: DocumentApiProvider::class
         ),
         new Post(
             inputFormats: ['multipart' => ['multipart/form-data']],
@@ -61,6 +64,10 @@ use Symfony\Component\Validator\Constraints as Assert;
                                         'type' => 'string',
                                         'format' => 'binary'
                                     ],
+                                    'anonymous' => [
+                                        'type' => 'boolean',
+                                        'example' => false
+                                    ],
                                 ]
                             ]
                         ]
@@ -69,8 +76,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             ),
             validationContext: ['groups' => ['document:create']],
             deserialize: false,
-            processor: DocumentProcessor::class
-        )    ],
+            processor: DocumentProcessor::class,
+        )],
     outputFormats: ['jsonld' => ['application/ld+json']],
     order: ['updateDate' => 'DESC'],
     provider: EntityClassDtoStateProvider::class,
@@ -104,6 +111,10 @@ class DocumentApi
     #[ApiFilter(BooleanFilter::class)]
     #[Groups(['search', 'document:get'])]
     public bool $under_review = true;
+
+    #[ApiFilter(BooleanFilter::class)]
+    #[Groups(['document:get'])]
+    public bool $anonymous = false;
 
     #[Groups(['document:get'])]
     public ?string $contentUrl = null;

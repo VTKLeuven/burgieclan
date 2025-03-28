@@ -6,6 +6,8 @@
     "sign_in": "Sign in to your account",
     "or_log_in_manually": "Or log in manually",
     "login_invalid_credentials": "Bad credentials, please verify that your username/password are correctly set.",
+    "login_failed": "Login failed, please try again.",
+    "login_success": "Successful login!",
     "username": "Username",
     "password": "Password",
     "profile": "Profile",
@@ -82,6 +84,10 @@
             "year": {
                 "label": "Academic Year",
                 "placeholder": "Select academic year..."
+            },
+            "anonymous": {
+                "label": "Anonymous",
+                "description": "Do you want to upload this document anonymously?"
             },
             "validation": {
                 "name": {
@@ -174,5 +180,19 @@
         "info_sub": "Quickly access any page by running a global search.",
         "no_results": "No results found",
         "no_results_sub": "Try searching for something else or check your spelling."
+    },
+    "sidebar": {
+        "home": "Home",
+        "upload": "Upload",
+        "my_courses": "My Courses",
+        "courses": "Courses",
+        "add_document": "Add Document",
+        "documents": "Documents",
+        "profile": "Profile",
+        "log_out": "Log Out",
+        "add_doc": "Add Document",
+        "go_to_vtk": "Go to VTK",
+        "user_avatar": "User avatar",
+        "my_favorite_documents": "Favorite Documents"
     }
 }

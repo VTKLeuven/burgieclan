@@ -63,6 +63,7 @@ export const useDocumentUpload = () => {
             formData.append('course', `/api/courses/${data.course}`);
             formData.append('category', `/api/document_categories/${data.category}`);
             formData.append('year', data.year);
+            formData.append('anonymous', data.anonymous.toString()); // Converting the boolean to string since FormData values must be strings
 
             const result = await ApiClient('POST', '/api/documents', formData);
 

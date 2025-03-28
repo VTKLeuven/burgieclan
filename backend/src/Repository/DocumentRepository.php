@@ -11,12 +11,13 @@
 
 namespace App\Repository;
 
+use App\Entity\Course;
 use App\Entity\Document;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
-
+use Psr\Log\LoggerInterface;
 use function Symfony\Component\String\u;
 
 /**
@@ -29,8 +30,10 @@ use function Symfony\Component\String\u;
  */
 class DocumentRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry                  $registry,
+        private readonly LoggerInterface $logger
+    ) {
         parent::__construct($registry, Document::class);
     }
 
@@ -46,9 +49,26 @@ class DocumentRepository extends ServiceEntityRepository
                 ->setParameter('under_review', false)
                 ->getQuery()
                 ->getSingleScalarResult() ?? 0;
-        } catch (NoResultException | NonUniqueResultException $e) {
+        } catch (NoResultException|NonUniqueResultException $e) {
+            $this->logger->warning('Error counting pending documents', [
+                'error' => $e->getMessage()
+            ]);
             return 0;
         }
+    }
+
+    /**
+     * @param Course $course
+     * @return Document[]
+     */
+    public function findByCourseAndHasFile(Course $course): array
+    {
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.course = :course')
+            ->andWhere('d.file_name IS NOT NULL')
+            ->setParameter('course', $course)
+            ->getQuery()
+            ->getResult();
     }
 
     /**

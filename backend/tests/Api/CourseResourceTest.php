@@ -38,6 +38,7 @@ class CourseResourceTest extends ApiTestCase
             'professors',
             'semesters',
             'credits',
+            'identicalCourses',
             'oldCourses',
             'newCourses',
             'modules',

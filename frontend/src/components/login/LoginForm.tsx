@@ -1,9 +1,10 @@
 'use client'
 
 // UI
-import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
+import { ChevronDown } from "lucide-react";
 import LitusOAuthButton from "@/components/login/LitusOAuthButton";
 import Logo from "@/components/common/Logo";
+import { useToast } from "@/components/ui/Toast";
 
 // Logic
 import React, { useState } from 'react';
@@ -28,6 +29,7 @@ export default function LoginForm() {
 
     const [isOpen, setIsOpen] = useState(false);
     const [error, setError] = useState<Error | null>(null);
+    const { showToast } = useToast();
 
     const redirectTo = searchParams.get('redirectTo') || '/';
 
@@ -57,7 +59,14 @@ export default function LoginForm() {
                 username: username,
                 password: password,
             });
+
+            if (response?.error) {
+                showToast(t('login_failed'), 'error');
+                return;
+            }
+
             await storeOAuthTokens(response.token);
+            showToast(t('login_success'), 'success');
             router.push(redirectTo);
         } catch (err: any) {
             setCredentialsError(t('login_invalid_credentials'));
@@ -89,8 +98,11 @@ export default function LoginForm() {
                         className="mt-4 w-full max-w-sm font-semibold text-center text-sm leading-6 text-vtk-blue-500 hover:text-vtk-blue-400 cursor-pointer flex items-center justify-center"
                         onClick={toggleCollapse}>
                         <p>{t('or_log_in_manually')}</p>
-                        {isOpen ? <ChevronDownIcon className="mt-0.5 h-4 w-4" aria-hidden="true" /> :
-                            <ChevronRightIcon className="mt-0.5 h-4 w-4" aria-hidden="true" />}
+                        <ChevronDown
+                            className={`mt-0.5 h-4 w-4 transform transition-transform duration-200 ${isOpen ? 'rotate-0' : '-rotate-90'
+                                }`}
+                            aria-hidden="true"
+                        />
                     </div>
                 </div>
                 <div
