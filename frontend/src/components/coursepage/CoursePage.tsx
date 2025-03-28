@@ -11,6 +11,7 @@ import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import { useFavorites } from '@/hooks/useFavorites';
 import { useUser } from '@/components/UserContext';
 import { Star, Folder, ChartPie, Home } from "lucide-react";
+import { convertToCourse } from "@/utils/convertToEntity";
 
 export default function CoursePage({ courseId, breadcrumb }: { courseId: number, breadcrumb: Breadcrumb }) {
     const [course, setCourse] = useState<Course | null>(null);
@@ -33,7 +34,8 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
         async function getCourse() {
             try {
                 const courseData = await fetchCourse(courseId);
-                setCourse(courseData);
+                const course = convertToCourse(courseData);
+                setCourse(course);
 
                 // Initialize translations based on course language
                 const { t: translationFunction } = await initTranslations(courseData.language);
