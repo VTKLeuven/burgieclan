@@ -3,12 +3,11 @@
 import { useParams } from 'next/navigation';
 import CoursePage from '@/components/coursepage/CoursePage';
 import {Breadcrumb} from '@/types/entities'
-import initTranslations from '@/app/i18n'
 import React from 'react'
 import Loading from '@/app/[locale]/loading'
 
 const CoursePageWrapper = () => {
-    const { locale, id } = useParams();
+    const { id } = useParams();
 
     const breadcrumb: Breadcrumb = {
         id: 1,
@@ -27,13 +26,6 @@ const CoursePageWrapper = () => {
         <div className="flex flex-1 h-full">
             {/* Main Content */}
             <div className="flex flex-1">
-                {/* Sidebar */}
-                <aside className="w-64 border-r">
-                    <div className="p-4">
-                        Sidebar content
-                    </div>
-                </aside>
-
                 <CoursePage courseId={Number(id)} breadcrumb={breadcrumb} />
             </div>
         </div>

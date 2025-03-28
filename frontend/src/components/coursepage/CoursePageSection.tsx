@@ -1,6 +1,6 @@
 'use client'
 
-import Image from 'next/image';
+import { FileText } from "lucide-react";
 
 interface CoursePageSectionProps {
     title: string;
