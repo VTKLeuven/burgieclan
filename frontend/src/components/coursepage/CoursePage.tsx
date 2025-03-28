@@ -1,24 +1,16 @@
 'use client'
 import CoursePageSection from "@/components/coursepage/CoursePageSection";
 import { Course, Breadcrumb } from "@/types/entities";
-import Image from 'next/image';
-import DocumentIcon from '/public/images/icons/document_icon.svg';
-import FolderIcon from '/public/images/icons/folder.svg';
-import PiechartIcon from '/public/images/icons/studiepunten.svg';
-import HomeIcon from '/public/images/icons/home.svg';
-import FavoriteStarFilled from '/public/images/icons/favorite_star_filled.svg';
-import FavoriteStarOutline from '/public/images/icons/favorite_star_outline.svg';
 import { useEffect, useState } from "react";
 import { ApiClient } from "@/actions/api";
 import { ApiError } from "next/dist/server/api-utils";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShare } from '@fortawesome/free-solid-svg-icons';
 import Loading from '@/app/[locale]/loading'
 import { useToast } from '@/components/ui/Toast';
 import initTranslations from "@/app/i18n";
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import { useFavorites } from '@/hooks/useFavorites';
 import { useUser } from '@/components/UserContext';
+import { Star, Folder, ChartPie, Home } from "lucide-react";
 
 export default function CoursePage({ courseId, breadcrumb }: { courseId: number, breadcrumb: Breadcrumb }) {
     const [course, setCourse] = useState<Course | null>(null);
@@ -85,7 +77,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
     if (!course) {
         return (
             <div className="flex items-center justify-center h-full w-full">
-                <Loading/>
+                <Loading />
             </div>
         )
     }
@@ -109,11 +101,10 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
 
                         <div className="flex items-center space-x-2 mt-3">
                             <div
-                                className="hover:scale-110 hover:border-wireframe-primary-blue hover:cursor-pointer transition-transform duration-300 flex items-center"
+                                className="hover:scale-110 hover:cursor-pointer transition-transform duration-300 flex items-center"
                                 onClick={handleFavoriteClick}>
                                 <div className="inline-block mr-2">
-                                    <Image src={isFavorite ? FavoriteStarFilled : FavoriteStarOutline}
-                                           alt="Favorites star" width={40} height={40}/>
+                                    <Star className='text-vtk-yellow-500' fill={isFavorite ? "currentColor" : "none"} />
                                 </div>
                             </div>
                             <h1 className="md:text-5xl text-4xl mb-4 text-wireframe-primary-blue">{course.name}</h1>
@@ -121,15 +112,15 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
 
                         <div className="flex flex-col md:flex-row md:mt-4 mb-4 md:gap-14 gap-2">
                             <div className="flex items-center space-x-1 gap-2">
-                                <Image src={FolderIcon} alt="Folder Icon" className="w-[24px] h-[24px]"/>
+                                <Folder className="w-[24px] h-[24px]" />
                                 <p className="text-lg">{course.code}</p>
                             </div>
                             <div className="flex items-center space-x-1 gap-2">
-                                <Image src={PiechartIcon} alt="Piechart Icon" width={24} height={24}/>
+                                <ChartPie className="w-[24px] h-[24px]" />
                                 <p className="text-lg">{course.credits} {t('credits')}</p>
                             </div>
                             <div className="flex items-center space-x-1 gap-2">
-                                <Image src={HomeIcon} alt="Home Icon" width={24} height={24} />
+                                <Home className="w-[24px] h-[24px]" />
                                 <p className="text-lg">KU Leuven</p>
                             </div>
                         </div>
@@ -157,7 +148,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                         <h2> {t('course-page.teachers')} </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {course?.professors?.map((p, index) => (
-                                <ProfessorDiv key={index} unumber={p} index={index} t={t}/>
+                                <ProfessorDiv key={index} unumber={p} index={index} t={t} />
                             ))}
                         </div>
                     </div>
