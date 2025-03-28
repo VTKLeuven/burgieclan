@@ -47,7 +47,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
         if (!loading) {
             getCourse();
         }
-    }, [courseId, showToast, loading]); // Fetch course only when `loading` is done
+    }, [courseId, showToast, loading, t]); // Fetch course only when `loading` is done
 
     useEffect(() => {
         if (user?.favoriteCourses) {

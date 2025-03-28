@@ -39,6 +39,7 @@ export const UserProvider = ({ children, userId }: { children: ReactNode, userId
 
     useEffect(() => {
         fetchUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userId]);
 
     return (
