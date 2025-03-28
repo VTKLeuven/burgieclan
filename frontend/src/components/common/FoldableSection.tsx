@@ -1,5 +1,5 @@
+import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 type FoldableSectionProps = {
     title: string;
@@ -21,7 +21,7 @@ export default function FoldableSection({ title, defaultOpen, children }: Foldab
                 onClick={toggleSection}
             >
                 <span>{title}</span>
-                <ChevronDownIcon
+                <ChevronDown
                     className={`h-4 w-4 transform transition-transform duration-200 ${isOpen ? 'rotate-0' : '-rotate-90'
                         }`}
                     aria-hidden="true"

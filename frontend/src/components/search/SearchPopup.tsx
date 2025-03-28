@@ -1,6 +1,5 @@
 import { Combobox, ComboboxInput, ComboboxOptions, Dialog, DialogBackdrop, DialogPanel, } from '@headlessui/react'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import { FaceFrownIcon, GlobeAmericasIcon } from '@heroicons/react/24/outline'
+import { Frown, Globe, Search as SearchIcon } from 'lucide-react';
 import { useEffect, useState } from 'react'
 import { ApiError } from "next/dist/server/api-utils";
 import FoldableSection from "@/components/common/FoldableSection";
@@ -113,7 +112,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                         }}
                     >
                         <div className="relative">
-                            <MagnifyingGlassIcon
+                            <SearchIcon
                                 className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-gray-400"
                                 aria-hidden="true"
                             />
@@ -140,7 +139,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
 
                         {error && (
                             <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
-                                <FaceFrownIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
+                                <Frown className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
                                 <p className="mt-4 font-semibold text-gray-900">{t('unexpected_error')}</p>
                                 <p className="mt-2 text-gray-500">{error.message}</p>
                             </div>
@@ -148,7 +147,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
 
                         {!error && query.length <= 2 && (
                             <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
-                                <GlobeAmericasIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
+                                <Globe className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
                                 <p className="mt-4 font-semibold text-gray-900">{t('search.info')}</p>
                                 <p className="mt-2 text-gray-500">{t('search.info_sub')}</p>
                             </div>
@@ -219,7 +218,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
 
                         {!error && !loading && query.length > 2 && Object.values(items).every(value => Array.isArray(value) && value.length === 0) && (
                             <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
-                                <FaceFrownIcon className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
+                                <Frown className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
                                 <p className="mt-4 font-semibold text-gray-900">{t('search.no_results')}</p>
                                 <p className="mt-2 text-gray-500">{t('search.no_results_sub')}</p>
                             </div>

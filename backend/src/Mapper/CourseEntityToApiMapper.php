@@ -52,6 +52,12 @@ class CourseEntityToApiMapper implements MapperInterface
             ]);
         }, $from->getNewCourses()->getValues());
 
+        $to->identicalCourses = array_map(function (Course $course) {
+            return $this->microMapper->map($course, CourseApi::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }, $from->getIdenticalCourses()->getValues());
+
         $to->modules = array_map(function (Module $module) {
             return $this->microMapper->map($module, ModuleApi::class, [
                 MicroMapperInterface::MAX_DEPTH => 0,

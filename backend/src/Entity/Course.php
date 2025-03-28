@@ -65,12 +65,18 @@ class Course
     #[ORM\OneToMany(mappedBy: 'course', targetEntity: CourseComment::class, orphanRemoval: true)]
     private Collection $courseComments;
 
+    // This is the self-referential many-to-many relationship
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: "identicalCourses")]
+    #[ORM\JoinTable(name: "course_identical_courses")]
+    private Collection $identicalCourses;
+
     public function __construct()
     {
         $this->oldCourses = new ArrayCollection();
         $this->newCourses = new ArrayCollection();
         $this->courseComments = new ArrayCollection();
         $this->modules = new ArrayCollection();
+        $this->identicalCourses = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -266,6 +272,33 @@ class Course
     {
         if ($this->modules->removeElement($module)) {
             $module->removeCourse($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getIdenticalCourses(): Collection
+    {
+        return $this->identicalCourses;
+    }
+
+    public function addIdenticalCourse(self $course): self
+    {
+        if (!$this->identicalCourses->contains($course)) {
+            $this->identicalCourses[] = $course;
+            $course->addIdenticalCourse($this); // Maintain bidirectional relationship
+        }
+
+        return $this;
+    }
+
+    public function removeIdenticalCourse(self $course): self
+    {
+        if ($this->identicalCourses->removeElement($course)) {
+            $course->removeIdenticalCourse($this);
         }
 
         return $this;

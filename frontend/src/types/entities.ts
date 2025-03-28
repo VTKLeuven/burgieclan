@@ -51,6 +51,7 @@ export interface Document extends NodeEntity {
     category?: Category;
     underReview?: boolean;
     contentUrl?: string;
+    anonymous?: boolean;
 }
 
 export interface User extends BaseEntity {

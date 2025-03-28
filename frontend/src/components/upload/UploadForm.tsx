@@ -1,4 +1,3 @@
-// components/upload/UploadForm.tsx
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -11,6 +10,7 @@ import { Text } from '@/components/ui/Text';
 import { useTranslation } from 'react-i18next';
 import { useYearOptions } from '@/hooks/useYearOptions';
 import { VISIBLE_YEARS } from "@/utils/constants/upload";
+import { Checkbox } from "@/components/ui/Checkbox";
 
 interface FormProps {
     onSubmit: (data: UploadFormData) => Promise<void>;
@@ -34,6 +34,9 @@ export default function UploadForm({
         formState: { errors },
     } = useForm<UploadFormData>({
         resolver: yupResolver(documentSchema(t)),
+        defaultValues: {
+            anonymous: false // TODO: Set the initial value of the checkbox based on anonymous user setting
+        }
     });
 
     const { courses, categories, isLoading: isLoadingFields, error } = useFormFields(isOpen);
@@ -51,7 +54,7 @@ export default function UploadForm({
     };
 
     return (
-        <form id="upload-form" onSubmit={handleSubmit(handleFormSubmit)} className="py-6 space-y-6">
+        <form id="upload-form" onSubmit={handleSubmit(onSubmit)} className="pt-6 space-y-6">
             {error && (
                 <div className="mb-4">
                     <Text className="text-red-600">{error}</Text>
@@ -108,7 +111,20 @@ export default function UploadForm({
                 </div>
 
                 <div className="col-span-full">
-                    <UploadField error={errors.file} setValue={setValue} initialFile={initialFile} />
+                    <UploadField
+                        error={errors.file}
+                        setValue={setValue}
+                        initialFile={initialFile}
+                    />
+                </div>
+
+                <div className="col-span-full mt-4 gap-3 pb-2">
+                    <Checkbox
+                        label={t('upload.form.anonymous.label')}
+                        {...register('anonymous')}
+                        disabled={isLoading || isLoadingFields}
+                        className="justify-end"
+                    />
                 </div>
             </div>
         </form>
