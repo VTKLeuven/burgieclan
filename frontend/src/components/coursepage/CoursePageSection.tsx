@@ -19,7 +19,7 @@ export default function CoursePageSection({ title, description }: CoursePageSect
         <>
             <div className="border border-[#E3E3E3] hover:border-wireframe-primary-blue rounded-[14.57px] transform hover:scale-[1.03] transition-transform duration-300 inline-block w-[107%]">
                 <div className="pl-4 pt-4">
-                    <Image src="/images/icons/document_icon.svg" alt="Document Icon" width={32} height={32} className="w-6 h-6" />
+                    <FileText className="w-6 h-6" />
 
                     <h3 className="hover:underline hover:cursor-pointer whitespace-nowrap">{title}</h3>
                     <p className="text-s w-[85%]">
