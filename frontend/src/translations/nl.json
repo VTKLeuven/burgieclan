@@ -22,7 +22,10 @@
     "modules": "Modules",
     "programs": "Richtingen",
     "documents": "Documenten",
+    "credits": "studiepunten",
     "FAQ": "FAQ",
+    "favorite": "Favoriet",
+    "share": "Delen",
     "overview": "Overzicht",
     "cookie_banner_text": "Deze website gebruikt alleen functionele cookies om je een soepele ervaring te bieden. Er worden geen andere cookies gebruikt.",
     "cookie_banner_accept": "Ik begrijp het",
@@ -125,6 +128,20 @@
             "search": "Zoeken...",
             "no_results": "Geen resultaten gevonden"
         }
+    },
+    "course-page": {
+        "about": "Over het vak",
+        "teachers": "Docenten",
+        "coordinator": "Coördinator",
+        "professor": "Professor",
+        "files": "Bestanden",
+        "summaries": "Samenvattingen",
+        "summaries-description": "Lorem ipsum dolor sit amet",
+        "exercise-session": "Oefenzittingen",
+        "exercise-session-description": "Lorem ipsum dolor sit amet",
+        "exams": "Examens",
+        "exams-description": "Lorem ipsum dolor sit amet",
+        "error-fetching": "Er is een fout opgetreden bij het ophalen van de vakgegevens: "
     },
     "account": {
         "account": "Account",
