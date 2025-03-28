@@ -52,10 +52,6 @@ export function useFavorites(user: User | null) {
         return updateFavorite(user.favoriteDocuments[index].id, "documents", isFavorite);
     };
 
-    const addFavorite = async (id: number, type: FavoriteType) => {
-        return updateFavorite(id, type, true);
-    };
-
     return {
         updateFavorite,
         updateFavoriteCourse,
