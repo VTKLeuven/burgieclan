@@ -122,6 +122,7 @@
         "coordinator": "Coordinator",
         "professor": "Professor",
         "view-documents": "View Documents",
+        "files": "Documents",
         "comments": {
             "no-comments": "No comments posted yet",
             "anonymous": "Anonymous",

@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from "react";
-import CoursePageSection from "./DocumentCategory";
+import DocumentCategoryPage from "@/components/coursepage/DocumentCategory";
 import { ApiClient } from "@/actions/api";
 import Loading from '@/app/[locale]/loading';
 import { convertToDocumentCategory } from "@/utils/convertToEntity";
@@ -36,9 +36,9 @@ export default function DocumentSections({ courseId }: { courseId: number }) {
     return (
         <>
             <h2> {t('course-page.files')} </h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:mt-5 transform scale-90 origin-left">
+            <div className="flex flex-wrap gap-6 md:mt-5">
                 {documentCategories.map((category) => (
-                    <CoursePageSection
+                    <DocumentCategoryPage
                         key={category.id}
                         title={category.name ?? ''}
                         href={`/courses/${courseId}/documents?category=${category.id}`}
