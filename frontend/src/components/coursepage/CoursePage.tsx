@@ -165,7 +165,10 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                 </div>
 
                 <div className="md:p-5 p-7">
-                    <CommentCategories comments={course.courseComments ?? []} />
+                    <CommentCategories
+                        comments={course.courseComments ?? []}
+                        courseId={courseId}
+                    />
                 </div>
             </div>
         </>
