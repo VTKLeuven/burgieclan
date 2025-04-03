@@ -141,7 +141,13 @@
         "exercise-session-description": "Lorem ipsum dolor sit amet",
         "exams": "Exams",
         "exams-description": "Lorem ipsum dolor sit amet",
-        "error-fetching": "An error occurred while fetching the course data: "
+        "error-fetching": "An error occurred while fetching the course data: ",
+        "comments": {
+            "no-comments": "No comments posted yet",
+            "anonymous": "Anonymous",
+            "title": "Subject evaluation",
+            "description": "Each of these comments is someones opinion. Please be respectful. If you have a question about the course, please contact the course coordinator."
+        }
     },
     "account": {
         "account": "Account",

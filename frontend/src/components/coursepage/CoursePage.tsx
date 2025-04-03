@@ -13,7 +13,8 @@ import { useUser } from '@/components/UserContext';
 import { Star, Folder, ChartPie, Link as LinkIcon } from "lucide-react";
 import { convertToCourse } from "@/utils/convertToEntity";
 import Link from "next/link";
-import SemesterIndicator from '@/components/SemesterIndicator';
+import SemesterIndicator from '@/components/ui/SemesterIndicator';
+import CommentCategories from "@/components/coursepage/CommentCategories";
 
 export default function CoursePage({ courseId, breadcrumb }: { courseId: number, breadcrumb: Breadcrumb }) {
     const [course, setCourse] = useState<Course | null>(null);
@@ -154,13 +155,17 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                     </div>
                 </div>
 
-                <div className="md:p-10 p-7 mb-10">
+                <div className="md:p-5 p-7">
                     <h2> {t('course-page.files')} </h2>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:mt-5 transform scale-90 origin-left ">
                         <CoursePageSection title={t('course-page.summaries')} description={t('course-page.summaries-description')} />
                         <CoursePageSection title={t('course-page.exercise-session')} description={t('course-page.exercise-session-description')} />
                         <CoursePageSection title={t('course-page.exams')} description={t('course-page.exams-description')} />
                     </div>
+                </div>
+
+                <div className="md:p-5 p-7">
+                    <CommentCategories comments={course.courseComments ?? []} />
                 </div>
             </div>
         </>
