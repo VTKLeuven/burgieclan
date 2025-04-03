@@ -72,7 +72,7 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">{t('course-page.comments.title')}</h2>
+                <h2>{t('course-page.comments.title')}</h2>
                 <div className="ml-auto">
                     <button
                         onClick={handleOpenCommentDialog}
