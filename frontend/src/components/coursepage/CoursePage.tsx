@@ -6,7 +6,6 @@ import { ApiClient } from "@/actions/api";
 import { ApiError } from "next/dist/server/api-utils";
 import Loading from '@/app/[locale]/loading'
 import { useToast } from '@/components/ui/Toast';
-import initTranslations from "@/app/i18n";
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import { useFavorites } from '@/hooks/useFavorites';
 import { useUser } from '@/components/UserContext';
@@ -15,15 +14,16 @@ import { convertToCourse } from "@/utils/convertToEntity";
 import Link from "next/link";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import CommentCategories from "@/components/coursepage/CommentCategories";
+import { useTranslation } from "react-i18next";
 
 export default function CoursePage({ courseId, breadcrumb }: { courseId: number, breadcrumb: Breadcrumb }) {
     const [course, setCourse] = useState<Course | null>(null);
-    const [t, setT] = useState<any>(() => (key: string) => key); // Default translation function
     const { showToast } = useToast();
     const [error, setError] = useState<boolean>(false);
     const { user, loading, refreshUser } = useUser();
     const { updateFavorite } = useFavorites(user);
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
+    const { t } = useTranslation();
 
     async function fetchCourse(query: number) {
         try {
@@ -39,11 +39,8 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                 const courseData = await fetchCourse(courseId);
                 const course = convertToCourse(courseData);
                 setCourse(course);
-
-                // Initialize translations based on course language
-                const { t: translationFunction } = await initTranslations(courseData.language);
-                setT(() => translationFunction);
-            } catch {
+            } catch (err) {
+                console.error(err);
                 setError(true);
                 showToast(t('course.error-fetching'), 'error');
             }
