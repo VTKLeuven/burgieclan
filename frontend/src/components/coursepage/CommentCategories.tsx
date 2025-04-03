@@ -6,14 +6,18 @@ import { useToast } from '@/components/ui/Toast';
 import { useTranslation } from 'react-i18next';
 import { convertToCategory } from '@/utils/convertToEntity';
 import CourseCommentList from '@/components/coursepage/CourseCommentList';
+import { MessageSquarePlus } from 'lucide-react';
+import CommentDialog from '@/components/coursepage/CommentDialog';
 
 type CommentCategoriesProps = {
     comments: CourseComment[];
+    courseId: number;
 };
 
-const CommentCategories = ({ comments }: CommentCategoriesProps) => {
+const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
     const [allCategories, setAllCategories] = useState<Category[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false);
     const { showToast } = useToast();
     const { t } = useTranslation();
 
@@ -41,6 +45,14 @@ const CommentCategories = ({ comments }: CommentCategoriesProps) => {
         );
     };
 
+    const handleOpenCommentDialog = () => {
+        setIsCommentDialogOpen(true);
+    };
+
+    const handleCloseCommentDialog = () => {
+        setIsCommentDialogOpen(false);
+    };
+
     if (isLoading) {
         return (
             <div className="flex justify-center py-4">
@@ -52,17 +64,30 @@ const CommentCategories = ({ comments }: CommentCategoriesProps) => {
     if (allCategories.length === 0) {
         return (
             <div className="text-center py-4">
-                <p>{t('course-page.no-categories')}</p>
+                <p>{t('course-page.comments.no-categories')}</p>
             </div>
         );
     }
 
     return (
         <div>
-            <h2 className="text-2xl font-semibold mb-6">{t('course-page.comments.title')}</h2>
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold">{t('course-page.comments.title')}</h2>
+                <div className="ml-auto">
+                    <button
+                        onClick={handleOpenCommentDialog}
+                        className="primary-button inline-flex items-center"
+                    >
+                        <MessageSquarePlus className="mr-2 w-5 h-5" />
+                        {t('course-page.comments.add-new')}
+                    </button>
+                </div>
+            </div>
+
             <p className="text-wireframe-mid-gray italic mb-4">
                 {t('course-page.comments.description')}
             </p>
+
             {allCategories.map((category) => (
                 <CourseCommentList
                     key={category.id}
@@ -71,6 +96,15 @@ const CommentCategories = ({ comments }: CommentCategoriesProps) => {
                     t={t}
                 />
             ))}
+
+            {isCommentDialogOpen && (
+                <CommentDialog
+                    isOpen={isCommentDialogOpen}
+                    onClose={handleCloseCommentDialog}
+                    courseId={courseId}
+                    categories={allCategories}
+                />
+            )}
         </div>
     );
 };

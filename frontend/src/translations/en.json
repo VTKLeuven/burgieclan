@@ -146,7 +146,34 @@
             "no-comments": "No comments posted yet",
             "anonymous": "Anonymous",
             "title": "Subject evaluation",
-            "description": "Each of these comments is someones opinion. Please be respectful. If you have a question about the course, please contact the course coordinator."
+            "description": "Each of these comments is someones opinion. Please be respectful. If you have a question about the course, please contact the course coordinator.",
+            "add-new": "Add comment",
+            "updated": "Updated",
+            "error-empty": "Comment cannot be empty",
+            "success": "Comment added successfully",
+            "error": "Failed to add comment",
+            "form": {
+                "content": {
+                    "required": "Comment is required"
+                },
+                "category": {
+                    "required": "Category is required"
+                }
+            },
+            "dialog": {
+                "title": "Add new comment",
+                "description": "Please share your experience with this course. Your feedback helps other students make informed decisions.",
+                "category": "Category",
+                "content": "Your comment",
+                "content-placeholder": "Share your experience with this course...",
+                "anonymous": "Post anonymously",
+                "button": {
+                    "submit": "Post comment",
+                    "submitting": "Posting...",
+                    "cancel": "Cancel"
+                }
+            },
+            "no-categories": "No comment categories available"
         }
     },
     "account": {

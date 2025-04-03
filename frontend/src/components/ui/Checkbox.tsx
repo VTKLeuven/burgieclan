@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useId } from 'react';
 
 /**
  * Props for the Checkbox component.
@@ -36,19 +36,28 @@ interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>
  * />
  */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
-                                                                         label,
-                                                                         className,
-                                                                         ...props
-                                                                     }, ref) => {
+    label,
+    className,
+    id: propId,
+    ...props
+}, ref) => {
+    // Generate a unique ID if one isn't provided
+    const generatedId = useId();
+    const id = propId || `checkbox-${generatedId}`;
+
     return (
         <div className={`flex items-center ${className}`}>
             <input
+                id={id}
                 type="checkbox"
                 ref={ref}
-                className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
+                className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded cursor-pointer"
                 {...props}
             />
-            <label className="ml-2 block text-sm font-medium text-gray-900">
+            <label
+                htmlFor={id}
+                className="ml-2 block text-sm font-medium text-gray-900 cursor-pointer"
+            >
                 {label}
             </label>
         </div>
@@ -65,11 +74,17 @@ Checkbox.displayName = 'Checkbox';
  * - Supports all standard HTML checkbox attributes
  * - Customizable appearance through className prop
  * - Tailwind styling with amber accent color
+ * - Clickable label toggling the checkbox state
+ *
+ * Accessibility Improvements:
+ * - Label associated with checkbox via htmlFor/id
+ * - Cursor changes to pointer when hovering over label
+ * - Larger hit area for better usability
  *
  * Styling Classes:
  * - Container: flex items-center
  * - Checkbox: h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded
- * - Label: ml-2 block text-sm font-medium text-gray-900
+ * - Label: ml-2 block text-sm font-medium text-gray-900 cursor-pointer
  *
  * Usage with React Hook Form:
  * The component is designed to work seamlessly with React Hook Form.

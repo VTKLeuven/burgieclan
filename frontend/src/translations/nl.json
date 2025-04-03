@@ -143,10 +143,37 @@
         "exams-description": "Lorem ipsum dolor sit amet",
         "error-fetching": "Er is een fout opgetreden bij het ophalen van de vakgegevens: ",
         "comments": {
-            "no-comments": "Geen opmerkingen gevonden",
+            "no-comments": "Nog geen opmerkingen geplaatst",
             "anonymous": "Anoniem",
             "title": "Vakevaluatie",
-            "description": "Elk van deze opmerkingen is iemands mening. Wees respectvol. Als je een vraag hebt over de cursus, neem dan contact op met de cursuscoördinator."
+            "description": "Elk van deze opmerkingen is iemands mening. Wees respectvol. Als je een vraag hebt over de cursus, neem dan contact op met de cursuscoördinator.",
+            "add-new": "Opmerking toevoegen",
+            "updated": "Bijgewerkt",
+            "error-empty": "Opmerking mag niet leeg zijn",
+            "success": "Opmerking succesvol toegevoegd",
+            "error": "Opmerking toevoegen mislukt",
+            "form": {
+                "content": {
+                    "required": "Opmerking is verplicht"
+                },
+                "category": {
+                    "required": "Categorie is verplicht"
+                }
+            },
+            "dialog": {
+                "title": "Nieuwe opmerking toevoegen",
+                "description": "Deel je ervaring met dit vak. Je feedback helpt andere studenten bij het maken van geïnformeerde keuzes.",
+                "category": "Categorie",
+                "content": "Je opmerking",
+                "content-placeholder": "Deel je ervaring met dit vak...",
+                "anonymous": "Anoniem plaatsen",
+                "button": {
+                    "submit": "Opmerking plaatsen",
+                    "submitting": "Plaatsen...",
+                    "cancel": "Annuleren"
+                }
+            },
+            "no-categories": "Geen opmerking-categorieën beschikbaar"
         }
     },
     "account": {
