@@ -1,9 +1,9 @@
-import {useEffect, useState} from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { TFunction } from 'i18next';
 
-export default function ProfessorDiv({ unumber, index, t }: { unumber: string, index: number, t: TFunction}) {
-    const sanitizedUnumber = unumber.replace(/\D/g, '');
+export default function ProfessorDiv({ unumber, index, t }: { unumber: string, index: number, t: TFunction }) {
+    const sanitizedUnumber = unumber.replace(/\D/g, '').padStart(7, '0').slice(-7);
     const [imgSrc, setImgSrc] = useState(`https://www.kuleuven.be/wieiswie/nl/person/0${sanitizedUnumber}/photo`);
     const [professorName, setProfessorName] = useState("N.");
 
@@ -16,7 +16,9 @@ export default function ProfessorDiv({ unumber, index, t }: { unumber: string, i
                 if (data._source?.firstName && data._source?.surname) {
                     return `${data._source.firstName[0]}. ${data._source.surname}`;
                 }
-            } catch {}
+            } catch (error) {
+                console.error("Error fetching professor name:", error);
+            }
             return "N.";
         }
 
