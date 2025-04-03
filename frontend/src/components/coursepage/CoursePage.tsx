@@ -133,7 +133,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                                     </p>
                                 </div>
                                 <div className="flex items-center space-x-1 gap-2">
-                                    <Link href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`} className="text-lg flex items-center gap-2">
+                                    <Link href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`} className="text-lg flex items-center gap-2 hover:underline hover:cursor-pointer">
                                         <LinkIcon className="w-[24px] h-[24px]" />
                                         ECTS
                                     </Link>
