@@ -3,9 +3,8 @@ import CoursePageSection from "@/components/coursepage/CoursePageSection";
 import { Course, Breadcrumb } from "@/types/entities";
 import { useEffect, useState } from "react";
 import { ApiClient } from "@/actions/api";
-import { ApiError } from "next/dist/server/api-utils";
+import { ApiError } from "@/utils/error/apiError";
 import Loading from '@/app/[locale]/loading'
-import { useToast } from '@/components/ui/Toast';
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import { useFavorites } from '@/hooks/useFavorites';
 import { useUser } from '@/components/UserContext';
@@ -15,41 +14,30 @@ import Link from "next/link";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import CommentCategories from "@/components/coursepage/CommentCategories";
 import { useTranslation } from "react-i18next";
+import ErrorPage from "@/components/error/ErrorPage";
 
 export default function CoursePage({ courseId, breadcrumb }: { courseId: number, breadcrumb: Breadcrumb }) {
     const [course, setCourse] = useState<Course | null>(null);
-    const { showToast } = useToast();
-    const [error, setError] = useState<boolean>(false);
+    const [error, setError] = useState<ApiError | null>(null);
     const { user, loading, refreshUser } = useUser();
     const { updateFavorite } = useFavorites(user);
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
     const { t } = useTranslation();
 
-    async function fetchCourse(query: number) {
-        try {
-            return await ApiClient('GET', `/api/courses/${query}`);
-        } catch (err) {
-            throw new ApiError(500, err.message);
-        }
-    }
-
     useEffect(() => {
         async function getCourse() {
-            try {
-                const courseData = await fetchCourse(courseId);
-                const course = convertToCourse(courseData);
-                setCourse(course);
-            } catch (err) {
-                console.error(err);
-                setError(true);
-                showToast(t('course.error-fetching'), 'error');
+            const result = await ApiClient('GET', `/api/courses/${courseId}`);
+            if (result.error) {
+                setError(new ApiError(result.error.message, result.error.status));
             }
+            const course = convertToCourse(result);
+            setCourse(course);
         }
 
         if (!loading) {
             getCourse();
         }
-    }, [courseId, showToast, loading, t]); // Fetch course only when `loading` is done
+    }, [courseId, loading]); // Fetch course only when `loading` is done
 
     useEffect(() => {
         if (user?.favoriteCourses) {
@@ -69,11 +57,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
     };
 
     if (error) {
-        return (
-            <div className="flex items-center justify-center h-full w-full">
-                <p>{t('course.error-fetching')}</p>
-            </div>
-        );
+        return <ErrorPage status={error.status} detail={error.message} />;
     }
 
     if (!course) {
