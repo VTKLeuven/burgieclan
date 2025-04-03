@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Category, CourseComment } from '@/types/entities';
 import FoldableSection from '@/components/common/FoldableSection';
-import { User, Calendar, RefreshCw } from 'lucide-react';
+import { User, Calendar, RefreshCw, UserX } from 'lucide-react';
 
 type CourseCommentListProps = {
     category: Category;
@@ -61,7 +61,7 @@ const CourseCommentList = ({ category, comments, t }: CourseCommentListProps) =>
                 ) : (
                     <ul className="divide-y divide-gray-200 list-none">
                         {sortedComments.map((comment) => (
-                            <li key={comment.id} className="py-3 px-4 flex flex-col md:flex-row">
+                            <li key={comment.id} className="py-2 px-4 flex flex-col md:flex-row">
                                 {/* Comment content - Left side */}
                                 <div className="flex-grow md:pr-4 mb-3 md:mb-0">
                                     <p className="text-gray-800 whitespace-pre-line">{comment.content}</p>
@@ -71,7 +71,7 @@ const CourseCommentList = ({ category, comments, t }: CourseCommentListProps) =>
                                 <div className="flex flex-col text-xs text-wireframe-mid-gray md:text-right md:min-w-[200px]">
                                     {/* Author */}
                                     <div className="flex items-center md:justify-end mb-1">
-                                        <User className="h-3.5 w-3.5 mr-1" />
+                                        {comment.anonymous ? <UserX className="h-3.5 w-3.5 mr-1" /> : <User className="h-3.5 w-3.5 mr-1" />}
                                         <span>{comment.anonymous ? t('course-page.comments.anonymous') : `${comment.creator?.fullName}`}</span>
                                     </div>
 

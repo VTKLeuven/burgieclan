@@ -29,7 +29,7 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
                 const data = await ApiClient('GET', '/api/comment_categories');
                 setAllCategories(data['hydra:member'].map(convertToCategory));
             } catch (err) {
-                showToast(t('course.error-fetching-categories'), 'error');
+                console.error(err);
             } finally {
                 setIsLoading(false);
             }
@@ -78,8 +78,8 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
                         onClick={handleOpenCommentDialog}
                         className="primary-button inline-flex items-center"
                     >
-                        <MessageSquarePlus className="mr-2 w-5 h-5" />
-                        {t('course-page.comments.add-new')}
+                        <MessageSquarePlus className="sm:mr-2 w-5 h-5" />
+                        <span className="hidden sm:inline">{t('course-page.comments.add-new')}</span>
                     </button>
                 </div>
             </div>
