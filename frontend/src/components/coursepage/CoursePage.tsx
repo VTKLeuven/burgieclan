@@ -1,5 +1,5 @@
 'use client'
-import CoursePageSection from "@/components/coursepage/CoursePageSection";
+import DocumentSections from "@/components/coursepage/DocumentSections";
 import { Course, Breadcrumb } from "@/types/entities";
 import { useEffect, useState } from "react";
 import { ApiClient } from "@/actions/api";
@@ -137,12 +137,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                 </div>
 
                 <div className="md:p-5 p-7">
-                    <h2> {t('course-page.files')} </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:mt-5 transform scale-90 origin-left ">
-                        <CoursePageSection title={t('course-page.summaries')} description={t('course-page.summaries-description')} />
-                        <CoursePageSection title={t('course-page.exercise-session')} description={t('course-page.exercise-session-description')} />
-                        <CoursePageSection title={t('course-page.exams')} description={t('course-page.exams-description')} />
-                    </div>
+                    <DocumentSections courseId={courseId} />
                 </div>
 
                 <div className="md:p-5 p-7">
