@@ -1,6 +1,9 @@
 import { type Category, type Course, type CourseComment, type Document, type Module, type Page, type Program, type QuickLink, type User } from '@/types/entities';
 
 export function convertToUser(user: any): User {
+    if (typeof user === 'string') {
+        return { id: parseId(user) };
+    }
     return {
         id: parseId(user['@id']),
         fullName: user.fullName,
@@ -90,11 +93,19 @@ export function convertToCourseComment(comment: any): CourseComment {
     return {
         id: parseId(comment['@id']),
         course: comment.course ? convertToCourse(comment.course) : undefined,
-        commentCategory: comment.category ? convertToCategory(comment.category) : undefined
+        commentCategory: comment.category ? convertToCategory(comment.category) : undefined,
+        content: comment.content,
+        anonymous: comment.anonymous,
+        createDate: new Date(comment.createdAt),
+        updateDate: new Date(comment.updatedAt),
+        creator: comment.creator ? convertToUser(comment.creator) : undefined
     };
 }
 
 export function convertToCategory(category: any): Category {
+    if (typeof category === 'string') {
+        return { id: parseId(category) };
+    }
     return {
         id: parseId(category['@id']),
         name: category.name,

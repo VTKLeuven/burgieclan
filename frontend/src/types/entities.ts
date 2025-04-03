@@ -38,6 +38,11 @@ export interface Program extends BaseEntity {
 export interface CourseComment extends BaseEntity {
     course?: Course;
     commentCategory?: Category;
+    content?: string;
+    anonymous?: boolean;
+    createDate?: Date;
+    updateDate?: Date;
+    creator?: User;
 }
 
 export interface Category extends BaseEntity {
