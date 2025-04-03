@@ -7,6 +7,7 @@ use App\ApiResource\CourseApi;
 use App\ApiResource\CourseCommentApi;
 use App\ApiResource\UserApi;
 use App\Entity\CourseComment;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -16,6 +17,7 @@ class CourseCommentEntityToApiMapper implements MapperInterface
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
+        private readonly Security $security,
     ) {
     }
 
@@ -43,7 +45,9 @@ class CourseCommentEntityToApiMapper implements MapperInterface
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);
 
-        if (!$from->isAnonymous()) {
+        // Only map the creator if the user is not anonymous or if the user is the creator
+        if (!$from->isAnonymous() ||
+            $from->getCreator()->getUserIdentifier() === $this->security->getUser()->getUserIdentifier()) {
             $to->creator = $this->microMapper->map($from->getCreator(), UserApi::class, [
                 MicroMapperInterface::MAX_DEPTH => 1,
             ]);
