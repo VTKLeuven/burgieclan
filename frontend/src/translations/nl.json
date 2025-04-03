@@ -1,5 +1,4 @@
 {
-    "homepage": "Startpagina",
     "login": "Inloggen",
     "login_vtk": "Log in met VTK",
     "logout": "Uitloggen",
@@ -11,7 +10,6 @@
     "username": "Gebruikersnaam",
     "password": "Wachtwoord",
     "profile": "Profiel",
-    "unexpected_error": "Onverwachte fout",
     "go_home": "Ga terug naar de startpagina",
     "contact_support": "Neem contact op met de ondersteuning",
     "report_issue": "Meld een probleem",
@@ -24,8 +22,6 @@
     "documents": "Documenten",
     "credits": "studiepunten",
     "FAQ": "FAQ",
-    "favorite": "Favoriet",
-    "share": "Delen",
     "overview": "Overzicht",
     "cookie_banner_text": "Deze website gebruikt alleen functionele cookies om je een soepele ervaring te bieden. Er worden geen andere cookies gebruikt.",
     "cookie_banner_accept": "Ik begrijp het",
@@ -49,9 +45,6 @@
             "payload_too_large": "De bestandsgrootte overschrijdt de limiet van {{size}}MB. Comprimeer je bestand of upload een kleiner bestand.",
             "rate_limit": "Te veel uploadpogingen. Wacht even voordat je het opnieuw probeert."
         },
-        "success": {
-            "upload": "Document succesvol geüpload!"
-        },
         "dialog": {
             "title": "Document uploaden",
             "description": "Upload hier je geweldige document. Je kunt een PDF-, Word- of Markdown-bestand uploaden. We controleren of het voldoet aan de richtlijnen. Bedankt voor het delen van je kennis met de wereld!",
@@ -65,10 +58,7 @@
         "field": {
             "label": "Bestand",
             "upload_button": "Upload een bestand",
-            "drag_drop_text": "of sleep en zet neer",
-            "icons": {
-                "alt": "{{type}} icoon"
-            }
+            "drag_drop_text": "of sleep en zet neer"
         },
         "form": {
             "name": {
@@ -82,12 +72,10 @@
                 "label": "Categorie"
             },
             "year": {
-                "label": "Academiejaar",
-                "placeholder": "Selecteer academiejaar..."
+                "label": "Academiejaar"
             },
             "anonymous": {
-                "label": "Anoniem",
-                "description": "Wil je dit document anoniem uploaden?"
+                "label": "Anoniem"
             },
             "validation": {
                 "name": {
@@ -126,7 +114,6 @@
             "fetch_failed": "Gegevens laden mislukt. Probeer het opnieuw."
         },
         "combo": {
-            "search": "Zoeken...",
             "no_results": "Geen resultaten gevonden"
         }
     },
@@ -135,22 +122,12 @@
         "coordinator": "Coördinator",
         "professor": "Professor",
         "view-documents": "Bekijk documenten",
-        "files": "Bestanden",
-        "summaries": "Samenvattingen",
-        "summaries-description": "Lorem ipsum dolor sit amet",
-        "exercise-session": "Oefenzittingen",
-        "exercise-session-description": "Lorem ipsum dolor sit amet",
-        "exams": "Examens",
-        "exams-description": "Lorem ipsum dolor sit amet",
-        "error-fetching": "Er is een fout opgetreden bij het ophalen van de vakgegevens: ",
         "comments": {
             "no-comments": "Nog geen opmerkingen geplaatst",
             "anonymous": "Anoniem",
             "title": "Vakevaluatie",
             "description": "Elk van deze opmerkingen is iemands mening. Wees respectvol. Als je een vraag hebt over de cursus, neem dan contact op met de cursuscoördinator.",
             "add-new": "Opmerking toevoegen",
-            "updated": "Bijgewerkt",
-            "error-empty": "Opmerking mag niet leeg zijn",
             "success": "Opmerking succesvol toegevoegd",
             "error": "Opmerking toevoegen mislukt",
             "form": {
@@ -178,13 +155,8 @@
         }
     },
     "account": {
-        "account": "Account",
         "greeting": "Hey, {{name}}!",
         "welcome_text": "Welkom bij je accountpagina. Hier vind je wat informatie over je favorieten en je bijdrages aan Burgieclan.",
-        "details": "Accountgegevens",
-        "name": "Naam",
-        "rnumber": "R-nummer",
-        "email": "E-mail",
         "favorite": {
             "courses": "Favoriete vakken",
             "modules": "Favoriete modules",
@@ -217,15 +189,10 @@
     },
     "sidebar": {
         "home": "Home",
-        "upload": "Upload",
         "my_courses": "Mijn Vakken",
-        "courses": "Vakken",
         "my_favorite_documents": "Favoriete Documenten",
-        "documents": "Documenten",
         "add_document": "Voeg document toe",
-        "profile": "Profiel",
         "log_out": "Uitloggen",
-        "add_doc": "Voeg document toe",
         "go_to_vtk": "Ga naar VTK",
         "user_avatar": "Gebruikersavatar"
     }
