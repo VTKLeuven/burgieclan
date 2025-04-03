@@ -66,7 +66,7 @@ class CourseEntityToApiMapper implements MapperInterface
 
         $to->courseComments = array_map(function (CourseComment $comment) {
             return $this->microMapper->map($comment, CourseCommentApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                MicroMapperInterface::MAX_DEPTH => 2,
             ]);
         }, $from->getCourseComments()->getValues());
         return $to;
