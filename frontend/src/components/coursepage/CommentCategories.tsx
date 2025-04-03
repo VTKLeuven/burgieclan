@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ApiClient } from '@/actions/api';
-import { Category, CourseComment } from '@/types/entities';
+import { CommentCategory, CourseComment } from '@/types/entities';
 import Loading from '@/app/[locale]/loading';
 import { useToast } from '@/components/ui/Toast';
 import { useTranslation } from 'react-i18next';
-import { convertToCategory } from '@/utils/convertToEntity';
+import { convertToCommentCategory } from '@/utils/convertToEntity';
 import CourseCommentList from '@/components/coursepage/CourseCommentList';
 import { MessageSquarePlus } from 'lucide-react';
 import CommentDialog from '@/components/coursepage/CommentDialog';
@@ -15,10 +15,9 @@ type CommentCategoriesProps = {
 };
 
 const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
-    const [allCategories, setAllCategories] = useState<Category[]>([]);
+    const [allCategories, setAllCategories] = useState<CommentCategory[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false);
-    const { showToast } = useToast();
     const { t } = useTranslation();
 
     // Fetch all categories from backend
@@ -27,7 +26,7 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
             try {
                 setIsLoading(true);
                 const data = await ApiClient('GET', '/api/comment_categories');
-                setAllCategories(data['hydra:member'].map(convertToCategory));
+                setAllCategories(data['hydra:member'].map(convertToCommentCategory));
             } catch (err) {
                 console.error(err);
             } finally {
@@ -36,7 +35,7 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
         };
 
         fetchCategories();
-    }, [showToast, t]);
+    }, []);
 
     // Group comments by category
     const getCommentsByCategory = (categoryId: number) => {

@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
-import { Category, CourseComment } from '@/types/entities';
+import { CommentCategory, CourseComment } from '@/types/entities';
 import FoldableSection from '@/components/common/FoldableSection';
 import { User, Calendar, RefreshCw, UserX } from 'lucide-react';
 
 type CourseCommentListProps = {
-    category: Category;
+    category: CommentCategory;
     comments: CourseComment[];
     t: (key: string) => string;
 };

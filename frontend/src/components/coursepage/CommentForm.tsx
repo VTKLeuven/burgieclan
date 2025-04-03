@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
-import { Category } from '@/types/entities';
+import { CommentCategory } from '@/types/entities';
 import { Checkbox } from '@/components/ui/Checkbox';
 import FormField from '@/components/ui/FormField';
 
@@ -16,7 +16,7 @@ interface CommentFormData {
 interface CommentFormProps {
     onSubmit: (data: CommentFormData) => Promise<void>;
     isLoading?: boolean;
-    categories: Category[];
+    categories: CommentCategory[];
 }
 
 export default function CommentForm({

@@ -4,7 +4,7 @@ import { Text } from '@/components/ui/Text';
 import { Send } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import { useTranslation } from 'react-i18next';
-import { Category } from '@/types/entities';
+import { CommentCategory } from '@/types/entities';
 import { ApiClient } from '@/actions/api';
 import CommentForm from './CommentForm';
 
@@ -12,7 +12,7 @@ interface CommentDialogProps {
     isOpen: boolean;
     onClose: () => void;
     courseId: number;
-    categories: Category[];
+    categories: CommentCategory[];
 }
 
 interface CommentFormData {
