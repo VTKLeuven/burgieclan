@@ -17,7 +17,9 @@ class CourseCommentResourceTest extends ApiTestCase
 
     public function testGetCollectionOfCourseComments(): void
     {
-        CourseCommentFactory::createMany(5);
+        CourseCommentFactory::createMany(5, [
+            'anonymous' => false
+        ]);
         $json = $this->browser()
             ->get('/api/course_comments', [
                 'headers' => [
@@ -267,10 +269,12 @@ class CourseCommentResourceTest extends ApiTestCase
                 'username' => 'creator',
                 'plainPassword' => 'password'
             ]);
+        $creator->save();
         $otherUser = UserFactory::createOne(
             [
                 'username' => 'other user',
                 'plainPassword' => 'password']);
+        $otherUser->save();
 
         $creatorTokenResponse = $this->browser()
             ->post('/api/auth/login', HttpOptions::json([
