@@ -1,10 +1,11 @@
 'use client';
 
-import { ApiClient } from "@/actions/api";
 import { useEffect, useState } from "react";
 import Loading from "@/app/[locale]/loading";
 import ErrorPage from "@/components/error/ErrorPage";
-import { ApiError } from "@/utils/error/apiError";
+import { useApi } from "@/hooks/useApi";
+import { type Page } from "@/types/entities";
+import { convertToPage } from "@/utils/convertToEntity";
 import { useTranslation } from "react-i18next";
 
 /**
@@ -14,33 +15,47 @@ import { useTranslation } from "react-i18next";
  * from the backend if it exists.
  */
 export default function Page({ params: { url_key } }: { params: { url_key: string } }) {
-    const [page, setPage] = useState<any>(null);
-    const [error, setError] = useState<ApiError | null>(null);
+    const { request, loading, error } = useApi();
+    const [page, setPage] = useState<Page | null>(null);
     const { i18n } = useTranslation();
     const currentLocale = i18n.language;
 
     useEffect(() => {
-        const FetchData = async () => {
-            const result = await ApiClient('GET', `/api/pages/${url_key}?lang=${currentLocale}`);
-            if (result.error) {
-                setError(new ApiError(result.error.message, result.error.status));
+        const fetchPage = async () => {
+            try {
+                const response = await request('GET', `/api/pages/${url_key}?lang=${currentLocale}`);
+
+                if (!response || response.error) {
+                    return null;
+                }
+
+                setPage(convertToPage(response));
+            } catch (err) {
+                console.error("Error fetching page:", err);
+                // The useApi hook will handle setting the error state
             }
-            setPage(result);
         };
 
-        FetchData();
-    }, [currentLocale, url_key]);
+        fetchPage();
+    }, [currentLocale, url_key, request]);
 
-    if (error) {
-        return <ErrorPage status={error.status} detail={error.message} />;
-    }
-
-    if (!page) {
+    // Show loading state
+    if (loading) {
         return <Loading />;
     }
 
-    // the page content is expected to be in html
-    const content = { __html: page.content };
+    // Show error state
+    if (error) {
+        return <ErrorPage status={500} detail={error} />;
+    }
+
+    // Show not found state
+    if (!page) {
+        return <ErrorPage status={404} detail={`Page with URL '${url_key}' not found`} />;
+    }
+
+    // The page content is expected to be in HTML
+    const content = { __html: page.content || "" };
 
     return (
         <div className="bg-white px-6 py-32 lg:px-8">
