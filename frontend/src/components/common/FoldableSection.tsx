@@ -34,7 +34,7 @@ export default function FoldableSection({
                 />
             </h2>
             <div
-                className={`transition-all duration-200 ease-in-out overflow-hidden ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                className={`transition-all duration-200 ease-in-out overflow-hidden ${isOpen ? 'opacity-100' : 'max-h-0 opacity-0'
                     }`}
             >
                 <div className="content text-sm text-gray-800">
