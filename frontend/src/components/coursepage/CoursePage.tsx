@@ -2,8 +2,7 @@
 import DocumentSections from "@/components/coursepage/DocumentSections";
 import { Course, Breadcrumb } from "@/types/entities";
 import { useEffect, useState } from "react";
-import { ApiClient } from "@/actions/api";
-import { ApiError } from "@/utils/error/apiError";
+import { useApi } from "@/hooks/useApi";
 import Loading from '@/app/[locale]/loading'
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import { useFavorites } from '@/hooks/useFavorites';
@@ -18,33 +17,34 @@ import ErrorPage from "@/components/error/ErrorPage";
 
 export default function CoursePage({ courseId, breadcrumb }: { courseId: number, breadcrumb: Breadcrumb }) {
     const [course, setCourse] = useState<Course | null>(null);
-    const [error, setError] = useState<ApiError | null>(null);
-    const { user, loading, refreshUser } = useUser();
+    const { user, loading: userLoading, refreshUser } = useUser();
     const { updateFavorite } = useFavorites(user);
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
     const { t } = useTranslation();
+    const { loading, error, request } = useApi();
 
     useEffect(() => {
         async function getCourse() {
-            const result = await ApiClient('GET', `/api/courses/${courseId}`);
-            if (result.error) {
-                setError(new ApiError(result.error.message, result.error.status));
+            const courseData = await request('GET', `/api/courses/${courseId}`);
+
+            if (courseData) {
+                const course = convertToCourse(courseData);
+                setCourse(course);
             }
-            const course = convertToCourse(result);
-            setCourse(course);
         }
 
-        if (!loading) {
+        // Only fetch the course when user data is loaded
+        if (!userLoading) {
             getCourse();
         }
-    }, [courseId, loading]); // Fetch course only when `loading` is done
+    }, [courseId, userLoading, request]);
 
+    // Update favorite status when user data changes
     useEffect(() => {
         if (user?.favoriteCourses) {
             setIsFavorite(user.favoriteCourses.some(favCourse => favCourse.id === courseId));
         }
     }, [user, courseId]);
-
 
     const handleFavoriteClick = async () => {
         if (!courseId || !user) return;
@@ -60,12 +60,13 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
         return <ErrorPage status={error.status} detail={error.message} />;
     }
 
-    if (!course) {
+    // Show loading state
+    if (loading || !course) {
         return (
             <div className="flex items-center justify-center h-full w-full">
                 <Loading />
             </div>
-        )
+        );
     }
 
     return (

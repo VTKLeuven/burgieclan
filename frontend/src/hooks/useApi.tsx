@@ -3,18 +3,18 @@
 import { useState, useCallback } from 'react';
 import { ApiClient } from '@/actions/api';
 
-export function useApi<T = any>() {
-    const [data, setData] = useState<T | null>(null);
+export function useApi() {
+    const [data, setData] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
 
-    const request = useCallback(async <R = T>(
+    const request = useCallback(async (
         method: string,
         endpoint: string,
         body?: any,
         customHeaders?: Headers
-    ): Promise<R | null> => {
+    ): Promise<any> => {
         setLoading(true);
         setError(null);
         setIsRedirecting(false);
@@ -30,10 +30,9 @@ export function useApi<T = any>() {
             }
 
             // Success case
-            setData(result as T);
-            return result as R;
+            setData(result);
+            return result;
         } catch (err) {
-            console.log('API call resulted in redirection', err);
             setIsRedirecting(true);
             // Let Next.js handle the redirect automatically
             return null;

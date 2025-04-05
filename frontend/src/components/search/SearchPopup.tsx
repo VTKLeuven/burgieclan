@@ -29,7 +29,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
     const [query, setQuery] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState('');
     const [items, setItems] = useState<SearchResults>({ courses: [], modules: [], programs: [], documents: [] });
-    const { error, loading, isRedirecting, request } = useApi<Record<string, any[]>>();
+    const { error, loading, isRedirecting, request } = useApi();
     const { t } = useTranslation();
 
     /**
@@ -81,10 +81,6 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
 
         fetchData();
     }, [debouncedQuery, request]);
-
-    useEffect(() => {
-        console.log({ isRedirecting });
-    }, [isRedirecting]);
 
     return (
         <Dialog

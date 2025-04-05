@@ -12,7 +12,7 @@ import { initiateLitusOAuthFlow } from "@/utils/oauth";
 import ErrorPage from "@/components/error/ErrorPage";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from 'next/navigation'
-import { ApiClient } from "@/actions/api";
+import { useApi } from "@/hooks/useApi";
 import { storeOAuthTokens } from "@/actions/oauth";
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
@@ -32,6 +32,7 @@ export default function LoginForm() {
     const [isOpen, setIsOpen] = useState(false);
     const [error, setError] = useState<Error | null>(null);
     const { showToast } = useToast();
+    const { request } = useApi();
 
     const redirectTo = searchParams.get('redirectTo') || '/';
 
@@ -59,25 +60,27 @@ export default function LoginForm() {
     const handleCredentialsLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
         setIsLoading(true);
-        try {
-            const response = await ApiClient('POST', `/api/auth/login`, {
-                username: username,
-                password: password,
-            });
+        setCredentialsError('');
 
-            if (response?.error) {
-                showToast(t('login_failed'), 'error');
-                return;
-            }
+        const response = await request('POST', `/api/auth/login`, {
+            username: username,
+            password: password,
+        });
 
-            await storeOAuthTokens(response.token);
-            showToast(t('login_success'), 'success');
-            router.push(redirectTo);
-        } catch (err: any) {
+        if (!response) {
             setCredentialsError(t('login_invalid_credentials'));
-        } finally {
-            setIsLoading(false);
+            return;
         }
+
+        if (response.error) {
+            showToast(t('login_failed'), 'error');
+            return;
+        }
+
+        await storeOAuthTokens(response.token);
+        showToast(t('login_success'), 'success');
+        router.push(redirectTo);
+        setIsLoading(false);
     };
 
     if (error) {
@@ -148,7 +151,7 @@ export default function LoginForm() {
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="block w-full rounded-md border-0 py-1.5 text-vtk-blue-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-600 sm:text-sm sm:leading-6"
                                 />
-                                <button 
+                                <button
                                     type="button"
                                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-vtk-blue-500"
                                     onClick={() => setShowPassword(!showPassword)}
