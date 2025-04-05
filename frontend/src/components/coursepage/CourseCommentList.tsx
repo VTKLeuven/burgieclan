@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { CommentCategory, CourseComment } from '@/types/entities';
 import FoldableSection from '@/components/common/FoldableSection';
-import { User, Calendar, RefreshCw, UserX } from 'lucide-react';
+import { User, Calendar, RefreshCw, UserX, Info } from 'lucide-react';
 
 type CourseCommentListProps = {
     category: CommentCategory;
@@ -54,6 +54,14 @@ const CourseCommentList = ({ category, comments, t }: CourseCommentListProps) =>
     return (
         <div className="rounded-lg border-2 border-vtk-yellow-400 mb-4">
             <FoldableSection title={category.name ?? ""} defaultOpen={false} headerClassName='text-lg'>
+                {/* Category description */}
+                {category.description && (
+                    <div className="px-4 py-2 bg-gray-50 rounded-md mb-3 flex items-start">
+                        <Info className="h-4 w-4 mr-2 text-gray-500 mt-0.5 flex-shrink-0" />
+                        <p className="text-sm text-gray-600 italic">{category.description}</p>
+                    </div>
+                )}
+                
                 {comments.length === 0 ? (
                     <div className="ml-4 border-b pb-3">
                         <p className="text-wireframe-mid-gray italic pb-3">{t('course-page.comments.no-comments')}</p>
@@ -88,7 +96,7 @@ const CourseCommentList = ({ category, comments, t }: CourseCommentListProps) =>
                                         </div>
 
                                         {/* Updated date - only show if different from create date */}
-                                        {comment.updateDate && comment.updateDate.getTime() !== comment.createDate?.getTime() && (
+                                        {comment.updateDate && comment.createDate && comment.updateDate.getTime() !== comment.createDate.getTime() && (
                                             <div className="flex items-center">
                                                 <RefreshCw className="h-3.5 w-3.5 mr-1" />
                                                 <span
