@@ -6,6 +6,7 @@ import { DragDropZone } from '@/components/upload/DragDropZone';
 import { useUploadFlow } from '@/hooks/useUploadFlow';
 import UploadDialog from '@/components/upload/UploadDialog'
 import { useTranslation } from 'react-i18next';
+import Link from 'next/link';
 
 export default function HomePage() {
     const {
