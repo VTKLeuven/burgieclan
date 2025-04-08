@@ -136,7 +136,8 @@ final class CourseFactory extends ModelFactory
             'professors' => $professors,
             'semesters' => $semesters,
             'credits' => self::faker()->numberBetween(1, 12),
-            'modules' => [ModuleFactory::randomOrCreate(), ModuleFactory::randomOrCreate()]
+            'modules' => [ModuleFactory::randomOrCreate(), ModuleFactory::randomOrCreate()],
+            'language' => self::faker()->randomElement(['nl', 'en'])
         ];
     }
 

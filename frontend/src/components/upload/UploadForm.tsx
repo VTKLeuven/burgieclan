@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type FieldError } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import FormField from '@/components/ui/FormField';
 import { UploadField } from '@/components/upload/UploadField';
@@ -112,7 +112,7 @@ export default function UploadForm({
 
                 <div className="col-span-full">
                     <UploadField
-                        error={errors.file}
+                        error={errors.file as FieldError | undefined}
                         setValue={setValue}
                         initialFile={initialFile}
                     />

@@ -37,7 +37,8 @@ class CourseEntityToApiMapper implements MapperInterface
 
         $to->name = $from->getName();
         $to->code = $from->getCode();
-        $to->professors = $from->getProfessors();
+        $to->language = $from->getLanguage();
+        $to->professors = array_values($from->getProfessors());
         $to->semesters = $from->getSemesters();
         $to->credits = $from->getCredits();
         $to->oldCourses = array_map(function (Course $course) {
