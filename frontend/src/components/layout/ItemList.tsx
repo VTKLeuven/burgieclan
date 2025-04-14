@@ -62,7 +62,7 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, updateFavorite
             {items.length > itemsPerList && (
                 <div className="flex justify-center mt-3">
                     <Link
-                        href="/en/account"
+                        href="/account"
                         className="py-1 px-2 rounded text-gray-600 text-sm hover:bg-gray-100 transition-colors duration-100"
                     >
                         View All
