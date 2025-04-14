@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Loading from "@/app/[locale]/loading";
 import ErrorPage from "@/components/error/ErrorPage";
 import { ApiError } from "@/utils/error/apiError";
+import { useTranslation } from "react-i18next";
 
 /**
  * Displays pages from page management system.
@@ -12,13 +13,15 @@ import { ApiError } from "@/utils/error/apiError";
  * Each page is identified with a unique url_key. When visiting /[url_key], the page with that url_key is fetched
  * from the backend if it exists.
  */
-export default function Page({ params: { locale, url_key } }: { params: { locale: string, url_key: string } }) {
+export default function Page({ params: { url_key } }: { params: { url_key: string } }) {
     const [page, setPage] = useState<any>(null);
     const [error, setError] = useState<ApiError | null>(null);
+    const { i18n } = useTranslation();
+    const currentLocale = i18n.language;
 
     useEffect(() => {
         const FetchData = async () => {
-            const result = await ApiClient('GET', `/api/pages/${url_key}?lang=${locale}`);
+            const result = await ApiClient('GET', `/api/pages/${url_key}?lang=${currentLocale}`);
             if (result.error) {
                 setError(new ApiError(result.error.message, result.error.status));
             }
@@ -26,7 +29,7 @@ export default function Page({ params: { locale, url_key } }: { params: { locale
         };
 
         FetchData();
-    }, [locale, url_key]); //TODO: use locale in the request, in backend add translated pages
+    }, [currentLocale, url_key]);
 
     if (error) {
         return <ErrorPage status={error.status} detail={error.message} />;
