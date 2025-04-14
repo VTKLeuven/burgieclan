@@ -55,7 +55,7 @@ export default function Header() {
                         :
                         <div className="flex md:hidden">
 
-                            <Link href="login" className="primary-button">
+                            <Link href="/login" className="primary-button">
                                 {t('login')}
                             </Link>
 
@@ -78,10 +78,10 @@ export default function Header() {
                             <LanguageSwitcher />
 
                             {isAuthenticated ?
-                                <Link href="account" className="text-sm font-semibold leading-6 text-gray-900">
+                                <Link href="/account" className="text-sm font-semibold leading-6 text-gray-900">
                                     {t('profile')}
                                 </Link> :
-                                <Link href="login" className="primary-button min-w-28">
+                                <Link href="/login" className="primary-button min-w-28">
                                     {t('login')}
                                 </Link>
                             }
@@ -133,7 +133,7 @@ export default function Header() {
                                 ))}
                             </div>
                             <div className="py-6">
-                                <Link href="account" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                <Link href="/account" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
                                     {t('profile')}
                                 </Link>
                             </div>
