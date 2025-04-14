@@ -4,6 +4,16 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig = {
     output: "standalone",
     reactStrictMode: false,
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'www.kuleuven.be',
+                port: '',
+                pathname: '/wieiswie/**',
+            },
+        ],
+    },
 };
 
 export default withSentryConfig(nextConfig, {
@@ -41,4 +51,9 @@ export default withSentryConfig(nextConfig, {
 
     // Automatically tree-shake Sentry logger statements to reduce bundle size
     disableLogger: true,
+
+    // Delete source maps after uploading them to Sentry
+    sourcemaps: {
+        deleteSourcemapsAfterUpload: true
+    }
 });
