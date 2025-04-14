@@ -16,7 +16,7 @@ const mapCoursesToItems = (courses: Course[]) => {
   return courses.map(course => ({
     name: course.name,
     code: course.code,
-    redirectUrl: `/courses/${course.id}`
+    redirectUrl: `/course/${course.id}`
   }));
 };
 

@@ -31,6 +31,7 @@
     "sharp": "^0.33.5",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
+    "type-fest": "^4.38.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {
