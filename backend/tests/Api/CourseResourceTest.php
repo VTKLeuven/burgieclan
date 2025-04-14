@@ -34,6 +34,7 @@ class CourseResourceTest extends ApiTestCase
             '@type',
             'name',
             'code',
+            'language',
             'professors',
             'semesters',
             'credits',
