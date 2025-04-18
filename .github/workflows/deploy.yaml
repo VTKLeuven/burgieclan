@@ -104,7 +104,7 @@ jobs:
           source ~/.nvm/nvm.sh && \
           cd \$RELEASE_DIR && \
           # Stop the current process if it exists
-          pm2 delete ${{ secrets.FRONTEND_PM2_APP_NAME }} || true && \
+          pm2 delete ecosystem.config.js || true && \
           # Start from the new directory with the new code
           pm2 start ecosystem.config.js --update-env"
       # Cleanup old releases keeping last 3
