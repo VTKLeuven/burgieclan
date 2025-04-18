@@ -10,6 +10,8 @@ jobs:
   git_pull:
     name: Git pull
     runs-on: ubuntu-latest
+    outputs:
+      release_timestamp: ${{ steps.set-timestamp.outputs.timestamp }}
 
     steps:
       - name: Install ssh keys
@@ -23,10 +25,11 @@ jobs:
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git fetch && git reset --hard origin/test"
 
       # Create shared timestamp for both jobs
-      - name: Create release directory
+      - name: Create release timestamp
+        id: set-timestamp
         run: |
           TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-          echo "RELEASE_TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
 
   deploy_backend:
     name: Deploy Backend
@@ -43,7 +46,7 @@ jobs:
       # Prepare new release in a separate directory
       - name: Backend - Prepare new release
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ env.RELEASE_TIMESTAMP }} && \
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
           mkdir -p \$RELEASE_DIR && \
           cp -r ${{ secrets.WORK_DIR_BACKEND }}/* \$RELEASE_DIR/ && \
           # Copy environment file properly
@@ -58,7 +61,7 @@ jobs:
       # Switch to new release with minimal downtime
       - name: Backend - Switch to new release
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ env.RELEASE_TIMESTAMP }} && \
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
           ln -sfn \$RELEASE_DIR ${{ secrets.DEPLOY_PATH }}/backend/current && \
           sudo systemctl reload php8.1-fpm"
       # Cleanup old releases keeping last 5
@@ -80,7 +83,7 @@ jobs:
       # Build in a temporary directory
       - name: Frontend - Prepare new release
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/frontend/releases/${{ env.RELEASE_TIMESTAMP }} && \
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/frontend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
           mkdir -p \$RELEASE_DIR && \
           cp -r ${{ secrets.WORK_DIR_FRONTEND }}/* \$RELEASE_DIR/ && \
           # Copy environment file properly
@@ -95,7 +98,7 @@ jobs:
       # Switch to new release with zero-downtime using pm2
       - name: Frontend - Switch to new release
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/frontend/releases/${{ env.RELEASE_TIMESTAMP }} && \
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/frontend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
           ln -sfn \$RELEASE_DIR ${{ secrets.DEPLOY_PATH }}/frontend/current && \
           export NVM_DIR=~/.nvm && \
           source ~/.nvm/nvm.sh && \
