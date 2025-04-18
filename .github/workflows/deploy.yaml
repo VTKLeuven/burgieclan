@@ -64,10 +64,10 @@ jobs:
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
           ln -sfn \$RELEASE_DIR ${{ secrets.DEPLOY_PATH }}/backend/current && \
           sudo systemctl reload php8.1-fpm"
-      # Cleanup old releases keeping last 5
+      # Cleanup old releases keeping last 3
       - name: Cleanup old backend releases
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOY_PATH }}/backend/releases && ls -t | tail -n +6 | xargs rm -rf"
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOY_PATH }}/backend/releases && ls -t | tail -n +4 | xargs rm -rf"
 
   deploy_frontend:
     name: Deploy Frontend
@@ -105,10 +105,10 @@ jobs:
           cd \$RELEASE_DIR && \
           # Use the ecosystem.config.js from the new release
           pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js"
-      # Cleanup old releases keeping last 5
+      # Cleanup old releases keeping last 3
       - name: Cleanup old releases
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOY_PATH }}/frontend/releases && ls -t | tail -n +6 | xargs rm -rf"
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOY_PATH }}/frontend/releases && ls -t | tail -n +4 | xargs rm -rf"
 
   cleanup:
     name: Clean up
