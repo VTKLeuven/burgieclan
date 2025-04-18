@@ -102,7 +102,9 @@ jobs:
           ln -sfn \$RELEASE_DIR ${{ secrets.DEPLOY_PATH }}/frontend/current && \
           export NVM_DIR=~/.nvm && \
           source ~/.nvm/nvm.sh && \
-          pm2 reload ${{ secrets.FRONTEND_PM2_APP_NAME }} --update-env"
+          cd \$RELEASE_DIR && \
+          # Use the ecosystem.config.js from the new release
+          pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js"
       # Cleanup old releases keeping last 5
       - name: Cleanup old releases
         run: |
