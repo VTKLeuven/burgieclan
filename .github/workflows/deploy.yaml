@@ -103,8 +103,10 @@ jobs:
           export NVM_DIR=~/.nvm && \
           source ~/.nvm/nvm.sh && \
           cd \$RELEASE_DIR && \
-          # Use the ecosystem.config.js from the new release
-          pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js"
+          # Stop the current process if it exists
+          pm2 delete ${{ secrets.FRONTEND_PM2_APP_NAME }} || true && \
+          # Start from the new directory with the new code
+          pm2 start ecosystem.config.js --update-env"
       # Cleanup old releases keeping last 3
       - name: Cleanup old releases
         run: |
