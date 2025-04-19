@@ -49,4 +49,18 @@ class QuickLinkResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/quick_links/' . $quickLink->getId());
     }
+
+    public function testGetQuickLinksWithInvalidToken(): void
+    {
+        QuickLinkFactory::createOne();
+        $this->browser()
+            ->get('/api/quick_links', [
+                'headers' => [
+                    'Authorization' => 'Bearer invalid_token_here'
+                ]
+            ])
+            ->assertStatus(401)
+            ->assertJsonMatches('"title"', 'An error occurred')
+            ->assertJsonMatches('"detail"', 'Invalid JWT, please login again to get a new one.');
+    }
 }
