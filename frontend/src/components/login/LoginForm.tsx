@@ -17,6 +17,7 @@ import { storeOAuthTokens } from "@/actions/oauth";
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { LoaderCircle } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
@@ -36,6 +37,7 @@ export default function LoginForm() {
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [credentialsError, setCredentialsError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -135,17 +137,28 @@ export default function LoginForm() {
                             <label htmlFor="password">
                                 <p className="mt-2 text-sm font-medium">{t('password')}</p>
                             </label>
-                            <div className="mt-2">
+                            <div className="mt-2 relative">
                                 <input
                                     id="password"
                                     name="password"
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     autoComplete="current-password"
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="block w-full rounded-md border-0 py-1.5 text-vtk-blue-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-600 sm:text-sm sm:leading-6"
                                 />
+                                <button 
+                                    type="button"
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-vtk-blue-500"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? (
+                                        <EyeOff className="h-5 w-5" aria-hidden="true" />
+                                    ) : (
+                                        <Eye className="h-5 w-5" aria-hidden="true" />
+                                    )}
+                                </button>
                             </div>
                         </div>
 
