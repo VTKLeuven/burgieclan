@@ -156,6 +156,7 @@
         }
     },
     "account": {
+        "account": "Account",
         "greeting": "Hi, {{name}}!",
         "welcome_text": "Welcome to your account page. Here you will find some information about your favorites and your contributions to Burgieclan.",
         "favorite": {
@@ -187,6 +188,9 @@
         "info_sub": "Quickly access any page by running a global search.",
         "no_results": "No results found",
         "no_results_sub": "Try searching for something else or check your spelling."
+    },
+    "header": {
+        "my_vtk": "My VTK"
     },
     "sidebar": {
         "home": "Home",

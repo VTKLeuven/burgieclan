@@ -6,6 +6,7 @@ import { Menu, X } from 'lucide-react';
 import Logo from '@/components/common/Logo';
 import { Skeleton } from "@/components/ui/skeleton";
 import Search from "@/components/header/Search";
+import HeaderProfileButton from "@/components/header/HeaderProfileButton";
 import { useUser } from '@/components/UserContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/components/header/LanguageSwitcher';
@@ -14,10 +15,11 @@ import Link from 'next/link';
 
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const { user } = useUser();
-    const isAuthenticated = user !== null;
 
     const { t, i18n } = useTranslation();
+
+    const { user } = useUser();
+    const isAuthenticated = user !== null;
 
     const navigation = [
         { name: t('courses'), href: '#' },
@@ -28,7 +30,7 @@ export default function Header() {
     return (
         <header className="bg-white">
             <nav aria-label="Global"
-                className="mx-auto flex max-w-7xl items-center justify-between border-b border-gray-900/10 p-6 lg:px-8">
+                 className="mx-auto flex max-w-7xl items-center justify-between border-b border-gray-900/10 p-6 lg:px-8">
 
                 {/* Logo and search */}
                 <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
@@ -64,8 +66,8 @@ export default function Header() {
                 </Suspense>
 
                 {/* Whitespace and login/profile links */}
-                <div className="hidden md:flex md:gap-x-8 items-center"> {/* Added items-center here */}
-                    <Suspense fallback={<Skeleton style={{ width: 100, height: 20 }} />}>
+                <div className="hidden md:flex md:gap-x-8 md:items-center">
+                    <Suspense fallback={<Skeleton style={{width: 100, height: 20}}/>}>
                         {isAuthenticated &&
                             navigation.map((item) => (
                                 <Link key={item.name} href={item.href}
@@ -74,16 +76,13 @@ export default function Header() {
                                 </Link>
                             ))}
 
-                        <div className="flex items-center gap-x-6"> {/* Added this wrapper div with alignment */}
+                        <div className="flex items-center gap-x-6">
                             <LanguageSwitcher />
-
-                            {isAuthenticated ?
-                                <Link href="/account" className="text-sm font-semibold leading-6 text-gray-900">
-                                    {t('profile')}
-                                </Link> :
-                                <Link href="/login" className="primary-button min-w-28">
-                                    {t('login')}
-                                </Link>
+                            {isAuthenticated
+                                ?   <HeaderProfileButton />
+                                :   <Link href="/login" className="primary-button">
+                                        {t('login')}
+                                    </Link>
                             }
                         </div>
                     </Suspense>
@@ -141,6 +140,6 @@ export default function Header() {
                     </div>
                 </div>
             </Dialog>
-        </header >
+        </header>
     );
 }
