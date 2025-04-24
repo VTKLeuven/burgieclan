@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
-import { faStar } from '@fortawesome/free-solid-svg-icons';
-import { faStar as faStarOutline } from '@fortawesome/free-regular-svg-icons';
+import { Star } from 'lucide-react';
 
 interface ItemListProps {
     items: { name?: string, code?: string, redirectUrl: string }[];
@@ -49,8 +47,8 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, updateFavorite
                                     onClick={() => toggleFavoriteStatus(index)}
                                     className="ml-2 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-100"
                                 >
-                                    <FontAwesomeIcon
-                                        icon={favorites[index] ? faStar : faStarOutline}
+                                    <Star
+                                        fill={favorites[index] ? "currentColor" : "none"}
                                         className="w-3.5 h-3.5"
                                     />
                                 </button>
@@ -64,7 +62,7 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, updateFavorite
             {items.length > itemsPerList && (
                 <div className="flex justify-center mt-3">
                     <Link
-                        href="/en/account"
+                        href="/account"
                         className="py-1 px-2 rounded text-gray-600 text-sm hover:bg-gray-100 transition-colors duration-100"
                     >
                         View All

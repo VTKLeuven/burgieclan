@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     shortName: 'Course',
     operations: [
-        new Get(),
+        new Get(normalizationContext: ['groups' => ['course:get']]),
         new GetCollection(),
     ],
     provider: EntityClassDtoStateProvider::class,
@@ -32,47 +32,57 @@ class CourseApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups(['search', 'user', 'document:get'])]
+    #[Groups(['course:get', 'search', 'user', 'document:get'])]
     public ?string $name = null;
 
     #[Assert\NotBlank]
     #[Assert\Length(6)]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups(['search', 'user', 'document:get'])]
+    #[Groups(['course:get', 'search', 'user', 'document:get'])]
     public ?string $code = null;
 
-    #[Groups('search')]
+    #[Assert\NotBlank]
+    #[Assert\Choice(choices: ['nl', 'en'], message: 'Choose a valid language.')]
+    #[Groups(['course:get'])]
+    public ?string $language = null;
+
+    #[Groups(['course:get', 'search'])]
     public array $professors = [];
 
-    #[Groups('search')]
+    #[Groups(['course:get', 'search'])]
     public array $semesters = [];
 
     #[Assert\Positive]
-    #[Groups('search')]
+    #[Groups(['course:get', 'search'])]
     public ?int $credits = null;
 
     /**
      * @var CourseApi[]
      */
+    #[Groups(['course:get'])]
     public array $identicalCourses = [];
 
     /**
      * @var CourseApi[]
      */
+    #[Groups(['course:get'])]
     public array $oldCourses = [];
 
     /**
      * @var CourseApi[]
      */
+    #[Groups(['course:get'])]
     public array $newCourses = [];
 
     /**
      * @var ModuleApi[]
      */
+    #[Groups(['course:get'])]
     public array $modules = [];
 
     /**
      * @var CourseCommentApi[]
      */
+    #[Groups(['course:get'])]
     public array $courseComments = [];
 }

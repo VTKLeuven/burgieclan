@@ -10,6 +10,8 @@ jobs:
   git_pull:
     name: Git pull
     runs-on: ubuntu-latest
+    outputs:
+      release_timestamp: ${{ steps.set-timestamp.outputs.timestamp }}
 
     steps:
       - name: Install ssh keys
@@ -22,11 +24,17 @@ jobs:
       - name: Connect and fetch
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git fetch && git reset --hard origin/test"
 
+      # Create shared timestamp for both jobs
+      - name: Create release timestamp
+        id: set-timestamp
+        run: |
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+
   deploy_backend:
     name: Deploy Backend
     runs-on: ubuntu-latest
     needs: git_pull
-
     steps:
       - name: Install ssh keys
         # check this thread to understand why its needed:
@@ -35,39 +43,74 @@ jobs:
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
-      - name: Backend - Run composer install
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && composer install --no-dev --optimize-autoloader"
-      - name: Backend - Update migrations
+      # Prepare new release in a separate directory
+      - name: Backend - Prepare new release
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console doctrine:migrations:migrate"
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console cache:clear --env=prod"
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_BACKEND }} && bin/console cache:warmup --env=prod"
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
+          mkdir -p \$RELEASE_DIR && \
+          cp -r ${{ secrets.WORK_DIR_BACKEND }}/* \$RELEASE_DIR/ && \
+          # Copy environment file properly
+          if [ -f ${{ secrets.WORK_DIR_BACKEND }}/.env.local.php ]; then \
+            cp ${{ secrets.WORK_DIR_BACKEND }}/.env.local.php \$RELEASE_DIR/ ; \
+          fi && \
+          cd \$RELEASE_DIR && \
+          composer install --no-dev --optimize-autoloader && \
+          bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration && \
+          bin/console cache:clear --env=prod && \
+          bin/console cache:warmup --env=prod"
+      # Switch to new release with minimal downtime
+      - name: Backend - Switch to new release
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
+          ln -sfn \$RELEASE_DIR ${{ secrets.DEPLOY_PATH }}/backend/current && \
+          sudo systemctl reload php8.1-fpm"
+      # Cleanup old releases keeping last 3
+      - name: Cleanup old backend releases
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOY_PATH }}/backend/releases && ls -t | tail -n +4 | xargs rm -rf"
 
   deploy_frontend:
     name: Deploy Frontend
     runs-on: ubuntu-latest
     needs: git_pull
-
     steps:
       - name: Install ssh keys
-        # check this thread to understand why its needed:
-        # https://stackoverflow.com/a/70447517
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
-      - name: Frontend - Run npm install
-        # We run extra commands to solve the issue with nvm not being found
-        # https://stackoverflow.com/questions/62863080/github-actions-err-bash-line-3-npm-command-not-found
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && export NVM_DIR=~/.nvm && source ~/.nvm/nvm.sh && npm install"
-      - name: Frontend - Build NextJS app
-        # We run extra commands to solve the issue with nvm not being found
-        # https://stackoverflow.com/questions/62863080/github-actions-err-bash-line-3-npm-command-not-found
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && export NVM_DIR=~/.nvm && source ~/.nvm/nvm.sh && npm run build"
-      - name: Frontend - Restart pm2
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR_FRONTEND }} && export NVM_DIR=~/.nvm && source ~/.nvm/nvm.sh && pm2 restart ${{ secrets.FRONTEND_PM2_APP_NAME }}"
-      - name: Frontend - Restart apache2
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo systemctl restart apache2"
+
+      # Build in a temporary directory
+      - name: Frontend - Prepare new release
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/frontend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
+          mkdir -p \$RELEASE_DIR && \
+          cp -r ${{ secrets.WORK_DIR_FRONTEND }}/* \$RELEASE_DIR/ && \
+          # Copy environment file properly
+          if [ -f ${{ secrets.WORK_DIR_FRONTEND }}/.env.local ]; then \
+            cp ${{ secrets.WORK_DIR_FRONTEND }}/.env.local \$RELEASE_DIR/ ; \
+          fi && \
+          cd \$RELEASE_DIR && \
+          export NVM_DIR=~/.nvm && \
+          source ~/.nvm/nvm.sh && \
+          npm install && \
+          npm run build"
+      # Switch to new release with zero-downtime using pm2
+      - name: Frontend - Switch to new release
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/frontend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
+          ln -sfn \$RELEASE_DIR ${{ secrets.DEPLOY_PATH }}/frontend/current && \
+          export NVM_DIR=~/.nvm && \
+          source ~/.nvm/nvm.sh && \
+          cd \$RELEASE_DIR && \
+          # Stop the current process if it exists
+          pm2 delete ecosystem.config.js || true && \
+          # Start from the new directory with the new code
+          pm2 start ecosystem.config.js --update-env"
+      # Cleanup old releases keeping last 3
+      - name: Cleanup old releases
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOY_PATH }}/frontend/releases && ls -t | tail -n +4 | xargs rm -rf"
 
   cleanup:
     name: Clean up
@@ -75,7 +118,6 @@ jobs:
     needs:
       - deploy_frontend
       - deploy_backend
-
     steps:
       - name: Cleanup
         run: rm -rf ~/.ssh
