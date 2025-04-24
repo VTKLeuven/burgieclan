@@ -15,46 +15,46 @@ use App\Entity\Announcement;
 use DateInterval;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityRepository;
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
-use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 
 /**
- * @extends ModelFactory<Announcement>
+ * @extends PersistentProxyObjectFactory<Announcement>
  *
- * @method        Announcement|Proxy               create(array|callable $attributes = [])
- * @method static Announcement|Proxy               createOne(array $attributes = [])
- * @method static Announcement|Proxy               find(object|array|mixed $criteria)
- * @method static Announcement|Proxy               findOrCreate(array $attributes)
- * @method static Announcement|Proxy               first(string $sortedField = 'id')
- * @method static Announcement|Proxy               last(string $sortedField = 'id')
- * @method static Announcement|Proxy               random(array $attributes = [])
- * @method static Announcement|Proxy               randomOrCreate(array $attributes = [])
- * @method static EntityRepository|RepositoryProxy repository()
- * @method static Announcement[]|Proxy[]           all()
- * @method static Announcement[]|Proxy[]           createMany(int $number, array|callable $attributes = [])
- * @method static Announcement[]|Proxy[]           createSequence(iterable|callable $sequence)
- * @method static Announcement[]|Proxy[]           findBy(array $attributes)
- * @method static Announcement[]|Proxy[]           randomRange(int $min, int $max, array $attributes = [])
- * @method static Announcement[]|Proxy[]           randomSet(int $number, array $attributes = [])
+ * @method        Announcement|Proxy                        create(array|callable $attributes = [])
+ * @method static Announcement|Proxy                        createOne(array $attributes = [])
+ * @method static Announcement|Proxy                        find(object|array|mixed $criteria)
+ * @method static Announcement|Proxy                        findOrCreate(array $attributes)
+ * @method static Announcement|Proxy                        first(string $sortedField = 'id')
+ * @method static Announcement|Proxy                        last(string $sortedField = 'id')
+ * @method static Announcement|Proxy                        random(array $attributes = [])
+ * @method static Announcement|Proxy                        randomOrCreate(array $attributes = [])
+ * @method static EntityRepository|ProxyRepositoryDecorator repository()
+ * @method static Announcement[]|Proxy[]                    all()
+ * @method static Announcement[]|Proxy[]                    createMany(int $number, array|callable $attributes = [])
+ * @method static Announcement[]|Proxy[]                    createSequence(iterable|callable $sequence)
+ * @method static Announcement[]|Proxy[]                    findBy(array $attributes)
+ * @method static Announcement[]|Proxy[]                    randomRange(int $min, int $max, array $attributes = [])
+ * @method static Announcement[]|Proxy[]                    randomSet(int $number, array $attributes = [])
  *
- * @phpstan-method        Proxy<Announcement> create(array|callable $attributes = [])
- * @phpstan-method static Proxy<Announcement> createOne(array $attributes = [])
- * @phpstan-method static Proxy<Announcement> find(object|array|mixed $criteria)
- * @phpstan-method static Proxy<Announcement> findOrCreate(array $attributes)
- * @phpstan-method static Proxy<Announcement> first(string $sortedField = 'id')
- * @phpstan-method static Proxy<Announcement> last(string $sortedField = 'id')
- * @phpstan-method static Proxy<Announcement> random(array $attributes = [])
- * @phpstan-method static Proxy<Announcement> randomOrCreate(array $attributes = [])
- * @phpstan-method static RepositoryProxy<Announcement> repository()
- * @phpstan-method static list<Proxy<Announcement>> all()
- * @phpstan-method static list<Proxy<Announcement>> createMany(int $number, array|callable $attributes = [])
- * @phpstan-method static list<Proxy<Announcement>> createSequence(iterable|callable $sequence)
- * @phpstan-method static list<Proxy<Announcement>> findBy(array $attributes)
- * @phpstan-method static list<Proxy<Announcement>> randomRange(int $min, int $max, array $attributes = [])
- * @phpstan-method static list<Proxy<Announcement>> randomSet(int $number, array $attributes = [])
+ * @phpstan-method        Announcement&Proxy<Announcement> create(array|callable $attributes = [])
+ * @phpstan-method static Announcement&Proxy<Announcement> createOne(array $attributes = [])
+ * @phpstan-method static Announcement&Proxy<Announcement> find(object|array|mixed $criteria)
+ * @phpstan-method static Announcement&Proxy<Announcement> findOrCreate(array $attributes)
+ * @phpstan-method static Announcement&Proxy<Announcement> first(string $sortedField = 'id')
+ * @phpstan-method static Announcement&Proxy<Announcement> last(string $sortedField = 'id')
+ * @phpstan-method static Announcement&Proxy<Announcement> random(array $attributes = [])
+ * @phpstan-method static Announcement&Proxy<Announcement> randomOrCreate(array $attributes = [])
+ * @phpstan-method static ProxyRepositoryDecorator<Announcement, EntityRepository> repository()
+ * @phpstan-method static list<Announcement&Proxy<Announcement>> all()
+ * @phpstan-method static list<Announcement&Proxy<Announcement>> createMany(int $number, array|callable $attributes = [])
+ * @phpstan-method static list<Announcement&Proxy<Announcement>> createSequence(iterable|callable $sequence)
+ * @phpstan-method static list<Announcement&Proxy<Announcement>> findBy(array $attributes)
+ * @phpstan-method static list<Announcement&Proxy<Announcement>> randomRange(int $min, int $max, array $attributes = [])
+ * @phpstan-method static list<Announcement&Proxy<Announcement>> randomSet(int $number, array $attributes = [])
  */
-final class AnnouncementFactory extends ModelFactory
+final class AnnouncementFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -64,10 +64,15 @@ final class AnnouncementFactory extends ModelFactory
         parent::__construct();
     }
 
+    public static function class(): string
+    {
+        return Announcement::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      */
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         $createDate = new DateTimeImmutable();
         $startTime = $createDate->add(new DateInterval('P'. self::faker()->numberBetween(1, 10) . 'D'));
@@ -84,15 +89,10 @@ final class AnnouncementFactory extends ModelFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
             // ->afterInstantiate(function(Announcement $announcement): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Announcement::class;
     }
 }
