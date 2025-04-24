@@ -25,7 +25,7 @@ final class DocumentProcessor implements ProcessorInterface
     ) {
     }
 
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         // $data doesn't contain anything. The data is located in the $context['request'].
         $dto = new DocumentApi();

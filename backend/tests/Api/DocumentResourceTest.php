@@ -433,7 +433,7 @@ class DocumentResourceTest extends ApiTestCase
 
         // Check that if the creator is set to non-anonymous later on, the creator is given in the GET-response.
         $document->setAnonymous(false);
-        $document->save();
+        $document->_save();
 
         $json = $this->browser()
             ->get('/api/documents/' . $document->getId(), [
@@ -471,7 +471,7 @@ class DocumentResourceTest extends ApiTestCase
 
         // Check that if the creator is set to anonymous later on, no creator field is given on GET.
         $document->setAnonymous(true);
-        $document->save();
+        $document->_save();
 
         $json = $this->browser()
             ->get('/api/documents/' . $document->getId(), [

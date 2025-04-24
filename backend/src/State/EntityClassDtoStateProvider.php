@@ -11,6 +11,7 @@ use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use ArrayIterator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 class EntityClassDtoStateProvider implements ProviderInterface
@@ -18,7 +19,8 @@ class EntityClassDtoStateProvider implements ProviderInterface
     public function __construct(
         #[Autowire(service: CollectionProvider::class)] private readonly ProviderInterface $collectionProvider,
         #[Autowire(service: ItemProvider::class)] private readonly ProviderInterface $itemProvider,
-        private readonly MicroMapperInterface $microMapper
+        private readonly MicroMapperInterface $microMapper,
+        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -53,6 +55,8 @@ class EntityClassDtoStateProvider implements ProviderInterface
 
     private function mapEntityToDto(object $entity, string $resourceClass): object
     {
-        return $this->microMapper->map($entity, $resourceClass);
+        $request = $this->requestStack->getCurrentRequest();
+        $lang = $request->query->get('lang'); // If the language is given as param, pass it to the mapper
+        return $this->microMapper->map($entity, $resourceClass, ["lang" => $lang]);
     }
 }

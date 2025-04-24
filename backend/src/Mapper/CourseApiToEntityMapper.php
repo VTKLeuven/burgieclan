@@ -45,6 +45,7 @@ class CourseApiToEntityMapper implements MapperInterface
 
         $to->setName($from->name);
         $to->setCode($from->code);
+        $to->setLanguage($from->language);
         $to->setProfessors($from->professors);
         $to->setSemesters($from->semesters);
         $to->setCredits($from->credits);

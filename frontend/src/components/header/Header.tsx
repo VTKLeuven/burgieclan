@@ -2,7 +2,7 @@
 
 import React, { Suspense, useState } from 'react';
 import { Dialog } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Menu, X } from 'lucide-react';
 import Logo from '@/components/common/Logo';
 import { Skeleton } from "@/components/ui/skeleton";
 import Search from "@/components/header/Search";
@@ -51,13 +51,13 @@ export default function Header() {
                                 className="-m-1.5 p-1.5 w-[50px] h-[50px] rounded-md text-gray-700 justify-center items-center flex"
                             >
                                 <span className="sr-only">{t('open_menu')}</span>
-                                <Bars3Icon aria-hidden="true" className="h-6 w-6" />
+                                <Menu aria-hidden="true" className="h-6 w-6" />
                             </button>
                         </div>
                         :
                         <div className="flex md:hidden">
 
-                            <Link href="login" className="primary-button">
+                            <Link href="/login" className="primary-button">
                                 {t('login')}
                             </Link>
 
@@ -80,7 +80,7 @@ export default function Header() {
                             <LanguageSwitcher />
                             {isAuthenticated
                                 ?   <HeaderProfileButton />
-                                :   <Link href="login" className="primary-button">
+                                :   <Link href="/login" className="primary-button">
                                         {t('login')}
                                     </Link>
                             }
@@ -113,7 +113,7 @@ export default function Header() {
                             className="-m-1.5 p-1.5 w-[50px] h-[50px] rounded-md text-gray-700 justify-center items-center flex"
                         >
                             <span className="sr-only">{t('close_menu')}</span>
-                            <XMarkIcon aria-hidden="true" className="h-6 w-6" />
+                            <X aria-hidden="true" className="h-6 w-6" />
                         </button>
                     </div>
 
@@ -132,7 +132,7 @@ export default function Header() {
                                 ))}
                             </div>
                             <div className="py-6">
-                                <Link href="account" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                <Link href="/account" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
                                     {t('profile')}
                                 </Link>
                             </div>

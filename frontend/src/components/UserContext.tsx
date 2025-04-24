@@ -9,6 +9,7 @@ import { convertToUser } from '@/utils/convertToEntity';
 interface UserContextType {
     user: User | null;
     loading: boolean;
+    refreshUser: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -17,29 +18,32 @@ export const UserProvider = ({ children, userId }: { children: ReactNode, userId
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        async function fetchUser() {
-            try {
-                if (!userId) {
-                    return;
-                }
-                const userData = await ApiClient('GET', `/api/users/${userId}`);
-                if (userData?.error) {
-                    throw new ApiError(userData.error.message, userData.error.status);
-                }
-                setUser(convertToUser(userData));
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
+    const fetchUser = async () => {
+        try {
+            if (!userId) {
+                setUser(null);
+                return;
             }
+            setLoading(true);
+            const userData = await ApiClient('GET', `/api/users/${userId}`);
+            if (userData?.error) {
+                throw new ApiError(userData.error.message, userData.error.status);
+            }
+            setUser(convertToUser(userData));
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
         }
+    };
 
+    useEffect(() => {
         fetchUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userId]);
 
     return (
-        <UserContext.Provider value={{ user, loading }}>
+        <UserContext.Provider value={{ user, loading, refreshUser: fetchUser }}>
             {children}
         </UserContext.Provider>
     );

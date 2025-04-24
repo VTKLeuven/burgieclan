@@ -40,11 +40,14 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
         const jwt = await getActiveJWT();
 
         const requestHeaders = new Headers(customHeaders || {});
-        // If body is FormData, don't set content-type (usefull for file uploads)
+        // If body is FormData, don't set content-type (useful for file uploads)
         if (!(body instanceof FormData)) {
             if (method === 'PATCH') {
                 // Backend expects content-type to be application/merge-patch+json for PATCH requests
                 requestHeaders.set('Content-Type', 'application/merge-patch+json');
+            } else if (method === 'POST') {
+                // Backend expects content-type to be application/ld+json for POST requests
+                requestHeaders.set('Content-Type', 'application/ld+json');
             } else {
                 // Backend expects content-type to be application/json
                 requestHeaders.set('Content-Type', 'application/json');
@@ -62,11 +65,9 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
             body: body instanceof FormData ? body : JSON.stringify(body),
         });
 
-        const res = await response.json();
-
         // Handle successful response
         if (response.ok) {
-            return res;
+            return response.json();
         }
 
         // Handle errors (except 401s)
