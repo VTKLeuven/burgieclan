@@ -37,18 +37,27 @@ export interface Program extends BaseEntity {
 
 export interface CourseComment extends BaseEntity {
     course?: Course;
-    commentCategory?: Category;
+    commentCategory?: CommentCategory;
+    content?: string;
+    anonymous?: boolean;
+    createDate?: Date;
+    updateDate?: Date;
+    creator?: User;
 }
 
-export interface Category extends BaseEntity {
+export interface CommentCategory extends BaseEntity {
     name?: string;
     description?: string;
+}
+
+export interface DocumentCategory extends BaseEntity {
+    name?: string;
 }
 
 export interface Document extends NodeEntity {
     name?: string;
     course?: Course;
-    category?: Category;
+    category?: DocumentCategory;
     underReview?: boolean;
     contentUrl?: string;
     anonymous?: boolean;
