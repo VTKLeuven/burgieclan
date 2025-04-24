@@ -269,12 +269,10 @@ class CourseCommentResourceTest extends ApiTestCase
                 'username' => 'creator',
                 'plainPassword' => 'password'
             ]);
-        $creator->save();
         $otherUser = UserFactory::createOne(
             [
                 'username' => 'other user',
                 'plainPassword' => 'password']);
-        $otherUser->save();
 
         $creatorTokenResponse = $this->browser()
             ->post('/api/auth/login', HttpOptions::json([
