@@ -156,6 +156,7 @@
         }
     },
     "account": {
+        "account": "Account",
         "greeting": "Hey, {{name}}!",
         "welcome_text": "Welkom bij je accountpagina. Hier vind je wat informatie over je favorieten en je bijdrages aan Burgieclan.",
         "favorite": {
