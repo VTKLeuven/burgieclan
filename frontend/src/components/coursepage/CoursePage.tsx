@@ -1,55 +1,43 @@
 'use client'
-import CoursePageSection from "@/components/coursepage/CoursePageSection";
+import DocumentSections from "@/components/coursepage/DocumentSections";
 import { Course, Breadcrumb } from "@/types/entities";
 import { useEffect, useState } from "react";
 import { ApiClient } from "@/actions/api";
-import { ApiError } from "next/dist/server/api-utils";
+import { ApiError } from "@/utils/error/apiError";
 import Loading from '@/app/[locale]/loading'
-import { useToast } from '@/components/ui/Toast';
-import initTranslations from "@/app/i18n";
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import { useFavorites } from '@/hooks/useFavorites';
 import { useUser } from '@/components/UserContext';
-import { Star, Folder, ChartPie, Home } from "lucide-react";
+import { Star, Folder, ChartPie, Link as LinkIcon } from "lucide-react";
 import { convertToCourse } from "@/utils/convertToEntity";
+import Link from "next/link";
+import SemesterIndicator from '@/components/ui/SemesterIndicator';
+import CommentCategories from "@/components/coursepage/CommentCategories";
+import { useTranslation } from "react-i18next";
+import ErrorPage from "@/components/error/ErrorPage";
 
 export default function CoursePage({ courseId, breadcrumb }: { courseId: number, breadcrumb: Breadcrumb }) {
     const [course, setCourse] = useState<Course | null>(null);
-    const [t, setT] = useState<any>(() => (key: string) => key); // Default translation function
-    const { showToast } = useToast();
-    const [error, setError] = useState<boolean>(false);
+    const [error, setError] = useState<ApiError | null>(null);
     const { user, loading, refreshUser } = useUser();
     const { updateFavorite } = useFavorites(user);
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
-
-    async function fetchCourse(query: number) {
-        try {
-            return await ApiClient('GET', `/api/courses/${query}`);
-        } catch (err) {
-            throw new ApiError(500, err.message);
-        }
-    }
+    const { t } = useTranslation();
 
     useEffect(() => {
         async function getCourse() {
-            try {
-                const courseData = await fetchCourse(courseId);
-                const course = convertToCourse(courseData);
-                setCourse(course);
-
-                // Initialize translations based on course language
-                const { t: translationFunction } = await initTranslations(courseData.language);
-                setT(() => translationFunction);
-            } catch {
-                setError(true);
-                showToast(t('course.error-fetching'), 'error');
+            const result = await ApiClient('GET', `/api/courses/${courseId}`);
+            if (result.error) {
+                setError(new ApiError(result.error.message, result.error.status));
             }
+            const course = convertToCourse(result);
+            setCourse(course);
         }
 
         if (!loading) {
             getCourse();
         }
-    }, [courseId, showToast, loading, t]); // Fetch course only when `loading` is done
+    }, [courseId, loading]); // Fetch course only when `loading` is done
 
     useEffect(() => {
         if (user?.favoriteCourses) {
@@ -69,11 +57,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
     };
 
     if (error) {
-        return (
-            <div className="flex items-center justify-center h-full w-full">
-                <p>{t('course.error-fetching')}</p>
-            </div>
-        );
+        return <ErrorPage status={error.status} detail={error.message} />;
     }
 
     if (!course) {
@@ -87,82 +71,80 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
     return (
         <>
             <div className="w-full h-full">
-                <div className="min-h-[35%] md:h-[40%] bg-wireframe-lightest-gray relative p-10 pt-5 md:pt-10">
-                    <div>
-                        {/* Breadcrumb */}
-                        <div className="flex flex-col md:flex-row space-x-2">
-                            {breadcrumb.breadcrumb.map((item, index) => (
-                                <div key={item} className="inline-block">
-                                    <span className="hover:underline hover:cursor-pointer text-wireframe-mid-gray">{item}</span>
-                                    {index + 1 < breadcrumb.breadcrumb.length && (
-                                        <span className="text-wireframe-mid-gray"> / </span>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="flex items-center space-x-2 mt-3">
-                            <div
-                                className="hover:scale-110 hover:cursor-pointer transition-transform duration-300 flex items-center"
-                                onClick={handleFavoriteClick}>
-                                <div className="inline-block mr-2">
-                                    <Star className='text-vtk-yellow-500' fill={isFavorite ? "currentColor" : "none"} />
-                                </div>
+                <div className="bg-wireframe-lightest-gray relative p-10 pt-5 md:pt-10">
+                    {/* Breadcrumb */}
+                    <div className="flex flex-col md:flex-row space-x-2">
+                        {breadcrumb.breadcrumb.map((item, index) => (
+                            <div key={item} className="inline-block">
+                                <span className="hover:underline hover:cursor-pointer text-wireframe-mid-gray">{item}</span>
+                                {index + 1 < breadcrumb.breadcrumb.length && (
+                                    <span className="text-wireframe-mid-gray"> / </span>
+                                )}
                             </div>
-                            <h1 className="md:text-5xl text-4xl mb-4 text-wireframe-primary-blue">{course.name}</h1>
-                        </div>
-
-                        <div className="flex flex-col md:flex-row md:mt-4 mb-4 md:gap-14 gap-2">
-                            <div className="flex items-center space-x-1 gap-2">
-                                <Folder className="w-[24px] h-[24px]" />
-                                <p className="text-lg">{course.code}</p>
-                            </div>
-                            <div className="flex items-center space-x-1 gap-2">
-                                <ChartPie className="w-[24px] h-[24px]" />
-                                <p className="text-lg">{course.credits} {t('credits')}</p>
-                            </div>
-                            <div className="flex items-center space-x-1 gap-2">
-                                <Home className="w-[24px] h-[24px]" />
-                                <p className="text-lg">KU Leuven</p>
-                            </div>
-                        </div>
-
-                        <p className="pt-3 md:pt-0 text-lg md:w-[60%] mb-5"> {/*Description top*/}
-                            Lorem ipsum dolor sit amet consectetur.
-                            At orci quis morbi vulputate nibh interdum lectus quam nec.
-                            Ipsum feugiat viverra justo consectetur. Odio commodo aliquet elit.
-                        </p>
+                        ))}
                     </div>
-                </div>
 
-                <div className="flex flex-col md:flex-row md:p-10 pt-7 pl-7 pr-7 md:space-x-2">
-                    <div className="md:w-[60%] mb-4 md:mb-0">
-                        <h2> {t('course-page.about')} </h2>
-                        <p className="text-lg md:w-[76%]"> {/*Description bottom*/}
-                            Lorem ipsum dolor sit amet consectetur.
-                            At orci quis morbi vulputate nibh interdum lectus quam nec.
-                            Ipsum feugiat viverra justo consectetur.
-                            Odio commodo aliquet elit auctor vulputate in fames condimentum leo.
-                            Venenatis amet ullamcorper pharetra congue arcu at non mi quam.
-                        </p>
+                    <div className="flex items-center space-x-2 mt-3">
+                        <div
+                            className="hover:scale-110 hover:cursor-pointer transition-transform duration-300 flex items-center"
+                            onClick={handleFavoriteClick}>
+                            <div className="inline-block mr-2">
+                                <Star className='text-vtk-yellow-500' fill={isFavorite ? "currentColor" : "none"} />
+                            </div>
+                        </div>
+                        <h1 className="md:text-5xl text-4xl mb-4 text-wireframe-primary-blue">{course.name}</h1>
                     </div>
-                    <div className="mb-2 md:mb-0">
-                        <h2> {t('course-page.teachers')} </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {course?.professors?.map((p, index) => (
-                                <ProfessorDiv key={index} unumber={p} index={index} t={t} />
-                            ))}
+                    <div className="flex flex-col md:flex-row">
+
+                        <div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:mt-4 mb-4">
+                                <div className="flex items-center space-x-1 gap-2">
+                                    <Folder className="w-[24px] h-[24px]" />
+                                    <p className="text-lg">{course.code}</p>
+                                </div>
+                                <div className="flex items-center space-x-1 gap-2">
+                                    <ChartPie className="w-[24px] h-[24px]" />
+                                    <p className="text-lg">{course.credits} {t('credits')}</p>
+                                </div>
+                                <div className="flex items-center space-x-1 gap-2">
+                                    <SemesterIndicator semesters={course.semesters} />
+                                    <p className="text-lg">
+                                        {Array.isArray(course.semesters)
+                                            ? (course.semesters.includes("Semester 1") && course.semesters.includes("Semester 2"))
+                                                ? t('Year course')
+                                                : course.semesters.join(", ")
+                                            : course.semesters}
+                                    </p>
+                                </div>
+                                <div className="flex items-center space-x-1 gap-2">
+                                    <Link href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`} className="text-lg flex items-center gap-2 hover:underline hover:cursor-pointer">
+                                        <LinkIcon className="w-[24px] h-[24px]" />
+                                        ECTS
+                                    </Link>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div className="mb-2 md:mb-0 md:ml-auto">
+                            <h4> {t('course-page.teachers')} </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {course?.professors?.map((p, index) => (
+                                    <ProfessorDiv key={index} unumber={p} index={index} t={t} />
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="md:p-10 p-7 mb-10">
-                    <h2> {t('course-page.files')} </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:mt-5 transform scale-90 origin-left ">
-                        <CoursePageSection title={t('course-page.summaries')} description={t('course-page.summaries-description')} />
-                        <CoursePageSection title={t('course-page.exercise-session')} description={t('course-page.exercise-session-description')} />
-                        <CoursePageSection title={t('course-page.exams')} description={t('course-page.exams-description')} />
-                    </div>
+                <div className="md:p-5 p-7">
+                    <DocumentSections courseId={courseId} />
+                </div>
+
+                <div className="md:p-5 p-7">
+                    <CommentCategories
+                        comments={course.courseComments ?? []}
+                        courseId={courseId}
+                    />
                 </div>
             </div>
         </>
