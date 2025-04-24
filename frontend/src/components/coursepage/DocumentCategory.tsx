@@ -24,7 +24,7 @@ export default function DocumentCategory({ title, href }: DocumentCategoryProps)
         <div className="px-4 pt-4">
             <div className="flex items-center gap-2">
                 <FileText className="w-6 h-6" />
-                <h3 className="whitespace-nowrap">{title}</h3>
+                <h4 className="whitespace-nowrap">{title}</h4>
             </div>
             <YellowSectionButton />
         </div>
