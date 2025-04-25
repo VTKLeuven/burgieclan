@@ -155,6 +155,9 @@
             "no-categories": "No comment categories available"
         }
     },
+    "curriculum-navigator": {
+        "no-courses": "No courses found matching your search."
+    },
     "account": {
         "account": "Account",
         "greeting": "Hi, {{name}}!",
