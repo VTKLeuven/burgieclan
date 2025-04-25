@@ -7,7 +7,7 @@ import Logo from "@/components/common/Logo";
 import { useToast } from "@/components/ui/Toast";
 
 // Logic
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { initiateLitusOAuthFlow } from "@/utils/oauth";
 import ErrorPage from "@/components/error/ErrorPage";
 import { useRouter } from "next/navigation";
@@ -32,7 +32,7 @@ export default function LoginForm() {
     const [isOpen, setIsOpen] = useState(false);
     const [error, setError] = useState<Error | null>(null);
     const { showToast } = useToast();
-    const { request } = useApi();
+    const { request, loading, error: apiError } = useApi();
 
     const redirectTo = searchParams.get('redirectTo') || '/';
 
@@ -40,7 +40,6 @@ export default function LoginForm() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [credentialsError, setCredentialsError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
 
     const { t } = useTranslation();
 
@@ -59,7 +58,6 @@ export default function LoginForm() {
 
     const handleCredentialsLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
-        setIsLoading(true);
         setCredentialsError('');
 
         const response = await request('POST', `/api/auth/login`, {
@@ -68,20 +66,23 @@ export default function LoginForm() {
         });
 
         if (!response) {
-            setCredentialsError(t('login_invalid_credentials'));
-            return;
-        }
-
-        if (response.error) {
-            showToast(t('login_failed'), 'error');
             return;
         }
 
         await storeOAuthTokens(response.token);
         showToast(t('login_success'), 'success');
         router.push(redirectTo);
-        setIsLoading(false);
     };
+
+    useEffect(() => {
+        if (apiError) {
+            if (apiError.status == 401) {
+                setCredentialsError(t('login_invalid_credentials'));
+            } else {
+                setCredentialsError(t('unexpected'));
+            }
+        }
+    }, [apiError, t]);
 
     if (error) {
         return <ErrorPage detail={error.message} />;
@@ -173,9 +174,9 @@ export default function LoginForm() {
                             <button
                                 type="submit"
                                 className="primary-button flex items-center justify-center gap-2"
-                                disabled={isLoading}
+                                disabled={loading}
                             >
-                                {isLoading ? <LoaderCircle className="animate-spin" /> : t('login')}
+                                {loading ? <LoaderCircle className="animate-spin" /> : t('login')}
                             </button>
                         </div>
                     </form>

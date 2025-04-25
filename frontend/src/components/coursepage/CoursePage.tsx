@@ -13,7 +13,7 @@ import Link from "next/link";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import CommentCategories from "@/components/coursepage/CommentCategories";
 import { useTranslation } from "react-i18next";
-import ErrorPage from "@/components/error/ErrorPage";
+import ErrorPage from "../error/ErrorPage";
 
 export default function CoursePage({ courseId, breadcrumb }: { courseId: number, breadcrumb: Breadcrumb }) {
     const [course, setCourse] = useState<Course | null>(null);
@@ -21,16 +21,18 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
     const { updateFavorite } = useFavorites(user);
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
     const { t } = useTranslation();
-    const { loading, error, request } = useApi();
+    const { request, loading, error } = useApi();
 
     useEffect(() => {
         async function getCourse() {
             const courseData = await request('GET', `/api/courses/${courseId}`);
 
-            if (courseData) {
-                const course = convertToCourse(courseData);
-                setCourse(course);
+            if (!courseData) {
+                return null;
             }
+
+            const course = convertToCourse(courseData);
+            setCourse(course);
         }
 
         // Only fetch the course when user data is loaded
@@ -56,12 +58,8 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
         await refreshUser();
     };
 
-    if (error) {
-        return <ErrorPage status={error.status} detail={error.message} />;
-    }
-
     // Show loading state
-    if (loading || !course) {
+    if (loading) {
         return (
             <div className="flex items-center justify-center h-full w-full">
                 <Loading />
@@ -69,7 +67,11 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
         );
     }
 
-    return (
+    if (error) {
+        return <ErrorPage status={error.status} detail={error.message} />;
+    }
+
+    return (course &&
         <>
             <div className="w-full h-full">
                 <div className="bg-wireframe-lightest-gray relative p-10 pt-5 md:pt-10">

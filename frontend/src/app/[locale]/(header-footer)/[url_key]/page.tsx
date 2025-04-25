@@ -22,31 +22,27 @@ export default function Page({ params: { url_key } }: { params: { url_key: strin
 
     useEffect(() => {
         const fetchPage = async () => {
-            try {
-                const response = await request('GET', `/api/pages/${url_key}?lang=${currentLocale}`);
+            const response = await request('GET', `/api/pages/${url_key}?lang=${currentLocale}`);
 
-                if (!response || response.error) {
-                    return null;
-                }
-
-                setPage(convertToPage(response));
-            } catch (err) {
-                console.error("Error fetching page:", err);
-                // The useApi hook will handle setting the error state
+            if (!response) {
+                return null;
             }
+
+            setPage(convertToPage(response));
         };
 
         fetchPage();
     }, [currentLocale, url_key, request]);
 
     // Show loading state
-    if (loading) {
+    if (loading || !page && !error) {
         return <Loading />;
     }
 
     // Show error state
-    if (error) {
-        return <ErrorPage status={500} detail={error} />;
+    if (error && error.status != 404) {
+        console.log(error);
+        return <ErrorPage status={error.status} detail={error.message} />;
     }
 
     // Show not found state

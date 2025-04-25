@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { ApiClient } from '@/actions/api';
 import { CommentCategory, CourseComment } from '@/types/entities';
 import Loading from '@/app/[locale]/loading';
-import { useToast } from '@/components/ui/Toast';
 import { useTranslation } from 'react-i18next';
 import { convertToCommentCategory } from '@/utils/convertToEntity';
 import CourseCommentList from '@/components/coursepage/CourseCommentList';
 import { MessageSquarePlus } from 'lucide-react';
 import CommentDialog from '@/components/coursepage/CommentDialog';
+import { useApi } from '@/hooks/useApi';
 
 type CommentCategoriesProps = {
     comments: CourseComment[];
@@ -16,26 +15,23 @@ type CommentCategoriesProps = {
 
 const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
     const [allCategories, setAllCategories] = useState<CommentCategory[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
     const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false);
     const { t } = useTranslation();
+    const { request, loading } = useApi();
 
     // Fetch all categories from backend
     useEffect(() => {
         const fetchCategories = async () => {
-            try {
-                setIsLoading(true);
-                const data = await ApiClient('GET', '/api/comment_categories');
-                setAllCategories(data['hydra:member'].map(convertToCommentCategory));
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setIsLoading(false);
+            const data = await request('GET', '/api/comment_categories');
+
+            if (!data) {
+                return null;
             }
+            setAllCategories(data['hydra:member'].map(convertToCommentCategory));
         };
 
         fetchCategories();
-    }, []);
+    }, [request]);
 
     // Group comments by category
     const getCommentsByCategory = (categoryId: number) => {
@@ -52,7 +48,7 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
         setIsCommentDialogOpen(false);
     };
 
-    if (isLoading) {
+    if (loading) {
         return (
             <div className="flex justify-center py-4">
                 <Loading />

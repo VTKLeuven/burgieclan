@@ -14,13 +14,18 @@ const getPublicAvailablePages = async (): Promise<Page[]> => {
         throw new Error(`Missing environment variable for backend base URL`)
     }
     const url = backendBaseUrl + '/api/pages';
-    const response = await fetch(url, {
-        method: 'GET'
-    });
-    const data = await response.json();
+    try {
+        const response = await fetch(url, {
+            method: 'GET'
+        });
+        const data = await response.json();
 
-    const pages: Page[] = data['hydra:member'].map(convertToPage);
-    return pages;
+        const pages: Page[] = data['hydra:member'].map(convertToPage);
+        return pages;
+    } catch (error) {
+        console.error('Error fetching public pages:', error);
+        return []
+    }
 }
 
 const startsWithAllowedPath = (pathWithoutLocale: string): boolean => {
