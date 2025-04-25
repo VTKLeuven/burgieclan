@@ -11,12 +11,14 @@ const handleError = async (response: Response) => {
     const errorData = await response.json();
 
     switch (response.status) {
+        case 401:
+            return { error: { message: errorData.message || errorData.title || 'Unauthorized. Please log in again.', detail: errorData.detail, status: 401 } };
         case 404:
-            return { error: { message: errorData.message || 'Resource not found.', status: 404 } };
+            return { error: { message: errorData.message || errorData.title || 'Resource not found.', detail: errorData.detail, status: 404 } };
         case 500:
-            return { error: { message: errorData.message || 'Internal Server Error. Please try again later.', status: 500 } };
+            return { error: { message: errorData.message || errorData.title || 'Internal Server Error. Please try again later.', detail: errorData.detail, status: 500 } };
         default:
-            return { error: { message: errorData.message || 'Unexpected Error.', status: response.status || 500 } };
+            return { error: { message: errorData.message || errorData.title || 'Unexpected Error.', detail: errorData.detail, status: response.status || 500 } };
     }
 };
 

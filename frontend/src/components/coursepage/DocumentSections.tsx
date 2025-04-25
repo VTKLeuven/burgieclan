@@ -1,29 +1,28 @@
 'use client'
 import { useEffect, useState } from "react";
 import DocumentCategoryPage from "@/components/coursepage/DocumentCategory";
-import { ApiClient } from "@/actions/api";
 import Loading from '@/app/[locale]/loading';
 import { convertToDocumentCategory } from "@/utils/convertToEntity";
 import type { DocumentCategory } from "@/types/entities";
 import { useTranslation } from "react-i18next";
+import { useApi } from "@/hooks/useApi";
 
 export default function DocumentSections({ courseId }: { courseId: number }) {
     const [documentCategories, setDocumentCategories] = useState<DocumentCategory[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
     const { t } = useTranslation();
+    const { request, loading } = useApi();
 
     useEffect(() => {
         async function fetchDocumentCategories() {
-            setLoading(true);
-            const result = await ApiClient('GET', '/api/document_categories');
-            if (!result.error) {
-                setDocumentCategories(result['hydra:member'].map(convertToDocumentCategory));
+            const result = await request('GET', '/api/document_categories');
+            if (!result) {
+                return null;
             }
-            setLoading(false);
+            setDocumentCategories(result['hydra:member'].map(convertToDocumentCategory));
         }
 
         fetchDocumentCategories();
-    }, []);
+    }, [request]);
 
     if (loading) {
         return (

@@ -4,12 +4,14 @@ import { createContext, useContext, useState, useEffect, ReactNode, useCallback 
 import { useApi } from '@/hooks/useApi';
 import type { User } from '@/types/entities';
 import { convertToUser } from '@/utils/convertToEntity';
+import { notFound } from 'next/navigation';
+import type { ApiError } from '@/utils/error/apiError';
 
 interface UserContextType {
     user: User | null;
     loading: boolean;
     isRedirecting: boolean;
-    error: string | null;
+    error: ApiError | null;
     refreshUser: () => Promise<void>;
 }
 
@@ -25,13 +27,12 @@ export const UserProvider = ({ children, userId }: { children: ReactNode, userId
             return;
         }
 
-        try {
-            const userData = await request('GET', `/api/users/${userId}`);
-            if (userData) {
-                setUser(convertToUser(userData));
-            }
-        } catch (error) {
-            console.error("Error fetching user:", error);
+
+        const userData = await request('GET', `/api/users/${userId}`);
+        if (userData && !userData.error) {
+            setUser(convertToUser(userData));
+        } else {
+            notFound();
         }
     }, [userId, request]);
 
