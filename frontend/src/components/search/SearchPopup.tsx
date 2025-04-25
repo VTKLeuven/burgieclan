@@ -155,7 +155,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                 <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
                                     <Frown className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
                                     <p className="mt-4 font-semibold text-gray-900">{t('unexpected')}</p>
-                                    <p className="mt-2 text-gray-500">{error}</p>
+                                    <p className="mt-2 text-gray-500">{error.message}</p>
                                 </div>
                             )}
 

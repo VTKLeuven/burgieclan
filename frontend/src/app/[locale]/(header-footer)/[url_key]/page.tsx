@@ -41,7 +41,6 @@ export default function Page({ params: { url_key } }: { params: { url_key: strin
 
     // Show error state
     if (error && error.status != 404) {
-        console.log(error);
         return <ErrorPage status={error.status} detail={error.message} />;
     }
 
