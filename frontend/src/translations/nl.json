@@ -155,6 +155,9 @@
             "no-categories": "Geen opmerking-categorieën beschikbaar"
         }
     },
+    "curriculum-navigator": {
+        "no-courses": "Geen vakken gevonden die overeenkomen met je zoekopdracht."
+    },
     "account": {
         "account": "Account",
         "greeting": "Hey, {{name}}!",
