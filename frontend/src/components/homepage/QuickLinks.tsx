@@ -1,4 +1,3 @@
-import { ApiClient } from '@/actions/api';
 import type { QuickLink } from '@/types/entities';
 import { convertToQuickLink } from '@/utils/convertToEntity';
 import { ApiError } from '@/utils/error/apiError';
@@ -7,35 +6,30 @@ import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useApi } from '@/hooks/useApi';
 
 export function QuickLinks() {
     const [links, setLinks] = useState<QuickLink[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const { t, i18n } = useTranslation();
     const currentLanguage = i18n.language;
+    const { request, loading, error } = useApi();
 
     useEffect(() => {
         const fetchQuickLinks = async () => {
-            try {
-                const response = await ApiClient('GET', `/api/quick_links?lang=${currentLanguage}`);
-                if (response?.error) {
-                    throw new ApiError(response.error.message, response.error.status);
-                }
+            const response = await request('GET', `/api/quick_links?lang=${currentLanguage}`);
 
-                const allLinks: QuickLink[] = response['hydra:member'].map(convertToQuickLink);
-                setLinks(allLinks.slice(0, MAX_QUICK_LINKS));
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'An error occurred');
-            } finally {
-                setIsLoading(false);
+            if (!response) {
+                return null;
             }
+
+            const allLinks: QuickLink[] = response['hydra:member'].map(convertToQuickLink);
+            setLinks(allLinks.slice(0, MAX_QUICK_LINKS));
         };
 
         fetchQuickLinks();
-    }, [currentLanguage]);
+    }, [currentLanguage, request]);
 
-    if (isLoading) {
+    if (loading) {
         return (
             <div className="flex justify-center items-center py-8">
                 <div className="animate-spin h-6 w-6 border-2 border-gray-500 rounded-full border-t-transparent"></div>

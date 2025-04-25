@@ -5,8 +5,8 @@ import { Send } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import { useTranslation } from 'react-i18next';
 import { CommentCategory } from '@/types/entities';
-import { ApiClient } from '@/actions/api';
 import CommentForm from './CommentForm';
+import { useApi } from '@/hooks/useApi';
 
 interface CommentDialogProps {
     isOpen: boolean;
@@ -27,31 +27,26 @@ const CommentDialog = ({
     courseId,
     categories
 }: CommentDialogProps) => {
-    const [isLoading, setIsLoading] = useState(false);
     const { showToast } = useToast();
     const { t } = useTranslation();
+    const { request, loading } = useApi();
 
     const handleSubmit = async (data: CommentFormData) => {
-        try {
-            setIsLoading(true);
+        const res = await request('POST', '/api/course_comments', {
+            content: data.content,
+            anonymous: data.anonymous,
+            course: `/api/courses/${courseId}`,
+            category: `/api/comment_categories/${data.categoryId}`
+        });
 
-            const res = await ApiClient('POST', '/api/course_comments', {
-                content: data.content,
-                anonymous: data.anonymous,
-                course: `/api/courses/${courseId}`,
-                category: `/api/comment_categories/${data.categoryId}`
-            });
-
-            console.log(res);
-
-            showToast(t('course-page.comments.success'), 'success');
-            onClose();
-            // You might want to add a callback to refresh comments
-        } catch (error) {
+        if (!res) {
             showToast(t('course-page.comments.error'), 'error');
-        } finally {
-            setIsLoading(false);
+            return;
         }
+
+        showToast(t('course-page.comments.success'), 'success');
+        onClose();
+        // TODO add a callback to refresh comments        
     };
 
     return (
@@ -70,7 +65,7 @@ const CommentDialog = ({
 
                 <CommentForm
                     onSubmit={handleSubmit}
-                    isLoading={isLoading}
+                    isLoading={loading}
                     categories={categories}
                 />
             </DialogBody>
@@ -79,17 +74,17 @@ const CommentDialog = ({
                     type="button"
                     onClick={onClose}
                     className="text-sm font-medium text-gray-700 hover:text-gray-500 px-4 py-2"
-                    disabled={isLoading}
+                    disabled={loading}
                 >
                     {t('course-page.comments.dialog.button.cancel')}
                 </button>
                 <button
                     type="submit"
                     form="comment-form"
-                    disabled={isLoading}
+                    disabled={loading}
                     className="primary-button inline-flex items-center"
                 >
-                    {isLoading ? (
+                    {loading ? (
                         <>
                             <span className="spinner mr-2" />
                             {t('course-page.comments.dialog.button.submitting')}
