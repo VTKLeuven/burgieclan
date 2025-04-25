@@ -1,6 +1,6 @@
 // hooks/useDocumentUpload.ts
 import { useState } from 'react';
-import { ApiClient } from '@/actions/api';
+import { useApi } from '@/hooks/useApi';
 import { ApiError } from '@/utils/error/apiError';
 import { UploadFormData } from '@/types/upload';
 import { FILE_SIZE_MB } from '@/utils/constants/upload';
@@ -39,12 +39,11 @@ const getDetailedErrorMessage = (error: any, t: (key: string, options?: any) => 
 };
 
 export const useDocumentUpload = () => {
-    const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState<UploadStatus>({ type: null, message: null });
     const { t } = useTranslation();
+    const { request, loading: isLoading } = useApi();
 
     const uploadDocument = async (data: UploadFormData): Promise<boolean> => {
-        setIsLoading(true);
         setStatus({ type: null, message: null });
 
         try {
@@ -65,9 +64,13 @@ export const useDocumentUpload = () => {
             formData.append('year', data.year);
             formData.append('anonymous', data.anonymous.toString()); // Converting the boolean to string since FormData values must be strings
 
-            const result = await ApiClient('POST', '/api/documents', formData);
+            const result = await request('POST', '/api/documents', formData);
 
-            if (result?.error) {
+            if (!result) {
+                throw new Error(t('unexpected'));
+            }
+
+            if (result.error) {
                 throw new ApiError(result.error.message, result.error.status);
             }
 
@@ -84,8 +87,6 @@ export const useDocumentUpload = () => {
                 message
             });
             return false;
-        } finally {
-            setIsLoading(false);
         }
     };
 
