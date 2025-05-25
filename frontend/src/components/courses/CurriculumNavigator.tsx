@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Loading from '@/app/[locale]/loading';
 import { convertToProgram } from "@/utils/convertToEntity";
-import type { Program, Module, Course } from '@/types/entities';
+import type { Program } from '@/types/entities';
 import ProgramNode from '@/components/courses/ProgramNode';
 import { useApi } from '@/hooks/useApi';
 import { useTranslation } from 'react-i18next';
@@ -85,11 +85,6 @@ export default function CurriculumNavigator() {
 
             {hasActiveSearch && (
                 <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                    <p className="text-sm text-blue-700">
-                        {t('curriculum-navigator.filtering-results')}
-                        {searchFilters?.query && <span className="font-medium"> {searchFilters.query}</span>}
-                    </p>
-
                     {/* Add match counts summary */}
                     {(matchCounts.programs > 0 || matchCounts.modules > 0 || matchCounts.courses > 0) && (
                         <p className="text-sm text-blue-700 mt-1">
