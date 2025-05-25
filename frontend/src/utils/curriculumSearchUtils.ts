@@ -354,26 +354,29 @@ export function filterCurriculum(
     const { query } = filters;
     const searchQuery = query?.toLowerCase();
 
-    const matchCounts = {
-        programs: 0,
-        modules: 0,
-        courses: 0
-    };
+    // Track unique IDs to avoid counting duplicates
+    const matchedProgramIds = new Set<number>();
+    const matchedModuleIds = new Set<number>();
+    const matchedCourseIds = new Set<number>();
 
     // Helper functions with match counting
     const trackModuleMatch = (module: Module): boolean => {
         const matches = moduleMatchesText(module, searchQuery);
-        if (matches) matchCounts.modules++;
+        if (matches && module.id && !matchedModuleIds.has(module.id)) {
+            matchedModuleIds.add(module.id);
+        }
         return matches;
     };
 
     const trackCourseMatch = (course: Course): boolean => {
-        const matches = courseMatchesText(course, searchQuery);
-        if (matches) matchCounts.courses++;
+        const matches = courseMatchesFilters(course, filters, favoriteCourses);
+        if (matches && query && courseMatchesText(course, query) && course.id && !matchedCourseIds.has(course.id)) {
+            matchedCourseIds.add(course.id);
+        }
         return matches;
     };
 
-    // Process a module tree for highlighting
+    // Process a module tree for highlighting and counting
     const processModuleTree = (module: Module): Module => {
         const moduleMatches = trackModuleMatch(module);
 
@@ -381,7 +384,7 @@ export function filterCurriculum(
             ...module,
             // Process courses
             courses: module.courses?.map(course => {
-                const courseMatches = trackCourseMatch(course);
+                trackCourseMatch(course);
                 return course;
             }),
             // Process submodules recursively
@@ -393,8 +396,10 @@ export function filterCurriculum(
     const filteredPrograms = programs
         .filter(program => {
             // Direct match on program name
-            if (searchQuery && program.name && program.name.toLowerCase().includes(searchQuery)) {
-                matchCounts.programs++;
+            if (searchQuery && programMatchesText(program, searchQuery)) {
+                if (program.id && !matchedProgramIds.has(program.id)) {
+                    matchedProgramIds.add(program.id);
+                }
                 return true;
             }
 
@@ -404,26 +409,30 @@ export function filterCurriculum(
             ) || false;
         })
         .map(program => {
-            // Process the program for filtering and highlighting
-            const programMatches = searchQuery && program.name &&
-                program.name.toLowerCase().includes(searchQuery);
+            // Process the program structure, counting matches as we go
+            const programMatches = searchQuery && programMatchesText(program, searchQuery);
 
-            if (programMatches) {
-                // Return the entire program with matching items marked
-                return {
-                    ...program,
-                    modules: program.modules?.map(module => processModuleTree(module))
-                };
-            } else {
-                // Only include modules that contain matches
-                return {
-                    ...program,
-                    modules: program.modules
-                        ?.filter(module => moduleContainsMatches(module, filters, favoriteCourses))
-                        .map(module => filterModule(module, filters, favoriteCourses))
-                };
-            }
+            // Process all modules for matches and counts
+            const processedModules = program.modules?.map(module => processModuleTree(module));
+
+            // Filter down to only matching modules if needed
+            const filteredModules = programMatches
+                ? processedModules
+                : processedModules?.filter(module =>
+                    moduleContainsMatches(module, filters, favoriteCourses));
+
+            return {
+                ...program,
+                modules: filteredModules
+            };
         });
+
+    // Create the final match counts from the unique ID sets
+    const matchCounts = {
+        programs: matchedProgramIds.size,
+        modules: matchedModuleIds.size,
+        courses: matchedCourseIds.size
+    };
 
     return { filteredPrograms, matchCounts };
 }
