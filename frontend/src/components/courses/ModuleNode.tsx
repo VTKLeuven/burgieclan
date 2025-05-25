@@ -69,7 +69,9 @@ const ModuleNode = ({
                     }`}
                 onClick={() => setExpanded(!expanded)}
             >
-                {expanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                <div className="transition-transform duration-200" style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+                    <ChevronRight size={18} />
+                </div>
                 <span className="ml-2 font-medium">{module.name}</span>
 
                 {/* Show badge with match count if matches exist */}
@@ -80,7 +82,7 @@ const ModuleNode = ({
                 )}
             </div>
 
-            {expanded && (
+            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
                 <div className="pl-6 mt-1">
                     {/* Render submodules recursively */}
                     {module.modules?.map(submodule => (
@@ -108,7 +110,7 @@ const ModuleNode = ({
                         </div>
                     )}
                 </div>
-            )}
+            </div>
         </div>
     );
 };
