@@ -9,7 +9,13 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'www.kuleuven.be',
                 port: '',
-                pathname: '/wieiswie/**',
+                pathname: '/**', // Allow any path under the domain
+            },
+            {
+                protocol: 'https',
+                hostname: 'dataservice.kuleuven.be',
+                port: '',
+                pathname: '/**',
             },
         ],
     },
