@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'Program',
     operations: [
         new Get(),
-        new GetCollection(),
+        new GetCollection(normalizationContext: ['groups' => ['program:get']]),
     ],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
@@ -32,11 +32,12 @@ class ProgramApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups(['search', 'user'])]
+    #[Groups(['program:get', 'search', 'user'])]
     public ?string $name = null;
 
     /**
      * @var ModuleApi[]
      */
+    #[Groups(['program:get'])]
     public array $modules = [];
 }

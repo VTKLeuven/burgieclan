@@ -32,13 +32,13 @@ class CourseApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups(['course:get', 'search', 'user', 'document:get'])]
+    #[Groups(['course:get', 'program:get', 'search', 'user', 'document:get'])]
     public ?string $name = null;
 
     #[Assert\NotBlank]
     #[Assert\Length(6)]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups(['course:get', 'search', 'user', 'document:get'])]
+    #[Groups(['course:get', 'program:get', 'search', 'user', 'document:get'])]
     public ?string $code = null;
 
     #[Assert\NotBlank]
@@ -46,14 +46,14 @@ class CourseApi
     #[Groups(['course:get'])]
     public ?string $language = null;
 
-    #[Groups(['course:get', 'search'])]
+    #[Groups(['course:get', 'program:get', 'search'])]
     public array $professors = [];
 
-    #[Groups(['course:get', 'search'])]
+    #[Groups(['course:get', 'program:get', 'search'])]
     public array $semesters = [];
 
     #[Assert\Positive]
-    #[Groups(['course:get', 'search'])]
+    #[Groups(['course:get', 'program:get', 'search'])]
     public ?int $credits = null;
 
     /**
