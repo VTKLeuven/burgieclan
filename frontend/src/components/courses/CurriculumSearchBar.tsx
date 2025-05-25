@@ -67,7 +67,7 @@ export default function CurriculumSearchBar({ onSearch, clearSearch }: SearchPro
                         <button
                             onClick={handleClear}
                             className="absolute inset-y-0 right-12 flex items-center pr-3"
-                            title={t('clear')}
+                            title={t('curriculum-navigator.clear-search')}
                         >
                             <X size={18} className="text-gray-400 hover:text-gray-600" />
                         </button>
@@ -84,7 +84,7 @@ export default function CurriculumSearchBar({ onSearch, clearSearch }: SearchPro
                     onClick={handleSearch}
                     className="ml-2 py-2 px-4 bg-wireframe-primary-blue text-white rounded-lg hover:bg-blue-700"
                 >
-                    {t('search_text')}
+                    {t('curriculum-navigator.search-submit')}
                 </button>
             </div>
 
@@ -96,6 +96,7 @@ export default function CurriculumSearchBar({ onSearch, clearSearch }: SearchPro
                             className="w-full p-2 border border-gray-300 rounded-md"
                             value={semester || ''}
                             onChange={(e) => setSemester(e.target.value ? parseInt(e.target.value) : null)}
+                            onKeyDown={handleKeyDown}
                         >
                             <option value="">{t('curriculum-navigator.any-semester')}</option>
                             <option value="1">1</option>
@@ -112,6 +113,7 @@ export default function CurriculumSearchBar({ onSearch, clearSearch }: SearchPro
                                 className="w-full p-2 border border-gray-300 rounded-md"
                                 value={minCredits}
                                 onChange={(e) => setMinCredits(e.target.value)}
+                                onKeyDown={handleKeyDown}
                             />
                             <span className="self-center">-</span>
                             <input
@@ -121,6 +123,7 @@ export default function CurriculumSearchBar({ onSearch, clearSearch }: SearchPro
                                 className="w-full p-2 border border-gray-300 rounded-md"
                                 value={maxCredits}
                                 onChange={(e) => setMaxCredits(e.target.value)}
+                                onKeyDown={handleKeyDown}
                             />
                         </div>
                     </div>
@@ -131,6 +134,7 @@ export default function CurriculumSearchBar({ onSearch, clearSearch }: SearchPro
                                 checked={showOnlyFavorites}
                                 onChange={() => setShowOnlyFavorites(!showOnlyFavorites)}
                                 className="rounded text-wireframe-primary-blue"
+                                onKeyDown={handleKeyDown}
                             />
                             <span className="text-sm font-medium text-gray-700">
                                 {t('curriculum-navigator.show-only-favorites')}
