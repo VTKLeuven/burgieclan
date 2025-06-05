@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import useRetrieveDocuments from '@/hooks/useRetrieveDocuments';
 import Link from 'next/link';
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle, Download } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import Badge from '@/components/ui/Badge';
 import { useTranslation } from 'react-i18next';
@@ -56,19 +56,30 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                         <div>
                             <div className="flex flex-col space-y-2 p-4">
                                 {documents.map((document) => (
-                                    <Link
-                                        href={`/document/${document.id}`}
-                                        key={document.id}
-                                    >
-                                        <div className="border p-3 rounded-md shadow-sm relative hover:shadow-md transition-shadow cursor-pointer">
-                                            <div className="flex justify-between items-center">
-                                                <div className="flex-1">
-                                                    <h3 className="text-lg font-semibold truncate">{document.name}</h3>
-                                                    <div className="flex items-center text-sm text-gray-700 space-x-4">
-                                                        <span className="truncate">{extractFilename(document.contentUrl)}</span>
-                                                    </div>
+                                    <div className="border p-3 rounded-md shadow-sm relative hover:shadow-md transition-shadow" key={document.id}>
+                                        <div className="flex items-center">
+                                            <div>
+                                                <Link
+                                                    href={`/document/${document.id}`}
+                                                    className="cursor-pointer hover:text-vtk-blue-600 hover:underline inline-block"
+                                                >
+                                                    <h3 className="text-lg font-semibold mb-0">{document.name}</h3>
+                                                </Link>
+                                                <div className="flex items-center text-xs text-gray-700 space-x-4">
+                                                    <span className="truncate">{extractFilename(document.contentUrl)}</span>
                                                 </div>
-                                                <div className="flex items-center space-x-3">
+                                            </div>
+
+                                            <div className="flex-grow"></div>
+
+                                            {document.underReview && (
+                                                <div className="mx-1">
+                                                    <Badge text={t('document.under_review')} color="yellow" />
+                                                </div>
+                                            )}
+
+                                            <div className="flex items-center space-x-4">
+                                                <div className="text-right">
                                                     <p className="text-gray-500 text-xs whitespace-nowrap">{new Date(document.createDate!).toLocaleString('en-GB', {
                                                         day: '2-digit',
                                                         month: '2-digit',
@@ -77,15 +88,27 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                                                         minute: '2-digit',
                                                         hour12: false
                                                     })}</p>
-                                                    {document.underReview ? (
-                                                        <Badge text={t('document.under_review')} color="yellow" />
+                                                    {document.anonymous ? (
+                                                        <span className="text-gray-600 text-sm">
+                                                            {t('course-page.documents.anonymous')}
+                                                        </span>
                                                     ) : (
-                                                        <Badge text={t('document.approved')} color="green" />
+                                                        <span className="text-gray-600 text-sm">
+                                                            {document.creator?.fullName || document.creator?.username}
+                                                        </span>
                                                     )}
                                                 </div>
+                                                <a
+                                                    href={document.contentUrl}
+                                                    download
+                                                    className="p-2 bg-vtk-blue-500 hover:bg-vtk-blue-600 text-white rounded-md flex items-center justify-center"
+                                                    title={t('course-page.documents.download')}
+                                                >
+                                                    <Download size={20} />
+                                                </a>
                                             </div>
                                         </div>
-                                    </Link>
+                                    </div>
                                 ))}
                             </div>
                             <Pagination totalAmount={totalItems} currentPage={page} itemsPerPage={itemsPerPage} onPageChange={setPage} />

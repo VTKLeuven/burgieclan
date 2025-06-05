@@ -156,7 +156,9 @@
         },
         "documents": {
             "header": "Documents",
-            "no-documents": "No documents available."
+            "no-documents": "No documents available.",
+            "anonymous": "Anonymous",
+            "download": "Download"
         }
     },
     "account": {
