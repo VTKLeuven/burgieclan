@@ -153,6 +153,10 @@
                 }
             },
             "no-categories": "No comment categories available"
+        },
+        "documents": {
+            "header": "Documents",
+            "no-documents": "No documents available."
         }
     },
     "account": {
