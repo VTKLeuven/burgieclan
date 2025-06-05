@@ -57,7 +57,7 @@ class UserApi
 
     #[Assert\NotBlank]
     #[ApiProperty(writable: false)]
-    #[Groups(['user', 'course:get'])]
+    #[Groups(['user', 'course:get', 'document:get'])]
     public ?string $fullName = null;
 
     #[Assert\NotBlank]
