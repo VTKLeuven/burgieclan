@@ -153,6 +153,10 @@
                 }
             },
             "no-categories": "Geen opmerking-categorieën beschikbaar"
+        },
+        "documents": {
+            "header": "Documenten",
+            "no-documents": "Geen documenten beschikbaar."
         }
     },
     "account": {
