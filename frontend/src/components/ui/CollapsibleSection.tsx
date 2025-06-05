@@ -1,13 +1,18 @@
 import React, { useState, ReactNode } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 interface CollapsibleSectionProps {
     header: ReactNode;
     children: ReactNode;
+    defaultCollapsed?: boolean;
 }
 
-const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ header, children }) => {
-    const [isCollapsed, setIsCollapsed] = useState(true);
+const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ 
+    header, 
+    children, 
+    defaultCollapsed = true
+}) => {
+    const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
 
     const toggleCollapse = () => {
         setIsCollapsed(!isCollapsed);
