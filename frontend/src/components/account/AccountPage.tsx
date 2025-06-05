@@ -47,7 +47,7 @@ export default function AccountPage() {
         updateFavoriteDocument
     } = useFavorites(user);
 
-    if (loading) {
+    if (loading || !user) {
         return <Loading />;
     }
 
