@@ -40,7 +40,7 @@ export default function DocumentSections({ courseId }: { courseId: number }) {
                     <DocumentCategoryPage
                         key={category.id}
                         title={category.name ?? ''}
-                        href={`/courses/${courseId}/documents?category=${category.id}`}
+                        href={`/course/${courseId}/documents?category=${category.id}`}
                     />
                 ))}
             </div>
