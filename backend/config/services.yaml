@@ -23,6 +23,10 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\Doctrine\Extension\DocumentUnderReviewExtension:
+        tags:
+            - { name: 'api_platform.doctrine.orm.query_extension.collection' }
+
     Symfony\Component\Security\Http\Logout\LogoutUrlGenerator: '@security.logout_url_generator'
 
     # Service that listens for a jwt token being created and adds the userId to the jwt
