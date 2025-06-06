@@ -15,19 +15,19 @@ interface DocumentListProps {
 
 const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
     const [page, setPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(50);
     const { documents, loading, totalItems } = useRetrieveDocuments(page, itemsPerPage, course, category, false);
     const [selectedDocuments, setSelectedDocuments] = useState<Document[]>([]);
     const { t } = useTranslation();
     const { downloadContent, loading: isDownloading, error: downloadError } = useDownloadContent();
 
     useEffect(() => {
-        // Show only 10 items per page on small screens, 20 on larger screens
+        // Show amount of items per page based on screen size
         const updateItemsPerPage = () => {
             if (window.innerWidth < 768) {
-                setItemsPerPage(10);
+                setItemsPerPage(50);
             } else {
-                setItemsPerPage(20);
+                setItemsPerPage(50);
             }
         };
 
