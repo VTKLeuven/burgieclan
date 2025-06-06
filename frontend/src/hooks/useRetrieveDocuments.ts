@@ -40,7 +40,6 @@ const useRetrieveDocuments = (
                 }
                 
                 const response = await request('GET', url);
-                console.log({response});
 
                 if (!response) {
                     throw new ApiError('Failed to fetch documents', 500);

@@ -28,7 +28,6 @@ class DocumentUnderReviewExtension implements QueryCollectionExtensionInterface
             // For authenticated users: show documents that are either
             // not under review OR created by the current user
             $paramName = $queryNameGenerator->generateParameterName('currentUserId');
-            error_log($context['filters']['_under_review_filter']['currentUserId']);
             $queryBuilder
                 ->andWhere(sprintf(
                     '(%s.under_review = false OR %s.creator = :%s)',

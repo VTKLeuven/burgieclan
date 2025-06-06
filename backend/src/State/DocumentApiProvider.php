@@ -47,9 +47,27 @@ class DocumentApiProvider implements ProviderInterface
                 ];
             }
 
-            $documentPaginator = $this->collectionProvider->provide($operation, $uriVariables, $context);
-            $documents = iterator_to_array($documentPaginator);
-            return array_map(fn($document) => $this->processDocument($document), $documents);
+            $paginator = $this->collectionProvider->provide($operation, $uriVariables, $context);
+            
+            // If it's an ApiPlatform\Doctrine\Orm\Paginator
+            if ($paginator instanceof \ApiPlatform\Doctrine\Orm\Paginator) {
+                // Process each document while maintaining pagination
+                $processedItems = [];
+                foreach ($paginator as $document) {
+                    $processedItems[] = $this->processDocument($document);
+                }
+                
+                // Create a custom TraversablePaginator with our processed items
+                return new \ApiPlatform\State\Pagination\TraversablePaginator(
+                    new \ArrayIterator($processedItems),
+                    $paginator->getCurrentPage(),
+                    $paginator->getItemsPerPage(),
+                    $paginator->getTotalItems()
+                );
+            }
+
+            // For non-paginated results (should not happen, but just in case)
+            return array_map(fn($document) => $this->processDocument($document), iterator_to_array($paginator));
         }
 
         if ($operation instanceof Get) {
