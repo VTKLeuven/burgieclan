@@ -51,6 +51,7 @@ export default function DocumentSections({ courseId }: { courseId: number }) {
                     <button
                         onClick={handleDownload}
                         className="primary-button inline-flex items-center"
+                        disabled={isDownloading}
                     >
                         <Download className="sm:mr-2 w-5 h-5" />
                         <span className="hidden sm:inline">{isDownloading ? t('course-page.documents.downloading') : t('course-page.documents.download-all')}</span>
