@@ -158,8 +158,19 @@
             "header": "Documenten",
             "no-documents": "Geen documenten beschikbaar.",
             "anonymous": "Anoniem",
-            "download": "Download"
+            "download": "Download",
+            "download-all": "Download alle documenten",
+            "downloading": "Downloaden...",
+            "select": "Selecteer document",
+            "selected": "{{amount}} geselecteerd",
+            "select-all": "Selecteer alles",
+            "deselect-all": "Deselecteer alles",
+            "clear-selection": "Selectie wissen"
         }
+    },
+    "download": {
+        "download-success": "Documents downloaded successfully!",
+        "download-error": "Failed to download documents."
     },
     "account": {
         "account": "Account",

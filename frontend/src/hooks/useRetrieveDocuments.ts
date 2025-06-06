@@ -18,8 +18,6 @@ const useRetrieveDocuments = (
     const [totalItems, setTotalItems] = useState<number>(0);
     const [error, setError] = useState<string | null>(null);
 
-    console.log('useRetrieveDocuments', { page, itemsPerPage, course, category, onlyUserDocuments });
-
     useEffect(() => {
         const fetchDocuments = async () => {
             try {
@@ -42,6 +40,7 @@ const useRetrieveDocuments = (
                 }
                 
                 const response = await request('GET', url);
+                console.log({response});
 
                 if (!response) {
                     throw new ApiError('Failed to fetch documents', 500);
