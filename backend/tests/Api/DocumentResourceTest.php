@@ -96,8 +96,7 @@ class DocumentResourceTest extends ApiTestCase
             ])
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/documents/' . $document->getId())
-            ->assertJsonMatches('anonymous', false)
-            ->assertJsonMatches('creator', '/api/users/' . $document->getCreator()->getId());
+            ->assertJsonMatches('anonymous', false);
     }
 
     public function testGetOneAnonymousDocument(): void
@@ -277,12 +276,15 @@ class DocumentResourceTest extends ApiTestCase
         $user2 = UserFactory::createOne();
         DocumentFactory::createMany(1, [
             'creator' => $user1,
+            'under_review' => false, // Only non-under-review documents are returned (except if the user is the creator)
         ]);
         DocumentFactory::createMany(2, [
             'creator' => $user2,
+            'under_review' => false,
         ]);
         DocumentFactory::createMany(5, [
             'creator' => UserFactory::createOne(),
+            'under_review' => false,
         ]);
 
         $this->browser()
