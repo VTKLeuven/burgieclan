@@ -165,7 +165,9 @@
             "selected": "Selected {{amount}}",
             "select-all": "Select all",
             "deselect-all": "Deselect all",
-            "clear-selection": "Clear selection"
+            "clear-selection": "Clear selection",
+            "add-favorite": "Add to favorites",
+            "remove-favorite": "Remove from favorites"
         }
     },
     "download": {
