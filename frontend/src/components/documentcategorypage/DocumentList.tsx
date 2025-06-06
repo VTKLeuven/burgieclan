@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import useRetrieveDocuments from '@/hooks/useRetrieveDocuments';
 import Link from 'next/link';
 import { LoaderCircle, Download } from 'lucide-react';
-import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import Badge from '@/components/ui/Badge';
 import { useTranslation } from 'react-i18next';
 import Pagination from '@/components/ui/Pagination';
@@ -44,7 +43,8 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
     }, []);
 
     return (
-        <CollapsibleSection defaultCollapsed={false} header={<h3 className="text-xl font-semibold">{t('course-page.documents.header')} <span className="text-sm">({totalItems})</span></h3>} >
+        <div className="mt-6 rounded-lg">
+                <h2 className="text-xl font-semibold">{t('course-page.documents.header')} <span className="text-sm">({totalItems})</span></h2>
             <div className="rounded-lg shadow-sm">
                 {loading ?
                     <div className="flex justify-center items-center h-full">
@@ -54,16 +54,16 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                         <p className='p-4'>{t('course-page.documents.no-documents')}</p>
                     ) : (
                         <div>
-                            <div className="flex flex-col space-y-2 p-4">
+                            <div className="flex flex-col space-y-2 px-4">
                                 {documents.map((document) => (
-                                    <div className="border p-3 rounded-md shadow-sm relative hover:shadow-md transition-shadow" key={document.id}>
+                                    <div className="border p-3 rounded-md relative" key={document.id}>
                                         <div className="flex items-center">
                                             <div>
                                                 <Link
                                                     href={`/document/${document.id}`}
                                                     className="cursor-pointer hover:text-vtk-blue-600 hover:underline inline-block"
                                                 >
-                                                    <h3 className="text-lg font-semibold mb-0">{document.name}</h3>
+                                                    <h3 className="text-lg font-semibold m-0">{document.name}</h3>
                                                 </Link>
                                                 <div className="flex items-center text-xs text-gray-700 space-x-4">
                                                     <span className="truncate">{extractFilename(document.contentUrl)}</span>
@@ -115,7 +115,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                         </div>
                     )}
             </div>
-        </CollapsibleSection>
+        </div>
     );
 };
 
