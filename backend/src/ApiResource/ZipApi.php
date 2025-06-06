@@ -52,6 +52,11 @@ use ArrayObject;
                                         'format' => 'iri-reference',
                                         'example' => ['/api/courses/1']
                                     ],
+                                    'documents' => [
+                                        'type' => 'array',
+                                        'format' => 'iri-reference',
+                                        'example' => ['/api/documents/1']
+                                    ],
                                 ],
                             ],
                         ],
@@ -78,4 +83,9 @@ class ZipApi
      * @var CourseApi[]
      */
     public array $courses = [];
+
+    /**
+     * @var DocumentApi[]
+     */
+    public array $documents = [];
 }

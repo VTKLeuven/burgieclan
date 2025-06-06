@@ -1,12 +1,11 @@
 <?php
 
-namespace Api;
+namespace App\Tests\Api;
 
 use App\Factory\CourseFactory;
 use App\Factory\DocumentFactory;
 use App\Factory\ModuleFactory;
 use App\Factory\ProgramFactory;
-use App\Tests\Api\ApiTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
@@ -32,6 +31,7 @@ class DownloadZipResourceTest extends ApiTestCase
                     'programs' => ['/api/programs/' . $program->getId()],
                     'modules' => ['/api/modules/' . $module->getId()],
                     'courses' => ['/api/courses/' . $course->getId()],
+                    'documents' => ['/api/documents/' . $document->getId()],
                 ],
             ])
             ->assertStatus(200)
@@ -50,6 +50,7 @@ class DownloadZipResourceTest extends ApiTestCase
                     'programs' => [],
                     'modules' => [],
                     'courses' => [],
+                    'documents' => [],
                 ],
             ])
             ->assertStatus(204);
@@ -67,6 +68,7 @@ class DownloadZipResourceTest extends ApiTestCase
                     'programs' => 'invalid',
                     'modules' => 'invalid',
                     'courses' => 'invalid',
+                    'documents' => 'invalid',
                 ],
             ])
             ->assertStatus(400);
