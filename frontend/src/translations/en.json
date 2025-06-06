@@ -156,6 +156,7 @@
         },
         "documents": {
             "header": "Documents",
+            "header-favorites": "Favorite documents",
             "no-documents": "No documents available.",
             "anonymous": "Anonymous",
             "download": "Download",
@@ -167,7 +168,8 @@
             "deselect-all": "Deselect all",
             "clear-selection": "Clear selection",
             "add-favorite": "Add to favorites",
-            "remove-favorite": "Remove from favorites"
+            "remove-favorite": "Remove from favorites",
+            "favorites-see-all": "See all favorites"
         }
     },
     "download": {

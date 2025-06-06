@@ -90,9 +90,9 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
     const allSelected = documents.length > 0 && selectedDocuments.length === documents.length;
 
     return (
-        <div className="mt-6 rounded-lg">
-            <div className="flex justify-between items-center mb-3">
-                <h3>{t('course-page.documents.header')} <span className="text-sm">({totalItems})</span></h3>
+        <div className="mt-3 rounded-lg">
+            <div className="flex justify-between items-center">
+                <h3>{t('course-page.documents.header')}</h3>
                 
                 {selectedDocuments.length > 0 && (
                     <div className="flex items-center space-x-2">

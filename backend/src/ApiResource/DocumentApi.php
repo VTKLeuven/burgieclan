@@ -95,11 +95,11 @@ class DocumentApi
     public ?string $name = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
-    #[Groups(['search', 'document:get', 'document:create'])]
+    #[Groups(['search', 'user', 'document:get', 'document:create'])]
     public ?CourseApi $course;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
-    #[Groups(['search', 'document:get', 'document:create'])]
+    #[Groups(['search', 'user', 'document:get', 'document:create'])]
     public ?DocumentCategoryApi $category = null;
 
     #[Assert\Length(5)]

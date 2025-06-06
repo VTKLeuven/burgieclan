@@ -156,6 +156,7 @@
         },
         "documents": {
             "header": "Documenten",
+            "header-favorites": "Favoriete documenten",
             "no-documents": "Geen documenten beschikbaar.",
             "anonymous": "Anoniem",
             "download": "Download",
@@ -167,7 +168,8 @@
             "deselect-all": "Deselecteer alles",
             "clear-selection": "Selectie wissen",
             "add-favorite": "Voeg toe aan favorieten",
-            "remove-favorite": "Verwijder uit favorieten"
+            "remove-favorite": "Verwijder uit favorieten",
+            "favorites-see-all": "Bekijk alle favorieten"
         }
     },
     "download": {
