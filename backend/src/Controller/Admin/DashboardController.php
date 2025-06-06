@@ -13,6 +13,7 @@ use App\Entity\Module;
 use App\Entity\Page;
 use App\Entity\Program;
 use App\Entity\QuickLink;
+use App\Entity\Tag;
 use App\Entity\User;
 use App\Repository\DocumentRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -88,7 +89,8 @@ class DashboardController extends AbstractDashboardController
                 MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class)
                     ->setPermission(User::ROLE_ADMIN),
                 MenuItem::linkToCrud('Comments', 'fa-solid fa-comments', DocumentComment::class)
-                    ->setPermission(User::ROLE_ADMIN)
+                    ->setPermission(User::ROLE_ADMIN),
+                MenuItem::linkToCrud('Tags', 'fa-solid fa-tags', Tag::class)
             ]);
         $amountPending = $this->documentRepository->getAmountPending();
         if ($amountPending > 0) {
@@ -96,7 +98,7 @@ class DashboardController extends AbstractDashboardController
             $pendingDocumentsMenu->setBadge($amountPending, 'danger');
         }
         yield $documentsMenu;
-        yield MenuItem::linkToCrud('Pages', 'fa-solid fa-newspaper', Page::Class)
+        yield MenuItem::linkToCrud('Pages', 'fa-solid fa-newspaper', Page::class)
             ->setPermission(User::ROLE_ADMIN);
         yield MenuItem::linkToCrud('Quick Links', 'fa-solid fa-link', QuickLink::class)
             ->setPermission(User::ROLE_ADMIN);

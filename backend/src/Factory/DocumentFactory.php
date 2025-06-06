@@ -84,6 +84,7 @@ final class DocumentFactory extends PersistentProxyObjectFactory
             // Uses the 'glob' function to get all files in the directory and 'randomElement' to pick one randomly.
             'file_name' => basename(self::faker()->randomElement(glob('data/documents/*'))),
             'year' => $this->generateYear(),
+            'tags' => TagFactory::randomSet(self::faker()->numberBetween(0, 3)),
         ];
     }
 

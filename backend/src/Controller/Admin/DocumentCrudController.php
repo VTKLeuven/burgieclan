@@ -56,6 +56,9 @@ class DocumentCrudController extends AbstractCrudController
         yield TextField::new('year')
             ->setLabel('Academic Year')
             ->hideOnForm();
+        yield AssociationField::new('tags')
+            ->autocomplete()
+            ->hideOnIndex();
         yield BooleanField::new('under_review')
             ->setLabel('Under review')
             ->renderAsSwitch(false);
