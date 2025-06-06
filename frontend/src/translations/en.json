@@ -158,8 +158,19 @@
             "header": "Documents",
             "no-documents": "No documents available.",
             "anonymous": "Anonymous",
-            "download": "Download"
+            "download": "Download",
+            "download-all": "Download all documents",
+            "downloading": "Downloading...",
+            "select": "Select document",
+            "selected": "Selected {{amount}}",
+            "select-all": "Select all",
+            "deselect-all": "Deselect all",
+            "clear-selection": "Clear selection"
         }
+    },
+    "download": {
+        "download-success": "Documents downloaded successfully!",
+        "download-error": "Failed to download documents."
     },
     "account": {
         "account": "Account",

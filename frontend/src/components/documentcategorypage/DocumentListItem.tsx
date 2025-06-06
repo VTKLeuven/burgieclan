@@ -4,9 +4,13 @@ import { Download } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import { useTranslation } from 'react-i18next';
 import type { Document } from '@/types/entities';
+import { Checkbox } from '@/components/ui/Checkbox';
+import useDownloadContent from '@/hooks/useDownloadContent';
 
 interface DocumentListItemProps {
     document: Document;
+    isSelected: boolean;
+    onToggleSelect: (document: Document) => void;
 }
 
 const extractFilename = (contentUrl?: string): string => {
@@ -15,12 +19,27 @@ const extractFilename = (contentUrl?: string): string => {
     return parts[parts.length - 1]; // Get the last part of the path
 };
 
-const DocumentListItem: React.FC<DocumentListItemProps> = ({ document }) => {
+const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelected, onToggleSelect }) => {
     const { t } = useTranslation();
+    const { downloadSingleDocument, loading: isDownloading } = useDownloadContent();
+
+    const handleDownload = (e: React.MouseEvent) => {
+        e.preventDefault();
+        downloadSingleDocument(document);
+    };
 
     return (
         <div className="border p-3 rounded-md relative" key={document.id}>
             <div className="flex items-center">
+                <div className="mr-3">
+                    <Checkbox 
+                        label=""
+                        checked={isSelected}
+                        onChange={() => onToggleSelect(document)}
+                        aria-label={t('course-page.documents.select')}
+                        className="my-0"
+                    />
+                </div>
                 <div>
                     <Link
                         href={`/document/${document.id}`}
@@ -43,7 +62,7 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document }) => {
 
                 <div className="flex items-center space-x-4">
                     <div className="text-right">
-                        <p className="text-gray-500 text-xs whitespace-nowrap">{new Date(document.createDate!).toLocaleString('en-GB', {
+                        <p className="text-gray-500 text-xs whitespace-nowrap">{new Date(document.updateDate!).toLocaleString('en-GB', {
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric',
@@ -61,14 +80,18 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document }) => {
                             </span>
                         )}
                     </div>
-                    <a
-                        href={document.contentUrl}
-                        download
+                    <button
+                        onClick={handleDownload}
+                        disabled={isDownloading}
                         className="p-2 bg-vtk-blue-500 hover:bg-vtk-blue-600 text-white rounded-md flex items-center justify-center"
                         title={t('course-page.documents.download')}
                     >
-                        <Download size={20} />
-                    </a>
+                        {isDownloading ? (
+                            <span className="animate-spin h-5 w-5 border-t-2 border-white rounded-full" />
+                        ) : (
+                            <Download size={20} />
+                        )}
+                    </button>
                 </div>
             </div>
         </div>
