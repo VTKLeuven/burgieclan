@@ -2,16 +2,16 @@
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Star, Download } from 'lucide-react';
+import { ChevronRight, Download } from 'lucide-react';
 import Link from 'next/link';
 import { useUser } from '@/components/UserContext';
 import useDownloadContent from '@/hooks/useDownloadContent';
 import type { Course, DocumentCategory, Document } from '@/types/entities';
 import Loading from '@/app/[locale]/loading';
 import Badge from '@/components/ui/Badge';
-import { useFavorites } from '@/hooks/useFavorites';
 import { useApi } from '@/hooks/useApi';
 import { convertToDocument } from '@/utils/convertToEntity';
+import FavoriteButton from '@/components/ui/FavoriteButton';
 
 interface FavoriteDocumentsProps {
     category: DocumentCategory;
@@ -28,7 +28,6 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
     const { user, loading: userLoading } = useUser();
     const { t } = useTranslation();
     const { downloadContent, loading: isDownloading } = useDownloadContent();
-    const { updateFavorite } = useFavorites(user);
     const { request } = useApi();
     const [favoriteDocuments, setFavoriteDocuments] = useState<Document[]>([]);
     const [loading, setLoading] = useState(true);
@@ -52,17 +51,17 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
 
             try {
                 // Fetch all document details in parallel
-                const documentPromises = potentialFavorites.map(doc => 
+                const documentPromises = potentialFavorites.map(doc =>
                     request('GET', `/api/documents/${doc.id}`)
                 );
 
                 const documentsData = await Promise.all(documentPromises);
-                
+
                 // Convert the API responses to Document objects
                 const documents = documentsData
                     .filter(Boolean) // Filter out any null responses
                     .map(docData => convertToDocument(docData));
-                
+
                 setFavoriteDocuments(documents);
             } catch (error) {
                 console.error('Error fetching favorite documents:', error);
@@ -90,21 +89,12 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
         downloadContent({ documents: [document] });
     };
 
-    const handleToggleFavorite = (document: Document, e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (user) {
-            updateFavorite(document.id, 'documents', false);
-            setFavoriteDocuments(prev => prev.filter(doc => doc.id !== document.id));
-        }
-    };
-
     return (
         <div className="mt-3 rounded-lg">
             <div className="flex justify-between items-center">
                 <h3>{t('course-page.documents.header-favorites')}</h3>
                 {favoriteDocuments.length > 3 && (
-                    <Link 
+                    <Link
                         href="/account"
                         className="flex items-center text-sm text-vtk-blue-500 hover:text-vtk-blue-700"
                     >
@@ -113,14 +103,14 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
                     </Link>
                 )}
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto pb-2">
                 {favoriteDocuments.slice(0, 4).map((document) => (
-                    <div 
+                    <div
                         key={document.id}
                         className="relative bg-white rounded-lg border border-gray-200 p-3"
                     >
-                        <Link 
+                        <Link
                             href={`/document/${document.id}`}
                             className="block"
                         >
@@ -133,7 +123,7 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
                             <p className="text-xs text-gray-500 truncate">
                                 {extractFilename(document.contentUrl)}
                             </p>
-                            
+
                             <div className="text-xs text-gray-500 flex justify-between mt-1">
                                 <p className="whitespace-nowrap">
                                     {document.updateDate && new Date(document.updateDate).toLocaleString('en-GB', {
@@ -146,22 +136,27 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
                                     })}
                                 </p>
                                 <p className="truncate ml-2">
-                                    {document.anonymous 
+                                    {document.anonymous
                                         ? t('course-page.documents.anonymous')
                                         : (document.creator?.fullName || document.creator?.username)}
                                 </p>
                             </div>
                         </Link>
-                        
+
                         <div className="flex justify-between pt-3 border-t border-gray-100">
-                            <button
-                                onClick={(e) => handleToggleFavorite(document, e)}
-                                className="p-1 text-yellow-500 hover:text-yellow-600 rounded-full hover:bg-gray-100"
-                                title={t('course-page.documents.remove-favorite')}
-                            >
-                                <Star size={16} className="fill-yellow-500" />
-                            </button>
-                            
+                            <FavoriteButton
+                                itemId={document.id}
+                                itemType="document"
+                                onToggle={(isFavorite) => {
+                                    if (!isFavorite) {
+                                        // Remove from local state when unfavorited
+                                        setFavoriteDocuments(prev =>
+                                            prev.filter(doc => doc.id !== document.id)
+                                        );
+                                    }
+                                }}
+                            />
+
                             <button
                                 onClick={(e) => handleDownload(document, e)}
                                 disabled={isDownloading}

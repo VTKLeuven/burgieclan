@@ -167,14 +167,16 @@
             "select-all": "Selecteer alles",
             "deselect-all": "Deselecteer alles",
             "clear-selection": "Selectie wissen",
-            "add-favorite": "Voeg toe aan favorieten",
-            "remove-favorite": "Verwijder uit favorieten",
             "favorites-see-all": "Bekijk alle favorieten"
         }
     },
     "download": {
-        "download-success": "Documents downloaded successfully!",
-        "download-error": "Failed to download documents."
+        "download-success": "Documenten succesvol gedownload!",
+        "download-error": "Downloaden mislukt."
+    },
+    "favorites": {
+        "add-favorite": "Voeg toe aan favorieten",
+        "remove-favorite": "Verwijder uit favorieten"
     },
     "account": {
         "account": "Account",

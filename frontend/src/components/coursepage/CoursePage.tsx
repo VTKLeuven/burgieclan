@@ -5,21 +5,19 @@ import { useEffect, useState } from "react";
 import { useApi } from "@/hooks/useApi";
 import Loading from '@/app/[locale]/loading'
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
-import { useFavorites } from '@/hooks/useFavorites';
 import { useUser } from '@/components/UserContext';
-import { Star, Folder, ChartPie, Link as LinkIcon } from "lucide-react";
+import { Folder, ChartPie, Link as LinkIcon } from "lucide-react";
 import { convertToCourse } from "@/utils/convertToEntity";
 import Link from "next/link";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import CommentCategories from "@/components/coursepage/CommentCategories";
 import { useTranslation } from "react-i18next";
 import ErrorPage from "../error/ErrorPage";
+import FavoriteButton from "@/components/ui/FavoriteButton";
 
 export default function CoursePage({ courseId, breadcrumb }: { courseId: number, breadcrumb: Breadcrumb }) {
     const [course, setCourse] = useState<Course | null>(null);
     const { user, loading: userLoading, refreshUser } = useUser();
-    const { updateFavorite } = useFavorites(user);
-    const [isFavorite, setIsFavorite] = useState<boolean>(false);
     const { t } = useTranslation();
     const { request, loading, error } = useApi();
 
@@ -40,23 +38,6 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
             getCourse();
         }
     }, [courseId, userLoading, request]);
-
-    // Update favorite status when user data changes
-    useEffect(() => {
-        if (user?.favoriteCourses) {
-            setIsFavorite(user.favoriteCourses.some(favCourse => favCourse.id === courseId));
-        }
-    }, [user, courseId]);
-
-    const handleFavoriteClick = async () => {
-        if (!courseId || !user) return;
-
-        const isCurrentlyFavorite = user.favoriteCourses?.some(favCourse => favCourse.id === courseId);
-        const newFavoriteState = !isCurrentlyFavorite;
-        setIsFavorite(newFavoriteState);
-        await updateFavorite(courseId, "courses", newFavoriteState);
-        await refreshUser();
-    };
 
     // Show loading state
     if (loading) {
@@ -88,12 +69,17 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                     </div>
 
                     <div className="flex items-center space-x-2 mt-3">
-                        <div
-                            className="hover:scale-110 hover:cursor-pointer transition-transform duration-300 flex items-center"
-                            onClick={handleFavoriteClick}>
-                            <div className="inline-block mr-2">
-                                <Star className='text-vtk-yellow-500' fill={isFavorite ? "currentColor" : "none"} />
-                            </div>
+                        <div className="hover:scale-110 transition-transform duration-300 flex items-center">
+                            <FavoriteButton
+                                itemId={courseId}
+                                itemType="course"
+                                className="mr-2"
+                                size={24}
+                                onToggle={() => {
+                                    // Refresh user data to keep everything in sync
+                                    refreshUser();
+                                }}
+                            />
                         </div>
                         <h1 className="md:text-5xl text-4xl mb-4 text-wireframe-primary-blue">{course.name}</h1>
                     </div>

@@ -167,14 +167,16 @@
             "select-all": "Select all",
             "deselect-all": "Deselect all",
             "clear-selection": "Clear selection",
-            "add-favorite": "Add to favorites",
-            "remove-favorite": "Remove from favorites",
             "favorites-see-all": "See all favorites"
         }
     },
     "download": {
         "download-success": "Documents downloaded successfully!",
         "download-error": "Failed to download documents."
+    },
+    "favorites": {
+        "add-favorite": "Add to favorites",
+        "remove-favorite": "Remove from favorites"
     },
     "account": {
         "account": "Account",
