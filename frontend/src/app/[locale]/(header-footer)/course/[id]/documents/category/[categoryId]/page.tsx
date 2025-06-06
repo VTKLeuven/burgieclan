@@ -5,12 +5,9 @@ import DocumentCategoryPage from '@/components/documentcategorypage/DocumentCate
 import { useApi } from '@/hooks/useApi';
 import type { Course, DocumentCategory } from '@/types/entities';
 import { convertToCourse, convertToDocumentCategory } from '@/utils/convertToEntity';
-import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export default function CourseDocumentsPage({ params: { locale, id: courseId } }: { params: { locale: string, id: number } }) {
-    const searchParams = useSearchParams();
-    const categoryId = searchParams.get('category') || '';
+export default function CourseDocumentsPage({ params: { id: courseId, categoryId } }: { params: { id: number, categoryId: number } }) {
     const [course, setCourse] = useState<Course | null>(null);
     const [category, setCategory] = useState<DocumentCategory | null>(null);
     const { request } = useApi();
