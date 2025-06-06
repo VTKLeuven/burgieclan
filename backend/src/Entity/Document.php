@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\DocumentRepository;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -42,6 +44,15 @@ class Document extends Node
 
     #[ORM\Column(length: 11, nullable: true)]
     private ?string $year = null; // Ex. 2024 - 2025
+
+    #[ORM\ManyToMany(targetEntity: Tag::class, mappedBy: 'documents')]
+    private Collection $tags;
+
+    public function __construct($creator)
+    {
+        parent::__construct($creator);
+        $this->tags = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -184,5 +195,32 @@ class Document extends Node
             $choices[$formattedYear] = $formattedYear;
         }
         return $choices;
+    }
+
+    /**
+     * @return Collection<int, Tag>
+     */
+    public function getTags(): Collection
+    {
+        return $this->tags;
+    }
+
+    public function addTag(Tag $tag): static
+    {
+        if (!$this->tags->contains($tag)) {
+            $this->tags->add($tag);
+            $tag->addDocument($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTag(Tag $tag): static
+    {
+        if ($this->tags->removeElement($tag)) {
+            $tag->removeDocument($this);
+        }
+
+        return $this;
     }
 }
