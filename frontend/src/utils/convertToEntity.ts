@@ -64,14 +64,14 @@ export function convertToDocument(doc: any): Document {
     }
     return {
         id: parseInt(doc['@id'].split('/').pop()),
-        createDate: new Date(doc.createdAt),
-        updateDate: new Date(doc.updatedAt),
+        createDate: doc.createdAt ? new Date(doc.createdAt) : undefined,
+        updateDate: doc.updatedAt? new Date(doc.updatedAt): undefined,
         name: doc.name,
-        course: doc.course,
-        category: doc.category,
+        course: doc.course ? convertToCourse(doc.course): undefined,
+        category: doc.category ? convertToDocumentCategory(doc.category) : undefined,
         underReview: doc.under_review,
-        creator: doc.creator,
-        contentUrl: process.env.NEXT_PUBLIC_BACKEND_URL + doc.contentUrl,
+        creator: doc.creator ? convertToUser(doc.creator) : undefined,
+        contentUrl: doc.contentUrl ? process.env.NEXT_PUBLIC_BACKEND_URL + doc.contentUrl: undefined,
         anonymous: doc.anonymous
     };
 }
@@ -96,8 +96,8 @@ export function convertToCourseComment(comment: any): CourseComment {
         commentCategory: comment.category ? convertToCommentCategory(comment.category) : undefined,
         content: comment.content,
         anonymous: comment.anonymous,
-        createDate: new Date(comment.createdAt),
-        updateDate: new Date(comment.updatedAt),
+        createDate: comment.createdAt ? new Date(comment.createdAt): undefined,
+        updateDate: comment.updatedAt ? new Date(comment.updatedAt) : undefined,
         creator: comment.creator ? convertToUser(comment.creator) : undefined
     };
 }

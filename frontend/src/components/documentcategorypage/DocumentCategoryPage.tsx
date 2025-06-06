@@ -3,6 +3,7 @@
 import type { Course, DocumentCategory } from "@/types/entities";
 import { FileText } from "lucide-react";
 import DocumentList from "./DocumentList";
+import FavoriteDocuments from "./FavoriteDocuments";
 
 interface DocumentCategoryPageProps {
     category: DocumentCategory;
@@ -20,7 +21,7 @@ export default function DocumentCategoryPage({ category, course }: DocumentCateg
                     </div>
                 </div>
 
-                {/* <FavoriteDocuments category={category} course={course} /> */}
+                <FavoriteDocuments category={category} course={course} />
 
                 <DocumentList category={category} course={course} />
             </div>
