@@ -165,7 +165,9 @@
             "selected": "{{amount}} geselecteerd",
             "select-all": "Selecteer alles",
             "deselect-all": "Deselecteer alles",
-            "clear-selection": "Selectie wissen"
+            "clear-selection": "Selectie wissen",
+            "add-favorite": "Voeg toe aan favorieten",
+            "remove-favorite": "Verwijder uit favorieten"
         }
     },
     "download": {

@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Download } from 'lucide-react';
+import { Download, Star } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import { useTranslation } from 'react-i18next';
 import type { Document } from '@/types/entities';
 import { Checkbox } from '@/components/ui/Checkbox';
 import useDownloadContent from '@/hooks/useDownloadContent';
+import { useUser } from '@/components/UserContext';
+import { useFavorites } from '@/hooks/useFavorites';
 
 interface DocumentListItemProps {
     document: Document;
@@ -22,10 +24,30 @@ const extractFilename = (contentUrl?: string): string => {
 const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelected, onToggleSelect }) => {
     const { t } = useTranslation();
     const { downloadSingleDocument, loading: isDownloading } = useDownloadContent();
+    const { user } = useUser();
+    const { updateFavorite } = useFavorites(user);
+    
+    // Initialize local state from user data
+    const [isFavorite, setIsFavorite] = useState(false);
+    
+    // Sync with user data on initial load
+    useEffect(() => {
+        const initialFavoriteState = user?.favoriteDocuments?.some(doc => doc.id === document.id) || false;
+        setIsFavorite(initialFavoriteState);
+    }, [user, document.id]);
 
     const handleDownload = (e: React.MouseEvent) => {
         e.preventDefault();
         downloadSingleDocument(document);
+    };
+
+    const handleToggleFavorite = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (user) {
+            setIsFavorite(!isFavorite);
+            updateFavorite(document.id, 'documents', !isFavorite);
+        }
     };
 
     return (
@@ -61,6 +83,19 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                 )}
 
                 <div className="flex items-center space-x-4">
+                    <button
+                        onClick={handleToggleFavorite}
+                        className="p-2 rounded-full hover:bg-gray-100"
+                        title={isFavorite ? t('course-page.documents.remove-favorite') : t('course-page.documents.add-favorite')}
+                    >
+                        <Star 
+                            size={20} 
+                            className={isFavorite 
+                                ? "fill-yellow-500 text-yellow-500" 
+                                : "text-gray-400 hover:text-gray-600"
+                            } 
+                        />
+                    </button>
                     <div className="text-right">
                         <p className="text-gray-500 text-xs whitespace-nowrap">{new Date(document.updateDate!).toLocaleString('en-GB', {
                             day: '2-digit',
