@@ -34,7 +34,8 @@ class TagCrudController extends AbstractCrudController
                         $document->getCourse()->getName(),
                         $document->getCategory()->getName()
                     );
-                });
+                })
+                ->setFormTypeOption('by_reference', false); // This is crucial for ManyToMany
         }
     }
 }

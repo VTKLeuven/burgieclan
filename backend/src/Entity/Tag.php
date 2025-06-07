@@ -18,7 +18,7 @@ class Tag
     #[ORM\Column(length: 255, unique: true)]
     private ?string $name = null;
 
-    #[ORM\ManyToMany(targetEntity: Document::class, inversedBy: 'tags')]
+    #[ORM\ManyToMany(targetEntity: Document::class, inversedBy: 'tags', cascade: ['persist'])]
     private Collection $documents;
 
     public function __construct()
@@ -55,6 +55,7 @@ class Tag
     {
         if (!$this->documents->contains($document)) {
             $this->documents->add($document);
+            $document->addTag($this);
         }
 
         return $this;
@@ -63,6 +64,7 @@ class Tag
     public function removeDocument(Document $document): static
     {
         $this->documents->removeElement($document);
+        $document->removeTag($this);
 
         return $this;
     }

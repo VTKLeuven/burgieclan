@@ -45,7 +45,7 @@ class Document extends Node
     #[ORM\Column(length: 11, nullable: true)]
     private ?string $year = null; // Ex. 2024 - 2025
 
-    #[ORM\ManyToMany(targetEntity: Tag::class, mappedBy: 'documents')]
+    #[ORM\ManyToMany(targetEntity: Tag::class, mappedBy: 'documents', cascade: ['persist'])]
     private Collection $tags;
 
     public function __construct($creator)
