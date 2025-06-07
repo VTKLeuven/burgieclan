@@ -135,4 +135,11 @@ class DocumentApi
     #[ApiProperty(writable: false)]
     #[Groups(['search', 'document:get'])]
     public string $updatedAt;
+
+    /**
+     * @var TagApi[]
+     */
+    #[ApiFilter(SearchFilter::class, properties: ['tags.name' => 'ipartial', 'tags' => 'exact'], strategy: 'exact')]
+    #[Groups(['document:get', 'document:create'])]
+    public array $tags = [];
 }
