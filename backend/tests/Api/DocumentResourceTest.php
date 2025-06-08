@@ -512,7 +512,7 @@ class DocumentResourceTest extends ApiTestCase
         ]);
 
         DocumentFactory::createOne([
-            'tags' => [$tagJavascript, $tagPHP],
+            'tags' => [$tagJavascript, $tagPHP, $tagPython],
             'under_review' => false,
         ]);
 
@@ -530,8 +530,8 @@ class DocumentResourceTest extends ApiTestCase
                 ]
             ])
             ->assertJson()
-            ->assertJsonMatches('"hydra:totalItems"', 2)
-            ->assertJsonMatches('length("hydra:member")', 2);
+            ->assertJsonMatches('"hydra:totalItems"', 3)
+            ->assertJsonMatches('length("hydra:member")', 3);
 
         // Test filtering by partial tag name (using ipartial strategy)
         $this->browser()
@@ -541,8 +541,8 @@ class DocumentResourceTest extends ApiTestCase
                 ]
             ])
             ->assertJson()
-            ->assertJsonMatches('"hydra:totalItems"', 2)
-            ->assertJsonMatches('length("hydra:member")', 2);
+            ->assertJsonMatches('"hydra:totalItems"', 3)
+            ->assertJsonMatches('length("hydra:member")', 3);
 
         // Test filtering by multiple tag names
         $this->browser()
@@ -552,8 +552,8 @@ class DocumentResourceTest extends ApiTestCase
                 ]
             ])
             ->assertJson()
-            ->assertJsonMatches('"hydra:totalItems"', 4)
-            ->assertJsonMatches('length("hydra:member")', 4);
+            ->assertJsonMatches('"hydra:totalItems"', 2)
+            ->assertJsonMatches('length("hydra:member")', 2);
 
         // Test filtering by tag IRI
         $this->browser()
@@ -575,8 +575,8 @@ class DocumentResourceTest extends ApiTestCase
                 ]
             ])
             ->assertJson()
-            ->assertJsonMatches('"hydra:totalItems"', 4)
-            ->assertJsonMatches('length("hydra:member")', 4);
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('length("hydra:member")', 1);
 
         // Verify total count without filters
         $this->browser()
