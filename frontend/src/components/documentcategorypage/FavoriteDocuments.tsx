@@ -126,7 +126,7 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
 
                             <div className="text-xs text-gray-500 flex justify-between mt-1">
                                 <p className="whitespace-nowrap">
-                                    {document.updateDate && new Date(document.updateDate).toLocaleString('en-GB', {
+                                    {document.updatedAt && new Date(document.updatedAt).toLocaleString('en-GB', {
                                         day: '2-digit',
                                         month: '2-digit',
                                         year: 'numeric',

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import useRetrieveDocuments from '@/hooks/useRetrieveDocuments';
+import useRetrieveDocuments, { DocumentFilters, DocumentSortOptions } from '@/hooks/useRetrieveDocuments';
 import useDownloadContent from '@/hooks/useDownloadContent';
 import { LoaderCircle, Download, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Pagination from '@/components/ui/Pagination';
 import DocumentListItem from './DocumentListItem';
+import DocumentFilter from './DocumentFilter';
+import DocumentSort from './DocumentSort';
 import type { Course, DocumentCategory, Document } from '@/types/entities';
 import { Checkbox } from '@/components/ui/Checkbox';
 
@@ -16,7 +18,19 @@ interface DocumentListProps {
 const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
     const [page, setPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(50);
-    const { documents, loading, totalItems } = useRetrieveDocuments(page, itemsPerPage, course, category, false);
+    const [filters, setFilters] = useState<DocumentFilters>({});
+    const [sort, setSort] = useState<DocumentSortOptions>({ field: 'name', direction: 'asc' });
+
+    const { documents, loading, totalItems } = useRetrieveDocuments(
+        page,
+        itemsPerPage,
+        course,
+        category,
+        false,
+        filters,
+        sort
+    );
+
     const [selectedDocuments, setSelectedDocuments] = useState<Document[]>([]);
     const { t } = useTranslation();
     const { downloadContent, loading: isDownloading, error: downloadError } = useDownloadContent();
@@ -43,6 +57,11 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
     useEffect(() => {
         setSelectedDocuments([]);
     }, [documents]);
+
+    // Reset page when filters or sort changes
+    useEffect(() => {
+        setPage(1);
+    }, [filters, sort]);
 
     // Log download errors
     useEffect(() => {
@@ -76,7 +95,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
     };
 
     const handleDownloadSelected = () => {
-        if (selectedDocuments.length > 0) {         
+        if (selectedDocuments.length > 0) {
             downloadContent({
                 documents: selectedDocuments,
             });
@@ -87,41 +106,68 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
         return selectedDocuments.some(doc => doc.id === document.id);
     };
 
+    const handleSortChange = (newSort: DocumentSortOptions) => {
+        setSort(newSort);
+    };
+
+    const handleFilterChange = (newFilters: DocumentFilters) => {
+        setFilters(newFilters);
+    };
+
+    const handleClearFilters = () => {
+        setFilters({});
+    };
+
     const allSelected = documents.length > 0 && selectedDocuments.length === documents.length;
 
     return (
         <div className="mt-3 rounded-lg">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-4">
                 <h3>{t('course-page.documents.header')}</h3>
-                
-                {selectedDocuments.length > 0 && (
-                    <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-700">
-                            {t('course-page.documents.selected', { amount: selectedDocuments.length })}
-                        </span>
-                        <button
-                            onClick={handleDownloadSelected}
-                            disabled={isDownloading}
-                            className="px-3 py-2 bg-vtk-blue-500 hover:bg-vtk-blue-600 text-white rounded-md flex items-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                            title={t('course-page.documents.download-selected')}
-                        >
-                            <Download size={16} className={`mr-1 ${isDownloading ? 'animate-pulse' : ''}`} />
-                            <span>{isDownloading ? t('course-page.documents.downloading') : t('course-page.documents.download')}</span>
-                        </button>
-                        <button
-                            onClick={handleClearSelection}
-                            className="p-2 text-gray-600 hover:text-gray-800 rounded-md"
-                            title={t('course-page.documents.clear-selection')}
-                        >
-                            <X size={16} />
-                        </button>
-                    </div>
-                )}
+
+                <div className="flex items-center space-x-2">
+                    <DocumentFilter
+                        filters={filters}
+                        onFilterChange={handleFilterChange}
+                        onClearFilters={handleClearFilters}
+                        course={course}
+                        category={category}
+                    />
+
+                    <DocumentSort
+                        currentSort={sort}
+                        onSortChange={handleSortChange}
+                    />
+
+                    {selectedDocuments.length > 0 && (
+                        <div className="flex items-center space-x-2 ml-4">
+                            <span className="text-sm text-gray-700">
+                                {t('course-page.documents.selected', { amount: selectedDocuments.length })}
+                            </span>
+                            <button
+                                onClick={handleDownloadSelected}
+                                disabled={isDownloading}
+                                className="px-3 py-2 bg-vtk-blue-500 hover:bg-vtk-blue-600 text-white rounded-md flex items-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                title={t('course-page.documents.download-selected')}
+                            >
+                                <Download size={16} className={`mr-1 ${isDownloading ? 'animate-pulse' : ''}`} />
+                                <span>{isDownloading ? t('course-page.documents.downloading') : t('course-page.documents.download')}</span>
+                            </button>
+                            <button
+                                onClick={handleClearSelection}
+                                className="p-2 text-gray-600 hover:text-gray-800 rounded-md"
+                                title={t('course-page.documents.clear-selection')}
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
-            
+
             <div className="rounded-lg shadow-sm">
                 {loading ? (
-                    <div className="flex justify-center items-center h-full">
+                    <div className="flex justify-center items-center h-full py-12">
                         <LoaderCircle className="animate-spin text-vtk-blue-500" size={48} />
                     </div>
                 ) : documents.length === 0 ? (
@@ -138,10 +184,10 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                                 />
                             </div>
                         )}
-                        
+
                         <div className="flex flex-col space-y-2">
                             {documents.map((document) => (
-                                <DocumentListItem 
+                                <DocumentListItem
                                     key={document.id}
                                     document={document}
                                     isSelected={isDocumentSelected(document)}
