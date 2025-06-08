@@ -87,7 +87,8 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->hideOnForm();
         yield AssociationField::new('tags')
             ->autocomplete()
-            ->hideOnIndex();
+            ->hideOnIndex()
+            ->setFormTypeOption('by_reference', false);
         yield BooleanField::new('under_review')
             ->setLabel('Under review')
             ->renderAsSwitch(false)
