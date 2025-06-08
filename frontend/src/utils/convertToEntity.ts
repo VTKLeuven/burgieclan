@@ -64,8 +64,8 @@ export function convertToDocument(doc: any): Document {
     }
     return {
         id: parseInt(doc['@id'].split('/').pop()),
-        createDate: doc.createdAt ? new Date(doc.createdAt) : undefined,
-        updateDate: doc.updatedAt? new Date(doc.updatedAt): undefined,
+        createdAt: doc.createdAt ? new Date(doc.createdAt) : undefined,
+        updatedAt: doc.updatedAt? new Date(doc.updatedAt): undefined,
         name: doc.name,
         course: doc.course ? convertToCourse(doc.course): undefined,
         category: doc.category ? convertToDocumentCategory(doc.category) : undefined,
@@ -97,8 +97,8 @@ export function convertToCourseComment(comment: any): CourseComment {
         commentCategory: comment.category ? convertToCommentCategory(comment.category) : undefined,
         content: comment.content,
         anonymous: comment.anonymous,
-        createDate: comment.createdAt ? new Date(comment.createdAt): undefined,
-        updateDate: comment.updatedAt ? new Date(comment.updatedAt) : undefined,
+        createdAt: comment.createdAt ? new Date(comment.createdAt): undefined,
+        updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : undefined,
         creator: comment.creator ? convertToUser(comment.creator) : undefined
     };
 }

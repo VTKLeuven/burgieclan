@@ -3,6 +3,7 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
@@ -13,6 +14,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Entity\Document;
+use App\Filter\TagFilter;
 use App\State\DocumentApiProvider;
 use App\State\DocumentProcessor;
 use App\State\EntityClassDtoStateProcessor;
@@ -30,6 +32,24 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: DocumentApiProvider::class
         ),
         new GetCollection(
+            openapi: new Model\Operation(
+                parameters: [
+                    new Model\Parameter(
+                        name: 'tags.name[]',
+                        in: 'query',
+                        description: 'Filter by multiple tag names (partial match)',
+                        required: false,
+                        schema: [
+                            'type' => 'array',
+                            'items' => [
+                                'type' => 'string'
+                            ]
+                        ],
+                        style: 'form',
+                        explode: true
+                    )
+                ]
+            ),
             normalizationContext: ['groups' => ['document:get']],
             provider: DocumentApiProvider::class
         ),
@@ -94,11 +114,11 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: DocumentProcessor::class,
         )],
     outputFormats: ['jsonld' => ['application/ld+json']],
-    order: ['updateDate' => 'DESC'],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: Document::class)
 )]
+#[ApiFilter(OrderFilter::class)]
 class DocumentApi
 {
     #[ApiProperty(readable: false, writable: false, identifier: true)]
@@ -139,7 +159,7 @@ class DocumentApi
     public ?File $file = null;
 
     #[ApiProperty(writable: false)]
-    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[ApiFilter(SearchFilter::class, strategy: 'exact', properties: ['creator' => 'exact', 'creator.fullName' => 'ipartial'])]
     #[Groups(['search', 'document:get'])]
     public ?UserApi $creator;
 
@@ -154,7 +174,7 @@ class DocumentApi
     /**
      * @var TagApi[]
      */
-    #[ApiFilter(SearchFilter::class, strategy: 'exact', properties: ['tags.name' => 'ipartial', 'tags' => 'exact'])]
+    #[ApiFilter(TagFilter::class, properties: ['tags' => true, 'tags.name' => true])]
     #[Groups(['search', 'user', 'document:get', 'document:create'])]
     public array $tags = [];
 }

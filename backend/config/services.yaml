@@ -26,6 +26,15 @@ services:
     App\Doctrine\Extension\DocumentUnderReviewExtension:
         tags:
             - { name: 'api_platform.doctrine.orm.query_extension.collection' }
+              
+    App\Doctrine\Extension\AnonymousCreatorSortExtension:
+        tags: ['api_platform.doctrine.orm.query_extension.collection']
+
+    App\Doctrine\Extension\AnonymousCreatorFilterExtension:
+        tags: ['api_platform.doctrine.orm.query_extension.collection']
+
+    App\Filter\TagFilter:
+        tags: ['api_platform.filter']
 
     Symfony\Component\Security\Http\Logout\LogoutUrlGenerator: '@security.logout_url_generator'
 

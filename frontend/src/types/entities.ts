@@ -4,8 +4,8 @@ interface BaseEntity {
 
 interface NodeEntity extends BaseEntity {
     creator?: User,
-    createDate?: Date;
-    updateDate?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface Course extends BaseEntity {
@@ -35,14 +35,11 @@ export interface Program extends BaseEntity {
     modules?: Module[];
 }
 
-export interface CourseComment extends BaseEntity {
+export interface CourseComment extends NodeEntity {
     course?: Course;
     commentCategory?: CommentCategory;
     content?: string;
     anonymous?: boolean;
-    createDate?: Date;
-    updateDate?: Date;
-    creator?: User;
 }
 
 export interface CommentCategory extends BaseEntity {

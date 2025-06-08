@@ -37,9 +37,9 @@ const CourseCommentList = ({ category, comments, t }: CourseCommentListProps) =>
     // Sort comments by most recent update/creation date
     const sortedComments = useMemo(() => {
         return [...comments].sort((a, b) => {
-            // Use updateDate if available, otherwise fall back to createDate
-            const dateA = a.updateDate || a.createDate;
-            const dateB = b.updateDate || b.createDate;
+            // Use updatedAt if available, otherwise fall back to createdAt
+            const dateA = a.updatedAt || a.createdAt;
+            const dateB = b.updatedAt || b.createdAt;
 
             // Handle undefined dates (push them to the end)
             if (!dateA && !dateB) return 0;
@@ -89,20 +89,20 @@ const CourseCommentList = ({ category, comments, t }: CourseCommentListProps) =>
                                         <div className="flex items-center">
                                             <Calendar className="h-3.5 w-3.5 mr-1" />
                                             <span
-                                                title={formatFullDateTime(comment.createDate)}
+                                                title={formatFullDateTime(comment.createdAt)}
                                             >
-                                                {formatDate(comment.createDate)}
+                                                {formatDate(comment.createdAt)}
                                             </span>
                                         </div>
 
                                         {/* Updated date - only show if different from create date */}
-                                        {comment.updateDate && comment.createDate && comment.updateDate.getTime() !== comment.createDate.getTime() && (
+                                        {comment.updatedAt && comment.createdAt && comment.updatedAt.getTime() !== comment.createdAt.getTime() && (
                                             <div className="flex items-center">
                                                 <RefreshCw className="h-3.5 w-3.5 mr-1" />
                                                 <span
-                                                    title={formatFullDateTime(comment.updateDate)}
+                                                    title={formatFullDateTime(comment.updatedAt)}
                                                 >
-                                                    {formatDate(comment.updateDate)}
+                                                    {formatDate(comment.updatedAt)}
                                                 </span>
                                             </div>
                                         )}

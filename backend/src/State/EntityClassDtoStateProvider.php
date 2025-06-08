@@ -28,6 +28,11 @@ class EntityClassDtoStateProvider implements ProviderInterface
     {
         $resourceClass = $operation->getClass();
         if ($operation instanceof CollectionOperationInterface) {
+            $request = $this->requestStack->getCurrentRequest();
+            $disablePagination = $request && $request->query->has('pagination') &&
+                                ($request->query->get('pagination') === 'false'
+                                || $request->query->get('pagination') === '0');
+
             $entities = $this->collectionProvider->provide($operation, $uriVariables, $context);
             assert($entities instanceof Paginator);
 
@@ -36,6 +41,12 @@ class EntityClassDtoStateProvider implements ProviderInterface
                 $dtos[] = $this->mapEntityToDto($entity, $resourceClass);
             }
 
+            // If pagination is disabled, return the raw array of DTOs
+            if ($disablePagination) {
+                return $dtos;
+            }
+
+            // Otherwise return a paginated result
             return new TraversablePaginator(
                 new ArrayIterator($dtos),
                 $entities->getCurrentPage(),

@@ -198,8 +198,26 @@
         }
     },
     "document": {
+        "name": "Naam",
+        "update-date": "Laatst bijgewerkt",
+        "create-date": "Aangemaakt op",
+        "creator": "Maker",
+        "tags": "Tags",
+        "anonymous": "Anoniem",
         "under_review": "In behandeling",
-        "approved": "Goedgekeurd"
+        "approved": "Goedgekeurd",
+        "sort-by": "Sorteer op",
+        "sort-ascending": "Oplopend",
+        "sort-descending": "Aflopend",
+        "filter": "Filter",
+        "filters": "Filters",
+        "clear-filters": "Filters wissen",
+        "search-by-name": "Zoeken op naam",
+        "search-by-tags": "Zoeken op tags",
+        "search-by-creator": "Zoeken op maker",
+        "match-all-tags": "Alle tags moeten overeenkomen",
+        "cancel": "Annuleren",
+        "apply": "Toepassen"
     },
     "pagination": {
         "previous": "Vorige",

@@ -85,7 +85,7 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                         className="p-2"
                     />
                     <div className="text-right">
-                        <p className="text-gray-500 text-xs whitespace-nowrap">{new Date(document.updateDate!).toLocaleString('en-GB', {
+                        <p className="text-gray-500 text-xs whitespace-nowrap">{new Date(document.updatedAt!).toLocaleString('en-GB', {
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric',

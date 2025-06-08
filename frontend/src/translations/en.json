@@ -198,8 +198,26 @@
         }
     },
     "document": {
+        "name": "Name",
+        "update-date": "Last updated",
+        "create-date": "Created on",
+        "creator": "Creator",
+        "tags": "Tags",
+        "anonymous": "Anonymous",
         "under_review": "Under review",
-        "approved": "Approved"
+        "approved": "Approved",
+        "sort-by": "Sort by",
+        "sort-ascending": "Ascending",
+        "sort-descending": "Descending",
+        "filter": "Filter",
+        "filters": "Filters",
+        "clear-filters": "Clear filters",
+        "search-by-name": "Search by name",
+        "search-by-tags": "Search by tags",
+        "search-by-creator": "Search by creator",
+        "match-all-tags": "Match all tags",
+        "cancel": "Cancel",
+        "apply": "Apply"
     },
     "pagination": {
         "previous": "Previous",
