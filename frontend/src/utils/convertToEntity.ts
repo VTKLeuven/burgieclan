@@ -1,4 +1,4 @@
-import { type CommentCategory, type Course, type CourseComment, type Document, type Module, type Page, type Program, type QuickLink, type User } from '@/types/entities';
+import { type CommentCategory, type Course, type CourseComment, type Document, type Module, type Page, type Program, type QuickLink, type Tag, type User } from '@/types/entities';
 
 export function convertToUser(user: any): User {
     if (typeof user === 'string') {
@@ -72,7 +72,8 @@ export function convertToDocument(doc: any): Document {
         underReview: doc.under_review,
         creator: doc.creator ? convertToUser(doc.creator) : undefined,
         contentUrl: doc.contentUrl ? process.env.NEXT_PUBLIC_BACKEND_URL + doc.contentUrl: undefined,
-        anonymous: doc.anonymous
+        anonymous: doc.anonymous,
+        tags: doc.tags?.map(convertToTag)
     };
 }
 
@@ -128,6 +129,17 @@ export function convertToQuickLink(link: any): QuickLink {
         id: parseId(link['@id']),
         name: link.name,
         linkTo: link.linkTo
+    };
+}
+
+export function convertToTag(tag: any): Tag {
+    if (typeof tag === 'string') {
+        return { id: parseId(tag) };
+    }
+    return {
+        id: parseId(tag['@id']),
+        name: tag.name,
+        documents: tag.documents?.map(convertToDocument)
     };
 }
 

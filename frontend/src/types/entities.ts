@@ -61,6 +61,7 @@ export interface Document extends NodeEntity {
     underReview?: boolean;
     contentUrl?: string;
     anonymous?: boolean;
+    tags?: Tag[];
 }
 
 export interface User extends BaseEntity {
@@ -87,4 +88,9 @@ export interface Breadcrumb extends BaseEntity {
 export interface QuickLink extends BaseEntity {
     name?: string;
     linkTo: string;
+}
+
+export interface Tag extends BaseEntity {
+    name?: string;
+    documents?: Document[];
 }

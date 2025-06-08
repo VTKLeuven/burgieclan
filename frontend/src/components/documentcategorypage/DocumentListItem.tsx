@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Download } from 'lucide-react';
+import { Download, Tag as TagIcon } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import { useTranslation } from 'react-i18next';
 import type { Document } from '@/types/entities';
@@ -49,6 +49,23 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                     </Link>
                     <div className="flex items-center text-xs text-gray-700 space-x-4">
                         <span className="truncate">{extractFilename(document.contentUrl)}</span>
+                        
+                        {/* Display tags if they exist */}
+                        {document.tags && document.tags.length > 0 && (
+                            <div className="flex items-center space-x-1">
+                                <TagIcon size={14} className="text-gray-500" />
+                                <div className="flex flex-wrap gap-1">
+                                    {document.tags.map(tag => (
+                                        <span 
+                                            key={tag.id} 
+                                            className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-sm text-xs"
+                                        >
+                                            {tag.name}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
