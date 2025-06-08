@@ -14,9 +14,9 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Entity\Document;
 use App\State\DocumentApiProvider;
+use App\State\DocumentProcessor;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
-use App\State\DocumentProcessor;
 use ArrayObject;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -68,6 +68,21 @@ use Symfony\Component\Validator\Constraints as Assert;
                                         'type' => 'boolean',
                                         'example' => false
                                     ],
+                                    'tags[]' => [
+                                        'type' => 'array',
+                                        'items' => [
+                                            'type' => 'string',
+                                            'format' => 'iri-reference',
+                                        ],
+                                        'example' => ['/api/tags/1', '/api/tags/2'],
+                                    ],
+                                ]
+                            ],
+                            'encoding' => [
+                                'tags[]' => [
+                                    'style' => 'form',
+                                    'explode' => true,
+                                    'allowReserved' => true
                                 ]
                             ]
                         ]
@@ -139,7 +154,7 @@ class DocumentApi
     /**
      * @var TagApi[]
      */
-    #[ApiFilter(SearchFilter::class, properties: ['tags.name' => 'ipartial', 'tags' => 'exact'], strategy: 'exact')]
-    #[Groups(['document:get', 'document:create'])]
+    #[ApiFilter(SearchFilter::class, strategy: 'exact', properties: ['tags.name' => 'ipartial', 'tags' => 'exact'])]
+    #[Groups(['search', 'user', 'document:get', 'document:create'])]
     public array $tags = [];
 }
