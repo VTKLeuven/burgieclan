@@ -166,4 +166,135 @@ class TagResourceTest extends ApiTestCase
             ->assertJsonMatches('"title"', 'An error occurred')
             ->assertJsonMatches('"detail"', 'Invalid JWT, please login again to get a new one.');
     }
+
+    public function testCreateTag(): void
+    {
+        $tagData = [
+            'name' => 'New Test Tag',
+            'documents' => []
+        ];
+
+        $response = $this->browser()
+            ->post('/api/tags', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token,
+                    'Content-Type' => 'application/ld+json'
+                ],
+                'json' => $tagData
+            ])
+            ->assertStatus(201)
+            ->assertJson()
+            ->assertJsonMatches('"name"', 'New Test Tag')
+            ->assertJsonMatches('length("documents")', 0);
+
+        // Verify the tag was actually created
+        $tagIRI = $response->json()->decoded()['@id'] ?? null;
+        $this->assertNotNull($tagIRI);
+
+        // Verify we can retrieve the created tag
+        $this->browser()
+            ->get($tagIRI, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('"name"', 'New Test Tag');
+    }
+
+    public function testCreateTagWithDocuments(): void
+    {
+        // Create some documents first that we'll associate with our new tag
+        $document1 = DocumentFactory::createOne();
+        $document2 = DocumentFactory::createOne();
+        
+        $tagData = [
+            'name' => 'Tag With Documents',
+            'documents' => [
+                '/api/documents/' . $document1->getId(),
+                '/api/documents/' . $document2->getId()
+            ]
+        ];
+
+        // Create the tag with document references
+        $response = $this->browser()
+            ->post('/api/tags', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token,
+                    'Content-Type' => 'application/ld+json'
+                ],
+                'json' => $tagData
+            ])
+            ->assertStatus(201)
+            ->assertJson()
+            ->assertJsonMatches('"name"', 'Tag With Documents')
+            ->assertJsonMatches('length("documents")', 2);
+            
+        $tagIRI = $response->json()->decoded()['@id'] ?? null;
+        $this->assertNotNull($tagIRI);
+        
+        // Verify the tag was created with the correct documents
+        $response = $this->browser()
+            ->get($tagIRI, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('"name"', 'Tag With Documents')
+            ->assertJsonMatches('length("documents")', 2)
+            ->json()->decoded();
+
+        $this->assertContains('/api/documents/' . $document1->getId(), $response['documents']);
+        $this->assertContains('/api/documents/' . $document2->getId(), $response['documents']);
+            
+        // Verify the relationship from the document side (optional)
+        $response = $this->browser()
+            ->get('/api/documents/' . $document1->getId(), [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->json()->decoded();
+
+        $this->assertContains('Tag With Documents', array_column($response['tags'], 'name'));
+    }
+
+    public function testCreateTagWithoutAuthentication(): void
+    {
+        $tagData = [
+            'name' => 'Unauthorized Tag',
+            'documents' => []
+        ];
+
+        $this->browser()
+            ->post('/api/tags', [
+                'json' => $tagData
+            ])
+            ->assertStatus(401);
+    }
+
+    public function testCreateTagWithMissingRequiredFields(): void
+    {
+        // name is required
+        $tagData = [
+            'documents' => []
+        ];
+
+        $this->browser()
+            ->post('/api/tags', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token,
+                    'Content-Type' => 'application/ld+json'
+                ],
+                'json' => $tagData
+            ])
+            ->assertStatus(422) // Unprocessable Entity
+            ->assertJson()
+            ->assertJsonMatches('"hydra:description"', 'Tag name is required');
+    }
 }
