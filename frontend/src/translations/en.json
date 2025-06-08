@@ -216,6 +216,7 @@
         "search-by-tags": "Search by tags",
         "search-by-creator": "Search by creator",
         "match-all-tags": "Match all tags",
+        "add-tags": "Add tags",
         "cancel": "Cancel",
         "apply": "Apply"
     },
