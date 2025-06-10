@@ -69,7 +69,7 @@ export default function Footer() {
 
     return (
         <footer aria-labelledby="footer-heading" className="bg-white">
-            <div className="mx-auto border-t border-gray-900/10 px-6 py-12 lg:px-8">
+            <div className="mx-auto border-t border-gray-900/10 px-6 py-6 lg:px-8">
                 <div className="md:flex md:items-center md:justify-between">
 
                     {/* Social Links Section */}
