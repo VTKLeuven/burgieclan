@@ -5,6 +5,10 @@ import SemesterIndicator from "@/components/ui/SemesterIndicator";
 import { Star, UserRound } from "lucide-react";
 import { useUser } from '@/components/UserContext';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useApi } from "@/hooks/useApi";
+import { convertToCourse } from "@/utils/convertToEntity";
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 interface CourseRowProps {
     course: Course;
@@ -13,30 +17,66 @@ interface CourseRowProps {
 }
 
 export const CourseRow = memo(({
-    course,
+    course: initialCourse,
     highlightMatch = false,
     isFirstRow = false,
 }: CourseRowProps) => {
     const { user } = useUser();
     const { updateFavorite } = useFavorites(user);
-    const [isFavorite, setIsFavorite] = useState<boolean>(
-        !!user?.favoriteCourses?.some(favCourse => favCourse.id === course.id)
-    );
+    const [course, setCourse] = useState<Course | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const { request } = useApi();
+    const [isFavorite, setIsFavorite] = useState<boolean>(false);
     const [showTooltip, setShowTooltip] = useState<boolean>(false);
     const [professorNames, setProfessorNames] = useState<string[]>([]);
     const [professorsLoaded, setProfessorsLoaded] = useState<boolean>(false);
 
-    const handleFavoriteClick = useCallback(async () => {
-        if (!user) return;
+    // Fetch complete course data if we only have the ID
+    useEffect(() => {
+        async function fetchCourseData() {
+            if (!initialCourse.id) return;
 
-        const isCurrentlyFavorite = user.favoriteCourses?.some(favCourse => favCourse.id === course.id);
+            // If we have essential data, just use it
+            if (initialCourse.name && initialCourse.code && initialCourse.credits && initialCourse.semesters) {
+                setCourse(initialCourse);
+                return;
+            }
+
+            setLoading(true);
+            try {
+                const courseData = await request('GET', `/api/courses/${initialCourse.id}`);
+                if (courseData) {
+                    const fullCourse = convertToCourse(courseData);
+                    setCourse(fullCourse);
+                }
+            } catch (error) {
+                console.error("Failed to fetch course data:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchCourseData();
+    }, [initialCourse, request]);
+
+    // Update favorite status when user data changes
+    useEffect(() => {
+        if (user?.favoriteCourses && initialCourse.id) {
+            setIsFavorite(user.favoriteCourses.some(favCourse => favCourse.id === initialCourse.id));
+        }
+    }, [user, initialCourse.id]);
+
+    const handleFavoriteClick = useCallback(async () => {
+        if (!user || !initialCourse.id) return;
+
+        const isCurrentlyFavorite = user.favoriteCourses?.some(favCourse => favCourse.id === initialCourse.id);
         const newFavoriteState = !isCurrentlyFavorite;
         setIsFavorite(newFavoriteState);
-        await updateFavorite(course.id, "courses", newFavoriteState);
-    }, [user, course.id, updateFavorite]);
+        await updateFavorite(initialCourse.id, "courses", newFavoriteState);
+    }, [user, initialCourse.id, updateFavorite]);
 
     const fetchProfessorNames = useCallback(async () => {
-        if (!course.professors?.length || professorsLoaded) return;
+        if (!course?.professors?.length || professorsLoaded) return;
 
         try {
             setProfessorsLoaded(true);
@@ -65,7 +105,7 @@ export const CourseRow = memo(({
         } catch (error) {
             setProfessorNames([]);
         }
-    }, [course.professors, professorsLoaded]);
+    }, [course?.professors, professorsLoaded]);
 
     // Only load professor data when the tooltip is hovered
     const handleProfessorHover = useCallback(() => {
@@ -76,33 +116,56 @@ export const CourseRow = memo(({
     // Add margin-top classes conditionally based on whether this is the first row
     const marginClass = isFirstRow ? '' : 'mt-2';
 
+    // Render the row structure, using either real data or skeletons
+    const content = loading || !course ? {
+        name: <Skeleton />,
+        code: <Skeleton />,
+        credits: <Skeleton />,
+        semesters: <Skeleton circle width={24} height={24} />,
+        star: <Skeleton circle width={24} height={24} />,
+        professor: <Skeleton circle width={20} height={20} />
+    } : {
+        name: course.name,
+        code: course.code,
+        credits: course.credits,
+        semesters: <SemesterIndicator semesters={course.semesters} />,
+        star: <Star className='text-vtk-yellow-500' fill={isFavorite ? "currentColor" : "none"} />,
+        professor: <UserRound className="text-wireframe-primary-blue" size={20} />
+    };
+
     return (
         <div className={`grid grid-cols-12 py-3 border-b hover:bg-gray-50 rounded-md ${highlightMatch ? 'ring-2 ring-yellow-300' : ''
             } ${marginClass}`}>
             <div className="col-span-5 px-4 flex">
                 <div
-                    className="hover:scale-110 hover:cursor-pointer transition-transform duration-300 flex items-center"
-                    onClick={handleFavoriteClick}>
+                    className={`hover:scale-110 ${!loading && 'hover:cursor-pointer'} transition-transform duration-300 flex items-center`}
+                    onClick={!loading && course ? handleFavoriteClick : undefined}>
                     <div className="inline-block mr-2">
-                        <Star className='text-vtk-yellow-500' fill={isFavorite ? "currentColor" : "none"} />
+                        {content.star}
                     </div>
                 </div>
-                <Link href={`/course/${course.id}`} className="hover:text-wireframe-primary-blue hover:underline">
-                    {course.name}
-                </Link>
+                {loading || !course ? (
+                    <div className="flex-grow">
+                        {content.name}
+                    </div>
+                ) : (
+                    <Link href={`/course/${course.id}`} className="hover:text-wireframe-primary-blue hover:underline">
+                        {content.name}
+                    </Link>
+                )}
             </div>
-            <div className="col-span-1 px-4">{course.code}</div>
-            <div className="col-span-1 px-4 text-center">{course.credits}</div>
+            <div className="col-span-1 px-4">{content.code}</div>
+            <div className="col-span-1 px-4 text-center">{content.credits}</div>
             <div className="col-span-2 flex justify-center items-center">
-                <SemesterIndicator semesters={course.semesters} />
+                {content.semesters}
             </div>
             <div className="col-span-2 flex justify-center items-center relative">
                 <div
-                    className="cursor-pointer p-1 hover:bg-gray-100 rounded-full"
-                    onMouseEnter={handleProfessorHover}
-                    onMouseLeave={() => setShowTooltip(false)}
+                    className={`p-1 ${!loading && 'hover:bg-gray-100 cursor-pointer'} rounded-full`}
+                    onMouseEnter={!loading && course ? handleProfessorHover : undefined}
+                    onMouseLeave={!loading && course ? () => setShowTooltip(false) : undefined}
                 >
-                    <UserRound className="text-wireframe-primary-blue" size={20} />
+                    {content.professor}
                     {showTooltip && professorNames.length > 0 && (
                         <ProfessorTooltip professorNames={professorNames} />
                     )}
