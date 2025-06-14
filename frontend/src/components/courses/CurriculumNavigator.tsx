@@ -26,7 +26,7 @@ export default function CurriculumNavigator() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const result = await request('GET', `/api/programs`);
+            const result = await request('GET', `/api/programs?order[name]=asc`);
             if (!result) {
                 return null;
             }
