@@ -69,6 +69,7 @@ export function convertToDocument(doc: any): Document {
         name: doc.name,
         course: doc.course ? convertToCourse(doc.course): undefined,
         category: doc.category ? convertToDocumentCategory(doc.category) : undefined,
+        year: doc.year,
         underReview: doc.under_review,
         creator: doc.creator ? convertToUser(doc.creator) : undefined,
         contentUrl: doc.contentUrl ? process.env.NEXT_PUBLIC_BACKEND_URL + doc.contentUrl: undefined,

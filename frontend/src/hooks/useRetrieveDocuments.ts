@@ -10,6 +10,7 @@ export interface DocumentFilters {
     tagIds?: number[];
     tagNames?: string[];
     creator?: string;
+    year?: string;
 }
 
 export interface DocumentSortOptions {
@@ -70,6 +71,9 @@ const useRetrieveDocuments = (
                     }
                     if (filters.creator) {
                         url += `&creator.fullName=${encodeURIComponent(filters.creator)}`;
+                    }
+                    if (filters.year) {
+                        url += `&year=${encodeURIComponent(filters.year)}`;
                     }
                 }
 

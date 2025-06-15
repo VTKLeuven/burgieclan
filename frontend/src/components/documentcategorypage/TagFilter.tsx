@@ -135,7 +135,7 @@ const TagFilter: React.FC<TagFilterProps> = ({
   return (
     <div className="relative" ref={containerRef}>
       <div 
-        className="flex flex-wrap items-center w-full border rounded-md px-2 py-1 bg-white focus-within:ring-1 focus-within:ring-vtk-blue-500 focus-within:border-vtk-blue-500 min-h-[38px] cursor-text"
+        className="flex flex-wrap items-center w-full border rounded-md px-2 py-1 border-[#6b7280] bg-white focus-within:ring-1 focus-within:ring-vtk-blue-500 focus-within:border-vtk-blue-500 min-h-[38px] cursor-text"
         onClick={handleContainerClick}
       >
         {/* Display selected tags by ID */}
