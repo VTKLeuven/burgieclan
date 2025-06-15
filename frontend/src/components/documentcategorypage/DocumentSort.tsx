@@ -39,6 +39,7 @@ const DocumentSort: React.FC<DocumentSortProps> = ({ currentSort, onSortChange }
     const sortableFields: SortableField[] = [
         { value: 'name', label: t('document.name') },
         { value: 'creator.fullName', label: t('document.creator') },
+        { value: 'year', label: t('document.year') },
         { value: 'updatedAt', label: t('document.update-date') },
         { value: 'createdAt', label: t('document.create-date') },
     ];

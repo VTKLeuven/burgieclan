@@ -55,6 +55,7 @@ export interface Document extends NodeEntity {
     name?: string;
     course?: Course;
     category?: DocumentCategory;
+    year?: string;
     underReview?: boolean;
     contentUrl?: string;
     anonymous?: boolean;

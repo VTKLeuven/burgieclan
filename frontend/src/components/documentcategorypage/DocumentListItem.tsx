@@ -49,15 +49,15 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                     </Link>
                     <div className="flex items-center text-xs text-gray-700 space-x-4">
                         <span className="truncate">{extractFilename(document.contentUrl)}</span>
-                        
+
                         {/* Display tags if they exist */}
                         {document.tags && document.tags.length > 0 && (
                             <div className="flex items-center space-x-1">
                                 <TagIcon size={14} className="text-gray-500" />
                                 <div className="flex flex-wrap gap-1">
                                     {document.tags.map(tag => (
-                                        <span 
-                                            key={tag.id} 
+                                        <span
+                                            key={tag.id}
                                             className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-sm text-xs"
                                         >
                                             {tag.name}
@@ -85,23 +85,34 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                         className="p-2"
                     />
                     <div className="text-right">
-                        <p className="text-gray-500 text-xs whitespace-nowrap">{new Date(document.updatedAt!).toLocaleString('en-GB', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false
-                        })}</p>
-                        {document.anonymous ? (
+                        <div className="flex items-center space-x-2 mb-1">
                             <span className="text-gray-600 text-sm">
-                                {t('course-page.documents.anonymous')}
+                                {document.anonymous ?
+                                    t('course-page.documents.anonymous') :
+                                    (document.creator?.fullName || document.creator?.username)
+                                }
                             </span>
-                        ) : (
-                            <span className="text-gray-600 text-sm">
-                                {document.creator?.fullName || document.creator?.username}
-                            </span>
-                        )}
+                        </div>
+                        <div className="flex items-center text-xs text-gray-500 space-x-2">
+                            {document.year && (
+                                <span className="whitespace-nowrap font-medium">
+                                    {document.year}
+                                </span>
+                            )}
+                            {document.updatedAt && (
+                                <>
+                                    <span className="text-gray-400">&bull;</span>
+                                    <span className="whitespace-nowrap">{new Date(document.updatedAt).toLocaleString('en-GB', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric',
+                                        // hour: '2-digit',
+                                        // minute: '2-digit',
+                                        // hour12: false
+                                    })}</span>
+                                </>
+                            )}
+                        </div>
                     </div>
                     <button
                         onClick={handleDownload}

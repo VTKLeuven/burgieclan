@@ -72,6 +72,7 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
       tagIds: [],
       tagNames: [],
       creator: '',
+      year: ''
     };
     setTempFilters(emptyFilters);
     onClearFilters();
@@ -124,6 +125,21 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border rounded-md text-sm"
                 placeholder={t('document.search-by-name')}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('document.year')}
+              </label>
+              <input
+                type="text"
+                id="year"
+                name="year"
+                value={tempFilters.year || ''}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border rounded-md text-sm"
+                placeholder={t('document.search-by-year')}
               />
             </div>
 
