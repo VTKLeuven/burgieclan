@@ -114,29 +114,33 @@ export const CourseRow = memo(({
     }, [fetchProfessorNames]);
 
     // Add margin-top classes conditionally based on whether this is the first row
-    const marginClass = isFirstRow ? '' : 'mt-2';
+    const marginClass = isFirstRow ? '' : 'mt-0';
 
     // Render the row structure, using either real data or skeletons
     const content = loading || !course ? {
         name: <Skeleton />,
         code: <Skeleton />,
         credits: <Skeleton />,
-        semesters: <Skeleton circle width={24} height={24} />,
-        star: <Skeleton circle width={24} height={24} />,
-        professor: <Skeleton circle width={20} height={20} />
+        semesters: <Skeleton circle width={16} height={16} />,
+        star: <Skeleton circle width={16} height={16} />,
+        professor: <Skeleton circle width={16} height={16} />
     } : {
         name: course.name,
         code: course.code,
-        credits: course.credits,
-        semesters: <SemesterIndicator semesters={course.semesters} />,
-        star: <Star className='text-vtk-yellow-500' fill={isFavorite ? "currentColor" : "none"} />,
-        professor: <UserRound className="text-wireframe-primary-blue" size={20} />
+        credits: (
+            <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">
+                {course.credits}
+            </span>
+        ),
+        semesters: <SemesterIndicator semesters={course.semesters} size={16} />,
+        star: <Star className='text-vtk-yellow-500' fill={isFavorite ? "currentColor" : "none"} size={16} />,
+        professor: <UserRound className="text-wireframe-primary-blue" size={16} />
     };
 
     return (
-        <div className={`grid grid-cols-12 py-3 border-b hover:bg-gray-50 rounded-md ${highlightMatch ? 'ring-2 ring-yellow-300' : ''
+        <div className={`grid grid-cols-12 py-2 px-3 border-b leading-tight hover:bg-gray-50 rounded-md ${highlightMatch ? 'ring-1 ring-yellow-300' : ''
             } ${marginClass}`}>
-            <div className="col-span-5 px-4 flex">
+            <div className="col-span-5 flex items-center">
                 <div
                     className={`hover:scale-110 ${!loading && 'hover:cursor-pointer'} transition-transform duration-300 flex items-center`}
                     onClick={!loading && course ? handleFavoriteClick : undefined}>
@@ -149,13 +153,13 @@ export const CourseRow = memo(({
                         {content.name}
                     </div>
                 ) : (
-                    <Link href={`/course/${course.id}`} className="hover:text-wireframe-primary-blue hover:underline">
+                    <Link href={`/course/${course.id}`} className="hover:text-wireframe-primary-blue hover:underline text-sm text-gray-700">
                         {content.name}
                     </Link>
                 )}
             </div>
-            <div className="col-span-1 px-4">{content.code}</div>
-            <div className="col-span-1 px-4 text-center">{content.credits}</div>
+            <div className="col-span-1 flex items-center text-sm font-mono text-gray-600">{content.code}</div>
+            <div className="col-span-1 flex items-center justify-center">{content.credits}</div>
             <div className="col-span-2 flex justify-center items-center">
                 {content.semesters}
             </div>

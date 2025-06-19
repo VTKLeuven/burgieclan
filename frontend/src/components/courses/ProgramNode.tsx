@@ -46,29 +46,29 @@ const ProgramNode = ({
   const matchingItems = searchQuery ? countMatchesInProgram(program, searchQuery) : 0;
 
   return (
-    <div className="program-node mb-4">
+    <div className="program-node mb-2">
       <div
-        className={`flex items-center p-3 border border-wireframe-primary-blue rounded-md cursor-pointer 
-          hover:bg-blue-50 ${programMatches ? 'ring-2 ring-yellow-300' : ''
+        className={`flex items-center py-2 px-3 border border-gray-200 rounded-md cursor-pointer 
+          hover:bg-blue-50 ${programMatches ? 'ring-1 ring-yellow-300' : ''
           }`}
         onClick={() => setExpanded(!expanded)}
       >
         <div className="transition-transform duration-200" style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
-          <ChevronRight size={20} />
+          <ChevronRight size={16} />
         </div>
-        <span className="ml-2 font-semibold">{program.name}</span>
+        <span className="ml-2 text-base font-medium">{program.name}</span>
 
         {/* Show badge with match count if matches exist */}
         {autoExpand && matchingItems > 0 && (
-          <div className="ml-auto bg-yellow-300 text-wireframe-primary-blue text-xs px-2 py-0.5 rounded-full">
-            {matchingItems} {matchingItems === 1 ? 'match' : 'matches'}
+          <div className="ml-auto bg-yellow-300 text-wireframe-primary-blue text-xs px-2 py-0.5 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center">
+            {matchingItems}
           </div>
         )}
       </div>
 
       <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
         {program.modules && (
-          <div className="pl-6 mt-2 border-l-2 border-gray-200">
+          <div className="pl-4 mt-1 border-l-2 border-gray-200 space-y-1">
             {program.modules.map(module => (
               <ModuleNode
                 key={module.id}

@@ -63,27 +63,27 @@ const ModuleNode = ({
     const totalMatches = matchingCourses + matchingModules;
 
     return (
-        <div className="module-node mb-2">
+        <div className="module-node mb-1">
             <div
-                className={`flex items-center p-2 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200 ${moduleMatches ? 'ring-2 ring-yellow-300' : ''
+                className={`flex items-center py-2 px-3 border border-gray-200 bg-gray-50 rounded-md cursor-pointer hover:bg-gray-100 ${moduleMatches ? 'ring-1 ring-yellow-300' : ''
                     }`}
                 onClick={() => setExpanded(!expanded)}
             >
                 <div className="transition-transform duration-200" style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
-                    <ChevronRight size={18} />
+                    <ChevronRight size={16} />
                 </div>
-                <span className="ml-2 font-medium">{module.name}</span>
+                <span className="ml-2 text-sm font-medium">{module.name}</span>
 
                 {/* Show badge with match count if matches exist */}
                 {searchFilters && searchQuery && totalMatches > 0 && (
-                    <div className="ml-auto bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full">
-                        {totalMatches} {totalMatches === 1 ? 'match' : 'matches'}
+                    <div className="ml-auto bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center">
+                        {totalMatches}
                     </div>
                 )}
             </div>
 
             <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                <div className="pl-6 mt-1">
+                <div className="pl-4 mt-1 space-y-1">
                     {/* Render submodules recursively */}
                     {module.modules?.map(submodule => (
                         <ModuleNode
@@ -97,7 +97,7 @@ const ModuleNode = ({
 
                     {/* Render courses */}
                     {module.courses && module.courses.length > 0 && (
-                        <div className="border rounded-md mt-2">
+                        <div className="border border-gray-200 rounded-md mt-1">
                             <CourseTableHeader />
                             {module.courses.map((course, index) => (
                                 <CourseRow
