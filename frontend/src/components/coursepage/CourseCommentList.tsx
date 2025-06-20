@@ -91,13 +91,13 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
     };
 
     return (
-        <div className="mb-2">
+        <div className="mb-2 relative z-10">
             {/* Category Header - Program-style */}
-            <div className="flex items-center py-2 px-3 border border-gray-200 rounded-md cursor-pointer hover:bg-blue-50">
-                <div 
-                    onClick={() => setExpanded(!expanded)}
-                    className="flex items-center flex-1"
-                >
+            <div 
+                className="flex items-center py-2 px-3 border border-gray-200 rounded-md cursor-pointer hover:bg-blue-50 relative z-20"
+                onClick={() => setExpanded(!expanded)}
+            >
+                <div className="flex items-center flex-1">
                     <div className="transition-transform duration-200" style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
                         <ChevronRight size={16} />
                     </div>
@@ -108,10 +108,13 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
                 {onAddComment && (
                     <button
                         onClick={handleAddButtonClick}
-                        className="ml-3 text-gray-500 hover:text-blue-600 hover:bg-blue-100 rounded transition-colors"
-                        title={t('course-page.comments.add-to-category')}
+                        className="relative group ml-3 text-gray-500 hover:text-amber-600 hover:bg-amber-100 rounded transition-colors p-1"
+                        title={t('course-page.comments.add-new')}
                     >
                         <MessageSquarePlus size={20} />
+                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-30">
+                            {t('course-page.comments.add-new')}
+                        </div>
                     </button>
                 )}
 
@@ -134,57 +137,61 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
 
                     {/* Add comment form */}
                     {showAddForm && (
-                        <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                        <div className="mb-3 p-3 bg-gray-100 border border-gray-400 rounded-md">
                             <form onSubmit={handleAddComment} className="space-y-2">
                                 <textarea
                                     value={formContent}
                                     onChange={(e) => setFormContent(e.target.value)}
                                     placeholder={t('course-page.comments.dialog.description')}
-                                    className="w-full p-2 text-sm border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full p-2 text-sm border border-gray-300 rounded-md resize-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 placeholder-gray-450"
                                     rows={2}
                                     required
                                     disabled={isSubmitting}
                                 />
                                 
-                                <div className="flex items-center justify-between">
-                                    <label className="flex items-center text-xs text-gray-600">
-                                        <input
-                                            type="checkbox"
-                                            checked={formAnonymous}
-                                            onChange={(e) => setFormAnonymous(e.target.checked)}
-                                            className="mr-2"
-                                            disabled={isSubmitting}
-                                        />
-                                        {t('course-page.comments.dialog.anonymous')}
-                                    </label>
+                                <div className="flex items-center justify-end gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={handleCancelAdd}
+                                        className="text-xs px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                                        disabled={isSubmitting}
+                                    >
+                                        {t('course-page.comments.dialog.button.cancel')}
+                                    </button>
                                     
-                                    <div className="flex gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={handleCancelAdd}
-                                            className="text-xs px-3 py-1 text-gray-600 hover:text-gray-800 transition-colors"
-                                            disabled={isSubmitting}
-                                        >
-                                            {t('course-page.comments.dialog.button.cancel')}
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            disabled={isSubmitting || !formContent.trim()}
-                                            className="text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors inline-flex items-center"
-                                        >
-                                            {isSubmitting ? (
-                                                <>
-                                                    <span className="spinner mr-1" />
-                                                    {t('course-page.comments.dialog.button.submitting')}
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Send className="mr-1 w-3 h-3" />
-                                                    {t('course-page.comments.dialog.button.submit')}
-                                                </>
-                                            )}
-                                        </button>
+                                    {/* Anonymous checkbox - custom implementation to match desired styling */}
+                                    <div className="flex items-center justify-end">
+                                        <label className="flex items-center text-xs text-gray-600 cursor-pointer hover:text-gray-800 transition-colors">
+                                            <input
+                                                type="checkbox"
+                                                checked={formAnonymous}
+                                                onChange={(e) => setFormAnonymous(e.target.checked)}
+                                                className="mr-2 cursor-pointer h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
+                                                disabled={isSubmitting}
+                                            />
+                                            <span className="cursor-pointer">
+                                                {t('course-page.comments.dialog.anonymous')}
+                                            </span>
+                                        </label>
                                     </div>
+                                    
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmitting || !formContent.trim()}
+                                        className="text-xs px-3 py-1 bg-amber-600 text-white rounded hover:bg-amber-700 disabled:opacity-50 transition-colors inline-flex items-center"
+                                    >
+                                        {isSubmitting ? (
+                                            <>
+                                                <span className="spinner mr-1" />
+                                                {t('course-page.comments.dialog.button.submitting')}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Send className="mr-1 w-3 h-3" />
+                                                {t('course-page.comments.dialog.button.submit')}
+                                            </>
+                                        )}
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -200,14 +207,14 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
                                 <div key={comment.id} className={`py-2 px-3 leading-tight flex overflow-visible relative ${index !== sortedComments.length - 1 ? 'border-b border-gray-200' : ''}`}>
                                     {/* Profile Picture - Left side */}
                                     <div className="flex items-start mr-2 overflow-visible">
-                                        <div className="relative group overflow-visible z-10">
+                                        <div className="relative group overflow-visible">
                                             {comment.anonymous ? (
                                                 <UserX className="h-4 w-4 text-gray-500 rounded-full mt-0.5" />
                                             ) : (
                                                 <CircleUserRound className="h-4 w-4 text-gray-500 rounded-full mt-0.5" />
                                             )}
                                             
-                                            <div className="absolute top-full left-0 mt-1 bg-white rounded border border-gray-200 px-1.5 py-0.5 z-20 whitespace-nowrap text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+                                            <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-30">
                                                 {comment.anonymous 
                                                     ? t('course-page.comments.anonymous') 
                                                     : comment.creator?.fullName
@@ -226,20 +233,26 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
                                         {/* Dates */}
                                         <div className="flex flex-col items-end space-y-1">
                                             {/* Created date */}
-                                            <div className="flex items-center">
+                                            <div className="relative group flex items-center">
                                                 <Calendar className="h-3 w-3 mr-1" />
-                                                <span title={formatFullDateTime(comment.createdAt)}>
+                                                <span>
                                                     {formatDate(comment.createdAt)}
                                                 </span>
+                                                <div className="absolute top-full right-0 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-20">
+                                                    {formatFullDateTime(comment.createdAt)}
+                                                </div>
                                             </div>
                                             
                                             {/* Updated date - only show if different from create date */}
                                             {comment.updatedAt && comment.createdAt && comment.updatedAt.getTime() !== comment.createdAt.getTime() && (
-                                                <div className="flex items-center">
+                                                <div className="relative group flex items-center">
                                                     <RefreshCw className="h-3 w-3 mr-1" />
-                                                    <span title={formatFullDateTime(comment.updatedAt)}>
+                                                    <span>
                                                         {formatDate(comment.updatedAt)}
                                                     </span>
+                                                    <div className="absolute top-full right-0 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-20">
+                                                        {formatFullDateTime(comment.updatedAt)}
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>

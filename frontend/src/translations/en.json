@@ -145,7 +145,7 @@
                 "category": "Category",
                 "content": "Your comment",
                 "content-placeholder": "Share your experience with this course...",
-                "anonymous": "Post anonymously",
+                "anonymous": "Anonymous",
                 "button": {
                     "submit": "Post comment",
                     "submitting": "Posting...",
