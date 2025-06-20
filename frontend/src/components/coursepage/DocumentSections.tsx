@@ -7,7 +7,7 @@ import type { DocumentCategory } from "@/types/entities";
 import { useTranslation } from "react-i18next";
 import { useApi } from "@/hooks/useApi";
 import useDownloadContent from "@/hooks/useDownloadContent";
-import { Download } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 
 export default function DocumentSections({ courseId }: { courseId: number }) {
     const [documentCategories, setDocumentCategories] = useState<DocumentCategory[]>([]);
@@ -48,14 +48,24 @@ export default function DocumentSections({ courseId }: { courseId: number }) {
             <div className="flex items-center gap-2">
                 <h2 className="mr-2">{t('course-page.files')}</h2>
                 <div className="ml-auto">
-                    <button
-                        onClick={handleDownload}
-                        className="primary-button inline-flex items-center"
-                        disabled={isDownloading}
-                    >
-                        <Download className="sm:mr-2 w-5 h-5" />
-                        <span className="hidden sm:inline">{isDownloading ? t('course-page.documents.downloading') : t('course-page.documents.download-all')}</span>
-                    </button>
+                    <div className="relative group">
+                        <button
+                            onClick={handleDownload}
+                            className="primary-button inline-flex items-center justify-center w-10 h-10 p-0"
+                            disabled={isDownloading}
+                        >
+                            {isDownloading ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                                <Download className="w-5 h-5" />
+                            )}
+                        </button>
+                        
+                        {/* Tooltip */}
+                        <div className="absolute top-full right-0 mt-2 bg-gray-900 text-white text-sm px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
+                            {isDownloading ? t('course-page.documents.downloading') : t('course-page.documents.download-all')}
+                        </div>
+                    </div>
                 </div>
             </div>
             <div className="flex flex-wrap gap-6 md:mt-5">

@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { CommentCategory, CourseComment } from '@/types/entities';
-import FoldableSection from '@/components/common/FoldableSection';
-import { User, Calendar, RefreshCw, UserX, Info } from 'lucide-react';
+import { Calendar, RefreshCw, UserX, Info, ChevronRight, CircleUserRound, MessageSquarePlus, Send } from 'lucide-react';
 
 type CourseCommentListProps = {
     category: CommentCategory;
     comments: CourseComment[];
     t: (key: string) => string;
+    onAddComment?: (categoryId: number, data: { content: string; anonymous: boolean }) => Promise<void>;
 };
 
 // Format date as dd/mm/yyyy
@@ -33,7 +33,13 @@ const formatFullDateTime = (date?: Date): string => {
     }).format(date);
 };
 
-const CourseCommentList = ({ category, comments, t }: CourseCommentListProps) => {
+const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommentListProps) => {
+    const [expanded, setExpanded] = useState(false);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [formContent, setFormContent] = useState('');
+    const [formAnonymous, setFormAnonymous] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     // Sort comments by most recent update/creation date
     const sortedComments = useMemo(() => {
         return [...comments].sort((a, b) => {
@@ -51,68 +57,199 @@ const CourseCommentList = ({ category, comments, t }: CourseCommentListProps) =>
         });
     }, [comments]);
 
-    return (
-        <div className="rounded-lg border-2 border-vtk-yellow-400 mb-4">
-            <FoldableSection title={category.name ?? ""} defaultOpen={false} headerClassName='text-lg'>
-                {/* Category description */}
-                {category.description && (
-                    <div className="px-4 py-2 bg-gray-50 rounded-md mb-3 flex items-start">
-                        <Info className="h-4 w-4 mr-2 text-gray-500 mt-0.5 flex-shrink-0" />
-                        <p className="text-sm text-gray-600 italic">{category.description}</p>
-                    </div>
-                )}
-                
-                {comments.length === 0 ? (
-                    <div className="ml-4 border-b pb-3">
-                        <p className="text-wireframe-mid-gray italic pb-3">{t('course-page.comments.no-comments')}</p>
-                    </div>
-                ) : (
-                    <ul className="divide-y divide-gray-200 list-none">
-                        {sortedComments.map((comment) => (
-                            <li key={comment.id} className="py-2 px-4 flex flex-col md:flex-row">
-                                {/* Comment content - Left side */}
-                                <div className="flex-grow md:pr-4 mb-3 md:mb-0">
-                                    <p className="text-gray-800 whitespace-pre-line">{comment.content}</p>
-                                </div>
+    const handleAddComment = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!formContent.trim() || !onAddComment) return;
 
-                                {/* Comment metadata - Right side */}
-                                <div className="flex flex-col text-xs text-wireframe-mid-gray md:text-right md:min-w-[200px]">
-                                    {/* Author */}
-                                    <div className="flex items-center md:justify-end mb-1">
-                                        {comment.anonymous ? <UserX className="h-3.5 w-3.5 mr-1" /> : <User className="h-3.5 w-3.5 mr-1" />}
-                                        <span>{comment.anonymous ? t('course-page.comments.anonymous') : `${comment.creator?.fullName}`}</span>
+        setIsSubmitting(true);
+        try {
+            await onAddComment(category.id, {
+                content: formContent,
+                anonymous: formAnonymous
+            });
+            // Reset form on success
+            setFormContent('');
+            setFormAnonymous(false);
+            setShowAddForm(false);
+        } catch (error) {
+            // Error handling is done in the parent component
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleCancelAdd = () => {
+        setShowAddForm(false);
+        setFormContent('');
+        setFormAnonymous(false);
+    };
+
+    const handleAddButtonClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setShowAddForm(true);
+        setExpanded(true);
+    };
+
+    return (
+        <div className="mb-2">
+            {/* Category Header - Program-style */}
+            <div className="flex items-center py-2 px-3 border border-gray-200 rounded-md cursor-pointer hover:bg-blue-50">
+                <div 
+                    onClick={() => setExpanded(!expanded)}
+                    className="flex items-center flex-1"
+                >
+                    <div className="transition-transform duration-200" style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+                        <ChevronRight size={16} />
+                    </div>
+                    <span className="ml-2 text-base font-medium">{category.name}</span>
+                </div>
+
+                {/* Add comment button */}
+                {onAddComment && (
+                    <button
+                        onClick={handleAddButtonClick}
+                        className="ml-3 text-gray-500 hover:text-blue-600 hover:bg-blue-100 rounded transition-colors"
+                        title={t('course-page.comments.add-to-category')}
+                    >
+                        <MessageSquarePlus size={20} />
+                    </button>
+                )}
+
+                {/* Comment count badge */}
+                <div className="ml-3 bg-blue-100 text-blue-800 px-2 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center text-xs">
+                    {comments.length}
+                </div>
+            </div>
+
+            {/* Collapsible Content */}
+            <div className={`overflow-visible transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                <div className="pl-4 mt-1 space-y-1">
+                    {/* Category description */}
+                    {category.description && (
+                        <div className="py-2 px-3 bg-gray-50 border border-gray-200 rounded-md flex items-start">
+                            <Info className="h-4 w-4 mr-2 text-gray-500 mt-0.5 flex-shrink-0" />
+                            <p className="text-sm text-gray-600">{category.description}</p>
+                        </div>
+                    )}
+
+                    {/* Add comment form */}
+                    {showAddForm && (
+                        <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                            <form onSubmit={handleAddComment} className="space-y-2">
+                                <textarea
+                                    value={formContent}
+                                    onChange={(e) => setFormContent(e.target.value)}
+                                    placeholder={t('course-page.comments.dialog.description')}
+                                    className="w-full p-2 text-sm border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    rows={2}
+                                    required
+                                    disabled={isSubmitting}
+                                />
+                                
+                                <div className="flex items-center justify-between">
+                                    <label className="flex items-center text-xs text-gray-600">
+                                        <input
+                                            type="checkbox"
+                                            checked={formAnonymous}
+                                            onChange={(e) => setFormAnonymous(e.target.checked)}
+                                            className="mr-2"
+                                            disabled={isSubmitting}
+                                        />
+                                        {t('course-page.comments.dialog.anonymous')}
+                                    </label>
+                                    
+                                    <div className="flex gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={handleCancelAdd}
+                                            className="text-xs px-3 py-1 text-gray-600 hover:text-gray-800 transition-colors"
+                                            disabled={isSubmitting}
+                                        >
+                                            {t('course-page.comments.dialog.button.cancel')}
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={isSubmitting || !formContent.trim()}
+                                            className="text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors inline-flex items-center"
+                                        >
+                                            {isSubmitting ? (
+                                                <>
+                                                    <span className="spinner mr-1" />
+                                                    {t('course-page.comments.dialog.button.submitting')}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Send className="mr-1 w-3 h-3" />
+                                                    {t('course-page.comments.dialog.button.submit')}
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    )}
+                    
+                    {comments.length === 0 ? (
+                        <div className="py-2 px-3 border border-gray-200 rounded-md">
+                            <p className="text-sm text-gray-500 italic">{t('course-page.comments.no-comments')}</p>
+                        </div>
+                    ) : (
+                        <div className="border border-gray-200 rounded-md overflow-visible relative">
+                            {sortedComments.map((comment, index) => (
+                                <div key={comment.id} className={`py-2 px-3 leading-tight flex overflow-visible relative ${index !== sortedComments.length - 1 ? 'border-b border-gray-200' : ''}`}>
+                                    {/* Profile Picture - Left side */}
+                                    <div className="flex items-start mr-2 overflow-visible">
+                                        <div className="relative group overflow-visible z-10">
+                                            {comment.anonymous ? (
+                                                <UserX className="h-4 w-4 text-gray-500 rounded-full mt-0.5" />
+                                            ) : (
+                                                <CircleUserRound className="h-4 w-4 text-gray-500 rounded-full mt-0.5" />
+                                            )}
+                                            
+                                            <div className="absolute top-full left-0 mt-1 bg-white rounded border border-gray-200 px-1.5 py-0.5 z-20 whitespace-nowrap text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+                                                {comment.anonymous 
+                                                    ? t('course-page.comments.anonymous') 
+                                                    : comment.creator?.fullName
+                                                }
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    {/* Dates */}
-                                    <div className="flex items-center md:justify-end space-x-3">
-                                        {/* Created date */}
-                                        <div className="flex items-center">
-                                            <Calendar className="h-3.5 w-3.5 mr-1" />
-                                            <span
-                                                title={formatFullDateTime(comment.createdAt)}
-                                            >
-                                                {formatDate(comment.createdAt)}
-                                            </span>
-                                        </div>
+                                    {/* Comment content - Center */}
+                                    <div className="flex-grow mr-3">
+                                        <p className="text-sm text-gray-700 whitespace-pre-line">{comment.content}</p>
+                                    </div>
 
-                                        {/* Updated date - only show if different from create date */}
-                                        {comment.updatedAt && comment.createdAt && comment.updatedAt.getTime() !== comment.createdAt.getTime() && (
+                                    {/* Metadata - Right side */}
+                                    <div className="flex flex-col text-xs text-gray-500 text-right min-w-[120px] space-y-1 mt-0.5">
+                                        {/* Dates */}
+                                        <div className="flex flex-col items-end space-y-1">
+                                            {/* Created date */}
                                             <div className="flex items-center">
-                                                <RefreshCw className="h-3.5 w-3.5 mr-1" />
-                                                <span
-                                                    title={formatFullDateTime(comment.updatedAt)}
-                                                >
-                                                    {formatDate(comment.updatedAt)}
+                                                <Calendar className="h-3 w-3 mr-1" />
+                                                <span title={formatFullDateTime(comment.createdAt)}>
+                                                    {formatDate(comment.createdAt)}
                                                 </span>
                                             </div>
-                                        )}
+                                            
+                                            {/* Updated date - only show if different from create date */}
+                                            {comment.updatedAt && comment.createdAt && comment.updatedAt.getTime() !== comment.createdAt.getTime() && (
+                                                <div className="flex items-center">
+                                                    <RefreshCw className="h-3 w-3 mr-1" />
+                                                    <span title={formatFullDateTime(comment.updatedAt)}>
+                                                        {formatDate(comment.updatedAt)}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </FoldableSection>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };
