@@ -32,19 +32,21 @@ class ModuleApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups(['search', 'user'])]
+    #[Groups(['program:get', 'search', 'user'])]
     public ?string $name = null;
 
     /**
      * @var CourseApi[]
      */
+    #[Groups(['program:get'])]
     public array $courses = [];
 
     /**
      * @var ModuleApi[]
      */
+    #[Groups(['program:get'])]
     public array $modules = [];
 
-    #[Groups('search')]
+    #[Groups(['program:get', 'search'])]
     public ProgramApi $program;
 }
