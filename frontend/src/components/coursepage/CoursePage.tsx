@@ -6,7 +6,7 @@ import { useApi } from "@/hooks/useApi";
 import Loading from '@/app/[locale]/loading'
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import { useUser } from '@/components/UserContext';
-import { Folder, ChartPie, Link as LinkIcon } from "lucide-react";
+import { ChartPie, Link as LinkIcon } from "lucide-react";
 import { convertToCourse } from "@/utils/convertToEntity";
 import Link from "next/link";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
@@ -55,68 +55,73 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
     return (course &&
         <>
             <div className="w-full h-full">
-                <div className="bg-wireframe-lightest-gray relative p-10 pt-5 md:pt-10">
+                <div className="bg-gray-100 border-b border-gray-200 px-6 py-4">
                     {/* Breadcrumb */}
-                    <div className="flex flex-col md:flex-row space-x-2">
+                    <div className="flex items-center space-x-2 mb-2">
                         {breadcrumb.breadcrumb.map((item, index) => (
-                            <div key={item} className="inline-block">
-                                <span className="hover:underline hover:cursor-pointer text-wireframe-mid-gray">{item}</span>
+                            <div key={item} className="flex items-center">
+                                <span className="text-sm text-gray-500 hover:text-gray-700 hover:underline cursor-pointer">
+                                    {item}
+                                </span>
                                 {index + 1 < breadcrumb.breadcrumb.length && (
-                                    <span className="text-wireframe-mid-gray"> / </span>
+                                    <span className="text-gray-400 mx-2">/</span>
                                 )}
                             </div>
                         ))}
                     </div>
 
-                    <div className="flex items-center space-x-2 mt-3">
-                        <div className="hover:scale-110 transition-transform duration-300 flex items-center">
-                            <FavoriteButton
-                                itemId={courseId}
-                                itemType="course"
-                                className="mr-2"
-                                size={24}
-                                onToggle={() => {
-                                    // Refresh user data to keep everything in sync
-                                    refreshUser();
-                                }}
-                            />
-                        </div>
-                        <h1 className="md:text-5xl text-4xl mb-4 text-wireframe-primary-blue">{course.name}</h1>
-                    </div>
-                    <div className="flex flex-col md:flex-row">
+                    {/* Main Content Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Left Column - Course Info */}
+                        <div className="lg:col-span-2">
+                            {/* Course Title & Code */}
+                            <div className="flex items-center gap-3 mb-2">
+                                <FavoriteButton
+                                    itemId={courseId}
+                                    itemType="course"
+                                    size={24}
+                                    onToggle={() => {
+                                        refreshUser();
+                                    }}
+                                />
+                                <h1 className="text-3xl font-semibold text-gray-900">{course.name}</h1>
+                                <span className="text-xl font-mono text-gray-600 pl-3 mt-2">
+                                    {course.code}
+                                </span>
+                            </div>
 
-                        <div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:mt-4 mb-4">
-                                <div className="flex items-center space-x-1 gap-2">
-                                    <Folder className="w-[24px] h-[24px]" />
-                                    <p className="text-lg">{course.code}</p>
+                            {/* Course Metadata */}
+                            <div className="flex items-center gap-6 text-sm text-gray-600">
+                                <div className="flex items-center gap-2">
+                                    <ChartPie size={16} className="text-gray-400" />
+                                    <span>{course.credits} {t('credits')}</span>
                                 </div>
-                                <div className="flex items-center space-x-1 gap-2">
-                                    <ChartPie className="w-[24px] h-[24px]" />
-                                    <p className="text-lg">{course.credits} {t('credits')}</p>
-                                </div>
-                                <div className="flex items-center space-x-1 gap-2">
-                                    <SemesterIndicator semesters={course.semesters} />
-                                    <p className="text-lg">
+                                
+                                <div className="flex items-center gap-2">
+                                    <SemesterIndicator semesters={course.semesters} size={16} />
+                                    <span>
                                         {Array.isArray(course.semesters)
                                             ? (course.semesters.includes("Semester 1") && course.semesters.includes("Semester 2"))
                                                 ? t('Year course')
                                                 : course.semesters.join(", ")
                                             : course.semesters}
-                                    </p>
+                                    </span>
                                 </div>
-                                <div className="flex items-center space-x-1 gap-2">
-                                    <Link href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`} className="text-lg flex items-center gap-2 hover:underline hover:cursor-pointer">
-                                        <LinkIcon className="w-[24px] h-[24px]" />
-                                        ECTS
-                                    </Link>
-                                </div>
-                            </div>
 
+                                <Link 
+                                    href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`} 
+                                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline"
+                                >
+                                    <LinkIcon size={16} />
+                                    <span>ECTS</span>
+                                </Link>
+                            </div>
                         </div>
-                        <div className="mb-2 md:mb-0 md:ml-auto">
-                            <h4> {t('course-page.teachers')} </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        {/* Right Column - Professors */}
+                        <div className="lg:col-span-1">
+                            <h3 className="text-lg font-medium text-gray-900 mt-4 mb-1">{t('course-page.teachers')}</h3>
+                            <div className="flex -space-x-3">
                                 {course?.professors?.map((p, index) => (
                                     <ProfessorDiv key={index} unumber={p} index={index} t={t} />
                                 ))}
@@ -125,11 +130,13 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                     </div>
                 </div>
 
-                <div className="md:p-5 p-7">
+                {/* Documents Section */}
+                <div className="px-6 py-8">
                     <DocumentSections courseId={courseId} />
                 </div>
 
-                <div className="md:p-5 p-7">
+                {/* Comments Section */}
+                <div className="px-6 py-8 border-t border-gray-100">
                     <CommentCategories
                         comments={course.courseComments ?? []}
                         courseId={courseId}
