@@ -22,7 +22,7 @@ export default function Header() {
     const isAuthenticated = user !== null;
 
     const navigation = [
-        { name: t('courses'), href: '#' },
+        { name: t('courses'), href: '/courses' },
         { name: t('FAQ'), href: '#' },
         { name: t('overview'), href: '#' },
     ];
@@ -30,7 +30,7 @@ export default function Header() {
     return (
         <header className="bg-white">
             <nav aria-label="Global"
-                 className="mx-auto flex max-w-7xl items-center justify-between border-b border-gray-900/10 p-6 lg:px-8">
+                 className="mx-auto flex items-center justify-between border-b border-gray-900/10 p-6 lg:px-8">
 
                 {/* Logo and search */}
                 <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
