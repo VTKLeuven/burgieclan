@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\CommentCategory;
 use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
@@ -16,6 +17,13 @@ class CommentCategoryCrudController extends AbstractCrudController
     public static function getEntityFqcn(): string
     {
         return CommentCategory::class;
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setEntityLabelInSingular('Comment Category')
+            ->setEntityLabelInPlural('Comment Categories');
     }
 
     public function configureFields(string $pageName): iterable
