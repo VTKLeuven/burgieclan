@@ -1,4 +1,4 @@
-import Fuse from 'fuse.js';
+import Fuse, {IFuseOptions, type FuseResult} from 'fuse.js';
 import type { Course, Module, Program } from '@/types/entities';
 
 // Configuration for similarity budget
@@ -26,11 +26,11 @@ class FuseBudgetSearch<T> {
 
   constructor(
     items: T[],
-    options: Fuse.IFuseOptions<T>,
+    options: IFuseOptions<T>,
     budgetConfig: Partial<SimilarityBudgetConfig> = {}
   ) {
     // Ensure we get scores for budget calculation
-    const fuseOptions: Fuse.IFuseOptions<T> = {
+    const fuseOptions: IFuseOptions<T> = {
       ...options,
       includeScore: true,
       // Set a high threshold to get all potential matches
@@ -44,10 +44,10 @@ class FuseBudgetSearch<T> {
   /**
    * Search with similarity budget logic
    */
-  search(query: string): Fuse.FuseResult<T>[] {
+  search(query: string): FuseResult<T>[] {
     // Get all results with scores
     const allResults = this.fuse.search(query);
-    
+
     if (allResults.length === 0) {
       return [];
     }
@@ -59,12 +59,12 @@ class FuseBudgetSearch<T> {
   /**
    * Core similarity budget logic
    */
-  private applySimilarityBudget(results: Fuse.FuseResult<T>[]): Fuse.FuseResult<T>[] {
+  private applySimilarityBudget(results: FuseResult<T>[]): FuseResult<T>[] {
     const { totalBudget, minResults, maxResults, fallbackThreshold } = this.config;
 
     // Results are already sorted by score (best first)
     let cumulativeScore = 0;
-    const budgetResults: Fuse.FuseResult<T>[] = [];
+    const budgetResults: FuseResult<T>[] = [];
 
     for (let i = 0; i < results.length; i++) {
       const result = results[i];
@@ -104,7 +104,7 @@ class FuseBudgetSearch<T> {
    * Get diagnostic information about the search
    */
   searchWithDiagnostics(query: string): {
-    results: Fuse.FuseResult<T>[];
+    results: FuseResult<T>[];
     diagnostics: {
       totalCandidates: number;
       budgetUsed: number;
@@ -114,7 +114,7 @@ class FuseBudgetSearch<T> {
   } {
     const allResults = this.fuse.search(query);
     const results = this.applySimilarityBudget(allResults);
-    
+
     const budgetUsed = results.reduce((sum, result) => sum + (result.score ?? 0), 0);
     const averageScore = results.length > 0 ? budgetUsed / results.length : 0;
 
@@ -234,7 +234,7 @@ export function programMatchesTextWithBudget(
  */
 export function findOptimalBudget<T>(
   items: T[],
-  options: Fuse.IFuseOptions<T>,
+  options: IFuseOptions<T>,
   testQueries: string[],
   targetResultCount: number = 5
 ): number {
