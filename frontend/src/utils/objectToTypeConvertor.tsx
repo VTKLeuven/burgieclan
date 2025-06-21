@@ -36,8 +36,8 @@ export function objectToProgram(obj: Record<string, any>): Program {
 export function objectToDocument(obj: Record<string, any>): Document {
     return {
         id: convertIriToId(obj['@id']),
-        createDate: new Date(obj['createdAt'].replace(' ', 'T')),
-        updateDate: new Date(obj['updatedAt'].replace(' ', 'T')),
+        createdAt: new Date(obj['createdAt'].replace(' ', 'T')),
+        updatedAt: new Date(obj['updatedAt'].replace(' ', 'T')),
         name: obj['name'],
         course: objectToCourse(obj['course']),
         category: obj['category'],

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog';
 import { Text } from '@/components/ui/Text';
 import { Send } from 'lucide-react';

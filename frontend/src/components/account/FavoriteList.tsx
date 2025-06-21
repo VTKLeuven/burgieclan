@@ -1,24 +1,29 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
-import { Star } from 'lucide-react';
+import FavoriteButton from '@/components/ui/FavoriteButton';
+
+interface FavoriteItem {
+    id: number;
+    name?: string;
+    code?: string;
+    redirectUrl: string;
+    type: 'document' | 'course' | 'module' | 'program';
+}
 
 interface FavoriteListProps {
     title: string;
-    items: { name?: string, code?: string, redirectUrl: string }[];
-    updateFavorite: (index: number, isFavorite: boolean) => void;
+    items: FavoriteItem[];
     emptyMessage: string;
+    onRemoveItem?: (index: number) => void;
 }
 
-const FavoriteList: React.FC<FavoriteListProps> = ({ title, items, emptyMessage, updateFavorite }) => {
-    const [favorites, setFavorites] = useState(items.map(item => true)); // Assuming all items are initially favorites
-    const toggleFavoriteStatus = (index: number) => {
-        const newFavorites = [...favorites];
-        newFavorites[index] = !newFavorites[index];
-        setFavorites(newFavorites);
-        updateFavorite(index, newFavorites[index]);
-    };
-
+const FavoriteList: React.FC<FavoriteListProps> = ({
+    title,
+    items,
+    emptyMessage,
+    onRemoveItem
+}) => {
     return (
         <CollapsibleSection
             header={
@@ -35,9 +40,17 @@ const FavoriteList: React.FC<FavoriteListProps> = ({ title, items, emptyMessage,
                                 <Link href={item.redirectUrl} className="hover:underline flex-1">
                                     {item.name} {item.code && <span className="text-sm text-gray-500">[{item.code}]</span>}
                                 </Link>
-                                <button onClick={() => toggleFavoriteStatus(index)} className="ml-2 text-red-500">
-                                    <Star className='text-vtk-yellow-500' fill={favorites[index] ? "currentColor" : "none"} />
-                                </button>
+                                <FavoriteButton
+                                    itemId={item.id}
+                                    itemType={item.type}
+                                    className="ml-2"
+                                    size={20}
+                                    onToggle={(isFavorite) => {
+                                        if (!isFavorite && onRemoveItem) {
+                                            onRemoveItem(index);
+                                        }
+                                    }}
+                                />
                             </li>
                         ))}
                     </ul>
