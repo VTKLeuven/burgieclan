@@ -178,6 +178,26 @@
         "add-favorite": "Add to favorites",
         "remove-favorite": "Remove from favorites"
     },
+    "curriculum-navigator": {
+        "search-placeholder": "Search for courses, modules, programs...",
+        "no-search-results": "No results found for your search.",
+        "no-programs": "No programs found matching your search.",
+        "no-courses": "No courses found matching your search.",
+        "program": "Program",
+        "programs": "Programs",
+        "module": "Module",
+        "modules": "Modules",
+        "course": "Course",
+        "courses": "Courses",
+        "clear-search": "Clear",
+        "advanced-filters": "Advanced filters",
+        "search-submit": "Search",
+        "semester": "Semester",
+        "any-semester": "Any semester",
+        "credits": "ECTS",
+        "show-only-favorites": "Show only favorites",
+        "matches-found": "Matches found"
+    },
     "account": {
         "account": "Account",
         "greeting": "Hi, {{name}}!",

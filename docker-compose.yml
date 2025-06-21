@@ -48,7 +48,7 @@ services:
       - "3000:3000"
     environment:
       - NEXT_PUBLIC_BACKEND_URL=http://burgieclan-backend:8000
-      - NEXT_PUBLIC_FRONTEND_URL=http://burgieclan-frontend:3000
+      - NEXT_PUBLIC_FRONTEND_URL=http://localhost:3000
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
     depends_on:
