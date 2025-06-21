@@ -72,7 +72,7 @@ export const CourseRow = memo(({
         const isCurrentlyFavorite = user.favoriteCourses?.some(favCourse => favCourse.id === initialCourse.id);
         const newFavoriteState = !isCurrentlyFavorite;
         setIsFavorite(newFavoriteState);
-        await updateFavorite(initialCourse.id, "course", newFavoriteState);
+        await updateFavorite(initialCourse.id, "courses", newFavoriteState);
     }, [user, initialCourse.id, updateFavorite]);
 
     const fetchProfessorNames = useCallback(async () => {
