@@ -1,60 +1,62 @@
-import { useApi } from "@/hooks/useApi";
+import { ApiClient } from "@/actions/api";
 import { ApiError } from "@/utils/error/apiError";
 import { User } from "@/types/entities";
-import { useState } from "react";
 
-type FavoriteType = "course" | "module" | "program" | "document";
+type FavoriteType = "courses" | "modules" | "programs" | "documents";
 
 export function useFavorites(user: User | null) {
-    const { request, loading } = useApi();
-    const [error, setError] = useState<Error | null>(null);
-
     const updateFavorite = async (id: number, type: FavoriteType, isFavorite: boolean) => {
-        if (!user) return null;
-
-        setError(null);
+        if (!user) return;
 
         try {
             let body;
             switch (type) {
-                case "course":
+                case "courses":
                     body = { favoriteCourses: [`/api/courses/${id}`] };
                     break;
-                case "module":
+                case "modules":
                     body = { favoriteModules: [`/api/modules/${id}`] };
                     break;
-                case "program":
+                case "programs":
                     body = { favoritePrograms: [`/api/programs/${id}`] };
                     break;
-                case "document":
+                case "documents":
                     body = { favoriteDocuments: [`/api/documents/${id}`] };
                     break;
             }
-
-            const result = await request(
-                'PATCH',
-                `/api/users/${user.id}/favorites/${isFavorite ? 'add' : 'remove'}`,
-                body
-            );
-
-            if (!result) {
-                throw new ApiError('Failed to update favorites', 500);
-            }
-
-            if (result.error) {
-                throw new ApiError(result.error.message, result.error.status || 500);
-            }
-
-            return result;
+            return await ApiClient('PATCH', `/api/users/${user.id}/favorites/${isFavorite ? 'add' : 'remove'}`, body);
+            // The list of favorites shown on the screen is not updated here. This makes is possible to add the removed item again.
+            // When the user refreshes the screen, the list is updated and the items that are not favorite anymore are removed.
         } catch (err: any) {
-            setError(err);
             throw new ApiError(err.message, 500);
         }
     };
 
+    const updateFavoriteCourse = async (index: number, isFavorite: boolean) => {
+        if (!user?.favoriteCourses) return;
+        return updateFavorite(user.favoriteCourses[index].id, "courses", isFavorite);
+    };
+
+    const updateFavoriteModule = async (index: number, isFavorite: boolean) => {
+        if (!user?.favoriteModules) return;
+        return updateFavorite(user.favoriteModules[index].id, "modules", isFavorite);
+    };
+
+    const updateFavoriteProgram = async (index: number, isFavorite: boolean) => {
+        if (!user?.favoritePrograms) return;
+        return updateFavorite(user.favoritePrograms[index].id, "programs", isFavorite);
+    };
+
+    const updateFavoriteDocument = async (index: number, isFavorite: boolean) => {
+        if (!user?.favoriteDocuments) return;
+        return updateFavorite(user.favoriteDocuments[index].id, "documents", isFavorite);
+    };
+
     return {
         updateFavorite,
-        loading,
-        error
+        updateFavoriteCourse,
+        updateFavoriteModule,
+        updateFavoriteProgram,
+        updateFavoriteDocument
     };
 }
