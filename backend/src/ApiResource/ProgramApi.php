@@ -2,6 +2,7 @@
 
 namespace App\ApiResource;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
@@ -19,12 +20,13 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'Program',
     operations: [
         new Get(),
-        new GetCollection(),
+        new GetCollection(normalizationContext: ['groups' => ['program:get']]),
     ],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: Program::class),
 )]
+#[ApiFilter(OrderFilter::class)]
 class ProgramApi
 {
     #[ApiProperty(readable: false, writable: false, identifier: true)]
@@ -32,11 +34,12 @@ class ProgramApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups(['search', 'user'])]
+    #[Groups(['program:get', 'search', 'user'])]
     public ?string $name = null;
 
     /**
      * @var ModuleApi[]
      */
+    #[Groups(['program:get'])]
     public array $modules = [];
 }

@@ -178,6 +178,27 @@
         "add-favorite": "Voeg toe aan favorieten",
         "remove-favorite": "Verwijder uit favorieten"
     },
+    "curriculum-navigator": {
+        "search-placeholder": "Zoeken naar vakken, modules, richtingen...",
+        "no-search-results": "Geen zoekresultaten gevonden",
+        "no-programs": "Geen richtingen gevonden die overeenkomen met je zoekopdracht.",
+        "no-modules": "Geen modules gevonden die overeenkomen met je zoekopdracht.",
+        "no-courses": "Geen vakken gevonden die overeenkomen met je zoekopdracht.",
+        "program": "Richting",
+        "programs": "Richtingen",
+        "module": "Module",
+        "modules": "Modules",
+        "course": "Vak",
+        "courses": "Vakken",
+        "clear-search": "Wis",
+        "advanced-filters": "Geavanceerde filters",
+        "search-submit": "Zoeken",
+        "semester": "Semester",
+        "any-semester": "Elk semester",
+        "credits": "Studiepunten",
+        "show-only-favorites": "Toon alleen favorieten",
+        "matches-found": "Gevonden overeenkomsten"
+    },
     "account": {
         "account": "Account",
         "greeting": "Hey, {{name}}!",

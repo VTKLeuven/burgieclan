@@ -19,7 +19,7 @@ class DocumentEntityToApiMapper implements MapperInterface
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
-        private readonly StorageInterface $storage,
+        private readonly StorageInterface     $storage,
     ) {
     }
 
