@@ -93,7 +93,7 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
     return (
         <div className="mb-2 relative z-10">
             {/* Category Header - Program-style */}
-            <div 
+            <div
                 className="flex items-center py-2 px-3 border border-gray-200 rounded-md cursor-pointer hover:bg-blue-50 relative z-20"
                 onClick={() => setExpanded(!expanded)}
             >
@@ -148,7 +148,7 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
                                     required
                                     disabled={isSubmitting}
                                 />
-                                
+
                                 <div className="flex items-center justify-end gap-3">
                                     <button
                                         type="button"
@@ -158,7 +158,7 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
                                     >
                                         {t('course-page.comments.dialog.button.cancel')}
                                     </button>
-                                    
+
                                     {/* Anonymous checkbox - custom implementation to match desired styling */}
                                     <div className="flex items-center justify-end">
                                         <label className="flex items-center text-xs text-gray-600 cursor-pointer hover:text-gray-800 transition-colors">
@@ -174,7 +174,7 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
                                             </span>
                                         </label>
                                     </div>
-                                    
+
                                     <button
                                         type="submit"
                                         disabled={isSubmitting || !formContent.trim()}
@@ -196,7 +196,7 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
                             </form>
                         </div>
                     )}
-                    
+
                     {comments.length === 0 ? (
                         <div className="py-2 px-3 border border-gray-200 rounded-md">
                             <p className="text-sm text-gray-500 italic">{t('course-page.comments.no-comments')}</p>
@@ -213,10 +213,10 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
                                             ) : (
                                                 <CircleUserRound className="h-4 w-4 text-gray-500 rounded-full mt-0.5" />
                                             )}
-                                            
+
                                             <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-30">
-                                                {comment.anonymous 
-                                                    ? t('course-page.comments.anonymous') 
+                                                {comment.anonymous
+                                                    ? t('course-page.comments.anonymous')
                                                     : comment.creator?.fullName
                                                 }
                                             </div>
@@ -242,7 +242,7 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
                                                     {formatFullDateTime(comment.createdAt)}
                                                 </div>
                                             </div>
-                                            
+
                                             {/* Updated date - only show if different from create date */}
                                             {comment.updatedAt && comment.createdAt && comment.updatedAt.getTime() !== comment.createdAt.getTime() && (
                                                 <div className="relative group flex items-center">

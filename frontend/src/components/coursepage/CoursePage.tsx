@@ -96,7 +96,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                                     <ChartPie size={16} className="text-gray-400" />
                                     <span>{course.credits} {t('credits')}</span>
                                 </div>
-                                
+
                                 <div className="flex items-center gap-2">
                                     <SemesterIndicator semesters={course.semesters} size={16} />
                                     <span>
@@ -108,8 +108,8 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                                     </span>
                                 </div>
 
-                                <Link 
-                                    href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`} 
+                                <Link
+                                    href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`}
                                     className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline"
                                 >
                                     <LinkIcon size={16} />
