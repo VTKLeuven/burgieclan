@@ -8,22 +8,25 @@ import UploadDialog from '@/components/upload/UploadDialog';
 import Loading from "@/app/[locale]/loading";
 import ItemList from '@/components/layout/ItemList';
 import type { Course, Document } from "@/types/entities";
-import { useFavorites } from "@/hooks/useFavorites";
 import Link from 'next/link';
 import Image from 'next/image';
 
 const mapCoursesToItems = (courses: Course[]) => {
   return courses.map(course => ({
+    id: course.id,
     name: course.name,
     code: course.code,
-    redirectUrl: `/course/${course.id}`
+    redirectUrl: `/course/${course.id}`,
+    type: 'course' as const
   }));
 };
 
 const mapDocumentsToItems = (documents: Document[]) => {
   return documents.map(document => ({
+    id: document.id,
     name: document.name,
-    redirectUrl: `/documents/${document.id}`
+    redirectUrl: `/documents/${document.id}`,
+    type: 'document' as const
   }));
 };
 
@@ -40,10 +43,6 @@ const NavigationSidebar = () => {
     documents: false
   });
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
-  const {
-    updateFavoriteCourse,
-    updateFavoriteDocument
-  } = useFavorites(user);
 
   if (!user) {
     return null;
@@ -69,16 +68,16 @@ const NavigationSidebar = () => {
   }
 
   return (
-      <aside>
-        <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-full bg-white border-r border-gray-200 flex flex-col`}>
-          {/* Collapse Toggle Button */}
-          <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="absolute -right-3 top-4 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100"
-              aria-label={'toggle'}
-          >
-            {isCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
-          </button>
+    <aside>
+      <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-full bg-white border-r border-gray-200 flex flex-col`}>
+        {/* Collapse Toggle Button */}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="absolute -right-3 top-4 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100"
+          aria-label={'toggle'}
+        >
+          {isCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
+        </button>
 
         {/* Top Navigation */}
         <nav className="p-4 flex flex-col gap-2">
@@ -108,9 +107,8 @@ const NavigationSidebar = () => {
           {/* Favorite Courses List */}
           {!isCollapsed && expandedSections.courses && (
             <ItemList
-              items={mapCoursesToItems(user!.favoriteCourses!)}
+              items={mapCoursesToItems(user.favoriteCourses || [])}
               emptyMessage={t('account.favorite.no_courses')}
-              updateFavorite={updateFavoriteCourse}
             />
           )}
           <div className="border-t border-gray-300" />
@@ -131,9 +129,8 @@ const NavigationSidebar = () => {
           {/* Favorite Documents List */}
           {!isCollapsed && expandedSections.documents && (
             <ItemList
-              items={mapDocumentsToItems(user!.favoriteDocuments!)}
+              items={mapDocumentsToItems(user.favoriteDocuments || [])}
               emptyMessage={t('account.favorite.no_documents')}
-              updateFavorite={updateFavoriteDocument}
             />
           )}
         </nav>

@@ -1,4 +1,4 @@
-import { type CommentCategory, type Course, type CourseComment, type Document, type Module, type Page, type Program, type QuickLink, type User } from '@/types/entities';
+import { type CommentCategory, type Course, type CourseComment, type Document, type Module, type Page, type Program, type QuickLink, type Tag, type User } from '@/types/entities';
 
 export function convertToUser(user: any): User {
     if (typeof user === 'string') {
@@ -64,15 +64,17 @@ export function convertToDocument(doc: any): Document {
     }
     return {
         id: parseInt(doc['@id'].split('/').pop()),
-        createDate: new Date(doc.createdAt),
-        updateDate: new Date(doc.updatedAt),
+        createdAt: doc.createdAt ? new Date(doc.createdAt) : undefined,
+        updatedAt: doc.updatedAt? new Date(doc.updatedAt): undefined,
         name: doc.name,
-        course: doc.course,
-        category: doc.category,
+        course: doc.course ? convertToCourse(doc.course): undefined,
+        category: doc.category ? convertToDocumentCategory(doc.category) : undefined,
+        year: doc.year,
         underReview: doc.under_review,
-        creator: doc.creator,
-        contentUrl: doc.contentUrl,
-        anonymous: doc.anonymous
+        creator: doc.creator ? convertToUser(doc.creator) : undefined,
+        contentUrl: doc.contentUrl ? process.env.NEXT_PUBLIC_BACKEND_URL + doc.contentUrl: undefined,
+        anonymous: doc.anonymous,
+        tags: doc.tags?.map(convertToTag)
     };
 }
 
@@ -96,8 +98,8 @@ export function convertToCourseComment(comment: any): CourseComment {
         commentCategory: comment.category ? convertToCommentCategory(comment.category) : undefined,
         content: comment.content,
         anonymous: comment.anonymous,
-        createDate: new Date(comment.createdAt),
-        updateDate: new Date(comment.updatedAt),
+        createdAt: comment.createdAt ? new Date(comment.createdAt): undefined,
+        updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : undefined,
         creator: comment.creator ? convertToUser(comment.creator) : undefined
     };
 }
@@ -128,6 +130,17 @@ export function convertToQuickLink(link: any): QuickLink {
         id: parseId(link['@id']),
         name: link.name,
         linkTo: link.linkTo
+    };
+}
+
+export function convertToTag(tag: any): Tag {
+    if (typeof tag === 'string') {
+        return { id: parseId(tag) };
+    }
+    return {
+        id: parseId(tag['@id']),
+        name: tag.name,
+        documents: tag.documents?.map(convertToDocument)
     };
 }
 

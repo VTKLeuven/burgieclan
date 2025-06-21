@@ -145,7 +145,7 @@
                 "category": "Category",
                 "content": "Your comment",
                 "content-placeholder": "Share your experience with this course...",
-                "anonymous": "Post anonymously",
+                "anonymous": "Anonymous",
                 "button": {
                     "submit": "Post comment",
                     "submitting": "Posting...",
@@ -153,7 +153,30 @@
                 }
             },
             "no-categories": "No comment categories available"
+        },
+        "documents": {
+            "header": "Documents",
+            "header-favorites": "Favorite documents",
+            "no-documents": "No documents available.",
+            "anonymous": "Anonymous",
+            "download": "Download",
+            "download-all": "Download all documents",
+            "downloading": "Downloading...",
+            "select": "Select document",
+            "selected": "Selected {{amount}}",
+            "select-all": "Select all",
+            "deselect-all": "Deselect all",
+            "clear-selection": "Clear selection",
+            "favorites-see-all": "See all favorites"
         }
+    },
+    "download": {
+        "download-success": "Documents downloaded successfully!",
+        "download-error": "Failed to download documents."
+    },
+    "favorites": {
+        "add-favorite": "Add to favorites",
+        "remove-favorite": "Remove from favorites"
     },
     "curriculum-navigator": {
         "search-placeholder": "Search for courses, modules, programs...",
@@ -195,8 +218,29 @@
         }
     },
     "document": {
+        "name": "Name",
+        "update-date": "Last updated",
+        "create-date": "Created on",
+        "creator": "Creator",
+        "year": "Academic year",
+        "tags": "Tags",
+        "anonymous": "Anonymous",
         "under_review": "Under review",
-        "approved": "Approved"
+        "approved": "Approved",
+        "sort-by": "Sort by",
+        "sort-ascending": "Ascending",
+        "sort-descending": "Descending",
+        "filter": "Filter",
+        "filters": "Filters",
+        "clear-filters": "Clear filters",
+        "search-by-name": "Search by name",
+        "search-by-tags": "Search by tags",
+        "search-by-creator": "Search by creator",
+        "search-by-year": "Search by academic year",
+        "match-all-tags": "Match all tags",
+        "add-tags": "Add tags",
+        "cancel": "Cancel",
+        "apply": "Apply"
     },
     "pagination": {
         "previous": "Previous",

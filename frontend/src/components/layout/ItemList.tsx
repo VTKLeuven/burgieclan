@@ -1,24 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { Star } from 'lucide-react';
+import FavoriteButton from '@/components/ui/FavoriteButton';
+
+interface Item {
+    id: number;
+    name?: string;
+    code?: string;
+    redirectUrl: string;
+    type: 'document' | 'course' | 'module' | 'program';
+}
 
 interface ItemListProps {
-    items: { name?: string, code?: string, redirectUrl: string }[];
-    updateFavorite: (index: number, isFavorite: boolean) => void;
+    items: Item[];
     emptyMessage: string;
 }
 
-const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, updateFavorite }) => {
-    const [favorites, setFavorites] = useState(items.map(item => true));
+const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage }) => {
     const itemsPerList = 5;
-    const [currentPage, setCurrentPage] = useState(0);
-
-    const toggleFavoriteStatus = (index: number) => {
-        const newFavorites = [...favorites];
-        newFavorites[index] = !newFavorites[index];
-        setFavorites(newFavorites);
-        updateFavorite(index, newFavorites[index]);
-    };
     const displayedItems = items.slice(0, itemsPerList);
 
     return (
@@ -42,16 +40,15 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, updateFavorite
                                         </span>
                                     </div>
                                 </Link>
-                                {/*#TODO add function to unfavorite with clicking the star*/}
-                                <button
-                                    onClick={() => toggleFavoriteStatus(index)}
-                                    className="ml-2 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-100"
-                                >
-                                    <Star
-                                        fill={favorites[index] ? "currentColor" : "none"}
-                                        className="w-3.5 h-3.5"
+                                <div className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-100">
+                                    <FavoriteButton
+                                        itemId={item.id}
+                                        itemType={item.type}
+                                        size={14}
+                                        className="p-0.5"
+                                        colorScheme="gray"
                                     />
-                                </button>
+                                </div>
                             </div>
                         </li>
                     ))}

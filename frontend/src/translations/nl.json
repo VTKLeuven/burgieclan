@@ -122,7 +122,7 @@
         "coordinator": "Coördinator",
         "professor": "Professor",
         "view-documents": "Bekijk documenten",
-        "files": "Bestanden",
+        "files": "Documenten",
         "comments": {
             "no-comments": "Nog geen opmerkingen geplaatst",
             "anonymous": "Anoniem",
@@ -145,7 +145,7 @@
                 "category": "Categorie",
                 "content": "Je opmerking",
                 "content-placeholder": "Deel je ervaring met dit vak...",
-                "anonymous": "Anoniem plaatsen",
+                "anonymous": "Anoniem",
                 "button": {
                     "submit": "Opmerking plaatsen",
                     "submitting": "Plaatsen...",
@@ -153,7 +153,30 @@
                 }
             },
             "no-categories": "Geen opmerking-categorieën beschikbaar"
+        },
+        "documents": {
+            "header": "Documenten",
+            "header-favorites": "Favoriete documenten",
+            "no-documents": "Geen documenten beschikbaar.",
+            "anonymous": "Anoniem",
+            "download": "Download",
+            "download-all": "Download alle documenten",
+            "downloading": "Downloaden...",
+            "select": "Selecteer document",
+            "selected": "{{amount}} geselecteerd",
+            "select-all": "Selecteer alles",
+            "deselect-all": "Deselecteer alles",
+            "clear-selection": "Selectie wissen",
+            "favorites-see-all": "Bekijk alle favorieten"
         }
+    },
+    "download": {
+        "download-success": "Documenten succesvol gedownload!",
+        "download-error": "Downloaden mislukt."
+    },
+    "favorites": {
+        "add-favorite": "Voeg toe aan favorieten",
+        "remove-favorite": "Verwijder uit favorieten"
     },
     "curriculum-navigator": {
         "search-placeholder": "Zoeken naar vakken, modules, richtingen...",
@@ -196,8 +219,29 @@
         }
     },
     "document": {
+        "name": "Naam",
+        "update-date": "Laatst bijgewerkt",
+        "create-date": "Aangemaakt op",
+        "creator": "Maker",
+        "year": "Academiejaar",
+        "tags": "Tags",
+        "anonymous": "Anoniem",
         "under_review": "In behandeling",
-        "approved": "Goedgekeurd"
+        "approved": "Goedgekeurd",
+        "sort-by": "Sorteer op",
+        "sort-ascending": "Oplopend",
+        "sort-descending": "Aflopend",
+        "filter": "Filter",
+        "filters": "Filters",
+        "clear-filters": "Filters wissen",
+        "search-by-name": "Zoeken op naam",
+        "search-by-tags": "Zoeken op tags",
+        "search-by-creator": "Zoeken op maker",
+        "search-by-year": "Zoeken op academiejaar",
+        "match-all-tags": "Alle tags moeten overeenkomen",
+        "add-tags": "Voeg tags toe",
+        "cancel": "Annuleren",
+        "apply": "Toepassen"
     },
     "pagination": {
         "previous": "Vorige",

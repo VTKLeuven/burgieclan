@@ -85,6 +85,10 @@ class DocumentPendingCrudController extends DocumentCrudController
         yield TextField::new('year')
             ->setLabel('Academic Year')
             ->hideOnForm();
+        yield AssociationField::new('tags')
+            ->autocomplete()
+            ->hideOnIndex()
+            ->setFormTypeOption('by_reference', false);
         yield BooleanField::new('under_review')
             ->setLabel('Under review')
             ->renderAsSwitch(false)

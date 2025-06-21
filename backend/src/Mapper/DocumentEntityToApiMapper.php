@@ -5,8 +5,10 @@ namespace App\Mapper;
 use App\ApiResource\CourseApi;
 use App\ApiResource\DocumentApi;
 use App\ApiResource\DocumentCategoryApi;
+use App\ApiResource\TagApi;
 use App\ApiResource\UserApi;
 use App\Entity\Document;
+use App\Entity\Tag;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -52,6 +54,11 @@ class DocumentEntityToApiMapper implements MapperInterface
         $to->createdAt = $from->getCreateDate()->format('Y-m-d H:i:s');
         $to->updatedAt = $from->getUpdateDate()->format('Y-m-d H:i:s');
         $to->contentUrl = $this->storage->resolveUri($from, 'file');
+        $to->tags = array_map(function (Tag $tag) {
+            return $this->microMapper->map($tag, TagApi::class, [
+                MicroMapperInterface::MAX_DEPTH => 1,
+            ]);
+        }, $from->getTags()->getValues());
 
         return $to;
     }

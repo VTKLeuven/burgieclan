@@ -4,9 +4,9 @@ import Loading from '@/app/[locale]/loading';
 import { useTranslation } from 'react-i18next';
 import { convertToCommentCategory } from '@/utils/convertToEntity';
 import CourseCommentList from '@/components/coursepage/CourseCommentList';
-import { MessageSquarePlus } from 'lucide-react';
 import CommentDialog from '@/components/coursepage/CommentDialog';
 import { useApi } from '@/hooks/useApi';
+import { useToast } from '@/components/ui/Toast';
 
 type CommentCategoriesProps = {
     comments: CourseComment[];
@@ -18,6 +18,7 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
     const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false);
     const { t } = useTranslation();
     const { request, loading } = useApi();
+    const { showToast } = useToast();
 
     // Fetch all categories from backend
     useEffect(() => {
@@ -48,6 +49,23 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
         setIsCommentDialogOpen(false);
     };
 
+    const handleAddCommentToCategory = async (categoryId: number, data: { content: string; anonymous: boolean }) => {
+        const res = await request('POST', '/api/course_comments', {
+            content: data.content,
+            anonymous: data.anonymous,
+            course: `/api/courses/${courseId}`,
+            category: `/api/comment_categories/${categoryId}`
+        });
+
+        if (!res) {
+            showToast(t('course-page.comments.error'), 'error');
+            throw new Error('Failed to add comment');
+        }
+
+        showToast(t('course-page.comments.success'), 'success');
+        // TODO: Add callback to refresh comments or update state
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center py-4">
@@ -66,9 +84,9 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-3">
                 <h2>{t('course-page.comments.title')}</h2>
-                <div className="ml-auto">
+                {/* <div className="ml-auto">
                     <button
                         onClick={handleOpenCommentDialog}
                         className="primary-button inline-flex items-center"
@@ -76,7 +94,7 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
                         <MessageSquarePlus className="sm:mr-2 w-5 h-5" />
                         <span className="hidden sm:inline">{t('course-page.comments.add-new')}</span>
                     </button>
-                </div>
+                </div> */}
             </div>
 
             <p className="text-wireframe-mid-gray italic mb-4">
@@ -89,6 +107,7 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
                     category={category}
                     comments={getCommentsByCategory(category.id)}
                     t={t}
+                    onAddComment={handleAddCommentToCategory}
                 />
             ))}
 
