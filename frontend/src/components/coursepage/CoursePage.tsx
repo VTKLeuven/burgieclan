@@ -78,7 +78,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                             <div className="flex items-center gap-3 mb-2">
                                 <FavoriteButton
                                     itemId={courseId}
-                                    itemType="courses"
+                                    itemType="course"
                                     size={24}
                                     onToggle={() => {
                                         refreshUser();
