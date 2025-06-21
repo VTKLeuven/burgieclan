@@ -8,7 +8,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 
 interface FavoriteButtonProps {
     itemId: number;
-    itemType: 'document' | 'course' | 'module' | 'program';
+    itemType: 'documents' | 'courses' | 'modules' | 'programs';
     onToggle?: (isFavorite: boolean) => void;
     className?: string;
     size?: number;
@@ -35,13 +35,13 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
             // Determine favorite status from user context
             let isItemFavorite = false;
 
-            if (itemType === 'document' && user.favoriteDocuments) {
+            if (itemType === 'documents' && user.favoriteDocuments) {
                 isItemFavorite = user.favoriteDocuments.some(doc => doc.id === itemId);
-            } else if (itemType === 'course' && user.favoriteCourses) {
+            } else if (itemType === 'courses' && user.favoriteCourses) {
                 isItemFavorite = user.favoriteCourses.some(course => course.id === itemId);
-            } else if (itemType === 'module' && user.favoriteModules) {
+            } else if (itemType === 'modules' && user.favoriteModules) {
                 isItemFavorite = user.favoriteModules.some(module => module.id === itemId);
-            } else if (itemType === 'program' && user.favoritePrograms) {
+            } else if (itemType === 'programs' && user.favoritePrograms) {
                 isItemFavorite = user.favoritePrograms.some(program => program.id === itemId);
             }
 
