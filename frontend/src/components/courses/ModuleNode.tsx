@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { CourseRow } from '@/components/courses/CourseRow';
 import type { Module, Course } from '@/types/entities';
 import { CourseTableHeader } from '@/components/courses/CourseTableHeader';
@@ -10,6 +10,7 @@ import {
     moduleContainsChildMatches
 } from '@/utils/curriculumSearchUtils';
 import { useTranslation } from 'react-i18next';
+import DownloadButton from '@/components/ui/DownloadButton';
 
 interface ModuleNodeProps {
     module: Module;
@@ -79,10 +80,14 @@ const ModuleNode = ({
 
                 {/* Show badge with match count if matches exist */}
                 {searchFilters && searchQuery && totalMatches > 0 && (
-                    <div className="ml-auto bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center">
+                    <div className="ml-auto bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center mr-2">
                         {totalMatches}
                     </div>
                 )}
+                
+                <div className="ml-auto flex items-center">
+                    <DownloadButton modules={[module]} />
+                </div>
             </div>
 
             <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>

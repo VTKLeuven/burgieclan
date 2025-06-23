@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import ModuleNode from '@/components/courses/ModuleNode';
 import type { Program, Course } from '@/types/entities';
 import { SearchFilters } from '@/components/courses/CurriculumSearchBar';
@@ -9,7 +9,7 @@ import {
   countMatchesInProgram
 } from '@/utils/curriculumSearchUtils';
 import { useTranslation } from 'react-i18next';
-import useDownloadContent from '@/hooks/useDownloadContent';
+import DownloadButton from '@/components/ui/DownloadButton';
 
 interface ProgramNodeProps {
   program: Program;
@@ -64,10 +64,14 @@ const ProgramNode = ({
 
         {/* Show badge with match count if matches exist */}
         {autoExpand && matchingItems > 0 && (
-          <div className="ml-auto bg-yellow-300 text-wireframe-primary-blue text-xs px-2 py-0.5 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center">
+          <div className="ml-auto bg-yellow-300 text-wireframe-primary-blue text-xs px-2 py-0.5 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center mr-2">
             {matchingItems}
           </div>
         )}
+
+        <div className="ml-auto flex items-center">
+          <DownloadButton programs={[program]} />
+        </div>
       </div>
 
       <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
