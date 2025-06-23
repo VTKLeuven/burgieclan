@@ -171,6 +171,9 @@
         }
     },
     "download": {
+        "download": "Download",
+        "download-all": "Download alles",
+        "downloading": "Downloaden...",
         "download-success": "Documenten succesvol gedownload!",
         "download-error": "Downloaden mislukt."
     },
