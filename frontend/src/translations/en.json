@@ -196,7 +196,9 @@
         "any-semester": "Any semester",
         "credits": "ECTS",
         "show-only-favorites": "Show only favorites",
-        "matches-found": "Matches found"
+        "matches-found": "Matches found",
+        "no-modules-in-program": "No modules available in this program.",
+        "no-courses-in-module": "No courses available in this module."
     },
     "account": {
         "account": "Account",
