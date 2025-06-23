@@ -9,6 +9,7 @@ import {
     moduleMatchesText,
     moduleContainsChildMatches
 } from '@/utils/curriculumSearchUtils';
+import { useTranslation } from 'react-i18next';
 
 interface ModuleNodeProps {
     module: Module;
@@ -23,6 +24,8 @@ const ModuleNode = ({
     searchFilters = null,
     favoriteCourses = []
 }: ModuleNodeProps) => {
+    const { t } = useTranslation();
+
     const [expanded, setExpanded] = useState(false);
 
     // Get search query
@@ -107,6 +110,16 @@ const ModuleNode = ({
                                     isFirstRow={index === 0}
                                 />
                             ))}
+                        </div>
+                    )}
+                    
+                    {/* Empty state when no submodules and no courses */}
+                    {(!module.modules || module.modules.length === 0) && 
+                     (!module.courses || module.courses.length === 0) && (
+                        <div className="py-3 px-2">
+                            <div className="text-gray-500 text-sm italic">
+                                {t('curriculum-navigator.no-courses-in-module')}
+                            </div>
                         </div>
                     )}
                 </div>

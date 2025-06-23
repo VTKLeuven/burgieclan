@@ -197,7 +197,9 @@
         "any-semester": "Elk semester",
         "credits": "Studiepunten",
         "show-only-favorites": "Toon alleen favorieten",
-        "matches-found": "Gevonden overeenkomsten"
+        "matches-found": "Gevonden overeenkomsten",
+        "no-modules-in-program": "Deze richting bevat geen modules.",
+        "no-courses-in-module": "Deze module bevat geen vakken."
     },
     "account": {
         "account": "Account",

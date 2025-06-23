@@ -8,6 +8,8 @@ import {
   programContainsChildMatches,
   countMatchesInProgram
 } from '@/utils/curriculumSearchUtils';
+import { useTranslation } from 'react-i18next';
+import useDownloadContent from '@/hooks/useDownloadContent';
 
 interface ProgramNodeProps {
   program: Program;
@@ -22,6 +24,8 @@ const ProgramNode = ({
   searchFilters = null,
   favoriteCourses = []
 }: ProgramNodeProps) => {
+  const { t } = useTranslation();
+
   const [expanded, setExpanded] = useState(false);
 
   // Get search query
@@ -67,7 +71,7 @@ const ProgramNode = ({
       </div>
 
       <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-        {program.modules && (
+        {program.modules && program.modules.length > 0 ? (
           <div className="pl-4 mt-1 border-l-2 border-gray-200 space-y-1">
             {program.modules.map(module => (
               <ModuleNode
@@ -78,6 +82,12 @@ const ProgramNode = ({
                 favoriteCourses={favoriteCourses}
               />
             ))}
+          </div>
+        ) : (
+          <div className="pl-4 mt-1 border-l-2 border-gray-200 py-1">
+            <div className="text-gray-500 text-sm italic">
+              {t('curriculum-navigator.no-modules-in-program')}
+            </div>
           </div>
         )}
       </div>
