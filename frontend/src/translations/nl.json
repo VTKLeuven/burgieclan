@@ -77,6 +77,12 @@
             "anonymous": {
                 "label": "Anoniem"
             },
+            "tags": {
+                "label": "Tags",
+                "placeholder": "Voeg tags toe (optioneel)...",
+                "create": "Maak nieuwe tag \"{{tag}}\"",
+                "no-results": "Geen tags gevonden"
+            },
             "validation": {
                 "name": {
                     "required": "Naam is verplicht",
