@@ -77,6 +77,12 @@
             "anonymous": {
                 "label": "Anonymous"
             },
+            "tags": {
+                "label": "Tags",
+                "placeholder": "Add tags (optional)...",
+                "create": "Create new tag \"{{tag}}\"",
+                "no-results": "No tags found"
+            },
             "validation": {
                 "name": {
                     "required": "Name is required",
