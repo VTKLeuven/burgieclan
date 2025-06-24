@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download } from 'lucide-react';
+import { Download, LoaderCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import useDownloadContent from '@/hooks/useDownloadContent';
 import type { Program, Module, Course, Document } from '@/types/entities';
@@ -48,12 +48,12 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
             onClick={handleDownload}
             disabled={loading}
             className={`inline-flex items-center justify-center rounded-md text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
-            title={t('download.download')}
         >
-            <Download
-                size={size}
-                className={loading ? 'animate-pulse' : ''}
-            />
+            {loading ? (
+                <LoaderCircle size={size} className="animate-spin" />
+            ) : (
+                <Download size={size} />
+            )}
             {showText && (
                 <span className="ml-1.5 text-sm">
                     {loading ? t('download.downloading') : t('download.download')}
