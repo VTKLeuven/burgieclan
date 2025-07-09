@@ -1,45 +1,56 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { ApiClient } from "@/actions/api";
-import { ApiError } from "@/utils/error/apiError";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { useApi } from '@/hooks/useApi';
 import type { User } from '@/types/entities';
 import { convertToUser } from '@/utils/convertToEntity';
+import { notFound } from 'next/navigation';
+import type { ApiError } from '@/utils/error/apiError';
 
 interface UserContextType {
     user: User | null;
     loading: boolean;
+    isRedirecting: boolean;
+    error: ApiError | null;
+    refreshUser: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children, userId }: { children: ReactNode, userId: number | null }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { loading, error, isRedirecting, request } = useApi();
 
-    useEffect(() => {
-        async function fetchUser() {
-            try {
-                if (!userId) {
-                    return;
-                }
-                const userData = await ApiClient('GET', `/api/users/${userId}`);
-                if (userData?.error) {
-                    throw new ApiError(userData.error.message, userData.error.status);
-                }
-                setUser(convertToUser(userData));
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
+    const fetchUser = useCallback(async () => {
+        if (!userId) {
+            setUser(null);
+            return;
         }
 
+
+        const userData = await request('GET', `/api/users/${userId}`);
+        if (userData && !userData.error) {
+            setUser(convertToUser(userData));
+        } else {
+            notFound();
+        }
+    }, [userId, request]);
+
+    // Initial fetch when component mounts or userId changes
+    useEffect(() => {
         fetchUser();
-    }, [userId]);
+    }, [fetchUser]);
+
+    const contextValue: UserContextType = {
+        user,
+        loading,
+        isRedirecting,
+        error,
+        refreshUser: fetchUser
+    };
 
     return (
-        <UserContext.Provider value={{ user, loading }}>
+        <UserContext.Provider value={contextValue}>
             {children}
         </UserContext.Provider>
     );

@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\ApiResource\ZipApi;
 use App\Entity\Course;
+use App\Entity\Document;
 use App\Entity\Module;
 use App\Entity\Program;
 use App\Repository\DocumentRepository;
@@ -22,9 +23,9 @@ final class DownloadZipController extends AbstractController
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
-        private readonly DocumentRepository   $documentRepository,
-        private readonly StorageInterface     $storage,
-        private readonly KernelInterface      $kernel,
+        private readonly DocumentRepository $documentRepository,
+        private readonly StorageInterface $storage,
+        private readonly KernelInterface $kernel,
     ) {
     }
 
@@ -33,11 +34,12 @@ final class DownloadZipController extends AbstractController
         $programs = $this->mapEntities($zipApi->programs, Program::class);
         $modules = $this->mapEntities($zipApi->modules, Module::class);
         $courses = $this->mapEntities($zipApi->courses, Course::class);
+        $documents = $this->mapEntities($zipApi->documents, Document::class);
 
-        $contentHash = $this->generateContentHash($programs, $modules, $courses);
+        $contentHash = $this->generateContentHash($programs, $modules, $courses, $documents);
 
         if ($contentHash !== md5('')) {
-            $fileName = $this->createZipFile($contentHash, $programs, $modules, $courses);
+            $fileName = $this->createZipFile($contentHash, $programs, $modules, $courses, $documents);
             return $this->createFileResponse($fileName);
         }
 
@@ -56,7 +58,7 @@ final class DownloadZipController extends AbstractController
      * @param Module[]  $modules
      * @param Course[]  $courses
      */
-    private function generateContentHash(array $programs, array $modules, array $courses): string
+    private function generateContentHash(array $programs, array $modules, array $courses, array $documents): string
     {
         $content = '';
 
@@ -70,6 +72,10 @@ final class DownloadZipController extends AbstractController
 
         foreach ($courses as $course) {
             $content .= $this->getCourseContent($course);
+        }
+
+        foreach ($documents as $document) {
+            $content .= $document->getFileName();
         }
 
         return md5($content);
@@ -109,8 +115,13 @@ final class DownloadZipController extends AbstractController
         return $content;
     }
 
-    private function createZipFile(string $contentHash, array $programs, array $modules, array $courses): string
-    {
+    private function createZipFile(
+        string $contentHash,
+        array $programs,
+        array $modules,
+        array $courses,
+        array $documents
+    ): string {
         $fileName = sprintf('%s/data/exports/%s.zip', $this->kernel->getProjectDir(), $contentHash);
 
         $zip = new ZipArchive();
@@ -118,6 +129,7 @@ final class DownloadZipController extends AbstractController
             $this->addProgramsToZip($zip, $programs);
             $this->addModulesToZip($zip, $modules, '');
             $this->addCoursesToZip($zip, $courses, '');
+            $this->addDocumentsToZip($zip, $documents, '');
             $zip->close();
         }
 
@@ -148,11 +160,69 @@ final class DownloadZipController extends AbstractController
         foreach ($courses as $course) {
             $courseName = $parentDir ? $parentDir . '/' . $course->getName() : $course->getName();
             $zip->addEmptyDir($courseName);
-            foreach ($this->documentRepository->findByCourseAndHasFile($course) as $document) {
-                $path = $this->storage->resolvePath($document, 'file');
-                $zip->addFile($path, $courseName . '/' . $document->getFileName());
+            $documents = $this->documentRepository->findByCourseAndHasFile($course);
+            $this->addDocumentsToZip($zip, $documents, $courseName);
+        }
+    }
+
+    private function addDocumentsToZip(ZipArchive $zip, array $documents, string $parentDir): void
+    {
+        $documentsByCategory = [];
+        foreach ($documents as $document) {
+            $category = $document->getCategory()->getName();
+            if (!isset($documentsByCategory[$category])) {
+                $documentsByCategory[$category] = [];
+            }
+            $documentsByCategory[$category][] = $document;
+        }
+
+        // Track used filenames within each category to handle duplicates
+        $usedFilenames = [];
+
+        foreach ($documentsByCategory as $category => $categoryDocuments) {
+            $categoryDir = $parentDir . '/' . $category;
+            $zip->addEmptyDir($categoryDir);
+            $usedFilenames[$category] = [];
+
+            foreach ($categoryDocuments as $document) {
+                if ($document->getFileName()) {
+                    $filePath = $this->storage->resolvePath($document, 'file');
+                    if (file_exists($filePath)) {
+                        $originalFileName = $document->getFileName();
+                        $fileNameToUse = $this->getUniqueFileName($originalFileName, $usedFilenames[$category]);
+                        $usedFilenames[$category][] = $fileNameToUse;
+
+                        $zip->addFile($filePath, $categoryDir . '/' . $fileNameToUse);
+                    }
+                }
             }
         }
+    }
+
+    /**
+     * Ensures a filename is unique by adding a numerical suffix if needed
+     *
+     * @param string $fileName Original filename
+     * @param array $existingFiles List of filenames already in use
+     * @return string Unique filename
+     */
+    private function getUniqueFileName(string $fileName, array $existingFiles): string
+    {
+        if (!in_array($fileName, $existingFiles)) {
+            return $fileName;
+        }
+
+        $pathInfo = pathinfo($fileName);
+        $extension = isset($pathInfo['extension']) ? '.' . $pathInfo['extension'] : '';
+        $baseName = $pathInfo['filename'];
+        $counter = 1;
+
+        // Keep incrementing counter until we find an unused filename
+        while (in_array("{$baseName}_{$counter}{$extension}", $existingFiles)) {
+            $counter++;
+        }
+
+        return "{$baseName}_{$counter}{$extension}";
     }
 
     private function createFileResponse(string $fileName): Response

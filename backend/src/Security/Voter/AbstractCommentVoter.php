@@ -50,6 +50,9 @@ class AbstractCommentVoter extends Voter
             case self::EDIT:
                 // logic to determine if the user can EDIT
                 // return true or false
+                if (!isset($subject->creator)) {
+                    return false;
+                }
                 $creator = $this->microMapper->map($subject->creator, User::class, [
                     MicroMapperInterface::MAX_DEPTH => 0,
                 ]);
@@ -61,6 +64,9 @@ class AbstractCommentVoter extends Voter
             case self::DELETE:
                 // logic to determine if the user can DELETE
                 // return true or false
+                if (!isset($subject->creator)) {
+                    return false;
+                }
                 $creator = $this->microMapper->map($subject->creator, User::class, [
                     MicroMapperInterface::MAX_DEPTH => 0,
                 ]);

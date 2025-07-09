@@ -11,7 +11,7 @@ const colors = {
 
 export default function Badge({ text, color }: { text: string, color: keyof typeof colors }) {
     return (
-        <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset ${colors[color]}`}>
+        <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset whitespace-nowrap shrink-0 ${colors[color]}`}>
             {text}
         </span>
     );
