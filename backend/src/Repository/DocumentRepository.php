@@ -46,7 +46,7 @@ class DocumentRepository extends ServiceEntityRepository
             return $this->createQueryBuilder('d')
                 ->select('count(d.id)')
                 ->andWhere('d.under_review = :under_review')
-                ->setParameter('under_review', false)
+                ->setParameter('under_review', true)
                 ->getQuery()
                 ->getSingleScalarResult() ?? 0;
         } catch (NoResultException|NonUniqueResultException $e) {
