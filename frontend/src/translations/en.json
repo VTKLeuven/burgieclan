@@ -1,5 +1,4 @@
 {
-    "homepage": "Homepage",
     "login": "Login",
     "login_vtk": "Log in with VTK",
     "logout": "Logout",
@@ -11,7 +10,6 @@
     "username": "Username",
     "password": "Password",
     "profile": "Profile",
-    "unexpected_error": "Unexpected error",
     "go_home": "Go back home",
     "contact_support": "Contact support",
     "report_issue": "Report an issue",
@@ -22,6 +20,7 @@
     "modules": "Modules",
     "programs": "Programs",
     "documents": "Documents",
+    "credits": "ECTS credits",
     "FAQ": "FAQ",
     "overview": "Overview",
     "cookie_banner_text": "This website only uses functional cookies to provide you a smooth experience. No other cookies are used.",
@@ -46,9 +45,6 @@
             "payload_too_large": "The file size exceeds the {{size}}MB limit. Please compress your file or upload a smaller one.",
             "rate_limit": "Too many upload attempts. Please wait a moment before trying again."
         },
-        "success": {
-            "upload": "Document uploaded successfully!"
-        },
         "dialog": {
             "title": "Upload document",
             "description": "Upload your awesome document here. You can upload a PDF, Word, or Markdown file. We will check if it follows the guidelines. Thanks for sharing your knowledge with the world!",
@@ -62,10 +58,7 @@
         "field": {
             "label": "File",
             "upload_button": "Upload a file",
-            "drag_drop_text": "or drag and drop",
-            "icons": {
-                "alt": "{{type}} icon"
-            }
+            "drag_drop_text": "or drag and drop"
         },
         "form": {
             "name": {
@@ -79,12 +72,10 @@
                 "label": "Category"
             },
             "year": {
-                "label": "Academic Year",
-                "placeholder": "Select academic year..."
+                "label": "Academic Year"
             },
             "anonymous": {
-                "label": "Anonymous",
-                "description": "Do you want to upload this document anonymously?"
+                "label": "Anonymous"
             },
             "validation": {
                 "name": {
@@ -115,25 +106,102 @@
         "description": "Welcome to Burgieclan! Your best friend in studying for exams. We provide a platform where students can share their study materials with each other. This way, you can help each other out and make studying a lot easier. So, what are you waiting for? Dive into the world of Burgieclan and start sharing your knowledge!",
         "recent_activities": "Pick up where you left off",
         "news": "News",
-        "navigate_to": "Navigate to"
+        "navigate_to": "Navigate to",
+        "no_quick_links": "No quick links found"
     },
     "form": {
         "errors": {
             "fetch_failed": "Failed to load form data. Please try again."
         },
         "combo": {
-            "search": "Search...",
             "no_results": "No results found"
         }
+    },
+    "course-page": {
+        "teachers": "Teachers",
+        "coordinator": "Coordinator",
+        "professor": "Professor",
+        "view-documents": "View Documents",
+        "files": "Documents",
+        "comments": {
+            "no-comments": "No comments posted yet",
+            "anonymous": "Anonymous",
+            "title": "Subject evaluation",
+            "description": "Each of these comments is someone's opinion. Please be respectful. If you have a question about the course, please contact the course coordinator.",
+            "add-new": "Add comment",
+            "success": "Comment added successfully",
+            "error": "Failed to add comment",
+            "form": {
+                "content": {
+                    "required": "Comment is required"
+                },
+                "category": {
+                    "required": "Category is required"
+                }
+            },
+            "dialog": {
+                "title": "Add new comment",
+                "description": "Please share your experience with this course. Your feedback helps other students make informed decisions.",
+                "category": "Category",
+                "content": "Your comment",
+                "content-placeholder": "Share your experience with this course...",
+                "anonymous": "Anonymous",
+                "button": {
+                    "submit": "Post comment",
+                    "submitting": "Posting...",
+                    "cancel": "Cancel"
+                }
+            },
+            "no-categories": "No comment categories available"
+        },
+        "documents": {
+            "header": "Documents",
+            "header-favorites": "Favorite documents",
+            "no-documents": "No documents available.",
+            "anonymous": "Anonymous",
+            "download": "Download",
+            "download-all": "Download all documents",
+            "downloading": "Downloading...",
+            "select": "Select document",
+            "selected": "Selected {{amount}}",
+            "select-all": "Select all",
+            "deselect-all": "Deselect all",
+            "clear-selection": "Clear selection",
+            "favorites-see-all": "See all favorites"
+        }
+    },
+    "download": {
+        "download-success": "Documents downloaded successfully!",
+        "download-error": "Failed to download documents."
+    },
+    "favorites": {
+        "add-favorite": "Add to favorites",
+        "remove-favorite": "Remove from favorites"
+    },
+    "curriculum-navigator": {
+        "search-placeholder": "Search for courses, modules, programs...",
+        "no-search-results": "No results found for your search.",
+        "no-programs": "No programs found matching your search.",
+        "no-courses": "No courses found matching your search.",
+        "program": "Program",
+        "programs": "Programs",
+        "module": "Module",
+        "modules": "Modules",
+        "course": "Course",
+        "courses": "Courses",
+        "clear-search": "Clear",
+        "advanced-filters": "Advanced filters",
+        "search-submit": "Search",
+        "semester": "Semester",
+        "any-semester": "Any semester",
+        "credits": "ECTS",
+        "show-only-favorites": "Show only favorites",
+        "matches-found": "Matches found"
     },
     "account": {
         "account": "Account",
         "greeting": "Hi, {{name}}!",
         "welcome_text": "Welcome to your account page. Here you will find some information about your favorites and your contributions to Burgieclan.",
-        "details": "Account details",
-        "name": "Name",
-        "rnumber": "R-number",
-        "email": "Email",
         "favorite": {
             "courses": "Favorite courses",
             "modules": "Favorite modules",
@@ -150,8 +218,29 @@
         }
     },
     "document": {
+        "name": "Name",
+        "update-date": "Last updated",
+        "create-date": "Created on",
+        "creator": "Creator",
+        "year": "Academic year",
+        "tags": "Tags",
+        "anonymous": "Anonymous",
         "under_review": "Under review",
-        "approved": "Approved"
+        "approved": "Approved",
+        "sort-by": "Sort by",
+        "sort-ascending": "Ascending",
+        "sort-descending": "Descending",
+        "filter": "Filter",
+        "filters": "Filters",
+        "clear-filters": "Clear filters",
+        "search-by-name": "Search by name",
+        "search-by-tags": "Search by tags",
+        "search-by-creator": "Search by creator",
+        "search-by-year": "Search by academic year",
+        "match-all-tags": "Match all tags",
+        "add-tags": "Add tags",
+        "cancel": "Cancel",
+        "apply": "Apply"
     },
     "pagination": {
         "previous": "Previous",
@@ -164,16 +253,14 @@
         "no_results": "No results found",
         "no_results_sub": "Try searching for something else or check your spelling."
     },
+    "header": {
+        "my_vtk": "My VTK"
+    },
     "sidebar": {
         "home": "Home",
-        "upload": "Upload",
         "my_courses": "My Courses",
-        "courses": "Courses",
         "add_document": "Add Document",
-        "documents": "Documents",
-        "profile": "Profile",
         "log_out": "Log Out",
-        "add_doc": "Add Document",
         "go_to_vtk": "Go to VTK",
         "user_avatar": "User avatar",
         "my_favorite_documents": "Favorite Documents"

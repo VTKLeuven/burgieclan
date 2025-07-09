@@ -61,6 +61,7 @@ class DocumentPendingCrudController extends DocumentCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
+            ->setPageTitle(Crud::PAGE_INDEX, 'Pending Documents')
             ->showEntityActionsInlined();
     }
 
@@ -84,10 +85,17 @@ class DocumentPendingCrudController extends DocumentCrudController
         yield TextField::new('year')
             ->setLabel('Academic Year')
             ->hideOnForm();
+        yield AssociationField::new('tags')
+            ->autocomplete()
+            ->hideOnIndex()
+            ->setFormTypeOption('by_reference', false);
         yield BooleanField::new('under_review')
             ->setLabel('Under review')
             ->renderAsSwitch(false)
             ->hideOnIndex();
+        yield BooleanField::new('anonymous')
+            ->setLabel('Anonymous')
+            ->renderAsSwitch(false);
         yield TextField::new('file')
             ->setFormType(VichFileType::class)
             ->setFormTypeOptions([

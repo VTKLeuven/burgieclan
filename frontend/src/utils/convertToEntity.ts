@@ -1,6 +1,9 @@
-import { type Category, type Course, type CourseComment, type Document, type Module, type Page, type Program, type User } from '@/types/entities';
+import { type CommentCategory, type Course, type CourseComment, type Document, type Module, type Page, type Program, type QuickLink, type Tag, type User } from '@/types/entities';
 
 export function convertToUser(user: any): User {
+    if (typeof user === 'string') {
+        return { id: parseId(user) };
+    }
     return {
         id: parseId(user['@id']),
         fullName: user.fullName,
@@ -61,15 +64,17 @@ export function convertToDocument(doc: any): Document {
     }
     return {
         id: parseInt(doc['@id'].split('/').pop()),
-        createDate: new Date(doc.createdAt),
-        updateDate: new Date(doc.updatedAt),
+        createdAt: doc.createdAt ? new Date(doc.createdAt) : undefined,
+        updatedAt: doc.updatedAt? new Date(doc.updatedAt): undefined,
         name: doc.name,
-        course: doc.course,
-        category: doc.category,
+        course: doc.course ? convertToCourse(doc.course): undefined,
+        category: doc.category ? convertToDocumentCategory(doc.category) : undefined,
+        year: doc.year,
         underReview: doc.under_review,
-        creator: doc.creator,
-        contentUrl: doc.contentUrl,
-        anonymous: doc.anonymous
+        creator: doc.creator ? convertToUser(doc.creator) : undefined,
+        contentUrl: doc.contentUrl ? process.env.NEXT_PUBLIC_BACKEND_URL + doc.contentUrl: undefined,
+        anonymous: doc.anonymous,
+        tags: doc.tags?.map(convertToTag)
     };
 }
 
@@ -90,15 +95,52 @@ export function convertToCourseComment(comment: any): CourseComment {
     return {
         id: parseId(comment['@id']),
         course: comment.course ? convertToCourse(comment.course) : undefined,
-        commentCategory: comment.category ? convertToCategory(comment.category) : undefined
+        commentCategory: comment.category ? convertToCommentCategory(comment.category) : undefined,
+        content: comment.content,
+        anonymous: comment.anonymous,
+        createdAt: comment.createdAt ? new Date(comment.createdAt): undefined,
+        updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : undefined,
+        creator: comment.creator ? convertToUser(comment.creator) : undefined
     };
 }
 
-export function convertToCategory(category: any): Category {
+export function convertToCommentCategory(category: any): CommentCategory {
+    if (typeof category === 'string') {
+        return { id: parseId(category) };
+    }
     return {
         id: parseId(category['@id']),
         name: category.name,
         description: category.description
+    };
+}
+
+export function convertToDocumentCategory(category: any): CommentCategory {
+    if (typeof category === 'string') {
+        return { id: parseId(category) };
+    }
+    return {
+        id: parseId(category['@id']),
+        name: category.name,
+    };
+}
+
+export function convertToQuickLink(link: any): QuickLink {
+    return {
+        id: parseId(link['@id']),
+        name: link.name,
+        linkTo: link.linkTo
+    };
+}
+
+export function convertToTag(tag: any): Tag {
+    if (typeof tag === 'string') {
+        return { id: parseId(tag) };
+    }
+    return {
+        id: parseId(tag['@id']),
+        name: tag.name,
+        documents: tag.documents?.map(convertToDocument)
     };
 }
 

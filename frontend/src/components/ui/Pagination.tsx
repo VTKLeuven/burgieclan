@@ -1,4 +1,4 @@
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface PaginationProps {
@@ -52,7 +52,7 @@ export default function Pagination({ totalAmount, currentPage, itemsPerPage, onP
                             disabled={currentPage === 1}
                         >
                             <span className="sr-only">{t('pagination.previous')}</span>
-                            <ChevronLeftIcon aria-hidden="true" className="size-5" />
+                            <ChevronLeft aria-hidden="true" className="size-5" />
                         </button>
                         {Array.from({ length: totalPages }, (_, index) => (
                             <button
@@ -73,7 +73,7 @@ export default function Pagination({ totalAmount, currentPage, itemsPerPage, onP
                             disabled={currentPage === totalPages}
                         >
                             <span className="sr-only">{t('pagination.next')}</span>
-                            <ChevronRightIcon aria-hidden="true" className="size-5" />
+                            <ChevronRight aria-hidden="true" className="size-5" />
                         </button>
                     </nav>
                 </div>

@@ -1,5 +1,4 @@
 {
-    "homepage": "Startpagina",
     "login": "Inloggen",
     "login_vtk": "Log in met VTK",
     "logout": "Uitloggen",
@@ -11,7 +10,6 @@
     "username": "Gebruikersnaam",
     "password": "Wachtwoord",
     "profile": "Profiel",
-    "unexpected_error": "Onverwachte fout",
     "go_home": "Ga terug naar de startpagina",
     "contact_support": "Neem contact op met de ondersteuning",
     "report_issue": "Meld een probleem",
@@ -22,6 +20,7 @@
     "modules": "Modules",
     "programs": "Richtingen",
     "documents": "Documenten",
+    "credits": "studiepunten",
     "FAQ": "FAQ",
     "overview": "Overzicht",
     "cookie_banner_text": "Deze website gebruikt alleen functionele cookies om je een soepele ervaring te bieden. Er worden geen andere cookies gebruikt.",
@@ -46,9 +45,6 @@
             "payload_too_large": "De bestandsgrootte overschrijdt de limiet van {{size}}MB. Comprimeer je bestand of upload een kleiner bestand.",
             "rate_limit": "Te veel uploadpogingen. Wacht even voordat je het opnieuw probeert."
         },
-        "success": {
-            "upload": "Document succesvol geüpload!"
-        },
         "dialog": {
             "title": "Document uploaden",
             "description": "Upload hier je geweldige document. Je kunt een PDF-, Word- of Markdown-bestand uploaden. We controleren of het voldoet aan de richtlijnen. Bedankt voor het delen van je kennis met de wereld!",
@@ -62,10 +58,7 @@
         "field": {
             "label": "Bestand",
             "upload_button": "Upload een bestand",
-            "drag_drop_text": "of sleep en zet neer",
-            "icons": {
-                "alt": "{{type}} icoon"
-            }
+            "drag_drop_text": "of sleep en zet neer"
         },
         "form": {
             "name": {
@@ -79,12 +72,10 @@
                 "label": "Categorie"
             },
             "year": {
-                "label": "Academiejaar",
-                "placeholder": "Selecteer academiejaar..."
+                "label": "Academiejaar"
             },
             "anonymous": {
-                "label": "Anoniem",
-                "description": "Wil je dit document anoniem uploaden?"
+                "label": "Anoniem"
             },
             "validation": {
                 "name": {
@@ -115,25 +106,103 @@
         "description": "Welkom bij Burgieclan! Je beste vriend bij het studeren voor examens. We bieden een platform waar studenten hun studiemateriaal met elkaar kunnen delen. Op deze manier kunnen jullie elkaar helpen en wordt studeren een stuk makkelijker. Dus waar wacht je nog op? Duik in de wereld van Burgieclan en begin met het delen van je kennis!",
         "recent_activities": "Ga verder waar je gebleven was",
         "news": "Nieuws",
-        "navigate_to": "Navigeer naar"
+        "navigate_to": "Navigeer naar",
+        "no_quick_links": "Geen snelkoppelingen gevonden"
     },
     "form": {
         "errors": {
             "fetch_failed": "Gegevens laden mislukt. Probeer het opnieuw."
         },
         "combo": {
-            "search": "Zoeken...",
             "no_results": "Geen resultaten gevonden"
         }
+    },
+    "course-page": {
+        "teachers": "Docenten",
+        "coordinator": "Coördinator",
+        "professor": "Professor",
+        "view-documents": "Bekijk documenten",
+        "files": "Documenten",
+        "comments": {
+            "no-comments": "Nog geen opmerkingen geplaatst",
+            "anonymous": "Anoniem",
+            "title": "Vakevaluatie",
+            "description": "Elk van deze opmerkingen is iemands mening. Wees respectvol. Als je een vraag hebt over de cursus, neem dan contact op met de cursuscoördinator.",
+            "add-new": "Opmerking toevoegen",
+            "success": "Opmerking succesvol toegevoegd",
+            "error": "Opmerking toevoegen mislukt",
+            "form": {
+                "content": {
+                    "required": "Opmerking is verplicht"
+                },
+                "category": {
+                    "required": "Categorie is verplicht"
+                }
+            },
+            "dialog": {
+                "title": "Nieuwe opmerking toevoegen",
+                "description": "Deel je ervaring met dit vak. Je feedback helpt andere studenten bij het maken van geïnformeerde keuzes.",
+                "category": "Categorie",
+                "content": "Je opmerking",
+                "content-placeholder": "Deel je ervaring met dit vak...",
+                "anonymous": "Anoniem",
+                "button": {
+                    "submit": "Opmerking plaatsen",
+                    "submitting": "Plaatsen...",
+                    "cancel": "Annuleren"
+                }
+            },
+            "no-categories": "Geen opmerking-categorieën beschikbaar"
+        },
+        "documents": {
+            "header": "Documenten",
+            "header-favorites": "Favoriete documenten",
+            "no-documents": "Geen documenten beschikbaar.",
+            "anonymous": "Anoniem",
+            "download": "Download",
+            "download-all": "Download alle documenten",
+            "downloading": "Downloaden...",
+            "select": "Selecteer document",
+            "selected": "{{amount}} geselecteerd",
+            "select-all": "Selecteer alles",
+            "deselect-all": "Deselecteer alles",
+            "clear-selection": "Selectie wissen",
+            "favorites-see-all": "Bekijk alle favorieten"
+        }
+    },
+    "download": {
+        "download-success": "Documenten succesvol gedownload!",
+        "download-error": "Downloaden mislukt."
+    },
+    "favorites": {
+        "add-favorite": "Voeg toe aan favorieten",
+        "remove-favorite": "Verwijder uit favorieten"
+    },
+    "curriculum-navigator": {
+        "search-placeholder": "Zoeken naar vakken, modules, richtingen...",
+        "no-search-results": "Geen zoekresultaten gevonden",
+        "no-programs": "Geen richtingen gevonden die overeenkomen met je zoekopdracht.",
+        "no-modules": "Geen modules gevonden die overeenkomen met je zoekopdracht.",
+        "no-courses": "Geen vakken gevonden die overeenkomen met je zoekopdracht.",
+        "program": "Richting",
+        "programs": "Richtingen",
+        "module": "Module",
+        "modules": "Modules",
+        "course": "Vak",
+        "courses": "Vakken",
+        "clear-search": "Wis",
+        "advanced-filters": "Geavanceerde filters",
+        "search-submit": "Zoeken",
+        "semester": "Semester",
+        "any-semester": "Elk semester",
+        "credits": "Studiepunten",
+        "show-only-favorites": "Toon alleen favorieten",
+        "matches-found": "Gevonden overeenkomsten"
     },
     "account": {
         "account": "Account",
         "greeting": "Hey, {{name}}!",
         "welcome_text": "Welkom bij je accountpagina. Hier vind je wat informatie over je favorieten en je bijdrages aan Burgieclan.",
-        "details": "Accountgegevens",
-        "name": "Naam",
-        "rnumber": "R-nummer",
-        "email": "E-mail",
         "favorite": {
             "courses": "Favoriete vakken",
             "modules": "Favoriete modules",
@@ -150,8 +219,29 @@
         }
     },
     "document": {
+        "name": "Naam",
+        "update-date": "Laatst bijgewerkt",
+        "create-date": "Aangemaakt op",
+        "creator": "Maker",
+        "year": "Academiejaar",
+        "tags": "Tags",
+        "anonymous": "Anoniem",
         "under_review": "In behandeling",
-        "approved": "Goedgekeurd"
+        "approved": "Goedgekeurd",
+        "sort-by": "Sorteer op",
+        "sort-ascending": "Oplopend",
+        "sort-descending": "Aflopend",
+        "filter": "Filter",
+        "filters": "Filters",
+        "clear-filters": "Filters wissen",
+        "search-by-name": "Zoeken op naam",
+        "search-by-tags": "Zoeken op tags",
+        "search-by-creator": "Zoeken op maker",
+        "search-by-year": "Zoeken op academiejaar",
+        "match-all-tags": "Alle tags moeten overeenkomen",
+        "add-tags": "Voeg tags toe",
+        "cancel": "Annuleren",
+        "apply": "Toepassen"
     },
     "pagination": {
         "previous": "Vorige",
@@ -164,17 +254,15 @@
         "no_results": "Geen resultaten gevonden",
         "no_results_sub": "Probeer een andere zoekopdracht of navigeer naar een andere pagina."
     },
+    "header": {
+        "my_vtk": "Mijn VTK"
+    },
     "sidebar": {
         "home": "Home",
-        "upload": "Upload",
         "my_courses": "Mijn Vakken",
-        "courses": "Vakken",
         "my_favorite_documents": "Favoriete Documenten",
-        "documents": "Documenten",
         "add_document": "Voeg document toe",
-        "profile": "Profiel",
         "log_out": "Uitloggen",
-        "add_doc": "Voeg document toe",
         "go_to_vtk": "Ga naar VTK",
         "user_avatar": "Gebruikersavatar"
     }

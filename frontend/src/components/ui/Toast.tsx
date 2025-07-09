@@ -1,9 +1,8 @@
-// src/components/ui/Toast/ToastProvider.tsx
 'use client'
 
 import React, { createContext, useContext, useCallback, useState } from 'react';
 import { Transition } from '@headlessui/react';
-import { ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import { AlertCircle, CheckCircle } from 'lucide-react';
 
 type ToastType = 'success' | 'error';
 
@@ -36,7 +35,7 @@ const ToastMessage = ({ message, type }: { message: string; type: ToastType }) =
         }
     }[type];
 
-    const Icon = type === 'error' ? ExclamationCircleIcon : CheckCircleIcon;
+    const Icon = type === 'error' ? AlertCircle : CheckCircle;
 
     return (
         <Transition

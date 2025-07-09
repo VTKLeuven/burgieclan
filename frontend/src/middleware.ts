@@ -14,13 +14,18 @@ const getPublicAvailablePages = async (): Promise<Page[]> => {
         throw new Error(`Missing environment variable for backend base URL`)
     }
     const url = backendBaseUrl + '/api/pages';
-    const response = await fetch(url, {
-        method: 'GET'
-    });
-    const data = await response.json();
+    try {
+        const response = await fetch(url, {
+            method: 'GET'
+        });
+        const data = await response.json();
 
-    const pages: Page[] = data['hydra:member'].map(convertToPage);
-    return pages;
+        const pages: Page[] = data['hydra:member'].map(convertToPage);
+        return pages;
+    } catch (error) {
+        console.error('Error fetching public pages:', error);
+        return []
+    }
 }
 
 const startsWithAllowedPath = (pathWithoutLocale: string): boolean => {
@@ -44,6 +49,7 @@ export default async function middleware(request: NextRequest) {
     let jwt = request.cookies.get('jwt')?.value || null;
     let isAuthenticated = jwt && Date.now() <= getJWTExpiration(jwt) * 1000;
 
+    const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || request.url;
     // Match and extract the locale from the URL path
     const localeMatch = request.nextUrl.pathname.match(/^\/([a-z]{2})(?:\/|$)/);
     const locale = localeMatch ? localeMatch[1] : '';
@@ -54,9 +60,12 @@ export default async function middleware(request: NextRequest) {
         const publicPage = await isPublicPage(pathWithoutLocale);
         if (!publicPage) {
             const loginUrl = locale ? `/${locale}/login` : '/login';
-            await new Promise(resolve => setTimeout(resolve, 10000));
-            return NextResponse.redirect(new URL(`${loginUrl}?redirectTo=${encodeURIComponent(request.nextUrl.href)}`, request.url));
-        }
+            // Use pathname instead of href to avoid localhost:3000
+            // Only add redirectTo if pathname is not root
+            const redirectUrl = request.nextUrl.pathname === '/' || request.nextUrl.pathname === '' 
+                ? loginUrl 
+                : `${loginUrl}?redirectTo=${encodeURIComponent(request.nextUrl.pathname)}`;
+            return NextResponse.redirect(new URL(redirectUrl, baseUrl));        }
     }
 
     // Allow access

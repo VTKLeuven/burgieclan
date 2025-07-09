@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { headers } from 'next/headers';
 import { getActiveJWT } from "@/utils/dal";
+import { logOut } from "./oauth";
 
 /**
  * Encodes an API error response from the backend server into a structured serializable format for the frontend.
@@ -11,12 +12,14 @@ const handleError = async (response: Response) => {
     const errorData = await response.json();
 
     switch (response.status) {
+        case 401:
+            return { error: { message: errorData.message || errorData.title || 'Unauthorized. Please log in again.', detail: errorData.detail, status: 401 } };
         case 404:
-            return { error: { message: errorData.message || 'Resource not found.', status: 404 } };
+            return { error: { message: errorData.message || errorData.title || 'Resource not found.', detail: errorData.detail, status: 404 } };
         case 500:
-            return { error: { message: errorData.message || 'Internal Server Error. Please try again later.', status: 500 } };
+            return { error: { message: errorData.message || errorData.title || 'Internal Server Error. Please try again later.', detail: errorData.detail, status: 500 } };
         default:
-            return { error: { message: errorData.message || 'Unexpected Error.', status: response.status || 500 } };
+            return { error: { message: errorData.message || errorData.title || 'Unexpected Error.', detail: errorData.detail, status: response.status || 500 } };
     }
 };
 
@@ -40,11 +43,14 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
         const jwt = await getActiveJWT();
 
         const requestHeaders = new Headers(customHeaders || {});
-        // If body is FormData, don't set content-type (usefull for file uploads)
+        // If body is FormData, don't set content-type (useful for file uploads)
         if (!(body instanceof FormData)) {
             if (method === 'PATCH') {
                 // Backend expects content-type to be application/merge-patch+json for PATCH requests
                 requestHeaders.set('Content-Type', 'application/merge-patch+json');
+            } else if (method === 'POST') {
+                // Backend expects content-type to be application/ld+json for POST requests
+                requestHeaders.set('Content-Type', 'application/ld+json');
             } else {
                 // Backend expects content-type to be application/json
                 requestHeaders.set('Content-Type', 'application/json');
@@ -62,38 +68,46 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
             body: body instanceof FormData ? body : JSON.stringify(body),
         });
 
-        const res = await response.json();
-
         // Handle successful response
         if (response.ok) {
-            return res;
+            return await response.json();
         }
 
-        // Handle errors (except 401s)
-        if (!(response.status === 401)) {
-            return await handleError(response);
+        // Handle 401 errors (except for login endpoint)
+        if (response.status === 401 && endpoint !== '/api/auth/login') {
+            // This throws a special error that will exit the function and trigger the redirect
+            // Important: This needs to be a throw so execution stops immediately
+            throw new Error('REDIRECT_TO_LOGIN');
         }
+
+        // Handle all other errors
+        return await handleError(response);
 
     } catch (error: any) {
+        // Special case for login redirection
+        if (error.message === 'REDIRECT_TO_LOGIN') {
+            // Ensure we exit the function properly with this redirect
+            redirectToLogin(frontendBaseUrl!);
+        }
+
+        // Handle all other errors
         return { error: { message: error.message || 'Unexpected API Error.', status: 500 } };
     }
+}
 
-    // Handle 401s for login endpoint
-    // This is a special case where we don't want to redirect to login page, because we are already there
-    if (endpoint === '/api/auth/login') {
-        throw new Error('401 Error logging in');
-    }
-
-
-    // Handle 401s by redirecting (must be done outside try-catch block because NextJS Redirect invoked via error)
+// Separate function to handle the redirect logic
+function redirectToLogin(frontendBaseUrl: string) {
     const headersList = headers();
     const refererUrl = headersList.get('referer') || "";
     const loginUrl = `${frontendBaseUrl}/login`;
 
+    logOut(); // Clear any existing session (e.g., cookies, to prevent infinite redirect loop)
+
     // Only set the redirectTo query parameter if the referer URL is not the login page
-    const redirectTo = refererUrl && !refererUrl.startsWith(loginUrl) ? `?redirectTo=${encodeURIComponent(refererUrl)}` : "";
+    const redirectTo = refererUrl && !refererUrl.startsWith(loginUrl)
+        ? `?redirectTo=${encodeURIComponent(refererUrl)}`
+        : "";
+
     const finalLoginUrl = `${loginUrl}${redirectTo}`;
     redirect(finalLoginUrl);
-
-    return;
 }

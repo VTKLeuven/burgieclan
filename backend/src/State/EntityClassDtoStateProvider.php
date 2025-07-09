@@ -11,6 +11,7 @@ use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use ArrayIterator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 class EntityClassDtoStateProvider implements ProviderInterface
@@ -18,7 +19,8 @@ class EntityClassDtoStateProvider implements ProviderInterface
     public function __construct(
         #[Autowire(service: CollectionProvider::class)] private readonly ProviderInterface $collectionProvider,
         #[Autowire(service: ItemProvider::class)] private readonly ProviderInterface $itemProvider,
-        private readonly MicroMapperInterface $microMapper
+        private readonly MicroMapperInterface $microMapper,
+        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -26,6 +28,11 @@ class EntityClassDtoStateProvider implements ProviderInterface
     {
         $resourceClass = $operation->getClass();
         if ($operation instanceof CollectionOperationInterface) {
+            $request = $this->requestStack->getCurrentRequest();
+            $disablePagination = $request && $request->query->has('pagination') &&
+                                ($request->query->get('pagination') === 'false'
+                                || $request->query->get('pagination') === '0');
+
             $entities = $this->collectionProvider->provide($operation, $uriVariables, $context);
             assert($entities instanceof Paginator);
 
@@ -34,6 +41,12 @@ class EntityClassDtoStateProvider implements ProviderInterface
                 $dtos[] = $this->mapEntityToDto($entity, $resourceClass);
             }
 
+            // If pagination is disabled, return the raw array of DTOs
+            if ($disablePagination) {
+                return $dtos;
+            }
+
+            // Otherwise return a paginated result
             return new TraversablePaginator(
                 new ArrayIterator($dtos),
                 $entities->getCurrentPage(),
@@ -53,6 +66,8 @@ class EntityClassDtoStateProvider implements ProviderInterface
 
     private function mapEntityToDto(object $entity, string $resourceClass): object
     {
-        return $this->microMapper->map($entity, $resourceClass);
+        $request = $this->requestStack->getCurrentRequest();
+        $lang = $request->query->get('lang'); // If the language is given as param, pass it to the mapper
+        return $this->microMapper->map($entity, $resourceClass, ["lang" => $lang]);
     }
 }
