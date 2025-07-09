@@ -8,9 +8,9 @@ export default function HeaderLayout({ children }: Readonly<{ children: React.Re
     return (
         <div className="flex h-full flex-col min-h-full">
             <Header />
-            <div className="grow flex flex-1">
+            <div className="grow flex flex-1 overflow-hidden">
                 <Sidebar />
-                <main className="flex-1 flex justify-center px-4">
+                <main className="flex-1 flex justify-center px-4 overflow-y-auto">
                     <div className="w-full max-w-6xl">
                         {children}
                     </div>
