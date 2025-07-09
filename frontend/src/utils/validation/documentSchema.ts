@@ -30,6 +30,28 @@ export const documentSchema = (t: any) => yup.object().shape({
         .boolean()
         .default(false),
 
+    tagIds: yup
+        .array(
+            yup.number()
+                .required()
+                .typeError(t('upload.form.validation.tags.number_required'))
+        )
+        .defined() // Ensures it returns an array, not undefined
+        .transform((value) => value || []) // Transform null or undefined to empty array
+        .default([]),
+
+    tagQueries: yup
+        .array(
+            yup.string()
+                .required()
+                .trim()
+                .min(1, t('upload.form.validation.tags.min'))
+                .max(50, t('upload.form.validation.tags.max'))
+        )
+        .defined() // Ensures it returns an array, not undefined
+        .transform((value) => value || []) // Transform null or undefined to empty array
+        .default([]),
+
     file: yup
         .mixed()
         .required(t('upload.form.validation.file.required'))
