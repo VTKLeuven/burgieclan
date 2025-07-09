@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import { Download, Tag as TagIcon } from 'lucide-react';
+import { Tag as TagIcon } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import { useTranslation } from 'react-i18next';
 import type { Document } from '@/types/entities';
 import { Checkbox } from '@/components/ui/Checkbox';
-import useDownloadContent from '@/hooks/useDownloadContent';
 import FavoriteButton from '@/components/ui/FavoriteButton';
+import DownloadButton from '@/components/ui/DownloadButton';
 
 interface DocumentListItemProps {
     document: Document;
@@ -21,12 +21,6 @@ const extractFilename = (contentUrl?: string): string => {
 
 const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelected, onToggleSelect }) => {
     const { t } = useTranslation();
-    const { downloadSingleDocument, loading: isDownloading } = useDownloadContent();
-
-    const handleDownload = (e: React.MouseEvent) => {
-        e.preventDefault();
-        downloadSingleDocument(document);
-    };
 
     return (
         <div className="border p-3 rounded-md relative" key={document.id}>
@@ -114,18 +108,11 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                             )}
                         </div>
                     </div>
-                    <button
-                        onClick={handleDownload}
-                        disabled={isDownloading}
-                        className="p-2 bg-vtk-blue-500 hover:bg-vtk-blue-600 text-white rounded-md flex items-center justify-center"
-                        title={t('course-page.documents.download')}
-                    >
-                        {isDownloading ? (
-                            <span className="animate-spin h-5 w-5 border-t-2 border-white rounded-full" />
-                        ) : (
-                            <Download size={20} />
-                        )}
-                    </button>
+                    <DownloadButton
+                        documents={[document]}
+                        size={20}
+                        className="p-2 bg-vtk-blue-400 hover:bg-vtk-blue-600 text-white hover:text-gray-300"
+                    />
                 </div>
             </div>
         </div>

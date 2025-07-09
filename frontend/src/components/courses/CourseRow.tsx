@@ -9,6 +9,7 @@ import { useApi } from "@/hooks/useApi";
 import { convertToCourse } from "@/utils/convertToEntity";
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
+import DownloadButton from '@/components/ui/DownloadButton';
 
 interface CourseRowProps {
     course: Course;
@@ -175,6 +176,9 @@ export const CourseRow = memo(({
                     )}
                 </div>
             </div>
+            {/* <div className="col-span-1 flex justify-center items-center"> */}
+                {!loading && course && <DownloadButton courses={[course]} size={16} />}
+            {/* </div> */}
         </div>
     );
 });

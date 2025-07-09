@@ -2,16 +2,16 @@
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Download } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useUser } from '@/components/UserContext';
-import useDownloadContent from '@/hooks/useDownloadContent';
-import type { Course, DocumentCategory, Document } from '@/types/entities';
-import Loading from '@/app/[locale]/loading';
-import Badge from '@/components/ui/Badge';
 import { useApi } from '@/hooks/useApi';
 import { convertToDocument } from '@/utils/convertToEntity';
 import FavoriteButton from '@/components/ui/FavoriteButton';
+import DownloadButton from '@/components/ui/DownloadButton';
+import type { Course, DocumentCategory, Document } from '@/types/entities';
+import Loading from '@/app/[locale]/loading';
+import Badge from '@/components/ui/Badge';
 
 interface FavoriteDocumentsProps {
     category: DocumentCategory;
@@ -27,7 +27,6 @@ const extractFilename = (contentUrl?: string): string => {
 const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course }) => {
     const { user, loading: userLoading } = useUser();
     const { t } = useTranslation();
-    const { downloadContent, loading: isDownloading } = useDownloadContent();
     const { request } = useApi();
     const [favoriteDocuments, setFavoriteDocuments] = useState<Document[]>([]);
     const [loading, setLoading] = useState(true);
@@ -82,12 +81,6 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
     if (favoriteDocuments.length === 0) {
         return null; // Don't show if no favorites match the current course/category
     }
-
-    const handleDownload = (document: Document, e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        downloadContent({ documents: [document] });
-    };
 
     return (
         <div className="mt-3 rounded-lg">
@@ -157,18 +150,11 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
                                 }}
                             />
 
-                            <button
-                                onClick={(e) => handleDownload(document, e)}
-                                disabled={isDownloading}
-                                className="p-1 bg-vtk-blue-500 hover:bg-vtk-blue-600 text-white rounded-md flex items-center justify-center"
-                                title={t('course-page.documents.download')}
-                            >
-                                {isDownloading ? (
-                                    <span className="animate-spin h-3 w-3 border-t-2 border-white rounded-full" />
-                                ) : (
-                                    <Download size={16} />
-                                )}
-                            </button>
+                            <DownloadButton 
+                                documents={[document]} 
+                                className="p-1 bg-vtk-blue-400 hover:bg-vtk-blue-600 text-white hover:text-gray-300 rounded-md flex items-center justify-center"
+                                size={16}
+                            />
                         </div>
                     </div>
                 ))}
