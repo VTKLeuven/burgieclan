@@ -42,8 +42,9 @@ class DashboardController extends AbstractDashboardController
 
     public function configureDashboard(): Dashboard
     {
+        // admin-assets is not proxied to the frontend, so it is accessible
         return Dashboard::new()
-            ->setTitle('<img src="image-for-test.png" alt="Icon" style="height: 20px; margin-right: 10px;"> Burgieclan');
+            ->setTitle('<img src="/admin-assets/images/logo.png" alt="Icon" style="height: 20px; margin-right: 10px;"> Burgieclan');
             //TODO add Burgieclan logo here
     }
 
