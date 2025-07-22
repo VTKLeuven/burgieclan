@@ -1,24 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { CommentCategory, CourseComment } from '@/types/entities';
 import Loading from '@/app/[locale]/loading';
-import { useTranslation } from 'react-i18next';
-import { convertToCommentCategory } from '@/utils/convertToEntity';
-import CourseCommentList from '@/components/coursepage/comment/CourseCommentList';
 import CommentDialog from '@/components/coursepage/comment/CommentDialog';
+import CourseCommentList from '@/components/coursepage/comment/CourseCommentList';
 import { useApi } from '@/hooks/useApi';
-import { useToast } from '@/components/ui/Toast';
+import { CommentCategory, CourseComment } from '@/types/entities';
+import { convertToCommentCategory, convertToCourseComment } from '@/utils/convertToEntity';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type CommentCategoriesProps = {
     comments: CourseComment[];
     courseId: number;
+    onCommentsUpdate?: (newComments: CourseComment[]) => void;
 };
 
-const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
+const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCategoriesProps) => {
     const [allCategories, setAllCategories] = useState<CommentCategory[]>([]);
     const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false);
+    const [localComments, setLocalComments] = useState<CourseComment[]>(comments);
     const { t } = useTranslation();
     const { request, loading } = useApi();
-    const { showToast } = useToast();
+
+    // Sync local comments with props
+    useEffect(() => {
+        setLocalComments(comments);
+    }, [comments]);
 
     // Fetch all categories from backend
     useEffect(() => {
@@ -34,12 +39,24 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
         fetchCategories();
     }, [request]);
 
-    // Group comments by category
-    const getCommentsByCategory = (categoryId: number) => {
-        return comments.filter(comment =>
-            comment.commentCategory && comment.commentCategory.id === categoryId
-        );
-    };
+    // Group comments by category - memoized to prevent unnecessary recalculations
+    const commentsByCategory = useMemo(() => {
+        const grouped: { [key: number]: CourseComment[] } = {};
+        localComments.forEach(comment => {
+            if (comment.commentCategory) {
+                const categoryId = comment.commentCategory.id;
+                if (!grouped[categoryId]) {
+                    grouped[categoryId] = [];
+                }
+                grouped[categoryId].push(comment);
+            }
+        });
+        return grouped;
+    }, [localComments]);
+
+    const getCommentsByCategory = useCallback((categoryId: number) => {
+        return commentsByCategory[categoryId] || [];
+    }, [commentsByCategory]);
 
     const handleOpenCommentDialog = () => {
         setIsCommentDialogOpen(true);
@@ -49,22 +66,21 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
         setIsCommentDialogOpen(false);
     };
 
-    const handleAddCommentToCategory = async (categoryId: number, data: { content: string; anonymous: boolean }) => {
-        const res = await request('POST', '/api/course_comments', {
-            content: data.content,
-            anonymous: data.anonymous,
-            course: `/api/courses/${courseId}`,
-            category: `/api/comment_categories/${categoryId}`
+    const handleCommentAdded = useCallback((newComment: CourseComment) => {
+        setLocalComments(prevComments => {
+            const updatedComments = [...prevComments, newComment];
+            // Notify parent component of the update
+            if (onCommentsUpdate) {
+                onCommentsUpdate(updatedComments);
+            }
+            return updatedComments;
         });
+    }, [onCommentsUpdate]);
 
-        if (!res) {
-            showToast(t('course-page.comments.error'), 'error');
-            throw new Error('Failed to add comment');
-        }
-
-        showToast(t('course-page.comments.success'), 'success');
-        // TODO: Add callback to refresh comments or update state
-    };
+    const handleCommentAddedFromDialog = useCallback((newCommentData: any) => {
+        const newComment = convertToCourseComment(newCommentData);
+        handleCommentAdded(newComment);
+    }, [handleCommentAdded]);
 
     if (loading) {
         return (
@@ -97,8 +113,8 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
                     key={category.id}
                     category={category}
                     comments={getCommentsByCategory(category.id)}
-                    t={t}
-                    onAddComment={handleAddCommentToCategory}
+                    courseId={courseId}
+                    onCommentAdded={handleCommentAdded}
                 />
             ))}
 
@@ -108,6 +124,7 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
                     onClose={handleCloseCommentDialog}
                     courseId={courseId}
                     categories={allCategories}
+                    onCommentAdded={handleCommentAddedFromDialog}
                 />
             )}
         </div>

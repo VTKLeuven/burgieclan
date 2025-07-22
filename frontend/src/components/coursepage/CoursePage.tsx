@@ -1,6 +1,6 @@
 'use client'
 import DocumentSections from "@/components/coursepage/DocumentSections";
-import { Course, Breadcrumb } from "@/types/entities";
+import { Course, Breadcrumb, CourseComment } from "@/types/entities";
 import { useEffect, useState } from "react";
 import { useApi } from "@/hooks/useApi";
 import Loading from '@/app/[locale]/loading'
@@ -38,6 +38,15 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
             getCourse();
         }
     }, [courseId, userLoading, request]);
+
+    const handleCommentsUpdate = (newComments: CourseComment[]) => {
+        if (course) {
+            setCourse({
+                ...course,
+                courseComments: newComments
+            });
+        }
+    };
 
     // Show loading state
     if (loading) {
@@ -140,6 +149,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                     <CommentCategories
                         comments={course.courseComments ?? []}
                         courseId={courseId}
+                        onCommentsUpdate={handleCommentsUpdate}
                     />
                 </div>
             </div>
