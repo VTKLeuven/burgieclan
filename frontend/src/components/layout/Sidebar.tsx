@@ -153,7 +153,7 @@ const NavigationSidebar = () => {
           {!isCollapsed && <span>{t('sidebar.add_document')}</span>}
         </button>
 
-        {/* User Profile - Fixed at Bottom #TODO add avatar input */}
+        {/* User Profile - Fixed at Bottom */}
         <div className="border-t border-gray-200 flex-shrink-0">
           <div className="p-4 flex items-center space-x-3">
             <Image
