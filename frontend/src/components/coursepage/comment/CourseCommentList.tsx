@@ -1,8 +1,8 @@
 import CommentRow from '@/components/coursepage/comment/CommentRow';
-import { useMemo, useState } from 'react';
-import { CommentCategory, CourseComment } from '@/types/entities';
-import { Info, ChevronRight, MessageSquarePlus, Send } from 'lucide-react';
 import Tooltip from '@/components/ui/Tooltip';
+import { CommentCategory, CourseComment } from '@/types/entities';
+import { ChevronRight, Info, MessageSquarePlus, Send } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type CourseCommentListProps = {
     category: CommentCategory;
@@ -18,6 +18,14 @@ const CourseCommentList = ({ category, comments: initialComments, t, onAddCommen
     const [formContent, setFormContent] = useState('');
     const [formAnonymous, setFormAnonymous] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    // Focus textarea when form is shown
+    useEffect(() => {
+        if (showAddForm && textareaRef.current) {
+            textareaRef.current.focus();
+        }
+    }, [showAddForm]);
 
     // Sort comments by most recent update/creation date
     const sortedComments = useMemo(() => {
@@ -121,6 +129,7 @@ const CourseCommentList = ({ category, comments: initialComments, t, onAddCommen
                         <div className="mb-3 p-3 bg-gray-100 border border-gray-400 rounded-md">
                             <form onSubmit={handleAddComment} className="space-y-2">
                                 <textarea
+                                    ref={textareaRef}
                                     value={formContent}
                                     onChange={(e) => setFormContent(e.target.value)}
                                     placeholder={t('course-page.comments.dialog.description')}
