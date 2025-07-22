@@ -7,6 +7,8 @@ import { useUser } from "@/components/UserContext";
 import FavoriteList from "@/components/account/FavoriteList";
 import DocumentList from "@/components/account/DocumentList";
 import { useEffect, useState } from "react";
+import { logOut } from "@/actions/oauth";
+import { useRouter } from "next/navigation";
 
 const mapCoursesToItems = (courses: Course[]) => {
     return courses.map(course => ({
@@ -48,6 +50,7 @@ const mapDocumentsToItems = (documents: Document[]) => {
 export default function AccountPage() {
     const { user, loading } = useUser();
     const { t } = useTranslation();
+    const router = useRouter();
 
     // Local state to manage favorites lists
     const [favoriteCourses, setFavoriteCourses] = useState<Course[]>([]);
@@ -69,8 +72,10 @@ export default function AccountPage() {
         return <Loading />;
     }
 
-    function handleLogout() {
-        // TODO implement logout
+
+    async function handleLogout() {
+        await logOut();
+        await router.push("/login");
     }
 
     return (
