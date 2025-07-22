@@ -270,7 +270,8 @@
     },
     "pagination": {
         "previous": "Previous",
-        "next": "Next"
+        "next": "Next",
+        "showing": "Showing {{start}} to {{end}} of {{total}} results"
     },
     "search": {
         "placeholder": "Search...",
