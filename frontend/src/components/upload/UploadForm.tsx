@@ -41,7 +41,7 @@ export default function UploadForm({
     } = useForm<UploadFormData>({
         resolver: yupResolver(documentSchema(t)),
         defaultValues: {
-            anonymous: false, // TODO: Set the initial value of the checkbox based on anonymous user setting
+            anonymous: false, // TODO: Set the initial value of the checkbox based on anonymous user setting, see https://burgieclan.atlassian.net/browse/BUR-222
             tagIds: [],
             tagQueries: []
         }
