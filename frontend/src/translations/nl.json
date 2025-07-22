@@ -271,7 +271,8 @@
     },
     "pagination": {
         "previous": "Vorige",
-        "next": "Volgende"
+        "next": "Volgende",
+        "showing": "Toont {{start}} tot {{end}} van {{total}} resultaten"
     },
     "search": {
         "placeholder": "Zoeken...",
