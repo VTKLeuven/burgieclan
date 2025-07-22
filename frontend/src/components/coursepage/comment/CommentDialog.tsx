@@ -4,7 +4,7 @@ import { Text } from '@/components/ui/Text';
 import { Send } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import { useTranslation } from 'react-i18next';
-import { CommentCategory } from '@/types/entities';
+import { CommentCategory, CourseComment } from '@/types/entities';
 import CommentForm from './CommentForm';
 import { useApi } from '@/hooks/useApi';
 
@@ -13,6 +13,7 @@ interface CommentDialogProps {
     onClose: () => void;
     courseId: number;
     categories: CommentCategory[];
+    onCommentAdded?: (newCommentData: any) => void;
 }
 
 interface CommentFormData {
@@ -25,7 +26,8 @@ const CommentDialog = ({
     isOpen,
     onClose,
     courseId,
-    categories
+    categories,
+    onCommentAdded
 }: CommentDialogProps) => {
     const { showToast } = useToast();
     const { t } = useTranslation();
@@ -45,8 +47,13 @@ const CommentDialog = ({
         }
 
         showToast(t('course-page.comments.success'), 'success');
-        onClose();
-        // TODO add a callback to refresh comments        
+        
+        // Notify parent about the new comment
+        if (onCommentAdded) {
+            onCommentAdded(res);
+        }
+        
+        onClose();        
     };
 
     return (
