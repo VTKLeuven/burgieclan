@@ -2,8 +2,6 @@
 
 namespace App\Controller\Admin\Filter;
 
-use App\Form\Type\Admin\EntityContainsFilterType;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Filter\FilterInterface;
@@ -49,10 +47,10 @@ class EntityContainsFilter implements FilterInterface
     }
 
     public function apply(
-        QueryBuilder $queryBuilder,
+        QueryBuilder  $queryBuilder,
         FilterDataDto $filterDataDto,
-        ?FieldDto $fieldDto,
-        EntityDto $entityDto
+        ?FieldDto     $fieldDto,
+        EntityDto     $entityDto
     ): void {
         $alias = $filterDataDto->getEntityAlias();
         $property = $filterDataDto->getProperty();
