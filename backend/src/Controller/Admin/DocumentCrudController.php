@@ -2,16 +2,21 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\Filter\EntityContainsFilter;
+use App\Entity\Course;
 use App\Entity\Document;
+use App\Entity\DocumentCategory;
+use App\Entity\Tag;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Vich\UploaderBundle\Form\Type\VichFileType;
 
@@ -75,5 +80,17 @@ class DocumentCrudController extends AbstractCrudController
             ->hideOnIndex();
         yield TextField::new('file_name')
             ->onlyOnIndex();
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('name')
+            ->add('year')
+            ->add(EntityContainsFilter::new('course', Course::class))
+            ->add(EntityContainsFilter::new('category', DocumentCategory::class))
+            ->add(EntityContainsFilter::new('tags', Tag ::class))
+            ->add('under_review')
+            ->add('anonymous');
     }
 }
