@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Announcement;
 use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -30,5 +31,14 @@ class AnnouncementCrudController extends AbstractCrudController
         yield TextField::new('content');
         yield DateTimeField::new('startTime');
         yield DateTimeField::new('endTime');
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('title')
+            ->add('content')
+            ->add('startTime')
+            ->add('endTime');
     }
 }
