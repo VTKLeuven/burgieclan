@@ -2,9 +2,13 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\Filter\EntityContainsFilter;
+use App\Entity\CommentCategory;
+use App\Entity\Course;
 use App\Entity\CourseComment;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -51,5 +55,17 @@ class CourseCommentCrudController extends AbstractCrudController
             ->hideOnForm();
         yield DateTimeField::new('updateDate')
             ->hideOnForm();
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add(EntityContainsFilter::new('course', Course::class))
+            ->add(EntityContainsFilter::new('category', CommentCategory::class))
+            ->add('content')
+            ->add(EntityContainsFilter::new('creator', User::class))
+            ->add('anonymous')
+            ->add('createDate')
+            ->add('updateDate');
     }
 }
