@@ -1,38 +1,17 @@
 import React, { useRef, useState } from 'react';
-import { Calendar, RefreshCw, UserX, CircleUserRound, Pencil, Trash2, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { CourseComment } from '@/types/entities';
 import { useTranslation } from 'react-i18next';
 import { useUpdateComment } from '@/hooks/useUpdateComment';
 import { useDeleteComment } from '@/hooks/useDeleteComment';
 import { useUser } from '@/components/UserContext';
+import CommentUserIcon from '@/components/coursepage/comment/CommentUserIcon';
+import CommentMetadata from '@/components/coursepage/comment/CommentMetadata';
+import CommentActions from '@/components/coursepage/comment/CommentActions';
 
 export type CommentRowProps = {
     comment: CourseComment;
     onDelete?: (commentId: number) => void;
-};
-
-// Format date as dd/mm/yyyy
-const formatDate = (date?: Date): string => {
-    if (!date) return '';
-    return new Intl.DateTimeFormat('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    }).format(date);
-};
-
-// Format full datetime for tooltip
-const formatFullDateTime = (date?: Date): string => {
-    if (!date) return '';
-    return new Intl.DateTimeFormat('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-    }).format(date);
 };
 
 const CommentRow: React.FC<CommentRowProps> = ({
@@ -97,27 +76,14 @@ const CommentRow: React.FC<CommentRowProps> = ({
     };
 
     return (
-        <div
-            className={`py-2 px-3 leading-tight flex overflow-visible relative items-center transition-colors border-b border-gray-200 hover:bg-amber-50 hover:shadow-sm group/comment`}
-        >
-            {/* Profile Picture - Left side */}
-            <div className="flex items-start mr-2 overflow-visible">
-                <div className="relative group overflow-visible">
-                    {comment.anonymous ? (
-                        <UserX className="h-4 w-4 text-gray-500 rounded-full mt-0.5" />
-                    ) : (
-                        <CircleUserRound className="h-4 w-4 text-gray-500 rounded-full mt-0.5" />
-                    )}
-                    <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-30">
-                        {comment.anonymous
-                            ? t('course-page.comments.anonymous')
-                            : comment.creator?.fullName}
-                    </div>
-                </div>
+        <div className="py-2 px-3 leading-tight flex flex-col sm:flex-row overflow-visible relative items-center transition-colors border-b border-gray-200 hover:bg-amber-50 hover:shadow-sm group/comment">
+            {/* Profile Picture - Left side (desktop only) */}
+            <div className="hidden sm:flex items-start mr-2 overflow-visible">
+                <CommentUserIcon anonymous={comment.anonymous ?? true} creatorName={comment.creator?.fullName} />
             </div>
 
             {/* Comment content - Center */}
-            <div className="flex-grow mr-3 flex items-start">
+            <div className="flex-grow mx-3 flex items-start items-center min-w-0 w-full">
                 {isEditing ? (
                     <form onSubmit={handleEditSubmit} className="space-y-2 w-full">
                         <textarea
@@ -173,67 +139,23 @@ const CommentRow: React.FC<CommentRowProps> = ({
                 ) : (
                     <>
                         <p className="text-sm text-gray-700 whitespace-pre-line">{comment.content}</p>
-                        {/* Edit button, only visible when the whole comment is hovered */}
-                        {isOwnComment && (
-                            <div className="relative flex items-center">
-                                <div className="relative group/edit">
-                                    <button
-                                        type="button"
-                                        onClick={handleEditClick}
-                                        className="ml-2 text-gray-500 bg-amber-100 hover:text-amber-600 hover:bg-amber-200 rounded transition-colors opacity-0 group-hover/comment:opacity-100 items-center px-2 py-1 justify-center"
-                                    >
-                                        <Pencil size={14} />
-                                    </button>
-                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover/edit:opacity-100 transition-opacity pointer-events-none shadow-lg z-30">
-                                        {t('course-page.comments.dialog.button.edit')}
-                                    </div>
-                                </div>
-                                <div className="relative group/delete">
-                                    <button
-                                        type="button"
-                                        onClick={handleDeleteComment}
-                                        className="ml-2 text-red-700 bg-red-100 hover:bg-red-200 rounded transition-colors opacity-0 group-hover/comment:opacity-100 items-center justify-center px-2 py-1 inline-flex"
-                                    >
-                                        <Trash2 size={14} />
-                                    </button>
-                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover/delete:opacity-100 transition-opacity pointer-events-none shadow-lg z-30">
-                                        {t('course-page.comments.dialog.button.delete')}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                        <div className="hidden sm:block w-auto">
+                            <CommentActions onEdit={handleEditClick} onDelete={handleDeleteComment} show={isOwnComment && !isEditing} />
+                        </div>
                     </>
                 )}
             </div>
 
-            {/* Metadata - Right side */}
-            <div className="flex flex-col text-xs text-gray-500 text-right min-w-[120px] space-y-1 mt-0.5">
-                {/* Dates */}
-                <div className="flex flex-col items-end space-y-1">
-                    {/* Created date */}
-                    <div className="relative group flex items-center">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        <span>
-                            {formatDate(comment.createdAt)}
-                        </span>
-                        <div className="absolute top-full right-0 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-20">
-                            {formatFullDateTime(comment.createdAt)}
-                        </div>
-                    </div>
+            {/* Metadata - Right side (desktop only) */}
+            <div className="hidden sm:block">
+                <CommentMetadata comment={comment} />
+            </div>
 
-                    {/* Updated date - only show if different from create date */}
-                    {comment.updatedAt && comment.createdAt && comment.updatedAt.getTime() !== comment.createdAt.getTime() && (
-                        <div className="relative group flex items-center">
-                            <RefreshCw className="h-3 w-3 mr-1" />
-                            <span>
-                                {formatDate(comment.updatedAt)}
-                            </span>
-                            <div className="absolute top-full right-0 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-20">
-                                {formatFullDateTime(comment.updatedAt)}
-                            </div>
-                        </div>
-                    )}
-                </div>
+            {/* Mobile: icon, metadata, actions in a row below comment */}
+            <div className="sm:hidden flex flex-row w-full mt-2 gap-2 items-start">
+                <CommentUserIcon anonymous={comment.anonymous ?? true} creatorName={comment.creator?.fullName} />
+                <CommentMetadata comment={comment} />
+                <CommentActions onEdit={handleEditClick} onDelete={handleDeleteComment} show={isOwnComment && !isEditing} isMobile />
             </div>
         </div>
     );

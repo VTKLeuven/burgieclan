@@ -3,8 +3,8 @@ import { CommentCategory, CourseComment } from '@/types/entities';
 import Loading from '@/app/[locale]/loading';
 import { useTranslation } from 'react-i18next';
 import { convertToCommentCategory } from '@/utils/convertToEntity';
-import CourseCommentList from '@/components/coursepage/CourseCommentList';
-import CommentDialog from '@/components/coursepage/CommentDialog';
+import CourseCommentList from '@/components/coursepage/comment/CourseCommentList';
+import CommentDialog from '@/components/coursepage/comment/CommentDialog';
 import { useApi } from '@/hooks/useApi';
 import { useToast } from '@/components/ui/Toast';
 
