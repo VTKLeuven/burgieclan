@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { CourseRow } from '@/components/courses/CourseRow';
 import type { Module, Course } from '@/types/entities';
 import { CourseTableHeader } from '@/components/courses/CourseTableHeader';
@@ -9,6 +9,8 @@ import {
     moduleMatchesText,
     moduleContainsChildMatches
 } from '@/utils/curriculumSearchUtils';
+import { useTranslation } from 'react-i18next';
+import DownloadButton from '@/components/ui/DownloadButton';
 
 interface ModuleNodeProps {
     module: Module;
@@ -23,6 +25,8 @@ const ModuleNode = ({
     searchFilters = null,
     favoriteCourses = []
 }: ModuleNodeProps) => {
+    const { t } = useTranslation();
+
     const [expanded, setExpanded] = useState(false);
 
     // Get search query
@@ -76,10 +80,14 @@ const ModuleNode = ({
 
                 {/* Show badge with match count if matches exist */}
                 {searchFilters && searchQuery && totalMatches > 0 && (
-                    <div className="ml-auto bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center">
+                    <div className="ml-auto bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center mr-2">
                         {totalMatches}
                     </div>
                 )}
+                
+                <div className="ml-auto flex items-center">
+                    <DownloadButton modules={[module]} className='px-4 py-0.5'/>
+                </div>
             </div>
 
             <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
@@ -107,6 +115,16 @@ const ModuleNode = ({
                                     isFirstRow={index === 0}
                                 />
                             ))}
+                        </div>
+                    )}
+                    
+                    {/* Empty state when no submodules and no courses */}
+                    {(!module.modules || module.modules.length === 0) && 
+                     (!module.courses || module.courses.length === 0) && (
+                        <div className="py-3 px-2">
+                            <div className="text-gray-500 text-sm italic">
+                                {t('curriculum-navigator.no-courses-in-module')}
+                            </div>
                         </div>
                     )}
                 </div>

@@ -16,11 +16,11 @@ interface ItemListProps {
 }
 
 const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage }) => {
-    const itemsPerList = 5;
+    const itemsPerList = 4;
     const displayedItems = items.slice(0, itemsPerList);
 
     return (
-        <div>
+        <div className="overflow-y-auto h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
             {items && items.length > 0 ? (
                 <ul className="space-y-0 list-none p-0">
                     {displayedItems.map((item, index) => (
@@ -54,7 +54,7 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage }) => {
                     ))}
                 </ul>
             ) : (
-                <p>{emptyMessage}</p>
+                <p className="text-sm text-gray-500">{emptyMessage}</p>
             )}
             {items.length > itemsPerList && (
                 <div className="flex justify-center mt-3">
