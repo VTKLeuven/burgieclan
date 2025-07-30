@@ -86,7 +86,7 @@ const ModuleNode = ({
                 )}
                 
                 <div className="ml-auto flex items-center">
-                    <DownloadButton modules={[module]} />
+                    <DownloadButton modules={[module]} className='px-4 py-0.5'/>
                 </div>
             </div>
 
