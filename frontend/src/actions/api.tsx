@@ -70,6 +70,9 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
 
         // Handle successful response
         if (response.ok) {
+            if (response.status === 204) {
+                return null; // No content response
+            }
             return await response.json();
         }
 
