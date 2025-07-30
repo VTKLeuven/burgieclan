@@ -155,7 +155,9 @@
                 "button": {
                     "submit": "Post comment",
                     "submitting": "Posting...",
-                    "cancel": "Cancel"
+                    "cancel": "Cancel",
+                    "edit": "Edit comment",
+                    "delete": "Delete comment"
                 }
             },
             "no-categories": "No comment categories available"

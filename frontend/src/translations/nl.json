@@ -155,7 +155,9 @@
                 "button": {
                     "submit": "Opmerking plaatsen",
                     "submitting": "Plaatsen...",
-                    "cancel": "Annuleren"
+                    "cancel": "Annuleren",
+                    "edit": "Opmerking bewerken",
+                    "delete": "Opmerking verwijderen"
                 }
             },
             "no-categories": "Geen opmerking-categorieën beschikbaar"
