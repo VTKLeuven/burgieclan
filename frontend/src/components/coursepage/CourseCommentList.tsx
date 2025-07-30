@@ -1,8 +1,7 @@
-import CommentRow from './CommentRow';
-import React, { useMemo, useState } from 'react';
+import CommentRow from '@/components/coursepage/CommentRow';
+import { useMemo, useState } from 'react';
 import { CommentCategory, CourseComment } from '@/types/entities';
 import { Info, ChevronRight, MessageSquarePlus, Send } from 'lucide-react';
-import Loading from '@/app/[locale]/loading';
 
 type CourseCommentListProps = {
     category: CommentCategory;
@@ -11,8 +10,8 @@ type CourseCommentListProps = {
     onAddComment?: (categoryId: number, data: { content: string; anonymous: boolean }) => Promise<void>;
 };
 
-const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommentListProps) => {
-
+const CourseCommentList = ({ category, comments: initialComments, t, onAddComment }: CourseCommentListProps) => {
+    const [comments, setComments] = useState<CourseComment[]>(initialComments);
     const [expanded, setExpanded] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
     const [formContent, setFormContent] = useState('');
@@ -67,6 +66,10 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
         e.stopPropagation();
         setShowAddForm(true);
         setExpanded(true);
+    };
+
+    const handleDeleteComment = (commentId: number) => {
+        setComments((prev) => prev.filter((c) => c.id !== commentId));
     };
 
     return (
@@ -182,14 +185,13 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
                         </div>
                     ) : (
                         <div className="border border-gray-200 rounded-md overflow-visible relative">
-                            {sortedComments.map((comment) => {
-                                return (
-                                    <CommentRow
-                                        key={comment.id}
-                                        comment={comment}
-                                    />
-                                );
-                            })}
+                            {sortedComments.map((comment) => (
+                                <CommentRow
+                                    key={comment.id}
+                                    comment={comment}
+                                    onDelete={handleDeleteComment}
+                                />
+                            ))}
                         </div>
                     )}
                 </div>

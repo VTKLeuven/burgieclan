@@ -4,10 +4,11 @@ import { CourseComment } from '@/types/entities';
 import { useTranslation } from 'react-i18next';
 import { useUpdateComment } from '@/hooks/useUpdateComment';
 import { useDeleteComment } from '@/hooks/useDeleteComment';
-import { useUser } from '../UserContext';
+import { useUser } from '@/components/UserContext';
 
 export type CommentRowProps = {
     comment: CourseComment;
+    onDelete?: (commentId: number) => void;
 };
 
 // Format date as dd/mm/yyyy
@@ -35,13 +36,16 @@ const formatFullDateTime = (date?: Date): string => {
 };
 
 const CommentRow: React.FC<CommentRowProps> = ({
-    comment,
+    comment: initialComment,
+    onDelete,
 }) => {
     const { user } = useUser();
+    const [comment, setComment] = useState(initialComment);
     const isOwnComment = !!(user && comment.creator?.id === user.id);
 
     const [isEditing, setIsEditing] = useState(false);
     const [editContent, setEditContent] = useState(comment.content ?? '');
+    const [editAnonymous, setEditAnonymous] = useState(comment.anonymous ?? false);
     const [editIsSubmitting, setEditIsSubmitting] = useState(false);
     const editTextareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -49,16 +53,21 @@ const CommentRow: React.FC<CommentRowProps> = ({
     const updateComment = useUpdateComment();
     const deleteComment = useDeleteComment();
 
+    // Handle click to edit comment
     const handleEditClick = () => {
         setIsEditing(true);
         setEditContent(comment.content ?? '');
+        setEditAnonymous(comment.anonymous ?? false);
     };
 
+    // Handle cancel edit
     const handleCancelEdit = () => {
         setIsEditing(false);
         setEditContent(comment.content ?? '');
+        setEditAnonymous(comment.anonymous ?? false);
     };
 
+    // Handle content change in edit textarea
     const handleEditContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setEditContent(e.target.value);
         if (editTextareaRef.current) {
@@ -72,7 +81,8 @@ const CommentRow: React.FC<CommentRowProps> = ({
         if (!editContent.trim()) return;
         setEditIsSubmitting(true);
         try {
-            await updateComment(comment.id, { content: editContent });
+            const updatedComment = await updateComment(comment.id, { content: editContent, anonymous: editAnonymous });
+            setComment({ ...comment, ...updatedComment });
             setIsEditing(false);
         } catch (error) {
             // Error handling can be added here
@@ -83,6 +93,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
 
     const handleDeleteComment = async () => {
         await deleteComment(comment.id);
+        if (onDelete) onDelete(comment.id);
     };
 
     return (
@@ -120,6 +131,18 @@ const CommentRow: React.FC<CommentRowProps> = ({
                             style={{ minHeight: '2.5rem', overflow: 'hidden' }}
                         />
                         <div className="flex items-center gap-2 justify-end">
+                            <label className="flex items-center text-xs text-gray-600 cursor-pointer hover:text-gray-800 transition-colors mr-2">
+                                <input
+                                    type="checkbox"
+                                    checked={editAnonymous}
+                                    onChange={(e) => setEditAnonymous(e.target.checked)}
+                                    className="mr-2 cursor-pointer h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
+                                    disabled={editIsSubmitting}
+                                />
+                                <span className="cursor-pointer">
+                                    {t('course-page.comments.dialog.anonymous')}
+                                </span>
+                            </label>
                             <button
                                 type="button"
                                 onClick={handleCancelEdit}

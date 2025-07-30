@@ -1,10 +1,29 @@
+import { useToast } from '@/components/ui/Toast';
+import { useApi } from '@/hooks/useApi';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function useDeleteComment() {
-    // Simulate async delete, implementation to be added later
+    const { request } = useApi();
+    const { showToast } = useToast();
+    const { t } = useTranslation();
+
     return useCallback(async (commentId: number) => {
-        // TODO: Replace with actual delete logic
-        await new Promise((resolve) => setTimeout(resolve, 400));
-        // Optionally return something or throw on error
-    }, []);
+        const result = await request('DELETE', `/api/course_comments/${commentId}`);
+
+        // result == null is a good thing
+        if (result && result.error) {
+            showToast(
+                t('course-page.comments.toast.delete-error'),
+                'error'
+            );
+            throw new Error(result?.error?.message || t('course-page.comments.toast.delete-error'));
+        }
+
+        showToast(
+            t('course-page.comments.toast.delete-success'),
+            'success'
+        );
+        return;
+    }, [request, showToast, t]);
 }
