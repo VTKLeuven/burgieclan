@@ -19,15 +19,6 @@ const SEARCH_CONFIG = {
   maxResults: undefined  // No maximum limit
 };
 
-// Debug flag - set to true to see what's happening
-const DEBUG_SEARCH = process.env.NODE_ENV === 'development';
-
-function debugLog(message: string, data?: any) {
-  if (DEBUG_SEARCH) {
-    console.log(`[CurriculumSearch] ${message}`, data || '');
-  }
-}
-
 /**
  * Initialize budget-aware Fuse instances with curriculum data
  */
@@ -35,9 +26,7 @@ export function initializeFuseInstances(
   courses: Course[],
   modules: Module[],
   programs: Program[]
-) {
-  debugLog(`Initializing Fuse instances with ${courses.length} courses, ${modules.length} modules, ${programs.length} programs`);
-  
+) {  
   // Store original data
   originalCourses = courses;
   originalModules = modules;
@@ -59,12 +48,6 @@ export function initializeFuseInstances(
       ignoreLocation: true,
     }, SEARCH_CONFIG);
 
-    debugLog('Fuse instances initialized successfully');
-  
-    // Auto-run debug test in development
-    if (DEBUG_SEARCH && courses.length > 0) {
-      setTimeout(() => debugBudgetSearchInternal('test'), 100);
-    }
   } catch (error) {
     console.error('Error initializing Fuse instances:', error);
   }
@@ -100,8 +83,6 @@ export function extractEntities(programs: Program[]): {
     }
   });
 
-  debugLog(`Extracted entities: ${allCourses.length} courses, ${allModules.length} modules, ${allPrograms.length} programs`);
-
   return {
     courses: allCourses,
     modules: allModules,
@@ -115,14 +96,11 @@ export function extractEntities(programs: Program[]): {
 export function courseMatchesText(course: Course, searchQuery?: string): boolean {
   if (!searchQuery) return false;
 
-  debugLog(`Checking course match: "${course.name}" against "${searchQuery}"`);
-
   // Quick exact match check first (performance optimization)
   if (
     course.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     course.code?.toLowerCase().includes(searchQuery.toLowerCase())
   ) {
-    debugLog(`Exact match found for course: ${course.name}`);
     return true;
   }
 
@@ -131,10 +109,6 @@ export function courseMatchesText(course: Course, searchQuery?: string): boolean
     try {
       const results = coursesBudgetFuse.search(searchQuery);
       const isMatch = results.some(result => result.item.id === course.id);
-      debugLog(`Budget search result for "${course.name}": ${isMatch}`, { 
-        totalResults: results.length,
-        scores: results.map(r => r.score)
-      });
       return isMatch;
     } catch (error) {
       console.error('Error in budget search for course:', error);
@@ -142,7 +116,6 @@ export function courseMatchesText(course: Course, searchQuery?: string): boolean
   }
 
   // Fallback to individual search
-  debugLog(`Using fallback search for course: ${course.name}`);
   const searchableItems = [course];
   const tempFuse = new FuseBudgetSearch(searchableItems, {
     keys: ['name', 'code'],
@@ -164,11 +137,8 @@ export function courseMatchesText(course: Course, searchQuery?: string): boolean
 export function moduleMatchesText(module: Module, searchQuery?: string): boolean {
   if (!searchQuery || !module.name) return false;
 
-  debugLog(`Checking module match: "${module.name}" against "${searchQuery}"`);
-
   // Quick exact match check
   if (module.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-    debugLog(`Exact match found for module: ${module.name}`);
     return true;
   }
 
@@ -177,7 +147,6 @@ export function moduleMatchesText(module: Module, searchQuery?: string): boolean
     try {
       const results = modulesBudgetFuse.search(searchQuery);
       const isMatch = results.some(result => result.item.id === module.id);
-      debugLog(`Budget search result for module "${module.name}": ${isMatch}`);
       return isMatch;
     } catch (error) {
       console.error('Error in budget search for module:', error);
@@ -185,7 +154,6 @@ export function moduleMatchesText(module: Module, searchQuery?: string): boolean
   }
 
   // Fallback
-  debugLog(`Using fallback search for module: ${module.name}`);
   const searchableItems = [module];
   const tempFuse = new FuseBudgetSearch(searchableItems, {
     keys: ['name'],
@@ -207,11 +175,8 @@ export function moduleMatchesText(module: Module, searchQuery?: string): boolean
 export function programMatchesText(program: Program, searchQuery?: string): boolean {
   if (!searchQuery || !program.name) return false;
 
-  debugLog(`Checking program match: "${program.name}" against "${searchQuery}"`);
-
   // Quick exact match check
   if (program.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-    debugLog(`Exact match found for program: ${program.name}`);
     return true;
   }
 
@@ -220,7 +185,6 @@ export function programMatchesText(program: Program, searchQuery?: string): bool
     try {
       const results = programsBudgetFuse.search(searchQuery);
       const isMatch = results.some(result => result.item.id === program.id);
-      debugLog(`Budget search result for program "${program.name}": ${isMatch}`);
       return isMatch;
     } catch (error) {
       console.error('Error in budget search for program:', error);
@@ -228,7 +192,6 @@ export function programMatchesText(program: Program, searchQuery?: string): bool
   }
 
   // Fallback
-  debugLog(`Using fallback search for program: ${program.name}`);
   const searchableItems = [program];
   const tempFuse = new FuseBudgetSearch(searchableItems, {
     keys: ['name'],
@@ -245,51 +208,6 @@ export function programMatchesText(program: Program, searchQuery?: string): bool
 }
 
 /**
- * Internal test function to verify budget search is working
- */
-function debugBudgetSearchInternal(query: string = 'test') {
-  if (!DEBUG_SEARCH) return;
-
-  console.log(`\n=== Testing Budget Search with query: "${query}" ===`);
-
-  if (coursesBudgetFuse && originalCourses.length > 0) {
-    try {
-      const result = coursesBudgetFuse.searchWithDiagnostics(query);
-      console.log('Courses search test:', {
-        query,
-        totalCandidates: result.diagnostics.totalCandidates,
-        resultsReturned: result.results.length,
-        budgetUsed: result.diagnostics.budgetUsed,
-        budgetLimit: result.diagnostics.budgetLimit,
-        results: result.results.map(r => ({ name: r.item.name, score: r.score }))
-      });
-    } catch (error) {
-      console.error('Error testing courses search:', error);
-    }
-  } else {
-    console.log('Courses fuse not initialized or no courses available');
-  }
-
-  if (modulesBudgetFuse && originalModules.length > 0) {
-    try {
-      const result = modulesBudgetFuse.searchWithDiagnostics(query);
-      console.log('Modules search test:', {
-        query,
-        totalCandidates: result.diagnostics.totalCandidates,
-        resultsReturned: result.results.length,
-        budgetUsed: result.diagnostics.budgetUsed,
-        budgetLimit: result.diagnostics.budgetLimit,
-        results: result.results.map(r => ({ name: r.item.name, score: r.score }))
-      });
-    } catch (error) {
-      console.error('Error testing modules search:', error);
-    }
-  }
-
-  console.log('=== End Budget Search Test ===\n');
-}
-
-/**
  * Get all matching courses with budget-aware search
  */
 export function getMatchingCourses(
@@ -297,8 +215,6 @@ export function getMatchingCourses(
   searchQuery: string
 ): Course[] {
   if (!searchQuery) return [];
-
-  debugLog(`Getting matching courses for query: "${searchQuery}"`);
   
   try {
     // Create temporary instance for this specific search
@@ -308,7 +224,6 @@ export function getMatchingCourses(
     }, SEARCH_CONFIG);
 
     const results = tempFuse.search(searchQuery).map(result => result.item);
-    debugLog(`Found ${results.length} matching courses`);
     return results;
   } catch (error) {
     console.error('Error in getMatchingCourses:', error);
@@ -337,9 +252,7 @@ export function searchWithAnalytics(
     programsFound: number;
     maxBudgetLimit: number;
   };
-} {
-  debugLog(`Search with analytics: "${query}"`);
-  
+} {  
   let coursesResults: any[] = [];
   let modulesResults: any[] = [];
   let programsResults: any[] = [];
@@ -356,7 +269,6 @@ export function searchWithAnalytics(
       }, SEARCH_CONFIG);
       coursesAnalytics = tempCoursesFuse.searchWithDiagnostics(query);
       coursesResults = coursesAnalytics.results;
-      debugLog(`Courses analytics: ${coursesResults.length} results, budget used: ${coursesAnalytics.diagnostics.budgetUsed}`);
     }
 
     if (originalModules.length > 0) {
@@ -366,7 +278,6 @@ export function searchWithAnalytics(
       }, SEARCH_CONFIG);
       modulesAnalytics = tempModulesFuse.searchWithDiagnostics(query);
       modulesResults = modulesAnalytics.results;
-      debugLog(`Modules analytics: ${modulesResults.length} results, budget used: ${modulesAnalytics.diagnostics.budgetUsed}`);
     }
 
     if (originalPrograms.length > 0) {
@@ -376,7 +287,6 @@ export function searchWithAnalytics(
       }, SEARCH_CONFIG);
       programsAnalytics = tempProgramsFuse.searchWithDiagnostics(query);
       programsResults = programsAnalytics.results;
-      debugLog(`Programs analytics: ${programsResults.length} results, budget used: ${programsAnalytics.diagnostics.budgetUsed}`);
     }
   } catch (error) {
     console.error('Error in searchWithAnalytics:', error);
@@ -400,18 +310,6 @@ export function searchWithAnalytics(
     programsFound: programsResults.length,
     maxBudgetLimit: SEARCH_CONFIG.totalBudget
   };
-
-  debugLog('Analytics result:', analytics);
-
-  // Debug: log the actual results found
-  if (DEBUG_SEARCH) {
-    console.log('=== SEARCH ANALYTICS BREAKDOWN ===');
-    console.log('Courses found:', coursesResults.map(r => ({ name: r.item.name, score: r.score })));
-    console.log('Modules found:', modulesResults.map(r => ({ name: r.item.name, score: r.score })));
-    console.log('Programs found:', programsResults.map(r => ({ name: r.item.name, score: r.score })));
-    console.log('Total budget used:', totalBudgetUsed);
-    console.log('====================================');
-  }
 
   return {
     courses: coursesResults.map(r => r.item),
@@ -575,8 +473,6 @@ export function filterCurriculum(
   filteredPrograms: Program[],
   matchCounts: { programs: number, modules: number, courses: number }
 } {
-  debugLog(`Filtering curriculum with query: "${filters.query}"`);
-
   const { query } = filters;
   const searchQuery = query?.toLowerCase();
 
@@ -658,8 +554,6 @@ export function filterCurriculum(
     modules: matchedModuleIds.size,
     courses: matchedCourseIds.size
   };
-
-  debugLog(`Filter results: ${filteredPrograms.length} programs, ${matchCounts.courses} courses, ${matchCounts.modules} modules`);
 
   return { filteredPrograms, matchCounts };
 }

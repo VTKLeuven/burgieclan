@@ -12,6 +12,7 @@ import { useYearOptions } from '@/hooks/useYearOptions';
 import { VISIBLE_YEARS } from "@/utils/constants/upload";
 import { Checkbox } from "@/components/ui/Checkbox";
 import UploadTagFilter from '@/components/upload/UploadTagFilter';
+import { getSuggestedNameFromFilename } from '@/utils/documentNameSuggestion';
 
 interface FormProps {
     onSubmit: (data: UploadFormData) => Promise<void>;
@@ -35,6 +36,7 @@ export default function UploadForm({
         handleSubmit,
         setValue,
         control,
+        watch,
         formState: { errors },
     } = useForm<UploadFormData>({
         resolver: yupResolver(documentSchema(t)),
@@ -47,6 +49,10 @@ export default function UploadForm({
 
     const { courses, categories, isLoading: isLoadingFields, error } = useFormFields(isOpen);
     const yearOptions = useYearOptions();
+    
+    // Watch the file and name fields
+    const watchedFile = watch('file');
+    const watchedName = watch('name');
 
     // Set initial file on mount if provided.
     useEffect(() => {
@@ -54,6 +60,14 @@ export default function UploadForm({
             setValue('file', initialFile, { shouldValidate: true });
         }
     }, [initialFile, setValue]);
+    
+    // Suggest name based on filename when file changes and name is empty
+    useEffect(() => {
+        if (watchedFile && !watchedName) {
+            const suggestedName = getSuggestedNameFromFilename(watchedFile.name);
+            setValue('name', suggestedName, { shouldValidate: true });
+        }
+    }, [watchedFile, watchedName, setValue]);
 
     // Update form values when tags change
     useEffect(() => {

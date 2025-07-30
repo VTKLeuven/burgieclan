@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { headers } from 'next/headers';
 import { getActiveJWT } from "@/utils/dal";
+import { logOut } from "./oauth";
 
 /**
  * Encodes an API error response from the backend server into a structured serializable format for the frontend.
@@ -99,6 +100,8 @@ function redirectToLogin(frontendBaseUrl: string) {
     const headersList = headers();
     const refererUrl = headersList.get('referer') || "";
     const loginUrl = `${frontendBaseUrl}/login`;
+
+    logOut(); // Clear any existing session (e.g., cookies, to prevent infinite redirect loop)
 
     // Only set the redirectTo query parameter if the referer URL is not the login page
     const redirectTo = refererUrl && !refererUrl.startsWith(loginUrl)
