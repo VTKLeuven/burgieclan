@@ -68,30 +68,30 @@ const NavigationSidebar = () => {
   }
 
   return (
-    <aside>
+    <aside className="h-full flex-shrink-0">
       <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-full bg-white border-r border-gray-200 flex flex-col`}>
         {/* Collapse Toggle Button */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-4 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100"
+          className="absolute -right-3 top-4 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100 z-10"
           aria-label={'toggle'}
         >
           {isCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
         </button>
 
         {/* Top Navigation */}
-        <nav className="p-4 flex flex-col gap-2">
+        <div className="p-4 flex-shrink-0">
           <Link href={`/${i18n.language}`} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-1 transition-all duration-200 hover:scale-[1.01]">
-            <button
-              onClick={() => setIsCollapsed(false)}
-            >
+            <button onClick={() => setIsCollapsed(false)}>
               <Home size={20} />
             </button>
             {!isCollapsed && <span>{t('sidebar.home')}</span>}
           </Link>
-          <div className="border-t border-gray-300" />
+        </div>
+        <nav className="flex-1 overflow-y-hidden overflow-x-hidden pl-4 flex flex-col">
+          <div className="border-t border-gray-300 mb-2"></div>
           <button
-            className="flex items-center justify-between w-full p-1 text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0"
+            className="flex items-center justify-between w-full p-1 text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0 flex-shrink-0"
             onClick={() => {
               toggleSection('courses');
               setIsCollapsed(false);
@@ -106,38 +106,42 @@ const NavigationSidebar = () => {
           </button>
           {/* Favorite Courses List */}
           {!isCollapsed && expandedSections.courses && (
-            <ItemList
-              items={mapCoursesToItems(user.favoriteCourses || [])}
-              emptyMessage={t('account.favorite.no_courses')}
-            />
-          )}
-          <div className="border-t border-gray-300" />
-          <button
-            className="flex items-center justify-between w-full p-1 text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0"
-            onClick={() => {
-              toggleSection('documents');
-              setIsCollapsed(false);
-            }}
-            aria-label={t('sidebar.toggle_documents')}
-          >
-            <div className="flex items-center space-x-2">
-              <File size={20} />
-              {!isCollapsed && <span>{t('sidebar.my_favorite_documents')}</span>}
+            <div className="flex-1 min-h-0">
+              <ItemList
+                items={mapCoursesToItems(user!.favoriteCourses!)}
+                emptyMessage={t('account.favorite.no_courses')}
+              />
             </div>
-            {!isCollapsed && <ChevronDown size={16} className={`transform transition-transform duration-200 ${expandedSections.documents ? 'rotate-0' : '-rotate-90'}`} />}
-          </button>
-          {/* Favorite Documents List */}
-          {!isCollapsed && expandedSections.documents && (
-            <ItemList
-              items={mapDocumentsToItems(user.favoriteDocuments || [])}
-              emptyMessage={t('account.favorite.no_documents')}
-            />
           )}
+          <div className="border-t border-gray-300 my-2 flex-shrink-0"></div>
+          <div className="flex-1 min-h-0">
+            <button
+              className="flex items-center justify-between w-full p-1 text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0 flex-shrink-0"
+              onClick={() => {
+                toggleSection('documents');
+                setIsCollapsed(false);
+              }}
+              aria-label={t('sidebar.toggle_documents')}
+            >
+              <div className="flex items-center space-x-2">
+                <File size={20} />
+                {!isCollapsed && <span>{t('sidebar.my_favorite_documents')}</span>}
+              </div>
+              {!isCollapsed && <ChevronDown size={16} className={`transform transition-transform duration-200 ${expandedSections.documents ? 'rotate-0' : '-rotate-90'}`} />}
+            </button>
+            {/* Favorite Documents List */}
+            {!isCollapsed && expandedSections.documents && (
+              <ItemList
+                items={mapDocumentsToItems(user.favoriteDocuments || [])}
+                emptyMessage={t('account.favorite.no_documents')}
+                />
+            )}
+          </div>
         </nav>
 
         {/* Add Document Button */}
         <button
-          className={`mx-4 my-2 flex items-center space-x-2 ${isCollapsed ? 'bg-transparent' : 'bg-amber-600 hover:bg-amber-700 transition-all duration-200 hover:scale-[1.01]'} text-white rounded-md py-2 px-4 hover:${isCollapsed ? 'bg-transparent' : 'bg-indigo-700'}`}
+          className={`mx-4 my-2 flex items-center space-x-2 ${isCollapsed ? 'bg-transparent' : 'bg-amber-600 hover:bg-amber-700 transition-all duration-200 hover:scale-[1.01]'} text-white rounded-md py-2 px-4 hover:${isCollapsed ? 'bg-transparent' : 'bg-indigo-700'} flex-shrink-0`}
           aria-label={t('sidebar.add_document')}
           onClick={handleUploadButtonClick}
         >
@@ -146,7 +150,7 @@ const NavigationSidebar = () => {
         </button>
 
         {/* User Profile - Fixed at Bottom #TODO add avatar input */}
-        <div className="mt-auto border-t border-gray-200">
+        <div className="border-t border-gray-200 flex-shrink-0">
           <div className="p-4 flex items-center space-x-3">
             <Image
               src={'/images/icons/empty_profile.png'}
@@ -169,7 +173,6 @@ const NavigationSidebar = () => {
           )}
         </div>
 
-        {/* Upload Dialog */}
         <UploadDialog
           isOpen={isUploadDialogOpen}
           onClose={handleUploadDialogClose}
