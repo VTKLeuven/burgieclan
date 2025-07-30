@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useRetrieveDocuments, { DocumentFilters, DocumentSortOptions } from '@/hooks/useRetrieveDocuments';
-import useDownloadContent from '@/hooks/useDownloadContent';
-import { LoaderCircle, Download, X } from 'lucide-react';
+import { LoaderCircle, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Pagination from '@/components/ui/Pagination';
 import DocumentListItem from './DocumentListItem';
@@ -9,6 +8,7 @@ import DocumentFilter from './DocumentFilter';
 import DocumentSort from './DocumentSort';
 import type { Course, DocumentCategory, Document } from '@/types/entities';
 import { Checkbox } from '@/components/ui/Checkbox';
+import DownloadButton from '@/components/ui/DownloadButton';
 
 interface DocumentListProps {
     course?: Course;
@@ -33,7 +33,6 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
 
     const [selectedDocuments, setSelectedDocuments] = useState<Document[]>([]);
     const { t } = useTranslation();
-    const { downloadContent, loading: isDownloading, error: downloadError } = useDownloadContent();
 
     useEffect(() => {
         // Show amount of items per page based on screen size
@@ -63,14 +62,6 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
         setPage(1);
     }, [filters, sort]);
 
-    // Log download errors
-    useEffect(() => {
-        if (downloadError) {
-            console.error('Download error:', downloadError);
-            // You could add a toast notification here
-        }
-    }, [downloadError]);
-
     const handleToggleSelect = (document: Document) => {
         setSelectedDocuments(prev => {
             const isSelected = prev.some(doc => doc.id === document.id);
@@ -92,14 +83,6 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
 
     const handleClearSelection = () => {
         setSelectedDocuments([]);
-    };
-
-    const handleDownloadSelected = () => {
-        if (selectedDocuments.length > 0) {
-            downloadContent({
-                documents: selectedDocuments,
-            });
-        }
     };
 
     const isDocumentSelected = (document: Document) => {
@@ -144,15 +127,12 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                             <span className="text-sm text-gray-700">
                                 {t('course-page.documents.selected', { amount: selectedDocuments.length })}
                             </span>
-                            <button
-                                onClick={handleDownloadSelected}
-                                disabled={isDownloading}
-                                className="px-3 py-2 bg-vtk-blue-500 hover:bg-vtk-blue-600 text-white rounded-md flex items-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                                title={t('course-page.documents.download-selected')}
-                            >
-                                <Download size={16} className={`mr-1 ${isDownloading ? 'animate-pulse' : ''}`} />
-                                <span>{isDownloading ? t('course-page.documents.downloading') : t('course-page.documents.download')}</span>
-                            </button>
+                            <DownloadButton
+                                documents={selectedDocuments}
+                                size={16}
+                                showText={true}
+                                className="px-3 py-2 bg-vtk-blue-400 hover:bg-vtk-blue-600 text-white hover:text-gray-300 text-sm"
+                            />
                             <button
                                 onClick={handleClearSelection}
                                 className="p-2 text-gray-600 hover:text-gray-800 rounded-md"
