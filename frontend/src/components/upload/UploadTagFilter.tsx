@@ -197,21 +197,25 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
     };
 
     return (
-        <div className="relative" ref={containerRef}>
+        <div className="mt-2" ref={containerRef}>
             <div
-                className="flex flex-wrap items-center w-full border rounded-md px-2 py-1 border-[#6b7280] bg-white focus-within:ring-1 focus-within:ring-vtk-blue-500 focus-within:border-vtk-blue-500 min-h-[38px] cursor-text"
+                className="block w-full rounded-md border-0 py-1.5 px-3
+                text-gray-900 shadow-sm ring-1 ring-inset
+                ring-gray-300 placeholder:text-gray-400
+                focus:ring-2 focus:ring-inset focus:ring-amber-600
+                sm:text-sm sm:leading-6 items-center"
                 onClick={handleContainerClick}
             >
                 {/* Display selected tags by ID */}
                 {selectedTags.map(tag => (
                     <div
                         key={`id-${tag.id}`}
-                        className="tag-chip flex items-center bg-gray-100 text-gray-800 rounded-md px-2 py-1 m-1 text-xs"
+                        className="tag-chip inline-flex items-center h-6 bg-gray-100 text-gray-800 rounded-md text-xs px-2 mr-2"
                     >
-                        <span>{tag.name}</span>
+                        <span className="text-xs">{tag.name}</span>
                         <button
                             type="button"
-                            className="ml-1 text-gray-600 hover:text-gray-800"
+                            className="ml-1.5 text-gray-600 hover:text-gray-800 flex items-center justify-center"
                             onClick={() => tag.id && removeExistingTag(tag.id)}
                         >
                             <X size={12} />
@@ -223,12 +227,12 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
                 {selectedTagQueries.map(query => (
                     <div
                         key={`query-${query}`}
-                        className="tag-chip flex items-center bg-gray-100 text-gray-800 rounded-md px-2 py-1 m-1 text-xs"
+                        className="tag-chip inline-flex items-center h-5 bg-gray-100 text-gray-800 rounded-md text-xs px-2 my-auto mr-2"
                     >
-                        <span>&quot;{query}&quot;</span>
+                        <span className="text-xs">&quot;{query}&quot;</span>
                         <button
                             type="button"
-                            className="ml-1 text-gray-600 hover:text-gray-800"
+                            className="ml-1.5 text-gray-600 hover:text-gray-800 flex items-center justify-center"
                             onClick={() => removeCustomTagQuery(query)}
                         >
                             <X size={12} />
@@ -243,7 +247,7 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
                     onChange={(e) => setTagInput(e.target.value)}
                     onFocus={() => setShowSuggestions(true)}
                     onKeyDown={handleKeyDown}
-                    className="flex-grow min-w-[80px] p-1 text-sm border-0 focus:ring-0"
+                    className="inline-flex p-0 text-sm border-0 focus:ring-0"
                     placeholder={selectedTags.length > 0 || selectedTagQueries.length > 0 ? "" : t('upload.form.tags.placeholder')}
                     aria-label={t('upload.form.tags.placeholder')}
                 />

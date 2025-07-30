@@ -74,7 +74,7 @@ export default function UploadForm({
                 </div>
             )}
 
-            <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+            <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-4">
                 <div className="col-span-full">
                     <FormField
                         label={t('upload.form.name.label')}
@@ -86,7 +86,7 @@ export default function UploadForm({
                     />
                 </div>
 
-                <div className="sm:col-span-full">
+                <div className="sm:col-span-3">
                     <FormField
                         label={t('upload.form.course.label')}
                         type="combobox"
@@ -98,19 +98,7 @@ export default function UploadForm({
                     />
                 </div>
 
-                <div className="sm:col-span-3">
-                    <FormField
-                        label={t('upload.form.category.label')}
-                        type="combobox"
-                        options={categories}
-                        error={errors.category}
-                        name="category"
-                        control={control}
-                        disabled={isLoading || isLoadingFields}
-                    />
-                </div>
-
-                <div className="sm:col-span-3">
+                <div className="sm:col-span-1">
                     <FormField
                         label={t('upload.form.year.label')}
                         type="combobox"
@@ -123,8 +111,20 @@ export default function UploadForm({
                     />
                 </div>
 
-                <div className="col-span-full">
-                    <label className="block text-sm font-medium text-gray-900 mb-2">
+                <div className="sm:col-span-2">
+                    <FormField
+                        label={t('upload.form.category.label')}
+                        type="combobox"
+                        options={categories}
+                        error={errors.category}
+                        name="category"
+                        control={control}
+                        disabled={isLoading || isLoadingFields}
+                    />
+                </div>
+
+                <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-gray-900">
                         {t('upload.form.tags.label')}
                     </label>
                     <UploadTagFilter
