@@ -1,8 +1,7 @@
-// components/ui/Dialog.tsx
 import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
 import React from 'react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
+import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next';
 
 const sizes = {
@@ -27,7 +26,7 @@ interface DialogProps {
     children?: React.ReactNode;
 }
 
-export function Dialog({isOpen, onClose, size = 'lg', className, children}: DialogProps) {
+export function Dialog({ isOpen, onClose, size = 'lg', className, children }: DialogProps) {
     return (
         <Headless.Transition appear show={isOpen} as={React.Fragment}>
             <Headless.Dialog
@@ -131,7 +130,7 @@ export function DialogCloseButton({ onClose }: DialogCloseButtonProps) {
             className="absolute top-4 right-4 p-1.5 text-gray-700 justify-center items-center flex"
         >
             <span className="sr-only">{t('dialog.close')}</span>
-            <XMarkIcon aria-hidden="true" className="h-6 w-6"/>
+            <X aria-hidden="true" className="h-6 w-6" />
         </button>
     )
 }

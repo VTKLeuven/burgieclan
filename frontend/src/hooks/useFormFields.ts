@@ -1,48 +1,45 @@
-// hooks/useFormFields.ts
 import { useState, useEffect, useCallback } from 'react';
-import { Course, Category } from '@/types/upload';
-import { ApiClient } from '@/actions/api';
+import type { CommentCategory, Course } from '@/types/entities';
+import { useApi } from '@/hooks/useApi';
 import { useTranslation } from 'react-i18next';
+import { convertToCommentCategory, convertToCourse } from '@/utils/convertToEntity';
 
 export const useFormFields = (isOpen: boolean) => {
     const [courses, setCourses] = useState<Course[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [categories, setCategories] = useState<CommentCategory[]>([]);
     const [shouldShowLoading, setShouldShowLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { t } = useTranslation();
+    const { request, loading: isLoading } = useApi();
 
     const fetchData = useCallback(async () => {
         try {
             const [courseResponse, categoryResponse] = await Promise.all([
-                ApiClient('GET', `/api/courses`),
-                ApiClient('GET', `/api/document_categories`)
+                request('GET', `/api/courses`),
+                request('GET', `/api/document_categories`)
             ]);
 
-            if (courseResponse.error) throw new Error(courseResponse.error.message);
-            if (categoryResponse.error) throw new Error(categoryResponse.error.message);
+            if (!courseResponse || courseResponse.error) {
+                throw new Error(courseResponse?.error?.message);
+            }
 
-            setCourses(courseResponse['hydra:member']?.map((course: any) => ({
-                id: course['@id'],
-                name: course.name
-            })) || []);
+            if (!categoryResponse || categoryResponse.error) {
+                throw new Error(categoryResponse?.error?.message);
+            }
 
-            setCategories(categoryResponse['hydra:member']?.map((category: any) => ({
-                id: category['@id'],
-                name: category.name
-            })) || []);
+            setCourses(courseResponse['hydra:member']?.map(convertToCourse) || []);
+
+            setCategories(categoryResponse['hydra:member']?.map(convertToCommentCategory) || []);
         } catch (err) {
             setError(t('form.errors.fetch_failed'));
             console.error('Failed to fetch form data:', err);
         } finally {
-            setIsLoading(false);
             setShouldShowLoading(false);
         }
-    }, [t]); // Add t to dependency array
+    }, [t, request]);
 
     useEffect(() => {
         if (!isOpen) {
-            setIsLoading(false);
             setShouldShowLoading(false);
             return;
         }
@@ -50,8 +47,6 @@ export const useFormFields = (isOpen: boolean) => {
         let loadingTimeout: NodeJS.Timeout;
 
         const initiateFetch = async () => {
-            setIsLoading(true);
-
             // Only show loading state if it takes longer than 400ms
             loadingTimeout = setTimeout(() => {
                 setShouldShowLoading(true);
@@ -64,7 +59,6 @@ export const useFormFields = (isOpen: boolean) => {
 
         return () => {
             clearTimeout(loadingTimeout);
-            setIsLoading(false);
             setShouldShowLoading(false);
         };
     }, [isOpen, fetchData]);
@@ -72,7 +66,7 @@ export const useFormFields = (isOpen: boolean) => {
     return {
         courses,
         categories,
-        isLoading: shouldShowLoading, // Only expose the delayed loading state
+        isLoading: shouldShowLoading && isLoading, // Only expose the delayed loading state
         error
     };
 };

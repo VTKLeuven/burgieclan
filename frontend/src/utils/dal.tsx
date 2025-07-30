@@ -6,15 +6,12 @@ import 'server-only'
  */
 
 import { cookies } from "next/headers";
-import {getJWTExpiration, LitusOAuthRefresh, parseJWT} from "@/utils/oauth";
-import {cache} from "react";
+import { getJWTExpiration, getJWTUserId, LitusOAuthRefresh } from "@/utils/oauth";
+import { cache } from "react";
 
-export const isAuth = cache(async () => {
+export const getUserId = cache(async () => {
     const jwt = await getActiveJWT();
-    if (jwt) {
-        console.log(parseJWT(jwt));
-    }
-    return jwt != null;
+    return jwt ? getJWTUserId(jwt) : null;
 })
 
 /**

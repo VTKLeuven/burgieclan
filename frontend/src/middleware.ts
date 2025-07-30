@@ -1,21 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getJWTExpiration } from "@/utils/oauth";
 import { i18nRouter } from 'next-i18n-router';
 import { i18nConfig } from '../i18nConfig';
+import type { Page } from "@/types/entities";
+import { convertToPage } from "@/utils/convertToEntity";
 
 /**
  * Fetches the list of public pages from the backend
  */
-const getPublicAvailablePages = async () => {
+const getPublicAvailablePages = async (): Promise<Page[]> => {
     const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     if (!backendBaseUrl) {
         throw new Error(`Missing environment variable for backend base URL`)
     }
     const url = backendBaseUrl + '/api/pages';
-    const response = await fetch(url, {
-        method: 'GET'
-    })
-    const data = await response.json();
-    return data['hydra:member'];
+    try {
+        const response = await fetch(url, {
+            method: 'GET'
+        });
+        const data = await response.json();
+
+        const pages: Page[] = data['hydra:member'].map(convertToPage);
+        return pages;
+    } catch (error) {
+        console.error('Error fetching public pages:', error);
+        return []
+    }
+}
+
+const startsWithAllowedPath = (pathWithoutLocale: string): boolean => {
+    const allowedPaths = [
+        'login',
+        'oauth',
+    ];
+
+    return allowedPaths.some((path) => pathWithoutLocale.startsWith(path));
 }
 
 /**
@@ -23,25 +42,30 @@ const getPublicAvailablePages = async () => {
  */
 const isPublicPage = async (urlKey: string) => {
     const pages = await getPublicAvailablePages();
-    return pages.some((page: any) => page.urlKey === urlKey);
+    return pages.some((page: Page) => page.urlKey === urlKey);
 };
 
 export default async function middleware(request: NextRequest) {
-    const isAuthenticated = request.cookies.has('jwt');
+    let jwt = request.cookies.get('jwt')?.value || null;
+    let isAuthenticated = jwt && Date.now() <= getJWTExpiration(jwt) * 1000;
 
+    const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || request.url;
     // Match and extract the locale from the URL path
     const localeMatch = request.nextUrl.pathname.match(/^\/([a-z]{2})(?:\/|$)/);
     const locale = localeMatch ? localeMatch[1] : '';
-    const loginUrl = locale ? `/${locale}/login` : '/login';
-    const homeUrl = locale ? `/${locale}` : '/';
+    const pathWithoutLocale = locale ? request.nextUrl.pathname.slice(3).replace(/^\/|\/$/g, '') : request.nextUrl.pathname.slice(1).replace(/^\/|\/$/g, '');
 
     // Redirect to login if user is not authenticated and the page is not public
-    if (!isAuthenticated && !request.nextUrl.pathname.startsWith(loginUrl) && request.nextUrl.pathname !== homeUrl) {
-        const pathWithoutLocale = locale ? request.nextUrl.pathname.slice(3).replace(/^\/|\/$/g, '') : request.nextUrl.pathname.slice(1).replace(/^\/|\/$/g, '');
+    if (!isAuthenticated && !startsWithAllowedPath(pathWithoutLocale)) {
         const publicPage = await isPublicPage(pathWithoutLocale);
         if (!publicPage) {
-            return NextResponse.redirect(new URL(`${loginUrl}?redirectTo=${encodeURIComponent(request.nextUrl.href)}`, request.url));
-        }
+            const loginUrl = locale ? `/${locale}/login` : '/login';
+            // Use pathname instead of href to avoid localhost:3000
+            // Only add redirectTo if pathname is not root
+            const redirectUrl = request.nextUrl.pathname === '/' || request.nextUrl.pathname === '' 
+                ? loginUrl 
+                : `${loginUrl}?redirectTo=${encodeURIComponent(request.nextUrl.pathname)}`;
+            return NextResponse.redirect(new URL(redirectUrl, baseUrl));        }
     }
 
     // Allow access
@@ -52,12 +76,11 @@ export const config = {
     matcher: [
         /*
          * Match all request paths except for the ones starting with:
-         * - oauth (OAuth callback)
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - public/images (public images)
          * - favicon.ico, sitemap.xml, robots.txt (metadata files)
          */
-        '/((?!oauth|_next/static|_next/image|images|favicon.ico|sitemap.xml|robots.txt).*)',
+        '/((?!_next/static|_next/image|images|favicon.ico|sitemap.xml|robots.txt).*)',
     ],
 }

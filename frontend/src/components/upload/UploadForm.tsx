@@ -1,6 +1,5 @@
-// components/upload/UploadForm.tsx
 import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type FieldError } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import FormField from '@/components/ui/FormField';
 import { UploadField } from '@/components/upload/UploadField';
@@ -11,6 +10,8 @@ import { Text } from '@/components/ui/Text';
 import { useTranslation } from 'react-i18next';
 import { useYearOptions } from '@/hooks/useYearOptions';
 import { VISIBLE_YEARS } from "@/utils/constants/upload";
+import { Checkbox } from "@/components/ui/Checkbox";
+import { getSuggestedNameFromFilename } from '@/utils/documentNameSuggestion';
 
 interface FormProps {
     onSubmit: (data: UploadFormData) => Promise<void>;
@@ -20,24 +21,32 @@ interface FormProps {
 }
 
 export default function UploadForm({
-                                       onSubmit,
-                                       isLoading = false,
-                                       isOpen,
-                                       initialFile,
-                                   }: FormProps) {
+    onSubmit,
+    isLoading = false,
+    isOpen,
+    initialFile,
+}: FormProps) {
     const { t } = useTranslation();
     const {
         register,
         handleSubmit,
         setValue,
         control,
+        watch,
         formState: { errors },
     } = useForm<UploadFormData>({
         resolver: yupResolver(documentSchema(t)),
+        defaultValues: {
+            anonymous: false // TODO: Set the initial value of the checkbox based on anonymous user setting
+        }
     });
 
     const { courses, categories, isLoading: isLoadingFields, error } = useFormFields(isOpen);
     const yearOptions = useYearOptions();
+    
+    // Watch the file and name fields
+    const watchedFile = watch('file');
+    const watchedName = watch('name');
 
     // Set initial file on mount if provided.
     useEffect(() => {
@@ -45,13 +54,21 @@ export default function UploadForm({
             setValue('file', initialFile, { shouldValidate: true });
         }
     }, [initialFile, setValue]);
+    
+    // Suggest name based on filename when file changes and name is empty
+    useEffect(() => {
+        if (watchedFile && !watchedName) {
+            const suggestedName = getSuggestedNameFromFilename(watchedFile.name);
+            setValue('name', suggestedName, { shouldValidate: true });
+        }
+    }, [watchedFile, watchedName, setValue]);
 
     const handleFormSubmit = async (data: UploadFormData) => {
         await onSubmit(data);
     };
 
     return (
-        <form id="upload-form" onSubmit={handleSubmit(handleFormSubmit)} className="py-6 space-y-6">
+        <form id="upload-form" onSubmit={handleSubmit(onSubmit)} className="pt-6 space-y-6">
             {error && (
                 <div className="mb-4">
                     <Text className="text-red-600">{error}</Text>
@@ -108,7 +125,20 @@ export default function UploadForm({
                 </div>
 
                 <div className="col-span-full">
-                    <UploadField error={errors.file} setValue={setValue} initialFile={initialFile} />
+                    <UploadField
+                        error={errors.file as FieldError | undefined}
+                        setValue={setValue}
+                        initialFile={initialFile}
+                    />
+                </div>
+
+                <div className="col-span-full mt-4 gap-3 pb-2">
+                    <Checkbox
+                        label={t('upload.form.anonymous.label')}
+                        {...register('anonymous')}
+                        disabled={isLoading || isLoadingFields}
+                        className="justify-end"
+                    />
                 </div>
             </div>
         </form>

@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Module;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -31,17 +32,21 @@ class ModuleApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
+    #[Groups(['program:get', 'search', 'user'])]
     public ?string $name = null;
 
     /**
      * @var CourseApi[]
      */
+    #[Groups(['program:get'])]
     public array $courses = [];
 
     /**
      * @var ModuleApi[]
      */
+    #[Groups(['program:get'])]
     public array $modules = [];
 
+    #[Groups(['program:get', 'search'])]
     public ProgramApi $program;
 }

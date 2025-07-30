@@ -1,0 +1,1 @@
+export const MAX_QUICK_LINKS = 10;

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog';
 import UploadForm from '@/components/upload/UploadForm';
 import { Text } from '@/components/ui/Text';
-import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
+import { Send } from 'lucide-react';
 import { useDocumentUpload } from '@/hooks/useDocumentUpload';
 import { UploadFormData } from '@/types/upload';
 import { useToast } from '@/components/ui/Toast';
@@ -15,10 +15,10 @@ interface UploadDialogProps {
 }
 
 const UploadDialog = ({
-                          isOpen,
-                          onClose,
-                          initialFile
-                      }: UploadDialogProps) => {
+    isOpen,
+    onClose,
+    initialFile
+}: UploadDialogProps) => {
     const { uploadDocument, isLoading, status, resetStatus } = useDocumentUpload();
     const { showToast } = useToast();
     const { t } = useTranslation();
@@ -48,7 +48,7 @@ const UploadDialog = ({
                 {t('upload.dialog.title')}
             </DialogTitle>
             <DialogBody>
-                <Text>
+                <Text className={'text-justify'}>
                     {t('upload.dialog.description')}
                 </Text>
 
@@ -59,7 +59,7 @@ const UploadDialog = ({
                     initialFile={initialFile}
                 />
             </DialogBody>
-            <DialogActions>
+            <DialogActions className="!mt-0"> {/* !mt-0 removes the top margin */}
                 <button
                     type="submit"
                     form="upload-form"
@@ -68,12 +68,12 @@ const UploadDialog = ({
                 >
                     {isLoading ? (
                         <>
-                            <span className="spinner mr-2"/>
+                            <span className="spinner mr-2" />
                             {t('upload.dialog.button.uploading')}
                         </>
                     ) : (
                         <>
-                            <PaperAirplaneIcon className="mr-2 w-5 h-5"/>
+                            <Send className="mr-2 w-5 h-5" />
                             {t('upload.dialog.button.send')}
                         </>
                     )}
