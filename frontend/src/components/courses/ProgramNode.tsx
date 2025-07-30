@@ -70,7 +70,7 @@ const ProgramNode = ({
         )}
 
         <div className="ml-auto flex items-center">
-          <DownloadButton programs={[program]} />
+          <DownloadButton programs={[program]} className='px-4 py-0.5' />
         </div>
       </div>
 
