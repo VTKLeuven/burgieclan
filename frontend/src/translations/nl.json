@@ -77,6 +77,12 @@
             "anonymous": {
                 "label": "Anoniem"
             },
+            "tags": {
+                "label": "Tags",
+                "placeholder": "Voeg tags toe (optioneel)...",
+                "create": "Maak nieuwe tag \"{{tag}}\"",
+                "no-results": "Geen tags gevonden"
+            },
             "validation": {
                 "name": {
                     "required": "Naam is verplicht",
@@ -171,6 +177,9 @@
         }
     },
     "download": {
+        "download": "Download",
+        "download-all": "Download alles",
+        "downloading": "Downloaden...",
         "download-success": "Documenten succesvol gedownload!",
         "download-error": "Downloaden mislukt."
     },
@@ -197,7 +206,9 @@
         "any-semester": "Elk semester",
         "credits": "Studiepunten",
         "show-only-favorites": "Toon alleen favorieten",
-        "matches-found": "Gevonden overeenkomsten"
+        "matches-found": "Gevonden overeenkomsten",
+        "no-modules-in-program": "Deze richting bevat geen modules.",
+        "no-courses-in-module": "Deze module bevat geen vakken."
     },
     "account": {
         "account": "Account",
