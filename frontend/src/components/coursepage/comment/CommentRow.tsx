@@ -34,9 +34,16 @@ const CommentRow: React.FC<CommentRowProps> = ({
 
     // Handle click to edit comment
     const handleEditClick = () => {
-        setIsEditing(true);
         setEditContent(comment.content ?? '');
         setEditAnonymous(comment.anonymous ?? false);
+        setIsEditing(true);
+        // Set textarea height to fit content after state updates
+        setTimeout(() => {
+            if (editTextareaRef.current) {
+                editTextareaRef.current.style.height = 'auto';
+                editTextareaRef.current.style.height = `${editTextareaRef.current.scrollHeight}px`;
+            }
+        }, 0);
     };
 
     // Handle cancel edit
@@ -96,8 +103,8 @@ const CommentRow: React.FC<CommentRowProps> = ({
                             disabled={editIsSubmitting}
                             style={{ minHeight: '2.5rem', overflow: 'hidden' }}
                         />
-                        <div className="flex items-center gap-2 justify-end">
-                            <label className="flex items-center text-xs text-gray-600 cursor-pointer hover:text-gray-800 transition-colors mr-2">
+                        <div className="flex flex-col sm:flex-row sm:justify-end gap-2 w-full">
+                            <label className="flex items-center text-xs text-gray-600 cursor-pointer hover:text-gray-800 transition-colors sm:mr-2">
                                 <input
                                     type="checkbox"
                                     checked={editAnonymous}
@@ -112,7 +119,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
                             <button
                                 type="button"
                                 onClick={handleCancelEdit}
-                                className="text-xs px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                                className="text-xs px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors w-full sm:w-auto"
                                 disabled={editIsSubmitting}
                             >
                                 {t('course-page.comments.dialog.button.cancel')}
@@ -120,7 +127,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
                             <button
                                 type="submit"
                                 disabled={editIsSubmitting || !editContent.trim()}
-                                className="text-xs px-3 py-1 bg-amber-600 text-white rounded hover:bg-amber-700 disabled:opacity-50 transition-colors inline-flex items-center"
+                                className="text-xs px-3 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 disabled:opacity-50 transition-colors inline-flex items-center w-full sm:w-auto"
                             >
                                 {editIsSubmitting ? (
                                     <>
@@ -138,7 +145,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
                     </form>
                 ) : (
                     <>
-                        <p className="text-sm text-gray-700 whitespace-pre-line">{comment.content}</p>
+                        <p className="text-sm min-h-[1.4rem] text-gray-700 whitespace-pre-line">{comment.content}</p>
                         <div className="hidden sm:block w-auto">
                             <CommentActions onEdit={handleEditClick} onDelete={handleDeleteComment} show={isOwnComment && !isEditing} />
                         </div>
@@ -152,7 +159,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
             </div>
 
             {/* Mobile: icon, metadata, actions in a row below comment */}
-            <div className="sm:hidden flex flex-row w-full mt-2 gap-2 items-start">
+            <div className="sm:hidden flex flex-row w-full mt-2 gap-2 items-center justify-end">
                 <CommentUserIcon anonymous={comment.anonymous ?? true} creatorName={comment.creator?.fullName} />
                 <CommentMetadata comment={comment} />
                 <CommentActions onEdit={handleEditClick} onDelete={handleDeleteComment} show={isOwnComment && !isEditing} isMobile />
