@@ -1,4 +1,4 @@
-import CommentRow from '@/components/coursepage/CommentRow';
+import CommentRow from '@/components/coursepage/comment/CommentRow';
 import { useMemo, useState } from 'react';
 import { CommentCategory, CourseComment } from '@/types/entities';
 import { Info, ChevronRight, MessageSquarePlus, Send } from 'lucide-react';
