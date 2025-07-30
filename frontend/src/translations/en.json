@@ -77,6 +77,12 @@
             "anonymous": {
                 "label": "Anonymous"
             },
+            "tags": {
+                "label": "Tags",
+                "placeholder": "Add tags (optional)...",
+                "create": "Create new tag \"{{tag}}\"",
+                "no-results": "No tags found"
+            },
             "validation": {
                 "name": {
                     "required": "Name is required",
@@ -171,6 +177,9 @@
         }
     },
     "download": {
+        "download": "Download",
+        "download-all": "Download all",
+        "downloading": "Downloading...",
         "download-success": "Documents downloaded successfully!",
         "download-error": "Failed to download documents."
     },
@@ -196,7 +205,9 @@
         "any-semester": "Any semester",
         "credits": "ECTS",
         "show-only-favorites": "Show only favorites",
-        "matches-found": "Matches found"
+        "matches-found": "Matches found",
+        "no-modules-in-program": "No modules available in this program.",
+        "no-courses-in-module": "No courses available in this module."
     },
     "account": {
         "account": "Account",
