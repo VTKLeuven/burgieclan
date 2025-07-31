@@ -22,7 +22,7 @@
         "doctrine/doctrine-bundle": "^2.11",
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^2.16",
-        "easycorp/easyadmin-bundle": "^4.8",
+        "easycorp/easyadmin-bundle": "^4.24",
         "knpuniversity/oauth2-client-bundle": "^2.18",
         "league/commonmark": "^2.1",
         "lexik/jwt-authentication-bundle": "^2.21",
