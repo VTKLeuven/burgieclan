@@ -2,7 +2,7 @@
 
 import React, { Suspense, useState } from 'react';
 import { Dialog } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Menu, X } from 'lucide-react';
 import Logo from '@/components/common/Logo';
 import { Skeleton } from "@/components/ui/skeleton";
 import Search from "@/components/header/Search";
@@ -22,7 +22,7 @@ export default function Header() {
     const isAuthenticated = user !== null;
 
     const navigation = [
-        { name: t('courses'), href: '#' },
+        { name: t('courses'), href: '/courses' },
         { name: t('FAQ'), href: '#' },
         { name: t('overview'), href: '#' },
     ];
@@ -30,7 +30,7 @@ export default function Header() {
     return (
         <header className="bg-white">
             <nav aria-label="Global"
-                className="mx-auto flex max-w-7xl items-center justify-between border-b border-gray-900/10 p-6 lg:px-8">
+                 className="mx-auto flex items-center justify-between border-b border-gray-900/10 p-6 lg:px-8">
 
                 {/* Logo and search */}
                 <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
@@ -51,13 +51,13 @@ export default function Header() {
                                 className="-m-1.5 p-1.5 w-[50px] h-[50px] rounded-md text-gray-700 justify-center items-center flex"
                             >
                                 <span className="sr-only">{t('open_menu')}</span>
-                                <Bars3Icon aria-hidden="true" className="h-6 w-6" />
+                                <Menu aria-hidden="true" className="h-6 w-6" />
                             </button>
                         </div>
                         :
                         <div className="flex md:hidden">
 
-                            <Link href="login" className="primary-button">
+                            <Link href="/login" className="primary-button">
                                 {t('login')}
                             </Link>
 
@@ -78,10 +78,9 @@ export default function Header() {
 
                         <div className="flex items-center gap-x-6">
                             <LanguageSwitcher />
-
                             {isAuthenticated
                                 ?   <HeaderProfileButton />
-                                :   <Link href="login" className="primary-button min-w-28">
+                                :   <Link href="/login" className="primary-button">
                                         {t('login')}
                                     </Link>
                             }
@@ -114,7 +113,7 @@ export default function Header() {
                             className="-m-1.5 p-1.5 w-[50px] h-[50px] rounded-md text-gray-700 justify-center items-center flex"
                         >
                             <span className="sr-only">{t('close_menu')}</span>
-                            <XMarkIcon aria-hidden="true" className="h-6 w-6" />
+                            <X aria-hidden="true" className="h-6 w-6" />
                         </button>
                     </div>
 
@@ -133,7 +132,7 @@ export default function Header() {
                                 ))}
                             </div>
                             <div className="py-6">
-                                <Link href="account" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                <Link href="/account" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
                                     {t('profile')}
                                 </Link>
                             </div>

@@ -22,6 +22,8 @@ use App\Factory\DocumentFactory;
 use App\Factory\ModuleFactory;
 use App\Factory\PageFactory;
 use App\Factory\ProgramFactory;
+use App\Factory\QuickLinkFactory;
+use App\Factory\TagFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -44,9 +46,11 @@ final class AppFixtures extends Fixture
         CommentCategoryFactory::createMany(5);
         CourseCommentFactory::createMany(100);
         DocumentCategoryFactory::createMany(5);
+        TagFactory::createMany(20);
         DocumentFactory::createMany(100);
         DocumentCommentFactory::createMany(150);
         PageFactory::createMany(20);
+        QuickLinkFactory::createMany(10);
     }
 
     private function loadUsers(ObjectManager $manager): void
@@ -73,7 +77,7 @@ final class AppFixtures extends Fixture
     {
         return [
             // $userData = [$fullname, $username, $password, $email, $roles];
-            ['Jane Doe', 'jane_admin', 'kitten', 'jane_admin@symfony.com', [User::ROLE_ADMIN]],
+            ['Jane Doe', 'jane_admin', 'kitten', 'jane_admin@symfony.com', [User::ROLE_SUPER_ADMIN]],
             ['Tom Doe', 'tom_admin', 'kitten', 'tom_admin@symfony.com', [User::ROLE_ADMIN]],
             ['John Doe', 'john_user', 'kitten', 'john_user@symfony.com', [User::ROLE_USER]],
         ];

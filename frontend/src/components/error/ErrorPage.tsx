@@ -21,7 +21,7 @@ export default function ErrorPage({ status, detail, className = '' }: ErrorPageP
         status = 500;
     }
 
-    const statusDescription = STATUS_CODES[status] || t('unexpected_error');  // short standard description
+    const statusDescription = STATUS_CODES[status] || t('unexpected');  // short standard description
     const customDescription = detail || getHttpStatusDescription(status) || "";  // longer custom description
 
     const redirectHome = () => {

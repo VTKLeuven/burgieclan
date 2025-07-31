@@ -14,10 +14,7 @@ class PageEntityToApiMapper implements MapperInterface
     {
         assert($from instanceof Page);
 
-        $dto = new PageApi();
-        $dto->id = $from->getId();
-
-        return $dto;
+        return new PageApi();
     }
 
     public function populate(object $from, object $to, array $context): object

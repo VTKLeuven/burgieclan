@@ -6,6 +6,7 @@ use App\ApiResource\DocumentApi;
 use App\Entity\Course;
 use App\Entity\Document;
 use App\Entity\DocumentCategory;
+use App\Entity\Tag;
 use App\Repository\DocumentRepository;
 use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -17,8 +18,8 @@ use Symfonycasts\MicroMapper\MicroMapperInterface;
 class DocumentApiToEntityMapper implements MapperInterface
 {
     public function __construct(
-        private readonly DocumentRepository $repository,
-        private readonly Security                $security,
+        private readonly DocumentRepository   $repository,
+        private readonly Security             $security,
         private readonly MicroMapperInterface $microMapper,
     ) {
     }
@@ -52,6 +53,14 @@ class DocumentApiToEntityMapper implements MapperInterface
         ]));
         $to->setYear($from->year);
         $to->setUnderReview($from->under_review);
+        $to->setAnonymous($from->anonymous);
+
+        foreach ($from->tags as $tag) {
+            $tagEntity = $this->microMapper->map($tag, Tag::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+            $to->addTag($tagEntity);
+        }
 
         return $to;
     }

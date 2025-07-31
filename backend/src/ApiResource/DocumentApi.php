@@ -3,6 +3,7 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
@@ -13,10 +14,11 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Entity\Document;
+use App\Filter\TagFilter;
 use App\State\DocumentApiProvider;
+use App\State\DocumentProcessor;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
-use App\State\DocumentProcessor;
 use ArrayObject;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -26,12 +28,30 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'Document',
     operations: [
         new Get(
-            provider: DocumentApiProvider::class,
-            normalizationContext: ['groups' => ['document:get']]
+            normalizationContext: ['groups' => ['document:get']],
+            provider: DocumentApiProvider::class
         ),
         new GetCollection(
-            provider: DocumentApiProvider::class,
-            normalizationContext: ['groups' => ['document:get']]
+            openapi: new Model\Operation(
+                parameters: [
+                    new Model\Parameter(
+                        name: 'tags.name[]',
+                        in: 'query',
+                        description: 'Filter by multiple tag names (partial match)',
+                        required: false,
+                        schema: [
+                            'type' => 'array',
+                            'items' => [
+                                'type' => 'string'
+                            ]
+                        ],
+                        style: 'form',
+                        explode: true
+                    )
+                ]
+            ),
+            normalizationContext: ['groups' => ['document:get']],
+            provider: DocumentApiProvider::class
         ),
         new Post(
             inputFormats: ['multipart' => ['multipart/form-data']],
@@ -66,7 +86,23 @@ use Symfony\Component\Validator\Constraints as Assert;
                                     ],
                                     'anonymous' => [
                                         'type' => 'boolean',
+                                        'example' => false
                                     ],
+                                    'tags[]' => [
+                                        'type' => 'array',
+                                        'items' => [
+                                            'type' => 'string',
+                                            'format' => 'iri-reference',
+                                        ],
+                                        'example' => ['/api/tags/1', '/api/tags/2'],
+                                    ],
+                                ]
+                            ],
+                            'encoding' => [
+                                'tags[]' => [
+                                    'style' => 'form',
+                                    'explode' => true,
+                                    'allowReserved' => true
                                 ]
                             ]
                         ]
@@ -78,11 +114,11 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: DocumentProcessor::class,
         )],
     outputFormats: ['jsonld' => ['application/ld+json']],
-    order: ['updateDate' => 'DESC'],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: Document::class)
 )]
+#[ApiFilter(OrderFilter::class)]
 class DocumentApi
 {
     #[ApiProperty(readable: false, writable: false, identifier: true)]
@@ -94,11 +130,11 @@ class DocumentApi
     public ?string $name = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
-    #[Groups(['search', 'document:get', 'document:create'])]
+    #[Groups(['search', 'user', 'document:get', 'document:create'])]
     public ?CourseApi $course;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
-    #[Groups(['search', 'document:get', 'document:create'])]
+    #[Groups(['search', 'user', 'document:get', 'document:create'])]
     public ?DocumentCategoryApi $category = null;
 
     #[Assert\Length(5)]
@@ -113,7 +149,7 @@ class DocumentApi
 
     #[ApiFilter(BooleanFilter::class)]
     #[Groups(['document:get'])]
-    public bool $anonymous;
+    public bool $anonymous = false;
 
     #[Groups(['document:get'])]
     public ?string $contentUrl = null;
@@ -131,7 +167,7 @@ class DocumentApi
     public ?File $file = null;
 
     #[ApiProperty(writable: false)]
-    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[ApiFilter(SearchFilter::class, strategy: 'exact', properties: ['creator' => 'exact', 'creator.fullName' => 'ipartial'])]
     #[Groups(['search', 'document:get'])]
     public ?UserApi $creator;
 
@@ -142,4 +178,11 @@ class DocumentApi
     #[ApiProperty(writable: false)]
     #[Groups(['search', 'document:get'])]
     public string $updatedAt;
+
+    /**
+     * @var TagApi[]
+     */
+    #[ApiFilter(TagFilter::class, properties: ['tags' => true, 'tags.name' => true])]
+    #[Groups(['search', 'user', 'document:get', 'document:create'])]
+    public array $tags = [];
 }

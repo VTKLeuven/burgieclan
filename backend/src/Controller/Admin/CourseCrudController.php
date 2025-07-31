@@ -26,6 +26,11 @@ class CourseCrudController extends AbstractCrudController
         yield IdField::new('id')->onlyOnDetail();
         yield TextField::new('name');
         yield TextField::new('code');
+        yield ChoiceField::new('language')
+            ->setChoices([
+                'Dutch' => 'nl',
+                'English' => 'en',
+            ]);
         yield AssociationField::new('modules')
             ->setFormTypeOption('by_reference', false);
         yield ArrayField::new('professors');
@@ -39,6 +44,9 @@ class CourseCrudController extends AbstractCrudController
             ->autocomplete()
             ->setFormTypeOption('by_reference', false);
         yield AssociationField::new('newCourses')
+            ->autocomplete()
+            ->setFormTypeOption('by_reference', false);
+        yield AssociationField::new('identicalCourses')
             ->autocomplete()
             ->setFormTypeOption('by_reference', false);
         yield AssociationField::new('courseComments')

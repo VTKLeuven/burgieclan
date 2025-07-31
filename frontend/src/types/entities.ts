@@ -4,20 +4,23 @@ interface BaseEntity {
 
 interface NodeEntity extends BaseEntity {
     creator?: User,
-    createDate?: Date;
-    updateDate?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface Course extends BaseEntity {
     name?: string;
+    courseComments?: CourseComment[];
+    modules?: string[];
     code?: string;
+    credits?: number;
+    location?: string;
     professors?: string[];
     semesters?: string[];
-    credits?: number;
+    description_top?: string;
+    description_bottom?: string;
     oldCourses?: Course[];
     newCourses?: Course[];
-    modules?: Module[];
-    courseComments?: CourseComment[];
 }
 
 export interface Module extends BaseEntity {
@@ -32,22 +35,31 @@ export interface Program extends BaseEntity {
     modules?: Module[];
 }
 
-export interface CourseComment extends BaseEntity {
+export interface CourseComment extends NodeEntity {
     course?: Course;
-    commentCategory?: Category;
+    commentCategory?: CommentCategory;
+    content?: string;
+    anonymous?: boolean;
 }
 
-export interface Category extends BaseEntity {
+export interface CommentCategory extends BaseEntity {
     name?: string;
     description?: string;
+}
+
+export interface DocumentCategory extends BaseEntity {
+    name?: string;
 }
 
 export interface Document extends NodeEntity {
     name?: string;
     course?: Course;
-    category?: Category;
+    category?: DocumentCategory;
+    year?: string;
     underReview?: boolean;
     contentUrl?: string;
+    anonymous?: boolean;
+    tags?: Tag[];
 }
 
 export interface User extends BaseEntity {
@@ -60,10 +72,23 @@ export interface User extends BaseEntity {
     favoriteDocuments?: Document[];
 }
 
-
 export interface Page extends BaseEntity {
     name?: string;
     content?: string;
     urlKey?: string;
     isPublic?: boolean;
+}
+
+export interface Breadcrumb extends BaseEntity {
+    breadcrumb: string[];
+}
+
+export interface QuickLink extends BaseEntity {
+    name?: string;
+    linkTo: string;
+}
+
+export interface Tag extends BaseEntity {
+    name?: string;
+    documents?: Document[];
 }
