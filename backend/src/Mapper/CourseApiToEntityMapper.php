@@ -45,6 +45,7 @@ class CourseApiToEntityMapper implements MapperInterface
 
         $to->setName($from->name);
         $to->setCode($from->code);
+        $to->setLanguage($from->language);
         $to->setProfessors($from->professors);
         $to->setSemesters($from->semesters);
         $to->setCredits($from->credits);
@@ -64,6 +65,14 @@ class CourseApiToEntityMapper implements MapperInterface
             ]);
         }
         $this->propertyAccessor->setValue($to, 'newCourses', $newCourses);
+
+        $identicalCourses = [];
+        foreach ($from->identicalCourses as $course) {
+            $identicalCourses[] = $this->microMapper->map($course, Course::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }
+        $this->propertyAccessor->setValue($to, 'identicalCourses', $identicalCourses);
 
         $modules = [];
         foreach ($from->modules as $module) {

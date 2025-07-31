@@ -2,9 +2,9 @@
 
 import styles from "./styles.module.css";
 import Link from 'next/link'
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import { getCurrentYear } from "@/utils/date";
 import { useTranslation } from "react-i18next";
+import { SquareArrowOutUpRight } from "lucide-react";
 
 type IconProps = React.SVGProps<SVGSVGElement>;
 
@@ -69,7 +69,7 @@ export default function Footer() {
 
     return (
         <footer aria-labelledby="footer-heading" className="bg-white">
-            <div className="mx-auto border-t border-gray-900/10 p-12">
+            <div className="mx-auto border-t border-gray-900/10 px-6 py-6 lg:px-8">
                 <div className="md:flex md:items-center md:justify-between">
 
                     {/* Social Links Section */}
@@ -89,7 +89,7 @@ export default function Footer() {
                         </Link>
                         <p className={styles.footerText}>{" or "}</p>
                         <Link href="https://github.com/VTKLeuven/burgieclan" className={styles.footerLink}>
-                            {t('contribute_github')}<span><ArrowTopRightOnSquareIcon className="h-3 w-3 inline-block ml-0.5 mb-1 text-gray-500" aria-hidden="true" /></span>
+                            {t('contribute_github')}<span><SquareArrowOutUpRight className="h-3 w-3 inline-block ml-0.5 mb-1 text-gray-500" aria-hidden="true" /></span>
                         </Link>
                     </div>
 

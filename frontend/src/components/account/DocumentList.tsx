@@ -60,7 +60,7 @@ const DocumentList: React.FC = () => {
                                             <p className="text-gray-700 truncate max-w-[75%]">{document.course!.name}</p>
                                             {/* TODO add rating */}
                                             <p className="text-gray-700 truncate max-w-[65%]">{document.category!.name}</p>
-                                            <p className="text-gray-500 text-xs absolute bottom-2 right-2">{new Date(document.createDate!).toLocaleString('en-GB', {
+                                            <p className="text-gray-500 text-xs absolute bottom-2 right-2">{new Date(document.createdAt!).toLocaleString('en-GB', {
                                                 day: '2-digit',
                                                 month: '2-digit',
                                                 year: 'numeric',

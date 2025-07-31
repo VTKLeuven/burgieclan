@@ -2,8 +2,23 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: "standalone",
     reactStrictMode: false,
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'www.kuleuven.be',
+                port: '',
+                pathname: '/**', // Allow any path under the domain
+            },
+            {
+                protocol: 'https',
+                hostname: 'dataservice.kuleuven.be',
+                port: '',
+                pathname: '/**',
+            },
+        ],
+    },
 };
 
 export default withSentryConfig(nextConfig, {
@@ -41,4 +56,9 @@ export default withSentryConfig(nextConfig, {
 
     // Automatically tree-shake Sentry logger statements to reduce bundle size
     disableLogger: true,
+
+    // Delete source maps after uploading them to Sentry
+    sourcemaps: {
+        deleteSourcemapsAfterUpload: true
+    }
 });
