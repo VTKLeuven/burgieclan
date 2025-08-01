@@ -258,7 +258,8 @@
         "load-more": "Meer pagina's laden ({{displayedPages}} van {{numPages}})",
         "comments": {
             "add": "Voeg opmerking toe..."
-        }
+        },
+        "under-review-warning": "Dit document is momenteel in behandeling, dus het is alleen zichtbaar voor jou."
     },
     "pagination": {
         "previous": "Vorige",
