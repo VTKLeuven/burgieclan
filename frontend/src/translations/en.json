@@ -254,7 +254,10 @@
         "apply": "Apply",
         "no-preview": "No preview available",
         "loading": "Bringing your document to life...",
-        "load-more": "Load More Pages ({{displayedPages}} of {{numPages}})"
+        "load-more": "Load More Pages ({{displayedPages}} of {{numPages}})",
+        "comments": {
+            "add": "Add Comment..."
+        }
     },
     "pagination": {
         "previous": "Previous",
