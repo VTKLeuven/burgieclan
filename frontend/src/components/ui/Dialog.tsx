@@ -1,7 +1,7 @@
-import * as Headless from '@headlessui/react'
-import clsx from 'clsx'
-import React from 'react'
-import { X } from 'lucide-react'
+import * as Headless from '@headlessui/react';
+import clsx from 'clsx';
+import { X } from 'lucide-react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const sizes = {
