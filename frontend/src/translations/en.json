@@ -257,7 +257,8 @@
         "load-more": "Load More Pages ({{displayedPages}} of {{numPages}})",
         "comments": {
             "add": "Add Comment..."
-        }
+        },
+        "under-review-warning": "This document is currently under review, so it is only visible to you."
     },
     "pagination": {
         "previous": "Previous",
