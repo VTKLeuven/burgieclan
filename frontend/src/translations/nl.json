@@ -255,7 +255,10 @@
         "apply": "Toepassen",
         "no-preview": "Geen voorbeeld beschikbaar",
         "loading": "Uw document tot leven brengen...",
-        "load-more": "Meer pagina's laden ({{displayedPages}} van {{numPages}})"
+        "load-more": "Meer pagina's laden ({{displayedPages}} van {{numPages}})",
+        "comments": {
+            "add": "Voeg opmerking toe..."
+        }
     },
     "pagination": {
         "previous": "Vorige",
