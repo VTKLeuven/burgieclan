@@ -6,27 +6,24 @@
  * Based on sample: https://github.com/wojtekmaj/react-pdf/tree/main/sample/next-app/app
  */
 
-import { useState, useMemo } from 'react';
-import { Document, Page } from 'react-pdf';
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
-import 'react-pdf/dist/esm/Page/TextLayer.css';
-import type { PDFDocumentProxy } from 'pdfjs-dist';
-import * as pdfjsLib from "pdfjs-dist";
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 
 const PAGES_PER_LOAD = 10;
 
 type PDFFile = string | File | null;
 
 // PDF worker from pdfjs-dist
-pdfjsLib.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/build/pdf.worker.min.mjs").toString();
+pdfjs.GlobalWorkerOptions.workerSrc = require("react-pdf/node_modules/pdfjs-dist/build/pdf.worker.min.mjs").toString();
 
-export default function PDFViewer({ fileArg, width }: { fileArg: PDFFile, width: number }): JSX.Element {
-    // PDF file to display
-    const [file, setFile] = useState<PDFFile>(fileArg);
+export default function PDFViewer({ file, width }: { file: PDFFile, width: number }): JSX.Element {
+    const { t } = useTranslation();
 
     // Total number of pages in the PDF
     const [numPages, setNumPages] = useState<number>();
-
     // Number of pages currently displayed
     const [displayedPages, setDisplayedPages] = useState<number>(PAGES_PER_LOAD);
 
@@ -39,7 +36,7 @@ export default function PDFViewer({ fileArg, width }: { fileArg: PDFFile, width:
     }), []); // Empty dependency array since these values never change
 
 
-    function onDocumentLoadSuccess({ numPages: nextNumPages }: PDFDocumentProxy): void {
+    function onDocumentLoadSuccess({ numPages: nextNumPages }: { numPages: number }): void {
         setNumPages(nextNumPages);
         setDisplayedPages(Math.min(PAGES_PER_LOAD, nextNumPages));
     }
@@ -59,7 +56,7 @@ export default function PDFViewer({ fileArg, width }: { fileArg: PDFFile, width:
                 className="flex flex-col items-center"
                 loading={
                     <div className="p-4 text-italic">
-                        Bringing your document to life...
+                        {t('document.loading')}
                     </div>
                 }
             >
@@ -80,7 +77,7 @@ export default function PDFViewer({ fileArg, width }: { fileArg: PDFFile, width:
                         onClick={loadMorePages}
                         className="white-button border border-vtk-blue-600 hover:bg-vtk-blue-600 hover:text-white"
                     >
-                        Load More Pages ({displayedPages} of {numPages})
+                        {t('document.load-more', { displayedPages, numPages })}
                     </button>
                 </div>
             )}
