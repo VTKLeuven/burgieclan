@@ -16,6 +16,7 @@ export default function HeaderLayout({ children }: Readonly<{ children: React.Re
                     </div>
                 </main>
             </div>
-        </>
+            <Footer />
+        </div>
     );
 }

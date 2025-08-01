@@ -42,6 +42,8 @@ class DocumentResourceTest extends ApiTestCase
             'under_review',
             'anonymous',
             'contentUrl',
+            'mimetype',
+            'filename',
             'creator',
             'createdAt',
             'updatedAt',
@@ -75,6 +77,8 @@ class DocumentResourceTest extends ApiTestCase
             'under_review',
             'anonymous',
             'contentUrl',
+            'mimetype',
+            'filename',
             'createdAt',
             'updatedAt',
             'tags',
@@ -464,8 +468,8 @@ class DocumentResourceTest extends ApiTestCase
 
         // Create document through normal upload process
         $document = DocumentFactory::new()->withoutPersisting()->create();
-        $document->object()->setFile($uploadedFile);
-        $document->save();
+        $document->setFile($uploadedFile);
+        $document->_save();
 
         $this->browser()
             ->get('/api/documents/' . $document->getId(), [
@@ -512,12 +516,12 @@ class DocumentResourceTest extends ApiTestCase
 
         // Create documents with actual files
         $pdfDocument = DocumentFactory::new()->withoutPersisting()->create();
-        $pdfDocument->object()->setFile($pdfFile);
-        $pdfDocument->save();
+        $pdfDocument->setFile($pdfFile);
+        $pdfDocument->_save();
 
         $txtDocument = DocumentFactory::new()->withoutPersisting()->create();
-        $txtDocument->object()->setFile($txtFile);
-        $txtDocument->save();
+        $txtDocument->setFile($txtFile);
+        $pdfDocument->_save();
 
         $json = $this->browser()
             ->get('/api/documents', [

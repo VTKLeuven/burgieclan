@@ -1,11 +1,11 @@
-import {ExclamationTriangleIcon} from "@heroicons/react/16/solid";
+import { TriangleAlert } from "lucide-react";
 
 export default function UnderReviewBox() {
     return (
         <div className="rounded-xl bg-yellow-50 p-4">
             <div className="flex">
                 <div className="shrink-0">
-                    <ExclamationTriangleIcon aria-hidden="true" className="size-5 text-yellow-400"/>
+                    <TriangleAlert aria-hidden="true" className="size-5 text-yellow-400"/>
                 </div>
                 <div className="ml-3">
                     <h3 className="text-sm font-medium text-yellow-800">

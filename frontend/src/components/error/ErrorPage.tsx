@@ -3,17 +3,11 @@ import { STATUS_CODES } from 'http';
 import { getHttpStatusDescription } from "@/utils/error/httpStatusDescriptions";
 import { useTranslation } from "react-i18next";
 
-interface ErrorPageProps {
-    status?: number;
-    detail?: string;
-    className?: string;
-}
-
 /**
  * Displays an error page with a status code, brief standard description and a longer custom description (which is
  * either given by `detail`, retrieved from the httpStatusDescriptions.ts file or left empty).
  */
-export default function ErrorPage({ status, detail, className = '' }: ErrorPageProps) {
+export default function ErrorPage({ status, detail }: { status?: number; detail?: string }) {
     const router = useRouter();
     const { t } = useTranslation();
 
@@ -33,7 +27,7 @@ export default function ErrorPage({ status, detail, className = '' }: ErrorPageP
     };
 
     return (
-        <main className={`grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8 ${className}`}>
+        <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
             <div className="text-center">
                 <p className="text-base font-semibold text-amber-700">{status}</p>
                 <h1 className="mt-4">{statusDescription}</h1>
@@ -42,13 +36,13 @@ export default function ErrorPage({ status, detail, className = '' }: ErrorPageP
                     <button
                         type="button"
                         onClick={redirectHome}
-                        className="primary-button w-full flex-1">
+                        className="primary-button flex-1">
                         {t('go_home')}
                     </button>
                     <button
                         type="button"
                         onClick={redirectSupport}
-                        className="white-button w-full flex-1 min-w-max">
+                        className="white-button flex-1 min-w-max">
                         {t('contact_support')} <span aria-hidden="true">&rarr;</span>
                     </button>
                 </div>

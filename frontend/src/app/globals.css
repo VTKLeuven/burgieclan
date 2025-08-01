@@ -3,15 +3,15 @@
 @tailwind utilities;
 
 .primary-button {
-    @apply flex justify-center rounded-md bg-amber-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600
+    @apply flex w-full items-center justify-center rounded-md bg-amber-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600 !important;
 }
 
 .white-button {
-    @apply flex justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900
+    @apply flex w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900
 }
 
 body {
-    @apply m-0 p-0 h-full
+    @apply leading-relaxed m-0 p-0 h-full
 }
 
 a {
@@ -23,27 +23,27 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    @apply text-4xl sm:text-5xl font-bold tracking-tight;
+    @apply text-4xl sm:text-5xl font-bold tracking-tight my-4;
 }
 
 h2 {
-    @apply text-3xl sm:text-4xl font-semibold;
+    @apply text-3xl sm:text-4xl font-semibold my-3;
 }
 
 h3 {
-    @apply text-2xl sm:text-3xl font-semibold;
+    @apply text-2xl sm:text-3xl font-semibold my-2;
 }
 
 h4 {
-    @apply text-xl sm:text-2xl font-medium;
+    @apply text-xl sm:text-2xl font-medium my-2;
 }
 
 h5 {
-    @apply text-lg sm:text-xl font-medium;
+    @apply text-lg sm:text-xl font-medium my-1;
 }
 
 h6 {
-    @apply text-base sm:text-lg font-medium;
+    @apply text-base sm:text-lg font-medium my-1;
 }
 
 p {
@@ -55,11 +55,11 @@ a {
 }
 
 ul {
-    @apply list-disc list-inside;
+    @apply list-disc list-inside pl-4;
 }
 
 ol {
-    @apply list-decimal list-inside;
+    @apply list-decimal list-inside pl-4;
 }
 
 ul, ol {
@@ -163,5 +163,6 @@ ol li p {
 
 @layer base {
   :root {
-
-        --radius: 0.5rem}}
+        --radius: 0.5rem
+  }
+}
