@@ -45,6 +45,13 @@ export default function DocumentPreview({ id }: { id: string }) {
         fetchDocumentData();
     }, [id, request]);
 
+    // Set window title based on document name
+    useEffect(() => {
+        if (document?.name) {
+            window.document.title = `${document.name} | Burgieclan`;
+        }
+    }, [document?.name]);
+
     // Update container width on mount and window resize, necessary to resize PDFViewer
     useEffect(() => {
         const updateWidth = () => {
