@@ -252,7 +252,7 @@
         "add-tags": "Add tags",
         "cancel": "Cancel",
         "apply": "Apply",
-        "no-preview": "No preview available",
+        "no-preview": "No preview available for {{filename}}",
         "loading": "Bringing your document to life...",
         "load-more": "Load More Pages ({{displayedPages}} of {{numPages}})",
         "comments": {
