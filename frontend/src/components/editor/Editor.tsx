@@ -2,7 +2,7 @@
 
 import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog';
 import { Code, Text } from '@/components/ui/Text';
-import { Mathematics } from '@tiptap-pro/extension-mathematics';
+import { Mathematics } from '@tiptap/extension-mathematics';
 import { TextSelection } from '@tiptap/pm/state';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { StarterKit } from "@tiptap/starter-kit";
@@ -255,10 +255,10 @@ const Editor = ({ className = '', parentDialogOpen = true }: EditorProps) => {  
             },
             // Strip styling from pasted content
             handlePaste(view, event, slice) {
-                event.preventDefault()
-                const text = event.clipboardData?.getData('text/plain')
-                view.dispatch(view.state.tr.insertText(text ?? '')) // Insert plain text as a new paragraph in the editor
-                return true
+                event.preventDefault();
+                const text = event.clipboardData?.getData('text/plain');
+                view.dispatch(view.state.tr.insertText(text ?? '')); // Insert plain text as a new paragraph in the editor
+                return true;
             }
         },
     })
