@@ -130,7 +130,7 @@ export default function DocumentPreview({ id }: { id: string }) {
                         <PDFViewer file={document.contentUrl} width={containerWidth} />
                     ) : (
                         <div className="w-full h-96 flex items-center justify-center">
-                            <p>{t('document.no-preview')}</p>
+                            <p>{t('document.no-preview', { filename: document.filename })}</p>
                         </div>
                     )}
                 </div>

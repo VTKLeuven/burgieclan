@@ -253,7 +253,7 @@
         "add-tags": "Voeg tags toe",
         "cancel": "Annuleren",
         "apply": "Toepassen",
-        "no-preview": "Geen voorbeeld beschikbaar",
+        "no-preview": "Geen voorbeeld beschikbaar voor {{filename}}",
         "loading": "Uw document tot leven brengen...",
         "load-more": "Meer pagina's laden ({{displayedPages}} van {{numPages}})",
         "comments": {
