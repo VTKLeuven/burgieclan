@@ -1,7 +1,7 @@
 import AddDocumentCommentBox from "@/components/document/AddDocumentCommentBox";
 import DocumentComment from "@/components/document/DocumentComment";
 
-/*TODO: retrieve documents from server instead of hardcoding*/
+/*TODO: retrieve document comments from server instead of hardcoding*/
 
 const sampleData = {
     names: [
