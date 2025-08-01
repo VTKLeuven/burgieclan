@@ -27,7 +27,7 @@ export default function VoteButton({
     const [isUpvoteHovered, setIsUpvoteHovered] = useState(false);
     const [isDownvoteHovered, setIsDownvoteHovered] = useState(false);
 
-    const handleVote = async (direction) => {
+    const handleVote = async (direction: VoteDirection) => {
         if (disabled || direction == VoteDirection.NONE) return;
 
         try {
@@ -53,7 +53,7 @@ export default function VoteButton({
     };
 
     // Calculate the vote delta (change in amount of votes) based on the old and new vote states
-    const calculateVoteDelta = (oldVote, newVote) => {
+    const calculateVoteDelta = (oldVote: VoteDirection, newVote: VoteDirection) => {
         if (oldVote === newVote) return 0;
         if (newVote === VoteDirection.NONE) return oldVote === VoteDirection.UP ? -1 : 1;
         if (oldVote === VoteDirection.NONE) return newVote === VoteDirection.UP ? 1 : -1;

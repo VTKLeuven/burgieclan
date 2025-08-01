@@ -1,57 +1,31 @@
 'use client'
 
-import {Download, Loader} from "lucide-react";
+import useDownloadContent from "@/hooks/useDownloadContent";
+import type { Document } from "@/types/entities";
+import { Download, Loader } from "lucide-react";
 import { useState } from "react";
 
 interface DownloadButtonProps {
-    contentUrl: string;          // The URL path to download from
-    fileName: string;            // The name to save the file as
+    document: Document;            // The document to download
     fileSize: string;            // Display size of the file
     disabled?: boolean;          // Whether the button is disabled
 }
 
-export default function DownloadButton({
-    contentUrl,
-    fileName,
+export default function DownloadSingleDocumentButton({
+    document,
     fileSize,
     disabled = false,
 }: DownloadButtonProps) {
-    const [isDownloading, setIsDownloading] = useState(false);
+    const { downloadContent, loading: isDownloading } = useDownloadContent();
     const [isHovered, setIsHovered] = useState(false); // Used to show file size on hover
 
-    const handleDownload = async () => {
+    const handleDownload = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent triggering parent click events (like expanding nodes)
         if (disabled || isDownloading) return;
-        setIsDownloading(true);
 
-        try {
-            const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + contentUrl, {
-                credentials: 'include'
-            });
-
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-            // Download the file using a blob
-            const blob = await response.blob();
-            const blobUrl = window.URL.createObjectURL(blob);
-
-            // Create a HTML link element (<a>) to download the file
-            const link = document.createElement('a');
-            link.style.display = 'none';
-            link.href = blobUrl;
-            link.download = fileName;
-
-            // Add the link to the document and click it
-            document.body.appendChild(link);
-            link.click();
-
-            // Cleanup
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(blobUrl);
-        } catch (error) {
-            console.error('Download failed:', error);
-        } finally {
-            setIsDownloading(false);
-        }
+        downloadContent({
+            documents: [document]
+        });
     };
 
     return (
@@ -90,7 +64,7 @@ export default function DownloadButton({
                 `}
             >
                 {isDownloading
-                    ? <Loader size={20} className="animate-spin"/>
+                    ? <Loader size={20} className="animate-spin" />
                     : fileSize
                 }
             </span>
