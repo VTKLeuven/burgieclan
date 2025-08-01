@@ -276,5 +276,19 @@
         "log_out": "Uitloggen",
         "go_to_vtk": "Ga naar VTK",
         "user_avatar": "Gebruikersavatar"
+    },
+    "editor": {
+        "info_dialog": {
+            "title": "Teksteditor",
+            "description": "De editor laat je wiskundige formules schrijven en weergeven met LaTeX-syntaxis.",
+            "inline": "Plaats je wiskundige expressies tussen",
+            "inline_end": "voor inline formules",
+            "block": " of ",
+            "block_end": "voor blokformules.",
+            "katex_overview": "Voor een overzicht van de ondersteunde functies, zie de ",
+            "katex_doc": "documentatie van KaTeX",
+            "katex_end": " de onderliggende LaTeX-interpreter."
+        },
+        "info_button": "Info"
     }
 }

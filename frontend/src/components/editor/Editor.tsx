@@ -1,34 +1,41 @@
 'use client'
 
-import 'katex/dist/katex.min.css'
-import { useEditor, EditorContent } from '@tiptap/react'
-import { TextSelection } from '@tiptap/pm/state'
+import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog';
+import { Code, Text } from '@/components/ui/Text';
+import { Mathematics } from '@tiptap-pro/extension-mathematics';
+import { TextSelection } from '@tiptap/pm/state';
+import { EditorContent, useEditor } from '@tiptap/react';
 import { StarterKit } from "@tiptap/starter-kit";
-import { TextStyle } from "@tiptap/extension-text-style";
-import { ListItem } from "@tiptap/extension-list-item";
-import { Mathematics } from '@tiptap-pro/extension-mathematics'
+import 'katex/dist/katex.min.css';
 import {
     Bold,
-    Italic,
-    Strikethrough,
     Code as CodeIcon,
     Heading1,
     Heading2,
+    Info,
+    Italic,
     List,
     ListOrdered,
-    Undo2,
     Redo2,
     SquareFunction,
-    Info
+    Strikethrough,
+    Undo2
 } from "lucide-react";
-import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog'
-import { Text, Code } from '@/components/ui/Text'
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
+
+interface InfoDialogProps {
+    isOpen: boolean;
+    setIsOpen: (isOpen: boolean) => void;
+    parentDialogOpen?: boolean;
+}
 
 /**
  * Dialog explaining how mathematical functions can be inserted
  */
-const InfoDialog = ({isOpen, setIsOpen, parentDialogOpen}) => {
+const InfoDialog = ({ isOpen, setIsOpen, parentDialogOpen }: InfoDialogProps) => {
+    const { t } = useTranslation();
+
     // Close this dialog when parent dialog closes
     useEffect(() => {
         if (!parentDialogOpen) {
@@ -37,7 +44,7 @@ const InfoDialog = ({isOpen, setIsOpen, parentDialogOpen}) => {
     }, [parentDialogOpen, setIsOpen]);
 
     // Stop event propagation to prevent affecting parent dialog
-    const handleClose = (e) => {
+    const handleClose = (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsOpen(false);
     };
@@ -48,16 +55,18 @@ const InfoDialog = ({isOpen, setIsOpen, parentDialogOpen}) => {
             onClose={() => setIsOpen(false)}
         >
             <DialogTitle>
-                Text Editor
+                {t('editor.info_dialog.title')}
             </DialogTitle>
             <DialogBody>
-                <Text>The editor allows you to write and display mathematical formulas using LaTeX syntax.<br/>
-                    Wrap your math expressions in <Code>$...$</Code> for inline formulas or <Code>$$...$$</Code> for
-                    block formulas.<br/>
-                    <br/>
-                    For an overview of the supported functions, refer to the
-                    <a href="https://katex.org/docs/supported" target="_blank"> documentation of KaTeX</a>,
-                    the underlying LaTeX interpreter.
+                <Text>
+                    {t('editor.info_dialog.description')}
+                    <br />
+                    {t('editor.info_dialog.inline')} <Code>$...$</Code> {t('editor.info_dialog.inline_end')}
+                    {t('editor.info_dialog.block')} <Code>$$...$$</Code> {t('editor.info_dialog.block_end')}
+                    <br /><br />
+                    {t('editor.info_dialog.katex_overview')}
+                    <a href="https://katex.org/docs/supported" target="_blank">{t('editor.info_dialog.katex_doc')}</a>,
+                    {t('editor.info_dialog.katex_end')}
                 </Text>
             </DialogBody>
             <DialogActions>
@@ -65,21 +74,21 @@ const InfoDialog = ({isOpen, setIsOpen, parentDialogOpen}) => {
                     type="button"
                     onClick={() => setIsOpen(false)}
                     className="primary-button">
-                    Close
+                    {t('dialog.close')}
                 </button>
             </DialogActions>
         </Dialog>
     )
 }
 
-const Toolbar = ({ editor, parentDialogOpen }) => {
+const Toolbar = ({ editor, parentDialogOpen }: { editor: any; parentDialogOpen?: boolean }) => {
     const [isInfoOpen, setIsInfoOpen] = useState(false);
 
     if (!editor) {
         return null
     }
 
-    const handleButtonClick = (e, action) => {
+    const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
         e.stopPropagation();
         action();
     };
@@ -98,7 +107,7 @@ const Toolbar = ({ editor, parentDialogOpen }) => {
                     }
                     className={`${editor.isActive('bold') ? 'isActive' : 'hover:bg-gray-100'}`}
                 >
-                    <Bold className="icon"/>
+                    <Bold className="icon" />
                 </button>
                 <button
                     onClick={() => editor?.chain().focus().toggleItalic().run()}
@@ -111,7 +120,7 @@ const Toolbar = ({ editor, parentDialogOpen }) => {
                     }
                     className={`${editor.isActive('italic') ? 'isActive' : 'hover:bg-gray-100'}`}
                 >
-                    <Italic className="icon"/>
+                    <Italic className="icon" />
                 </button>
                 <button
                     onClick={() => editor?.chain().focus().toggleStrike().run()}
@@ -124,7 +133,7 @@ const Toolbar = ({ editor, parentDialogOpen }) => {
                     }
                     className={`${editor.isActive('strike') ? 'isActive' : 'hover:bg-gray-100'}`}
                 >
-                    <Strikethrough className="icon"/>
+                    <Strikethrough className="icon" />
                 </button>
                 <button
                     onClick={() => editor?.chain().focus().toggleCode().run()}
@@ -137,31 +146,31 @@ const Toolbar = ({ editor, parentDialogOpen }) => {
                     }
                     className={`${editor.isActive('code') ? 'isActive' : 'hover:bg-gray-100'}`}
                 >
-                    <CodeIcon className="icon"/>
+                    <CodeIcon className="icon" />
                 </button>
                 <button
-                    onClick={() => editor?.chain().focus().toggleHeading({level: 1}).run()}
-                    className={`${editor.isActive('heading', {level: 1}) ? 'isActive' : 'hover:bg-gray-100'}`}
+                    onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
+                    className={`${editor.isActive('heading', { level: 1 }) ? 'isActive' : 'hover:bg-gray-100'}`}
                 >
-                    <Heading1 className="icon"/>
+                    <Heading1 className="icon" />
                 </button>
                 <button
-                    onClick={() => editor?.chain().focus().toggleHeading({level: 2}).run()}
-                    className={`${editor.isActive('heading', {level: 2}) ? 'isActive' : 'hover:bg-gray-100'}`}
+                    onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+                    className={`${editor.isActive('heading', { level: 2 }) ? 'isActive' : 'hover:bg-gray-100'}`}
                 >
-                    <Heading2 className="icon"/>
+                    <Heading2 className="icon" />
                 </button>
                 <button
                     onClick={() => editor?.chain().focus().toggleBulletList().run()}
                     className={`${editor.isActive('bulletList') ? 'isActive' : 'hover:bg-gray-100'}`}
                 >
-                    <List className="icon"/>
+                    <List className="icon" />
                 </button>
                 <button
                     onClick={() => editor?.chain().focus().toggleOrderedList().run()}
                     className={`${editor.isActive('orderedList') ? 'isActive' : 'hover:bg-gray-100'}`}
                 >
-                    <ListOrdered className="icon"/>
+                    <ListOrdered className="icon" />
                 </button>
                 <button
                     onClick={() => editor?.chain().focus().undo().run()}
@@ -174,7 +183,7 @@ const Toolbar = ({ editor, parentDialogOpen }) => {
                     }
                     className="p-1 mx-2 clickable"
                 >
-                    <Undo2 className="icon"/>
+                    <Undo2 className="icon" />
                 </button>
                 <button
                     onClick={() => editor?.chain().focus().redo().run()}
@@ -187,7 +196,7 @@ const Toolbar = ({ editor, parentDialogOpen }) => {
                     }
                     className="p-1 mx-2 clickable"
                 >
-                    <Redo2 className="icon"/>
+                    <Redo2 className="icon" />
                 </button>
                 <button
                     // Clicking inserts a math block
@@ -196,7 +205,7 @@ const Toolbar = ({ editor, parentDialogOpen }) => {
                         editor.chain().focus().insertContent('$$').run();
 
                         // Move the cursor between the dollar signs
-                        const {tr} = editor.state;
+                        const { tr } = editor.state;
                         const position = tr.selection.from - 1; // One character back (to move between the dollar signs)
                         const newSelection = TextSelection.create(tr.doc, position);
 
@@ -205,12 +214,12 @@ const Toolbar = ({ editor, parentDialogOpen }) => {
                     }}
                     className="p-1 mx-2 clickable"
                 >
-                    <SquareFunction className="icon"/>
+                    <SquareFunction className="icon" />
                 </button>
             </div>
             <div>
                 <button className="clickable" onClick={() => setIsInfoOpen(true)}>
-                    <Info className="icon"/>
+                    <Info className="icon" />
                 </button>
                 <InfoDialog isOpen={isInfoOpen} setIsOpen={setIsInfoOpen} />
             </div>
@@ -236,7 +245,7 @@ const Editor = ({ className = '', parentDialogOpen = true }: EditorProps) => {  
                 orderedList: {},
                 code: {},
             }),
-            TextStyle.configure({types: [ListItem.name]}),
+            // TextStyle.configure({types: [ListItem.name]}), // TODO check if this does anything
             Mathematics,
         ],
         autofocus: true,
@@ -247,8 +256,8 @@ const Editor = ({ className = '', parentDialogOpen = true }: EditorProps) => {  
             // Strip styling from pasted content
             handlePaste(view, event, slice) {
                 event.preventDefault()
-                const text = event.clipboardData.getData('text/plain')
-                view.dispatch(view.state.tr.insertText(text)) // Insert plain text as a new paragraph in the editor
+                const text = event.clipboardData?.getData('text/plain')
+                view.dispatch(view.state.tr.insertText(text ?? '')) // Insert plain text as a new paragraph in the editor
                 return true
             }
         },
