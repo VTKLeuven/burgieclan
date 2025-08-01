@@ -251,7 +251,10 @@
         "match-all-tags": "Match all tags",
         "add-tags": "Add tags",
         "cancel": "Cancel",
-        "apply": "Apply"
+        "apply": "Apply",
+        "no-preview": "No preview available",
+        "loading": "Bringing your document to life...",
+        "load-more": "Load More Pages ({{displayedPages}} of {{numPages}})"
     },
     "pagination": {
         "previous": "Previous",

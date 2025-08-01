@@ -252,7 +252,10 @@
         "match-all-tags": "Alle tags moeten overeenkomen",
         "add-tags": "Voeg tags toe",
         "cancel": "Annuleren",
-        "apply": "Toepassen"
+        "apply": "Toepassen",
+        "no-preview": "Geen voorbeeld beschikbaar",
+        "loading": "Uw document tot leven brengen...",
+        "load-more": "Meer pagina's laden ({{displayedPages}} van {{numPages}})"
     },
     "pagination": {
         "previous": "Vorige",
