@@ -40,7 +40,7 @@ const mapDocumentsToItems = (documents: Document[]) => {
     return documents.map(document => ({
         id: document.id,
         name: document.name,
-        redirectUrl: `/documents/${document.id}`,
+        redirectUrl: `/document/${document.id}`,
         type: 'document' as const
     }));
 };
