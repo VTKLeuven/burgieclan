@@ -120,6 +120,7 @@ class DocumentApiProvider implements ProviderInterface
         return $this->itemProvider->provide($operation, $uriVariables, $context);
     }
 
+    // Returns DocumentApi object with author removed if document is anonymous
     private function processDocument(Document $document)
     {
         $documentApi = $this->microMapper->map($document, DocumentApi::class);

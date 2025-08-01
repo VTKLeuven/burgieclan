@@ -6,10 +6,10 @@ import { Menu, X } from 'lucide-react';
 import Logo from '@/components/common/Logo';
 import { Skeleton } from "@/components/ui/skeleton";
 import Search from "@/components/header/Search";
+import HeaderProfileButton from "@/components/header/HeaderProfileButton";
 import { useUser } from '@/components/UserContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/components/header/LanguageSwitcher';
-import HeaderProfileButton from "@/components/header/HeaderProfileButton";
 import Link from 'next/link';
 
 

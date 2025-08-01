@@ -7,6 +7,7 @@ export default async function Homepage({ params: { locale } }: { params: { local
 
     return (
         <div className="flex flex-1 h-full">
+            {/* Main Content */}
             <div className="flex flex-1">
                 <HomePage/>
             </div>

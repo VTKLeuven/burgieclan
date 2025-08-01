@@ -11,7 +11,7 @@ use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 class UserVoter extends Voter
 {
-    public const VIEW_FULLNAME = 'VIEW_FULLNAME';
+    public const VIEW_USERNAME = 'VIEW_USERNAME';
     public const VIEW_EMAIL = 'VIEW_EMAIL';
     public const VIEW_FAVORITES = 'VIEW_FAVORITES';
 
@@ -25,7 +25,7 @@ class UserVoter extends Voter
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
-        return in_array($attribute, [self::VIEW_FULLNAME, self::VIEW_EMAIL, self::VIEW_FAVORITES])
+        return in_array($attribute, [self::VIEW_USERNAME, self::VIEW_EMAIL, self::VIEW_FAVORITES])
             && $subject instanceof UserApi;
     }
 
@@ -42,7 +42,7 @@ class UserVoter extends Voter
         switch ($attribute) {
             case self::VIEW_FAVORITES:
             case self::VIEW_EMAIL:
-            case self::VIEW_FULLNAME:
+            case self::VIEW_USERNAME:
                 $requestedUser = $this->microMapper->map($subject, User::class, [
                     MicroMapperInterface::MAX_DEPTH => 0,
                 ]);
