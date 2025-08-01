@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
 import { ArrowBigDownIcon, ArrowBigUpIcon } from "lucide-react";
+import { useState } from 'react';
 
 export enum VoteDirection {
     UP = 'UP',
@@ -76,13 +76,12 @@ export default function VoteButton({
                     ${voteState === VoteDirection.UP ? 'text-amber-600 fill-amber-600' : 'text-gray-500'}
                 `}
             />
-            <div className={`text-sm ${
-                voteState === VoteDirection.UP
-                    ? 'text-amber-600'
-                    : voteState === VoteDirection.DOWN
-                        ? 'text-blue-500'
-                        : ''
-            }`}>
+            <div className={`text-sm ${voteState === VoteDirection.UP
+                ? 'text-amber-600'
+                : voteState === VoteDirection.DOWN
+                    ? 'text-blue-500'
+                    : ''
+                }`}>
                 {voteCount}
             </div>
             <ArrowBigDownIcon
