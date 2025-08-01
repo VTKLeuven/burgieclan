@@ -1,14 +1,18 @@
-import Editor from "@/components/editor/Editor";
-import {Dialog} from "@/components/ui/Dialog";
 import PDFViewer from "@/components/document/pdf/PDFViewer";
-import {useEffect, useState, useRef} from "react";
+import Editor from "@/components/editor/Editor";
+import { Dialog } from "@/components/ui/Dialog";
+import { useEffect, useRef, useState } from "react";
 
-/**
- * TODO: improve layout, add submit button layout and functionality (sending comment to backend)
- * TODO: Rethink if this modal is really necessary or if we can just use the editor directly
- */
+//TODO: improve layout, add submit button layout and functionality (sending comment to backend)
+//TODO: Rethink if this modal is really necessary or if we can just use the editor directly
 
-export default function AddDocumentCommentModal({isModalOpen, setIsModalOpen}) {
+interface AddDocumentCommentModalProps {
+    file?: string;
+    isModalOpen: boolean;
+    setIsModalOpen: (isOpen: boolean) => void;
+}
+
+export default function AddDocumentCommentModal({ file, isModalOpen, setIsModalOpen }: AddDocumentCommentModalProps) {
     const [containerWidth, setContainerWidth] = useState<number>(0);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -33,15 +37,17 @@ export default function AddDocumentCommentModal({isModalOpen, setIsModalOpen}) {
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
         >
-            <div
-                ref={containerRef}
-                className="flex-1 overflow-auto p-4"
-            >
-                <PDFViewer
-                    fileArg="/documents/test.pdf"
-                    width={containerWidth}
-                />
-            </div>
+            {file &&
+                <div
+                    ref={containerRef}
+                    className="flex-1 overflow-auto p-4"
+                >
+                    <PDFViewer
+                        file={file}
+                        width={containerWidth}
+                    />
+                </div>
+            }
             <div className="border-t border-gray-200 mt-2">
                 <Editor parentDialogOpen={isModalOpen} />
             </div>

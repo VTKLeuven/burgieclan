@@ -1,9 +1,7 @@
-import DocumentComment from "@/components/document/DocumentComment";
 import AddDocumentCommentBox from "@/components/document/AddDocumentCommentBox";
+import DocumentComment from "@/components/document/DocumentComment";
 
-/**
- * TODO: retrieve documents from server instead of hardcoding
- */
+/*TODO: retrieve documents from server instead of hardcoding*/
 
 const sampleData = {
     names: [
@@ -29,9 +27,9 @@ const sampleData = {
     voteCounts: [0, 1, 2, 3, 4, 5]
 };
 
-const getRandomItem = (array) => array[Math.floor(Math.random() * array.length)];
+const getRandomItem = <T,>(array: T[]) => array[Math.floor(Math.random() * array.length)];
 
-export default function DocumentCommentSection() {
+export default function DocumentCommentSection({ file }: { file?: string }) {
     // Generate 6 random comments
     const comments = Array.from({ length: 6 }, () => ({
         author: getRandomItem(sampleData.names),
@@ -44,7 +42,7 @@ export default function DocumentCommentSection() {
             <div className="space-y-4 py-2.5">
                 <div className="h-8"></div>
                 {/*Allow users to add comments*/}
-                <AddDocumentCommentBox />
+                <AddDocumentCommentBox file={file} />
 
                 {/*Display existing comments*/}
                 {comments.map((comment, index) => (
