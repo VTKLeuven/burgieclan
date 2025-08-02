@@ -3,8 +3,8 @@ import { CommentCategory, CourseComment } from '@/types/entities';
 import Loading from '@/app/[locale]/loading';
 import { useTranslation } from 'react-i18next';
 import { convertToCommentCategory } from '@/utils/convertToEntity';
-import CourseCommentList from '@/components/coursepage/CourseCommentList';
-import CommentDialog from '@/components/coursepage/CommentDialog';
+import CourseCommentList from '@/components/coursepage/comment/CourseCommentList';
+import CommentDialog from '@/components/coursepage/comment/CommentDialog';
 import { useApi } from '@/hooks/useApi';
 import { useToast } from '@/components/ui/Toast';
 
@@ -83,18 +83,9 @@ const CommentCategories = ({ comments, courseId }: CommentCategoriesProps) => {
     }
 
     return (
-        <div>
+        <div className="relative">
             <div className="flex justify-between items-center mb-3">
                 <h2>{t('course-page.comments.title')}</h2>
-                {/* <div className="ml-auto">
-                    <button
-                        onClick={handleOpenCommentDialog}
-                        className="primary-button inline-flex items-center"
-                    >
-                        <MessageSquarePlus className="sm:mr-2 w-5 h-5" />
-                        <span className="hidden sm:inline">{t('course-page.comments.add-new')}</span>
-                    </button>
-                </div> */}
             </div>
 
             <p className="text-wireframe-mid-gray italic mb-4">

@@ -1,6 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import CommentRow from '@/components/coursepage/comment/CommentRow';
+import { useMemo, useState } from 'react';
 import { CommentCategory, CourseComment } from '@/types/entities';
-import { Calendar, RefreshCw, UserX, Info, ChevronRight, CircleUserRound, MessageSquarePlus, Send } from 'lucide-react';
+import { Info, ChevronRight, MessageSquarePlus, Send } from 'lucide-react';
+import Tooltip from '@/components/ui/Tooltip';
 
 type CourseCommentListProps = {
     category: CommentCategory;
@@ -9,31 +11,8 @@ type CourseCommentListProps = {
     onAddComment?: (categoryId: number, data: { content: string; anonymous: boolean }) => Promise<void>;
 };
 
-// Format date as dd/mm/yyyy
-const formatDate = (date?: Date): string => {
-    if (!date) return '';
-    return new Intl.DateTimeFormat('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    }).format(date);
-};
-
-// Format full datetime for tooltip
-const formatFullDateTime = (date?: Date): string => {
-    if (!date) return '';
-    return new Intl.DateTimeFormat('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-    }).format(date);
-};
-
-const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommentListProps) => {
+const CourseCommentList = ({ category, comments: initialComments, t, onAddComment }: CourseCommentListProps) => {
+    const [comments, setComments] = useState<CourseComment[]>(initialComments);
     const [expanded, setExpanded] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
     const [formContent, setFormContent] = useState('');
@@ -90,6 +69,10 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
         setExpanded(true);
     };
 
+    const handleDeleteComment = (commentId: number) => {
+        setComments((prev) => prev.filter((c) => c.id !== commentId));
+    };
+
     return (
         <div className="mb-2 relative z-10">
             {/* Category Header - Program-style */}
@@ -106,16 +89,14 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
 
                 {/* Add comment button */}
                 {onAddComment && (
-                    <button
-                        onClick={handleAddButtonClick}
-                        className="relative group ml-3 text-gray-500 hover:text-amber-600 hover:bg-amber-100 rounded transition-colors p-1"
-                        title={t('course-page.comments.add-new')}
-                    >
-                        <MessageSquarePlus size={20} />
-                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-30">
-                            {t('course-page.comments.add-new')}
-                        </div>
-                    </button>
+                    <Tooltip content={t('course-page.comments.add-new')}>
+                        <button
+                            onClick={handleAddButtonClick}
+                            className="ml-3 text-gray-500 hover:text-amber-600 hover:bg-amber-100 rounded transition-colors p-1"
+                        >
+                            <MessageSquarePlus size={20} />
+                        </button>
+                    </Tooltip>
                 )}
 
                 {/* Comment count badge */}
@@ -203,61 +184,12 @@ const CourseCommentList = ({ category, comments, t, onAddComment }: CourseCommen
                         </div>
                     ) : (
                         <div className="border border-gray-200 rounded-md overflow-visible relative">
-                            {sortedComments.map((comment, index) => (
-                                <div key={comment.id} className={`py-2 px-3 leading-tight flex overflow-visible relative ${index !== sortedComments.length - 1 ? 'border-b border-gray-200' : ''}`}>
-                                    {/* Profile Picture - Left side */}
-                                    <div className="flex items-start mr-2 overflow-visible">
-                                        <div className="relative group overflow-visible">
-                                            {comment.anonymous ? (
-                                                <UserX className="h-4 w-4 text-gray-500 rounded-full mt-0.5" />
-                                            ) : (
-                                                <CircleUserRound className="h-4 w-4 text-gray-500 rounded-full mt-0.5" />
-                                            )}
-
-                                            <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-30">
-                                                {comment.anonymous
-                                                    ? t('course-page.comments.anonymous')
-                                                    : comment.creator?.fullName
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Comment content - Center */}
-                                    <div className="flex-grow mr-3">
-                                        <p className="text-sm text-gray-700 whitespace-pre-line">{comment.content}</p>
-                                    </div>
-
-                                    {/* Metadata - Right side */}
-                                    <div className="flex flex-col text-xs text-gray-500 text-right min-w-[120px] space-y-1 mt-0.5">
-                                        {/* Dates */}
-                                        <div className="flex flex-col items-end space-y-1">
-                                            {/* Created date */}
-                                            <div className="relative group flex items-center">
-                                                <Calendar className="h-3 w-3 mr-1" />
-                                                <span>
-                                                    {formatDate(comment.createdAt)}
-                                                </span>
-                                                <div className="absolute top-full right-0 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-20">
-                                                    {formatFullDateTime(comment.createdAt)}
-                                                </div>
-                                            </div>
-
-                                            {/* Updated date - only show if different from create date */}
-                                            {comment.updatedAt && comment.createdAt && comment.updatedAt.getTime() !== comment.createdAt.getTime() && (
-                                                <div className="relative group flex items-center">
-                                                    <RefreshCw className="h-3 w-3 mr-1" />
-                                                    <span>
-                                                        {formatDate(comment.updatedAt)}
-                                                    </span>
-                                                    <div className="absolute top-full right-0 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-20">
-                                                        {formatFullDateTime(comment.updatedAt)}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
+                            {sortedComments.map((comment) => (
+                                <CommentRow
+                                    key={comment.id}
+                                    comment={comment}
+                                    onDelete={handleDeleteComment}
+                                />
                             ))}
                         </div>
                     )}
