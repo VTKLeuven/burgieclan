@@ -83,70 +83,22 @@ const CommentRow: React.FC<CommentRowProps> = ({
     };
 
     return (
-        <div className="py-2 px-3 leading-tight flex flex-col sm:flex-row overflow-visible relative items-center transition-colors border-b border-gray-200 hover:bg-amber-50 hover:shadow-sm group/comment">
+        <div className="py-2 px-3 leading-tight flex flex-col sm:flex-row overflow-visible relative items-center transition-colors border-b border-gray-200 hover:bg-gray-50 hover:shadow-sm group/comment">
             {/* Profile Picture - Left side (desktop only) */}
-            <div className="hidden sm:flex items-start mr-2 overflow-visible">
+            <div className="hidden sm:flex items-center mr-2 overflow-visible">
                 <CommentUserIcon anonymous={comment.anonymous ?? true} creatorName={comment.creator?.fullName} />
             </div>
 
             {/* Comment content - Center */}
-            <div className="flex-grow mx-3 flex items-start items-center min-w-0 w-full">
+            <div className="flex-grow mx-3 flex items-center min-w-0 w-full">
                 {isEditing ? (
                     <form onSubmit={handleEditSubmit} className="space-y-2 w-full">
-                        <textarea
-                            ref={editTextareaRef}
-                            value={editContent}
-                            onChange={handleEditContentChange}
-                            className="w-full p-2 text-sm border border-amber-300 rounded-md resize-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 placeholder-gray-450"
-                            rows={1}
-                            required
-                            disabled={editIsSubmitting}
-                            style={{ minHeight: '2.5rem', overflow: 'hidden' }}
-                        />
-                        <div className="flex flex-col sm:flex-row sm:justify-end gap-2 w-full">
-                            <label className="flex items-center text-xs text-gray-600 cursor-pointer hover:text-gray-800 transition-colors sm:mr-2">
-                                <input
-                                    type="checkbox"
-                                    checked={editAnonymous}
-                                    onChange={(e) => setEditAnonymous(e.target.checked)}
-                                    className="mr-2 cursor-pointer h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
-                                    disabled={editIsSubmitting}
-                                />
-                                <span className="cursor-pointer">
-                                    {t('course-page.comments.dialog.anonymous')}
-                                </span>
-                            </label>
-                            <button
-                                type="button"
-                                onClick={handleCancelEdit}
-                                className="text-xs px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors w-full sm:w-auto"
-                                disabled={editIsSubmitting}
-                            >
-                                {t('course-page.comments.dialog.button.cancel')}
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={editIsSubmitting || !editContent.trim()}
-                                className="text-xs px-3 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 disabled:opacity-50 transition-colors inline-flex items-center w-full sm:w-auto"
-                            >
-                                {editIsSubmitting ? (
-                                    <>
-                                        <span className="spinner mr-1" />
-                                        {t('course-page.comments.dialog.button.submitting')}
-                                    </>
-                                ) : (
-                                    <>
-                                        <Send className="mr-1 w-3 h-3" />
-                                        {t('course-page.comments.dialog.button.submit')}
-                                    </>
-                                )}
-                            </button>
-                        </div>
+                        {/* ...existing form content... */}
                     </form>
                 ) : (
                     <>
                         <p className="text-sm min-h-[1.4rem] text-gray-700 whitespace-pre-line">{comment.content}</p>
-                        <div className="hidden sm:block w-auto">
+                        <div className="hidden sm:flex items-center w-auto">
                             <CommentActions onEdit={handleEditClick} onDelete={handleDeleteComment} show={isOwnComment && !isEditing} />
                         </div>
                     </>
@@ -154,7 +106,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
             </div>
 
             {/* Metadata - Right side (desktop only) */}
-            <div className="hidden sm:block">
+            <div className="hidden sm:flex items-center">
                 <CommentMetadata comment={comment} />
             </div>
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Calendar, RefreshCw } from 'lucide-react';
 import { CourseComment } from '@/types/entities';
+import Tooltip from '@/components/ui/Tooltip';
 
 export type CommentMetadataProps = {
   comment: CourseComment;
@@ -32,21 +33,20 @@ const formatFullDateTime = (date?: Date): string => {
 
 const CommentMetadata: React.FC<CommentMetadataProps> = ({ comment }) => (
   <div className="flex flex-col items-end space-y-1 text-xs text-gray-500">
-    <div className="relative group flex items-center">
-      <Calendar className="h-3 w-3 mr-1" />
-      <span>{formatDate(comment.createdAt)}</span>
-      <div className="absolute top-full right-0 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-20">
-        {formatFullDateTime(comment.createdAt)}
+    <Tooltip content={formatFullDateTime(comment.createdAt)}>
+      <div className="flex items-center">
+        <Calendar className="h-3 w-3 mr-1" />
+        <span>{formatDate(comment.createdAt)}</span>
       </div>
-    </div>
+    </Tooltip>
+    
     {comment.updatedAt && comment.createdAt && comment.updatedAt.getTime() !== comment.createdAt.getTime() && (
-      <div className="relative group flex items-center">
-        <RefreshCw className="h-3 w-3 mr-1" />
-        <span>{formatDate(comment.updatedAt)}</span>
-        <div className="absolute top-full right-0 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-20">
-          {formatFullDateTime(comment.updatedAt)}
+      <Tooltip content={formatFullDateTime(comment.updatedAt)}>
+        <div className="flex items-center">
+          <RefreshCw className="h-3 w-3 mr-1" />
+          <span>{formatDate(comment.updatedAt)}</span>
         </div>
-      </div>
+      </Tooltip>
     )}
   </div>
 );

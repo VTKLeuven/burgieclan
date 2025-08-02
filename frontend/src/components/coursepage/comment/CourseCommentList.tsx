@@ -2,6 +2,7 @@ import CommentRow from '@/components/coursepage/comment/CommentRow';
 import { useMemo, useState } from 'react';
 import { CommentCategory, CourseComment } from '@/types/entities';
 import { Info, ChevronRight, MessageSquarePlus, Send } from 'lucide-react';
+import Tooltip from '@/components/ui/Tooltip';
 
 type CourseCommentListProps = {
     category: CommentCategory;
@@ -88,16 +89,14 @@ const CourseCommentList = ({ category, comments: initialComments, t, onAddCommen
 
                 {/* Add comment button */}
                 {onAddComment && (
-                    <button
-                        onClick={handleAddButtonClick}
-                        className="relative group ml-3 text-gray-500 hover:text-amber-600 hover:bg-amber-100 rounded transition-colors p-1"
-                        title={t('course-page.comments.add-new')}
-                    >
-                        <MessageSquarePlus size={20} />
-                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-30">
-                            {t('course-page.comments.add-new')}
-                        </div>
-                    </button>
+                    <Tooltip content={t('course-page.comments.add-new')}>
+                        <button
+                            onClick={handleAddButtonClick}
+                            className="ml-3 text-gray-500 hover:text-amber-600 hover:bg-amber-100 rounded transition-colors p-1"
+                        >
+                            <MessageSquarePlus size={20} />
+                        </button>
+                    </Tooltip>
                 )}
 
                 {/* Comment count badge */}
