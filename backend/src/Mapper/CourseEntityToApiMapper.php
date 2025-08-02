@@ -5,9 +5,11 @@ namespace App\Mapper;
 use App\ApiResource\CourseApi;
 use App\ApiResource\CourseCommentApi;
 use App\ApiResource\ModuleApi;
+use App\ApiResource\ProfessorApi;
 use App\Entity\Course;
 use App\Entity\CourseComment;
 use App\Entity\Module;
+use App\Entity\Professor;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -38,7 +40,11 @@ class CourseEntityToApiMapper implements MapperInterface
         $to->name = $from->getName();
         $to->code = $from->getCode();
         $to->language = $from->getLanguage();
-        $to->professors = array_values($from->getProfessors());
+        $to->professors = array_map(function (Professor $professor) {
+            return $this->microMapper->map($professor, ProfessorApi::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }, $from->getProfessors()->getValues());
         $to->semesters = $from->getSemesters();
         $to->credits = $from->getCredits();
         $to->oldCourses = array_map(function (Course $course) {

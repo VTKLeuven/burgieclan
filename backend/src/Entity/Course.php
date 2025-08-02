@@ -38,8 +38,9 @@ class Course
     #[Assert\Length(6)]
     private ?string $code = null;
 
-    #[ORM\Column(type: Types::JSON, nullable: true)]
-    private array $professors = [];
+    #[ORM\ManyToMany(targetEntity: Professor::class, inversedBy: 'courses')]
+    #[ORM\JoinTable(name: 'course_professor')]
+    private Collection $professors;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private array $semesters = [];
@@ -77,6 +78,7 @@ class Course
         $this->courseComments = new ArrayCollection();
         $this->modules = new ArrayCollection();
         $this->identicalCourses = new ArrayCollection();
+        $this->professors = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -113,14 +115,29 @@ class Course
         return $this;
     }
 
-    public function getProfessors(): array
+    /**
+     * @return Collection<int, Professor>
+     */
+    public function getProfessors(): Collection
     {
         return $this->professors;
     }
 
-    public function setProfessors(?array $professors): self
+    public function addProfessor(Professor $professor): self
     {
-        $this->professors = $professors;
+        if (!$this->professors->contains($professor)) {
+            $this->professors->add($professor);
+            $professor->addCourse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProfessor(Professor $professor): self
+    {
+        if ($this->professors->removeElement($professor)) {
+            $professor->removeCourse($this);
+        }
 
         return $this;
     }

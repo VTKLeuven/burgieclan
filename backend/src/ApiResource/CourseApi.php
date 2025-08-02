@@ -46,6 +46,9 @@ class CourseApi
     #[Groups(['course:get'])]
     public ?string $language = null;
 
+    /**
+     * @var ProfessorApi[]
+     */
     #[Groups(['course:get', 'program:get', 'search'])]
     public array $professors = [];
 

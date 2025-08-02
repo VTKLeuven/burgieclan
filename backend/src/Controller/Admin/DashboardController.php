@@ -11,6 +11,7 @@ use App\Entity\DocumentCategory;
 use App\Entity\DocumentComment;
 use App\Entity\Module;
 use App\Entity\Page;
+use App\Entity\Professor;
 use App\Entity\Program;
 use App\Entity\QuickLink;
 use App\Entity\Tag;
@@ -73,6 +74,8 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Courses', 'fa-solid fa-book')
             ->setSubItems([
                 MenuItem::linkToCrud('Courses', 'fa fa-book', Course::class)
+                    ->setPermission(User::ROLE_ADMIN),
+                MenuItem::linkToCrud('Professors', 'fa fa-user-tie', Professor::class)
                     ->setPermission(User::ROLE_ADMIN),
                 MenuItem::linkToCrud('Comment Categories', 'fas fa-tags', CommentCategory::class)
                     ->setPermission(User::ROLE_ADMIN),

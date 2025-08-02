@@ -3,9 +3,10 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Course;
+use App\Entity\Professor;
 use App\Entity\User;
+use App\Service\ProfessorService;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -33,7 +34,8 @@ class CourseCrudController extends AbstractCrudController
             ]);
         yield AssociationField::new('modules')
             ->setFormTypeOption('by_reference', false);
-        yield ArrayField::new('professors');
+        yield AssociationField::new('professors')
+            ->setFormTypeOption('by_reference', false);
         yield ChoiceField::new('semesters')
             ->setChoices(Course::SEMESTERS)
             ->allowMultipleChoices()
