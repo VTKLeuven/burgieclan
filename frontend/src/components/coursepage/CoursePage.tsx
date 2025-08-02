@@ -10,7 +10,7 @@ import { ChartPie, Link as LinkIcon } from "lucide-react";
 import { convertToCourse } from "@/utils/convertToEntity";
 import Link from "next/link";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
-import CommentCategories from "@/components/coursepage/CommentCategories";
+import CommentCategories from "@/components/coursepage/comment/CommentCategories";
 import { useTranslation } from "react-i18next";
 import ErrorPage from "../error/ErrorPage";
 import FavoriteButton from "@/components/ui/FavoriteButton";

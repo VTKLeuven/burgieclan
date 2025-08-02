@@ -137,6 +137,12 @@
             "add-new": "Add comment",
             "success": "Comment added successfully",
             "error": "Failed to add comment",
+            "toast": {
+                "update-success": "Comment updated successfully",
+                "update-error": "Failed to update comment",
+                "delete-success": "Comment deleted successfully",
+                "delete-error": "Failed to delete comment"
+            },
             "form": {
                 "content": {
                     "required": "Comment is required"
@@ -155,7 +161,9 @@
                 "button": {
                     "submit": "Post comment",
                     "submitting": "Posting...",
-                    "cancel": "Cancel"
+                    "cancel": "Cancel",
+                    "edit": "Edit comment",
+                    "delete": "Delete comment"
                 }
             },
             "no-categories": "No comment categories available"

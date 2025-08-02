@@ -137,6 +137,12 @@
             "add-new": "Opmerking toevoegen",
             "success": "Opmerking succesvol toegevoegd",
             "error": "Opmerking toevoegen mislukt",
+            "toast": {
+                "update-success": "Opmerking succesvol bijgewerkt",
+                "update-error": "Opmerking bijwerken mislukt",
+                "delete-success": "Opmerking succesvol verwijderd",
+                "delete-error": "Opmerking verwijderen mislukt"
+            },
             "form": {
                 "content": {
                     "required": "Opmerking is verplicht"
@@ -155,7 +161,9 @@
                 "button": {
                     "submit": "Opmerking plaatsen",
                     "submitting": "Plaatsen...",
-                    "cancel": "Annuleren"
+                    "cancel": "Annuleren",
+                    "edit": "Opmerking bewerken",
+                    "delete": "Opmerking verwijderen"
                 }
             },
             "no-categories": "Geen opmerking-categorieën beschikbaar"
