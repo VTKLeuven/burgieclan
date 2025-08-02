@@ -154,6 +154,14 @@ class DocumentApi
     #[Groups(['document:get'])]
     public ?string $contentUrl = null;
 
+    #[ApiProperty(writable: false)]
+    #[Groups(['document:get'])]
+    public ?string $mimetype = null;
+
+    #[ApiProperty(writable: false)]
+    #[Groups(['document:get'])]
+    public ?string $filename = null;
+
     #[Assert\NotNull(groups: ['document:create'])]
     #[ApiProperty(readable: false)]
     public ?File $file = null;

@@ -251,7 +251,14 @@
         "match-all-tags": "Match all tags",
         "add-tags": "Add tags",
         "cancel": "Cancel",
-        "apply": "Apply"
+        "apply": "Apply",
+        "no-preview": "No preview available for {{filename}}",
+        "loading": "Bringing your document to life...",
+        "load-more": "Load More Pages ({{displayedPages}} of {{numPages}})",
+        "comments": {
+            "add": "Add Comment..."
+        },
+        "under-review-warning": "This document is currently under review, so it is only visible to you."
     },
     "pagination": {
         "previous": "Previous",
@@ -275,5 +282,19 @@
         "go_to_vtk": "Go to VTK",
         "user_avatar": "User avatar",
         "my_favorite_documents": "Favorite Documents"
+    },
+    "editor": {
+        "info_dialog": {
+            "title": "Text Editor",
+            "description": "The editor allows you to write and display mathematical formulas using LaTeX syntax.",
+            "inline": "Wrap your math expressions in",
+            "inline_end": "for inline formulas",
+            "block": " or ",
+            "block_end": "for block formulas.",
+            "katex_overview": "For an overview of the supported functions, refer to the ",
+            "katex_doc": "documentation of KaTeX",
+            "katex_end": " the underlying LaTeX interpreter."
+        },
+        "info_button": "Info"
     }
 }

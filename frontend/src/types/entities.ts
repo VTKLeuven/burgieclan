@@ -57,8 +57,10 @@ export interface Document extends NodeEntity {
     category?: DocumentCategory;
     year?: string;
     underReview?: boolean;
-    contentUrl?: string;
     anonymous?: boolean;
+    contentUrl?: string;
+    mimetype?: string;
+    filename?: string;
     tags?: Tag[];
 }
 
