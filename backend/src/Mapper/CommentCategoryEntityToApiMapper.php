@@ -26,9 +26,10 @@ class CommentCategoryEntityToApiMapper implements MapperInterface
         assert($from instanceof CommentCategory);
         assert($to instanceof CommentCategoryApi);
 
-        $to->name = $from->getName();
-        $to->description = $from->getDescription();
+        $lang = $context['lang'] ?? CommentCategory::$DEFAULT_LANGUAGE;
 
+        $to->name = $from->getName($lang);
+        $to->description = $from->getDescription($lang);
         return $to;
     }
 }
