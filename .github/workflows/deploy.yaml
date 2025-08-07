@@ -46,13 +46,18 @@ jobs:
       # Prepare new release in a separate directory
       - name: Backend - Prepare new release
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
+          RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
           mkdir -p \$RELEASE_DIR && \
+          mkdir -p ${{ secrets.DATA_DIR }} && \
           cp -r ${{ secrets.WORK_DIR_BACKEND }}/* \$RELEASE_DIR/ && \
           # Copy environment file properly
           if [ -f ${{ secrets.WORK_DIR_BACKEND }}/.env.local.php ]; then \
             cp ${{ secrets.WORK_DIR_BACKEND }}/.env.local.php \$RELEASE_DIR/ ; \
           fi && \
+          # Remove release data dir and symlink to shared data
+          rm -rf \$RELEASE_DIR/data && \
+          ln -sfn ${{ secrets.DATA_DIR }} \$RELEASE_DIR/data && \
           cd \$RELEASE_DIR && \
           composer install --no-dev --optimize-autoloader && \
           bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration && \
