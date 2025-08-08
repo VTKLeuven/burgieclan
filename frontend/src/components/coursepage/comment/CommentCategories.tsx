@@ -17,7 +17,7 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
     const [allCategories, setAllCategories] = useState<CommentCategory[]>([]);
     const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false);
     const [localComments, setLocalComments] = useState<CourseComment[]>(comments);
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { request, loading } = useApi();
 
     // Sync local comments with props
@@ -28,7 +28,8 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
     // Fetch all categories from backend
     useEffect(() => {
         const fetchCategories = async () => {
-            const data = await request('GET', '/api/comment_categories');
+            const lang = i18n.language;
+            const data = await request('GET', `/api/comment_categories?lang=${lang}`);
 
             if (!data) {
                 return null;
@@ -37,7 +38,7 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
         };
 
         fetchCategories();
-    }, [request]);
+    }, [request, i18n.language]);
 
     // Group comments by category - memoized to prevent unnecessary recalculations
     const commentsByCategory = useMemo(() => {
