@@ -22,7 +22,7 @@ class Module
     private Collection $courses;
 
     #[ORM\ManyToOne(inversedBy: 'modules')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Program $program = null;
 
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'modules')]
