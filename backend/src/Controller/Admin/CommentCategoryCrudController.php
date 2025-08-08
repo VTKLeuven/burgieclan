@@ -7,6 +7,7 @@ use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -30,8 +31,20 @@ class CommentCategoryCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnDetail();
-        yield TextField::new('name');
-        yield TextEditorField::new('description');
+        yield Textfield::new('name_nl')
+            ->setRequired(true)
+            ->setLabel('Name (NL)');
+        yield TextEditorField::new('description_nl')
+            ->setLabel('Description (NL)')
+            ->setTemplatePath('admin/text_editor.html.twig');
+
+        yield FormField::addPanel('English Content')->setIcon('fa fa-language')
+            ->collapsible();
+        yield Textfield::new('name_en')
+            ->setLabel('Name (EN)');
+        yield TextEditorField::new('description_en')
+            ->setLabel('Description (EN)')
+            ->setTemplatePath('admin/text_editor.html.twig');
     }
 
     public function configureFilters(Filters $filters): Filters
