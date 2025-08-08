@@ -190,7 +190,8 @@ final class DownloadZipController extends AbstractController
     {
         $documentsByCategory = [];
         foreach ($documents as $document) {
-            $category = $document->getCategory()->getName();
+            assert($document instanceof Document);
+            $category = $document->getCategory()->getNameEn();
             if (!isset($documentsByCategory[$category])) {
                 $documentsByCategory[$category] = [];
             }
