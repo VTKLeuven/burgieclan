@@ -32,6 +32,11 @@ security:
             stateless: true
             jwt: ~
 
+        files:
+            pattern: ^/files
+            stateless: true
+            jwt: ~
+
         main:
             # this firewall does not have a 'pattern' option because it applies to all URLs
             lazy: true
