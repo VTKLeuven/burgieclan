@@ -39,7 +39,7 @@ class DocumentCommentEntityToApiMapper implements MapperInterface
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);
         $to->creator = $this->microMapper->map($from->getCreator(), UserApi::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
+            MicroMapperInterface::MAX_DEPTH => 1,
         ]);
         $to->createdAt = $from->getCreateDate()->format('Y-m-d H:i:s');
         $to->updatedAt = $from->getUpdateDate()->format('Y-m-d H:i:s');

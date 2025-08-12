@@ -11,14 +11,14 @@ abstract class NodeApi
 {
     #[ApiProperty(writable: false)]
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
-    #[Groups(['course:get'])]
+    #[Groups(['course:get', 'document_comment:get'])]
     public ?UserApi $creator;
 
     #[ApiProperty(writable: false)]
-    #[Groups(['course:get'])]
+    #[Groups(['course:get', 'document_comment:get'])]
     public string $createdAt;
 
     #[ApiProperty(writable: false)]
-    #[Groups(['course:get'])]
+    #[Groups(['course:get', 'document_comment:get'])]
     public string $updatedAt;
 }
