@@ -48,7 +48,7 @@ final class AppFixtures extends Fixture
         DocumentCategoryFactory::createMany(5);
         TagFactory::createMany(20);
         DocumentFactory::createMany(100);
-        DocumentCommentFactory::createMany(150);
+        DocumentCommentFactory::createMany(400);
         PageFactory::createMany(20);
         QuickLinkFactory::createMany(10);
     }
