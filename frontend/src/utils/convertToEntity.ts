@@ -1,4 +1,4 @@
-import { type CommentCategory, type Course, type CourseComment, type Document, type Module, type Page, type Program, type QuickLink, type Tag, type User } from '@/types/entities';
+import { type CommentCategory, type Course, type CourseComment, type Document, type DocumentComment, type Module, type Page, type Program, type QuickLink, type Tag, type User } from '@/types/entities';
 
 export function convertToUser(user: any): User {
     if (typeof user === 'string') {
@@ -98,6 +98,21 @@ export function convertToCourseComment(comment: any): CourseComment {
         id: parseId(comment['@id']),
         course: comment.course ? convertToCourse(comment.course) : undefined,
         commentCategory: comment.category ? convertToCommentCategory(comment.category) : undefined,
+        content: comment.content,
+        anonymous: comment.anonymous,
+        createdAt: comment.createdAt ? new Date(comment.createdAt) : undefined,
+        updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : undefined,
+        creator: comment.creator ? convertToUser(comment.creator) : undefined
+    };
+}
+
+export function convertToDocumentComment(comment: any): DocumentComment {
+    if (typeof comment === 'string') {
+        return { id: parseId(comment) };
+    }
+    return {
+        id: parseId(comment['@id']),
+        document: comment.document ? convertToDocument(comment.document) : undefined,
         content: comment.content,
         anonymous: comment.anonymous,
         createdAt: comment.createdAt ? new Date(comment.createdAt) : undefined,
