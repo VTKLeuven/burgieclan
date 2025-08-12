@@ -12,10 +12,10 @@ abstract class AbstractCommentApi extends NodeApi
 {
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups(['course:get'])]
+    #[Groups(['course:get', 'document_comment:get'])]
     public ?string $content = null;
 
     #[ApiFilter(BooleanFilter::class)]
-    #[Groups(['course:get'])]
+    #[Groups(['course:get', 'document_comment:get'])]
     public bool $anonymous = false;
 }
