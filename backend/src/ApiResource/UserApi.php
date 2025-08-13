@@ -98,4 +98,7 @@ class UserApi
     #[Groups(['user', 'user:favorites'])]
     #[ApiProperty(security: 'is_granted("VIEW_FAVORITES", object)')]
     public array $favoriteDocuments = [];
+
+    #[Groups(['user'])]
+    public bool $defaultAnonymous = true;
 }
