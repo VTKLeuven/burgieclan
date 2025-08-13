@@ -2,9 +2,9 @@
 
 import styles from "./styles.module.css";
 import Link from 'next/link'
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import { getCurrentYear } from "@/utils/date";
 import { useTranslation } from "react-i18next";
+import { SquareArrowOutUpRight } from "lucide-react";
 
 type IconProps = React.SVGProps<SVGSVGElement>;
 
@@ -69,16 +69,16 @@ export default function Footer() {
 
     return (
         <footer aria-labelledby="footer-heading" className="bg-white">
-            <div className="mx-auto border-t border-gray-900/10 max-w-7xl px-6 py-12 lg:px-8">
+            <div className="mx-auto border-t border-gray-900/10 px-6 py-6 lg:px-8">
                 <div className="md:flex md:items-center md:justify-between">
 
                     {/* Social Links Section */}
                     <div className="flex space-x-6 md:order-3  md:mt-0">
                         {navigation.map((item) => (
-                            <a key={item.name} href={item.href} className="text-gray-400 hover:text-gray-500">
+                            <Link key={item.name} href={item.href} className="text-gray-400 hover:text-gray-500">
                                 <span className="sr-only">{item.name}</span>
                                 <item.icon aria-hidden="true" className="h-6 w-6" />
-                            </a>
+                            </Link>
                         ))}
                     </div>
 
@@ -88,9 +88,9 @@ export default function Footer() {
                             {t('report_issue')}
                         </Link>
                         <p className={styles.footerText}>{" or "}</p>
-                        <a href="https://github.com/VTKLeuven/burgieclan" className={styles.footerLink}>
-                            {t('contribute_github')}<span><ArrowTopRightOnSquareIcon className="h-3 w-3 inline-block ml-0.5 mb-1 text-gray-500" aria-hidden="true" /></span>
-                        </a>
+                        <Link href="https://github.com/VTKLeuven/burgieclan" className={styles.footerLink}>
+                            {t('contribute_github')}<span><SquareArrowOutUpRight className="h-3 w-3 inline-block ml-0.5 mb-1 text-gray-500" aria-hidden="true" /></span>
+                        </Link>
                     </div>
 
                     {/* Copyright Section */}

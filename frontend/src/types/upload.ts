@@ -3,17 +3,10 @@ export interface UploadFormData {
     course: string;
     category: string;
     year: string;
+    anonymous: boolean;
     file: any;
-}
-
-export interface Course {
-    id: string;
-    name: string;
-}
-
-export interface Category {
-    id: string;
-    name: string;
+    tagIds: number[];
+    tagQueries: string[];
 }
 
 export interface UploadFormProps {

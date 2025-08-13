@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\DocumentRepository;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -31,14 +33,26 @@ class Document extends Node
     #[ORM\Column]
     private ?bool $under_review = null;
 
+    #[ORM\Column]
+    private ?bool $anonymous = null;
+
     #[Vich\UploadableField(mapping: 'document_object', fileNameProperty: 'file_name')]
     private ?File $file = null;
 
     #[ORM\Column(nullable: true)]
     private ?string $file_name = null;
 
-    #[ORM\Column(length: 5, nullable: true)]
-    private ?string $year = null;
+    #[ORM\Column(length: 11, nullable: true)]
+    private ?string $year = null; // Ex. 2024 - 2025
+
+    #[ORM\ManyToMany(targetEntity: Tag::class, mappedBy: 'documents', cascade: ['persist'])]
+    private Collection $tags;
+
+    public function __construct($creator)
+    {
+        parent::__construct($creator);
+        $this->tags = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -88,6 +102,18 @@ class Document extends Node
     public function setUnderReview(bool $under_review): static
     {
         $this->under_review = $under_review;
+
+        return $this;
+    }
+
+    public function isAnonymous(): ?bool
+    {
+        return $this->anonymous;
+    }
+
+    public function setAnonymous(bool $anonymous): static
+    {
+        $this->anonymous = $anonymous;
 
         return $this;
     }
@@ -142,7 +168,7 @@ class Document extends Node
      *
      * @param int $amountOfYears The number of years to generate choices for, default is 10
      * @param string|null $firstYear The first year to start generating choices from, default is null
-     * @return array The array of academic year choices
+     * @return array The array of academic year choices, formatted like '2024 - 2025' => '2024 - 2025'
      */
     public static function getAcademicYearChoices(int $amountOfYears = 10, string $firstYear = null): array
     {
@@ -157,18 +183,44 @@ class Document extends Node
         }
 
         if (!is_null($firstYear)) {
-            $firstYear = (int)substr($firstYear, 0, 2);
-            $firstYear += ($firstYear > (int)date('y')) ? 1900 : 2000; // TODO fix this Y2.1K bug
+            $firstYear = (int)substr($firstYear, 0, 4);
             $amountOfYears = max($amountOfYears, $currentYear - $firstYear + 1);
         }
 
-            $choices = [];
+        $choices = [];
         for ($i = 0; $i < $amountOfYears; $i++) {
             $startYear = $currentYear - $i;
             $endYear = $startYear + 1;
-            $formattedYear = sprintf('%02d-%02d', $startYear % 100, $endYear % 100);
+            $formattedYear = sprintf('%d - %d', $startYear, $endYear);
             $choices[$formattedYear] = $formattedYear;
         }
         return $choices;
+    }
+
+    /**
+     * @return Collection<int, Tag>
+     */
+    public function getTags(): Collection
+    {
+        return $this->tags;
+    }
+
+    public function addTag(Tag $tag): static
+    {
+        if (!$this->tags->contains($tag)) {
+            $this->tags->add($tag);
+            $tag->addDocument($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTag(Tag $tag): static
+    {
+        if ($this->tags->removeElement($tag)) {
+            $tag->removeDocument($this);
+        }
+
+        return $this;
     }
 }

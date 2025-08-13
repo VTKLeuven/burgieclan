@@ -37,7 +37,8 @@ class CourseEntityToApiMapper implements MapperInterface
 
         $to->name = $from->getName();
         $to->code = $from->getCode();
-        $to->professors = $from->getProfessors();
+        $to->language = $from->getLanguage();
+        $to->professors = array_values($from->getProfessors());
         $to->semesters = $from->getSemesters();
         $to->credits = $from->getCredits();
         $to->oldCourses = array_map(function (Course $course) {
@@ -51,6 +52,12 @@ class CourseEntityToApiMapper implements MapperInterface
             ]);
         }, $from->getNewCourses()->getValues());
 
+        $to->identicalCourses = array_map(function (Course $course) {
+            return $this->microMapper->map($course, CourseApi::class, [
+                MicroMapperInterface::MAX_DEPTH => 0,
+            ]);
+        }, $from->getIdenticalCourses()->getValues());
+
         $to->modules = array_map(function (Module $module) {
             return $this->microMapper->map($module, ModuleApi::class, [
                 MicroMapperInterface::MAX_DEPTH => 0,
@@ -59,7 +66,7 @@ class CourseEntityToApiMapper implements MapperInterface
 
         $to->courseComments = array_map(function (CourseComment $comment) {
             return $this->microMapper->map($comment, CourseCommentApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                MicroMapperInterface::MAX_DEPTH => 2,
             ]);
         }, $from->getCourseComments()->getValues());
         return $to;

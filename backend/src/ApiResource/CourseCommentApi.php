@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Post;
 use App\Entity\CourseComment;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     shortName: 'Course Comment',
@@ -40,7 +41,9 @@ class CourseCommentApi extends AbstractCommentApi
     #[ApiProperty(readable: false, writable: false, identifier: true)]
     public ?int $id = null;
 
+    #[Groups(['course:get'])]
     public ?CourseApi $course;
 
+    #[Groups(['course:get'])]
     public ?CommentCategoryApi $category;
 }

@@ -5,8 +5,10 @@ namespace App\Mapper;
 use App\ApiResource\CourseApi;
 use App\ApiResource\DocumentApi;
 use App\ApiResource\DocumentCategoryApi;
+use App\ApiResource\TagApi;
 use App\ApiResource\UserApi;
 use App\Entity\Document;
+use App\Entity\Tag;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -17,7 +19,7 @@ class DocumentEntityToApiMapper implements MapperInterface
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
-        private readonly StorageInterface $storage,
+        private readonly StorageInterface     $storage,
     ) {
     }
 
@@ -38,19 +40,25 @@ class DocumentEntityToApiMapper implements MapperInterface
 
         $to->name = $from->getName();
         $to->course = $this->microMapper->map($from->getCourse(), CourseApi::class, [
-            MicroMapperInterface::MAX_DEPTH => 1,
+            MicroMapperInterface::MAX_DEPTH => 2,
         ]);
         $to->category = $this->microMapper->map($from->getCategory(), DocumentCategoryApi::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
+            MicroMapperInterface::MAX_DEPTH => 2,
         ]);
         $to->year = $from->getYear();
         $to->under_review = $from->isUnderReview();
+        $to->anonymous = $from->isAnonymous();
         $to->creator = $this->microMapper->map($from->getCreator(), UserApi::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
+            MicroMapperInterface::MAX_DEPTH => 1,
         ]);
         $to->createdAt = $from->getCreateDate()->format('Y-m-d H:i:s');
         $to->updatedAt = $from->getUpdateDate()->format('Y-m-d H:i:s');
         $to->contentUrl = $this->storage->resolveUri($from, 'file');
+        $to->tags = array_map(function (Tag $tag) {
+            return $this->microMapper->map($tag, TagApi::class, [
+                MicroMapperInterface::MAX_DEPTH => 1,
+            ]);
+        }, $from->getTags()->getValues());
 
         return $to;
     }

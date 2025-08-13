@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\DocumentComment;
 use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -18,6 +19,13 @@ class DocumentCommentCrudController extends AbstractCrudController
     public static function getEntityFqcn(): string
     {
         return DocumentComment::class;
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setEntityLabelInSingular('Document Comment')
+            ->setEntityLabelInPlural('Document Comments');
     }
 
     public function createEntity(string $entityFqcn)

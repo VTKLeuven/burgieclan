@@ -26,12 +26,38 @@ export const documentSchema = (t: any) => yup.object().shape({
         .required(t('upload.form.validation.year.required'))
         .matches(/^\d{4} - \d{4}$/, t('upload.form.validation.year.format')),
 
+    anonymous: yup
+        .boolean()
+        .default(false),
+
+    tagIds: yup
+        .array(
+            yup.number()
+                .required()
+                .typeError(t('upload.form.validation.tags.number_required'))
+        )
+        .defined() // Ensures it returns an array, not undefined
+        .transform((value) => value || []) // Transform null or undefined to empty array
+        .default([]),
+
+    tagQueries: yup
+        .array(
+            yup.string()
+                .required()
+                .trim()
+                .min(1, t('upload.form.validation.tags.min'))
+                .max(50, t('upload.form.validation.tags.max'))
+        )
+        .defined() // Ensures it returns an array, not undefined
+        .transform((value) => value || []) // Transform null or undefined to empty array
+        .default([]),
+
     file: yup
         .mixed()
         .required(t('upload.form.validation.file.required'))
         .test('fileSize', t('upload.form.validation.file.size', { size: FILE_SIZE_MB }),
             (value) => !value || (value instanceof File && value.size <= FILE_SIZE_LIMIT))
-        .test('fileType', t('upload.form.validation.file.type'),  async (value) => {
+        .test('fileType', t('upload.form.validation.file.type'), async (value) => {
             if (!value) return false;
             const type = await fileTypeFromBlob(value as Blob);
             if (!type?.mime) return false;
