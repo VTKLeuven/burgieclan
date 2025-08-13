@@ -19,7 +19,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'User',
     operations: [
         new Get(),
-        new Patch(),
+        new Patch(
+            security: 'is_granted("PATCH_USER", object)',
+        ),
     ],
     normalizationContext: ['groups' => ['user']],
     provider: EntityClassDtoStateProvider::class,
@@ -100,5 +102,8 @@ class UserApi
     public array $favoriteDocuments = [];
 
     #[Groups(['user'])]
-    public bool $defaultAnonymous = true;
+    #[ApiProperty(security: 'object === null or is_granted("VIEW_USER_DEFAULT_ANONYMOUS", object)')]
+    // object === null is needed to circumvent a specific bug.
+    // It is explained more in https://symfonycasts.com/screencast/api-platform-extending/patch-field-security#the-apiproperty-security-option-on-patch-operations
+    public ?bool $defaultAnonymous = null;
 }
