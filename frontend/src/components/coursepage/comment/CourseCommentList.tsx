@@ -2,6 +2,7 @@ import CommentRow from '@/components/coursepage/comment/CommentRow';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { useToast } from '@/components/ui/Toast';
 import Tooltip from '@/components/ui/Tooltip';
+import { useUser } from '@/components/UserContext';
 import { useApi } from '@/hooks/useApi';
 import { CommentCategory, CourseComment } from '@/types/entities';
 import { convertToCourseComment } from '@/utils/convertToEntity';
@@ -17,6 +18,8 @@ type CourseCommentListProps = {
 };
 
 const CourseCommentList = ({ category, comments: initialComments, courseId, onCommentAdded }: CourseCommentListProps) => {
+    const { user } = useUser();
+
     const [comments, setComments] = useState<CourseComment[]>(initialComments);
     const [expanded, setExpanded] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -34,6 +37,13 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
             textareaRef.current.focus();
         }
     }, [showAddForm]);
+
+    // Initialize anonymous state from user preference when form is shown
+    useEffect(() => {
+        if (showAddForm && user?.defaultAnonymous !== undefined) {
+            setFormAnonymous(user.defaultAnonymous);
+        }
+    }, [showAddForm, user]);
 
     // Sort comments by most recent update/creation date
     const sortedComments = useMemo(() => {
