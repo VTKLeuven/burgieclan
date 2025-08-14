@@ -12,7 +12,8 @@ export function convertToUser(user: any): User {
         favoriteCourses: user.favoriteCourses?.map(convertToCourse),
         favoriteModules: user.favoriteModules?.map(convertToModule),
         favoritePrograms: user.favoritePrograms?.map(convertToProgram),
-        favoriteDocuments: user.favoriteDocuments?.map(convertToDocument)
+        favoriteDocuments: user.favoriteDocuments?.map(convertToDocument),
+        defaultAnonymous: user.defaultAnonymous
     };
 }
 
