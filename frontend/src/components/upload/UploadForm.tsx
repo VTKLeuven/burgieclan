@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { useForm, type FieldError } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import FormField from '@/components/ui/FormField';
-import { UploadField } from '@/components/upload/UploadField';
-import { UploadFormData } from '@/types/upload';
-import { documentSchema } from '@/utils/validation/documentSchema';
-import { useFormFields } from '@/hooks/useFormFields';
-import { Text } from '@/components/ui/Text';
-import { useTranslation } from 'react-i18next';
-import { useYearOptions } from '@/hooks/useYearOptions';
-import { VISIBLE_YEARS } from "@/utils/constants/upload";
 import { Checkbox } from "@/components/ui/Checkbox";
+import FormField from '@/components/ui/FormField';
+import { Text } from '@/components/ui/Text';
+import { UploadField } from '@/components/upload/UploadField';
 import UploadTagFilter from '@/components/upload/UploadTagFilter';
+import { useUser } from '@/components/UserContext';
+import { useFormFields } from '@/hooks/useFormFields';
+import { useYearOptions } from '@/hooks/useYearOptions';
+import { UploadFormData } from '@/types/upload';
+import { VISIBLE_YEARS } from "@/utils/constants/upload";
 import { getSuggestedNameFromFilename } from '@/utils/documentNameSuggestion';
+import { documentSchema } from '@/utils/validation/documentSchema';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useEffect, useState } from 'react';
+import { useForm, type FieldError } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 interface FormProps {
     onSubmit: (data: UploadFormData) => Promise<void>;
@@ -28,6 +29,7 @@ export default function UploadForm({
     initialFile,
 }: FormProps) {
     const { t } = useTranslation();
+    const { user } = useUser();
     const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
     const [selectedTagQueries, setSelectedTagQueries] = useState<string[]>([]);
 
@@ -41,7 +43,7 @@ export default function UploadForm({
     } = useForm<UploadFormData>({
         resolver: yupResolver(documentSchema(t)),
         defaultValues: {
-            anonymous: false, // TODO: Set the initial value of the checkbox based on anonymous user setting, see https://burgieclan.atlassian.net/browse/BUR-222
+            anonymous: user?.defaultAnonymous,
             tagIds: [],
             tagQueries: []
         }
@@ -49,7 +51,7 @@ export default function UploadForm({
 
     const { courses, categories, isLoading: isLoadingFields, error } = useFormFields(isOpen);
     const yearOptions = useYearOptions();
-    
+
     // Watch the file and name fields
     const watchedFile = watch('file');
     const watchedName = watch('name');
@@ -60,7 +62,7 @@ export default function UploadForm({
             setValue('file', initialFile, { shouldValidate: true });
         }
     }, [initialFile, setValue]);
-    
+
     // Suggest name based on filename when file changes and name is empty
     useEffect(() => {
         if (watchedFile && !watchedName) {
