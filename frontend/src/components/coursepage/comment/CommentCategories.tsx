@@ -1,5 +1,4 @@
 import Loading from '@/app/[locale]/loading';
-import CommentDialog from '@/components/coursepage/comment/CommentDialog';
 import CourseCommentList from '@/components/coursepage/comment/CourseCommentList';
 import { useApi } from '@/hooks/useApi';
 import { CommentCategory, CourseComment } from '@/types/entities';
@@ -118,16 +117,6 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
                     onCommentAdded={handleCommentAdded}
                 />
             ))}
-
-            {isCommentDialogOpen && (
-                <CommentDialog
-                    isOpen={isCommentDialogOpen}
-                    onClose={handleCloseCommentDialog}
-                    courseId={courseId}
-                    categories={allCategories}
-                    onCommentAdded={handleCommentAddedFromDialog}
-                />
-            )}
         </div>
     );
 };
