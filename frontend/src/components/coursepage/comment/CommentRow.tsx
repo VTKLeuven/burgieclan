@@ -1,13 +1,14 @@
-import React, { useRef, useState } from 'react';
-import { Send } from 'lucide-react';
-import { CourseComment } from '@/types/entities';
-import { useTranslation } from 'react-i18next';
-import { useUpdateComment } from '@/hooks/useUpdateComment';
-import { useDeleteComment } from '@/hooks/useDeleteComment';
 import { useUser } from '@/components/UserContext';
-import CommentUserIcon from '@/components/coursepage/comment/CommentUserIcon';
-import CommentMetadata from '@/components/coursepage/comment/CommentMetadata';
 import CommentActions from '@/components/coursepage/comment/CommentActions';
+import CommentMetadata from '@/components/coursepage/comment/CommentMetadata';
+import CommentUserIcon from '@/components/coursepage/comment/CommentUserIcon';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { useDeleteComment } from '@/hooks/useDeleteComment';
+import { useUpdateComment } from '@/hooks/useUpdateComment';
+import { CourseComment } from '@/types/entities';
+import { Send } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type CommentRowProps = {
     comment: CourseComment;
@@ -113,20 +114,16 @@ const CommentRow: React.FC<CommentRowProps> = ({
                                 {t('course-page.comments.dialog.button.cancel')}
                             </button>
 
-                            {/* Anonymous checkbox - custom implementation to match desired styling */}
+                            {/* Anonymous checkbox */}
                             <div className="flex items-center justify-end">
-                                <label className="flex items-center text-xs text-gray-600 cursor-pointer hover:text-gray-800 transition-colors">
-                                    <input
-                                        type="checkbox"
-                                        checked={editAnonymous}
-                                        onChange={(e) => setEditAnonymous(e.target.checked)}
-                                        className="mr-2 cursor-pointer h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
-                                        disabled={editIsSubmitting}
-                                    />
-                                    <span className="cursor-pointer">
-                                        {t('course-page.comments.dialog.anonymous')}
-                                    </span>
-                                </label>
+                                <Checkbox
+                                    id={`anonymous-edit-${comment.id}`}
+                                    label={t('course-page.comments.dialog.anonymous')}
+                                    checked={editAnonymous}
+                                    onChange={(e) => setEditAnonymous(e.target.checked)}
+                                    disabled={editIsSubmitting}
+                                    labelClassName="text-xs text-gray-600 hover:text-gray-800 transition-colors"
+                                />
                             </div>
 
                             <button
