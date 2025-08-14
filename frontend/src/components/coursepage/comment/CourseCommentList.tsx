@@ -1,4 +1,5 @@
 import CommentRow from '@/components/coursepage/comment/CommentRow';
+import { Checkbox } from '@/components/ui/Checkbox';
 import { useToast } from '@/components/ui/Toast';
 import Tooltip from '@/components/ui/Tooltip';
 import { useApi } from '@/hooks/useApi';
@@ -174,20 +175,16 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
                                         {t('course-page.comments.dialog.button.cancel')}
                                     </button>
 
-                                    {/* Anonymous checkbox - custom implementation to match desired styling */}
+                                    {/* Anonymous checkbox */}
                                     <div className="flex items-center justify-end">
-                                        <label className="flex items-center text-xs text-gray-600 cursor-pointer hover:text-gray-800 transition-colors">
-                                            <input
-                                                type="checkbox"
-                                                checked={formAnonymous}
-                                                onChange={(e) => setFormAnonymous(e.target.checked)}
-                                                className="mr-2 cursor-pointer h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
-                                                disabled={isSubmitting}
-                                            />
-                                            <span className="cursor-pointer">
-                                                {t('course-page.comments.dialog.anonymous')}
-                                            </span>
-                                        </label>
+                                        <Checkbox
+                                            id="anonymous-comment"
+                                            label={t('course-page.comments.dialog.anonymous')}
+                                            checked={formAnonymous}
+                                            onChange={(e) => setFormAnonymous(e.target.checked)}
+                                            disabled={isSubmitting}
+                                            labelClassName="text-xs text-gray-600 hover:text-gray-800 transition-colors"
+                                        />
                                     </div>
 
                                     <button
