@@ -13,6 +13,7 @@ interface UserContextType {
     isRedirecting: boolean;
     error: ApiError | null;
     refreshUser: () => Promise<void>;
+    updateUserProperty: <K extends keyof User>(property: K, value: User[K]) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -36,6 +37,13 @@ export const UserProvider = ({ children, userId }: { children: ReactNode, userId
         }
     }, [userId, request]);
 
+    const updateUserProperty = useCallback(<K extends keyof User>(property: K, value: User[K]) => {
+        setUser(currentUser => {
+            if (!currentUser) return null;
+            return { ...currentUser, [property]: value };
+        });
+    }, []);
+
     // Initial fetch when component mounts or userId changes
     useEffect(() => {
         fetchUser();
@@ -46,7 +54,8 @@ export const UserProvider = ({ children, userId }: { children: ReactNode, userId
         loading,
         isRedirecting,
         error,
-        refreshUser: fetchUser
+        refreshUser: fetchUser,
+        updateUserProperty
     };
 
     return (
