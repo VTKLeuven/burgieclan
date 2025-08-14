@@ -1,14 +1,15 @@
 'use client';
 
-import Loading from "@/app/[locale]/loading";
-import type { Course, Document, Module, Program } from "@/types/entities";
-import { useTranslation } from "react-i18next";
-import { useUser } from "@/components/UserContext";
-import FavoriteList from "@/components/account/FavoriteList";
-import DocumentList from "@/components/account/DocumentList";
-import { useEffect, useState } from "react";
 import { logOut } from "@/actions/oauth";
+import Loading from "@/app/[locale]/loading";
+import { useUser } from "@/components/UserContext";
+import AnonymousSetting from "@/components/account/AnonymousSetting";
+import DocumentList from "@/components/account/DocumentList";
+import FavoriteList from "@/components/account/FavoriteList";
+import type { Course, Document, Module, Program } from "@/types/entities";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const mapCoursesToItems = (courses: Course[]) => {
     return courses.map(course => ({
@@ -109,12 +110,17 @@ export default function AccountPage() {
                 items={mapDocumentsToItems(favoriteDocuments)}
                 emptyMessage={t('account.favorite.no_documents')}
             />
-            <button
-                onClick={handleLogout}
-                className="bg-red-500 text-white px-4 py-2 rounded mt-8 hover:bg-red-600 active:bg-red-700 transition duration-150 ease-in-out"
-            >
-                {t('logout')}
-            </button>
+
+            <AnonymousSetting />
+
+            <div className="mt-6">
+                <button
+                    onClick={handleLogout}
+                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 active:bg-red-700 transition duration-150 ease-in-out"
+                >
+                    {t('logout')}
+                </button>
+            </div>
         </div>
     );
 }

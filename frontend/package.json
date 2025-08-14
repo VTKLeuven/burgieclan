@@ -13,6 +13,7 @@
     "@hookform/resolvers": "^3.9.0",
     "@lexical/react": "^0.17.1",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
+    "@radix-ui/react-switch": "^1.2.6",
     "@sentry/nextjs": "^8.22.0",
     "@tailwindcss/forms": "^0.5.7",
     "@tiptap/extension-mathematics": "^3.0.8",
