@@ -3,21 +3,25 @@
 import useDownloadContent from "@/hooks/useDownloadContent";
 import type { Document } from "@/types/entities";
 import { Download, Loader } from "lucide-react";
+import { formatFileSize } from "@/utils/fileSize";
 import { useState } from "react";
 
 interface DownloadButtonProps {
     document: Document;            // The document to download
-    fileSize: string;            // Display size of the file
+    fileSize?: string;
     disabled?: boolean;          // Whether the button is disabled
 }
 
 export default function DownloadSingleDocumentButton({
-    document,
-    fileSize,
-    disabled = false,
-}: DownloadButtonProps) {
+                                                         document,
+                                                         fileSize,
+                                                         disabled = false,
+                                                     }: DownloadButtonProps) {
     const { downloadContent, loading: isDownloading } = useDownloadContent();
     const [isHovered, setIsHovered] = useState(false); // Used to show file size on hover
+
+    // Use the provided fileSize prop or format the document's fileSize
+    const formattedFileSize = fileSize || (document.fileSize ? formatFileSize(document.fileSize) : "Unknown size");
 
     const handleDownload = (e: React.MouseEvent) => {
         e.stopPropagation(); // Prevent triggering parent click events (like expanding nodes)
@@ -41,6 +45,7 @@ export default function DownloadSingleDocumentButton({
             onMouseLeave={() => setIsHovered(false)}
             onClick={handleDownload}
             disabled={disabled}
+            title={`Download ${document.name} (${formattedFileSize})`}
         >
             <Download
                 size={20}
@@ -65,7 +70,7 @@ export default function DownloadSingleDocumentButton({
             >
                 {isDownloading
                     ? <Loader size={20} className="animate-spin" />
-                    : fileSize
+                    : formattedFileSize
                 }
             </span>
         </button>
