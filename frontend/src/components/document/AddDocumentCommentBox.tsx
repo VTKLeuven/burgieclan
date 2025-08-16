@@ -5,11 +5,12 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface AddDocumentCommentBoxProps {
+    documentId: number;
     file?: string;
     content?: string;
 }
 
-export default function AddDocumentCommentBox({ file, content }: AddDocumentCommentBoxProps) {
+export default function AddDocumentCommentBox({ documentId, file, content }: AddDocumentCommentBoxProps) {
     const { t } = useTranslation();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,7 +22,7 @@ export default function AddDocumentCommentBox({ file, content }: AddDocumentComm
                 onClick={() => setIsModalOpen(true)}>
                 <span>{t("document.comments.add")}</span>
             </button>
-            <AddDocumentCommentModal file={file} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+            <AddDocumentCommentModal documentId={documentId} file={file} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
             <p className="text-sm">{content}</p>
         </div>
     );
