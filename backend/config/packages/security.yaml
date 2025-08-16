@@ -36,7 +36,7 @@ security:
               # The JWTRefreshTokenBundle will automatically handle refresh token invalidation
 
         files:
-            pattern: ^/files
+            pattern: ^/files/download
             stateless: true
             jwt: ~
 
