@@ -162,6 +162,10 @@ class DocumentApi
     #[Groups(['document:get'])]
     public ?string $filename = null;
 
+    #[ApiProperty(writable: false)]
+    #[Groups(['document:get'])]
+    public ?int $fileSize = null;
+
     #[Assert\NotNull(groups: ['document:create'])]
     #[ApiProperty(readable: false)]
     public ?File $file = null;
