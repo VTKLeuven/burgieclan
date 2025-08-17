@@ -39,9 +39,7 @@ export default function DocumentPreview({ id }: { id: string }) {
             if (!documentData) {
                 return null;
             }
-
-            const convertedDocument = convertToDocument(documentData);
-            setDocument(convertedDocument);
+            setDocument(convertToDocument(documentData));
         };
 
         fetchDocumentData();
@@ -87,7 +85,7 @@ export default function DocumentPreview({ id }: { id: string }) {
                     {document.createdAt && <DocumentInfoField icon={Calendar} value={document.createdAt?.toLocaleDateString()} />}
                     <DocumentInfoField
                         icon={Package}
-                        value={document.fileSize ? formatFileSize(document.fileSize) : "Size unavailable"}
+                        value={document.fileSize ? formatFileSize(document.fileSize) : ""}
                     />
                     {document.year && <DocumentInfoField icon={ChartPie} value={document.year} />}
                 </div>
