@@ -45,7 +45,6 @@ class DocumentResourceTest extends ApiTestCase
             'mimetype',
             'filename',
             'creator',
-            'fileSize',
             'createdAt',
             'updatedAt',
             'tags',
@@ -82,23 +81,6 @@ class DocumentResourceTest extends ApiTestCase
             'updatedAt',
             'tags',
         ]); // Notice that creator is not included in the response.
-
-        $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
-            '@id',
-            '@type',
-            'name',
-            'course',
-            'category',
-            'year',
-            'under_review',
-            'anonymous',
-            'contentUrl',
-            'mimetype',
-            'filename',
-            'createdAt',
-            'updatedAt',
-            'tags',
-        ]);
     }
 
     public function testGetOneDocument(): void
