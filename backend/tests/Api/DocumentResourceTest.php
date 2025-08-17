@@ -79,7 +79,6 @@ class DocumentResourceTest extends ApiTestCase
             'mimetype',
             'filename',
             'createdAt',
-            'fileSize',
             'updatedAt',
             'tags',
         ]); // Notice that creator is not included in the response.
@@ -96,7 +95,6 @@ class DocumentResourceTest extends ApiTestCase
             'contentUrl',
             'mimetype',
             'filename',
-            'fileSize',
             'createdAt',
             'updatedAt',
             'tags',
