@@ -55,7 +55,7 @@ class DocumentResourceTest extends ApiTestCase
     public function testGetCollectionOfAnonymousDocuments(): void
     {
         DocumentFactory::createMany(5, [
-            'anonymous' => true,https://github.com/VTKLeuven/burgieclan/tree/BUR-333-add-download-size-to-download-button
+            'anonymous' => true,
         ]);
         $json = $this->browser()
             ->get('/api/documents', [
