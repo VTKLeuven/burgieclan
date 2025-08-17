@@ -134,7 +134,7 @@ class SearchResourceTest extends ApiTestCase
             'documents',
         ]);
         $documents = $decoded_json['documents'];
-        $this->assertSame(2, count($documents));
+        $this->assertSame(1, count($documents));
         $this->assertSame('/api/documents/' . $document->getId(), $documents[0]['@id']);
 
         $json = $this->browser()

@@ -55,7 +55,7 @@ class DocumentResourceTest extends ApiTestCase
     public function testGetCollectionOfAnonymousDocuments(): void
     {
         DocumentFactory::createMany(5, [
-            'anonymous' => true,
+            'anonymous' => true,https://github.com/VTKLeuven/burgieclan/tree/BUR-333-add-download-size-to-download-button
         ]);
         $json = $this->browser()
             ->get('/api/documents', [
@@ -66,9 +66,7 @@ class DocumentResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
-            ->json();
-
-        $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
+            ->json();$this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
             '@id',
             '@type',
             'name',
@@ -85,6 +83,24 @@ class DocumentResourceTest extends ApiTestCase
             'updatedAt',
             'tags',
         ]); // Notice that creator is not included in the response.
+
+        $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
+            '@id',
+            '@type',
+            'name',
+            'course',
+            'category',
+            'year',
+            'under_review',
+            'anonymous',
+            'contentUrl',
+            'mimetype',
+            'filename',
+            'fileSize',
+            'createdAt',
+            'updatedAt',
+            'tags',
+        ]);
     }
 
     public function testGetOneDocument(): void
