@@ -197,3 +197,4 @@ class DocumentApi
     #[Groups(['search', 'user', 'document:get', 'document:create'])]
     public array $tags = [];
 }
+

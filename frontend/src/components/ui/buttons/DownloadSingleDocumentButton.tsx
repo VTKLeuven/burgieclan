@@ -12,16 +12,12 @@ interface DownloadButtonProps {
     disabled?: boolean;          // Whether the button is disabled
 }
 
-export default function DownloadSingleDocumentButton({
-                                                         document,
-                                                         fileSize,
-                                                         disabled = false,
-                                                     }: DownloadButtonProps) {
+export default function DownloadSingleDocumentButton({document, fileSize, disabled = false,}: DownloadButtonProps) {
     const { downloadContent, loading: isDownloading } = useDownloadContent();
     const [isHovered, setIsHovered] = useState(false); // Used to show file size on hover
 
     // Use the provided fileSize prop or format the document's fileSize
-    const formattedFileSize = fileSize || (document.fileSize ? formatFileSize(document.fileSize) : "Unknown size");
+    const formattedFileSize = fileSize || (document.fileSize ? formatFileSize(document.fileSize) : "");
 
     const handleDownload = (e: React.MouseEvent) => {
         e.stopPropagation(); // Prevent triggering parent click events (like expanding nodes)
