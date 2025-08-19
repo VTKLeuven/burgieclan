@@ -39,9 +39,7 @@ export default function Pagination({ totalAmount, currentPage, itemsPerPage, onP
             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                 <div>
                     <p className="text-sm text-gray-700">
-                        {/* TODO translations */}
-                        Showing <span className="font-medium">{currentStart}</span> to <span className="font-medium">{currentEnd}</span> of{' '}
-                        <span className="font-medium">{totalAmount}</span> results
+                        {t('pagination.showing', { start: currentStart, end: currentEnd, total: totalAmount })}
                     </p>
                 </div>
                 <div>

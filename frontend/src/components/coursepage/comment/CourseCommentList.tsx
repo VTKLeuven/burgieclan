@@ -1,23 +1,38 @@
 import CommentRow from '@/components/coursepage/comment/CommentRow';
-import { useMemo, useState } from 'react';
-import { CommentCategory, CourseComment } from '@/types/entities';
-import { Info, ChevronRight, MessageSquarePlus, Send } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 import Tooltip from '@/components/ui/Tooltip';
+import { useApi } from '@/hooks/useApi';
+import { CommentCategory, CourseComment } from '@/types/entities';
+import { convertToCourseComment } from '@/utils/convertToEntity';
+import { ChevronRight, Info, MessageSquarePlus, Send } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type CourseCommentListProps = {
     category: CommentCategory;
     comments: CourseComment[];
-    t: (key: string) => string;
-    onAddComment?: (categoryId: number, data: { content: string; anonymous: boolean }) => Promise<void>;
+    courseId: number;
+    onCommentAdded?: (newComment: CourseComment) => void;
 };
 
-const CourseCommentList = ({ category, comments: initialComments, t, onAddComment }: CourseCommentListProps) => {
+const CourseCommentList = ({ category, comments: initialComments, courseId, onCommentAdded }: CourseCommentListProps) => {
     const [comments, setComments] = useState<CourseComment[]>(initialComments);
     const [expanded, setExpanded] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
     const [formContent, setFormContent] = useState('');
     const [formAnonymous, setFormAnonymous] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const { request } = useApi();
+    const { showToast } = useToast();
+    const { t } = useTranslation();
+
+    // Focus textarea when form is shown
+    useEffect(() => {
+        if (showAddForm && textareaRef.current) {
+            textareaRef.current.focus();
+        }
+    }, [showAddForm]);
 
     // Sort comments by most recent update/creation date
     const sortedComments = useMemo(() => {
@@ -38,20 +53,38 @@ const CourseCommentList = ({ category, comments: initialComments, t, onAddCommen
 
     const handleAddComment = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formContent.trim() || !onAddComment) return;
+        if (!formContent.trim()) return;
 
         setIsSubmitting(true);
         try {
-            await onAddComment(category.id, {
+            const res = await request('POST', '/api/course_comments', {
                 content: formContent,
-                anonymous: formAnonymous
+                anonymous: formAnonymous,
+                course: `/api/courses/${courseId}`,
+                category: `/api/comment_categories/${category.id}`
             });
+
+            if (!res) {
+                showToast(t('course-page.comments.error'), 'error');
+                throw new Error('Failed to add comment');
+            }
+
+            showToast(t('course-page.comments.success'), 'success');
+
+            // Convert and notify parent about the new comment
+            const newComment = convertToCourseComment(res);
+            // Add the new comment to the local state so it appears immediately
+            setComments((prev) => [newComment, ...prev]);
+            if (onCommentAdded) {
+                onCommentAdded(newComment);
+            }
+
             // Reset form on success
             setFormContent('');
             setFormAnonymous(false);
             setShowAddForm(false);
         } catch (error) {
-            // Error handling is done in the parent component
+            // Error handling is done above
         } finally {
             setIsSubmitting(false);
         }
@@ -88,7 +121,7 @@ const CourseCommentList = ({ category, comments: initialComments, t, onAddCommen
                 </div>
 
                 {/* Add comment button */}
-                {onAddComment && (
+                {onCommentAdded && (
                     <Tooltip content={t('course-page.comments.add-new')}>
                         <button
                             onClick={handleAddButtonClick}
@@ -121,6 +154,7 @@ const CourseCommentList = ({ category, comments: initialComments, t, onAddCommen
                         <div className="mb-3 p-3 bg-gray-100 border border-gray-400 rounded-md">
                             <form onSubmit={handleAddComment} className="space-y-2">
                                 <textarea
+                                    ref={textareaRef}
                                     value={formContent}
                                     onChange={(e) => setFormContent(e.target.value)}
                                     placeholder={t('course-page.comments.dialog.description')}
@@ -199,4 +233,4 @@ const CourseCommentList = ({ category, comments: initialComments, t, onAddCommen
     );
 };
 
-export default CourseCommentList;
+export default React.memo(CourseCommentList);
