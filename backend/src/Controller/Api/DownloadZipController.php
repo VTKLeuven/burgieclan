@@ -128,6 +128,13 @@ final class DownloadZipController extends AbstractController
     ): string {
         $fileName = sprintf('%s/data/exports/%s.zip', $this->kernel->getProjectDir(), $contentHash);
 
+        // Ensure export directory exists
+        $exportDir = dirname($fileName);
+        if (!is_dir($exportDir)) {
+            // Use 0775 to match the permissions of the data directory (owner/group writeable)
+            mkdir($exportDir, 0775, true);
+        }
+
         $zip = new ZipArchive();
         if (!file_exists($fileName) && $zip->open($fileName, ZipArchive::CREATE) === true) {
             $this->addProgramsToZip($zip, $programs);
@@ -998,7 +1005,7 @@ final class DownloadZipController extends AbstractController
     private function createFileResponse(string $fileName, string $displayFilename = 'documents.zip'): Response
     {
         if (!file_exists($fileName)) {
-            throw new RuntimeException('File not found');
+            throw new RuntimeException('File not found: ' . $fileName);
         }
 
         $fileSize = filesize($fileName);
