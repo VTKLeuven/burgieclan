@@ -2,9 +2,11 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\Filter\EntityContainsFilter;
 use App\Entity\DocumentComment;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -49,5 +51,16 @@ class DocumentCommentCrudController extends AbstractCrudController
             ->hideOnForm();
         yield DateTimeField::new('updateDate')
             ->hideOnForm();
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('content')
+            ->add(EntityContainsFilter::new('creator', User::class))
+            ->add('anonymous')
+            ->add(EntityContainsFilter::new('document', DocumentComment::class))
+            ->add('createDate')
+            ->add('updateDate');
     }
 }

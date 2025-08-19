@@ -2,8 +2,11 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\Filter\EntityContainsFilter;
 use App\Entity\Course;
+use App\Entity\Module;
 use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -51,5 +54,20 @@ class CourseCrudController extends AbstractCrudController
             ->setFormTypeOption('by_reference', false);
         yield AssociationField::new('courseComments')
             ->hideOnForm();
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('name')
+            ->add('code')
+            ->add('language')
+            ->add(EntityContainsFilter::new('modules', Module::class))
+            ->add('professors')
+            ->add('semesters')
+            ->add('credits')
+            ->add(EntityContainsFilter::new('oldCourses', Course::class))
+            ->add(EntityContainsFilter::new('newCourses', Course::class))
+            ->add(EntityContainsFilter::new('identicalCourses', Course::class));
     }
 }

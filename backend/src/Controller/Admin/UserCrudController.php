@@ -2,18 +2,25 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\Filter\ArrayContainsFilter;
+use App\Controller\Admin\Filter\EntityContainsFilter;
+use App\Entity\Course;
+use App\Entity\Document;
+use App\Entity\Module;
+use App\Entity\Program;
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AvatarField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted(User::ROLE_SUPER_ADMIN)]
@@ -100,5 +107,21 @@ class UserCrudController extends AbstractCrudController
             $user->setPassword($hashedPassword);
             $user->eraseCredentials();
         }
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('fullName')
+            ->add('username')
+            ->add('email')
+            ->add(ArrayContainsFilter::new(
+                'roles',
+                array_combine(User::getAvailableRoles(), User::getAvailableRoles())
+            ))
+            ->add(EntityContainsFilter::new('favoritePrograms', Program::class))
+            ->add(EntityContainsFilter::new('favoriteModules', Module::class))
+            ->add(EntityContainsFilter::new('favoriteCourses', Course::class))
+            ->add(EntityContainsFilter::new('favoriteDocuments', Document::class));
     }
 }
