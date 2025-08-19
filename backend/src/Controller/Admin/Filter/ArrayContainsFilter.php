@@ -2,13 +2,13 @@
 
 namespace App\Controller\Admin\Filter;
 
+use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Filter\FilterInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\FilterDataDto;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\FilterTrait;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Filter\Type\ChoiceFilterType;
-use Doctrine\ORM\QueryBuilder;
 
 class ArrayContainsFilter implements FilterInterface
 {
@@ -49,7 +49,6 @@ class ArrayContainsFilter implements FilterInterface
         $comparison = $filterDataDto->getComparison();
         $parameterName = $filterDataDto->getParameterName();
         $value = $filterDataDto->getValue();
-        $isMultiple = $filterDataDto->getFormTypeOption('multiple');
 
         // Normalize $value to array
         if (is_array($value)) {

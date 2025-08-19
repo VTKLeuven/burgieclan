@@ -3,6 +3,7 @@
 namespace App\Controller\Admin\Filter;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Query\Expr\Orx;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Filter\FilterInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
@@ -109,7 +110,7 @@ class EntityContainsFilter implements FilterInterface
                     // No values selected: do not filter
                     return;
                 } else {
-                    $orX = new \Doctrine\ORM\Query\Expr\Orx();
+                    $orX = new Orx();
                     $orX->add(sprintf('%s %s (:%s)', $assocAlias, $comparison, $parameterName));
                     if ('NOT IN' === $comparison) {
                         $orX->add(sprintf('%s IS NULL', $assocAlias));
@@ -128,7 +129,7 @@ class EntityContainsFilter implements FilterInterface
                 $queryBuilder->andWhere(sprintf('%s.%s IN (:%s)', $alias, $property, $parameterName))
                     ->setParameter($parameterName, $values);
             } elseif ($comparison === 'NOT IN') {
-                $orX = new \Doctrine\ORM\Query\Expr\Orx();
+                $orX = new Orx();
                 $orX->add(sprintf('%s.%s NOT IN (:%s)', $alias, $property, $parameterName));
                 $orX->add(sprintf('%s.%s IS NULL', $alias, $property));
                 $queryBuilder->andWhere($orX)
@@ -144,7 +145,7 @@ class EntityContainsFilter implements FilterInterface
                 // No values selected: do not filter
                 return;
             } else {
-                $orX = new \Doctrine\ORM\Query\Expr\Orx();
+                $orX = new Orx();
                 $orX->add(sprintf('%s.%s %s (:%s)', $alias, $property, $comparison, $parameterName));
                 if ('!=' === $comparison) {
                     $orX->add(sprintf('%s.%s IS NULL', $alias, $property));
