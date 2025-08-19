@@ -5,7 +5,10 @@ namespace App\Controller\Admin;
 use App\Entity\DocumentCategory;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted(User::ROLE_ADMIN)]
@@ -23,14 +26,15 @@ class DocumentCategoryCrudController extends AbstractCrudController
             ->setEntityLabelInPlural('Document Categories');
     }
 
-    /*
     public function configureFields(string $pageName): iterable
     {
-        return [
-            IdField::new('id'),
-            TextField::new('title'),
-            TextEditorField::new('description'),
-        ];
+        yield IdField::new('id')->onlyOnDetail();
+        yield TextField::new('name');
     }
-    */
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('name');
+    }
 }
