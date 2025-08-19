@@ -15,30 +15,6 @@ type CourseCommentListProps = {
     onCommentAdded?: (newComment: CourseComment) => void;
 };
 
-// Format date as dd/mm/yyyy
-const formatDate = (date?: Date): string => {
-    if (!date) return '';
-    return new Intl.DateTimeFormat('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    }).format(date);
-};
-
-// Format full datetime for tooltip
-const formatFullDateTime = (date?: Date): string => {
-    if (!date) return '';
-    return new Intl.DateTimeFormat('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-    }).format(date);
-};
-
 const CourseCommentList = ({ category, comments: initialComments, courseId, onCommentAdded }: CourseCommentListProps) => {
     const [comments, setComments] = useState<CourseComment[]>(initialComments);
     const [expanded, setExpanded] = useState(false);
@@ -97,7 +73,8 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
 
             // Convert and notify parent about the new comment
             const newComment = convertToCourseComment(res);
-            console.log({ newComment });
+            // Add the new comment to the local state so it appears immediately
+            setComments((prev) => [newComment, ...prev]);
             if (onCommentAdded) {
                 onCommentAdded(newComment);
             }
