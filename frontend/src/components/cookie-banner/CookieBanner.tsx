@@ -1,9 +1,10 @@
 "use client"
+import { STORAGE_KEYS } from "@/utils/cookieNames";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export function cookieConsentGiven() {
-    return localStorage.getItem('cookie_consent') ?? 'undecided';
+    return localStorage.getItem(STORAGE_KEYS.COOKIE_CONSENT) ?? 'undecided';
 }
 
 const CookieBanner = () => {
@@ -18,7 +19,7 @@ const CookieBanner = () => {
     }, []);
 
     const handleAcceptCookies = () => {
-        localStorage.setItem('cookie_consent', 'true');
+        localStorage.setItem(STORAGE_KEYS.COOKIE_CONSENT, 'true');
         setConsentGiven('true');
     };
 
