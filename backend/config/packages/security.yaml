@@ -19,18 +19,17 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        login:
-            pattern: ^/api/auth/login
-            stateless: true
-            json_login:
-                check_path: /api/auth/login
-                success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
-
         api:
             pattern: ^/api
             stateless: true
+            entry_point: jwt
+            json_login:
+              check_path: /api/auth/login
+              success_handler: lexik_jwt_authentication.handler.authentication_success
+              failure_handler: lexik_jwt_authentication.handler.authentication_failure
             jwt: ~
+            refresh_jwt:
+              check_path: /api/auth/token/refresh
 
         files:
             pattern: ^/files
