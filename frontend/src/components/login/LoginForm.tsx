@@ -1,23 +1,18 @@
 'use client'
 
-// UI
-import { ChevronDown } from "lucide-react";
-import LitusOAuthButton from "@/components/login/LitusOAuthButton";
+import { storeTokensInCookies } from "@/actions/auth";
 import Logo from "@/components/common/Logo";
-import { useToast } from "@/components/ui/Toast";
-
-// Logic
-import React, { use, useEffect, useState } from 'react';
-import { initiateLitusOAuthFlow } from "@/utils/oauth";
 import ErrorPage from "@/components/error/ErrorPage";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from 'next/navigation'
+import LitusOAuthButton from "@/components/login/LitusOAuthButton";
+import { useToast } from "@/components/ui/Toast";
 import { useApi } from "@/hooks/useApi";
-import { storeOAuthTokens } from "@/actions/oauth";
-import { useTranslation } from 'react-i18next';
+import { ChevronDown, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import Link from 'next/link';
-import { LoaderCircle } from 'lucide-react';
-import { Eye, EyeOff } from 'lucide-react';
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || '';
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
@@ -47,13 +42,9 @@ export default function LoginForm() {
         setIsOpen(!isOpen);
     };
 
-    const handleOAuthLogin = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-        event.preventDefault();
-        try {
-            initiateLitusOAuthFlow(router, decodeURIComponent(redirectTo));
-        } catch (err: any) {
-            setError(err);
-        }
+    const handleOAuthLogin = () => {
+        // Redirect to backend OAuth initiation endpoint
+        window.location.href = `${BACKEND_URL}/api/auth/oauth/initiate?redirect_to=${encodeURIComponent(redirectTo)}`;
     };
 
     const handleCredentialsLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -69,7 +60,11 @@ export default function LoginForm() {
             return;
         }
 
-        await storeOAuthTokens(response.token);
+        await storeTokensInCookies(
+            response.token,
+            response.refresh_token,
+            response.refresh_token_expiration
+        );
         showToast(t('login_success'), 'success');
         router.push(redirectTo);
     };

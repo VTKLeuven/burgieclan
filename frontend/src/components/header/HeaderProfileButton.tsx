@@ -1,6 +1,6 @@
 'use client'
 
-import { logOut } from "@/actions/oauth";
+import { logOut } from "@/actions/auth";
 import {
     DropdownMenu,
     DropdownMenuContent,
