@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getJWTExpiration } from "@/utils/oauth";
-import { i18nRouter } from 'next-i18n-router';
-import { i18nConfig } from '../i18nConfig';
 import type { Page } from "@/types/entities";
 import { convertToPage } from "@/utils/convertToEntity";
+import { decodeJWT, isJWTExpired } from "@/utils/jwt";
+import { i18nRouter } from 'next-i18n-router';
+import { NextRequest, NextResponse } from "next/server";
+import { i18nConfig } from '../i18nConfig';
 
 /**
  * Fetches the list of public pages from the backend
@@ -31,7 +31,7 @@ const getPublicAvailablePages = async (): Promise<Page[]> => {
 const startsWithAllowedPath = (pathWithoutLocale: string): boolean => {
     const allowedPaths = [
         'login',
-        'oauth',
+        'auth', // for OAuth callback
     ];
 
     return allowedPaths.some((path) => pathWithoutLocale.startsWith(path));
@@ -45,27 +45,130 @@ const isPublicPage = async (urlKey: string) => {
     return pages.some((page: Page) => page.urlKey === urlKey);
 };
 
-export default async function middleware(request: NextRequest) {
-    let jwt = request.cookies.get('jwt')?.value || null;
-    let isAuthenticated = jwt && Date.now() <= getJWTExpiration(jwt) * 1000;
+/**
+ * Check if user is authenticated based on JWT in cookies
+ * Returns true only if JWT exists AND is not expired
+ */
+const checkAuthentication = (request: NextRequest): boolean => {
+    const jwt = request.cookies.get('jwt')?.value;
 
+    if (!jwt) {
+        return false;
+    }
+
+    // Check if JWT is expired
+    if (isJWTExpired(jwt)) {
+        return false;
+    }
+
+    return true;
+};
+
+/**
+ * Attempt to refresh tokens in middleware
+ * This is a simplified version that doesn't store cookies (Edge Runtime limitation)
+ */
+const tryRefreshToken = async (request: NextRequest): Promise<string | null> => {
+    const refreshToken = request.cookies.get('refresh_token')?.value;
+
+    if (!refreshToken) {
+        return null;
+    }
+
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/token/refresh`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                refresh_token: refreshToken
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.token;
+        }
+
+        return null;
+    } catch (error) {
+        console.error('Token refresh failed in middleware:', error);
+        return null;
+    }
+};
+
+export default async function middleware(request: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || request.url;
+
     // Match and extract the locale from the URL path
     const localeMatch = request.nextUrl.pathname.match(/^\/([a-z]{2})(?:\/|$)/);
     const locale = localeMatch ? localeMatch[1] : '';
     const pathWithoutLocale = locale ? request.nextUrl.pathname.slice(3).replace(/^\/|\/$/g, '') : request.nextUrl.pathname.slice(1).replace(/^\/|\/$/g, '');
 
-    // Redirect to login if user is not authenticated and the page is not public
-    if (!isAuthenticated && !startsWithAllowedPath(pathWithoutLocale)) {
+    // Check if path is allowed without authentication
+    if (startsWithAllowedPath(pathWithoutLocale)) {
+        return i18nRouter(request, i18nConfig);
+    }
+
+    // Check authentication
+    let isAuthenticated = checkAuthentication(request);
+
+    // If not authenticated, try to refresh tokens
+    if (!isAuthenticated) {
+        const jwt = request.cookies.get('jwt')?.value;
+        const refreshToken = request.cookies.get('refresh_token')?.value;
+
+        // Try refresh if:
+        // 1. We have a refresh token AND
+        // 2. Either no JWT OR an expired JWT
+        if (refreshToken && (!jwt || isJWTExpired(jwt))) {
+            const newJwt = await tryRefreshToken(request);
+
+            if (newJwt) {
+                // Create response with new JWT cookie
+                const response = i18nRouter(request, i18nConfig);
+
+                // Calculate new JWT expiration
+                const jwtPayload = decodeJWT(newJwt);
+                const jwtExpiration = jwtPayload?.exp ? new Date(jwtPayload.exp * 1000) : new Date(Date.now() + 15 * 60 * 1000); // 15 min fallback
+
+                // Set new JWT cookie
+                response.cookies.set({
+                    name: 'jwt',
+                    value: newJwt,
+                    path: '/',
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'strict',
+                    expires: jwtExpiration,
+                });
+
+                // Mark as authenticated since we got a new token
+                isAuthenticated = true;
+                return response;
+            }
+        }
+    }
+
+    // If still not authenticated, check if page is public
+    if (!isAuthenticated) {
         const publicPage = await isPublicPage(pathWithoutLocale);
         if (!publicPage) {
             const loginUrl = locale ? `/${locale}/login` : '/login';
             // Use pathname instead of href to avoid localhost:3000
             // Only add redirectTo if pathname is not root
-            const redirectUrl = request.nextUrl.pathname === '/' || request.nextUrl.pathname === '' 
-                ? loginUrl 
+            const redirectUrl = request.nextUrl.pathname === '/' || request.nextUrl.pathname === ''
+                ? loginUrl
                 : `${loginUrl}?redirectTo=${encodeURIComponent(request.nextUrl.pathname)}`;
-            return NextResponse.redirect(new URL(redirectUrl, baseUrl));        }
+
+            // Clear invalid cookies when redirecting to login
+            const response = NextResponse.redirect(new URL(redirectUrl, baseUrl));
+            response.cookies.delete('jwt');
+            response.cookies.delete('refresh_token');
+
+            return response;
+        }
     }
 
     // Allow access

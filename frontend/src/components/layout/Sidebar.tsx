@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useUser } from "@/components/UserContext";
-import { ChevronDown, Home, File, FolderClosed, Plus, PanelLeftClose, PanelLeft } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import UploadDialog from '@/components/upload/UploadDialog';
+import { logOut } from '@/actions/auth';
 import Loading from "@/app/[locale]/loading";
 import ItemList from '@/components/layout/ItemList';
+import UploadDialog from '@/components/upload/UploadDialog';
+import { useUser } from "@/components/UserContext";
 import type { Course, Document } from "@/types/entities";
-import Link from 'next/link';
+import { ChevronDown, File, FolderClosed, Home, PanelLeft, PanelLeftClose, Plus } from 'lucide-react';
 import Image from 'next/image';
-import { logOut } from '@/actions/oauth';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const mapCoursesToItems = (courses: Course[]) => {
   return courses.map(course => ({

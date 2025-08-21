@@ -1,6 +1,6 @@
 'use client';
 
-import { logOut } from "@/actions/oauth";
+import { logOut } from "@/actions/auth";
 import Loading from "@/app/[locale]/loading";
 import { useUser } from "@/components/UserContext";
 import AnonymousSetting from "@/components/account/AnonymousSetting";
