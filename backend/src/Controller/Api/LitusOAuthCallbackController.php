@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 class LitusOAuthCallbackController extends AbstractController
 {
@@ -33,8 +34,26 @@ class LitusOAuthCallbackController extends AbstractController
         $state = $request->query->get('state');
         $error = $request->query->get('error');
 
-        // Get frontend URL from environment
-        $frontendUrl = rtrim($this->getParameter('app.frontend_url'), '/');
+        // Get frontend URL from environment with validation
+        try {
+            $frontendUrl = $this->getParameter('app.frontend_url');
+            if (empty($frontendUrl)) {
+                throw new Exception('Frontend URL parameter is empty');
+            }
+            $frontendUrl = rtrim($frontendUrl, '/');
+        } catch (ParameterNotFoundException $e) {
+            $this->logger->critical("Frontend URL parameter not configured", [
+                'exception' => $e,
+                'session_id' => $request->getSession()->getId()
+            ]);
+            throw new Exception('Frontend URL configuration missing. Please configure app.frontend_url parameter.');
+        } catch (Exception $e) {
+            $this->logger->critical("Invalid frontend URL configuration", [
+                'exception' => $e,
+                'session_id' => $request->getSession()->getId()
+            ]);
+            throw new Exception('Invalid frontend URL configuration: ' . $e->getMessage());
+        }
 
         // Handle OAuth error
         if ($error) {
