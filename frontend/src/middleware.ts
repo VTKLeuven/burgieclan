@@ -1,5 +1,6 @@
 import type { Page } from "@/types/entities";
 import { convertToPage } from "@/utils/convertToEntity";
+import { COOKIE_NAMES } from "@/utils/cookieNames";
 import { decodeJWT, isJWTExpired } from "@/utils/jwt";
 import { i18nRouter } from 'next-i18n-router';
 import { NextRequest, NextResponse } from "next/server";
@@ -50,7 +51,7 @@ const isPublicPage = async (urlKey: string) => {
  * Returns true only if JWT exists AND is not expired
  */
 const checkAuthentication = (request: NextRequest): boolean => {
-    const jwt = request.cookies.get('jwt')?.value;
+    const jwt = request.cookies.get(COOKIE_NAMES.JWT)?.value;
 
     if (!jwt) {
         return false;
@@ -69,7 +70,7 @@ const checkAuthentication = (request: NextRequest): boolean => {
  * This is a simplified version that doesn't store cookies (Edge Runtime limitation)
  */
 const tryRefreshToken = async (request: NextRequest): Promise<string | null> => {
-    const refreshToken = request.cookies.get('refresh_token')?.value;
+    const refreshToken = request.cookies.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
 
     if (!refreshToken) {
         return null;
@@ -116,8 +117,8 @@ export default async function middleware(request: NextRequest) {
 
     // If not authenticated, try to refresh tokens
     if (!isAuthenticated) {
-        const jwt = request.cookies.get('jwt')?.value;
-        const refreshToken = request.cookies.get('refresh_token')?.value;
+        const jwt = request.cookies.get(COOKIE_NAMES.JWT)?.value;
+        const refreshToken = request.cookies.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
 
         // Try refresh if:
         // 1. We have a refresh token AND
@@ -135,7 +136,7 @@ export default async function middleware(request: NextRequest) {
 
                 // Set new JWT cookie
                 response.cookies.set({
-                    name: 'jwt',
+                    name: COOKIE_NAMES.JWT,
                     value: newJwt,
                     path: '/',
                     httpOnly: true,
@@ -164,8 +165,8 @@ export default async function middleware(request: NextRequest) {
 
             // Clear invalid cookies when redirecting to login
             const response = NextResponse.redirect(new URL(redirectUrl, baseUrl));
-            response.cookies.delete('jwt');
-            response.cookies.delete('refresh_token');
+            response.cookies.delete(COOKIE_NAMES.JWT);
+            response.cookies.delete(COOKIE_NAMES.REFRESH_TOKEN);
 
             return response;
         }

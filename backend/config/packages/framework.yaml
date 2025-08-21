@@ -12,6 +12,7 @@ framework:
         cookie_secure: auto
         cookie_samesite: lax
         storage_factory_id: session.storage.factory.native
+        name: BUR_PHPSESSID # Custom session name with BUR prefix
 
     # When using the HTTP Cache, ESI allows to render page fragments separately
     # and with different cache configurations for each fragment
@@ -33,3 +34,9 @@ when@test:
         test: true
         session:
             storage_factory_id: session.storage.factory.mock_file
+            name: BUR_TEST_PHPSESSID
+
+when@dev:
+    framework:
+        session:
+            name: BUR_DEV_PHPSESSID

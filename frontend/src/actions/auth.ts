@@ -1,5 +1,6 @@
 'use server'
 
+import { COOKIE_NAMES } from '@/utils/cookieNames';
 import { getUserIdFromJWT, isJWTExpired } from '@/utils/jwt';
 import { cookies } from 'next/headers';
 
@@ -9,7 +10,7 @@ import { cookies } from 'next/headers';
  */
 export const getUserId = async (): Promise<number | null> => {
     const cookieStore = cookies();
-    const jwt = cookieStore.get('jwt')?.value;
+    const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
 
     if (!jwt) {
         return null;
@@ -37,7 +38,7 @@ export const isAuthenticated = async (): Promise<boolean> => {
  */
 export const getServerJWT = async (): Promise<string | null> => {
     const cookieStore = cookies();
-    const jwt = cookieStore.get('jwt')?.value;
+    const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
 
     if (!jwt) {
         return null;
@@ -57,8 +58,8 @@ export const getServerJWT = async (): Promise<string | null> => {
  */
 export const getActiveJWT = async (): Promise<string | null> => {
     const cookieStore = cookies();
-    let jwt = cookieStore.get('jwt')?.value;
-    const refreshToken = cookieStore.get('refresh_token')?.value;
+    let jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
+    const refreshToken = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
 
     // If no JWT at all, return null
     if (!jwt) {
@@ -123,7 +124,7 @@ export const storeTokensInCookies = async (
 
     // Set JWT cookie
     cookieStore.set({
-        name: 'jwt',
+        name: COOKIE_NAMES.JWT,
         value: jwt,
         path: '/',
         httpOnly: true,
@@ -139,7 +140,7 @@ export const storeTokensInCookies = async (
             : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Default 30 days fallback
 
         cookieStore.set({
-            name: 'refresh_token',
+            name: COOKIE_NAMES.REFRESH_TOKEN,
             value: refreshToken,
             path: '/',
             httpOnly: true,
@@ -155,8 +156,8 @@ export const storeTokensInCookies = async (
  */
 export const clearTokenCookies = async () => {
     const cookieStore = cookies();
-    cookieStore.delete('jwt');
-    cookieStore.delete('refresh_token');
+    cookieStore.delete(COOKIE_NAMES.JWT);
+    cookieStore.delete(COOKIE_NAMES.REFRESH_TOKEN);
 };
 
 /**
