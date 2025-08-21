@@ -1,8 +1,7 @@
+import { proxyTokenRequest, storeOAuthTokens } from "@/actions/oauth";
 import crypto from "crypto";
-import axios from "axios";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { ReadonlyURLSearchParams } from "next/navigation";
-import { proxyTokenRequest, storeOAuthTokens } from "@/actions/oauth";
 
 interface JWTPayload {
     exp: number;
@@ -107,13 +106,22 @@ const requestJWT = async (accessToken: string): Promise<string> => {
     }
 
     try {
-        const response = await axios.post(backendAuthUrl, { accessToken }, {
+        const response = await fetch(backendAuthUrl, {
+            method: 'POST',
             headers: {
                 'Accept': 'application/ld+json',
                 'Content-Type': 'application/ld+json'
-            }
+            },
+            body: JSON.stringify({ accessToken })
         });
-        return response.data.token;
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.token;
     } catch (error) {
         throw new Error(`Failed to exchange access token for JWT: ${error.response?.data?.message || error.message}`);
     }
