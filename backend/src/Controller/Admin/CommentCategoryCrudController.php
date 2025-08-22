@@ -50,7 +50,9 @@ class CommentCategoryCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
-            ->add('name')
-            ->add('description');
+            ->add('name_nl')
+            ->add('description_nl')
+            ->add('name_en')
+            ->add('description_en');
     }
 }

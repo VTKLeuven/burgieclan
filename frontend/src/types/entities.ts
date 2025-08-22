@@ -35,11 +35,18 @@ export interface Program extends BaseEntity {
     modules?: Module[];
 }
 
-export interface CourseComment extends NodeEntity {
-    course?: Course;
-    commentCategory?: CommentCategory;
+export interface AbstractComment extends NodeEntity {
     content?: string;
     anonymous?: boolean;
+}
+
+export interface CourseComment extends AbstractComment {
+    course?: Course;
+    commentCategory?: CommentCategory;
+}
+
+export interface DocumentComment extends AbstractComment {
+    document?: Document;
 }
 
 export interface CommentCategory extends BaseEntity {
