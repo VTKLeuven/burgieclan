@@ -24,10 +24,10 @@ export default function AddDocumentCommentBox({ documentId, file, content, onCom
                 onClick={() => setIsModalOpen(true)}>
                 <span className="text-left">{t("document.comments.add")}</span>
             </button>
-            <AddDocumentCommentModal 
-                documentId={documentId} 
-                file={file} 
-                isModalOpen={isModalOpen} 
+            <AddDocumentCommentModal
+                documentId={documentId}
+                file={file}
+                isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
                 onCommentAdded={onCommentAdded}
             />

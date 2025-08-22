@@ -1,7 +1,7 @@
 import AddDocumentCommentBox from "@/components/document/AddDocumentCommentBox";
 import DocumentComment from "@/components/document/DocumentComment";
 import { useApi } from "@/hooks/useApi";
-import type { Document, DocumentComment as DocumentCommentEntity } from "@/types/entities";
+import type { DocumentComment as DocumentCommentEntity } from "@/types/entities";
 import { convertToDocumentComment } from "@/utils/convertToEntity";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -39,9 +39,9 @@ export default function DocumentCommentSection({ documentId, file }: DocumentCom
             <div className="space-y-4 py-2.5">
                 <div className="h-8"></div>
                 {/*Allow users to add comments*/}
-                <AddDocumentCommentBox 
-                    documentId={documentId} 
-                    file={file} 
+                <AddDocumentCommentBox
+                    documentId={documentId}
+                    file={file}
                     onCommentAdded={handleCommentAdded}
                 />
 
