@@ -10,12 +10,13 @@ import DownloadButton from "@/components/ui/DownloadButton";
 
 export default function DocumentSections({ courseId }: { courseId: number }) {
     const [documentCategories, setDocumentCategories] = useState<DocumentCategory[]>([]);
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { request, loading } = useApi();
 
     useEffect(() => {
         async function fetchDocumentCategories() {
-            const result = await request('GET', '/api/document_categories');
+            const lang = i18n.language;
+            const result = await request('GET', `/api/document_categories?lang=${lang}`);
             if (!result) {
                 return null;
             }
@@ -23,7 +24,7 @@ export default function DocumentSections({ courseId }: { courseId: number }) {
         }
 
         fetchDocumentCategories();
-    }, [request]);
+    }, [request, i18n.language]);
 
     if (loading) {
         return (

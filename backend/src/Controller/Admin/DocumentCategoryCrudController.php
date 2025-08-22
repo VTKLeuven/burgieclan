@@ -29,12 +29,10 @@ class DocumentCategoryCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnDetail();
-        yield TextField::new('name');
-    }
-
-    public function configureFilters(Filters $filters): Filters
-    {
-        return $filters
-            ->add('name');
+        yield TextField::new('name_nl')
+            ->setRequired(true)
+            ->setLabel('Name (NL)');
+        yield TextField::new('name_en')
+            ->setLabel('Name (EN)');
     }
 }

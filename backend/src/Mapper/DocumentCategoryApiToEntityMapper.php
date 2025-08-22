@@ -37,7 +37,7 @@ class DocumentCategoryApiToEntityMapper implements MapperInterface
         assert($from instanceof DocumentCategoryApi);
         assert($to instanceof DocumentCategory);
 
-        $to->setName($from->name);
+        // No need to map the properties, only ID is needed here because the entity is loaded in the load method.
 
         return $to;
     }
