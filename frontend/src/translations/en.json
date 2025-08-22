@@ -264,7 +264,12 @@
         "loading": "Bringing your document to life...",
         "load-more": "Load More Pages ({{displayedPages}} of {{numPages}})",
         "comments": {
-            "add": "Add Comment..."
+            "add": "Add Comment...",
+            "submit": "Submit",
+            "submitting": "Submitting...",
+            "anonymous": "Anonymous",
+            "success": "Comment added successfully",
+            "error": "Failed to add comment"
         },
         "under-review-warning": "This document is currently under review, so it is only visible to you."
     },
