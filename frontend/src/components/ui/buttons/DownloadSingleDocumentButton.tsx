@@ -5,6 +5,7 @@ import type { Document } from "@/types/entities";
 import { Download, Loader } from "lucide-react";
 import { formatFileSize } from "@/utils/fileSize";
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 interface DownloadButtonProps {
     document: Document;            // The document to download
@@ -15,6 +16,7 @@ interface DownloadButtonProps {
 export default function DownloadSingleDocumentButton({document, fileSize, disabled = false,}: DownloadButtonProps) {
     const { downloadContent, loading: isDownloading } = useDownloadContent();
     const [isHovered, setIsHovered] = useState(false); // Used to show file size on hover
+    const { t } = useTranslation();
 
     // Use the provided fileSize prop or format the document's fileSize
     const formattedFileSize = fileSize || (document.fileSize ? formatFileSize(document.fileSize) : "");
@@ -41,7 +43,7 @@ export default function DownloadSingleDocumentButton({document, fileSize, disabl
             onMouseLeave={() => setIsHovered(false)}
             onClick={handleDownload}
             disabled={disabled}
-            title={`Download ${document.name} (${formattedFileSize})`}
+            title={t('download.title', { name: document.name, size: formattedFileSize })}
         >
             <Download
                 size={20}
