@@ -230,6 +230,7 @@ const Toolbar = ({ editor, parentDialogOpen }: { editor: any; parentDialogOpen?:
 export interface EditorProps {
     className?: string;
     parentDialogOpen?: boolean;
+    onEditorReady?: (editor: any) => void;
 }
 
 /**
@@ -237,7 +238,7 @@ export interface EditorProps {
  * - https://tiptap.dev/docs/editor/getting-started/overview
  * - https://tiptap.dev/docs/editor/extensions/functionality/mathematics
  */
-const Editor = ({ className = '', parentDialogOpen = true }: EditorProps) => {    // Create the editor instance
+const Editor = ({ className = '', parentDialogOpen = true, onEditorReady }: EditorProps) => {    // Create the editor instance
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -249,6 +250,7 @@ const Editor = ({ className = '', parentDialogOpen = true }: EditorProps) => {  
             Mathematics,
         ],
         autofocus: true,
+        immediatelyRender: false, // Prevents hydration errors in Next.js
         editorProps: {
             attributes: {
                 class: 'tiptap overflow-auto mx-auto h-32 p-3 focus:outline-none',
@@ -262,6 +264,13 @@ const Editor = ({ className = '', parentDialogOpen = true }: EditorProps) => {  
             }
         },
     })
+
+    // Notify parent when editor is ready
+    useEffect(() => {
+        if (editor && onEditorReady) {
+            onEditorReady(editor);
+        }
+    }, [editor, onEditorReady]);
 
     return (
         <div className={`editor-container border border-gray-900/10 rounded-md h-fit ${className}`}>

@@ -265,7 +265,12 @@
         "loading": "Uw document tot leven brengen...",
         "load-more": "Meer pagina's laden ({{displayedPages}} van {{numPages}})",
         "comments": {
-            "add": "Voeg opmerking toe..."
+            "add": "Voeg opmerking toe...",
+            "submit": "Opmerking indienen",
+            "submitting": "Opmerking indienen...",
+            "anonymous": "Anoniem",
+            "success": "Opmerking succesvol toegevoegd",
+            "error": "Opmerking toevoegen mislukt"
         },
         "under-review-warning": "Dit document is momenteel in behandeling, dus het is alleen zichtbaar voor jou."
     },
