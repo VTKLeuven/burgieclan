@@ -2,7 +2,6 @@
 
 import { storeTokensInCookies } from "@/actions/auth";
 import Logo from "@/components/common/Logo";
-import ErrorPage from "@/components/error/ErrorPage";
 import LitusOAuthButton from "@/components/login/LitusOAuthButton";
 import { useToast } from "@/components/ui/Toast";
 import { useApi } from "@/hooks/useApi";
@@ -12,8 +11,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || '';
-
 /**
  * Login form component, displays initial login form with VTK login option and expands
  * when user chooses to log in manually.
@@ -22,10 +19,9 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || '';
  */
 export default function LoginForm() {
     const router = useRouter();
-    const searchParams = useSearchParams()
+    const searchParams = useSearchParams();
 
     const [isOpen, setIsOpen] = useState(false);
-    const [error, setError] = useState<Error | null>(null);
     const { showToast } = useToast();
     const { request, loading, error: apiError } = useApi();
 
@@ -44,7 +40,12 @@ export default function LoginForm() {
 
     const handleOAuthLogin = () => {
         // Redirect to backend OAuth initiation endpoint
-        window.location.href = `${BACKEND_URL}/api/auth/oauth/initiate?redirect_to=${encodeURIComponent(redirectTo)}`;
+        const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+        if (!backendBaseUrl) {
+            throw new Error(`Missing environment variable for backend base URL`)
+        }
+
+        window.location.href = `${backendBaseUrl}/api/auth/oauth/initiate?redirect_to=${encodeURIComponent(redirectTo)}`;
     };
 
     const handleCredentialsLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -78,10 +79,6 @@ export default function LoginForm() {
             }
         }
     }, [apiError, t]);
-
-    if (error) {
-        return <ErrorPage detail={error.message} />;
-    }
 
     return (
         <>

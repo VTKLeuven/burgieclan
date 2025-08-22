@@ -97,6 +97,12 @@ const useDownloadContent = () => {
      * @param options Object containing arrays of documents, programs, modules, and courses to download
      */
     const downloadContent = async (options: DownloadOptions) => {
+        const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+        if (!backendBaseUrl) {
+            setError('Missing environment variable for backend base URL');
+            return;
+        }
+
         const totalItems =
             (options.documents?.length || 0) +
             (options.programIds?.length || 0) +
@@ -127,7 +133,7 @@ const useDownloadContent = () => {
             };
 
             // Request the zip file from the API
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/zip`, {
+            const response = await fetch(`${backendBaseUrl}/api/zip`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/ld+json',
