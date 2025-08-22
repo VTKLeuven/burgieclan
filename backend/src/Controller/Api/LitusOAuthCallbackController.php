@@ -5,17 +5,18 @@ namespace App\Controller\Api;
 use App\OauthProvider\LitusResourceOwner;
 use App\Repository\UserRepository;
 use DateTime;
+use DateTimeInterface;
 use Exception;
 use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface;
 use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2Client;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 class LitusOAuthCallbackController extends AbstractController
 {
@@ -103,7 +104,7 @@ class LitusOAuthCallbackController extends AbstractController
             // Generate refresh token using the generator
             $refreshToken = $this->refreshTokenGenerator->createForUserWithTtl(
                 $user,
-                (new DateTime())->modify("+{$refreshTokenTtl} seconds")->getTimestamp()
+                $refreshTokenTtl
             );
 
             // Save the refresh token
