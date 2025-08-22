@@ -4,6 +4,8 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { Dialog, DialogActions } from "@/components/ui/Dialog";
 import { useToast } from "@/components/ui/Toast";
 import { useApi } from "@/hooks/useApi";
+import type { DocumentComment } from "@/types/entities";
+import { convertToDocumentComment } from "@/utils/convertToEntity";
 import { Editor as TiptapEditor } from '@tiptap/react';
 import { Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -16,9 +18,10 @@ interface AddDocumentCommentModalProps {
     file?: string;
     isModalOpen: boolean;
     setIsModalOpen: (isOpen: boolean) => void;
+    onCommentAdded?: (newComment: DocumentComment) => void;
 }
 
-export default function AddDocumentCommentModal({ documentId, file, isModalOpen, setIsModalOpen }: AddDocumentCommentModalProps) {
+export default function AddDocumentCommentModal({ documentId, file, isModalOpen, setIsModalOpen, onCommentAdded }: AddDocumentCommentModalProps) {
     const [containerWidth, setContainerWidth] = useState<number>(0);
     const containerRef = useRef<HTMLDivElement>(null);
     const [editorInstance, setEditorInstance] = useState<TiptapEditor | null>(null);
@@ -42,7 +45,11 @@ export default function AddDocumentCommentModal({ documentId, file, isModalOpen,
         showToast(t('document.comments.success'), 'success');
         setIsModalOpen(false);
 
-        // TODO update list of comments with this new one.
+        // Convert the response to a DocumentComment and notify parent
+        if (onCommentAdded) {
+            const newComment = convertToDocumentComment(res);
+            onCommentAdded(newComment);
+        }
     }
 
     // Update container width on mount and window resize
