@@ -39,4 +39,9 @@ abstract class AbstractComment extends Node
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return substr($this->content, 0, 20) . (strlen($this->content) > 20 ? '...' : '');
+    }
 }

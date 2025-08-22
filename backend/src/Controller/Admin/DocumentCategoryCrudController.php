@@ -35,4 +35,11 @@ class DocumentCategoryCrudController extends AbstractCrudController
         yield TextField::new('name_en')
             ->setLabel('Name (EN)');
     }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('name_nl')
+            ->add('name_en');
+    }
 }
