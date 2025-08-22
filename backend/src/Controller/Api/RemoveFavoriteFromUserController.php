@@ -2,7 +2,7 @@
 
 namespace App\Controller\Api;
 
-use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
 use App\ApiResource\CourseApi;
 use App\ApiResource\DocumentApi;
 use App\ApiResource\ModuleApi;

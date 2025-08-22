@@ -1,57 +1,55 @@
 <?php
 
-namespace App\State;
+namespace App\Controller\Api;
 
-use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Doctrine\Common\State\PersistProcessor;
-use ApiPlatform\Metadata\Operation;
-use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
 use App\ApiResource\CourseApi;
 use App\ApiResource\DocumentApi;
 use App\ApiResource\DocumentCategoryApi;
 use App\ApiResource\TagApi;
 use App\Entity\Document;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 use Vich\UploaderBundle\Storage\StorageInterface;
 
-final class DocumentProcessor implements ProcessorInterface
+class CreateDocumentController extends AbstractController
 {
     public function __construct(
-        #[Autowire(service: PersistProcessor::class)] private readonly ProcessorInterface $persistProcessor,
-        private readonly IriConverterInterface                                            $iriConverter,
-        private readonly MicroMapperInterface                                             $microMapper,
-        private readonly StorageInterface                                                 $storage,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly IriConverterInterface  $iriConverter,
+        private readonly MicroMapperInterface   $microMapper,
+        private readonly StorageInterface       $storage,
     ) {
     }
 
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
+    public function __invoke(Request $request): DocumentApi
     {
-        // $data doesn't contain anything. The data is located in the $context['request'].
         $dto = new DocumentApi();
-        $request = $context['request']->request;
 
         // Get all variables from the request (these are IRI's), convert them to an object and add them to the dto.
         // If a variable is missing, throw a BadRequestHttpException.
-        $dto->name = $request->get('name') ?? throw new BadRequestHttpException('"name" is required');
+        $dto->name = $request->request->get('name') ?? throw new BadRequestHttpException('"name" is required');
         /** @var CourseApi $course */
-        $course = $this->iriConverter->getResourceFromIri($request->get('course') ??
+        $course = $this->iriConverter->getResourceFromIri($request->request->get('course') ??
             throw new BadRequestHttpException('"course" is required'));
         $dto->course = $course;
         /** @var DocumentCategoryApi $category */
-        $category = $this->iriConverter->getResourceFromIri($request->get('category') ??
+        $category = $this->iriConverter->getResourceFromIri($request->request->get('category') ??
             throw new BadRequestHttpException('"category" is required'));
         $dto->category = $category;
 
-        $dto->year = $request->get('year');
+        $dto->year = $request->request->get('year');
 
-        $anonymous = $request->get('anonymous') === 'true';
+        $anonymous = $request->request->get('anonymous') === 'true';
         $dto->anonymous = $anonymous;
 
         $dto->tags = [];
         // Get all tags from the request (Symfony collects multiple 'tags' parameters as an array)
-        $tagsArray = $request->all('tags');
+        $tagsArray = $request->request->all('tags');
         if (!empty($tagsArray)) {
             foreach ($tagsArray as $tagIri) {
                 if (empty($tagIri)) {
@@ -61,7 +59,7 @@ final class DocumentProcessor implements ProcessorInterface
                     /** @var TagApi $tag */
                     $tag = $this->iriConverter->getResourceFromIri($tagIri);
                     $dto->tags[] = $tag;
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     throw new BadRequestHttpException($e->getMessage() . ' - Invalid tag IRI: ' . $tagIri);
                 }
             }
@@ -71,7 +69,7 @@ final class DocumentProcessor implements ProcessorInterface
         $document = $this->microMapper->map($dto, Document::class);
         assert($document instanceof Document);
 
-        $uploadedFile = $context['request']->files->get('file');
+        $uploadedFile = $request->files->get('file');
         if (!$uploadedFile) {
             throw new BadRequestHttpException('"file" is required');
         }
@@ -79,7 +77,8 @@ final class DocumentProcessor implements ProcessorInterface
         $document->setFile($uploadedFile);
 
         // Persist the document to the database.
-        $this->persistProcessor->process($document, $operation, $uriVariables, $context);
+        $this->entityManager->persist($document);
+        $this->entityManager->flush();
 
         // Add the id of the persisted document to the dto.
         $dto->id = $document->getId();

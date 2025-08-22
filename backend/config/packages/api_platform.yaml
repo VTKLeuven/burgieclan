@@ -2,16 +2,17 @@ api_platform:
   title: Burgieclan API Platform
   version: 1.0.0
   formats:
-    jsonld: [ 'application/ld+json' ]
-    multipart: [ 'multipart/form-data' ] # Needed for file upload
-    zip: [ 'application/zip' ] # Needed for file download
+    jsonld: ["application/ld+json"]
+    multipart: ["multipart/form-data"] # Needed for file upload
+    zip: ["application/zip"] # Needed for file download
   docs_formats:
-    jsonld: [ 'application/ld+json' ]
-    jsonopenapi: [ 'application/vnd.openapi+json' ]
-    html: [ 'text/html' ]
+    jsonld: ["application/ld+json"]
+    jsonopenapi: ["application/vnd.openapi+json"]
+    html: ["text/html"]
   defaults:
+    stateless: true
     cache_headers:
-      vary: [ 'Content-Type', 'Authorization', 'Origin' ]
+      vary: ["Content-Type", "Authorization", "Origin"]
     extra_properties:
       standard_put: true
       rfc_7807_compliant_errors: true
@@ -21,6 +22,7 @@ api_platform:
     pagination_items_per_page: 30
   event_listeners_backward_compatibility_layer: false
   keep_legacy_inflector: false
+  use_symfony_listeners: true
   swagger:
     api_keys:
       JWT:

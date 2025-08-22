@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
+use App\Controller\Api\CreateDocumentController;
 use App\Entity\Document;
 use App\Filter\TagFilter;
 use App\State\DocumentApiProvider;
@@ -55,6 +56,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new Post(
             inputFormats: ['multipart' => ['multipart/form-data']],
+            controller: CreateDocumentController::class,
             openapi: new Model\Operation(
                 requestBody: new Model\RequestBody(
                     content: new ArrayObject([
@@ -110,8 +112,9 @@ use Symfony\Component\Validator\Constraints as Assert;
                 )
             ),
             validationContext: ['groups' => ['document:create']],
+            read: false,
             deserialize: false,
-            processor: DocumentProcessor::class,
+            validate: false,
         )],
     outputFormats: ['jsonld' => ['application/ld+json']],
     provider: EntityClassDtoStateProvider::class,
@@ -167,7 +170,11 @@ class DocumentApi
     public ?File $file = null;
 
     #[ApiProperty(writable: false)]
-    #[ApiFilter(SearchFilter::class, strategy: 'exact', properties: ['creator' => 'exact', 'creator.fullName' => 'ipartial'])]
+    #[ApiFilter(
+        SearchFilter::class,
+        strategy: 'exact',
+        properties: ['creator' => 'exact', 'creator.fullName' => 'ipartial']
+    )]
     #[Groups(['search', 'document:get'])]
     public ?UserApi $creator;
 
