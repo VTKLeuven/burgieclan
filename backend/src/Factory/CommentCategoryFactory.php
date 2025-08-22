@@ -74,8 +74,10 @@ final class CommentCategoryFactory extends PersistentProxyObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'name' => self::faker()->word(),
-            'description' => self::faker()->paragraph(),
+            'name_nl' => self::faker()->word(),
+            'description_nl' => self::faker()->paragraph(),
+            'name_en' => '(en)' . self::faker()->word(),
+            'description_en' => '(en)' . self::faker()->paragraph(),
         ];
     }
 

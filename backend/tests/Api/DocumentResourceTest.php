@@ -480,9 +480,18 @@ class DocumentResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('mimetype', 'application/pdf');
 
-        // Safe cleanup
+        // Safe cleanup of temp file
         if (file_exists($tempFile)) {
             unlink($tempFile);
+        }
+
+        // Also cleanup the uploaded file from the data/documents directory
+        $filename = $document->getFileName();
+        if ($filename) {
+            $uploadedPath = __DIR__ . '/../../data/documents/' . $filename;
+            if (file_exists($uploadedPath)) {
+                unlink($uploadedPath);
+            }
         }
     }
 
@@ -552,12 +561,22 @@ class DocumentResourceTest extends ApiTestCase
         $this->assertEquals('application/pdf', $pdfResponse['mimetype']);
         $this->assertEquals('text/plain', $txtResponse['mimetype']);
 
-        // Safe cleanup
+        // Safe cleanup of temp files
         if (file_exists($pdfTempFile)) {
             unlink($pdfTempFile);
         }
         if (file_exists($txtTempFile)) {
             unlink($txtTempFile);
+        }
+
+        // Cleanup uploaded files from the data/documents directory
+        foreach ($documents as $doc) {
+            if (!empty($doc['filename'])) {
+                $uploadedPath = __DIR__ . '/../../data/documents/' . $doc['filename'];
+                if (file_exists($uploadedPath)) {
+                    unlink($uploadedPath);
+                }
+            }
         }
     }
 
