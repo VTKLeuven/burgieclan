@@ -57,6 +57,11 @@ export const getServerJWT = async (): Promise<string | null> => {
  * This function handles automatic token refresh using the refresh token
  */
 export const getActiveJWT = async (): Promise<string | null> => {
+    const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    if (!backendBaseUrl) {
+        throw new Error('Missing environment variable for backend base URL');
+    }
+
     const cookieStore = cookies();
     let jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
     const refreshToken = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
@@ -78,7 +83,7 @@ export const getActiveJWT = async (): Promise<string | null> => {
 
     try {
         // Call the refresh endpoint
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/token/refresh`, {
+        const response = await fetch(`${backendBaseUrl}/api/auth/token/refresh`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
