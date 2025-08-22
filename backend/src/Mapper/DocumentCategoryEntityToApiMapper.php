@@ -26,7 +26,9 @@ class DocumentCategoryEntityToApiMapper implements MapperInterface
         assert($from instanceof DocumentCategory);
         assert($to instanceof DocumentCategoryApi);
 
-        $to->name = $from->getName();
+        $lang = $context['lang'] ?? DocumentCategory::$DEFAULT_LANGUAGE;
+
+        $to->name = $from->getName($lang);
 
         return $to;
     }

@@ -190,7 +190,8 @@ final class DownloadZipController extends AbstractController
     {
         $documentsByCategory = [];
         foreach ($documents as $document) {
-            $category = $document->getCategory()->getName();
+            assert($document instanceof Document);
+            $category = $document->getCategory()->getNameEn();
             if (!isset($documentsByCategory[$category])) {
                 $documentsByCategory[$category] = [];
             }
@@ -711,7 +712,7 @@ final class DownloadZipController extends AbstractController
 
         // Create a relative path for the document within the ZIP
         $courseName = $document->getCourse() ? $document->getCourse()->getName() : '';
-        $categoryName = $document->getCategory() ? $document->getCategory()->getName() : '';
+        $categoryName = $document->getCategory() ? $document->getCategory()->getNameEn() : '';
 
         if ($courseName && $categoryName) {
             if ($parentPath) {
@@ -852,7 +853,7 @@ final class DownloadZipController extends AbstractController
         // Group documents by category
         $documentsByCategory = [];
         foreach ($documents as $document) {
-            $category = $document->getCategory()->getName();
+            $category = $document->getCategory()->getNameEn();
             if (!isset($documentsByCategory[$category])) {
                 $documentsByCategory[$category] = [];
             }
