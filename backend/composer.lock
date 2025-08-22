@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "688d61bd8dc3f4f8d3141500f9b4b037",
+    "content-hash": "a3724fd9a1df711c16b3e5d4a0ac0b50",
     "packages": [
         {
             "name": "api-platform/doctrine-common",
@@ -11141,16 +11141,16 @@
         },
         {
             "name": "symfonycasts/micro-mapper",
-            "version": "v0.1.4",
+            "version": "v0.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SymfonyCasts/micro-mapper.git",
-                "reference": "81190a2c94359213afc3053c5dd85c9fd2c3d7bb"
+                "reference": "8a5f53221babfc010fa8f2e11f149be277aa28cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SymfonyCasts/micro-mapper/zipball/81190a2c94359213afc3053c5dd85c9fd2c3d7bb",
-                "reference": "81190a2c94359213afc3053c5dd85c9fd2c3d7bb",
+                "url": "https://api.github.com/repos/SymfonyCasts/micro-mapper/zipball/8a5f53221babfc010fa8f2e11f149be277aa28cf",
+                "reference": "8a5f53221babfc010fa8f2e11f149be277aa28cf",
                 "shasum": ""
             },
             "require": {
@@ -11158,9 +11158,10 @@
             },
             "require-dev": {
                 "phpstan/phpstan": "^1.10.39",
-                "symfony/filesystem": "^6.3",
-                "symfony/framework-bundle": "^6.3",
-                "symfony/phpunit-bridge": "^6.3"
+                "phpunit/phpunit": "^9.6",
+                "symfony/filesystem": "^6.3|^7.0",
+                "symfony/framework-bundle": "^6.3|^7.0",
+                "symfony/phpunit-bridge": "^6.3.9|^7.0"
             },
             "type": "library",
             "autoload": {
@@ -11184,9 +11185,9 @@
             ],
             "support": {
                 "issues": "https://github.com/SymfonyCasts/micro-mapper/issues",
-                "source": "https://github.com/SymfonyCasts/micro-mapper/tree/v0.1.4"
+                "source": "https://github.com/SymfonyCasts/micro-mapper/tree/v0.2.1"
             },
-            "time": "2023-10-18T15:25:09+00:00"
+            "time": "2024-10-22T16:58:40+00:00"
         },
         {
             "name": "twig/extra-bundle",
