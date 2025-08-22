@@ -1,41 +1,34 @@
 import AddDocumentCommentBox from "@/components/document/AddDocumentCommentBox";
 import DocumentComment from "@/components/document/DocumentComment";
+import { useApi } from "@/hooks/useApi";
+import type { Document, DocumentComment as DocumentCommentEntity } from "@/types/entities";
+import { convertToDocumentComment } from "@/utils/convertToEntity";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
-/*TODO: retrieve document comments from server instead of hardcoding*/
+interface DocumentCommentSectionProps {
+    document: Document;
+    file?: string;
+}
 
-const sampleData = {
-    names: [
-        "Alex Thompson",
-        "Maria Garcia",
-        "James Wilson",
-        "Sarah Chen",
-        "Mohammed Ahmed",
-        "Emma Parker",
-        "David Kim",
-        "Lisa Patel"
-    ],
-    comments: [
-        "Really insightful document! The analysis is spot-on and well-researched.",
-        "Good points overall, though I think section 3 could use more detail.",
-        "Excellent work! The methodology is clearly explained and the results are compelling.",
-        "Interesting perspective, but I'd like to see more real-world examples.",
-        "Great document, especially the conclusions. Very well structured.",
-        "The diagrams really help explain the concepts. Well done!",
-        "Solid analysis, though I have some questions about the assumptions made.",
-        "This is exactly what I was looking for. Very comprehensive!"
-    ],
-    voteCounts: [0, 1, 2, 3, 4, 5]
-};
+export default function DocumentCommentSection({ document, file }: DocumentCommentSectionProps) {
+    const [comments, setComments] = useState<DocumentCommentEntity[]>([]);
+    const { request } = useApi();
+    const { t } = useTranslation();
 
-const getRandomItem = <T,>(array: T[]) => array[Math.floor(Math.random() * array.length)];
+    useEffect(() => {
+        async function getComments() {
+            const commentsData = await request('GET', `/api/document_comments?document=/api/documents/${document.id}`);
 
-export default function DocumentCommentSection({ file }: { file?: string }) {
-    // Generate 6 random comments
-    const comments = Array.from({ length: 6 }, () => ({
-        author: getRandomItem(sampleData.names),
-        content: getRandomItem(sampleData.comments),
-        initialVotes: getRandomItem(sampleData.voteCounts)
-    }));
+            if (!commentsData) {
+                return null;
+            }
+
+            setComments(commentsData['hydra:member'].map(convertToDocumentComment));
+        }
+
+        getComments();
+    }, [document.id, request]);
 
     return (
         <>
@@ -48,9 +41,9 @@ export default function DocumentCommentSection({ file }: { file?: string }) {
                 {comments.map((comment, index) => (
                     <DocumentComment
                         key={index}
-                        author={comment.author}
-                        content={comment.content}
-                        initialVotes={comment.initialVotes}
+                        author={comment.creator?.fullName || t("document.anonymous")}
+                        content={comment.content ?? ''}
+                        initialVotes={Math.floor(Math.random() * 10)} // TODO replace with actual vote count
                     />
                 ))}
             </div>

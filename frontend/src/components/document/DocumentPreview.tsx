@@ -134,7 +134,7 @@ export default function DocumentPreview({ id }: { id: string }) {
                         </div>
                     )}
                 </div>
-                <DocumentCommentSection file={document.contentUrl} />
+                <DocumentCommentSection document={document} file={document.contentUrl} />
             </div>
         </div>
     )
