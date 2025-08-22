@@ -90,7 +90,4 @@ use App\Controller\Api\LitusOAuthCallbackController;
 )]
 class LitusOAuthCallbackApi
 {
-    // This class doesn't need real properties since we're not using entity operations
-    // But API Platform requires at least one property
-    public ?string $status = null;
 }
