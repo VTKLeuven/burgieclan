@@ -1,19 +1,22 @@
 lexik_jwt_authentication:
-    secret_key: "%env(resolve:JWT_SECRET_KEY)%" # required for token creation
-    public_key: "%env(resolve:JWT_PUBLIC_KEY)%" # required for token verification
-    pass_phrase: "%env(JWT_PASSPHRASE)%" # required for token creation
-    token_ttl: 3600 # in seconds, default is 3600
-    token_extractors:
-        authorization_header:
-            enabled: true
-            prefix: Bearer
-            name: Authorization
-        cookie:
-            enabled: true
-            name: BUR_jwt # Default production name
+  secret_key: "%env(resolve:JWT_SECRET_KEY)%" # required for token creation
+  public_key: "%env(resolve:JWT_PUBLIC_KEY)%" # required for token verification
+  pass_phrase: "%env(JWT_PASSPHRASE)%" # required for token creation
+  token_ttl: 3600 # in seconds, default is 3600
+  token_extractors:
+    authorization_header:
+      enabled: true
+      prefix: Bearer
+      name: Authorization
+    cookie:
+      enabled: true
+      name: BUR_jwt # Default production name
+  blocklist_token:
+    enabled: true
+    cache: cache.app
 
 when@dev:
-    lexik_jwt_authentication:
-        token_extractors:
-            cookie:
-                name: BUR_DEV_jwt
+  lexik_jwt_authentication:
+    token_extractors:
+      cookie:
+        name: BUR_DEV_jwt

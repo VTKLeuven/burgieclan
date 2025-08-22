@@ -30,6 +30,10 @@ security:
             jwt: ~
             refresh_jwt:
               check_path: /api/auth/token/refresh
+            logout:
+              path: api_logout
+              # The LexikJWTAuthenticationBundle will handle JWT invalidation
+              # The JWTRefreshTokenBundle will automatically handle refresh token invalidation
 
         files:
             pattern: ^/files
