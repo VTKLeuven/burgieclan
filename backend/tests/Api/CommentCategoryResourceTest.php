@@ -14,7 +14,17 @@ class CommentCategoryResourceTest extends ApiTestCase
     public function testGetCollectionOfCommentCategories(): void
     {
         CommentCategoryFactory::createMany(5);
-        $json = $this->browser()->get('/api/comment_categories', ['headers' => ['Authorization' => 'Bearer ' . $this->token]])->assertStatus(200)->assertJson()->assertJsonMatches('"hydra:totalItems"', 5)->assertJsonMatches('length("hydra:member")', 5)->json();
+        $json = $this->browser()
+            ->get('/api/comment_categories', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 5)
+            ->assertJsonMatches('length("hydra:member")', 5)
+            ->json();
 
         $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), ['@id', '@type', 'name', 'description',]);
     }
@@ -23,28 +33,49 @@ class CommentCategoryResourceTest extends ApiTestCase
     {
         $category = CommentCategoryFactory::createOne();
 
-        $this->browser()->get('/api/comment_categories/' . $category->getId(), ['headers' => ['Authorization' => 'Bearer ' . $this->token]])->assertStatus(200)->assertJson()->assertJsonMatches('"@id"', '/api/comment_categories/' . $category->getId());
+        $this->browser()
+            ->get('/api/comment_categories/' . $category->getId(), [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('"@id"', '/api/comment_categories/' . $category->getId());
     }
 
     public function testGetCommentCategoryFilterByName(): void
     {
         $category1 = CommentCategoryFactory::createOne(['name_nl' => 'category1',]);
-
         $category2 = CommentCategoryFactory::createOne(['name_nl' => 'category2',]);
-
         $category3 = CommentCategoryFactory::createOne(['name_nl' => 'category3',]);
 
         CommentCategoryFactory::createMany(5);
 
-        $this->browser()->get('/api/comment_categories?name=category2', ['headers' => ['Authorization' => 'Bearer ' . $this->token]])->assertStatus(200)->assertJson()->assertJsonMatches('"hydra:totalItems"', 1)->assertJsonMatches('length("hydra:member")', 1)->get('/api/comment_categories?name=category', ['headers' => ['Authorization' => 'Bearer ' . $this->token]])->assertJson()->assertJsonMatches('"hydra:totalItems"', 3)->assertJsonMatches('length("hydra:member")', 3);
+        $this->browser()
+            ->get('/api/comment_categories?name=category2', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('length("hydra:member")', 1)
+            ->get('/api/comment_categories?name=category', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token
+                ]
+            ])
+            ->assertJson()
+            ->assertJsonMatches('"hydra:totalItems"', 3)
+            ->assertJsonMatches('length("hydra:member")', 3);
     }
 
     public function testGetCommentCategoryFilterByDescription(): void
     {
         $category1 = CommentCategoryFactory::createOne(['description_nl' => 'description1',]);
-
         $category2 = CommentCategoryFactory::createOne(['description_nl' => 'description2',]);
-
         $category3 = CommentCategoryFactory::createOne(['description_nl' => 'description3',]);
 
         CommentCategoryFactory::createMany(5);
