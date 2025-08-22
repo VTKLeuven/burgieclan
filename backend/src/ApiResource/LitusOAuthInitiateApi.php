@@ -56,7 +56,4 @@ use App\Controller\Api\LitusOAuthInitiateController;
 )]
 class LitusOAuthInitiateApi
 {
-    // This class doesn't need real properties since we're not using entity operations
-    // But API Platform requires at least one property
-    public ?string $redirectUrl = null;
 }
