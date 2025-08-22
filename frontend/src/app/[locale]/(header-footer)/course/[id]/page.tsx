@@ -1,32 +1,15 @@
-'use client';
-
-import { useParams } from 'next/navigation';
 import CoursePage from '@/components/coursepage/CoursePage';
-import { Breadcrumb } from '@/types/entities'
-import React from 'react'
-import Loading from '@/app/[locale]/loading'
+import type { Metadata } from 'next';
 
-const CoursePageWrapper = () => {
-    const { id } = useParams();
+export const metadata: Metadata = {
+    title: 'Course | Burgieclan',
+    description: 'View course details, documents, professors, and comments on Burgieclan.',
+};
 
-    const breadcrumb: Breadcrumb = {
-        id: 1,
-        breadcrumb: ['Home', 'Courses', `Course ${id}`]
-    };
-
-    if (!id) {
-        return (
-            <div className="flex items-center justify-center h-full w-full">
-                <Loading />
-            </div>
-        )
-    }
-
+export default function Page() {
     return (
         <div className="flex h-full w-full items-center justify-center">
-            <CoursePage courseId={Number(id)} breadcrumb={breadcrumb} />
+            <CoursePage />
         </div>
     );
 };
-
-export default CoursePageWrapper;
