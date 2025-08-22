@@ -7,7 +7,7 @@
 export function formatFileSize(bytes: number | null | undefined, decimals = 1): string {
     if (!bytes || bytes === 0) return '0 B';
 
-    const k = 1024;
+    const k = 1000;
     const dm = decimals < 0 ? 0 : decimals;
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
 
