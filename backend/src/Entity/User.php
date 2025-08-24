@@ -112,12 +112,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinTable(name: 'favorite_user_document')]
     private Collection $favoriteDocuments;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserDocumentView::class)]
+    private Collection $viewedDocuments;
+
     public function __construct()
     {
         $this->favoritePrograms = new ArrayCollection();
         $this->favoriteModules = new ArrayCollection();
         $this->favoriteCourses = new ArrayCollection();
         $this->favoriteDocuments = new ArrayCollection();
+        $this->viewedDocuments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -354,6 +358,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeFavoriteDocument(Document $document): self
     {
         $this->favoriteDocuments->removeElement($document);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserDocumentView>
+     */
+    public function getViewedDocuments(): Collection
+    {
+        return $this->viewedDocuments;
+    }
+
+    public function addViewedDocument(UserDocumentView $viewedDocument): static
+    {
+        if (!$this->viewedDocuments->contains($viewedDocument)) {
+            $this->viewedDocuments->add($viewedDocument);
+            $viewedDocument->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeViewedDocument(UserDocumentView $viewedDocument): static
+    {
+        if ($this->viewedDocuments->removeElement($viewedDocument)) {
+            $this->viewedDocuments->removeElement($viewedDocument);
+        }
 
         return $this;
     }

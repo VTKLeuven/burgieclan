@@ -22,6 +22,7 @@ use App\Factory\DocumentFactory;
 use App\Factory\ModuleFactory;
 use App\Factory\PageFactory;
 use App\Factory\ProgramFactory;
+use App\Factory\UserDocumentViewFactory;
 use App\Factory\QuickLinkFactory;
 use App\Factory\TagFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -50,6 +51,7 @@ final class AppFixtures extends Fixture
         DocumentFactory::createMany(100);
         DocumentCommentFactory::createMany(400);
         PageFactory::createMany(20);
+        UserDocumentViewFactory::createMany(10);
         QuickLinkFactory::createMany(10);
     }
 
