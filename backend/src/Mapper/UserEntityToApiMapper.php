@@ -62,6 +62,7 @@ class UserEntityToApiMapper implements MapperInterface
                 MicroMapperInterface::MAX_DEPTH => 1,
             ]);
         }, $from->getFavoriteDocuments()->getValues());
+        $to->defaultAnonymous = $from->isDefaultAnonymous();
 
         return $to;
     }

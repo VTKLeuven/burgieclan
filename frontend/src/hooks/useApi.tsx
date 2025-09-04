@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useCallback } from 'react';
 import { ApiClient } from '@/actions/api';
 import { ApiError } from '@/utils/error/apiError';
+import { useCallback, useState } from 'react';
 
 export function useApi() {
     const [data, setData] = useState<any>(null);
