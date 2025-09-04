@@ -237,7 +237,7 @@
         },
         "anonymous_setting": {
             "title": "Default Anonymous",
-            "description": "When enabled, your contributions will be anonymous by default.",
+            "description": "When enabled, your contributions will be anonymous by default. This means your name will not be visible to others (except for moderators and administrators).",
             "toggle_label": "Toggle anonymous mode",
             "enabled": "Enabled",
             "disabled": "Disabled",
