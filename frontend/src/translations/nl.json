@@ -238,7 +238,7 @@
         },
         "anonymous_setting": {
             "title": "Standaard Anoniem",
-            "description": "Wanneer ingeschakeld, zijn je bijdragen standaard anoniem.",
+            "description": "Wanneer ingeschakeld, zijn je bijdragen standaard anoniem. Je naam is dus niet zichtbaar voor anderen (behalve voor moderators en administrators).",
             "toggle_label": "Anonieme modus in- of uitschakelen",
             "enabled": "Ingeschakeld",
             "disabled": "Uitgeschakeld",
