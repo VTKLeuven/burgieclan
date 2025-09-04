@@ -84,6 +84,7 @@ const ProgramNode = ({
                 autoExpand={autoExpand}
                 searchFilters={searchFilters}
                 favoriteCourses={favoriteCourses}
+                parentVisible={expanded}
               />
             ))}
           </div>

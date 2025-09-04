@@ -15,12 +15,14 @@ interface CourseRowProps {
     course: Course;
     highlightMatch?: boolean;
     isFirstRow?: boolean;
+    parentVisible?: boolean;
 }
 
 export const CourseRow = memo(({
     course: initialCourse,
     highlightMatch = false,
     isFirstRow = false,
+    parentVisible = true,
 }: CourseRowProps) => {
     const { user } = useUser();
     const { updateFavorite } = useFavorites(user);
@@ -32,7 +34,7 @@ export const CourseRow = memo(({
     const [professorNames, setProfessorNames] = useState<string[]>([]);
     const [professorsLoaded, setProfessorsLoaded] = useState<boolean>(false);
 
-    // Fetch complete course data if we only have the ID
+    // Fetch complete course data if we only have the ID and parent is visible
     useEffect(() => {
         async function fetchCourseData() {
             if (!initialCourse.id) return;
@@ -57,8 +59,10 @@ export const CourseRow = memo(({
             }
         }
 
-        fetchCourseData();
-    }, [initialCourse, request]);
+        if (parentVisible) {
+            fetchCourseData();
+        }
+    }, [initialCourse, request, parentVisible]);
 
     // Update favorite status when user data changes
     useEffect(() => {
