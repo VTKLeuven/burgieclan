@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/Toast';
-import { useTranslation } from 'react-i18next';
 import type { Document } from '@/types/entities';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export interface DownloadOptions {
     documents?: Document[];
@@ -27,7 +27,7 @@ const useDownloadContent = () => {
             console.error('Download error:', error);
             showToast(t('download.download-error', { error }), 'error');
         }
-        
+
         if (isSuccess) {
             showToast(t('download.download-success'), 'success');
             setIsSuccess(false);
@@ -38,14 +38,58 @@ const useDownloadContent = () => {
      * Download a single document directly using its contentUrl
      * @param document The document with a contentUrl to download
      */
-    const downloadSingleDocument = (document: Document) => {
+    const downloadSingleDocument = async (document: Document) => {
         if (!document.contentUrl) {
             setError('Document has no content URL');
             return;
         }
 
-        window.location.href = document.contentUrl;
-        setIsSuccess(true);
+        try {
+            setLoading(true);
+            setError(null);
+
+            // Use fetch so we can gracefully handle 4xx/5xx (e.g., 404 when file was deleted)
+            const response = await fetch(document.contentUrl, {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                // Avoid navigating to backend error page; surface a nice toast instead
+                const statusText = `${response.status} ${response.statusText}`;
+                throw new Error(statusText);
+            }
+
+            // Derive filename from Content-Disposition if present, else fallback
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let filename = document.name || 'download';
+            if (contentDisposition) {
+                const match = contentDisposition.match(/filename="?([^";]+)"?/i);
+                if (match && match[1]) {
+                    filename = match[1];
+                }
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = window.document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            window.document.body.appendChild(link);
+            link.click();
+            window.URL.revokeObjectURL(url);
+            window.document.body.removeChild(link);
+
+            setIsSuccess(true);
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('Unknown download error');
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     /**
@@ -91,11 +135,11 @@ const useDownloadContent = () => {
                 body: JSON.stringify(payload),
                 credentials: 'include', // This ensures cookies (including JWT) are sent with the request
             });
-            
+
             if (!response.ok) {
                 throw new Error(`Failed to download: ${response.status} ${response.statusText}`);
             }
-            
+
             // Get the filename from the Content-Disposition header or use a default
             const contentDisposition = response.headers.get('Content-Disposition');
             let filename = 'download.zip';
@@ -105,22 +149,22 @@ const useDownloadContent = () => {
                     filename = filenameMatch[1];
                 }
             }
-            
+
             // Create a blob from the response
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
-            
+
             // Create a link element and trigger download
             const link = document.createElement('a');
             link.href = url;
             link.download = filename;
             document.body.appendChild(link);
             link.click();
-            
+
             // Clean up
             window.URL.revokeObjectURL(url);
             document.body.removeChild(link);
-            
+
             setIsSuccess(true);
 
         } catch (err) {
