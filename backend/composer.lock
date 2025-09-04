@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "71a686fc68da760cfeea1224f282b526",
+    "content-hash": "d9d1e9d13c66f3978e25678d5e9c62ec",
     "packages": [
         {
             "name": "api-platform/core",
@@ -11175,20 +11175,20 @@
         },
         {
             "name": "vich/uploader-bundle",
-            "version": "2.3.3",
+            "version": "v2.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dustin10/VichUploaderBundle.git",
-                "reference": "4002ecc83bae414b5be287907ccecb27611eaa69"
+                "reference": "caa3abb8685430da0b1668819784aac37b56f49e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dustin10/VichUploaderBundle/zipball/4002ecc83bae414b5be287907ccecb27611eaa69",
-                "reference": "4002ecc83bae414b5be287907ccecb27611eaa69",
+                "url": "https://api.github.com/repos/dustin10/VichUploaderBundle/zipball/caa3abb8685430da0b1668819784aac37b56f49e",
+                "reference": "caa3abb8685430da0b1668819784aac37b56f49e",
                 "shasum": ""
             },
             "require": {
-                "doctrine/persistence": "^3",
+                "doctrine/persistence": "^3.0 || ^4.0",
                 "ext-simplexml": "*",
                 "jms/metadata": "^2.4",
                 "php": "^8.1",
@@ -11207,17 +11207,18 @@
                 "league/flysystem": "<2.0"
             },
             "require-dev": {
-                "dg/bypass-finals": "^1.3",
+                "dg/bypass-finals": "^1.9",
+                "doctrine/common": "^3.0",
                 "doctrine/doctrine-bundle": "^2.7",
                 "doctrine/mongodb-odm": "^2.4",
-                "doctrine/orm": "^2.13",
+                "doctrine/orm": "^2.13 || ^3.0",
                 "ext-sqlite3": "*",
                 "knplabs/knp-gaufrette-bundle": "dev-master",
                 "league/flysystem-bundle": "^2.4 || ^3.0",
                 "league/flysystem-memory": "^2.0 || ^3.0",
                 "matthiasnoback/symfony-dependency-injection-test": "^5.1",
                 "mikey179/vfsstream": "^1.6.11",
-                "phpunit/phpunit": "^9.6",
+                "phpunit/phpunit": "^10.5 || ^11.5 || ^12.0",
                 "symfony/asset": "^5.4 || ^6.0 || ^7.0",
                 "symfony/browser-kit": "^5.4 || ^6.0 || ^7.0",
                 "symfony/css-selector": "^5.4 || ^6.0 || ^7.0",
@@ -11225,18 +11226,16 @@
                 "symfony/dom-crawler": "^5.4 || ^6.0 || ^7.0",
                 "symfony/form": "^5.4 || ^6.0 || ^7.0",
                 "symfony/framework-bundle": "^5.4 || ^6.0 || ^7.0",
-                "symfony/phpunit-bridge": "^7.0",
+                "symfony/phpunit-bridge": "^7.2",
                 "symfony/security-csrf": "^5.4 || ^6.0 || ^7.0",
                 "symfony/translation": "^5.4 || ^6.0 || ^7.0",
                 "symfony/twig-bridge": "^5.4 || ^6.0 || ^7.0",
                 "symfony/twig-bundle": "^5.4 || ^6.0 || ^7.0",
                 "symfony/validator": "^5.4 || ^6.0 || ^7.0",
                 "symfony/var-dumper": "^5.4 || ^6.0 || ^7.0",
-                "symfony/yaml": "^5.4 || ^6.0 || ^7.0",
-                "yoast/phpunit-polyfills": "^2.0"
+                "symfony/yaml": "^5.4 || ^6.0 || ^7.0"
             },
             "suggest": {
-                "doctrine/annotations": "If you use doctrine/doctrine-bundle >2.7, this package is required to use annotations",
                 "doctrine/doctrine-bundle": "For integration with Doctrine",
                 "doctrine/mongodb-odm-bundle": "For integration with Doctrine ODM",
                 "doctrine/orm": "For integration with Doctrine ORM",
@@ -11278,9 +11277,9 @@
             ],
             "support": {
                 "issues": "https://github.com/dustin10/VichUploaderBundle/issues",
-                "source": "https://github.com/dustin10/VichUploaderBundle/tree/2.3.3"
+                "source": "https://github.com/dustin10/VichUploaderBundle/tree/v2.8.0"
             },
-            "time": "2024-04-24T07:17:05+00:00"
+            "time": "2025-09-01T07:16:57+00:00"
         },
         {
             "name": "webmozart/assert",
