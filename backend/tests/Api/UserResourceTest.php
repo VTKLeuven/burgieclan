@@ -280,6 +280,22 @@ class UserResourceTest extends ApiTestCase
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('defaultAnonymous', true);
+
+        $user2 = UserFactory::createOne([
+            'username' => 'nonanonuser',
+            'plainPassword' => 'password',
+            'defaultAnonymous' => false
+        ]);
+        $token2 = $this->getToken('nonanonuser', 'password');
+        $this->browser()
+            ->get('/api/users/' . $user2->getId(), [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token2
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('defaultAnonymous', false);
     }
 
     public function testPatchDefaultAnonymous(): void
