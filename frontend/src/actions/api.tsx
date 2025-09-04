@@ -1,9 +1,8 @@
 'use server'
 
-import { redirect } from "next/navigation";
+import { getActiveJWT, logOut } from "@/actions/auth";
 import { headers } from 'next/headers';
-import { getActiveJWT } from "@/utils/dal";
-import { logOut } from "./oauth";
+import { redirect } from "next/navigation";
 
 /**
  * Encodes an API error response from the backend server into a structured serializable format for the frontend.
