@@ -1,11 +1,11 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useApi } from '@/hooks/useApi';
 import type { User } from '@/types/entities';
 import { convertToUser } from '@/utils/convertToEntity';
-import { notFound } from 'next/navigation';
 import type { ApiError } from '@/utils/error/apiError';
+import { notFound } from 'next/navigation';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 
 interface UserContextType {
     user: User | null;

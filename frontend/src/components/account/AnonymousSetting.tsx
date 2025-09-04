@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useUser } from '@/components/UserContext';
-import { useToast } from '@/components/ui/Toast';
-import { useTranslation } from 'react-i18next';
-import { useApi } from '@/hooks/useApi';
-import { Switch } from '@/components/ui/Switch';
 import { Label } from '@/components/ui/Label';
+import { Switch } from '@/components/ui/Switch';
+import { useToast } from '@/components/ui/Toast';
+import { useApi } from '@/hooks/useApi';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function AnonymousSetting() {
     const { user, updateUserProperty } = useUser();
@@ -16,17 +16,17 @@ export default function AnonymousSetting() {
 
     const handleToggleAnonymous = async () => {
         if (!user) return;
-        
+
         const newValue = !(user.defaultAnonymous);
-        
+
         const result = await request('PATCH', `/api/users/${user.id}`, {
             defaultAnonymous: newValue
         });
-        
+
         if (result) {
             // Update user property in context without full reload
             updateUserProperty('defaultAnonymous', newValue);
-            
+
             showToast(
                 t('account.anonymous_setting.update_success'),
                 'success'
@@ -64,8 +64,8 @@ export default function AnonymousSetting() {
                         aria-label={t('account.anonymous_setting.toggle_label')}
                     />
                     <Label htmlFor="anonymous-mode" className="whitespace-nowrap text-sm">
-                        {user?.defaultAnonymous 
-                            ? t('account.anonymous_setting.enabled') 
+                        {user?.defaultAnonymous
+                            ? t('account.anonymous_setting.enabled')
                             : t('account.anonymous_setting.disabled')}
                     </Label>
                 </div>
