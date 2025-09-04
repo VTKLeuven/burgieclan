@@ -234,6 +234,15 @@
         "documents": {
             "no_uploads": "You haven't uploaded any documents yet.",
             "my": "My documents"
+        },
+        "anonymous_setting": {
+            "title": "Default Anonymous",
+            "description": "When enabled, your contributions will be anonymous by default. This means your name will not be visible to others (except for moderators and administrators).",
+            "toggle_label": "Toggle anonymous mode",
+            "enabled": "Enabled",
+            "disabled": "Disabled",
+            "update_success": "Setting updated",
+            "update_error": "Failed to update setting"
         }
     },
     "document": {

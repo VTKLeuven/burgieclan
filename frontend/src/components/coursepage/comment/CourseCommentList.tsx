@@ -1,6 +1,8 @@
 import CommentRow from '@/components/coursepage/comment/CommentRow';
+import { Checkbox } from '@/components/ui/Checkbox';
 import { useToast } from '@/components/ui/Toast';
 import Tooltip from '@/components/ui/Tooltip';
+import { useUser } from '@/components/UserContext';
 import { useApi } from '@/hooks/useApi';
 import { CommentCategory, CourseComment } from '@/types/entities';
 import { convertToCourseComment } from '@/utils/convertToEntity';
@@ -16,6 +18,8 @@ type CourseCommentListProps = {
 };
 
 const CourseCommentList = ({ category, comments: initialComments, courseId, onCommentAdded }: CourseCommentListProps) => {
+    const { user } = useUser();
+
     const [comments, setComments] = useState<CourseComment[]>(initialComments);
     const [expanded, setExpanded] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -33,6 +37,13 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
             textareaRef.current.focus();
         }
     }, [showAddForm]);
+
+    // Initialize anonymous state from user preference when form is shown
+    useEffect(() => {
+        if (showAddForm && user?.defaultAnonymous !== undefined) {
+            setFormAnonymous(user.defaultAnonymous);
+        }
+    }, [showAddForm, user]);
 
     // Sort comments by most recent update/creation date
     const sortedComments = useMemo(() => {
@@ -174,20 +185,16 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
                                         {t('course-page.comments.dialog.button.cancel')}
                                     </button>
 
-                                    {/* Anonymous checkbox - custom implementation to match desired styling */}
+                                    {/* Anonymous checkbox */}
                                     <div className="flex items-center justify-end">
-                                        <label className="flex items-center text-xs text-gray-600 cursor-pointer hover:text-gray-800 transition-colors">
-                                            <input
-                                                type="checkbox"
-                                                checked={formAnonymous}
-                                                onChange={(e) => setFormAnonymous(e.target.checked)}
-                                                className="mr-2 cursor-pointer h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
-                                                disabled={isSubmitting}
-                                            />
-                                            <span className="cursor-pointer">
-                                                {t('course-page.comments.dialog.anonymous')}
-                                            </span>
-                                        </label>
+                                        <Checkbox
+                                            id="anonymous-comment"
+                                            label={t('course-page.comments.dialog.anonymous')}
+                                            checked={formAnonymous}
+                                            onChange={(e) => setFormAnonymous(e.target.checked)}
+                                            disabled={isSubmitting}
+                                            labelClassName="text-xs text-gray-600 hover:text-gray-800 transition-colors"
+                                        />
                                     </div>
 
                                     <button

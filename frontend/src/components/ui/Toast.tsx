@@ -1,8 +1,8 @@
 'use client'
 
-import React, { createContext, useContext, useCallback, useState } from 'react';
 import { Transition } from '@headlessui/react';
 import { AlertCircle, CheckCircle } from 'lucide-react';
+import React, { createContext, useCallback, useContext, useState } from 'react';
 
 type ToastType = 'success' | 'error';
 
