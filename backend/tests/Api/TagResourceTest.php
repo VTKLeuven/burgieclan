@@ -20,15 +20,14 @@ class TagResourceTest extends ApiTestCase
         $json = $this->browser()
             ->get('/api/tags', [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
             ])
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
-            ->json()
-        ;
+            ->json();
 
         $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
             '@id',
@@ -45,7 +44,7 @@ class TagResourceTest extends ApiTestCase
         $this->browser()
             ->get('/api/tags/' . $tag->getId(), [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
             ])
             ->assertStatus(200)
@@ -58,10 +57,10 @@ class TagResourceTest extends ApiTestCase
         // Create courses and categories
         $course1 = CourseFactory::createOne();
         $course2 = CourseFactory::createOne();
-        
+
         $category1 = DocumentCategoryFactory::createOne();
         $category2 = DocumentCategoryFactory::createOne();
-        
+
         $tag1 = TagFactory::createOne();
         $tag2 = TagFactory::createOne();
         $tag3 = TagFactory::createOne();
@@ -73,25 +72,25 @@ class TagResourceTest extends ApiTestCase
             'category' => $category1,
             'tags' => [$tag1, $tag2],
         ]);
-        
+
         $document2 = DocumentFactory::createOne([
             'course' => $course1,
             'category' => $category2,
             'tags' => [$tag2],
         ]);
-        
+
         $document3 = DocumentFactory::createOne([
             'course' => $course2,
             'category' => $category1,
             'tags' => [$tag2],
         ]);
-        
+
         $document4 = DocumentFactory::createOne([
             'course' => $course2,
             'category' => $category2,
             'tags' => [$tag3],
         ]);
-        
+
         // Test filtering by course
         $this->browser()
             ->get('/api/tags?course=/api/courses/' . $course1->getId(), [
@@ -103,7 +102,7 @@ class TagResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2) // tag1 and tag2 have documents with course1
             ->assertJsonMatches('length("hydra:member")', 2);
-        
+
         // Test filtering by category
         $this->browser()
             ->get('/api/tags?category=/api/document_categories/' . $category1->getId(), [
@@ -115,7 +114,7 @@ class TagResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2) // tag1 and tag2 have documents with category1
             ->assertJsonMatches('length("hydra:member")', 2);
-        
+
         // Test filtering by both course and category
         $this->browser()
             ->get('/api/tags?course=/api/courses/' . $course2->getId() . '&category=/api/document_categories/' . $category2->getId(), [
@@ -128,7 +127,7 @@ class TagResourceTest extends ApiTestCase
             ->assertJsonMatches('"hydra:totalItems"', 1) // Only tag3 has a document with both course2 and category2
             ->assertJsonMatches('length("hydra:member")', 1)
             ->assertJsonMatches('"hydra:member"[0].name', $tag3->getName());
-        
+
         // Test with non-existent course
         $this->browser()
             ->get('/api/tags?course=/api/courses/999', [
@@ -139,7 +138,7 @@ class TagResourceTest extends ApiTestCase
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 0);
-            
+
         // Test with no filter (should return all tags)
         $this->browser()
             ->get('/api/tags', [
@@ -208,7 +207,7 @@ class TagResourceTest extends ApiTestCase
         // Create some documents first that we'll associate with our new tag
         $document1 = DocumentFactory::createOne();
         $document2 = DocumentFactory::createOne();
-        
+
         $tagData = [
             'name' => 'Tag With Documents',
             'documents' => [
@@ -230,10 +229,10 @@ class TagResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"name"', 'Tag With Documents')
             ->assertJsonMatches('length("documents")', 2);
-            
+
         $tagIRI = $response->json()->decoded()['@id'] ?? null;
         $this->assertNotNull($tagIRI);
-        
+
         // Verify the tag was created with the correct documents
         $response = $this->browser()
             ->get($tagIRI, [
@@ -249,7 +248,7 @@ class TagResourceTest extends ApiTestCase
 
         $this->assertContains('/api/documents/' . $document1->getId(), $response['documents']);
         $this->assertContains('/api/documents/' . $document2->getId(), $response['documents']);
-            
+
         // Verify the relationship from the document side (optional)
         $response = $this->browser()
             ->get('/api/documents/' . $document1->getId(), [
@@ -273,6 +272,9 @@ class TagResourceTest extends ApiTestCase
 
         $this->browser()
             ->post('/api/tags', [
+                'headers' => [
+                    'Content-Type' => 'application/ld+json'
+                ],
                 'json' => $tagData
             ])
             ->assertStatus(401);
