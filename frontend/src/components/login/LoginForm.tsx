@@ -1,23 +1,15 @@
 'use client'
 
-// UI
-import { ChevronDown } from "lucide-react";
-import LitusOAuthButton from "@/components/login/LitusOAuthButton";
+import { storeTokensInCookies } from "@/actions/auth";
 import Logo from "@/components/common/Logo";
+import LitusOAuthButton from "@/components/login/LitusOAuthButton";
 import { useToast } from "@/components/ui/Toast";
-
-// Logic
-import React, { use, useEffect, useState } from 'react';
-import { initiateLitusOAuthFlow } from "@/utils/oauth";
-import ErrorPage from "@/components/error/ErrorPage";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from 'next/navigation'
 import { useApi } from "@/hooks/useApi";
-import { storeOAuthTokens } from "@/actions/oauth";
-import { useTranslation } from 'react-i18next';
+import { ChevronDown, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import Link from 'next/link';
-import { LoaderCircle } from 'lucide-react';
-import { Eye, EyeOff } from 'lucide-react';
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
@@ -27,10 +19,9 @@ import { Eye, EyeOff } from 'lucide-react';
  */
 export default function LoginForm() {
     const router = useRouter();
-    const searchParams = useSearchParams()
+    const searchParams = useSearchParams();
 
     const [isOpen, setIsOpen] = useState(false);
-    const [error, setError] = useState<Error | null>(null);
     const { showToast } = useToast();
     const { request, loading, error: apiError } = useApi();
 
@@ -47,13 +38,14 @@ export default function LoginForm() {
         setIsOpen(!isOpen);
     };
 
-    const handleOAuthLogin = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-        event.preventDefault();
-        try {
-            initiateLitusOAuthFlow(router, decodeURIComponent(redirectTo));
-        } catch (err: any) {
-            setError(err);
+    const handleOAuthLogin = () => {
+        // Redirect to backend OAuth initiation endpoint
+        const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+        if (!backendBaseUrl) {
+            throw new Error(`Missing environment variable for backend base URL`)
         }
+
+        window.location.href = `${backendBaseUrl}/api/auth/oauth/initiate?redirect_to=${encodeURIComponent(redirectTo)}`;
     };
 
     const handleCredentialsLogin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -69,7 +61,11 @@ export default function LoginForm() {
             return;
         }
 
-        await storeOAuthTokens(response.token);
+        await storeTokensInCookies(
+            response.token,
+            response.refresh_token,
+            response.refresh_token_expiration
+        );
         showToast(t('login_success'), 'success');
         router.push(redirectTo);
     };
@@ -83,10 +79,6 @@ export default function LoginForm() {
             }
         }
     }, [apiError, t]);
-
-    if (error) {
-        return <ErrorPage detail={error.message} />;
-    }
 
     return (
         <>

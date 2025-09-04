@@ -19,18 +19,21 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        login:
-            pattern: ^/api/auth/login
-            stateless: true
-            json_login:
-                check_path: /api/auth/login
-                success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
-
         api:
             pattern: ^/api
             stateless: true
+            entry_point: jwt
+            json_login:
+              check_path: /api/auth/login
+              success_handler: lexik_jwt_authentication.handler.authentication_success
+              failure_handler: lexik_jwt_authentication.handler.authentication_failure
             jwt: ~
+            refresh_jwt:
+              check_path: /api/auth/token/refresh
+            logout:
+              path: api_logout
+              # The LexikJWTAuthenticationBundle will handle JWT invalidation
+              # The JWTRefreshTokenBundle will automatically handle refresh token invalidation
 
         files:
             pattern: ^/files
@@ -65,6 +68,7 @@ security:
             remember_me:
                 secret:   '%kernel.secret%' # required
                 lifetime: 604800 # 1 week in seconds
+                name: BUR_REMEMBERME # Custom remember me cookie name with BUR prefix
                 # by default, the feature is enabled by checking a checkbox in the
                 # login form , uncomment the following line to always enable it.
                 #always_remember_me: true
@@ -122,3 +126,10 @@ when@test:
         firewalls:
             main:
                 http_basic: ~
+
+when@dev:
+    security:
+        firewalls:
+            main:
+                remember_me:
+                    name: BUR_DEV_REMEMBERME

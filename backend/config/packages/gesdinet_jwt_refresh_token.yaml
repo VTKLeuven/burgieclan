@@ -1,0 +1,6 @@
+gesdinet_jwt_refresh_token:
+  refresh_token_class: App\Entity\RefreshToken
+  return_expiration: true
+  ttl: 2592000 # 30 days in seconds, default
+  single_use: true # refresh tokens are replaces on use
+  logout_firewall: api  # Specify which firewall handles logout
