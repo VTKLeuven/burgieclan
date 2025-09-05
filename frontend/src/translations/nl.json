@@ -77,6 +77,12 @@
             "anonymous": {
                 "label": "Anoniem"
             },
+            "tags": {
+                "label": "Tags",
+                "placeholder": "Voeg tags toe (optioneel)...",
+                "create": "Maak nieuwe tag \"{{tag}}\"",
+                "no-results": "Geen tags gevonden"
+            },
             "validation": {
                 "name": {
                     "required": "Naam is verplicht",
@@ -131,6 +137,12 @@
             "add-new": "Opmerking toevoegen",
             "success": "Opmerking succesvol toegevoegd",
             "error": "Opmerking toevoegen mislukt",
+            "toast": {
+                "update-success": "Opmerking succesvol bijgewerkt",
+                "update-error": "Opmerking bijwerken mislukt",
+                "delete-success": "Opmerking succesvol verwijderd",
+                "delete-error": "Opmerking verwijderen mislukt"
+            },
             "form": {
                 "content": {
                     "required": "Opmerking is verplicht"
@@ -149,7 +161,9 @@
                 "button": {
                     "submit": "Opmerking plaatsen",
                     "submitting": "Plaatsen...",
-                    "cancel": "Annuleren"
+                    "cancel": "Annuleren",
+                    "edit": "Opmerking bewerken",
+                    "delete": "Opmerking verwijderen"
                 }
             },
             "no-categories": "Geen opmerking-categorieën beschikbaar"
@@ -171,6 +185,9 @@
         }
     },
     "download": {
+        "download": "Download",
+        "download-all": "Download alles",
+        "downloading": "Downloaden...",
         "download-success": "Documenten succesvol gedownload!",
         "download-error": "Downloaden mislukt."
     },
@@ -197,7 +214,9 @@
         "any-semester": "Elk semester",
         "credits": "Studiepunten",
         "show-only-favorites": "Toon alleen favorieten",
-        "matches-found": "Gevonden overeenkomsten"
+        "matches-found": "Gevonden overeenkomsten",
+        "no-modules-in-program": "Deze richting bevat geen modules.",
+        "no-courses-in-module": "Deze module bevat geen vakken."
     },
     "account": {
         "account": "Account",
@@ -216,6 +235,15 @@
         "documents": {
             "no_uploads": "Je hebt nog geen documenten geüpload.",
             "my": "Mijn documenten"
+        },
+        "anonymous_setting": {
+            "title": "Standaard Anoniem",
+            "description": "Wanneer ingeschakeld, zijn je bijdragen standaard anoniem. Je naam is dus niet zichtbaar voor anderen (behalve voor moderators en administrators).",
+            "toggle_label": "Anonieme modus in- of uitschakelen",
+            "enabled": "Ingeschakeld",
+            "disabled": "Uitgeschakeld",
+            "update_success": "Instelling bijgewerkt",
+            "update_error": "Bijwerken mislukt"
         }
     },
     "document": {
@@ -241,11 +269,24 @@
         "match-all-tags": "Alle tags moeten overeenkomen",
         "add-tags": "Voeg tags toe",
         "cancel": "Annuleren",
-        "apply": "Toepassen"
+        "apply": "Toepassen",
+        "no-preview": "Geen voorbeeld beschikbaar voor {{filename}}",
+        "loading": "Uw document tot leven brengen...",
+        "load-more": "Meer pagina's laden ({{displayedPages}} van {{numPages}})",
+        "comments": {
+            "add": "Voeg opmerking toe...",
+            "submit": "Opmerking indienen",
+            "submitting": "Opmerking indienen...",
+            "anonymous": "Anoniem",
+            "success": "Opmerking succesvol toegevoegd",
+            "error": "Opmerking toevoegen mislukt"
+        },
+        "under-review-warning": "Dit document is momenteel in behandeling, dus het is alleen zichtbaar voor jou."
     },
     "pagination": {
         "previous": "Vorige",
-        "next": "Volgende"
+        "next": "Volgende",
+        "showing": "Toont {{start}} tot {{end}} van {{total}} resultaten"
     },
     "search": {
         "placeholder": "Zoeken...",
@@ -265,5 +306,19 @@
         "log_out": "Uitloggen",
         "go_to_vtk": "Ga naar VTK",
         "user_avatar": "Gebruikersavatar"
+    },
+    "editor": {
+        "info_dialog": {
+            "title": "Teksteditor",
+            "description": "De editor laat je wiskundige formules schrijven en weergeven met LaTeX-syntaxis.",
+            "inline": "Plaats je wiskundige expressies tussen",
+            "inline_end": "voor inline formules",
+            "block": " of ",
+            "block_end": "voor blokformules.",
+            "katex_overview": "Voor een overzicht van de ondersteunde functies, zie de ",
+            "katex_doc": "documentatie van KaTeX",
+            "katex_end": " de onderliggende LaTeX-interpreter."
+        },
+        "info_button": "Info"
     }
 }

@@ -1,25 +1,33 @@
-'use client'
-import DocumentSections from "@/components/coursepage/DocumentSections";
-import { Course, Breadcrumb } from "@/types/entities";
-import { useEffect, useState } from "react";
-import { useApi } from "@/hooks/useApi";
-import Loading from '@/app/[locale]/loading'
-import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
-import { useUser } from '@/components/UserContext';
-import { ChartPie, Link as LinkIcon } from "lucide-react";
-import { convertToCourse } from "@/utils/convertToEntity";
-import Link from "next/link";
-import SemesterIndicator from '@/components/ui/SemesterIndicator';
-import CommentCategories from "@/components/coursepage/CommentCategories";
-import { useTranslation } from "react-i18next";
-import ErrorPage from "../error/ErrorPage";
-import FavoriteButton from "@/components/ui/FavoriteButton";
+'use client';
 
-export default function CoursePage({ courseId, breadcrumb }: { courseId: number, breadcrumb: Breadcrumb }) {
+import Loading from '@/app/[locale]/loading';
+import CommentCategories from "@/components/coursepage/comment/CommentCategories";
+import DocumentSections from "@/components/coursepage/DocumentSections";
+import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
+import ErrorPage from "@/components/error/ErrorPage";
+import FavoriteButton from "@/components/ui/FavoriteButton";
+import SemesterIndicator from '@/components/ui/SemesterIndicator';
+import { useUser } from '@/components/UserContext';
+import { useApi } from "@/hooks/useApi";
+import { Breadcrumb, Course, CourseComment } from "@/types/entities";
+import { convertToCourse } from "@/utils/convertToEntity";
+import { ChartPie, Link as LinkIcon } from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+
+export default function CoursePage() {
+    const { id: courseId } = useParams();
     const [course, setCourse] = useState<Course | null>(null);
-    const { user, loading: userLoading, refreshUser } = useUser();
+    const { loading: userLoading, refreshUser } = useUser();
     const { t } = useTranslation();
     const { request, loading, error } = useApi();
+
+    const breadcrumb: Breadcrumb = {
+        id: 1,
+        breadcrumb: ['Home', 'Courses', `Course ${courseId}`]
+    };
 
     useEffect(() => {
         async function getCourse() {
@@ -39,8 +47,23 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
         }
     }, [courseId, userLoading, request]);
 
+    useEffect(() => {
+        if (course?.name) {
+            document.title = `${course.name} | Burgieclan`;
+        }
+    }, [course?.name]);
+
+    const handleCommentsUpdate = (newComments: CourseComment[]) => {
+        if (course) {
+            setCourse({
+                ...course,
+                courseComments: newComments
+            });
+        }
+    };
+
     // Show loading state
-    if (loading) {
+    if (!courseId || loading) {
         return (
             <div className="flex items-center justify-center h-full w-full">
                 <Loading />
@@ -77,7 +100,7 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
                             {/* Course Title & Code */}
                             <div className="flex items-center gap-3 mb-2">
                                 <FavoriteButton
-                                    itemId={courseId}
+                                    itemId={course.id}
                                     itemType="course"
                                     size={24}
                                     onToggle={() => {
@@ -132,14 +155,15 @@ export default function CoursePage({ courseId, breadcrumb }: { courseId: number,
 
                 {/* Documents Section */}
                 <div className="px-6 py-8">
-                    <DocumentSections courseId={courseId} />
+                    <DocumentSections courseId={course.id} />
                 </div>
 
                 {/* Comments Section */}
                 <div className="px-6 py-8 border-t border-gray-100">
                     <CommentCategories
                         comments={course.courseComments ?? []}
-                        courseId={courseId}
+                        courseId={course.id}
+                        onCommentsUpdate={handleCommentsUpdate}
                     />
                 </div>
             </div>

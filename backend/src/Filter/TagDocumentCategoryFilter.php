@@ -2,9 +2,9 @@
 
 namespace App\Filter;
 
-use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -14,12 +14,12 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 class TagDocumentCategoryFilter extends AbstractFilter
 {
     private IriConverterInterface $iriConverter;
-    
+
     public function __construct(
-        ManagerRegistry $managerRegistry,
-        IriConverterInterface $iriConverter,
-        ?LoggerInterface $logger = null,
-        ?array $properties = null,
+        ManagerRegistry         $managerRegistry,
+        IriConverterInterface   $iriConverter,
+        ?LoggerInterface        $logger = null,
+        ?array                  $properties = null,
         ?NameConverterInterface $nameConverter = null
     ) {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
@@ -28,20 +28,20 @@ class TagDocumentCategoryFilter extends AbstractFilter
     }
 
     protected function filterProperty(
-        string $property,
+        string                      $property,
         $value,
-        QueryBuilder $queryBuilder,
+        QueryBuilder                $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
-        string $resourceClass,
-        ?Operation $operation = null,
-        array $context = []
+        string                      $resourceClass,
+        ?Operation                  $operation = null,
+        array                       $context = []
     ): void {
         if ($property !== 'category') {
             return;
         }
 
         $categoryId = $value;
-        
+
         // Try to convert IRI to an entity and get its ID
         if (is_string($value) && strpos($value, '/api/') === 0) {
             try {
@@ -59,7 +59,7 @@ class TagDocumentCategoryFilter extends AbstractFilter
         // Check if documents join already exists from another filter
         $docAlias = 'd_shared';
         $joinFound = false;
-        
+
         $joinParts = $queryBuilder->getDQLPart('join');
         if (isset($joinParts[$alias])) {
             foreach ($joinParts[$alias] as $join) {
@@ -70,7 +70,7 @@ class TagDocumentCategoryFilter extends AbstractFilter
                 }
             }
         }
-        
+
         if (!$joinFound) {
             $queryBuilder->join("$alias.documents", $docAlias);
         }

@@ -13,15 +13,15 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 class LitusAuthenticator extends OAuth2Authenticator implements AuthenticationEntryPointInterface
 {
     public function __construct(
-        private readonly ClientRegistry $clientRegistry,
+        private readonly ClientRegistry  $clientRegistry,
         private readonly RouterInterface $router,
-        private readonly UserRepository $userRepository
+        private readonly UserRepository  $userRepository
     ) {
     }
 
@@ -37,7 +37,7 @@ class LitusAuthenticator extends OAuth2Authenticator implements AuthenticationEn
 
     public function authenticate(Request $request): SelfValidatingPassport
     {
-        $client = $this->clientRegistry->getClient("litus");
+        $client = $this->clientRegistry->getClient("litus_backend");
         $accessToken = $this->fetchAccessToken($client);
         return new SelfValidatingPassport(
             new UserBadge($accessToken->getToken(), function () use ($accessToken, $client) {

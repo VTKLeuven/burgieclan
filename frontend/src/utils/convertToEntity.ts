@@ -1,4 +1,4 @@
-import { type CommentCategory, type Course, type CourseComment, type Document, type Module, type Page, type Program, type QuickLink, type Tag, type User } from '@/types/entities';
+import { type CommentCategory, type Course, type CourseComment, type Document, type DocumentComment, type Module, type Page, type Program, type QuickLink, type Tag, type User } from '@/types/entities';
 
 export function convertToUser(user: any): User {
     if (typeof user === 'string') {
@@ -12,7 +12,8 @@ export function convertToUser(user: any): User {
         favoriteCourses: user.favoriteCourses?.map(convertToCourse),
         favoriteModules: user.favoriteModules?.map(convertToModule),
         favoritePrograms: user.favoritePrograms?.map(convertToProgram),
-        favoriteDocuments: user.favoriteDocuments?.map(convertToDocument)
+        favoriteDocuments: user.favoriteDocuments?.map(convertToDocument),
+        defaultAnonymous: user.defaultAnonymous
     };
 }
 
@@ -64,16 +65,18 @@ export function convertToDocument(doc: any): Document {
     }
     return {
         id: parseInt(doc['@id'].split('/').pop()),
+        creator: doc.creator ? convertToUser(doc.creator) : undefined,
         createdAt: doc.createdAt ? new Date(doc.createdAt) : undefined,
-        updatedAt: doc.updatedAt? new Date(doc.updatedAt): undefined,
+        updatedAt: doc.updatedAt ? new Date(doc.updatedAt) : undefined,
         name: doc.name,
-        course: doc.course ? convertToCourse(doc.course): undefined,
+        course: doc.course ? convertToCourse(doc.course) : undefined,
         category: doc.category ? convertToDocumentCategory(doc.category) : undefined,
         year: doc.year,
         underReview: doc.under_review,
-        creator: doc.creator ? convertToUser(doc.creator) : undefined,
-        contentUrl: doc.contentUrl ? process.env.NEXT_PUBLIC_BACKEND_URL + doc.contentUrl: undefined,
         anonymous: doc.anonymous,
+        contentUrl: doc.contentUrl ? process.env.NEXT_PUBLIC_BACKEND_URL + doc.contentUrl : undefined,
+        mimetype: doc.mimetype,
+        filename: doc.filename,
         tags: doc.tags?.map(convertToTag)
     };
 }
@@ -98,7 +101,22 @@ export function convertToCourseComment(comment: any): CourseComment {
         commentCategory: comment.category ? convertToCommentCategory(comment.category) : undefined,
         content: comment.content,
         anonymous: comment.anonymous,
-        createdAt: comment.createdAt ? new Date(comment.createdAt): undefined,
+        createdAt: comment.createdAt ? new Date(comment.createdAt) : undefined,
+        updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : undefined,
+        creator: comment.creator ? convertToUser(comment.creator) : undefined
+    };
+}
+
+export function convertToDocumentComment(comment: any): DocumentComment {
+    if (typeof comment === 'string') {
+        return { id: parseId(comment) };
+    }
+    return {
+        id: parseId(comment['@id']),
+        document: comment.document ? convertToDocument(comment.document) : undefined,
+        content: comment.content,
+        anonymous: comment.anonymous,
+        createdAt: comment.createdAt ? new Date(comment.createdAt) : undefined,
         updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : undefined,
         creator: comment.creator ? convertToUser(comment.creator) : undefined
     };

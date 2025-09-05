@@ -44,7 +44,7 @@ class DownloadZipResourceTest extends ApiTestCase
             ->post('/api/zip', [
                 'headers' => [
                     'Content-Type' => 'application/ld+json',
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ],
                 'json' => [
                     'programs' => [],
@@ -62,7 +62,7 @@ class DownloadZipResourceTest extends ApiTestCase
             ->post('/api/zip', [
                 'headers' => [
                     'Content-Type' => 'application/ld+json',
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ],
                 'json' => [
                     'programs' => 'invalid',

@@ -74,7 +74,8 @@ final class DocumentCategoryFactory extends PersistentProxyObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'name' => self::faker()->word(),
+            'name_nl' => self::faker()->word(),
+            'name_en' => '(en)' . self::faker()->word(),
         ];
     }
 

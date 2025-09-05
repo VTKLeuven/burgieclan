@@ -1,12 +1,13 @@
+import { getUserId } from "@/actions/auth";
 import "@/app/globals.css";
-import React from "react";
-import { Inter } from 'next/font/google'
+import initTranslations from "@/app/i18n";
 import CookieBanner from "@/components/cookie-banner/CookieBanner";
 import TranslationsProvider from "@/components/TranslationProvider";
-import initTranslations from "@/app/i18n";
 import { ToastProvider } from "@/components/ui/Toast";
 import { UserProvider } from "@/components/UserContext";
-import { getUserId } from "@/utils/dal";
+import type { Metadata } from "next";
+import { Inter } from 'next/font/google';
+import React from "react";
 
 // Inter as default font
 const inter = Inter({
@@ -15,7 +16,7 @@ const inter = Inter({
 })
 
 // Metadata for improved SEO and web shareability
-export const metadata: { description: string; title: string } = {
+export const metadata: Metadata = {
   title: "VTK Burgieclan",
   description: "Vlaamse Technische Kring Leuven Burgieclan",
 };

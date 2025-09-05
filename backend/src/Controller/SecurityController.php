@@ -69,7 +69,7 @@ final class SecurityController extends AbstractController
     #[Route("/login/litus/start", name: "login_litus_start")]
     public function loginLitusStart(ClientRegistry $clientRegistry): RedirectResponse
     {
-        return $clientRegistry->getClient("litus")->redirect();
+        return $clientRegistry->getClient("litus_backend")->redirect();
     }
 
     /**

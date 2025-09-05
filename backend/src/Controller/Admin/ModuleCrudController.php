@@ -2,8 +2,11 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\Filter\EntityContainsFilter;
+use App\Entity\Course;
 use App\Entity\Module;
 use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -25,5 +28,14 @@ class ModuleCrudController extends AbstractCrudController
         yield AssociationField::new('program');
         yield AssociationField::new('modules');
         yield AssociationField::new('courses');
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('name')
+            ->add('program')
+            ->add(EntityContainsFilter::new('modules', Module::class))
+            ->add(EntityContainsFilter::new('courses', Course::class));
     }
 }

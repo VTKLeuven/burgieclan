@@ -47,7 +47,8 @@ class UserResourceTest extends ApiTestCase
             'favoriteCourses',
             'favoriteDocuments',
             'favoriteModules',
-            'favoritePrograms'
+            'favoritePrograms',
+            'defaultAnonymous'
         ], array_keys($json->decoded()));
 
         $json = $this->browser()
@@ -167,8 +168,7 @@ class UserResourceTest extends ApiTestCase
             ->assertJsonMatches('favoriteCourses[0]', '/api/courses/' . $course->getId())
             ->assertJsonMatches('favoriteModules[0]', '/api/modules/' . $module->getId())
             ->assertJsonMatches('favoritePrograms[0]', '/api/programs/' . $program->getId())
-            ->assertJsonMatches('favoriteDocuments[0]', '/api/documents/' . $document->getId())
-        ;
+            ->assertJsonMatches('favoriteDocuments[0]', '/api/documents/' . $document->getId());
 
         self::assertEquals(1, count($user->getFavoriteCourses()));
         self::assertEquals(1, count($user->getFavoriteModules()));
@@ -260,5 +260,110 @@ class UserResourceTest extends ApiTestCase
                 ]
             ])
             ->assertStatus(403);
+    }
+
+    public function testGetDefaultAnonymous(): void
+    {
+        $user = UserFactory::createOne([
+            'username' => 'anonuser',
+            'plainPassword' => 'password',
+            'defaultAnonymous' => true
+        ]);
+        $token = $this->getToken('anonuser', 'password');
+
+        $this->browser()
+            ->get('/api/users/' . $user->getId(), [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('defaultAnonymous', true);
+
+        $user2 = UserFactory::createOne([
+            'username' => 'nonanonuser',
+            'plainPassword' => 'password',
+            'defaultAnonymous' => false
+        ]);
+        $token2 = $this->getToken('nonanonuser', 'password');
+        $this->browser()
+            ->get('/api/users/' . $user2->getId(), [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token2
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('defaultAnonymous', false);
+    }
+
+    public function testPatchDefaultAnonymous(): void
+    {
+        $user = UserFactory::createOne([
+            'username' => 'patchanon',
+            'plainPassword' => 'password',
+            'defaultAnonymous' => false
+        ]);
+        $token = $this->getToken('patchanon', 'password');
+
+        // Check start state
+        $this->browser()
+            ->get('/api/users/' . $user->getId(), [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('defaultAnonymous', false);
+
+        // Update default anonymous field
+        $this->browser()
+            ->patch('/api/users/' . $user->getId(), [
+                'headers' => [
+                    'Content-Type' => 'application/merge-patch+json',
+                    'Authorization' => 'Bearer ' . $token
+                ],
+                'json' => [
+                    'defaultAnonymous' => true
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJsonMatches('defaultAnonymous', true);
+
+        // Confirm the change is persisted
+        $this->browser()
+            ->get('/api/users/' . $user->getId(), [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJsonMatches('defaultAnonymous', true);
+
+        // Change back to false
+        $this->browser()
+            ->patch('/api/users/' . $user->getId(), [
+                'headers' => [
+                    'Content-Type' => 'application/merge-patch+json',
+                    'Authorization' => 'Bearer ' . $token
+                ],
+                'json' => [
+                    'defaultAnonymous' => false
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJsonMatches('defaultAnonymous', false);
+
+        // Confirm the change is persisted
+        $this->browser()
+            ->get('/api/users/' . $user->getId(), [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJsonMatches('defaultAnonymous', false);
     }
 }

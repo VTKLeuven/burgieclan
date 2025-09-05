@@ -45,7 +45,7 @@ class UserApiToEntityMapper implements MapperInterface
         assert($from instanceof UserApi);
         assert($to instanceof User);
 
-        // No need to set any fields from user except the favorites.
+        // No need to set any fields from user except the favorites and other fields that can be updated.
         // It either gets pulled from the database in load() or doesn't exist.
 
         $favoriteCourses = [];
@@ -79,6 +79,8 @@ class UserApiToEntityMapper implements MapperInterface
             ]);
         }
         $this->propertyAccessor->setValue($to, 'favoriteDocuments', $favoriteDocuments);
+
+        $to->setDefaultAnonymous($from->defaultAnonymous);
 
         return $to;
     }

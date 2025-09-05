@@ -2,9 +2,9 @@
 
 namespace App\Filter;
 
-use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -28,13 +28,13 @@ final class TagFilter extends AbstractFilter
     }
 
     protected function filterProperty(
-        string $property,
+        string                      $property,
         $value,
-        QueryBuilder $queryBuilder,
+        QueryBuilder                $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
-        string $resourceClass,
-        ?Operation $operation = null,
-        array $context = []
+        string                      $resourceClass,
+        ?Operation                  $operation = null,
+        array                       $context = []
     ): void {
         // Only apply to the relevant properties
         if (!$this->isPropertyEnabled($property, $resourceClass) || !$value) {

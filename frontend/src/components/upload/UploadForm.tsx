@@ -1,17 +1,19 @@
-import React, { useEffect } from 'react';
-import { useForm, type FieldError } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import FormField from '@/components/ui/FormField';
-import { UploadField } from '@/components/upload/UploadField';
-import { UploadFormData } from '@/types/upload';
-import { documentSchema } from '@/utils/validation/documentSchema';
-import { useFormFields } from '@/hooks/useFormFields';
-import { Text } from '@/components/ui/Text';
-import { useTranslation } from 'react-i18next';
-import { useYearOptions } from '@/hooks/useYearOptions';
-import { VISIBLE_YEARS } from "@/utils/constants/upload";
 import { Checkbox } from "@/components/ui/Checkbox";
+import FormField from '@/components/ui/FormField';
+import { Text } from '@/components/ui/Text';
+import { UploadField } from '@/components/upload/UploadField';
+import UploadTagFilter from '@/components/upload/UploadTagFilter';
+import { useUser } from '@/components/UserContext';
+import { useFormFields } from '@/hooks/useFormFields';
+import { useYearOptions } from '@/hooks/useYearOptions';
+import { UploadFormData } from '@/types/upload';
+import { VISIBLE_YEARS } from "@/utils/constants/upload";
 import { getSuggestedNameFromFilename } from '@/utils/documentNameSuggestion';
+import { documentSchema } from '@/utils/validation/documentSchema';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useEffect, useState } from 'react';
+import { useForm, type FieldError } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 interface FormProps {
     onSubmit: (data: UploadFormData) => Promise<void>;
@@ -27,6 +29,10 @@ export default function UploadForm({
     initialFile,
 }: FormProps) {
     const { t } = useTranslation();
+    const { user } = useUser();
+    const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+    const [selectedTagQueries, setSelectedTagQueries] = useState<string[]>([]);
+
     const {
         register,
         handleSubmit,
@@ -37,13 +43,15 @@ export default function UploadForm({
     } = useForm<UploadFormData>({
         resolver: yupResolver(documentSchema(t)),
         defaultValues: {
-            anonymous: false // TODO: Set the initial value of the checkbox based on anonymous user setting
+            anonymous: user?.defaultAnonymous,
+            tagIds: [],
+            tagQueries: []
         }
     });
 
     const { courses, categories, isLoading: isLoadingFields, error } = useFormFields(isOpen);
     const yearOptions = useYearOptions();
-    
+
     // Watch the file and name fields
     const watchedFile = watch('file');
     const watchedName = watch('name');
@@ -54,7 +62,7 @@ export default function UploadForm({
             setValue('file', initialFile, { shouldValidate: true });
         }
     }, [initialFile, setValue]);
-    
+
     // Suggest name based on filename when file changes and name is empty
     useEffect(() => {
         if (watchedFile && !watchedName) {
@@ -63,8 +71,15 @@ export default function UploadForm({
         }
     }, [watchedFile, watchedName, setValue]);
 
-    const handleFormSubmit = async (data: UploadFormData) => {
-        await onSubmit(data);
+    // Update form values when tags change
+    useEffect(() => {
+        setValue('tagIds', selectedTagIds);
+        setValue('tagQueries', selectedTagQueries);
+    }, [selectedTagIds, selectedTagQueries, setValue]);
+
+    const handleTagSelectionChange = (tagIds: number[], tagQueries: string[]) => {
+        setSelectedTagIds(tagIds);
+        setSelectedTagQueries(tagQueries);
     };
 
     return (
@@ -75,7 +90,7 @@ export default function UploadForm({
                 </div>
             )}
 
-            <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+            <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-4">
                 <div className="col-span-full">
                     <FormField
                         label={t('upload.form.name.label')}
@@ -87,7 +102,7 @@ export default function UploadForm({
                     />
                 </div>
 
-                <div className="sm:col-span-full">
+                <div className="sm:col-span-3">
                     <FormField
                         label={t('upload.form.course.label')}
                         type="combobox"
@@ -99,7 +114,20 @@ export default function UploadForm({
                     />
                 </div>
 
-                <div className="sm:col-span-3">
+                <div className="sm:col-span-1">
+                    <FormField
+                        label={t('upload.form.year.label')}
+                        type="combobox"
+                        options={yearOptions}
+                        error={errors.year}
+                        name="year"
+                        control={control}
+                        disabled={isLoading || isLoadingFields}
+                        visibleOptions={VISIBLE_YEARS}
+                    />
+                </div>
+
+                <div className="sm:col-span-2">
                     <FormField
                         label={t('upload.form.category.label')}
                         type="combobox"
@@ -111,16 +139,16 @@ export default function UploadForm({
                     />
                 </div>
 
-                <div className="sm:col-span-3">
-                    <FormField
-                        label={t('upload.form.year.label')}
-                        type="combobox"
-                        options={yearOptions}
-                        error={errors.year}
-                        name="year"
-                        control={control}
-                        disabled={isLoading || isLoadingFields}
-                        visibleOptions={VISIBLE_YEARS}
+                <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-gray-900">
+                        {t('upload.form.tags.label')}
+                    </label>
+                    <UploadTagFilter
+                        selectedTagIds={selectedTagIds}
+                        selectedTagQueries={selectedTagQueries}
+                        onTagSelectionChange={handleTagSelectionChange}
+                        course={control._formValues.course ? { id: parseInt(control._formValues.course) } : undefined}
+                        category={control._formValues.category ? { id: parseInt(control._formValues.category) } : undefined}
                     />
                 </div>
 

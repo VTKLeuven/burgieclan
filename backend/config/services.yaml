@@ -7,6 +7,8 @@ parameters:
     locale: 'en'
     # This parameter defines the codes of the locales (languages) enabled in the application
     app_locales: en|nl
+    # Add your frontend URL
+    app.frontend_url: '%env(FRONTEND_URL)%'
 
 services:
     # default configuration for services in *this* file

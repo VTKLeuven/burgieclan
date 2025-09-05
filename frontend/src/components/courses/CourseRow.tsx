@@ -9,17 +9,20 @@ import { useApi } from "@/hooks/useApi";
 import { convertToCourse } from "@/utils/convertToEntity";
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
+import DownloadButton from '@/components/ui/DownloadButton';
 
 interface CourseRowProps {
     course: Course;
     highlightMatch?: boolean;
     isFirstRow?: boolean;
+    parentVisible?: boolean;
 }
 
 export const CourseRow = memo(({
     course: initialCourse,
     highlightMatch = false,
     isFirstRow = false,
+    parentVisible = true,
 }: CourseRowProps) => {
     const { user } = useUser();
     const { updateFavorite } = useFavorites(user);
@@ -31,7 +34,7 @@ export const CourseRow = memo(({
     const [professorNames, setProfessorNames] = useState<string[]>([]);
     const [professorsLoaded, setProfessorsLoaded] = useState<boolean>(false);
 
-    // Fetch complete course data if we only have the ID
+    // Fetch complete course data if we only have the ID and parent is visible
     useEffect(() => {
         async function fetchCourseData() {
             if (!initialCourse.id) return;
@@ -56,8 +59,10 @@ export const CourseRow = memo(({
             }
         }
 
-        fetchCourseData();
-    }, [initialCourse, request]);
+        if (parentVisible) {
+            fetchCourseData();
+        }
+    }, [initialCourse, request, parentVisible]);
 
     // Update favorite status when user data changes
     useEffect(() => {
@@ -175,6 +180,9 @@ export const CourseRow = memo(({
                     )}
                 </div>
             </div>
+            {/* <div className="col-span-1 flex justify-center items-center"> */}
+                {!loading && course && <DownloadButton courses={[course]} size={16} />}
+            {/* </div> */}
         </div>
     );
 });

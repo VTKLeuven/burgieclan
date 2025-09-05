@@ -9,6 +9,8 @@ interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>
     label: string;
     /** Optional CSS classes to apply to the container div */
     className?: string;
+    /** Optional CSS classes to apply to the label element */
+    labelClassName?: string;
 }
 
 /**
@@ -32,12 +34,14 @@ interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>
  * <Checkbox
  *   label="Accept terms"
  *   className="justify-end"
+ *   labelClassName="text-xs text-gray-600 hover:text-gray-800 transition-colors"
  *   required
  * />
  */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
     label,
     className,
+    labelClassName,
     id: propId,
     ...props
 }, ref) => {
@@ -56,7 +60,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
             />
             <label
                 htmlFor={id}
-                className="ml-2 block text-sm font-medium text-gray-900 cursor-pointer"
+                className={`ml-2 block cursor-pointer ${labelClassName || 'text-sm font-medium text-gray-900'}`}
             >
                 {label}
             </label>
@@ -84,7 +88,8 @@ Checkbox.displayName = 'Checkbox';
  * Styling Classes:
  * - Container: flex items-center
  * - Checkbox: h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded
- * - Label: ml-2 block text-sm font-medium text-gray-900 cursor-pointer
+ * - Default Label: ml-2 block text-sm font-medium text-gray-900 cursor-pointer
+ * - Custom Label: Use labelClassName to override the default label styling
  *
  * Usage with React Hook Form:
  * The component is designed to work seamlessly with React Hook Form.

@@ -37,9 +37,7 @@ class CommentCategoryApiToEntityMapper implements MapperInterface
         assert($from instanceof CommentCategoryApi);
         assert($to instanceof CommentCategory);
 
-        $to->setName($from->name);
-        $to->setDescription($from->description);
-
+        // No need to map the properties, only ID is needed here because the entity is loaded in the load method.
         return $to;
     }
 }
