@@ -49,7 +49,10 @@ jobs:
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
           RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
           mkdir -p \$RELEASE_DIR && \
-          mkdir -p ${{ secrets.DATA_DIR }} && \
+          # Create data directory only if it doesn't exist
+          if [ ! -d ${{ secrets.DATA_DIR }} ]; then \
+            mkdir -p ${{ secrets.DATA_DIR }} ; \
+          fi && \
           cp -r ${{ secrets.WORK_DIR_BACKEND }}/* \$RELEASE_DIR/ && \
           # Copy environment file properly
           if [ -f ${{ secrets.WORK_DIR_BACKEND }}/.env.local.php ]; then \
