@@ -1,7 +1,7 @@
-import * as Headless from '@headlessui/react'
-import clsx from 'clsx'
-import React from 'react'
-import { X } from 'lucide-react'
+import * as Headless from '@headlessui/react';
+import clsx from 'clsx';
+import { X } from 'lucide-react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const sizes = {
@@ -14,6 +14,8 @@ const sizes = {
     '3xl': 'sm:max-w-3xl',
     '4xl': 'sm:max-w-4xl',
     '5xl': 'sm:max-w-5xl',
+    '6xl': 'sm:max-w-6xl',
+    '7xl': 'sm:max-w-7xl',
 }
 
 interface DialogProps {

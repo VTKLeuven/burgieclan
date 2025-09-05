@@ -1,9 +1,8 @@
 'use server'
 
-import { redirect } from "next/navigation";
+import { getActiveJWT, logOut } from "@/actions/auth";
 import { headers } from 'next/headers';
-import { getActiveJWT } from "@/utils/dal";
-import { logOut } from "./oauth";
+import { redirect } from "next/navigation";
 
 /**
  * Encodes an API error response from the backend server into a structured serializable format for the frontend.
@@ -70,6 +69,9 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
 
         // Handle successful response
         if (response.ok) {
+            if (response.status === 204) {
+                return null; // No content response
+            }
             return await response.json();
         }
 

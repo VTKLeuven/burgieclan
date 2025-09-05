@@ -1,6 +1,6 @@
 import { useApi } from "@/hooks/useApi";
-import { ApiError } from "@/utils/error/apiError";
 import { User } from "@/types/entities";
+import { ApiError } from "@/utils/error/apiError";
 import { useState } from "react";
 
 type FavoriteType = "course" | "module" | "program" | "document";

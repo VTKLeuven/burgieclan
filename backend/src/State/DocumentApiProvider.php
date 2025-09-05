@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace App\State;
 
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
@@ -21,16 +12,22 @@ use App\ApiResource\DocumentApi;
 use App\Entity\Document;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Mime\MimeTypes;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
+use Vich\UploaderBundle\Storage\StorageInterface;
 
 class DocumentApiProvider implements ProviderInterface
 {
+    private MimeTypes $mimeTypes;
+
     public function __construct(
         #[Autowire(service: ItemProvider::class)] private readonly ProviderInterface       $itemProvider,
         #[Autowire(service: CollectionProvider::class)] private readonly ProviderInterface $collectionProvider,
         private readonly MicroMapperInterface                                              $microMapper,
+        private readonly StorageInterface $storage,
         private readonly Security                                                          $security,
     ) {
+        $this->mimeTypes = new MimeTypes();
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
@@ -130,6 +127,21 @@ class DocumentApiProvider implements ProviderInterface
 
         if ($document->isAnonymous()) {
             unset($documentApi->creator); // Remove author in GET-requests if document is anonymous
+        }
+
+        if ($document->getFileName()) {
+            $documentApi->filename = $document->getFileName();
+
+            try {
+                $filePath = $this->storage->resolvePath($document, 'file');
+                if ($filePath) {
+                    $mimeType = $this->mimeTypes->guessMimeType($filePath);
+                    $documentApi->mimetype = $mimeType ?: 'application/octet-stream';
+                }
+            } catch (\Exception $e) {
+                // If we can't determine the mime type, default to octet-stream
+                $documentApi->mimetype = 'application/octet-stream';
+            }
         }
 
         return $documentApi;

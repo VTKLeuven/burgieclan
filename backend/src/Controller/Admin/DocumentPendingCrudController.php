@@ -2,24 +2,29 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\Filter\EntityContainsFilter;
+use App\Entity\Course;
 use App\Entity\Document;
+use App\Entity\DocumentCategory;
+use App\Entity\Tag;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use Doctrine\ORM\QueryBuilder;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
-use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
-use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
-use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use LogicException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -48,9 +53,9 @@ class DocumentPendingCrudController extends DocumentCrudController
     }
 
     public function createIndexQueryBuilder(
-        SearchDto $searchDto,
-        EntityDto $entityDto,
-        FieldCollection $fields,
+        SearchDto        $searchDto,
+        EntityDto        $entityDto,
+        FieldCollection  $fields,
         FilterCollection $filters
     ): QueryBuilder {
         return parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters)
@@ -108,9 +113,9 @@ class DocumentPendingCrudController extends DocumentCrudController
     }
 
     public function approve(
-        AdminContext $adminContext,
+        AdminContext           $adminContext,
         EntityManagerInterface $entityManagerInterface,
-        AdminUrlGenerator $adminUrlGenerator
+        AdminUrlGenerator      $adminUrlGenerator
     ): RedirectResponse {
         $document = $adminContext->getEntity()->getInstance();
         if (!$document instanceof Document) {
@@ -126,5 +131,17 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->setEntityId($document->getId())
             ->generateUrl();
         return $this->redirect($targetUrl);
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('name')
+            ->add('year')
+            ->add(EntityContainsFilter::new('course', Course::class))
+            ->add(EntityContainsFilter::new('category', DocumentCategory::class))
+            ->add(EntityContainsFilter::new('tags', Tag::class))
+            ->add('under_review')
+            ->add('anonymous');
     }
 }

@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useUser } from "@/components/UserContext";
-import { ChevronDown, Home, File, FolderClosed, Plus, PanelLeftClose, PanelLeft } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import UploadDialog from '@/components/upload/UploadDialog';
+import { logOut } from '@/actions/auth';
 import Loading from "@/app/[locale]/loading";
 import ItemList from '@/components/layout/ItemList';
+import UploadDialog from '@/components/upload/UploadDialog';
+import { useUser } from "@/components/UserContext";
 import type { Course, Document } from "@/types/entities";
-import Link from 'next/link';
+import { ChevronDown, File, FolderClosed, Home, PanelLeft, PanelLeftClose, Plus } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const mapCoursesToItems = (courses: Course[]) => {
   return courses.map(course => ({
@@ -25,18 +27,15 @@ const mapDocumentsToItems = (documents: Document[]) => {
   return documents.map(document => ({
     id: document.id,
     name: document.name,
-    redirectUrl: `/documents/${document.id}`,
+    redirectUrl: `/document/${document.id}`,
     type: 'document' as const
   }));
 };
 
-function handleLogout() {
-  // TODO implement logout
-}
-
 const NavigationSidebar = () => {
   const { user, loading } = useUser();
   const { t, i18n } = useTranslation();
+  const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     courses: true,
@@ -46,6 +45,11 @@ const NavigationSidebar = () => {
 
   if (!user) {
     return null;
+  }
+
+  async function handleLogout() {
+    await logOut();
+    await router.push('/login');
   }
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -134,7 +138,7 @@ const NavigationSidebar = () => {
               <ItemList
                 items={mapDocumentsToItems(user.favoriteDocuments || [])}
                 emptyMessage={t('account.favorite.no_documents')}
-                />
+              />
             )}
           </div>
         </nav>
@@ -149,7 +153,7 @@ const NavigationSidebar = () => {
           {!isCollapsed && <span>{t('sidebar.add_document')}</span>}
         </button>
 
-        {/* User Profile - Fixed at Bottom #TODO add avatar input */}
+        {/* User Profile - Fixed at Bottom */}
         <div className="border-t border-gray-200 flex-shrink-0">
           <div className="p-4 flex items-center space-x-3">
             <Image

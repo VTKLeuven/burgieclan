@@ -15,18 +15,23 @@ use ApiPlatform\Metadata\Post;
 use App\Entity\DocumentComment;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     shortName: 'Document Comment',
     operations: [
-        new Get(),
-        new GetCollection(),
+        new Get(
+            normalizationContext: ['groups' => ['document_comment:get']]
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => ['document_comment:get']]
+        ),
         new Patch(
         // This redirects the security check to all voters to see if one accepts CourseCommentApi objects
         // This is handled by the src/Security/Voter/AbstractCommentVoter
             security: 'is_granted("EDIT", object)'
         ),
-        new Post(),
+        new Post(normalizationContext: ['groups' => ['document_comment:get']]),
         new Delete(
         // This redirects the security check to all voters to see if one accepts CourseCommentApi objects
         // This is handled by the src/Security/Voter/AbstractCommentVoter
@@ -43,5 +48,6 @@ class DocumentCommentApi extends AbstractCommentApi
     public ?int $id = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
+    #[Groups(['document_comment:get'])]
     public ?DocumentApi $document;
 }

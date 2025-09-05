@@ -46,13 +46,18 @@ jobs:
       # Prepare new release in a separate directory
       - name: Backend - Prepare new release
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
+          RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
           mkdir -p \$RELEASE_DIR && \
+          mkdir -p ${{ secrets.DATA_DIR }} && \
           cp -r ${{ secrets.WORK_DIR_BACKEND }}/* \$RELEASE_DIR/ && \
           # Copy environment file properly
           if [ -f ${{ secrets.WORK_DIR_BACKEND }}/.env.local.php ]; then \
             cp ${{ secrets.WORK_DIR_BACKEND }}/.env.local.php \$RELEASE_DIR/ ; \
           fi && \
+          # Remove release data dir and symlink to shared data
+          rm -rf \$RELEASE_DIR/data && \
+          ln -sfn ${{ secrets.DATA_DIR }} \$RELEASE_DIR/data && \
           cd \$RELEASE_DIR && \
           composer install --no-dev --optimize-autoloader && \
           bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration && \
@@ -63,11 +68,11 @@ jobs:
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
           ln -sfn \$RELEASE_DIR ${{ secrets.DEPLOY_PATH }}/backend/current && \
-          sudo systemctl reload php8.1-fpm"
-      # Cleanup old releases keeping last 3
+          sudo systemctl reload php8.3-fpm"
+      # Cleanup old releases keeping last 2
       - name: Cleanup old backend releases
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOY_PATH }}/backend/releases && ls -t | tail -n +4 | xargs rm -rf"
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOY_PATH }}/backend/releases && ls -t | tail -n +3 | xargs rm -rf"
 
   deploy_frontend:
     name: Deploy Frontend
@@ -107,10 +112,10 @@ jobs:
           pm2 delete ecosystem.config.js || true && \
           # Start from the new directory with the new code
           pm2 start ecosystem.config.js --update-env"
-      # Cleanup old releases keeping last 3
+      # Cleanup old releases keeping last 2
       - name: Cleanup old releases
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOY_PATH }}/frontend/releases && ls -t | tail -n +4 | xargs rm -rf"
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOY_PATH }}/frontend/releases && ls -t | tail -n +3 | xargs rm -rf"
 
   cleanup:
     name: Clean up

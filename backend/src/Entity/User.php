@@ -112,6 +112,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinTable(name: 'favorite_user_document')]
     private Collection $favoriteDocuments;
 
+    /**
+     * Indicates if the user wants uploads/comments to be anonymous by default.
+     */
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+    private ?bool $defaultAnonymous = true;
+
+
     public function __construct()
     {
         $this->favoritePrograms = new ArrayCollection();
@@ -354,6 +361,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeFavoriteDocument(Document $document): self
     {
         $this->favoriteDocuments->removeElement($document);
+
+        return $this;
+    }
+
+    public function isDefaultAnonymous(): ?bool
+    {
+        return $this->defaultAnonymous;
+    }
+
+    public function setDefaultAnonymous(bool $defaultAnonymous): static
+    {
+        $this->defaultAnonymous = $defaultAnonymous;
 
         return $this;
     }
