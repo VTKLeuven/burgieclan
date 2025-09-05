@@ -108,8 +108,6 @@
         }
     },
     "home": {
-        "title": "Home",
-        "description": "Welcome to Burgieclan! Your best friend in studying for exams. We provide a platform where students can share their study materials with each other. This way, you can help each other out and make studying a lot easier. So, what are you waiting for? Dive into the world of Burgieclan and start sharing your knowledge!",
         "recent_activities": "Pick up where you left off",
         "news": "News",
         "navigate_to": "Navigate to",
