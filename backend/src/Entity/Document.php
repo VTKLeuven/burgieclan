@@ -36,11 +36,14 @@ class Document extends Node
     #[ORM\Column]
     private ?bool $anonymous = null;
 
-    #[Vich\UploadableField(mapping: 'document_object', fileNameProperty: 'file_name')]
+    #[Vich\UploadableField(mapping: 'document_object', fileNameProperty: 'file_name', size: 'file_size')]
     private ?File $file = null;
 
     #[ORM\Column(nullable: true)]
     private ?string $file_name = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $file_size = null;
 
     #[ORM\Column(length: 11, nullable: true)]
     private ?string $year = null; // Ex. 2024 - 2025
@@ -127,6 +130,17 @@ class Document extends Node
     {
         $this->file_name = $file_name;
 
+        return $this;
+    }
+
+    public function getFileSize(): ?int
+    {
+        return $this->file_size;
+    }
+
+    public function setFileSize(?int $file_size): static
+    {
+        $this->file_size = $file_size;
         return $this;
     }
 

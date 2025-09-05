@@ -12,6 +12,7 @@ import { useUser } from "@/components/UserContext";
 import { useApi } from "@/hooks/useApi";
 import type { Document } from "@/types/entities";
 import { convertToDocument } from "@/utils/convertToEntity";
+import { formatFileSize } from "@/utils/fileSize";
 import { Calendar, ChartPie, CircleUser, File, Package } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
@@ -38,7 +39,6 @@ export default function DocumentPreview({ id }: { id: string }) {
             if (!documentData) {
                 return null;
             }
-
             setDocument(convertToDocument(documentData));
         };
 
@@ -83,7 +83,10 @@ export default function DocumentPreview({ id }: { id: string }) {
             <div className="flex flex-row justify-between py-5">
                 <div className="flex space-x-8">
                     {document.createdAt && <DocumentInfoField icon={Calendar} value={document.createdAt?.toLocaleDateString()} />}
-                    <DocumentInfoField icon={Package} value="4 MB" />  {/*TODO: retrieve from api endpoint or calculate here*/}
+                    <DocumentInfoField
+                        icon={Package}
+                        value={document.fileSize ? formatFileSize(document.fileSize) : ""}
+                    />
                     {document.year && <DocumentInfoField icon={ChartPie} value={document.year} />}
                 </div>
                 <div>
@@ -115,7 +118,7 @@ export default function DocumentPreview({ id }: { id: string }) {
                         <div className="flex space-x-2">
                             <DownloadSingleDocumentButton
                                 document={document}
-                                fileSize="3.6 MB" /* TODO: retrieve from api endpoint or calculate here*/
+                                fileSize={document.fileSize ? formatFileSize(document.fileSize) : "Unknown size"}
                                 disabled={!user}
                             />
                             <FavoriteButton

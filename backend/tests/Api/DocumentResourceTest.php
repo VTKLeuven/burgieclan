@@ -65,9 +65,7 @@ class DocumentResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
-            ->json();
-
-        $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
+            ->json();$this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
             '@id',
             '@type',
             'name',
