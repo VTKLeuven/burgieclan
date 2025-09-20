@@ -77,6 +77,7 @@ export function convertToDocument(doc: any): Document {
         contentUrl: doc.contentUrl ? process.env.NEXT_PUBLIC_BACKEND_URL + doc.contentUrl : undefined,
         mimetype: doc.mimetype,
         filename: doc.filename,
+        fileSize: doc.fileSize,
         tags: doc.tags?.map(convertToTag)
     };
 }

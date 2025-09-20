@@ -125,6 +125,9 @@ class DocumentApiProvider implements ProviderInterface
     {
         $documentApi = $this->microMapper->map($document, DocumentApi::class);
 
+        // Get file size from document entity
+        $documentApi->fileSize = $document->getFileSize();
+
         if ($document->isAnonymous()) {
             unset($documentApi->creator); // Remove author in GET-requests if document is anonymous
         }
