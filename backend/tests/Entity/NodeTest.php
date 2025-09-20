@@ -5,14 +5,15 @@ namespace App\Tests\Entity;
 use App\Entity\Node;
 use App\Entity\User;
 use DateTime;
-use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class NodeTest extends TestCase
+class NodeTest extends KernelTestCase
 {
     public function testConstructNode()
     {
         $creator = $this->createMock(User::class);
         $beforedate = new DateTime();
+        /** @var Node $nodeMock */
         $nodeMock = $this->getMockBuilder(Node::class)
             ->setConstructorArgs(array($creator))
             ->getMockForAbstractClass();
