@@ -1,4 +1,4 @@
-import { type CommentCategory, type Course, type CourseComment, type Document, type DocumentComment, type Module, type Page, type Program, type QuickLink, type Tag, type User } from '@/types/entities';
+import { type Announcement, type CommentCategory, type Course, type CourseComment, type Document, type DocumentComment, type Module, type Page, type Program, type QuickLink, type Tag, type User } from '@/types/entities';
 
 export function convertToUser(user: any): User {
     if (typeof user === 'string') {
@@ -159,6 +159,20 @@ export function convertToTag(tag: any): Tag {
         id: parseId(tag['@id']),
         name: tag.name,
         documents: tag.documents?.map(convertToDocument)
+    };
+}
+
+export function convertToAnnouncement(announcement: any): Announcement {
+    return {
+        id: parseId(announcement['@id']),
+        creator: announcement.creator ? convertToUser(announcement.creator) : undefined,
+        createdAt: announcement.createdAt ? new Date(announcement.createdAt) : undefined,
+        updatedAt: announcement.updatedAt ? new Date(announcement.updatedAt) : undefined,
+        title: announcement.title,
+        content: announcement.content,
+        priority: announcement.priority,
+        startTime: announcement.startTime ? new Date(announcement.startTime) : undefined,
+        endTime: announcement.endTime ? new Date(announcement.endTime) : undefined,
     };
 }
 
