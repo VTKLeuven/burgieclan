@@ -66,6 +66,7 @@ export interface Document extends NodeEntity {
     underReview?: boolean;
     anonymous?: boolean;
     contentUrl?: string;
+    fileSize?: number;
     mimetype?: string;
     filename?: string;
     tags?: Tag[];
