@@ -9,26 +9,49 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class AnnouncementTest extends KernelTestCase
 {
-    public function testSetTitle(): void
+    public function testSetTitleNl(): void
     {
+        /** @var User $user */
         $user = $this->createMock(User::class);
         $announcement = new Announcement($user);
-        $announcement->setTitle("Announcement");
+        $announcement->setTitleNl("Dutch Announcement");
 
-        $this->assertSame("Announcement", $announcement->getTitle());
+        $this->assertSame("Dutch Announcement", $announcement->getTitleNl());
     }
 
-    public function testSetContent(): void
+    public function testSetTitleEn(): void
     {
+        /** @var User $user */
         $user = $this->createMock(User::class);
         $announcement = new Announcement($user);
-        $announcement->setContent("Announcement content");
+        $announcement->setTitleEn("English Announcement");
 
-        $this->assertSame("Announcement content", $announcement->getContent());
+        $this->assertSame("English Announcement", $announcement->getTitleEn());
+    }
+
+    public function testSetContentNl(): void
+    {
+        /** @var User $user */
+        $user = $this->createMock(User::class);
+        $announcement = new Announcement($user);
+        $announcement->setContentNl("Dutch announcement content");
+
+        $this->assertSame("Dutch announcement content", $announcement->getContentNl());
+    }
+
+    public function testSetContentEn(): void
+    {
+        /** @var User $user */
+        $user = $this->createMock(User::class);
+        $announcement = new Announcement($user);
+        $announcement->setContentEn("English announcement content");
+
+        $this->assertSame("English announcement content", $announcement->getContentEn());
     }
 
     public function testSetStartTime(): void
     {
+        /** @var User $user */
         $user = $this->createMock(User::class);
         $announcement = new Announcement($user);
         $starttime = new DateTime();
@@ -39,11 +62,25 @@ class AnnouncementTest extends KernelTestCase
 
     public function testSetEndTime(): void
     {
+        /** @var User $user */
         $user = $this->createMock(User::class);
         $announcement = new Announcement($user);
         $endtime = new DateTime();
         $announcement->setEndTime($endtime);
 
         $this->assertSame($endtime, $announcement->getEndTime());
+    }
+
+    public function testSetPriority(): void
+    {
+        /** @var User $user */
+        $user = $this->createMock(User::class);
+        $announcement = new Announcement($user);
+        $announcement->setPriority(true);
+
+        $this->assertTrue($announcement->isPriority());
+
+        $announcement->setPriority(false);
+        $this->assertFalse($announcement->isPriority());
     }
 }
