@@ -15,20 +15,16 @@ export default function AnnouncementSlideShow() {
     const { i18n } = useTranslation();
     const currentLocale = i18n.language;
 
-    function getActiveAnnouncementsUrl(): string {
-        const now = new Date();
-        const formattedNow = now.toLocaleString("sv-SE", { timeZone: "Europe/Brussels" }).replace("T", " ");
-        const params = new URLSearchParams({
-            "startTime[strictly_before]": formattedNow,
-            "endTime[after]": formattedNow,
-            "lang": currentLocale
-        });
-        return `/api/announcements?${params.toString()}`;
-    }
-
     useEffect(() => {
         const fetchAnnouncements = async () => {
-            const response = await request('GET', getActiveAnnouncementsUrl());
+            const now = new Date();
+            const formattedNow = now.toLocaleString("sv-SE", { timeZone: "Europe/Brussels" }).replace("T", " ");
+            const params = new URLSearchParams({
+                "startTime[strictly_before]": formattedNow,
+                "endTime[after]": formattedNow,
+                "lang": currentLocale
+            });
+            const response = await request('GET', `/api/announcements?${params.toString()}`);
 
             if (!response) {
                 return;
