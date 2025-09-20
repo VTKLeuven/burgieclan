@@ -1,12 +1,12 @@
 'use client';
 
-import React from 'react';
+import AnnouncementSlideShow from '@/components/announcement/AnnouncementSlideShow';
+import { QuickLinks } from '@/components/homepage/QuickLinks';
 import { Text } from '@/components/ui/Text';
 import { DragDropZone } from '@/components/upload/DragDropZone';
+import UploadDialog from '@/components/upload/UploadDialog';
 import { useUploadFlow } from '@/hooks/useUploadFlow';
-import UploadDialog from '@/components/upload/UploadDialog'
 import { useTranslation } from 'react-i18next';
-import { QuickLinks } from './QuickLinks';
 
 export default function HomePage() {
     const {
@@ -21,6 +21,8 @@ export default function HomePage() {
     return (
         <main className="flex-1 flex flex-col">
             <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 md:px-8 py-4">
+                <AnnouncementSlideShow />
+
                 {/* Header */}
                 <div className="mb-8">
                     <h2 className="text-black">{t('home.title')}</h2>

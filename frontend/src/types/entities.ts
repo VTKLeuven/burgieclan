@@ -102,3 +102,11 @@ export interface Tag extends BaseEntity {
     name?: string;
     documents?: Document[];
 }
+
+export interface Announcement extends NodeEntity {
+    title?: string;
+    content?: string;
+    priority?: boolean;
+    startTime?: Date;
+    endTime?: Date;
+}
