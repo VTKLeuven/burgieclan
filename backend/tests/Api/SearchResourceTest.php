@@ -18,25 +18,25 @@ class SearchResourceTest extends ApiTestCase
     {
         CourseFactory::createMany(5);
         $course = CourseFactory::createOne([
-            'name' => 'Course1',
+            'name' => 'CoursewitUniqueName1',
         ]);
         ModuleFactory::createMany(5);
         $module = ModuleFactory::createOne([
-            'name' => 'Module1',
+            'name' => 'ModulewitUniqueName1',
         ]);
         ProgramFactory::createMany(5);
         $program = ProgramFactory::createOne([
-            'name' => 'Program1',
+            'name' => 'ProgramwitUniqueName1',
         ]);
         DocumentFactory::createMany(5);
         $document = DocumentFactory::createOne([
-            'name' => 'Document1',
+            'name' => 'DocumentwitUniqueName1',
         ]);
 
         $json = $this->browser()
-            ->get('/api/search?searchText=ourse')
+            ->get('/api/search?searchText=rsewitUnique')
             ->assertStatus(401)
-            ->get('/api/search?searchText=ourse', [
+            ->get('/api/search?searchText=rsewitUnique', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
@@ -60,9 +60,9 @@ class SearchResourceTest extends ApiTestCase
         $this->assertSame('/api/courses/' . $course->getId(), $courses[0]['@id']);
 
         $json = $this->browser()
-            ->get('/api/search?searchText=odule1')
+            ->get('/api/search?searchText=ulewitUniqueNa')
             ->assertStatus(401)
-            ->get('/api/search?searchText=odule1', [
+            ->get('/api/search?searchText=ulewitUniqueName1', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
@@ -86,9 +86,9 @@ class SearchResourceTest extends ApiTestCase
         $this->assertSame('/api/modules/' . $module->getId(), $modules[0]['@id']);
 
         $json = $this->browser()
-            ->get('/api/search?searchText=ogra')
+            ->get('/api/search?searchText=gramwitUniqueNa')
             ->assertStatus(401)
-            ->get('/api/search?searchText=ogra', [
+            ->get('/api/search?searchText=gramwitUniqueNa', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
@@ -112,9 +112,9 @@ class SearchResourceTest extends ApiTestCase
         $this->assertSame('/api/programs/' . $program->getId(), $programs[0]['@id']);
 
         $json = $this->browser()
-            ->get('/api/search?searchText=ocum')
+            ->get('/api/search?searchText=umentwitUniqueN')
             ->assertStatus(401)
-            ->get('/api/search?searchText=ocum', [
+            ->get('/api/search?searchText=umentwitUniqueN', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
@@ -138,9 +138,9 @@ class SearchResourceTest extends ApiTestCase
         $this->assertSame('/api/documents/' . $document->getId(), $documents[0]['@id']);
 
         $json = $this->browser()
-            ->get('/api/search?searchText')
+            ->get('/api/search?searchText=gwrergergherg')
             ->assertStatus(401)
-            ->get('/api/search?searchText', [
+            ->get('/api/search?searchText=gwrergergherg', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
