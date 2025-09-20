@@ -78,10 +78,13 @@ final class AnnouncementFactory extends PersistentProxyObjectFactory
         $startTime = $createDate->add(new DateInterval('P'. self::faker()->numberBetween(1, 10) . 'D'));
         $endTime = $startTime->add(new DateInterval('P'. self::faker()->numberBetween(1, 10) . 'D'));
         return [
-            'title' => self::faker()->word(),
-            'content' => self::faker()->text(),
+            'title_nl' => self::faker()->word(),
+            'title_en' => self::faker()->word(),
+            'content_nl' => self::faker()->text(),
+            'content_en' => self::faker()->text(),
             'startTime' => $startTime,
             'endTime' => $endTime,
+            'priority' => self::faker()->boolean(),
             'creator' => UserFactory::randomOrCreate(),
         ];
     }
