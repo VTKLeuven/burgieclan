@@ -130,4 +130,16 @@ class Announcement extends Node
 
         return $this;
     }
+
+    public function getTitle(string $lang): ?string
+    {
+        $title = $this->{'title_' . $lang};
+        return (!empty($title)) ? $title : $this->{'title_' . self::$DEFAULT_LANGUAGE};
+    }
+
+    public function getContent(string $lang): ?string
+    {
+        $content = $this->{'content_' . $lang};
+        return (!empty($content)) ? $content : $this->{'content_' . self::$DEFAULT_LANGUAGE};
+    }
 }

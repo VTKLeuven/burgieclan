@@ -44,8 +44,7 @@ class AnnouncementCrudController extends AbstractCrudController
         yield DateTimeField::new('endTime');
 
         yield FormField::addPanel('English Content')->setIcon('fa fa-language')
-            ->collapsible()
-            ->renderCollapsed();
+            ->collapsible();
         yield TextField::new('title_en')
             ->setLabel('Title (English)');
         yield TextField::new('content_en')
@@ -56,8 +55,10 @@ class AnnouncementCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
-            ->add('title')
-            ->add('content')
+            ->add('title_nl')
+            ->add('content_nl')
+            ->add('title_en')
+            ->add('content_en')
             ->add('startTime')
             ->add('endTime');
     }
