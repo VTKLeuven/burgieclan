@@ -35,15 +35,8 @@ const config = {
 						blue: "#1A1F4A",
 						panache: "#FFD400",
 					},
-				},
-				wireframe: {
 					content: "#1A1F4A",
-					darkest: {
-						gray: "#4A5A71",
-					},
-					lightest: {
-						gray: "#EFF1F6",
-					},
+
 				},
 			},
 			borderRadius: {
