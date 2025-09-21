@@ -75,9 +75,9 @@ class DashboardController extends AbstractDashboardController
             ->setSubItems([
                 MenuItem::linkToCrud('Courses', 'fa fa-book', Course::class)
                     ->setPermission(User::ROLE_ADMIN),
-                MenuItem::linkToCrud('Comment Categories', 'fas fa-tags', CommentCategory::class)
+                MenuItem::linkToCrud('Comment Categories', 'fa fa-tags', CommentCategory::class)
                     ->setPermission(User::ROLE_ADMIN),
-                MenuItem::linkToCrud('Comments', 'far fa-comments', CourseComment::class)
+                MenuItem::linkToCrud('Comments', 'fa fa-comments', CourseComment::class)
                     ->setPermission(User::ROLE_ADMIN)
             ]);
         $pendingDocumentsMenu = MenuItem::linkToCrud('Pending Documents', 'fa-regular fa-file', Document::class)

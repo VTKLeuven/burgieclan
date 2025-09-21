@@ -2,8 +2,13 @@
 
 namespace App\Tests\Api;
 
+use App\Factory\CourseCommentFactory;
+use App\Factory\CourseCommentVoteFactory;
 use App\Factory\CourseFactory;
+use App\Factory\DocumentCommentFactory;
+use App\Factory\DocumentCommentVoteFactory;
 use App\Factory\DocumentFactory;
+use App\Factory\DocumentVoteFactory;
 use App\Factory\ModuleFactory;
 use App\Factory\ProgramFactory;
 use App\Factory\UserFactory;
@@ -48,7 +53,10 @@ class UserResourceTest extends ApiTestCase
             'favoriteDocuments',
             'favoriteModules',
             'favoritePrograms',
-            'defaultAnonymous'
+            'defaultAnonymous',
+            'documentVotes',
+            'documentCommentVotes',
+            'courseCommentVotes',
         ], array_keys($json->decoded()));
 
         $json = $this->browser()
@@ -365,5 +373,189 @@ class UserResourceTest extends ApiTestCase
             ])
             ->assertStatus(200)
             ->assertJsonMatches('defaultAnonymous', false);
+    }
+public function testGetVotes(): void
+    {
+        // Create votes for different entities
+        $document = DocumentFactory::createOne();
+        $documentComment = DocumentCommentFactory::createOne();
+        $courseComment = CourseCommentFactory::createOne();
+
+        // Create a user
+        $user = UserFactory::createOne(['plainPassword' => 'password']);
+        $userToken = $this->getToken($user->getUsername(), 'password');
+        $otherUser = UserFactory::createOne();
+
+        $documentVote = DocumentVoteFactory::createOne(['creator' => $user, 'document' => $document]);
+        $documentCommentVote = DocumentCommentVoteFactory::createOne(['creator' => $user, 'documentComment' => $documentComment]);
+        $courseCommentVote = CourseCommentVoteFactory::createOne(['creator' => $user, 'courseComment' => $courseComment]);
+
+        $documentVotes = $user->getDocumentVotes();
+        $documentCommentVotes = $user->getDocumentCommentVotes();
+        $courseCommentVotes = $user->getCourseCommentVotes();
+
+        // Assert the specific vote collections
+        $this->assertEquals(1, $documentVotes->count());
+        $this->assertEquals(1, $documentCommentVotes->count());
+        $this->assertEquals(1, $courseCommentVotes->count());
+
+        $this->browser()
+            ->get('/api/users/' . $user->getId(), [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $userToken
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('"@id"', '/api/users/' . $user->getId())
+            ->assertJsonMatches('length(documentVotes)', 1)
+            ->assertJsonMatches('length(documentCommentVotes)', 1)
+            ->assertJsonMatches('length(courseCommentVotes)', 1)
+            ->assertJsonMatches('documentVotes[0]', '/api/document_votes/' . $documentVote->getId())
+            ->assertJsonMatches('documentCommentVotes[0]', '/api/document_comment_votes/' . $documentCommentVote->getId())
+            ->assertJsonMatches('courseCommentVotes[0]', '/api/course_comment_votes/' . $courseCommentVote->getId())
+            ->get('/api/users/' . $user->getId() . '/votes', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $userToken
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('"@id"', '/api/users/' . $user->getId() . '/votes')
+            ->assertJsonMatches('length(documentVotes)', 1)
+            ->assertJsonMatches('length(documentCommentVotes)', 1)
+            ->assertJsonMatches('length(courseCommentVotes)', 1)
+            ->assertJsonMatches('documentVotes[0]', '/api/document_votes/' . $documentVote->getId())
+            ->assertJsonMatches('documentCommentVotes[0]', '/api/document_comment_votes/' . $documentCommentVote->getId())
+            ->assertJsonMatches('courseCommentVotes[0]', '/api/course_comment_votes/' . $courseCommentVote->getId());
+
+        $this->browser()
+            ->get('/api/users/' . $otherUser->getId() . '/votes', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $userToken
+                ]
+            ])
+            ->assertStatus(403);
+    }
+
+    public function testAddVotes(): void
+    {
+        $user = UserFactory::createOne(['plainPassword' => 'password']);
+        $userToken = $this->getToken($user->getUsername(), 'password');
+        $otherUser = UserFactory::createOne();
+
+        // Create votes for different entities
+        $document = DocumentFactory::createOne();
+        $documentComment = DocumentCommentFactory::createOne();
+        $courseComment = CourseCommentFactory::createOne();
+
+        $documentVote = DocumentVoteFactory::createOne(['creator' => $user, 'document' => $document]);
+        $documentCommentVote = DocumentCommentVoteFactory::createOne(['creator' => $user, 'documentComment' => $documentComment]);
+        $courseCommentVote = CourseCommentVoteFactory::createOne(['creator' => $user, 'courseComment' => $courseComment]);
+
+        self::assertCount(1, $user->getDocumentVotes());
+        self::assertCount(1, $user->getDocumentCommentVotes());
+        self::assertCount(1, $user->getCourseCommentVotes());
+
+        $this->browser()
+            ->patch('/api/users/' . $user->getId() . '/votes/add', [
+                'headers' => [
+                    'Content-Type' => 'application/merge-patch+json',
+                    'Authorization' => 'Bearer ' . $userToken
+                ],
+                'json' => [
+                    'documentVotes' => ['/api/document_votes/' . $documentVote->getId()],
+                    'documentCommentVotes' => ['/api/document_comment_votes/' . $documentCommentVote->getId()],
+                    'courseCommentVotes' => ['/api/course_comment_votes/' . $courseCommentVote->getId()],
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('documentVotes[0]', '/api/document_votes/' . $documentVote->getId())
+            ->assertJsonMatches('documentCommentVotes[0]', '/api/document_comment_votes/' . $documentCommentVote->getId())
+            ->assertJsonMatches('courseCommentVotes[0]', '/api/course_comment_votes/' . $courseCommentVote->getId());
+
+        self::assertCount(1, $user->getDocumentVotes());
+        self::assertCount(1, $user->getDocumentCommentVotes());
+        self::assertCount(1, $user->getCourseCommentVotes());
+
+        $this->browser()
+            ->patch('/api/users/' . $otherUser->getId() . '/votes/add', [
+                'headers' => [
+                    'Content-Type' => 'application/merge-patch+json',
+                    'Authorization' => 'Bearer ' . $userToken
+                ],
+                'json' => [
+                    'documentVotes' => ['/api/document_votes/' . $documentVote->getId()],
+                    'documentCommentVotes' => ['/api/document_comment_votes/' . $documentCommentVote->getId()],
+                    'courseCommentVotes' => ['/api/course_comment_votes/' . $courseCommentVote->getId()],
+                ]
+            ])
+            ->assertStatus(403);
+    }
+
+    public function testRemoveVotes(): void
+    {
+        $document1 = DocumentFactory::createOne();
+        $document2 = DocumentFactory::createOne();
+        $documentComment1 = DocumentCommentFactory::createOne();
+        $documentComment2 = DocumentCommentFactory::createOne();
+        $courseComment1 = CourseCommentFactory::createOne();
+        $courseComment2 = CourseCommentFactory::createOne();
+
+        $user = UserFactory::createOne(['plainPassword' => 'password']);
+        $userToken = $this->getToken($user->getUsername(), 'password');
+        $otherUser = UserFactory::createOne();
+
+        $documentVote1 = DocumentVoteFactory::createOne(['creator' => $user, 'document' => $document1]);
+        $documentVote2 = DocumentVoteFactory::createOne(['creator' => $user, 'document' => $document2]);
+        $documentCommentVote1 = DocumentCommentVoteFactory::createOne(['creator' => $user, 'documentComment' => $documentComment1]);
+        $documentCommentVote2 = DocumentCommentVoteFactory::createOne(['creator' => $user, 'documentComment' => $documentComment2]);
+        $courseCommentVote1 = CourseCommentVoteFactory::createOne(['creator' => $user, 'courseComment' => $courseComment1]);
+        $courseCommentVote2 = CourseCommentVoteFactory::createOne(['creator' => $user, 'courseComment' => $courseComment2]);
+
+        self::assertCount(2, $user->getDocumentVotes());
+        self::assertCount(2, $user->getDocumentCommentVotes());
+        self::assertCount(2, $user->getCourseCommentVotes());
+
+
+        $this->browser()
+            ->patch('/api/users/' . $user->getId() . '/votes/remove', [
+                'headers' => [
+                    'Content-Type' => 'application/merge-patch+json',
+                    'Authorization' => 'Bearer ' . $userToken
+                ],
+                'json' => [
+                    'documentVotes' => ['/api/document_votes/' . $documentVote2->getId()],
+                    'documentCommentVotes' => ['/api/document_comment_votes/' . $documentCommentVote2->getId()],
+                    'courseCommentVotes' => ['/api/course_comment_votes/' . $courseCommentVote2->getId()],
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('length(documentVotes)', 1)
+            ->assertJsonMatches('length(documentCommentVotes)', 1)
+            ->assertJsonMatches('length(courseCommentVotes)', 1)
+            ->assertJsonMatches('documentVotes[0]', '/api/document_votes/' . $documentVote1->getId())
+            ->assertJsonMatches('documentCommentVotes[0]', '/api/document_comment_votes/' . $documentCommentVote1->getId())
+            ->assertJsonMatches('courseCommentVotes[0]', '/api/course_comment_votes/' . $courseCommentVote1->getId());
+
+        self::assertCount(1, $user->getDocumentVotes());
+        self::assertCount(1, $user->getDocumentCommentVotes());
+        self::assertCount(1, $user->getCourseCommentVotes());
+
+        $this->browser()
+            ->patch('/api/users/' . $otherUser->getId() . '/votes/remove', [
+                'headers' => [
+                    'Content-Type' => 'application/merge-patch+json',
+                    'Authorization' => 'Bearer ' . $userToken
+                ],
+                'json' => [
+                    'documentVotes' => ['/api/courses/' . $documentVote1->getId()],
+                    'documentCommentVotes' => ['/api/modules/' . $documentCommentVote1->getId()],
+                    'courseCommentVotes' => ['/api/programs/' . $courseCommentVote1->getId()],
+                ]
+            ])
+            ->assertStatus(403);
     }
 }
