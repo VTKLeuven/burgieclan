@@ -15,10 +15,13 @@ use App\Entity\User;
 use App\Factory\AnnouncementFactory;
 use App\Factory\CommentCategoryFactory;
 use App\Factory\CourseCommentFactory;
+use App\Factory\CourseCommentVoteFactory;
 use App\Factory\CourseFactory;
 use App\Factory\DocumentCategoryFactory;
 use App\Factory\DocumentCommentFactory;
+use App\Factory\DocumentCommentVoteFactory;
 use App\Factory\DocumentFactory;
+use App\Factory\DocumentVoteFactory;
 use App\Factory\ModuleFactory;
 use App\Factory\PageFactory;
 use App\Factory\ProgramFactory;
@@ -53,6 +56,9 @@ final class AppFixtures extends Fixture
         PageFactory::createMany(20);
         QuickLinkFactory::createMany(10);
         UserDocumentViewFactory::createMany(100);
+        DocumentVoteFactory::createMany(100);
+        DocumentCommentVoteFactory::createMany(100);
+        CourseCommentVoteFactory::createMany(100);
     }
 
     private function loadUsers(ObjectManager $manager): void
