@@ -1,4 +1,4 @@
-import { type Announcement, type CommentCategory, type Course, type CourseComment, type Document, type DocumentComment, type Module, type Page, type Program, type QuickLink, type Tag, type User } from '@/types/entities';
+import { type Announcement, type CommentCategory, type Course, type CourseComment, type Document, type DocumentComment, type DocumentView, type Module, type Page, type Program, type QuickLink, type Tag, type User } from '@/types/entities';
 
 export function convertToUser(user: any): User {
     if (typeof user === 'string') {
@@ -164,6 +164,9 @@ export function convertToTag(tag: any): Tag {
 }
 
 export function convertToAnnouncement(announcement: any): Announcement {
+    if (typeof announcement === 'string') {
+        return { id: parseId(announcement) };
+    }
     return {
         id: parseId(announcement['@id']),
         creator: announcement.creator ? convertToUser(announcement.creator) : undefined,
@@ -174,6 +177,17 @@ export function convertToAnnouncement(announcement: any): Announcement {
         priority: announcement.priority,
         startTime: announcement.startTime ? new Date(announcement.startTime) : undefined,
         endTime: announcement.endTime ? new Date(announcement.endTime) : undefined,
+    };
+}
+
+export function convertToDocumentView(documentView: any): DocumentView {
+    if (typeof documentView === 'string') {
+        return { id: parseId(documentView) };
+    }
+    return {
+        id: parseId(documentView['@id']),
+        document: documentView.document ? convertToDocument(documentView.document) : undefined,
+        lastViewed: documentView.lastViewed ? new Date(documentView.lastViewed) : undefined,
     };
 }
 

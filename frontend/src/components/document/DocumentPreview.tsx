@@ -9,6 +9,7 @@ import DownloadSingleDocumentButton from "@/components/ui/buttons/DownloadSingle
 import VoteButton, { VoteDirection } from "@/components/ui/buttons/VoteButton";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import { useUser } from "@/components/UserContext";
+import { logDocumentView } from "@/hooks/logDocumentView";
 import { useApi } from "@/hooks/useApi";
 import type { Document } from "@/types/entities";
 import { convertToDocument } from "@/utils/convertToEntity";
@@ -44,6 +45,10 @@ export default function DocumentPreview({ id }: { id: string }) {
 
         fetchDocumentData();
     }, [id, request]);
+
+    useEffect(() => {
+        logDocumentView(id);
+    }, [id]);
 
     // Set window title based on document name
     useEffect(() => {

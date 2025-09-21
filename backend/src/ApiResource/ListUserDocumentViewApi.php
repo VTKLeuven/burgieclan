@@ -10,7 +10,7 @@ use App\Entity\UserDocumentView;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
-    shortName: 'User document views',
+    shortName: 'User document view',
     operations: [
         new Post(
             uriTemplate: 'document_views/batch',
