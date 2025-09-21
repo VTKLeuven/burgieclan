@@ -12,7 +12,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: DocumentRepository::class)]
-class Document extends Node
+class Document extends Node implements VotableInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -51,10 +51,14 @@ class Document extends Node
     #[ORM\ManyToMany(targetEntity: Tag::class, mappedBy: 'documents', cascade: ['persist'])]
     private Collection $tags;
 
+    #[ORM\OneToMany(mappedBy: 'document', targetEntity: DocumentVote::class, cascade: ['persist', 'remove'])]
+    private Collection $votes;
+
     public function __construct($creator)
     {
         parent::__construct($creator);
         $this->tags = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -184,7 +188,7 @@ class Document extends Node
      * @param string|null $firstYear The first year to start generating choices from, default is null
      * @return array The array of academic year choices, formatted like '2024 - 2025' => '2024 - 2025'
      */
-    public static function getAcademicYearChoices(int $amountOfYears = 10, string $firstYear = null): array
+    public static function getAcademicYearChoices(int $amountOfYears = 10, ?string $firstYear = null): array
     {
         $currentYear = (int)date('Y');
         // Calculate the date of the last Monday of September
@@ -233,6 +237,131 @@ class Document extends Node
     {
         if ($this->tags->removeElement($tag)) {
             $tag->removeDocument($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get votes for this document
+     *
+     * @return Collection<int, DocumentVote>
+     */
+    public function getVotes(): Collection
+    {
+        return $this->votes ?? new ArrayCollection();
+    }
+
+    /**
+     * Calculate the vote score (upvotes - downvotes) for this document
+     *
+     * @return int
+     */
+    public function getVoteScore(): int
+    {
+        $score = 0;
+        foreach ($this->getVotes() as $vote) {
+            $score += $vote->getVoteType();
+        }
+
+        return $score;
+    }
+
+    /**
+     * Get a specific user's vote on this document
+     *
+     * @param User $user
+     *
+     * @return DocumentVote|null
+     */
+    public function getUserVote(User $user): ?DocumentVote
+    {
+        foreach ($this->getVotes() as $vote) {
+            if ($vote->getCreator() === $user) {
+                return $vote;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the number of upvotes
+     *
+     * @return int
+     */
+    public function getUpvoteCount(): int
+    {
+        $count = 0;
+        foreach ($this->getVotes() as $vote) {
+            if ($vote->isUpvote()) {
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * Get the number of downvotes
+     *
+     * @return int
+     */
+    public function getDownvoteCount(): int
+    {
+        $count = 0;
+        foreach ($this->getVotes() as $vote) {
+            if ($vote->isDownvote()) {
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * Check if a specific user has voted on this document
+     *
+     * @param User $user
+     *
+     * @return bool
+     */
+    public function hasUserVoted(User $user): bool
+    {
+        return $this->getUserVote($user) !== null;
+    }
+
+    /**
+     * Add a vote to this document
+     *
+     * @param DocumentVote $vote
+     *
+     * @return Document
+     */
+    public function addVote(DocumentVote $vote): static
+    {
+        if (!$this->votes->contains($vote)) {
+            $this->votes->add($vote);
+            $vote->setDocument($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove a vote from this document
+     *
+     * @param DocumentVote $vote
+     *
+     * @return Document
+     */
+    public function removeVote(DocumentVote $vote): static
+    {
+        if ($this->votes->removeElement($vote)) {
+            // Set the owning side to null (unless already changed)
+            if ($vote->getDocument() === $this) {
+                $vote->setDocument(null);
+            }
         }
 
         return $this;
