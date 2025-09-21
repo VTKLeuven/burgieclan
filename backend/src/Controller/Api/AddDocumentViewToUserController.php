@@ -37,7 +37,7 @@ class AddDocumentViewToUserController extends AbstractController
 
         $requestBody = json_decode($request->getContent(), true);
         $viewsToAdd = $requestBody['userDocumentViews'] ??
-            throw new HttpException(500, 'No valid document views provided');
+            throw new HttpException(422, 'No valid document views provided');
 
         foreach ($viewsToAdd as $view) {
             $documentApiIri = $view['document'];
