@@ -52,7 +52,7 @@ final class AppFixtures extends Fixture
         DocumentCommentFactory::createMany(400);
         PageFactory::createMany(20);
         QuickLinkFactory::createMany(10);
-        UserDocumentViewFactory::createMany(10);
+        UserDocumentViewFactory::createMany(100);
     }
 
     private function loadUsers(ObjectManager $manager): void
