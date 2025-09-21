@@ -18,7 +18,7 @@ class UserDocumentView
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'documentViews')]
+    #[ORM\ManyToOne(inversedBy: 'viewedDocuments')]
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 
