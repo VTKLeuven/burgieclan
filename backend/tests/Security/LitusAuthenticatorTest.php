@@ -118,7 +118,7 @@ class LitusAuthenticatorTest extends TestCase
         $this->clientRegistry
             ->expects($this->once())
             ->method('getClient')
-            ->with('litus')
+            ->with('litus_backend')
             ->willReturn($client);
 
         // Mock the client to return the access token
