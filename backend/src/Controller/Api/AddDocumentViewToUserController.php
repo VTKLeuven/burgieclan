@@ -2,9 +2,8 @@
 
 namespace App\Controller\Api;
 
-use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
 use App\ApiResource\DocumentApi;
-use App\ApiResource\ListUserDocumentViewApi;
 use App\Entity\Document;
 use App\Entity\User;
 use App\Repository\UserDocumentViewRepository;
@@ -31,7 +30,7 @@ class AddDocumentViewToUserController extends AbstractController
     /**
      * @throws Exception
      */
-    public function __invoke(ListUserDocumentViewApi $listUserDocumentViewApi, Request $request)
+    public function __invoke(Request $request)
     {
         $user = $this->security->getUser();
         assert($user instanceof User);

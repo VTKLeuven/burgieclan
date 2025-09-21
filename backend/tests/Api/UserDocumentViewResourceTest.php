@@ -37,7 +37,7 @@ class UserDocumentViewResourceTest extends ApiTestCase
         ]);
 
         // Test getting own document views
-        $response = $this->browser()
+        $this->browser()
             ->get('/api/document_views', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $userToken
