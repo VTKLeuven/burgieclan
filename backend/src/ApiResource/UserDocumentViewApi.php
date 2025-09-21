@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    shortName: 'User document views',
+    shortName: 'User document view',
     operations: [
         new GetCollection(
             uriTemplate: 'document_views',

@@ -43,7 +43,7 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
 
         const requestHeaders = new Headers(customHeaders || {});
         // If body is FormData, don't set content-type (useful for file uploads)
-        if (!(body instanceof FormData)) {
+        if (!(body instanceof FormData) && !customHeaders?.get('Content-Type')) {
             if (method === 'PATCH') {
                 // Backend expects content-type to be application/merge-patch+json for PATCH requests
                 requestHeaders.set('Content-Type', 'application/merge-patch+json');
@@ -51,7 +51,7 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
                 // Backend expects content-type to be application/ld+json for POST requests
                 requestHeaders.set('Content-Type', 'application/ld+json');
             } else {
-                // Backend expects content-type to be application/json
+                // Set default content type to application/json if not specified
                 requestHeaders.set('Content-Type', 'application/json');
             }
         }

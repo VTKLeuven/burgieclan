@@ -111,3 +111,8 @@ export interface Announcement extends NodeEntity {
     startTime?: Date;
     endTime?: Date;
 }
+
+export interface DocumentView extends BaseEntity {
+    document?: Document;
+    lastViewed?: Date;
+}

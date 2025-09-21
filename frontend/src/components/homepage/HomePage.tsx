@@ -7,6 +7,7 @@ import { DragDropZone } from '@/components/upload/DragDropZone';
 import UploadDialog from '@/components/upload/UploadDialog';
 import { useUploadFlow } from '@/hooks/useUploadFlow';
 import { useTranslation } from 'react-i18next';
+import { RecentActivities } from "@/components/homepage/recent/RecentActivities";
 
 export default function HomePage() {
     const {
@@ -36,11 +37,7 @@ export default function HomePage() {
                     {/* Top Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Recent activities */}
-                        <div className="rounded-lg border border-gray-200 h-full">
-                            <div className="p-4">
-                                <h3 className="text-xl text-gray-900">{t('home.recent_activities')}</h3>
-                            </div>
-                        </div>
+                        <RecentActivities />
                         {/* Dropbox */}
                         <DragDropZone onFileDrop={handleFileDrop} className="h-full" />
                     </div>
