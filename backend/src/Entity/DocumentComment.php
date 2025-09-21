@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DocumentCommentRepository::class)]
-class DocumentComment extends AbstractComment
+class DocumentComment extends AbstractComment implements VotableInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -24,12 +24,12 @@ class DocumentComment extends AbstractComment
         targetEntity: DocumentCommentVote::class,
         cascade: ['persist', 'remove']
     )]
-    private \Doctrine\Common\Collections\Collection $votes;
+    private Collection $votes;
     
     public function __construct(User $creator)
     {
         parent::__construct($creator);
-        $this->votes = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
 
     public function getId(): ?int
