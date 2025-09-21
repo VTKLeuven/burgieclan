@@ -44,7 +44,7 @@ final class DocumentCommentVoteFactory extends PersistentProxyObjectFactory
         return [
             'creator' => UserFactory::randomOrCreate(),
             'documentComment' => DocumentCommentFactory::randomOrCreate(),
-            'voteType' => self::random([AbstractVote::UPVOTE, AbstractVote::DOWNVOTE]),
+            'voteType' => self::faker()->randomElement([AbstractVote::UPVOTE, AbstractVote::DOWNVOTE]),
         ];
     }
 
