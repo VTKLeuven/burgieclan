@@ -62,7 +62,7 @@ export default function AnnouncementSlideShow() {
 
     // Show loading state
     if (loading) {
-        return <Loading />;
+        return;
     }
 
     // Show error state
