@@ -34,9 +34,13 @@ class VoteResourceTest extends ApiTestCase
             ->assertJsonMatches('sum', 0);
 
         // Create some votes manually in the database for testing
-        $user1 = UserFactory::createOne();
-        $user2 = UserFactory::createOne();
-        $user3 = UserFactory::createOne();
+        $user1 = UserFactory::createOne(['plainPassword' => 'password']);
+        $user2 = UserFactory::createOne(['plainPassword' => 'password']);
+        $user3 = UserFactory::createOne(['plainPassword' => 'password']);
+
+        $user1Token = $this->getToken($user1->getUsername(), 'password');
+        $user2Token = $this->getToken($user2->getUsername(), 'password');
+        $user3Token = $this->getToken($user3->getUsername(), 'password');
 
         // Create votes directly through the entities (simulating existing votes)
         $vote1 = DocumentVoteFactory::createOne([
@@ -60,13 +64,36 @@ class VoteResourceTest extends ApiTestCase
         // Test vote summary with votes
         $this->browser()
             ->get('/api/documents/' . $document->getId() . '/votes', [
-                'headers' => ['Authorization' => 'Bearer ' . $this->token]
+                'headers' => ['Authorization' => 'Bearer ' . $user1Token]
             ])
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 2)
             ->assertJsonMatches('downvotes', 1)
-            ->assertJsonMatches('sum', 1);
+            ->assertJsonMatches('sum', 1)
+            ->assertJsonMatches('currentUserVote', 1);
+
+        $this->browser()
+            ->get('/api/documents/' . $document->getId() . '/votes', [
+                'headers' => ['Authorization' => 'Bearer ' . $user2Token]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('upvotes', 2)
+            ->assertJsonMatches('downvotes', 1)
+            ->assertJsonMatches('sum', 1)
+            ->assertJsonMatches('currentUserVote', 1);
+
+        $this->browser()
+            ->get('/api/documents/' . $document->getId() . '/votes', [
+                'headers' => ['Authorization' => 'Bearer ' . $user3Token]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('upvotes', 2)
+            ->assertJsonMatches('downvotes', 1)
+            ->assertJsonMatches('sum', 1)
+            ->assertJsonMatches('currentUserVote', -1);
     }
 
     public function testGetDocumentCommentVoteSummary(): void
@@ -83,9 +110,13 @@ class VoteResourceTest extends ApiTestCase
             ->assertJsonMatches('downvotes', 0)
             ->assertJsonMatches('sum', 0);
 
-        $user1 = UserFactory::createOne();
-        $user2 = UserFactory::createOne();
-        $user3 = UserFactory::createOne();
+        $user1 = UserFactory::createOne(['plainPassword' => 'password']);
+        $user2 = UserFactory::createOne(['plainPassword' => 'password']);
+        $user3 = UserFactory::createOne(['plainPassword' => 'password']);
+
+        $user1Token = $this->getToken($user1->getUsername(), 'password');
+        $user2Token = $this->getToken($user2->getUsername(), 'password');
+        $user3Token = $this->getToken($user3->getUsername(), 'password');
 
         $vote1 = DocumentCommentVoteFactory::createOne([
             'creator' => $user1,
@@ -107,13 +138,36 @@ class VoteResourceTest extends ApiTestCase
 
         $this->browser()
             ->get('/api/document-comments/' . $documentComment->getId() . '/votes', [
-                'headers' => ['Authorization' => 'Bearer ' . $this->token]
+                'headers' => ['Authorization' => 'Bearer ' . $user1Token]
             ])
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 2)
             ->assertJsonMatches('downvotes', 1)
-            ->assertJsonMatches('sum', 1);
+            ->assertJsonMatches('sum', 1)
+            ->assertJsonMatches('currentUserVote', 1);
+
+        $this->browser()
+            ->get('/api/document-comments/' . $documentComment->getId() . '/votes', [
+                'headers' => ['Authorization' => 'Bearer ' . $user2Token]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('upvotes', 2)
+            ->assertJsonMatches('downvotes', 1)
+            ->assertJsonMatches('sum', 1)
+            ->assertJsonMatches('currentUserVote', 1);
+
+        $this->browser()
+            ->get('/api/document-comments/' . $documentComment->getId() . '/votes', [
+                'headers' => ['Authorization' => 'Bearer ' . $user3Token]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('upvotes', 2)
+            ->assertJsonMatches('downvotes', 1)
+            ->assertJsonMatches('sum', 1)
+            ->assertJsonMatches('currentUserVote', -1);
     }
 
     public function testGetCourseCommentVoteSummary(): void
@@ -130,9 +184,13 @@ class VoteResourceTest extends ApiTestCase
             ->assertJsonMatches('downvotes', 0)
             ->assertJsonMatches('sum', 0);
 
-        $user1 = UserFactory::createOne();
-        $user2 = UserFactory::createOne();
-        $user3 = UserFactory::createOne();
+        $user1 = UserFactory::createOne(['plainPassword' => 'password']);
+        $user2 = UserFactory::createOne(['plainPassword' => 'password']);
+        $user3 = UserFactory::createOne(['plainPassword' => 'password']);
+
+        $user1Token = $this->getToken($user1->getUsername(), 'password');
+        $user2Token = $this->getToken($user2->getUsername(), 'password');
+        $user3Token = $this->getToken($user3->getUsername(), 'password');
 
         $vote1 = CourseCommentVoteFactory::createOne([
             'creator' => $user1,
@@ -154,13 +212,36 @@ class VoteResourceTest extends ApiTestCase
 
         $this->browser()
             ->get('/api/course-comments/' . $courseComment->getId() . '/votes', [
-                'headers' => ['Authorization' => 'Bearer ' . $this->token]
+                'headers' => ['Authorization' => 'Bearer ' . $user1Token]
             ])
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 2)
             ->assertJsonMatches('downvotes', 1)
-            ->assertJsonMatches('sum', 1);
+            ->assertJsonMatches('sum', 1)
+            ->assertJsonMatches('currentUserVote', 1);
+
+        $this->browser()
+            ->get('/api/course-comments/' . $courseComment->getId() . '/votes', [
+                'headers' => ['Authorization' => 'Bearer ' . $user2Token]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('upvotes', 2)
+            ->assertJsonMatches('downvotes', 1)
+            ->assertJsonMatches('sum', 1)
+            ->assertJsonMatches('currentUserVote', 1);
+
+        $this->browser()
+            ->get('/api/course-comments/' . $courseComment->getId() . '/votes', [
+                'headers' => ['Authorization' => 'Bearer ' . $user3Token]
+            ])
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('upvotes', 2)
+            ->assertJsonMatches('downvotes', 1)
+            ->assertJsonMatches('sum', 1)
+            ->assertJsonMatches('currentUserVote', -1);
     }
 
     public function testGetVoteSummaryForNonExistentEntity(): void
@@ -386,6 +467,19 @@ class VoteResourceTest extends ApiTestCase
                 ]
             ])
             ->assertStatus(201);
+
+        // Get vote summary
+        $this->browser()
+            ->get('/api/documents/' . $document->getId() . '/votes', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token,
+                    'Content-Type' => 'application/ld+json'
+                ]
+            ])
+            ->assertStatus(200)
+            ->assertJsonMatches('upvotes', 1)
+            ->assertJsonMatches('downvotes', 0)
+            ->assertJsonMatches('sum', 1);
 
         // Delete the vote
         $this->browser()

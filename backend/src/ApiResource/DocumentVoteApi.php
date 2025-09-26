@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             uriTemplate: '/documents/{id}/votes',
             controller: CreateVoteController::class,
             security: 'is_granted("ROLE_USER")',
+            read: false,
             openapiContext: [
                 'summary' => 'Create or update a vote on a document',
                 'parameters' => [
@@ -38,6 +39,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             uriTemplate: '/documents/{id}/votes',
             controller: DeleteVoteController::class,
             security: 'is_granted("ROLE_USER")',
+            read: false,
             openapiContext: [
                 'summary' => 'Remove vote from a document',
                 'parameters' => [
