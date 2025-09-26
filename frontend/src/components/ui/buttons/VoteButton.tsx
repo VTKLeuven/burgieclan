@@ -14,13 +14,15 @@ export interface VoteButtonProps {
     objectId: number;
     disabled?: boolean;                         // Whether the vote button is disabled (unclickable)
     className?: string;                         // Custom classes for the outer span element
+    size?: 'small' | 'normal';                 // Size variant for the vote button
 }
 
 export default function VoteButton({
     type,
     objectId,
     disabled = false,
-    className = ''
+    className = '',
+    size = 'normal'
 }: VoteButtonProps) {
     const [voteState, setVoteState] = useState<VoteDirection>(VoteDirection.NONE);
     const [voteCount, setVoteCount] = useState(0);
@@ -92,13 +94,19 @@ export default function VoteButton({
         return newVote - oldVote;
     };
 
+    const iconSize = size === 'small' ? 16 : 20;
+    const textSize = size === 'small' ? 'text-xs' : 'text-sm';
+    const padding = size === 'small' ? 'p-0.5' : 'p-1';
+    const spacing = size === 'small' ? 'space-x-1' : 'space-x-1.5';
+
     return (
-        <span className={`inline-flex items-center p-1 border rounded-2xl space-x-1.5 
+        <span className={`inline-flex items-center border rounded-2xl 
+            ${padding} ${spacing}
             ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             ${className}`}
         >
             <ArrowBigUpIcon
-                size={20}
+                size={iconSize}
                 strokeWidth={isUpvoteHovered ? '2' : '1.5'}
                 onMouseEnter={() => setIsUpvoteHovered(true)}
                 onMouseLeave={() => setIsUpvoteHovered(false)}
@@ -108,7 +116,7 @@ export default function VoteButton({
                     ${voteState === VoteDirection.UP ? 'text-amber-600 fill-amber-600' : 'text-gray-500'}
                 `}
             />
-            <div className={`text-sm ${voteState === VoteDirection.UP
+            <div className={`${textSize} ${voteState === VoteDirection.UP
                 ? 'text-amber-600'
                 : voteState === VoteDirection.DOWN
                     ? 'text-blue-500'
@@ -117,7 +125,7 @@ export default function VoteButton({
                 {voteCount}
             </div>
             <ArrowBigDownIcon
-                size={20}
+                size={iconSize}
                 strokeWidth={isDownvoteHovered ? '2' : '1.5'}
                 onMouseEnter={() => setIsDownvoteHovered(true)}
                 onMouseLeave={() => setIsDownvoteHovered(false)}
