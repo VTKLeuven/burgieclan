@@ -1,63 +1,95 @@
+import { useApi } from "@/hooks/useApi";
+import { convertToVoteSummary } from "@/utils/convertToEntity";
 import { ArrowBigDownIcon, ArrowBigUpIcon } from "lucide-react";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export enum VoteDirection {
-    UP = 'UP',
-    DOWN = 'DOWN',
-    NONE = 'NONE'
+    UP = 1,
+    DOWN = -1,
+    NONE = 0
 }
 
 export interface VoteButtonProps {
-    initialVotes: number;                       // The initial number of votes
-    initialVote?: VoteDirection;                // The initial vote direction
-    onVote?: (delta: number) => Promise<(vote: number) => void>; // Callback when the vote button is clicked
+    type: 'course_comment' | 'document_comment' | 'document';
+    objectId: number;
     disabled?: boolean;                         // Whether the vote button is disabled (unclickable)
     className?: string;                         // Custom classes for the outer span element
 }
 
 export default function VoteButton({
-    initialVotes = 0,
-    initialVote = VoteDirection.NONE,
-    onVote,
+    type,
+    objectId,
     disabled = false,
     className = ''
 }: VoteButtonProps) {
-    const [voteState, setVoteState] = useState<VoteDirection>(initialVote || VoteDirection.NONE);
-    const [voteCount, setVoteCount] = useState(initialVotes);
+    const [voteState, setVoteState] = useState<VoteDirection>(VoteDirection.NONE);
+    const [voteCount, setVoteCount] = useState(0);
     const [isUpvoteHovered, setIsUpvoteHovered] = useState(false);
     const [isDownvoteHovered, setIsDownvoteHovered] = useState(false);
+    const { request } = useApi();
 
-    const handleVote = async (direction: VoteDirection) => {
-        if (disabled || direction == VoteDirection.NONE) return;
+    let apiEndpoint = '';
+    switch (type) {
+        case 'course_comment':
+            apiEndpoint = `/api/course-comments/${objectId}/votes`;
+            break;
+        case 'document_comment':
+            apiEndpoint = `/api/document-comments/${objectId}/votes`;
+            break;
+        case 'document':
+            apiEndpoint = `/api/documents/${objectId}/votes`;
+            break;
+        default:
+            throw new Error('Invalid vote type');
+    }
 
-        try {
-            const newVoteState = voteState === direction ? VoteDirection.NONE : direction;
-
-            const delta = calculateVoteDelta(voteState, newVoteState);
-
-            // Run callback
-            if (onVote) {
-                await onVote(delta);
+    useEffect(() => {
+        async function getVoteSummary() {
+            const result = await request('GET', apiEndpoint);
+            if (!result) {
+                return;
             }
 
-            // TODO: Update vote count in backend (awaiting backend fix)
+            const voteSummary = convertToVoteSummary(result);
 
-            // Update local state
-            setVoteCount(prev => prev + delta);
-            setVoteState(newVoteState);
-        } catch (error) {
-            // Revert on error
-            setVoteCount(voteCount);
-            setVoteState(voteState);
+            setVoteState(voteSummary.currentUserVote);
+            setVoteCount(voteSummary.sum);
         }
+        getVoteSummary();
+    }, [apiEndpoint, request]);
+
+
+    const handleVote = async (direction: VoteDirection) => {
+        if (disabled) return;
+
+        const newVoteState = voteState === direction ? VoteDirection.NONE : direction;
+
+        const delta = calculateVoteDelta(voteState, newVoteState);
+
+        console.log({ apiEndpoint, direction, delta, voteCount, newVoteCount: voteCount + delta });
+        const result = await request('POST', apiEndpoint, {
+            voteType: direction
+        });
+
+        if (!result || result.error) {
+            setVoteState(voteState);
+            setVoteCount(voteCount);
+        }
+
+        // Update local state
+        setVoteCount(prev => prev + delta);
+        setVoteState(newVoteState);
     };
 
     // Calculate the vote delta (change in amount of votes) based on the old and new vote states
+    // From NONE to UP, returns 1
+    // From UP to DOWN, returns -2
+    // From DOWN to NONE, returns 1
+    // From NONE to DOWN, returns -1
+    // From DOWN to UP, returns 2
+    // Same vote, returns 0
     const calculateVoteDelta = (oldVote: VoteDirection, newVote: VoteDirection) => {
-        if (oldVote === newVote) return 0;
-        if (newVote === VoteDirection.NONE) return oldVote === VoteDirection.UP ? -1 : 1;
-        if (oldVote === VoteDirection.NONE) return newVote === VoteDirection.UP ? 1 : -1;
-        return newVote === VoteDirection.UP ? 2 : -2;
+        return newVote - oldVote;
     };
 
     return (

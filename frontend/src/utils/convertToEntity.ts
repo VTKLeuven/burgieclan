@@ -1,4 +1,19 @@
-import { type Announcement, type CommentCategory, type Course, type CourseComment, type Document, type DocumentComment, type DocumentView, type Module, type Page, type Program, type QuickLink, type Tag, type User } from '@/types/entities';
+import {
+    type Announcement,
+    type CommentCategory,
+    type Course,
+    type CourseComment,
+    type Document,
+    type DocumentComment,
+    type DocumentView,
+    type Module,
+    type Page,
+    type Program,
+    type QuickLink,
+    type Tag,
+    type User,
+    type VoteSummary
+} from '@/types/entities';
 
 export function convertToUser(user: any): User {
     if (typeof user === 'string') {
@@ -188,6 +203,15 @@ export function convertToDocumentView(documentView: any): DocumentView {
         id: parseId(documentView['@id']),
         document: documentView.document ? convertToDocument(documentView.document) : undefined,
         lastViewed: documentView.lastViewed ? new Date(documentView.lastViewed) : undefined,
+    };
+}
+
+export function convertToVoteSummary(voteSummary: any): VoteSummary {
+    return {
+        upvotes: voteSummary.upvotes,
+        downvotes: voteSummary.downvotes,
+        sum: voteSummary.sum,
+        currentUserVote: voteSummary.currentUserVote
     };
 }
 
