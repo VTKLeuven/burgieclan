@@ -3,43 +3,64 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Controller\Api\CreateVoteController;
+use App\Controller\Api\DeleteVoteController;
 use App\Entity\DocumentCommentVote;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     shortName: 'Document Comment Vote',
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Patch(
-        // This redirects the security check to all voters to see if one accepts DocumentCommentVoteApi objects
-        // This is handled by the src/Security/Voter/AbstractVoteVoter
-            security: 'is_granted("EDIT", object)'
+        new Post(
+            uriTemplate: '/document-comments/{id}/votes',
+            controller: CreateVoteController::class,
+            security: 'is_granted("ROLE_USER")',
+            openapiContext: [
+                'summary' => 'Create or update a vote on a document comment',
+                'parameters' => [
+                    [
+                        'name' => 'id',
+                        'in' => 'path',
+                        'required' => true,
+                        'schema' => ['type' => 'integer'],
+                        'description' => 'Document Comment ID'
+                    ]
+                ]
+            ]
         ),
-        new Post(),
         new Delete(
-        // This redirects the security check to all voters to see if one accepts DocumentCommentVoteApi objects
-        // This is handled by the src/Security/Voter/AbstractVoteVoter
-            security: 'is_granted("DELETE", object)'
+            uriTemplate: '/document-comments/{id}/votes',
+            controller: DeleteVoteController::class,
+            security: 'is_granted("ROLE_USER")',
+            openapiContext: [
+                'summary' => 'Remove vote from a document comment',
+                'parameters' => [
+                    [
+                        'name' => 'id',
+                        'in' => 'path',
+                        'required' => true,
+                        'schema' => ['type' => 'integer'],
+                        'description' => 'Document Comment ID'
+                    ]
+                ]
+            ]
         ),
     ],
+    normalizationContext: ['groups' => ['vote:read']],
+    denormalizationContext: ['groups' => ['vote:write']],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: DocumentCommentVote::class),
 )]
 class DocumentCommentVoteApi extends AbstractVoteApi
 {
-    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
-    #[Assert\NotNull]
+    #[ApiProperty(writable: false)]
+    #[Groups(['vote:read'])]
     public ?DocumentCommentApi $documentComment = null;
 }
