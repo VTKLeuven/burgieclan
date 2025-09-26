@@ -6,6 +6,8 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use App\Controller\Api\GetVoteSummaryController;
+use App\Entity\AbstractVote;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'Vote Summary',
@@ -65,9 +67,6 @@ use App\Controller\Api\GetVoteSummaryController;
 )]
 class VoteSummaryApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[ApiProperty(description: 'Number of upvotes')]
     public int $upvotes = 0;
 
@@ -76,4 +75,11 @@ class VoteSummaryApi
 
     #[ApiProperty(description: 'Vote score (upvotes - downvotes)')]
     public int $sum = 0;
+
+    #[ApiProperty(description: 'Current user vote')]
+    #[Assert\Choice(
+        choices: [AbstractVote::UPVOTE, AbstractVote::DOWNVOTE],
+        message: 'Vote type must be either UPVOTE (1) or DOWNVOTE (-1).'
+    )]
+    public int $currentUserVote = 0;
 }

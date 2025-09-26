@@ -43,6 +43,7 @@ class GetVoteSummaryController extends AbstractController
         $voteSummary->upvotes = $entity->getUpvoteCount();
         $voteSummary->downvotes = $entity->getDownvoteCount();
         $voteSummary->sum = $entity->getVoteScore();
+        $voteSummary->currentUserVote = $entity->getUserVote($this->getUser())?->getVoteType() ?? 0;
 
         return $voteSummary;
     }
