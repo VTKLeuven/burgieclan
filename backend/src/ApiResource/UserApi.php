@@ -9,8 +9,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
 use App\Controller\Api\AddFavoriteToUserController;
 use App\Controller\Api\RemoveFavoriteFromUserController;
-use App\Controller\Api\AddVoteToUserController;
-use App\Controller\Api\RemoveVoteFromUserController;
 use App\Entity\User;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
@@ -49,29 +47,6 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
     ],
     security: 'is_granted("VIEW_FAVORITES", object)',
-    provider: EntityClassDtoStateProvider::class,
-    processor: EntityClassDtoStateProcessor::class,
-    stateOptions: new Options(entityClass: User::class),
-)]
-#[ApiResource(
-    shortName: 'User Votes',
-    operations: [
-        new Get(
-            uriTemplate: 'users/{id}/votes',
-            normalizationContext: ['groups' => ['user:votes']],
-        ),
-        new Patch(
-            uriTemplate: 'users/{id}/votes/add',
-            controller: AddVoteToUserController::class,
-            normalizationContext: ['groups' => ['user:votes']],
-        ),
-        new Patch(
-            uriTemplate: 'users/{id}/votes/remove',
-            controller: RemoveVoteFromUserController::class,
-            normalizationContext: ['groups' => ['user:votes']],
-        ),
-    ],
-    security: 'is_granted("VIEW_VOTES", object)',
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: User::class),
@@ -131,25 +106,4 @@ class UserApi
     // object === null is needed to circumvent a specific bug.
     // It is explained more in https://symfonycasts.com/screencast/api-platform-extending/patch-field-security#the-apiproperty-security-option-on-patch-operations
     public ?bool $defaultAnonymous = null;
-
-    /**
-     * @var DocumentVoteApi[]
-     */
-    #[Groups(['user', 'user:votes'])]
-    #[ApiProperty(security: 'is_granted("VIEW_VOTES", object)')]
-    public array $documentVotes = [];
-
-    /**
-     * @var DocumentCommentVoteApi[]
-     */
-    #[Groups(['user', 'user:votes'])]
-    #[ApiProperty(security: 'is_granted("VIEW_VOTES", object)')]
-    public array $documentCommentVotes = [];
-
-    /**
-     * @var CourseCommentVoteApi[]
-     */
-    #[Groups(['user', 'user:votes'])]
-    #[ApiProperty(security: 'is_granted("VIEW_VOTES", object)')]
-    public array $courseCommentVotes = [];
 }
