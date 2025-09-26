@@ -6,7 +6,7 @@ import UnderReviewBox from "@/components/document/UnderReviewBox";
 import ErrorPage from "@/components/error/ErrorPage";
 import LoadingPage from "@/components/loading/LoadingPage";
 import DownloadSingleDocumentButton from "@/components/ui/buttons/DownloadSingleDocumentButton";
-import VoteButton, { VoteDirection } from "@/components/ui/buttons/VoteButton";
+import VoteButton from "@/components/ui/buttons/VoteButton";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import { useUser } from "@/components/UserContext";
 import { logDocumentView } from "@/hooks/logDocumentView";
@@ -114,9 +114,9 @@ export default function DocumentPreview({ id }: { id: string }) {
             <div className="flex flex-row space-x-4 w-full justify-center">
                 <div style={{ width: containerWidth }} className="py-5">
                     <div className="flex flex-row h-8 justify-between place-items-center">
-                        <VoteButton /* TODO: implement voting functionality */
-                            initialVotes={10}
-                            initialVote={VoteDirection.UP}
+                        <VoteButton
+                            type="document"
+                            objectId={Number(id)}
                             disabled={!user}
                             className="border-gray-500"
                         />

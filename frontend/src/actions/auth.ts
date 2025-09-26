@@ -185,7 +185,7 @@ export const logOut = async (): Promise<{ success: boolean; error?: string }> =>
             const response = await fetch(`${backendBaseUrl}/api/auth/logout`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/ld+json',
                     'Authorization': `Bearer ${jwt}`
                 },
                 body: JSON.stringify({
