@@ -91,10 +91,6 @@ export interface Page extends BaseEntity {
     isPublic?: boolean;
 }
 
-export interface Breadcrumb extends BaseEntity {
-    breadcrumb: string[];
-}
-
 export interface QuickLink extends BaseEntity {
     name?: string;
     linkTo: string;
