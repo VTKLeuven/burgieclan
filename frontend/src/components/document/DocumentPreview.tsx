@@ -7,6 +7,7 @@ import ErrorPage from "@/components/error/ErrorPage";
 import LoadingPage from "@/components/loading/LoadingPage";
 import DownloadSingleDocumentButton from "@/components/ui/buttons/DownloadSingleDocumentButton";
 import VoteButton from "@/components/ui/buttons/VoteButton";
+import DynamicBreadcrumb from "@/components/ui/DynamicBreadcrumb";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import { useUser } from "@/components/UserContext";
 import { logDocumentView } from "@/hooks/logDocumentView";
@@ -78,6 +79,15 @@ export default function DocumentPreview({ id }: { id: string }) {
 
     return (document &&
         <div className="p-8 flex-auto text-sm w-full">
+            {/* Breadcrumb */}
+            <div className="mb-2">
+                <DynamicBreadcrumb
+                    course={document.course}
+                    category={document.category}
+                    document={document}
+                />
+            </div>
+
             {/* Filename */}
             <span className="inline-flex items-center space-x-4">
                 <File />
