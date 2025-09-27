@@ -32,12 +32,13 @@ export default function DocumentPreview({ id }: { id: string }) {
     const { user } = useUser();
     const { request, loading, error } = useApi();
     const { t } = useTranslation();
-
+    const { i18n } = useTranslation();
+    const currentLocale = i18n.language;
     const MAXWIDTH = 1000;
 
     useEffect(() => {
         const fetchDocumentData = async () => {
-            const documentData = await request('GET', `/api/documents/${id}`);
+            const documentData = await request('GET', `/api/documents/${id}?lang=${currentLocale}`);
             if (!documentData) {
                 return null;
             }
@@ -45,7 +46,7 @@ export default function DocumentPreview({ id }: { id: string }) {
         };
 
         fetchDocumentData();
-    }, [id, request]);
+    }, [id, request, currentLocale]);
 
     useEffect(() => {
         logDocumentView(id);

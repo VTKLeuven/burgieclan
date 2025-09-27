@@ -6,6 +6,7 @@ import { useApi } from '@/hooks/useApi';
 import type { Course, DocumentCategory } from '@/types/entities';
 import { convertToCourse, convertToDocumentCategory } from '@/utils/convertToEntity';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface CourseDocumentsContentProps {
     courseId: number;
@@ -16,6 +17,8 @@ export default function CourseDocumentsContent({ courseId, categoryId }: CourseD
     const [course, setCourse] = useState<Course | null>(null);
     const [category, setCategory] = useState<DocumentCategory | null>(null);
     const { request } = useApi();
+    const { i18n } = useTranslation();
+    const currentLocale = i18n.language;
 
     useEffect(() => {
         async function getCourse() {
@@ -34,7 +37,7 @@ export default function CourseDocumentsContent({ courseId, categoryId }: CourseD
 
     useEffect(() => {
         async function getCategory() {
-            const categoryData = await request('GET', `/api/document_categories/${categoryId}`);
+            const categoryData = await request('GET', `/api/document_categories/${categoryId}?lang=${currentLocale}`);
 
             if (!categoryData) {
                 return null;
@@ -45,7 +48,7 @@ export default function CourseDocumentsContent({ courseId, categoryId }: CourseD
         }
 
         getCategory();
-    }, [categoryId, request]);
+    }, [categoryId, request, currentLocale]);
 
     useEffect(() => {
         if (course?.name && category?.name) {
