@@ -34,26 +34,24 @@ export default function DynamicBreadcrumb({ course, category, document }: Dynami
     breadcrumbItems.push({
         label: t('courses'),
         href: '/courses',
-        isCurrentPage: false
+        isCurrentPage: !course && !category && !document
     });
 
     // Add Course if available
     if (course) {
-        const isCoursePage = !category && !document;
         breadcrumbItems.push({
             label: course.name || `Course ${course.id}`,
             href: `/course/${course.id}`,
-            isCurrentPage: isCoursePage
+            isCurrentPage: !category && !document
         });
     }
 
     // Add Category if available
     if (category && course) {
-        const isCategoryPage = !document;
         breadcrumbItems.push({
             label: category.name || `Category ${category.id}`,
             href: `/course/${course.id}/documents/category/${category.id}`,
-            isCurrentPage: isCategoryPage
+            isCurrentPage: !document
         });
     }
 
