@@ -135,7 +135,7 @@ const NavigationSidebar = () => {
         </nav>
 
         {/* Add Document Button */}
-        <CreateDocumentButton />
+        <CreateDocumentButton className='mx-2 my-2' />
 
         {/* User Profile - Fixed at Bottom */}
         <div className="border-t border-gray-200 flex-shrink-0">
