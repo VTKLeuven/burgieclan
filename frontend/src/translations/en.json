@@ -45,6 +45,9 @@
             "payload_too_large": "The file size exceeds the {{size}}MB limit. Please compress your file or upload a smaller one.",
             "rate_limit": "Too many upload attempts. Please wait a moment before trying again."
         },
+        "button": {
+            "create_document": "Create document"
+        },
         "dialog": {
             "title": "Upload document",
             "description": "Upload your awesome document here. You can upload a PDF, Word, or Markdown file. We will check if it follows the guidelines. Thanks for sharing your knowledge with the world!",
