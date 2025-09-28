@@ -19,7 +19,6 @@ import { useTranslation } from 'react-i18next';
 interface FormProps {
     onSubmit: (data: UploadFormData) => Promise<void>;
     isLoading?: boolean;
-    isOpen: boolean;
     initialFile: File | null;
     initialData?: {
         course?: Course;
@@ -30,7 +29,6 @@ interface FormProps {
 export default function UploadForm({
     onSubmit,
     isLoading = false,
-    isOpen,
     initialFile,
     initialData,
 }: FormProps) {
@@ -55,7 +53,7 @@ export default function UploadForm({
         }
     });
 
-    const { courses, categories, isLoading: isLoadingFields, error } = useFormFields(isOpen);
+    const { courses, categories, isLoading: isLoadingFields, error } = useFormFields();
     const yearOptions = useYearOptions();
 
     // Watch the file and name fields

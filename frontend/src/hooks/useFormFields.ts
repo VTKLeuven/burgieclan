@@ -4,7 +4,7 @@ import { convertToCommentCategory, convertToCourse } from '@/utils/convertToEnti
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const useFormFields = (isOpen: boolean) => {
+export const useFormFields = () => {
     const [courses, setCourses] = useState<Course[]>([]);
     const [categories, setCategories] = useState<CommentCategory[]>([]);
     const [isLoading, setIsLoading] = useState(false);
