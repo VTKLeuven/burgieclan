@@ -45,13 +45,11 @@ class LitusOAuthCallbackController extends AbstractController
         } catch (ParameterNotFoundException $e) {
             $this->logger->critical("Frontend URL parameter not configured", [
                 'exception' => $e,
-                'session_id' => $request->getSession()->getId()
             ]);
             throw new Exception('Frontend URL configuration missing. Please configure app.frontend_url parameter.');
         } catch (Exception $e) {
             $this->logger->critical("Invalid frontend URL configuration", [
                 'exception' => $e,
-                'session_id' => $request->getSession()->getId()
             ]);
             throw new Exception('Invalid frontend URL configuration: ' . $e->getMessage());
         }
@@ -60,7 +58,6 @@ class LitusOAuthCallbackController extends AbstractController
         if ($error) {
             $this->logger->error("OAuth error received", [
                 'oauth_error' => $error,
-                'session_id' => $request->getSession()->getId()
             ]);
             return new RedirectResponse(
                 "{$frontendUrl}/auth/callback?error=oauth_failed"
@@ -68,12 +65,11 @@ class LitusOAuthCallbackController extends AbstractController
         }
 
         // Verify state parameter
-        $sessionState = $request->getSession()->get('oauth_state');
+        $sessionState = $request->cookies->get('x-oauth-state');
         if ($state !== $sessionState) {
             $this->logger->error("OAuth state mismatch", [
                 'expected_state' => $sessionState,
                 'received_state' => $state,
-                'session_id' => $request->getSession()->getId()
             ]);
             return new RedirectResponse(
                 "{$frontendUrl}/auth/callback?error=invalid_state"
@@ -114,12 +110,7 @@ class LitusOAuthCallbackController extends AbstractController
             $refreshTokenExpiration = $refreshToken->getValid()->getTimestamp();
 
             // Get frontend redirect URL
-            $frontendRedirectTo = $request->getSession()->get('frontend_redirect_to', '/');
-
-            // Clean up session
-            $request->getSession()->remove('oauth_state');
-            $request->getSession()->remove('oauth2state');
-            $request->getSession()->remove('frontend_redirect_to');
+            $frontendRedirectTo = $request->cookies->get('x-frontend-redirect-to', '/');
 
             // Redirect to frontend with all tokens and expiration
             return new RedirectResponse(
@@ -132,7 +123,6 @@ class LitusOAuthCallbackController extends AbstractController
             $this->logger->error("Litus OAuth callback error", [
                 'exception' => $e,
                 'oauth_state' => $state,
-                'session_id' => $request->getSession()->getId()
             ]);
             
             return new RedirectResponse(
