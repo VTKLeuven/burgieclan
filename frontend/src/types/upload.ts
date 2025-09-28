@@ -1,7 +1,7 @@
 export interface UploadFormData {
     name: string;
-    course: string;
-    category: string;
+    course: number;
+    category: number;
     year: string;
     anonymous: boolean;
     file: any;

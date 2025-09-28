@@ -6,6 +6,7 @@ import UploadTagFilter from '@/components/upload/UploadTagFilter';
 import { useUser } from '@/components/UserContext';
 import { useFormFields } from '@/hooks/useFormFields';
 import { useYearOptions } from '@/hooks/useYearOptions';
+import { Course, DocumentCategory } from '@/types/entities';
 import { UploadFormData } from '@/types/upload';
 import { VISIBLE_YEARS } from "@/utils/constants/upload";
 import { getSuggestedNameFromFilename } from '@/utils/documentNameSuggestion';
@@ -20,6 +21,10 @@ interface FormProps {
     isLoading?: boolean;
     isOpen: boolean;
     initialFile: File | null;
+    initialData?: {
+        course?: Course;
+        category?: DocumentCategory;
+    };
 }
 
 export default function UploadForm({
@@ -27,6 +32,7 @@ export default function UploadForm({
     isLoading = false,
     isOpen,
     initialFile,
+    initialData,
 }: FormProps) {
     const { t } = useTranslation();
     const { user } = useUser();
@@ -71,6 +77,25 @@ export default function UploadForm({
         }
     }, [watchedFile, watchedName, setValue]);
 
+    // Set initial form values when initialData is provided and form fields are loaded
+    useEffect(() => {
+        if (initialData && initialData.course && initialData.course.id && courses.length > 0) {
+            const initialId = initialData.course.id;
+            if (courses.find(course => course.id === initialId)) {
+                setValue('course', initialData.course.id, { shouldValidate: true });
+            }
+        }
+    }, [initialData, courses, setValue]);
+
+    useEffect(() => {
+        if (initialData && initialData.category && initialData.category.id && categories.length > 0) {
+            const initialId = initialData.category.id;
+            if (categories.find(category => category.id === initialId)) {
+                setValue('category', initialData.category.id, { shouldValidate: true });
+            }
+        }
+    }, [initialData, categories, setValue]);
+
     // Update form values when tags change
     useEffect(() => {
         setValue('tagIds', selectedTagIds);
@@ -98,7 +123,7 @@ export default function UploadForm({
                         placeholder={t('upload.form.name.placeholder')}
                         name="name"
                         registration={register('name')}
-                        disabled={isLoading || isLoadingFields}
+                        disabled={isLoading}
                     />
                 </div>
 
@@ -122,7 +147,7 @@ export default function UploadForm({
                         error={errors.year}
                         name="year"
                         control={control}
-                        disabled={isLoading || isLoadingFields}
+                        disabled={isLoading}
                         visibleOptions={VISIBLE_YEARS}
                     />
                 </div>
@@ -164,7 +189,7 @@ export default function UploadForm({
                     <Checkbox
                         label={t('upload.form.anonymous.label')}
                         {...register('anonymous')}
-                        disabled={isLoading || isLoadingFields}
+                        disabled={isLoading}
                         className="justify-end"
                     />
                 </div>
