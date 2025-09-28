@@ -61,7 +61,6 @@ const UploadDialog = ({
                 <UploadForm
                     onSubmit={handleSubmit}
                     isLoading={isLoading}
-                    isOpen={isOpen}
                     initialFile={initialFile}
                     initialData={initialData}
                 />
