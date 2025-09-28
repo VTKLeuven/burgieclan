@@ -1,22 +1,22 @@
-import { useState, useEffect, useCallback } from 'react';
-import type { CommentCategory, Course } from '@/types/entities';
 import { useApi } from '@/hooks/useApi';
-import { useTranslation } from 'react-i18next';
+import type { CommentCategory, Course } from '@/types/entities';
 import { convertToCommentCategory, convertToCourse } from '@/utils/convertToEntity';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const useFormFields = (isOpen: boolean) => {
     const [courses, setCourses] = useState<Course[]>([]);
     const [categories, setCategories] = useState<CommentCategory[]>([]);
-    const [shouldShowLoading, setShouldShowLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { t } = useTranslation();
-    const { request, loading: isLoading } = useApi();
+    const { request } = useApi();
 
     const fetchData = useCallback(async () => {
         try {
             const [courseResponse, categoryResponse] = await Promise.all([
-                request('GET', `/api/courses`),
-                request('GET', `/api/document_categories`)
+                request('GET', `/api/courses?pagination=false`),
+                request('GET', `/api/document_categories?pagination=false`)
             ]);
 
             if (!courseResponse || courseResponse.error) {
@@ -28,45 +28,29 @@ export const useFormFields = (isOpen: boolean) => {
             }
 
             setCourses(courseResponse['hydra:member']?.map(convertToCourse) || []);
-
             setCategories(categoryResponse['hydra:member']?.map(convertToCommentCategory) || []);
         } catch (err) {
             setError(t('form.errors.fetch_failed'));
             console.error('Failed to fetch form data:', err);
         } finally {
-            setShouldShowLoading(false);
+            setIsLoading(false);
         }
     }, [t, request]);
 
     useEffect(() => {
-        if (!isOpen) {
-            setShouldShowLoading(false);
-            return;
-        }
-
-        let loadingTimeout: NodeJS.Timeout;
-
         const initiateFetch = async () => {
-            // Only show loading state if it takes longer than 400ms
-            loadingTimeout = setTimeout(() => {
-                setShouldShowLoading(true);
-            }, 400);
-
+            setIsLoading(true);
             await fetchData();
+            await new Promise(resolve => setTimeout(resolve, 4000));
+            setIsLoading(false);
         };
-
         initiateFetch();
-
-        return () => {
-            clearTimeout(loadingTimeout);
-            setShouldShowLoading(false);
-        };
-    }, [isOpen, fetchData]);
+    }, [fetchData]);
 
     return {
         courses,
         categories,
-        isLoading: shouldShowLoading && isLoading, // Only expose the delayed loading state
+        isLoading,
         error
     };
 };

@@ -1,23 +1,29 @@
-import { useCallback } from 'react';
 import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog';
-import UploadForm from '@/components/upload/UploadForm';
 import { Text } from '@/components/ui/Text';
-import { Send } from 'lucide-react';
-import { useDocumentUpload } from '@/hooks/useDocumentUpload';
-import { UploadFormData } from '@/types/upload';
 import { useToast } from '@/components/ui/Toast';
+import UploadForm from '@/components/upload/UploadForm';
+import { useDocumentUpload } from '@/hooks/useDocumentUpload';
+import { Course, DocumentCategory } from '@/types/entities';
+import { UploadFormData } from '@/types/upload';
+import { Send } from 'lucide-react';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface UploadDialogProps {
     isOpen: boolean;
     onClose: () => void;
     initialFile: File | null;
+    initialData?: {
+        course?: Course;
+        category?: DocumentCategory;
+    };
 }
 
 const UploadDialog = ({
     isOpen,
     onClose,
-    initialFile
+    initialFile,
+    initialData
 }: UploadDialogProps) => {
     const { uploadDocument, isLoading, status, resetStatus } = useDocumentUpload();
     const { showToast } = useToast();
@@ -57,6 +63,7 @@ const UploadDialog = ({
                     isLoading={isLoading}
                     isOpen={isOpen}
                     initialFile={initialFile}
+                    initialData={initialData}
                 />
             </DialogBody>
             <DialogActions className="!mt-0"> {/* !mt-0 removes the top margin */}

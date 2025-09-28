@@ -14,11 +14,11 @@ export const documentSchema = (t: any) => yup.object().shape({
         .max(100, t('upload.form.validation.name.max', { max: 100 })),
 
     course: yup
-        .string()
+        .number()
         .required(t('upload.form.validation.course.required')),
 
     category: yup
-        .string()
+        .number()
         .required(t('upload.form.validation.category.required')),
 
     year: yup
