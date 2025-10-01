@@ -48,6 +48,45 @@ final class UserDocumentViewFactory extends PersistentProxyObjectFactory
     }
 
     /**
+     * Generate a sequence of unique user-document combinations
+     */
+    public static function createUniqueSequence(int $count): array
+    {
+        $users = UserFactory::all();
+        $documents = DocumentFactory::all();
+
+        $maxPossibleCombinations = count($users) * count($documents);
+
+        if ($count > $maxPossibleCombinations) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Cannot create %d unique UserDocumentView combinations. Maximum possible is %d (users: %d × documents: %d)',
+                    $count,
+                    $maxPossibleCombinations,
+                    count($users),
+                    count($documents)
+                )
+            );
+        }
+
+        // Generate all possible unique combinations
+        $combinations = [];
+        foreach ($users as $user) {
+            foreach ($documents as $document) {
+                $combinations[] = [
+                    'user' => $user,
+                    'document' => $document,
+                    'lastViewed' => self::faker()->dateTimeBetween('-1 month'),
+                ];
+            }
+        }
+
+        // Shuffle to randomize and take only the requested count
+        shuffle($combinations);
+        return array_slice($combinations, 0, $count);
+    }
+
+    /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
     protected function initialize(): static
