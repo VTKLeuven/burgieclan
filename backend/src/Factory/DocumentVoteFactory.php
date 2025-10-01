@@ -11,13 +11,14 @@
 
 namespace App\Factory;
 
-use App\Entity\UserDocumentView;
+use App\Entity\AbstractVote;
+use App\Entity\DocumentVote;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<UserDocumentView>
+ * @extends PersistentProxyObjectFactory<DocumentVote>
  */
-final class UserDocumentViewFactory extends PersistentProxyObjectFactory
+final class DocumentVoteFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -30,7 +31,7 @@ final class UserDocumentViewFactory extends PersistentProxyObjectFactory
 
     public static function class(): string
     {
-        return UserDocumentView::class;
+        return DocumentVote::class;
     }
 
     /**
@@ -41,14 +42,14 @@ final class UserDocumentViewFactory extends PersistentProxyObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'user' => UserFactory::randomOrCreate(),
+            'creator' => UserFactory::randomOrCreate(),
             'document' => DocumentFactory::randomOrCreate(),
-            'lastViewed' => self::faker()->dateTimeBetween('-1 month'),
+            'voteType' => self::faker()->randomElement([AbstractVote::UPVOTE, AbstractVote::DOWNVOTE]),
         ];
     }
 
     /**
-     * Generate a sequence of unique user-document combinations
+     * Generate a sequence of unique creator-document combinations
      */
     public static function createUniqueSequence(int $count): array
     {
@@ -60,7 +61,7 @@ final class UserDocumentViewFactory extends PersistentProxyObjectFactory
         if ($count > $maxPossibleCombinations) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'Cannot create %d unique UserDocumentView combinations. Maximum possible is %d (users: %d × documents: %d)',
+                    'Cannot create %d unique DocumentVote combinations. Maximum possible is %d (users: %d × documents: %d)',
                     $count,
                     $maxPossibleCombinations,
                     count($users),
@@ -74,9 +75,9 @@ final class UserDocumentViewFactory extends PersistentProxyObjectFactory
         foreach ($users as $user) {
             foreach ($documents as $document) {
                 $combinations[] = [
-                    'user' => $user,
+                    'creator' => $user,
                     'document' => $document,
-                    'lastViewed' => self::faker()->dateTimeBetween('-1 month'),
+                    'voteType' => self::faker()->randomElement([AbstractVote::UPVOTE, AbstractVote::DOWNVOTE]),
                 ];
             }
         }
@@ -92,7 +93,7 @@ final class UserDocumentViewFactory extends PersistentProxyObjectFactory
     protected function initialize(): static
     {
         return $this
-            // ->afterInstantiate(function(UserDocumentView $userDocumentView): void {})
+            // ->afterInstantiate(function(DocumentVote $documentVote): void {})
         ;
     }
 }

@@ -1,3 +1,4 @@
+import { VoteDirection } from "@/components/ui/buttons/VoteButton";
 interface BaseEntity {
     id: number;
 }
@@ -115,4 +116,11 @@ export interface Announcement extends NodeEntity {
 export interface DocumentView extends BaseEntity {
     document?: Document;
     lastViewed?: Date;
+}
+
+export interface VoteSummary {
+    upvotes: number;
+    downvotes: number;
+    sum: number;
+    currentUserVote: VoteDirection;
 }
