@@ -20,8 +20,22 @@ use Symfony\Component\Serializer\Attribute\Groups;
                         'in'          => 'query',
                         'description' => 'Searchtext',
                         'required'    => false,
-                        'type'        => 'string',
-                        'default'     => '',
+                        'schema'      => [
+                            'type' => 'string',
+                            'default'     => '',
+                        ],                        
+                    ],
+                    [
+                        'name'        => 'entities',
+                        'in'          => 'query',
+                        'description' => 'Entities to search',
+                        'required'    => false,
+                        'schema'      => [
+                            'type'      => 'array',
+                            'default'   => ['courses', 'modules', 'programs', 'documents'], 
+                            // This only supports clients with docs that this is the default, 
+                            // it does not change runtime behavior
+                        ],
                     ],
                 ],
             ],

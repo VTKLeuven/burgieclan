@@ -68,7 +68,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
                                 onChange={(e) => setQuery(e.target.value)}
                                 onBlur={onBlur}
                                 displayValue={(option: Option | null) => option?.name || ''}
-                                placeholder={placeholder || `${t('select')} ${name}`}
+                                placeholder={placeholder || `${t('select_')} ${name}`}
                                 autoComplete="off"
                             />
                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
