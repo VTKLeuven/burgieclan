@@ -1,11 +1,12 @@
-import Link from 'next/link';
-import { Tag as TagIcon } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
-import { useTranslation } from 'react-i18next';
-import type { Document } from '@/types/entities';
 import { Checkbox } from '@/components/ui/Checkbox';
-import FavoriteButton from '@/components/ui/FavoriteButton';
 import DownloadButton from '@/components/ui/DownloadButton';
+import FavoriteButton from '@/components/ui/FavoriteButton';
+import VoteButton from '@/components/ui/buttons/VoteButton';
+import type { Document } from '@/types/entities';
+import { Tag as TagIcon } from 'lucide-react';
+import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 interface DocumentListItemProps {
     document: Document;
@@ -72,6 +73,10 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                 )}
 
                 <div className="flex items-center space-x-4">
+                    <VoteButton
+                        type="document"
+                        objectId={document.id}
+                    />
                     <FavoriteButton
                         itemId={document.id}
                         itemType="document"

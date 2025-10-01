@@ -11,13 +11,14 @@
 
 namespace App\Factory;
 
-use App\Entity\UserDocumentView;
+use App\Entity\AbstractVote;
+use App\Entity\CourseCommentVote;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<UserDocumentView>
+ * @extends PersistentProxyObjectFactory<CourseCommentVote>
  */
-final class UserDocumentViewFactory extends PersistentProxyObjectFactory
+final class CourseCommentVoteFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -30,7 +31,7 @@ final class UserDocumentViewFactory extends PersistentProxyObjectFactory
 
     public static function class(): string
     {
-        return UserDocumentView::class;
+        return CourseCommentVote::class;
     }
 
     /**
@@ -41,30 +42,30 @@ final class UserDocumentViewFactory extends PersistentProxyObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'user' => UserFactory::randomOrCreate(),
-            'document' => DocumentFactory::randomOrCreate(),
-            'lastViewed' => self::faker()->dateTimeBetween('-1 month'),
+            'courseComment' => CourseCommentFactory::randomOrCreate(),
+            'creator' => UserFactory::randomOrCreate(),
+            'voteType' => self::faker()->randomElement([AbstractVote::UPVOTE, AbstractVote::DOWNVOTE]),
         ];
     }
 
     /**
-     * Generate a sequence of unique user-document combinations
+     * Generate a sequence of unique creator-courseComment combinations
      */
     public static function createUniqueSequence(int $count): array
     {
         $users = UserFactory::all();
-        $documents = DocumentFactory::all();
+        $courseComments = CourseCommentFactory::all();
 
-        $maxPossibleCombinations = count($users) * count($documents);
+        $maxPossibleCombinations = count($users) * count($courseComments);
 
         if ($count > $maxPossibleCombinations) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'Cannot create %d unique UserDocumentView combinations. Maximum possible is %d (users: %d × documents: %d)',
+                    'Cannot create %d unique CourseCommentVote combinations. Maximum possible is %d (users: %d × courseComments: %d)',
                     $count,
                     $maxPossibleCombinations,
                     count($users),
-                    count($documents)
+                    count($courseComments)
                 )
             );
         }
@@ -72,11 +73,11 @@ final class UserDocumentViewFactory extends PersistentProxyObjectFactory
         // Generate all possible unique combinations
         $combinations = [];
         foreach ($users as $user) {
-            foreach ($documents as $document) {
+            foreach ($courseComments as $courseComment) {
                 $combinations[] = [
-                    'user' => $user,
-                    'document' => $document,
-                    'lastViewed' => self::faker()->dateTimeBetween('-1 month'),
+                    'creator' => $user,
+                    'courseComment' => $courseComment,
+                    'voteType' => self::faker()->randomElement([AbstractVote::UPVOTE, AbstractVote::DOWNVOTE]),
                 ];
             }
         }
@@ -92,7 +93,7 @@ final class UserDocumentViewFactory extends PersistentProxyObjectFactory
     protected function initialize(): static
     {
         return $this
-            // ->afterInstantiate(function(UserDocumentView $userDocumentView): void {})
+            // ->afterInstantiate(function(CourseCommentVote $courseCommentVote): void {})
         ;
     }
 }

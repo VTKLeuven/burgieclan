@@ -16,6 +16,7 @@ class UserVoter extends Voter
     public const VIEW_FAVORITES = 'VIEW_FAVORITES';
     public const VIEW_USER_DEFAULT_ANONYMOUS = 'VIEW_USER_DEFAULT_ANONYMOUS';
     public const PATCH_USER = 'PATCH_USER';
+    public const VIEW_VOTES = 'VIEW_VOTES';
 
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
@@ -32,7 +33,8 @@ class UserVoter extends Voter
                 self::VIEW_EMAIL,
                 self::VIEW_FAVORITES,
                 self::VIEW_USER_DEFAULT_ANONYMOUS,
-                self::PATCH_USER
+                self::PATCH_USER,
+                self::VIEW_VOTES,
             ])
             && $subject instanceof UserApi;
     }
@@ -51,6 +53,7 @@ class UserVoter extends Voter
             case self::PATCH_USER:
             case self::VIEW_USER_DEFAULT_ANONYMOUS:
             case self::VIEW_FAVORITES:
+            case self::VIEW_VOTES:
             case self::VIEW_EMAIL:
             case self::VIEW_USERNAME:
                 // True if the current user is the same as the requested user

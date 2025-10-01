@@ -1,17 +1,7 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace App\Entity;
 
-use App\Factory\UserFactory;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -22,16 +12,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * Defines the properties of the User entity to represent the application users.
- * See https://symfony.com/doc/current/doctrine.html#creating-an-entity-class.
- *
- * Tip: if you have an existing database, you can generate these entity class automatically.
- * See https://symfony.com/doc/current/doctrine/reverse_engineering.html
- *
- * @author Ryan Weaver <weaverryan@gmail.com>
- * @author Javier Eguiluz <javier.eguiluz@gmail.com>
- */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'user')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -122,6 +102,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserDocumentView::class)]
     private Collection $viewedDocuments;
 
+        /**
+     * @var Collection
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'creator',
+        targetEntity: DocumentVote::class,
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
+    private Collection $documentVotes;
+
+    /**
+     * @var Collection
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'creator',
+        targetEntity: DocumentCommentVote::class,
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
+    private Collection $documentCommentVotes;
+
+    /**
+     * @var Collection
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'creator',
+        targetEntity: CourseCommentVote::class,
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
+    private Collection $courseCommentVotes;
+
     public function __construct()
     {
         $this->favoritePrograms = new ArrayCollection();
@@ -129,6 +142,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->favoriteCourses = new ArrayCollection();
         $this->favoriteDocuments = new ArrayCollection();
         $this->viewedDocuments = new ArrayCollection();
+        $this->documentVotes = new ArrayCollection();
+        $this->documentCommentVotes = new ArrayCollection();
+        $this->courseCommentVotes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -403,6 +419,134 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->viewedDocuments->removeElement($viewedDocument)) {
             $this->viewedDocuments->removeElement($viewedDocument);
+        }
+
+        return $this;
+    }
+
+    public function getVotes(): Collection
+    {
+        $allVotes = new ArrayCollection();
+
+        foreach ($this->getDocumentVotes() as $vote) {
+            $allVotes->add($vote);
+        }
+
+        foreach ($this->getDocumentCommentVotes() as $vote) {
+            $allVotes->add($vote);
+        }
+
+        foreach ($this->getCourseCommentVotes() as $vote) {
+            $allVotes->add($vote);
+        }
+
+        return $allVotes;
+    }
+
+    public function addVote(AbstractVote $vote): self
+    {
+        switch (true) {
+            case $vote instanceof DocumentVote:
+                $this->addDocumentVote($vote);
+                break;
+            case $vote instanceof DocumentCommentVote:
+                $this->addDocumentCommentVote($vote);
+                break;
+            case $vote instanceof CourseCommentVote:
+                $this->addCourseCommentVote($vote);
+                break;
+        }
+
+        return $this;
+    }
+
+    public function removeVote(AbstractVote $vote): self
+    {
+        switch (true) {
+            case $vote instanceof DocumentVote:
+                $this->removeDocumentVote($vote);
+                break;
+            case $vote instanceof DocumentCommentVote:
+                $this->removeDocumentCommentVote($vote);
+                break;
+            case $vote instanceof CourseCommentVote:
+                $this->removeCourseCommentVote($vote);
+                break;
+        }
+
+        return $this;
+    }
+
+    public function getDocumentVotes(): Collection
+    {
+        return $this->documentVotes;
+    }
+
+    public function addDocumentVote(DocumentVote $documentVote): self
+    {
+        if (!$this->documentVotes->contains($documentVote)) {
+            $this->documentVotes->add($documentVote);
+
+            $documentVote->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDocumentVote(DocumentVote $documentVote): self
+    {
+        if ($this->documentVotes->contains($documentVote)) {
+            $this->documentVotes->removeElement($documentVote);
+        }
+
+        return $this;
+    }
+
+    public function getDocumentCommentVotes(): Collection
+    {
+        return $this->documentCommentVotes;
+    }
+
+    public function addDocumentCommentVote(DocumentCommentVote $documentCommentVote): self
+    {
+        if (!$this->documentCommentVotes->contains($documentCommentVote)) {
+            $this->documentCommentVotes->add($documentCommentVote);
+
+            $documentCommentVote->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDocumentCommentVote(DocumentCommentVote $documentCommentVote): self
+    {
+        if ($this->documentCommentVotes->contains($documentCommentVote)) {
+            $this->documentCommentVotes->removeElement($documentCommentVote);
+        }
+
+        return $this;
+    }
+
+    public function getCourseCommentVotes(): Collection
+    {
+        return $this->courseCommentVotes;
+    }
+
+    public function addCourseCommentVote(CourseCommentVote $courseCommentVote): self
+    {
+        if (!$this->courseCommentVotes->contains($courseCommentVote)) {
+            $this->courseCommentVotes->add($courseCommentVote);
+
+            $courseCommentVote->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCourseCommentVote(CourseCommentVote $courseCommentVote): self
+    {
+        if ($this->courseCommentVotes->contains($courseCommentVote)) {
+            $this->courseCommentVotes->removeElement($courseCommentVote);
         }
 
         return $this;

@@ -3,6 +3,7 @@ import CommentActions from '@/components/coursepage/comment/CommentActions';
 import CommentMetadata from '@/components/coursepage/comment/CommentMetadata';
 import CommentUserIcon from '@/components/coursepage/comment/CommentUserIcon';
 import { Checkbox } from '@/components/ui/Checkbox';
+import VoteButton from '@/components/ui/buttons/VoteButton';
 import { useDeleteComment } from '@/hooks/useDeleteComment';
 import { useUpdateComment } from '@/hooks/useUpdateComment';
 import { CourseComment } from '@/types/entities';
@@ -155,15 +156,31 @@ const CommentRow: React.FC<CommentRowProps> = ({
                 )}
             </div>
 
+            {/* Vote Button - Desktop only */}
+            <div className="hidden sm:flex items-center mr-3">
+                <VoteButton
+                    type="course_comment"
+                    objectId={comment.id}
+                    size="small"
+                    className="bg-white"
+                />
+            </div>
+
             {/* Metadata - Right side (desktop only) */}
             <div className="hidden sm:flex items-center">
                 <CommentMetadata comment={comment} />
             </div>
 
-            {/* Mobile: icon, metadata, actions in a row below comment */}
+            {/* Mobile: icon, metadata, vote, actions in a row below comment */}
             <div className="sm:hidden flex flex-row w-full mt-2 gap-2 items-center justify-end">
                 <CommentUserIcon anonymous={comment.anonymous ?? true} creatorName={comment.creator?.fullName} />
                 <CommentMetadata comment={comment} />
+                <VoteButton
+                    type="course_comment"
+                    objectId={comment.id}
+                    size="small"
+                    className="bg-white"
+                />
                 <CommentActions onEdit={handleEditClick} onDelete={handleDeleteComment} show={isOwnComment && !isEditing} isMobile />
             </div>
         </div>
