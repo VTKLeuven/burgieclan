@@ -49,6 +49,45 @@ final class DocumentCommentVoteFactory extends PersistentProxyObjectFactory
     }
 
     /**
+     * Generate a sequence of unique creator-documentComment combinations
+     */
+    public static function createUniqueSequence(int $count): array
+    {
+        $users = UserFactory::all();
+        $documentComments = DocumentCommentFactory::all();
+
+        $maxPossibleCombinations = count($users) * count($documentComments);
+
+        if ($count > $maxPossibleCombinations) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Cannot create %d unique DocumentCommentVote combinations. Maximum possible is %d (users: %d × documentComments: %d)',
+                    $count,
+                    $maxPossibleCombinations,
+                    count($users),
+                    count($documentComments)
+                )
+            );
+        }
+
+        // Generate all possible unique combinations
+        $combinations = [];
+        foreach ($users as $user) {
+            foreach ($documentComments as $documentComment) {
+                $combinations[] = [
+                    'creator' => $user,
+                    'documentComment' => $documentComment,
+                    'voteType' => self::faker()->randomElement([AbstractVote::UPVOTE, AbstractVote::DOWNVOTE]),
+                ];
+            }
+        }
+
+        // Shuffle to randomize and take only the requested count
+        shuffle($combinations);
+        return array_slice($combinations, 0, $count);
+    }
+
+    /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
     protected function initialize(): static

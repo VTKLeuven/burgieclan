@@ -55,10 +55,19 @@ final class AppFixtures extends Fixture
         DocumentCommentFactory::createMany(400);
         PageFactory::createMany(20);
         QuickLinkFactory::createMany(10);
-        UserDocumentViewFactory::createMany(100);
-        DocumentVoteFactory::createMany(100);
-        DocumentCommentVoteFactory::createMany(100);
-        CourseCommentVoteFactory::createMany(100);
+        // Create unique UserDocumentView combinations to avoid violating unique constraint
+        $uniqueUserDocumentViews = UserDocumentViewFactory::createUniqueSequence(100);
+        UserDocumentViewFactory::createSequence($uniqueUserDocumentViews);
+
+        // Create unique vote combinations to avoid violating unique constraints
+        $uniqueDocumentVotes = DocumentVoteFactory::createUniqueSequence(100);
+        DocumentVoteFactory::createSequence($uniqueDocumentVotes);
+
+        $uniqueDocumentCommentVotes = DocumentCommentVoteFactory::createUniqueSequence(100);
+        DocumentCommentVoteFactory::createSequence($uniqueDocumentCommentVotes);
+
+        $uniqueCourseCommentVotes = CourseCommentVoteFactory::createUniqueSequence(100);
+        CourseCommentVoteFactory::createSequence($uniqueCourseCommentVotes);
     }
 
     private function loadUsers(ObjectManager $manager): void
