@@ -8,8 +8,6 @@ use App\Entity\Document;
 use App\Entity\DocumentCategory;
 use App\Entity\Tag;
 use App\Entity\User;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -32,13 +30,10 @@ class DocumentCrudController extends AbstractCrudController
     {
         $user = $this->getUser();
         assert($user instanceof User);
-        return new Document($user);
-    }
-
-    public function configureActions(Actions $actions): Actions
-    {
-        return $actions
-            ->disable(Action::NEW);
+        $document = new Document($user);
+        $document->setUnderReview(false); // Default is false
+        $document->setAnonymous(true); // Default is true
+        return $document;
     }
 
     public function configureFields(string $pageName): iterable
@@ -55,7 +50,7 @@ class DocumentCrudController extends AbstractCrudController
         $instance = $this->getContext()->getEntity()->getInstance();
         $firstYear = $instance ? $instance->getYear() : null;
         yield ChoiceField::new('year')
-            ->setChoices(Document::getAcademicYearChoices(firstYear: $firstYear))
+            ->setChoices(Document::getAcademicYearChoices(amountOfYears: 50, firstYear: $firstYear))
             ->setLabel('Academic Year')
             ->onlyOnForms();
         yield TextField::new('year')
