@@ -1,8 +1,6 @@
+import ComboboxController from '@/components/ui/ComboboxController';
 import React from 'react';
-import { FieldError, UseFormRegisterReturn } from 'react-hook-form';
-import { Controller } from 'react-hook-form';
-import ComboboxController from './ComboboxController';
-import { useTranslation } from 'react-i18next';
+import { Controller, FieldError, UseFormRegisterReturn } from 'react-hook-form';
 
 export interface Option {
     id: number | string;
@@ -39,8 +37,6 @@ export const FormField: React.FC<FormFieldProps> = ({
     disabled,
     visibleOptions,
 }) => {
-    const { t } = useTranslation();
-
     // For text fields, use the registration props to bind RHF.
     if (type === 'text') {
         return (

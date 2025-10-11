@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import useRetrieveDocuments, { DocumentFilters, DocumentSortOptions } from '@/hooks/useRetrieveDocuments';
-import { LoaderCircle, X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import Pagination from '@/components/ui/Pagination';
-import DocumentListItem from './DocumentListItem';
-import DocumentFilter from './DocumentFilter';
-import DocumentSort from './DocumentSort';
-import type { Course, DocumentCategory, Document } from '@/types/entities';
+import DocumentFilter from '@/components/documentcategorypage/DocumentFilter';
+import DocumentListItem from '@/components/documentcategorypage/DocumentListItem';
+import DocumentSort from '@/components/documentcategorypage/DocumentSort';
 import { Checkbox } from '@/components/ui/Checkbox';
+import CreateDocumentButton from '@/components/ui/CreateDocumentButton';
 import DownloadButton from '@/components/ui/DownloadButton';
+import Pagination from '@/components/ui/Pagination';
+import useRetrieveDocuments, { DocumentFilters, DocumentSortOptions } from '@/hooks/useRetrieveDocuments';
+import type { Course, Document, DocumentCategory } from '@/types/entities';
+import { LoaderCircle, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface DocumentListProps {
     course?: Course;
@@ -109,6 +110,8 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                 <h3>{t('course-page.documents.header')}</h3>
 
                 <div className="flex items-center space-x-2">
+                    <CreateDocumentButton className='mx-0' initialData={{ course, category }} />
+
                     <DocumentFilter
                         filters={filters}
                         onFilterChange={handleFilterChange}

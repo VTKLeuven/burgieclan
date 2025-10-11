@@ -45,6 +45,9 @@
             "payload_too_large": "De bestandsgrootte overschrijdt de limiet van {{size}}MB. Comprimeer je bestand of upload een kleiner bestand.",
             "rate_limit": "Te veel uploadpogingen. Wacht even voordat je het opnieuw probeert."
         },
+        "button": {
+            "create_document": "Document toevoegen"
+        },
         "dialog": {
             "title": "Document uploaden",
             "description": "Upload hier je geweldige document. Je kunt een PDF-, Word- of Markdown-bestand uploaden. We controleren of het voldoet aan de richtlijnen. Bedankt voor het delen van je kennis met de wereld!",
