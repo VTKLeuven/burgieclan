@@ -7,6 +7,7 @@ import ErrorPage from "@/components/error/ErrorPage";
 import LoadingPage from "@/components/loading/LoadingPage";
 import DownloadSingleDocumentButton from "@/components/ui/buttons/DownloadSingleDocumentButton";
 import VoteButton from "@/components/ui/buttons/VoteButton";
+import DynamicBreadcrumb from "@/components/ui/DynamicBreadcrumb";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import { useUser } from "@/components/UserContext";
 import { logDocumentView } from "@/hooks/logDocumentView";
@@ -31,12 +32,13 @@ export default function DocumentPreview({ id }: { id: string }) {
     const { user } = useUser();
     const { request, loading, error } = useApi();
     const { t } = useTranslation();
-
+    const { i18n } = useTranslation();
+    const currentLocale = i18n.language;
     const MAXWIDTH = 1000;
 
     useEffect(() => {
         const fetchDocumentData = async () => {
-            const documentData = await request('GET', `/api/documents/${id}`);
+            const documentData = await request('GET', `/api/documents/${id}?lang=${currentLocale}`);
             if (!documentData) {
                 return null;
             }
@@ -44,7 +46,7 @@ export default function DocumentPreview({ id }: { id: string }) {
         };
 
         fetchDocumentData();
-    }, [id, request]);
+    }, [id, request, currentLocale]);
 
     useEffect(() => {
         logDocumentView(id);
@@ -78,6 +80,15 @@ export default function DocumentPreview({ id }: { id: string }) {
 
     return (document &&
         <div className="p-8 flex-auto text-sm w-full">
+            {/* Breadcrumb */}
+            <div className="mb-2">
+                <DynamicBreadcrumb
+                    course={document.course}
+                    category={document.category}
+                    document={document}
+                />
+            </div>
+
             {/* Filename */}
             <span className="inline-flex items-center space-x-4">
                 <File />
