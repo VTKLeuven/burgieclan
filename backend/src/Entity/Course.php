@@ -81,7 +81,7 @@ class Course
 
     public function __toString(): string
     {
-        return $this->getName();
+        return sprintf('%s (%s)', $this->getName(), $this->getCode());
     }
 
     public function getId(): ?int

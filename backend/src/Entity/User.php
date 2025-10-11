@@ -31,19 +31,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: Types::STRING)]
     #[Assert\NotBlank]
-    private ?string $fullName = null;
+    private string $fullName;
 
     #[ORM\Column(type: Types::STRING, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 2, max: 50)]
-    private ?string $username = null;
+    private string $username;
 
     #[ORM\Column(type: Types::STRING, unique: true)]
     #[Assert\Email]
-    private ?string $email = null;
+    private string $email;
 
     #[ORM\Column(type: Types::STRING)]
-    private ?string $password = null;
+    private string $password;
 
     /**
      * @var string|null $plainPassword
@@ -96,7 +96,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Indicates if the user wants uploads/comments to be anonymous by default.
      */
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
-    private ?bool $defaultAnonymous = true;
+    private bool $defaultAnonymous = true;
 
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserDocumentView::class)]
@@ -157,7 +157,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->fullName = $fullName;
     }
 
-    public function getFullName(): ?string
+    public function getFullName(): string
     {
         return $this->fullName;
     }
@@ -177,7 +177,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->username = $username;
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -187,7 +187,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->email = $email;
     }
 
-    public function getPassword(): ?string
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -290,7 +290,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __toString(): string
     {
-        return $this->getFullName() ?? '';
+        return $this->getFullName();
     }
 
     /**
@@ -385,7 +385,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isDefaultAnonymous(): ?bool
+    public function isDefaultAnonymous(): bool
     {
         return $this->defaultAnonymous;
     }

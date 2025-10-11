@@ -158,4 +158,9 @@ class Page
 
         return $clean;
     }
+
+    public function __toString(): string
+    {
+        return sprintf('%s (%s)', $this->getNameNl(), $this->getNameEn());
+    }
 }

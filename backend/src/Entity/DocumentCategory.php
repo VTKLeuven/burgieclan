@@ -33,7 +33,7 @@ class DocumentCategory
 
     public function __toString(): string
     {
-        return $this->getNameNl();
+        return sprintf('%s (%s)', $this->getNameNl(), $this->getNameEn());
     }
 
     public function getName(string $lang): ?string
