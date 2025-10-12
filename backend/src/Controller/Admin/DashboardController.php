@@ -16,28 +16,25 @@ use App\Entity\QuickLink;
 use App\Entity\Tag;
 use App\Entity\User;
 use App\Repository\DocumentRepository;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+#[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
     public function __construct(private readonly DocumentRepository $documentRepository)
     {
     }
 
-    #[Route('/admin', name: 'admin')]
     public function index(): Response
     {
-        $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
-
-        return $this->redirect($adminUrlGenerator->setController(DocumentPendingCrudController::class)->generateUrl());
+        return $this->redirectToRoute('admin_document_pending_index');
     }
 
     public function configureDashboard(): Dashboard
@@ -45,7 +42,7 @@ class DashboardController extends AbstractDashboardController
         // admin-assets is not proxied to the frontend, so it is accessible
         return Dashboard::new()
             ->setTitle('<img src="/admin-assets/images/logo.png" alt="Icon" style="height: 20px; margin-right: 10px;"> Burgieclan');
-            //TODO add Burgieclan logo here
+        //TODO add Burgieclan logo here
     }
 
     public function configureCrud(): Crud
