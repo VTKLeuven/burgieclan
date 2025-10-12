@@ -84,6 +84,7 @@ class DashboardController extends AbstractDashboardController
                 MenuItem::linkToCrud('Documents', 'fa fa-file', Document::class)
                     ->setController(DocumentCrudController::class),
                 $pendingDocumentsMenu,
+                MenuItem::linkToRoute('Bulk Upload', 'fa fa-upload', 'admin_bulk_upload_index'),
                 MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class)
                     ->setPermission(User::ROLE_ADMIN),
                 MenuItem::linkToCrud('Comments', 'fa-solid fa-comments', DocumentComment::class)
