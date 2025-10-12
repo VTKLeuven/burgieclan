@@ -1,0 +1,81 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}
+    <twig:ea:Icon name="fa fa-cloud-arrow-up" class="me-1" />
+    Bulk Upload Documents
+{% endblock %}
+
+{% block main %}
+    <twig:ea:Alert variant="info">
+        <h5 class="alert-heading">
+            <twig:ea:Icon name="fa fa-circle-info" class="me-1" />
+            Bulk Document Upload
+        </h5>
+        <p class="mb-2">Upload multiple documents at once. You'll be able to review and edit metadata before finalizing.</p>
+        <ul class="mb-0">
+            <li>Select default course and category (required)</li>
+            <li>Choose default year and tags (optional)</li>
+            <li>Upload multiple document files</li>
+            <li>Review and edit individual document metadata in the next step</li>
+        </ul>
+    </twig:ea:Alert>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {{ form_start(form, {'action': path('admin_bulk_upload_index'), 'attr': {'novalidate': 'novalidate', 'class': 'ea-form'}}) }}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.course) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.category) }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.defaultYear) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.defaultTags) }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.underReview) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.anonymous) }}
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="mb-4">
+                    {{ form_row(form.files) }}
+                </div>
+                
+                <div class="form-actions d-flex gap-2">
+                    <twig:ea:Button 
+                        variant="primary" 
+                        icon="fa fa-cloud-arrow-up"
+                        type="submit"
+                    >
+                        Upload & Preview
+                    </twig:ea:Button>
+
+                    <twig:ea:Button 
+                        htmlElement="a" 
+                        href="{{ path('admin') }}" 
+                        variant="default"
+                        icon="fa fa-xmark"
+                    >
+                        Cancel
+                    </twig:ea:Button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
+
