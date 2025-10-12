@@ -60,12 +60,18 @@ class DocumentBulkUploadController extends AbstractController
                 'required' => true,
                 'constraints' => [new NotNull(message: 'Please select a category')],
             ])
+            ->add('useFileDate', CheckboxType::class, [
+                'label' => 'Detect year from file date',
+                'required' => false,
+                'data' => true,
+                'help' => 'Automatically determine academic year from file creation/modification date',
+            ])
             ->add('defaultYear', ChoiceType::class, [
                 'choices' => Document::getAcademicYearChoices(amountOfYears: 10),
                 'label' => 'Default Year',
                 'required' => false,
                 'data' => $this->getCurrentAcademicYear(),
-                'help' => 'This will be used as default for documents where year cannot be determined from file',
+                'help' => 'This will be used as default when "Detect year from file date" is disabled or year cannot be determined',
             ])
             ->add('defaultTags', EntityType::class, [
                 'class' => Tag::class,
@@ -154,6 +160,7 @@ class DocumentBulkUploadController extends AbstractController
 
         $course = $data['course'];
         $category = $data['category'];
+        $useFileDate = $data['useFileDate'] ?? true;
         $defaultYear = $data['defaultYear'] ?? $this->getCurrentAcademicYear();
         /** ArrayCollection $defaultTags */
         $defaultTags = $data['defaultTags'] ?? [];
@@ -176,9 +183,13 @@ class DocumentBulkUploadController extends AbstractController
             $uploadedFile->move($tempDir, $tmpFilename);
             $tmpPath = $tempDir . '/' . $tmpFilename;
 
-            // Extract year from file modification time
-            $fileYear = $this->extractYearFromFile($tmpPath);
-            $year = $fileYear ?: $defaultYear;
+            // Determine year based on settings
+            if ($useFileDate) {
+                $fileYear = $this->extractYearFromFile($tmpPath);
+                $year = $fileYear ?: $defaultYear;
+            } else {
+                $year = $defaultYear;
+            }
 
             // Extract document name from filename with proper formatting
             $documentName = $this->getSuggestedNameFromFilename($originalName);
@@ -202,6 +213,7 @@ class DocumentBulkUploadController extends AbstractController
         $session->set(self::SESSION_KEY . '_defaults', [
             'course' => $courseId,
             'category' => $categoryId,
+            'useFileDate' => $useFileDate,
             'defaultYear' => $defaultYear,
             'defaultTags' => $tagIds,
             'underReview' => $underReview,
@@ -386,11 +398,6 @@ class DocumentBulkUploadController extends AbstractController
         }
 
         // Redirect to the documents list in EasyAdmin
-        // $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
-        // return $this->redirect($adminUrlGenerator
-        //     ->setController(DocumentCrudController::class)
-        //     ->setAction(Action::INDEX)
-        //     ->generateUrl());
         return $this->redirectToRoute('admin_document_index');
     }
 
