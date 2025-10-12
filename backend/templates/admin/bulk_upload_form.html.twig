@@ -34,9 +34,15 @@
 
                 <div class="row">
                     <div class="col-md-6">
-                        {{ form_row(form.defaultYear) }}
+                        {{ form_row(form.useFileDate) }}
                     </div>
                     <div class="col-md-6">
+                        {{ form_row(form.defaultYear) }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
                         {{ form_row(form.defaultTags) }}
                     </div>
                 </div>
@@ -77,5 +83,39 @@
             {{ form_end(form) }}
         </div>
     </div>
+{% endblock %}
+
+{% block configured_body_contents %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const useFileDateCheckbox = document.querySelector('input[name="form[useFileDate]"]');
+        const defaultYearField = document.querySelector('select[name="form[defaultYear]"]');
+        
+        if (useFileDateCheckbox && defaultYearField) {
+            const yearFormGroup = defaultYearField.closest('.mb-3, .form-group');
+            
+            function toggleYearField() {
+                if (useFileDateCheckbox.checked) {
+                    defaultYearField.disabled = true;
+                    if (yearFormGroup) {
+                        yearFormGroup.style.opacity = '0.5';
+                    }
+                } else {
+                    defaultYearField.disabled = false;
+                    if (yearFormGroup) {
+                        yearFormGroup.style.opacity = '1';
+                    }
+                }
+            }
+            
+            // Initial state
+            toggleYearField();
+            
+            // Listen for changes
+            useFileDateCheckbox.addEventListener('change', toggleYearField);
+        }
+    });
+</script>
 {% endblock %}
 
