@@ -148,6 +148,10 @@ class DocumentBulkUploadController extends AbstractController
             return $this->redirectToRoute('admin_bulk_upload_index');
         }
 
+        // Get file timestamps from JavaScript
+        $request = $this->requestStack->getCurrentRequest();
+        $fileTimestamps = json_decode($request->request->get('file_timestamps', '[]'), true);
+
         // Process uploaded files
         $documentsMetadata = [];
         $sessionId = session_id();
@@ -172,8 +176,10 @@ class DocumentBulkUploadController extends AbstractController
         $categoryId = $category->getId();
         $tagIds = array_map(fn($tag) => $tag->getId(), $defaultTags->toArray());
 
+        $fileIndex = 0;
         foreach ($files as $uploadedFile) {
             if (!$uploadedFile instanceof UploadedFile || !$uploadedFile->isValid()) {
+                $fileIndex++;
                 continue;
             }
 
@@ -182,6 +188,11 @@ class DocumentBulkUploadController extends AbstractController
             $tmpFilename = uniqid() . '_' . $originalName;
             $uploadedFile->move($tempDir, $tmpFilename);
             $tmpPath = $tempDir . '/' . $tmpFilename;
+
+            // Preserve the original file timestamp if available
+            if (isset($fileTimestamps[$fileIndex]) && is_numeric($fileTimestamps[$fileIndex])) {
+                touch($tmpPath, $fileTimestamps[$fileIndex]);
+            }
 
             // Determine year based on settings
             if ($useFileDate) {
@@ -193,6 +204,8 @@ class DocumentBulkUploadController extends AbstractController
 
             // Extract document name from filename with proper formatting
             $documentName = $this->getSuggestedNameFromFilename($originalName);
+
+            $fileIndex++;
 
             $documentsMetadata[] = [
                 'tmpPath' => $tmpPath,

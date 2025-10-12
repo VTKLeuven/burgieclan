@@ -91,6 +91,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         const useFileDateCheckbox = document.querySelector('input[name="form[useFileDate]"]');
         const defaultYearField = document.querySelector('select[name="form[defaultYear]"]');
+        const form = document.querySelector('.ea-form');
+        const fileInput = document.querySelector('input[type="file"][multiple]');
         
         if (useFileDateCheckbox && defaultYearField) {
             const yearFormGroup = defaultYearField.closest('.mb-3, .form-group');
@@ -114,6 +116,34 @@
             
             // Listen for changes
             useFileDateCheckbox.addEventListener('change', toggleYearField);
+        }
+
+        // Capture file timestamps before form submission
+        if (form && fileInput) {
+            form.addEventListener('submit', function(e) {
+                // Remove any existing timestamp fields
+                form.querySelectorAll('.file-timestamp').forEach(el => el.remove());
+                
+                // Add timestamp for each file
+                const files = fileInput.files;
+                const timestamps = [];
+                
+                for (let i = 0; i < files.length; i++) {
+                    // Convert to Unix timestamp (seconds)
+                    const timestamp = Math.floor(files[i].lastModified / 1000);
+                    timestamps.push(timestamp);
+                }
+                
+                // Add as JSON array to form
+                if (timestamps.length > 0) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'file_timestamps';
+                    input.value = JSON.stringify(timestamps);
+                    input.className = 'file-timestamp';
+                    form.appendChild(input);
+                }
+            });
         }
     });
 </script>
