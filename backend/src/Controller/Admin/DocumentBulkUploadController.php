@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -486,37 +487,7 @@ class DocumentBulkUploadController extends AbstractController
         $categoryId = $request->query->get('category');
 
         $tagRepository = $this->entityManager->getRepository(Tag::class);
-        $queryBuilder = $tagRepository->createQueryBuilder('t')
-            ->join('t.documents', 'd');
-
-        $hasFilter = false;
-
-        if ($courseId) {
-            $queryBuilder
-                ->join('d.course', 'co')
-                ->andWhere('co.id = :courseId')
-                ->setParameter('courseId', $courseId);
-            $hasFilter = true;
-        }
-
-        if ($categoryId) {
-            $queryBuilder
-                ->join('d.category', 'cat')
-                ->andWhere('cat.id = :categoryId')
-                ->setParameter('categoryId', $categoryId);
-            $hasFilter = true;
-        }
-
-        // If no filter is applied, return empty array
-        if (!$hasFilter) {
-            return $this->json([]);
-        }
-
-        $queryBuilder
-            ->distinct()
-            ->orderBy('t.name', 'ASC');
-
-        $tags = $queryBuilder->getQuery()->getResult();
+        $tags = $tagRepository->findByCourseOrCategoryOrUnused($courseId, $categoryId);
 
         $tagData = array_map(function (Tag $tag) {
             return [
@@ -526,6 +497,46 @@ class DocumentBulkUploadController extends AbstractController
         }, $tags);
 
         return $this->json($tagData);
+    }
+
+    #[AdminRoute('/bulk-upload/create-tag', name: 'bulk_upload_create_tag')]
+    public function createTag(Request $request): Response
+    {
+        if (!($request->isMethod('POST'))) {
+            throw new BadRequestException('Invalid request method');
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $tagName = trim($data['name'] ?? '');
+
+        if (empty($tagName)) {
+            throw new BadRequestException('Tag name is required');
+        }
+
+        // Check if tag already exists
+        $tagRepository = $this->entityManager->getRepository(Tag::class);
+        $existingTag = $tagRepository->findOneBy(['name' => $tagName]);
+
+        if ($existingTag) {
+            return $this->json([
+                'id' => $existingTag->getId(),
+                'name' => $existingTag->getName(),
+                'existing' => true,
+            ]);
+        }
+
+        // Create new tag
+        $tag = new Tag();
+        $tag->setName($tagName);
+
+        $this->entityManager->persist($tag);
+        $this->entityManager->flush();
+
+        return $this->json([
+            'id' => $tag->getId(),
+            'name' => $tag->getName(),
+            'existing' => false,
+        ], 201);
     }
 
     private function cleanupTempFiles(array $documentsMetadata): void
