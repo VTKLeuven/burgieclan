@@ -375,6 +375,7 @@ Review and Edit Document Metadata
             <li>Edit individual fields directly in the table</li>
             <li>Select multiple documents and use "Bulk Edit" to change course, category, year, or tags for all selected</li>
             <li>Click "Create All Documents" when ready to finalize the upload</li>
+            <li>Click "Cancel" to abort the upload</li>
         </ul>
     </twig:ea:Alert>
 
@@ -640,10 +641,10 @@ Review and Edit Document Metadata
                         Create All Documents ({{ documents|length }})
                     </twig:ea:Button>
 
-                    <twig:ea:Button htmlElement="a" href="{{ path('admin_bulk_upload_index') }}" variant="default"
+                    <twig:ea:Button htmlElement="a" href="{{ path('admin_bulk_upload_cancel') }}" variant="default"
                         icon="fa fa-xmark"
-                        htmlAttributes="{{ {onclick: 'return confirm(\'Are you sure you want to cancel and start over?\')' } }}">
-                        Cancel & Start Over
+                        htmlAttributes="{{ {onclick: 'return confirm(\'Are you sure you want to cancel? All uploaded files will be removed.\')' } }}">
+                        Cancel
                     </twig:ea:Button>
                 </div>
             </form>
