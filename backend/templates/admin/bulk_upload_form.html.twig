@@ -1,5 +1,75 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
+{% block configured_head_contents %}
+{{ parent() }}
+<style>
+    .course-search-wrapper {
+        position: relative;
+    }
+    
+    #courseSearch {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: 10px center;
+        background-size: 16px;
+        padding-left: 35px;
+    }
+    
+    #courseSearch:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    #courseDropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        max-height: 300px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: none;
+        margin-top: 0.25rem;
+    }
+    
+    #courseDropdown.show {
+        display: block;
+    }
+    
+    .course-option {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .course-option:hover,
+    .course-option.active {
+        background-color: #f8f9fa;
+    }
+    
+    .course-option:last-child {
+        border-bottom: none;
+    }
+    
+    .course-option.no-results {
+        color: #6c757d;
+        cursor: default;
+    }
+    
+    .course-option.no-results:hover {
+        background-color: white;
+    }
+    
+    #courseFieldHidden {
+        display: none;
+    }
+</style>
+{% endblock %}
+
 {% block content_title %}
     <twig:ea:Icon name="fa fa-cloud-arrow-up" class="me-1" />
     Bulk Upload Documents
@@ -25,7 +95,22 @@
             {{ form_start(form, {'action': path('admin_bulk_upload_index'), 'attr': {'novalidate': 'novalidate', 'class': 'ea-form'}}) }}
                 <div class="row">
                     <div class="col-md-6">
-                        {{ form_row(form.course) }}
+                        <div class="mb-3">
+                            <label class="form-label required">{{ form.course.vars.label }}</label>
+                            <div class="course-search-wrapper">
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="courseSearch" 
+                                       placeholder="Search courses..."
+                                       autocomplete="off">
+                                <div id="courseDropdown"></div>
+                            </div>
+                            <div id="courseFieldHidden">
+                                {{ form_widget(form.course) }}
+                            </div>
+                            {{ form_help(form.course) }}
+                            {{ form_errors(form.course) }}
+                        </div>
                     </div>
                     <div class="col-md-6">
                         {{ form_row(form.category) }}
@@ -113,6 +198,137 @@
         const courseField = document.querySelector('select[name="form[course]"]');
         const categoryField = document.querySelector('select[name="form[category]"]');
         const tagsField = document.querySelector('select[name="form[defaultTags][]"]');
+        const courseSearch = document.getElementById('courseSearch');
+        const courseDropdown = document.getElementById('courseDropdown');
+        
+        // Course autocomplete functionality
+        if (courseSearch && courseField && courseDropdown) {
+            // Store all courses as data
+            const allCourses = Array.from(courseField.options)
+                .filter(opt => opt.value !== '') // Exclude placeholder
+                .map(opt => ({
+                    value: opt.value,
+                    text: opt.textContent.trim()
+                }));
+            
+            let selectedCourse = null;
+            
+            function showDropdown(courses) {
+                courseDropdown.innerHTML = '';
+                
+                if (courses.length === 0) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'course-option no-results';
+                    noResults.textContent = 'No courses found';
+                    courseDropdown.appendChild(noResults);
+                } else {
+                    courses.forEach(course => {
+                        const option = document.createElement('div');
+                        option.className = 'course-option';
+                        option.textContent = course.text;
+                        option.dataset.value = course.value;
+                        
+                        option.addEventListener('click', function() {
+                            selectCourse(course);
+                        });
+                        
+                        courseDropdown.appendChild(option);
+                    });
+                }
+                
+                courseDropdown.classList.add('show');
+            }
+            
+            function hideDropdown() {
+                courseDropdown.classList.remove('show');
+            }
+            
+            function selectCourse(course) {
+                selectedCourse = course;
+                courseSearch.value = course.text;
+                courseField.value = course.value;
+                hideDropdown();
+                
+                // Trigger change event for tags update
+                courseField.dispatchEvent(new Event('change'));
+            }
+            
+            function filterCourses(searchTerm) {
+                const searchLower = searchTerm.toLowerCase();
+                return allCourses.filter(course => 
+                    course.text.toLowerCase().includes(searchLower)
+                );
+            }
+            
+            // Show all courses when focusing
+            courseSearch.addEventListener('focus', function() {
+                const searchTerm = this.value;
+                const filtered = searchTerm ? filterCourses(searchTerm) : allCourses;
+                showDropdown(filtered);
+            });
+            
+            // Filter as user types
+            courseSearch.addEventListener('input', function() {
+                const filtered = filterCourses(this.value);
+                showDropdown(filtered);
+                
+                // Clear selection if user modifies the text
+                if (selectedCourse && this.value !== selectedCourse.text) {
+                    selectedCourse = null;
+                    courseField.value = '';
+                }
+            });
+            
+            // Handle keyboard navigation
+            courseSearch.addEventListener('keydown', function(e) {
+                const options = courseDropdown.querySelectorAll('.course-option:not(.no-results)');
+                const activeOption = courseDropdown.querySelector('.course-option.active');
+                let currentIndex = Array.from(options).indexOf(activeOption);
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (currentIndex < options.length - 1) {
+                        if (activeOption) activeOption.classList.remove('active');
+                        options[currentIndex + 1].classList.add('active');
+                        options[currentIndex + 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (currentIndex > 0) {
+                        if (activeOption) activeOption.classList.remove('active');
+                        options[currentIndex - 1].classList.add('active');
+                        options[currentIndex - 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (activeOption) {
+                        const value = activeOption.dataset.value;
+                        const course = allCourses.find(c => c.value === value);
+                        if (course) {
+                            selectCourse(course);
+                        }
+                    }
+                } else if (e.key === 'Escape') {
+                    hideDropdown();
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!courseSearch.contains(e.target) && !courseDropdown.contains(e.target)) {
+                    hideDropdown();
+                }
+            });
+            
+            // Initialize with existing value if any
+            if (courseField.value) {
+                const course = allCourses.find(c => c.value === courseField.value);
+                if (course) {
+                    selectedCourse = course;
+                    courseSearch.value = course.text;
+                }
+            }
+        }
         
         if (useFileDateCheckbox && defaultYearField) {
             const yearFormGroup = defaultYearField.closest('.mb-3, .form-group');
