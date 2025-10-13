@@ -80,7 +80,13 @@ class DocumentBulkUploadController extends AbstractController
                 'label' => 'Default Tags',
                 'multiple' => true,
                 'required' => false,
-                'help' => 'These tags will be applied to all documents by default',
+                'query_builder' => function ($repository) {
+                    // Return empty query builder - will be filtered by JavaScript
+                    return $repository->createQueryBuilder('t')
+                        ->where('1 = 0'); // Initially show no tags
+                },
+                'help' => 'These tags will be applied to all documents by default (filtered by selected course/category)',
+                'attr' => ['data-dynamic-tags' => 'true'],
             ])
             ->add('underReview', CheckboxType::class, [
                 'label' => 'Under Review',
@@ -471,6 +477,55 @@ class DocumentBulkUploadController extends AbstractController
         }
 
         return sprintf('%d - %d', $currentYear - 1, $currentYear);
+    }
+
+    #[AdminRoute('/bulk-upload/get-tags', name: 'bulk_upload_get_tags')]
+    public function getTags(Request $request): Response
+    {
+        $courseId = $request->query->get('course');
+        $categoryId = $request->query->get('category');
+
+        $tagRepository = $this->entityManager->getRepository(Tag::class);
+        $queryBuilder = $tagRepository->createQueryBuilder('t')
+            ->join('t.documents', 'd');
+
+        $hasFilter = false;
+
+        if ($courseId) {
+            $queryBuilder
+                ->join('d.course', 'co')
+                ->andWhere('co.id = :courseId')
+                ->setParameter('courseId', $courseId);
+            $hasFilter = true;
+        }
+
+        if ($categoryId) {
+            $queryBuilder
+                ->join('d.category', 'cat')
+                ->andWhere('cat.id = :categoryId')
+                ->setParameter('categoryId', $categoryId);
+            $hasFilter = true;
+        }
+
+        // If no filter is applied, return empty array
+        if (!$hasFilter) {
+            return $this->json([]);
+        }
+
+        $queryBuilder
+            ->distinct()
+            ->orderBy('t.name', 'ASC');
+
+        $tags = $queryBuilder->getQuery()->getResult();
+
+        $tagData = array_map(function (Tag $tag) {
+            return [
+                'id' => $tag->getId(),
+                'name' => $tag->getName(),
+            ];
+        }, $tags);
+
+        return $this->json($tagData);
     }
 
     private function cleanupTempFiles(array $documentsMetadata): void

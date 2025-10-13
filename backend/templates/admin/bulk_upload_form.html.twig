@@ -68,7 +68,7 @@
                         icon="fa fa-cloud-arrow-up"
                         type="submit"
                     >
-                        Upload & Preview
+                        Upload &amp; Preview
                     </twig:ea:Button>
 
                     <twig:ea:Button 
@@ -93,6 +93,9 @@
         const defaultYearField = document.querySelector('select[name="form[defaultYear]"]');
         const form = document.querySelector('.ea-form');
         const fileInput = document.querySelector('input[type="file"][multiple]');
+        const courseField = document.querySelector('select[name="form[course]"]');
+        const categoryField = document.querySelector('select[name="form[category]"]');
+        const tagsField = document.querySelector('select[name="form[defaultTags][]"]');
         
         if (useFileDateCheckbox && defaultYearField) {
             const yearFormGroup = defaultYearField.closest('.mb-3, .form-group');
@@ -116,6 +119,82 @@
             
             // Listen for changes
             useFileDateCheckbox.addEventListener('change', toggleYearField);
+        }
+
+        // Dynamic tags filtering based on course and category
+        if (courseField && categoryField && tagsField) {
+            let debounceTimer;
+
+            const noCourseoOrCategoryHTML = '<option value="">Please select a course or category first</option>';
+            
+            function updateTags() {
+                const courseId = courseField.value;
+                const categoryId = categoryField.value;
+                
+                // Clear debounce timer
+                clearTimeout(debounceTimer);
+                
+                // If neither course nor category is selected, clear tags
+                if (!courseId && !categoryId) {
+                    tagsField.innerHTML = noCourseoOrCategoryHTML;
+                    tagsField.disabled = true;
+                    return;
+                }
+                
+                // Debounce the API call
+                debounceTimer = setTimeout(() => {
+                    // Build query string
+                    const params = new URLSearchParams();
+                    if (courseId) params.append('course', courseId);
+                    if (categoryId) params.append('category', categoryId);
+                    
+                    // Fetch filtered tags
+                    fetch('{{ path('admin_bulk_upload_get_tags') }}?' + params.toString())
+                        .then(response => response.json())
+                        .then(tags => {
+                            // Store currently selected values
+                            const selectedValues = Array.from(tagsField.selectedOptions).map(opt => opt.value);
+                            
+                            // Clear and rebuild options
+                            tagsField.innerHTML = '<option value="">Select tags</option>';
+                            
+                            if (tags.length > 0) {
+                                tags.forEach(tag => {
+                                    const option = document.createElement('option');
+                                    option.value = tag.id;
+                                    option.textContent = tag.name;
+                                    // Restore selection if it was previously selected and still available
+                                    if (selectedValues.includes(String(tag.id))) {
+                                        option.selected = true;
+                                    }
+                                    tagsField.appendChild(option);
+                                });
+                                tagsField.disabled = false;
+                            } else {
+                                const option = document.createElement('option');
+                                option.value = '';
+                                option.textContent = 'No tags found for this course/category';
+                                tagsField.innerHTML = option.outerHTML;
+                                tagsField.disabled = true;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching tags:', error);
+                            tagsField.innerHTML = '<option value="">Error loading tags</option>';
+                            tagsField.disabled = true;
+                        });
+                }, 300); // 300ms debounce
+            }
+            
+            // Listen for changes
+            courseField.addEventListener('change', updateTags);
+            categoryField.addEventListener('change', updateTags);
+            
+            // Initial state - disable tags until course/category is selected
+            if (!courseField.value && !categoryField.value) {
+                tagsField.disabled = true;
+                tagsField.innerHTML = noCourseoOrCategoryHTML;
+            }
         }
 
         // Capture file timestamps before form submission
