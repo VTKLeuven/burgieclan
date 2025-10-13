@@ -44,6 +44,23 @@
                 <div class="row">
                     <div class="col-md-12">
                         {{ form_row(form.defaultTags) }}
+                        
+                        <div class="mt-2 mb-3">
+                            <div class="input-group">
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="newTagInput" 
+                                       placeholder="Create a new tag...">
+                                <button class="btn btn-outline-secondary" 
+                                        type="button" 
+                                        id="createTagBtn">
+                                    <i class="fa fa-plus"></i> Create Tag
+                                </button>
+                            </div>
+                            <small class="form-text text-muted">
+                                Create a new tag and it will be automatically added to your selection
+                            </small>
+                        </div>
                     </div>
                 </div>
 
@@ -125,7 +142,8 @@
         if (courseField && categoryField && tagsField) {
             let debounceTimer;
 
-            const noCourseoOrCategoryHTML = '<option value="">Please select a course or category first</option>';
+            const newTagInput = document.getElementById('newTagInput');
+            const createTagBtn = document.getElementById('createTagBtn');
             
             function updateTags() {
                 const courseId = courseField.value;
@@ -134,21 +152,14 @@
                 // Clear debounce timer
                 clearTimeout(debounceTimer);
                 
-                // If neither course nor category is selected, clear tags
-                if (!courseId && !categoryId) {
-                    tagsField.innerHTML = noCourseoOrCategoryHTML;
-                    tagsField.disabled = true;
-                    return;
-                }
-                
                 // Debounce the API call
                 debounceTimer = setTimeout(() => {
-                    // Build query string
+                    // Build query string (can be empty if no course/category selected)
                     const params = new URLSearchParams();
                     if (courseId) params.append('course', courseId);
                     if (categoryId) params.append('category', categoryId);
                     
-                    // Fetch filtered tags
+                    // Fetch tags (including tags with no documents)
                     fetch('{{ path('admin_bulk_upload_get_tags') }}?' + params.toString())
                         .then(response => response.json())
                         .then(tags => {
@@ -156,7 +167,7 @@
                             const selectedValues = Array.from(tagsField.selectedOptions).map(opt => opt.value);
                             
                             // Clear and rebuild options
-                            tagsField.innerHTML = '<option value="">Select tags</option>';
+                            tagsField.innerHTML = '';
                             
                             if (tags.length > 0) {
                                 tags.forEach(tag => {
@@ -173,8 +184,8 @@
                             } else {
                                 const option = document.createElement('option');
                                 option.value = '';
-                                option.textContent = 'No tags found for this course/category';
-                                tagsField.innerHTML = option.outerHTML;
+                                option.textContent = 'No tags available';
+                                tagsField.appendChild(option);
                                 tagsField.disabled = true;
                             }
                         })
@@ -190,10 +201,100 @@
             courseField.addEventListener('change', updateTags);
             categoryField.addEventListener('change', updateTags);
             
-            // Initial state - disable tags until course/category is selected
-            if (!courseField.value && !categoryField.value) {
-                tagsField.disabled = true;
-                tagsField.innerHTML = noCourseoOrCategoryHTML;
+            // Initial load - fetch all tags (including those with no documents)
+            updateTags();
+
+            // Handle tag creation
+            if (createTagBtn && newTagInput) {
+                function createNewTag() {
+                    const tagName = newTagInput.value.trim();
+                    
+                    if (!tagName) {
+                        alert('Please enter a tag name');
+                        return;
+                    }
+                    
+                    // Disable button during creation
+                    createTagBtn.disabled = true;
+                    createTagBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating...';
+                    
+                    // Send request to create tag
+                    fetch('{{ path('admin_bulk_upload_create_tag') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ name: tagName })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to create tag');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Enable the select if it was disabled and clear placeholder
+                        if (tagsField.disabled) {
+                            tagsField.disabled = false;
+                            tagsField.innerHTML = '';
+                        }
+                        
+                        // Check if tag already exists in the select
+                        let optionExists = false;
+                        Array.from(tagsField.options).forEach(option => {
+                            if (option.value === String(data.id)) {
+                                optionExists = true;
+                                option.selected = true;
+                            }
+                        });
+                        
+                        // If tag doesn't exist in the list, add it
+                        if (!optionExists) {
+                            const option = document.createElement('option');
+                            option.value = data.id;
+                            option.textContent = data.name;
+                            option.selected = true;
+                            tagsField.appendChild(option);
+                        }
+                        
+                        // Clear input
+                        newTagInput.value = '';
+                        
+                        // Show success message
+                        if (data.existing) {
+                            alert('Tag "' + data.name + '" already exists and has been selected');
+                        } else {
+                            // Create a temporary success message
+                            const successMsg = document.createElement('div');
+                            successMsg.className = 'alert alert-success alert-dismissible fade show mt-2';
+                            successMsg.innerHTML = `
+                                <i class="fa fa-check-circle"></i> Tag "${data.name}" created successfully!
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            `;
+                            newTagInput.parentElement.parentElement.appendChild(successMsg);
+                            setTimeout(() => successMsg.remove(), 3000);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error creating tag:', error);
+                        alert('Failed to create tag. Please try again.');
+                    })
+                    .finally(() => {
+                        // Re-enable button
+                        createTagBtn.disabled = false;
+                        createTagBtn.innerHTML = '<i class="fa fa-plus"></i> Create Tag';
+                    });
+                }
+                
+                createTagBtn.addEventListener('click', createNewTag);
+                
+                // Allow Enter key to create tag
+                newTagInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        createNewTag();
+                    }
+                });
             }
         }
 
