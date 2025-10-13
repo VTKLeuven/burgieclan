@@ -52,6 +52,10 @@ class DocumentBulkUploadController extends AbstractController
                 'label' => 'Default Course',
                 'required' => true,
                 'constraints' => [new NotNull(message: 'Please select a course')],
+                'query_builder' => function ($repository) {
+                    return $repository->createQueryBuilder('c')
+                        ->orderBy('c.name', 'ASC');
+                },
             ])
             ->add('category', EntityType::class, [
                 'class' => DocumentCategory::class,
@@ -60,6 +64,10 @@ class DocumentBulkUploadController extends AbstractController
                 'label' => 'Default Category',
                 'required' => true,
                 'constraints' => [new NotNull(message: 'Please select a category')],
+                'query_builder' => function ($repository) {
+                    return $repository->createQueryBuilder('c')
+                        ->orderBy('c.name_nl', 'ASC');
+                },
             ])
             ->add('useFileDate', CheckboxType::class, [
                 'label' => 'Detect year from file date',
@@ -278,8 +286,8 @@ class DocumentBulkUploadController extends AbstractController
         return $this->render('admin/bulk_upload_edit.html.twig', [
             'documents' => $documentsMetadata,
             'defaults' => $defaults,
-            'courses' => $courseRepo->findAll(),
-            'categories' => $categoryRepo->findAll(),
+            'courses' => $courseRepo->findBy([], ['name' => 'ASC']),
+            'categories' => $categoryRepo->findBy([], ['name_nl' => 'ASC']),
             'tags' => $tagRepo->findAll(),
             'yearChoices' => Document::getAcademicYearChoices(amountOfYears: 10),
         ]);
