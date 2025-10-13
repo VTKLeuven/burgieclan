@@ -20,6 +20,20 @@
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
     
+    #courseSearch.is-invalid {
+        border-color: #dc3545;
+        padding-right: calc(1.5em + 0.75rem);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+    
+    #courseSearch.is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+    
     #courseDropdown {
         position: absolute;
         top: 100%;
@@ -67,6 +81,67 @@
     #courseFieldHidden {
         display: none;
     }
+    
+    .tags-wrapper {
+        position: relative;
+    }
+    
+    #tagsFieldHidden {
+        display: none;
+    }
+    
+    #tagsCheckboxList {
+        max-height: 250px;
+        overflow-y: auto;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        padding: 0.5rem;
+        background: white;
+    }
+    
+    #tagsCheckboxList:empty::before {
+        content: 'Loading tags...';
+        color: #6c757d;
+        font-style: italic;
+        display: block;
+        padding: 0.5rem;
+    }
+    
+    .tag-checkbox-item {
+        display: flex;
+        align-items: center;
+        padding: 0.375rem 0.5rem;
+        cursor: pointer;
+        border-radius: 0.25rem;
+        transition: background-color 0.15s ease-in-out;
+    }
+    
+    .tag-checkbox-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .tag-checkbox-item input[type="checkbox"] {
+        margin-right: 0.5rem;
+        cursor: pointer;
+    }
+    
+    .tag-checkbox-item label {
+        margin: 0;
+        cursor: pointer;
+        flex: 1;
+        user-select: none;
+    }
+    
+    .tags-selected-count {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+    
+    #tagsCheckboxList.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
 </style>
 {% endblock %}
 
@@ -76,7 +151,7 @@
 {% endblock %}
 
 {% block main %}
-    <twig:ea:Alert variant="info">
+    <twig:ea:Alert variant="info" class="mb-3">
         <h5 class="alert-heading">
             <twig:ea:Icon name="fa fa-circle-info" class="me-1" />
             Bulk Document Upload
@@ -96,9 +171,10 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label required">{{ form.course.vars.label }}</label>
+                            <label for="courseSearch" class="required">{{ form.course.vars.label }}</label>
                             <div class="course-search-wrapper">
-                                <input type="text" 
+                                    {{ form_errors(form.course) }}
+                                    <input type="text" 
                                        class="form-control" 
                                        id="courseSearch" 
                                        placeholder="Search courses..."
@@ -109,11 +185,15 @@
                                 {{ form_widget(form.course) }}
                             </div>
                             {{ form_help(form.course) }}
-                            {{ form_errors(form.course) }}
                         </div>
                     </div>
                     <div class="col-md-6">
-                        {{ form_row(form.category) }}
+                        <div class="mb-3">
+                            {{ form_label(form.category) }}
+                            {{ form_widget(form.category) }}
+                            {{ form_help(form.category) }}
+                            {# {{ form_errors(form.category) }} #}
+                        </div>
                     </div>
                 </div>
 
@@ -128,7 +208,19 @@
 
                 <div class="row">
                     <div class="col-md-12">
-                        {{ form_row(form.defaultTags) }}
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.defaultTags.vars.label }}</label>
+                            <div class="tags-wrapper">
+                                <div id="tagsCheckboxList"></div>
+                                {# Hidden select field that will be synced with checkboxes #}
+                                <div style="display: none;">
+                                    {{ form_widget(form.defaultTags) }}
+                                </div>
+                                <div class="tags-selected-count" id="tagsSelectedCount"></div>
+                            </div>
+                            {{ form_help(form.defaultTags) }}
+                            {{ form_errors(form.defaultTags) }}
+                        </div>
                         
                         <div class="mt-2 mb-3">
                             <div class="input-group">
@@ -182,7 +274,7 @@
                         Cancel
                     </twig:ea:Button>
                 </div>
-            {{ form_end(form) }}
+            {# {{ form_end(form) }} #}
         </div>
     </div>
 {% endblock %}
@@ -200,6 +292,25 @@
         const tagsField = document.querySelector('select[name="form[defaultTags][]"]');
         const courseSearch = document.getElementById('courseSearch');
         const courseDropdown = document.getElementById('courseDropdown');
+        
+        // Check if course field has errors and apply styling
+        if (courseSearch && courseField) {
+            const courseFieldWrapper = courseField.closest('.mb-3');
+            const hasErrors = courseFieldWrapper && courseFieldWrapper.querySelector('.invalid-feedback');
+            
+            if (hasErrors) {
+                courseSearch.classList.add('is-invalid');
+            }
+            
+            // Remove error styling when user interacts with the field
+            courseSearch.addEventListener('input', function() {
+                courseSearch.classList.remove('is-invalid');
+            });
+            
+            courseSearch.addEventListener('change', function() {
+                courseSearch.classList.remove('is-invalid');
+            });
+        }
         
         // Course autocomplete functionality
         if (courseSearch && courseField && courseDropdown) {
@@ -360,6 +471,17 @@
 
             const newTagInput = document.getElementById('newTagInput');
             const createTagBtn = document.getElementById('createTagBtn');
+            const tagsCheckboxList = document.getElementById('tagsCheckboxList');
+            const tagsSelectedCount = document.getElementById('tagsSelectedCount');
+            
+            function updateTagsDisplay() {
+                const selectedCount = Array.from(tagsField.selectedOptions).length;
+                if (selectedCount > 0) {
+                    tagsSelectedCount.textContent = `${selectedCount} tag${selectedCount !== 1 ? 's' : ''} selected`;
+                } else {
+                    tagsSelectedCount.textContent = '';
+                }
+            }
             
             function updateTags() {
                 const courseId = courseField.value;
@@ -375,40 +497,78 @@
                     if (courseId) params.append('course', courseId);
                     if (categoryId) params.append('category', categoryId);
                     
+                    // Show loading state
+                    tagsCheckboxList.innerHTML = '';
+                    tagsCheckboxList.classList.add('disabled');
+                    
                     // Fetch tags (including tags with no documents)
                     fetch('{{ path('admin_bulk_upload_get_tags') }}?' + params.toString())
                         .then(response => response.json())
                         .then(tags => {
-                            // Store currently selected values
+                            // Store currently selected values from the hidden select
                             const selectedValues = Array.from(tagsField.selectedOptions).map(opt => opt.value);
                             
-                            // Clear and rebuild options
+                            // Clear and rebuild both select and checkbox list
                             tagsField.innerHTML = '';
+                            tagsCheckboxList.innerHTML = '';
+                            tagsCheckboxList.classList.remove('disabled');
                             
                             if (tags.length > 0) {
+                                // Sort tags alphabetically
+                                tags.sort((a, b) => a.name.localeCompare(b.name));
+                                
                                 tags.forEach(tag => {
+                                    // Add to hidden select
                                     const option = document.createElement('option');
                                     option.value = tag.id;
                                     option.textContent = tag.name;
-                                    // Restore selection if it was previously selected and still available
+                                    // Restore selection if it was previously selected
                                     if (selectedValues.includes(String(tag.id))) {
                                         option.selected = true;
                                     }
                                     tagsField.appendChild(option);
+                                    
+                                    // Create checkbox item
+                                    const checkboxItem = document.createElement('div');
+                                    checkboxItem.className = 'tag-checkbox-item';
+                                    
+                                    const checkbox = document.createElement('input');
+                                    checkbox.type = 'checkbox';
+                                    checkbox.id = `tag-${tag.id}`;
+                                    checkbox.value = tag.id;
+                                    checkbox.className = 'form-check-input';
+                                    checkbox.checked = selectedValues.includes(String(tag.id));
+                                    
+                                    const label = document.createElement('label');
+                                    label.htmlFor = `tag-${tag.id}`;
+                                    label.textContent = tag.name;
+                                    
+                                    // Handle checkbox change - sync with hidden select
+                                    checkbox.addEventListener('change', function() {
+                                        const option = Array.from(tagsField.options).find(opt => opt.value === String(tag.id));
+                                        if (option) {
+                                            option.selected = this.checked;
+                                        }
+                                        updateTagsDisplay();
+                                    });
+                                    
+                                    checkboxItem.appendChild(checkbox);
+                                    checkboxItem.appendChild(label);
+                                    tagsCheckboxList.appendChild(checkboxItem);
                                 });
-                                tagsField.disabled = false;
+                                
+                                updateTagsDisplay();
                             } else {
-                                const option = document.createElement('option');
-                                option.value = '';
-                                option.textContent = 'No tags available';
-                                tagsField.appendChild(option);
-                                tagsField.disabled = true;
+                                const noTags = document.createElement('div');
+                                noTags.className = 'text-muted fst-italic p-2';
+                                noTags.textContent = 'No tags available';
+                                tagsCheckboxList.appendChild(noTags);
                             }
                         })
                         .catch(error => {
                             console.error('Error fetching tags:', error);
-                            tagsField.innerHTML = '<option value="">Error loading tags</option>';
-                            tagsField.disabled = true;
+                            tagsCheckboxList.innerHTML = '<div class="text-danger p-2">Error loading tags</div>';
+                            tagsCheckboxList.classList.remove('disabled');
                         });
                 }, 300); // 300ms debounce
             }
@@ -449,12 +609,6 @@
                         return response.json();
                     })
                     .then(data => {
-                        // Enable the select if it was disabled and clear placeholder
-                        if (tagsField.disabled) {
-                            tagsField.disabled = false;
-                            tagsField.innerHTML = '';
-                        }
-                        
                         // Check if tag already exists in the select
                         let optionExists = false;
                         Array.from(tagsField.options).forEach(option => {
@@ -466,19 +620,65 @@
                         
                         // If tag doesn't exist in the list, add it
                         if (!optionExists) {
+                            // Add to hidden select
                             const option = document.createElement('option');
                             option.value = data.id;
                             option.textContent = data.name;
                             option.selected = true;
                             tagsField.appendChild(option);
+                            
+                            // Add to checkbox list
+                            const checkboxItem = document.createElement('div');
+                            checkboxItem.className = 'tag-checkbox-item';
+                            
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.id = `tag-${data.id}`;
+                            checkbox.value = data.id;
+                            checkbox.className = 'form-check-input';
+                            checkbox.checked = true;
+                            
+                            const label = document.createElement('label');
+                            label.htmlFor = `tag-${data.id}`;
+                            label.textContent = data.name;
+                            
+                            // Sync checkbox with select
+                            checkbox.addEventListener('change', function() {
+                                const option = Array.from(tagsField.options).find(opt => opt.value === String(data.id));
+                                if (option) {
+                                    option.selected = this.checked;
+                                }
+                                updateTagsDisplay();
+                            });
+                            
+                            checkboxItem.appendChild(checkbox);
+                            checkboxItem.appendChild(label);
+                            tagsCheckboxList.appendChild(checkboxItem);
+                        } else {
+                            // Just check the existing checkbox
+                            const existingCheckbox = document.getElementById(`tag-${data.id}`);
+                            if (existingCheckbox) {
+                                existingCheckbox.checked = true;
+                                existingCheckbox.dispatchEvent(new Event('change'));
+                            }
                         }
+                        
+                        updateTagsDisplay();
                         
                         // Clear input
                         newTagInput.value = '';
                         
                         // Show success message
                         if (data.existing) {
-                            alert('Tag "' + data.name + '" already exists and has been selected');
+                            // Create a temporary info message
+                            const infoMsg = document.createElement('div');
+                            infoMsg.className = 'alert alert-info alert-dismissible fade show mt-2';
+                            infoMsg.innerHTML = `
+                                <i class="fa fa-info-circle"></i> Tag "${data.name}" already exists and has been selected
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            `;
+                            newTagInput.parentElement.parentElement.appendChild(infoMsg);
+                            setTimeout(() => infoMsg.remove(), 3000);
                         } else {
                             // Create a temporary success message
                             const successMsg = document.createElement('div');

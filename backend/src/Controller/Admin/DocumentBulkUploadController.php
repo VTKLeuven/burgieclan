@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Repository\CourseRepository;
 use App\Repository\DocumentCategoryRepository;
 use App\Repository\TagRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,7 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -89,17 +90,11 @@ class DocumentBulkUploadController extends AbstractController
             ->add('defaultTags', EntityType::class, [
                 'class' => Tag::class,
                 'choice_label' => 'name',
-                'placeholder' => 'Select tags',
                 'label' => 'Default Tags',
                 'multiple' => true,
+                'expanded' => false, // Keep as select, we'll customize the rendering
                 'required' => false,
-                'query_builder' => function (TagRepository $repository) {
-                    // Return empty query builder - will be filtered by JavaScript
-                    return $repository->createQueryBuilder('t')
-                        ->where('1 = 0'); // Initially show no tags
-                },
                 'help' => 'These tags will be applied to all documents by default (filtered by selected course/category)',
-                'attr' => ['data-dynamic-tags' => 'true'],
             ])
             ->add('underReview', CheckboxType::class, [
                 'label' => 'Under Review',
@@ -144,7 +139,7 @@ class DocumentBulkUploadController extends AbstractController
                 'attr' => ['class' => 'btn btn-primary'],
             ])
             ->getForm();
-
+        assert($form instanceof Form);
         $form->handleRequest($this->requestStack->getCurrentRequest());
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -156,44 +151,60 @@ class DocumentBulkUploadController extends AbstractController
         ]);
     }
 
-    private function handleUpload(FormInterface $form): Response
+    private function handleUpload(Form $form): Response
     {
         $session = $this->requestStack->getSession();
         $data = $form->getData();
         $files = $form->get('files')->getData();
 
-        if (!$files || count($files) === 0) {
+        if (!$files || !is_array($files) || count($files) === 0) {
             $this->addFlash('error', 'Please select at least one file to upload.');
             return $this->redirectToRoute('admin_bulk_upload_index');
         }
 
         // Get file timestamps from JavaScript
         $request = $this->requestStack->getCurrentRequest();
-        $fileTimestamps = json_decode($request->request->get('file_timestamps', '[]'), true);
+        $fileTimestamps = [];
+        if ($request !== null) {
+            $fileTimestampsRaw = $request->request->get('file_timestamps', '[]');
+            $fileTimestamps = json_decode((string)$fileTimestampsRaw, true);
+        }
+        if (!is_array($fileTimestamps)) {
+            $fileTimestamps = [];
+        }
 
         // Process uploaded files
         $documentsMetadata = [];
         $sessionId = session_id();
         $projectDir = $this->getParameter('kernel.project_dir');
+        if (!is_string($projectDir) || empty($projectDir)) {
+            throw new \RuntimeException('Project directory parameter "kernel.project_dir" is missing or invalid.');
+        }
         $tempDir = $projectDir . self::TEMP_DIR . $sessionId;
 
         if (!is_dir($tempDir)) {
             mkdir($tempDir, 0777, true);
         }
 
+        if (!is_array($data)) {
+            throw new \RuntimeException('Form data is not an array.');
+        }
+
         $course = $data['course'];
+        assert($course instanceof Course);
         $category = $data['category'];
+        assert($category instanceof DocumentCategory);
         $useFileDate = $data['useFileDate'] ?? true;
         $defaultYear = $data['defaultYear'] ?? $this->getCurrentAcademicYear();
-        /** ArrayCollection $defaultTags */
-        $defaultTags = $data['defaultTags'] ?? [];
+        $defaultTags = $data['defaultTags'] ?? new ArrayCollection();
+        assert($defaultTags instanceof ArrayCollection);
         $underReview = $data['underReview'] ?? false;
         $anonymous = $data['anonymous'] ?? true;
 
         // Get IDs for storage
         $courseId = $course->getId();
         $categoryId = $category->getId();
-        $tagIds = array_map(fn($tag) => $tag->getId(), $defaultTags->toArray());
+        $tagIds = array_map(fn(Tag $tag) => $tag->getId(), $defaultTags->toArray());
 
         $fileIndex = 0;
         foreach ($files as $uploadedFile) {
@@ -209,8 +220,9 @@ class DocumentBulkUploadController extends AbstractController
             $tmpPath = $tempDir . '/' . $tmpFilename;
 
             // Preserve the original file timestamp if available
-            if (isset($fileTimestamps[$fileIndex]) && is_numeric($fileTimestamps[$fileIndex])) {
-                touch($tmpPath, $fileTimestamps[$fileIndex]);
+            $timestamp = $fileTimestamps[$fileIndex];
+            if (isset($timestamp) && is_numeric($timestamp)) {
+                touch($tmpPath, (int)$timestamp);
             }
 
             // Determine year based on settings
@@ -263,7 +275,7 @@ class DocumentBulkUploadController extends AbstractController
         $documentsMetadata = $session->get(self::SESSION_KEY, []);
         $defaults = $session->get(self::SESSION_KEY . '_defaults', []);
 
-        if (empty($documentsMetadata)) {
+        if (!is_array($documentsMetadata) || empty($documentsMetadata)) {
             $this->addFlash('warning', 'No documents in session. Please upload files first.');
             return $this->redirectToRoute('admin_bulk_upload_index');
         }
@@ -274,10 +286,11 @@ class DocumentBulkUploadController extends AbstractController
         $tagRepo = $this->entityManager->getRepository(Tag::class);
 
         foreach ($documentsMetadata as &$doc) {
+            assert(is_array($doc));
             $doc['courseEntity'] = $courseRepo->find($doc['course']);
             $doc['categoryEntity'] = $categoryRepo->find($doc['category']);
             $doc['tagEntities'] = [];
-            if (!empty($doc['tags'])) {
+            if (!empty($doc['tags']) && is_array($doc['tags'])) {
                 foreach ($doc['tags'] as $tagId) {
                     $tag = $tagRepo->find($tagId);
                     if ($tag) {
@@ -302,16 +315,17 @@ class DocumentBulkUploadController extends AbstractController
     {
         $session = $this->requestStack->getSession();
         $documentsMetadata = $session->get(self::SESSION_KEY, []);
+        assert(is_array($documentsMetadata));
 
-        $selectedIndices = $request->request->all('selected') ?? [];
+        $selectedIndices = $request->request->all('selected');
         $bulkCourse = $request->request->get('bulk_course');
         $bulkCategory = $request->request->get('bulk_category');
         $bulkYear = $request->request->get('bulk_year');
-        $bulkTags = $request->request->all('bulk_tags') ?? [];
+        $bulkTags = $request->request->all('bulk_tags');
 
         // Update selected documents
         foreach ($selectedIndices as $index) {
-            if (isset($documentsMetadata[$index])) {
+            if (isset($documentsMetadata[$index]) && is_array($documentsMetadata[$index])) {
                 if ($bulkCourse) {
                     $documentsMetadata[$index]['course'] = $bulkCourse;
                 }
@@ -328,12 +342,13 @@ class DocumentBulkUploadController extends AbstractController
         }
 
         // Also handle individual row updates
-        $names = $request->request->all('name') ?? [];
-        $years = $request->request->all('year') ?? [];
-        $courses = $request->request->all('course') ?? [];
-        $categories = $request->request->all('category') ?? [];
+        $names = $request->request->all('name');
+        $years = $request->request->all('year');
+        $courses = $request->request->all('course');
+        $categories = $request->request->all('category');
 
         foreach ($documentsMetadata as $index => &$doc) {
+            assert(is_array($doc));
             if (isset($names[$index])) {
                 $doc['name'] = $names[$index];
             }
@@ -358,6 +373,7 @@ class DocumentBulkUploadController extends AbstractController
     {
         $session = $this->requestStack->getSession();
         $documentsMetadata = $session->get(self::SESSION_KEY, []);
+        assert(is_array($documentsMetadata));
 
         if (empty($documentsMetadata)) {
             $this->addFlash('warning', 'No documents to create.');
@@ -371,44 +387,56 @@ class DocumentBulkUploadController extends AbstractController
         $errors = [];
 
         foreach ($documentsMetadata as $docMeta) {
+            assert(is_array($docMeta));
             try {
-                $document = new Document($user);
-                $document->setName($docMeta['name']);
-                $document->setYear($docMeta['year']);
-                $document->setUnderReview($docMeta['underReview'] ?? false);
-                $document->setAnonymous($docMeta['anonymous'] ?? true);
+                $name = $docMeta['name'];
+                $year = $docMeta['year'];
+                $underReview = $docMeta['underReview'];
+                $anonymous = $docMeta['anonymous'];
 
-                // Set course
-                $course = $this->entityManager->getRepository(Course::class)->find($docMeta['course']);
-                if ($course) {
-                    $document->setCourse($course);
-                }
+                if (is_string($name) && is_string($year) && is_bool($underReview) && is_bool($anonymous)) {
+                    $document = new Document($user);
+                    $document->setName(trim($name));
+                    $document->setYear(trim($year));
+                    $document->setUnderReview($underReview);
+                    $document->setAnonymous($anonymous);
 
-                // Set category
-                $category = $this->entityManager->getRepository(DocumentCategory::class)->find($docMeta['category']);
-                if ($category) {
-                    $document->setCategory($category);
-                }
+                    // Set course
+                    $course = $this->entityManager->getRepository(Course::class)->find($docMeta['course']);
+                    if ($course) {
+                        $document->setCourse($course);
+                    }
 
-                // Set tags
-                if (!empty($docMeta['tags'])) {
-                    foreach ($docMeta['tags'] as $tagId) {
-                        $tag = $this->entityManager->getRepository(Tag::class)->find($tagId);
-                        if ($tag) {
-                            $document->addTag($tag);
+                    // Set category
+                    $category = $this->entityManager->getRepository(DocumentCategory::class)->find($docMeta['category']);
+                    if ($category) {
+                        $document->setCategory($category);
+                    }
+
+                    // Set tags
+                    if (!empty($docMeta['tags'])) {
+                        foreach ($docMeta['tags'] as $tagId) {
+                            $tag = $this->entityManager->getRepository(Tag::class)->find($tagId);
+                            if ($tag) {
+                                $document->addTag($tag);
+                            }
                         }
                     }
+
+                    // Set file
+                    $tempPath = $docMeta['tmpPath'];
+                    if (!(isset($tempPath) && is_string($tempPath) && file_exists($tempPath))) {
+                        throw new \RuntimeException('Temporary file not found: ' . (is_string($tempPath) ? $tempPath : ''));
+                    }
+                    $file = new File($tempPath);
+                    $document->setFile($file);
+                    $document->setFileName(is_string($docMeta['originalName']) ? $docMeta['originalName'] : '');
+
+                    $this->entityManager->persist($document);
+                    $createdCount++;
                 }
-
-                // Set file
-                $file = new File($docMeta['tmpPath']);
-                $document->setFile($file);
-                $document->setFileName($docMeta['originalName']);
-
-                $this->entityManager->persist($document);
-                $createdCount++;
             } catch (\Exception $e) {
-                $errors[] = sprintf('Error creating document "%s": %s', $docMeta['name'], $e->getMessage());
+                $errors[] = sprintf('Error creating document "%s": %s', is_string($docMeta['name']) ? $docMeta['name'] : '', $e->getMessage());
             }
         }
 
