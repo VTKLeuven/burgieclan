@@ -7,6 +7,9 @@ use App\Entity\Document;
 use App\Entity\DocumentCategory;
 use App\Entity\Tag;
 use App\Entity\User;
+use App\Repository\CourseRepository;
+use App\Repository\DocumentCategoryRepository;
+use App\Repository\TagRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,6 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -52,7 +56,7 @@ class DocumentBulkUploadController extends AbstractController
                 'label' => 'Default Course',
                 'required' => true,
                 'constraints' => [new NotNull(message: 'Please select a course')],
-                'query_builder' => function ($repository) {
+                'query_builder' => function (CourseRepository $repository) {
                     return $repository->createQueryBuilder('c')
                         ->orderBy('c.name', 'ASC');
                 },
@@ -64,7 +68,7 @@ class DocumentBulkUploadController extends AbstractController
                 'label' => 'Default Category',
                 'required' => true,
                 'constraints' => [new NotNull(message: 'Please select a category')],
-                'query_builder' => function ($repository) {
+                'query_builder' => function (DocumentCategoryRepository $repository) {
                     return $repository->createQueryBuilder('c')
                         ->orderBy('c.name_nl', 'ASC');
                 },
@@ -89,7 +93,7 @@ class DocumentBulkUploadController extends AbstractController
                 'label' => 'Default Tags',
                 'multiple' => true,
                 'required' => false,
-                'query_builder' => function ($repository) {
+                'query_builder' => function (TagRepository $repository) {
                     // Return empty query builder - will be filtered by JavaScript
                     return $repository->createQueryBuilder('t')
                         ->where('1 = 0'); // Initially show no tags
@@ -152,7 +156,7 @@ class DocumentBulkUploadController extends AbstractController
         ]);
     }
 
-    private function handleUpload($form): Response
+    private function handleUpload(FormInterface $form): Response
     {
         $session = $this->requestStack->getSession();
         $data = $form->getData();
