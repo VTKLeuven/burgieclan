@@ -41,8 +41,8 @@
         right: 0;
         max-height: 300px;
         overflow-y: auto;
-        background: white;
-        border: 1px solid #ced4da;
+        background: var(--bs-body-bg);
+        border: 1px solid var(--bs-border-color);
         border-radius: 0.25rem;
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         z-index: 1000;
@@ -57,12 +57,13 @@
     .course-option {
         padding: 0.5rem 1rem;
         cursor: pointer;
-        border-bottom: 1px solid #f0f0f0;
+        border-bottom: 1px solid var(--bs-border-color);
+        color: var(--bs-body-color);
     }
     
     .course-option:hover,
     .course-option.active {
-        background-color: #f8f9fa;
+        background-color: var(--bs-secondary-bg);
     }
     
     .course-option:last-child {
@@ -70,12 +71,12 @@
     }
     
     .course-option.no-results {
-        color: #6c757d;
+        color: var(--bs-secondary-color);
         cursor: default;
     }
     
     .course-option.no-results:hover {
-        background-color: white;
+        background-color: var(--bs-body-bg);
     }
     
     #courseFieldHidden {
@@ -93,15 +94,15 @@
     #tagsCheckboxList {
         max-height: 250px;
         overflow-y: auto;
-        border: 1px solid #ced4da;
+        border: 1px solid var(--bs-border-color);
         border-radius: 0.25rem;
         padding: 0.5rem;
-        background: white;
+        background: var(--bs-body-bg);
     }
     
     #tagsCheckboxList:empty::before {
         content: 'Loading tags...';
-        color: #6c757d;
+        color: var(--bs-secondary-color);
         font-style: italic;
         display: block;
         padding: 0.5rem;
@@ -117,7 +118,7 @@
     }
     
     .tag-checkbox-item:hover {
-        background-color: #f8f9fa;
+        background-color: var(--bs-secondary-bg);
     }
     
     .tag-checkbox-item input[type="checkbox"] {
@@ -134,7 +135,7 @@
     
     .tags-selected-count {
         font-size: 0.875rem;
-        color: #6c757d;
+        color: var(--bs-secondary-color);
         margin-top: 0.25rem;
     }
     
@@ -560,7 +561,8 @@
                                 updateTagsDisplay();
                             } else {
                                 const noTags = document.createElement('div');
-                                noTags.className = 'text-muted fst-italic p-2';
+                                noTags.className = 'fst-italic p-2';
+                                noTags.style.color = 'var(--bs-secondary-color)';
                                 noTags.textContent = 'No tags available';
                                 tagsCheckboxList.appendChild(noTags);
                             }
