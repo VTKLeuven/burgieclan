@@ -23,7 +23,7 @@
     "doctrine/doctrine-bundle": "^2.15",
     "doctrine/doctrine-migrations-bundle": "^3.3",
     "doctrine/orm": "^3.5",
-    "easycorp/easyadmin-bundle": "^4.24",
+    "easycorp/easyadmin-bundle": "^4.26",
     "gesdinet/jwt-refresh-token-bundle": "^1.5",
     "knpuniversity/oauth2-client-bundle": "^2.18",
     "league/commonmark": "^2.1",

@@ -165,7 +165,7 @@ export default function LoginForm() {
                         <div className="mt-5 w-full max-w-sm">
                             <button
                                 type="submit"
-                                className="primary-button flex items-center justify-center gap-2"
+                                className="primary-button flex w-full items-center justify-center gap-2"
                                 disabled={loading}
                             >
                                 {loading ? <LoaderCircle className="animate-spin" /> : t('login')}

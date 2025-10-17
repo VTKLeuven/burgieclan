@@ -1,0 +1,747 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block configured_head_contents %}
+{{ parent() }}
+<style>
+    .course-search-wrapper {
+        position: relative;
+    }
+    
+    #courseSearch {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: 10px center;
+        background-size: 16px;
+        padding-left: 35px;
+    }
+    
+    #courseSearch:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    #courseSearch.is-invalid {
+        border-color: #dc3545;
+        padding-right: calc(1.5em + 0.75rem);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+    
+    #courseSearch.is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+    
+    #courseDropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        max-height: 300px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: none;
+        margin-top: 0.25rem;
+    }
+    
+    #courseDropdown.show {
+        display: block;
+    }
+    
+    .course-option {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .course-option:hover,
+    .course-option.active {
+        background-color: #f8f9fa;
+    }
+    
+    .course-option:last-child {
+        border-bottom: none;
+    }
+    
+    .course-option.no-results {
+        color: #6c757d;
+        cursor: default;
+    }
+    
+    .course-option.no-results:hover {
+        background-color: white;
+    }
+    
+    #courseFieldHidden {
+        display: none;
+    }
+    
+    .tags-wrapper {
+        position: relative;
+    }
+    
+    #tagsFieldHidden {
+        display: none;
+    }
+    
+    #tagsCheckboxList {
+        max-height: 250px;
+        overflow-y: auto;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        padding: 0.5rem;
+        background: white;
+    }
+    
+    #tagsCheckboxList:empty::before {
+        content: 'Loading tags...';
+        color: #6c757d;
+        font-style: italic;
+        display: block;
+        padding: 0.5rem;
+    }
+    
+    .tag-checkbox-item {
+        display: flex;
+        align-items: center;
+        padding: 0.375rem 0.5rem;
+        cursor: pointer;
+        border-radius: 0.25rem;
+        transition: background-color 0.15s ease-in-out;
+    }
+    
+    .tag-checkbox-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .tag-checkbox-item input[type="checkbox"] {
+        margin-right: 0.5rem;
+        cursor: pointer;
+    }
+    
+    .tag-checkbox-item label {
+        margin: 0;
+        cursor: pointer;
+        flex: 1;
+        user-select: none;
+    }
+    
+    .tags-selected-count {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+    
+    #tagsCheckboxList.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block content_title %}
+    <twig:ea:Icon name="fa fa-cloud-arrow-up" class="me-1" />
+    Bulk Upload Documents
+{% endblock %}
+
+{% block main %}
+    <twig:ea:Alert variant="info" class="mb-3">
+        <h5 class="alert-heading">
+            <twig:ea:Icon name="fa fa-circle-info" class="me-1" />
+            Bulk Document Upload
+        </h5>
+        <p class="mb-2">Upload multiple documents at once. You'll be able to review and edit metadata before finalizing.</p>
+        <ul class="mb-0">
+            <li>Select default course and category (required)</li>
+            <li>Choose default year and tags (optional)</li>
+            <li>Upload multiple document files</li>
+            <li>Review and edit individual document metadata in the next step</li>
+        </ul>
+    </twig:ea:Alert>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {{ form_start(form, {'action': path('admin_bulk_upload_index'), 'attr': {'novalidate': 'novalidate', 'class': 'ea-form'}}) }}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="courseSearch" class="required">{{ form.course.vars.label }}</label>
+                            <div class="course-search-wrapper">
+                                    {{ form_errors(form.course) }}
+                                    <input type="text" 
+                                       class="form-control" 
+                                       id="courseSearch" 
+                                       placeholder="Search courses..."
+                                       autocomplete="off">
+                                <div id="courseDropdown"></div>
+                            </div>
+                            <div id="courseFieldHidden">
+                                {{ form_widget(form.course) }}
+                            </div>
+                            {{ form_help(form.course) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ form_label(form.category) }}
+                            {{ form_widget(form.category) }}
+                            {{ form_help(form.category) }}
+                            {# {{ form_errors(form.category) }} #}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.useFileDate) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.defaultYear) }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.defaultTags.vars.label }}</label>
+                            <div class="tags-wrapper">
+                                <div id="tagsCheckboxList"></div>
+                                {# Hidden select field that will be synced with checkboxes #}
+                                <div style="display: none;">
+                                    {{ form_widget(form.defaultTags) }}
+                                </div>
+                                <div class="tags-selected-count" id="tagsSelectedCount"></div>
+                            </div>
+                            {{ form_help(form.defaultTags) }}
+                            {{ form_errors(form.defaultTags) }}
+                        </div>
+                        
+                        <div class="mt-2 mb-3">
+                            <div class="input-group">
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="newTagInput" 
+                                       placeholder="Create a new tag...">
+                                <button class="btn btn-outline-secondary" 
+                                        type="button" 
+                                        id="createTagBtn">
+                                    <i class="fa fa-plus"></i> Create Tag
+                                </button>
+                            </div>
+                            <small class="form-text text-muted">
+                                Create a new tag and it will be automatically added to your selection
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.underReview) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.anonymous) }}
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="mb-4">
+                    {{ form_row(form.files) }}
+                </div>
+                
+                <div class="form-actions d-flex gap-2">
+                    <twig:ea:Button 
+                        variant="primary" 
+                        icon="fa fa-cloud-arrow-up"
+                        type="submit"
+                    >
+                        Upload &amp; Preview
+                    </twig:ea:Button>
+
+                    <twig:ea:Button 
+                        htmlElement="a" 
+                        href="{{ path('admin') }}" 
+                        variant="default"
+                        icon="fa fa-xmark"
+                    >
+                        Cancel
+                    </twig:ea:Button>
+                </div>
+            {# {{ form_end(form) }} #}
+        </div>
+    </div>
+{% endblock %}
+
+{% block configured_body_contents %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const useFileDateCheckbox = document.querySelector('input[name="form[useFileDate]"]');
+        const defaultYearField = document.querySelector('select[name="form[defaultYear]"]');
+        const form = document.querySelector('.ea-form');
+        const fileInput = document.querySelector('input[type="file"][multiple]');
+        const courseField = document.querySelector('select[name="form[course]"]');
+        const categoryField = document.querySelector('select[name="form[category]"]');
+        const tagsField = document.querySelector('select[name="form[defaultTags][]"]');
+        const courseSearch = document.getElementById('courseSearch');
+        const courseDropdown = document.getElementById('courseDropdown');
+        
+        // Check if course field has errors and apply styling
+        if (courseSearch && courseField) {
+            const courseFieldWrapper = courseField.closest('.mb-3');
+            const hasErrors = courseFieldWrapper && courseFieldWrapper.querySelector('.invalid-feedback');
+            
+            if (hasErrors) {
+                courseSearch.classList.add('is-invalid');
+            }
+            
+            // Remove error styling when user interacts with the field
+            courseSearch.addEventListener('input', function() {
+                courseSearch.classList.remove('is-invalid');
+            });
+            
+            courseSearch.addEventListener('change', function() {
+                courseSearch.classList.remove('is-invalid');
+            });
+        }
+        
+        // Course autocomplete functionality
+        if (courseSearch && courseField && courseDropdown) {
+            // Store all courses as data
+            const allCourses = Array.from(courseField.options)
+                .filter(opt => opt.value !== '') // Exclude placeholder
+                .map(opt => ({
+                    value: opt.value,
+                    text: opt.textContent.trim()
+                }));
+            
+            let selectedCourse = null;
+            
+            function showDropdown(courses) {
+                courseDropdown.innerHTML = '';
+                
+                if (courses.length === 0) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'course-option no-results';
+                    noResults.textContent = 'No courses found';
+                    courseDropdown.appendChild(noResults);
+                } else {
+                    courses.forEach(course => {
+                        const option = document.createElement('div');
+                        option.className = 'course-option';
+                        option.textContent = course.text;
+                        option.dataset.value = course.value;
+                        
+                        option.addEventListener('click', function() {
+                            selectCourse(course);
+                        });
+                        
+                        courseDropdown.appendChild(option);
+                    });
+                }
+                
+                courseDropdown.classList.add('show');
+            }
+            
+            function hideDropdown() {
+                courseDropdown.classList.remove('show');
+            }
+            
+            function selectCourse(course) {
+                selectedCourse = course;
+                courseSearch.value = course.text;
+                courseField.value = course.value;
+                hideDropdown();
+                
+                // Trigger change event for tags update
+                courseField.dispatchEvent(new Event('change'));
+            }
+            
+            function filterCourses(searchTerm) {
+                const searchLower = searchTerm.toLowerCase();
+                return allCourses.filter(course => 
+                    course.text.toLowerCase().includes(searchLower)
+                );
+            }
+            
+            // Show all courses when focusing
+            courseSearch.addEventListener('focus', function() {
+                const searchTerm = this.value;
+                const filtered = searchTerm ? filterCourses(searchTerm) : allCourses;
+                showDropdown(filtered);
+            });
+            
+            // Filter as user types
+            courseSearch.addEventListener('input', function() {
+                const filtered = filterCourses(this.value);
+                showDropdown(filtered);
+                
+                // Clear selection if user modifies the text
+                if (selectedCourse && this.value !== selectedCourse.text) {
+                    selectedCourse = null;
+                    courseField.value = '';
+                }
+            });
+            
+            // Handle keyboard navigation
+            courseSearch.addEventListener('keydown', function(e) {
+                const options = courseDropdown.querySelectorAll('.course-option:not(.no-results)');
+                const activeOption = courseDropdown.querySelector('.course-option.active');
+                let currentIndex = Array.from(options).indexOf(activeOption);
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (currentIndex < options.length - 1) {
+                        if (activeOption) activeOption.classList.remove('active');
+                        options[currentIndex + 1].classList.add('active');
+                        options[currentIndex + 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (currentIndex > 0) {
+                        if (activeOption) activeOption.classList.remove('active');
+                        options[currentIndex - 1].classList.add('active');
+                        options[currentIndex - 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (activeOption) {
+                        const value = activeOption.dataset.value;
+                        const course = allCourses.find(c => c.value === value);
+                        if (course) {
+                            selectCourse(course);
+                        }
+                    }
+                } else if (e.key === 'Escape') {
+                    hideDropdown();
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!courseSearch.contains(e.target) && !courseDropdown.contains(e.target)) {
+                    hideDropdown();
+                }
+            });
+            
+            // Initialize with existing value if any
+            if (courseField.value) {
+                const course = allCourses.find(c => c.value === courseField.value);
+                if (course) {
+                    selectedCourse = course;
+                    courseSearch.value = course.text;
+                }
+            }
+        }
+        
+        if (useFileDateCheckbox && defaultYearField) {
+            const yearFormGroup = defaultYearField.closest('.mb-3, .form-group');
+            
+            function toggleYearField() {
+                if (useFileDateCheckbox.checked) {
+                    defaultYearField.disabled = true;
+                    if (yearFormGroup) {
+                        yearFormGroup.style.opacity = '0.5';
+                    }
+                } else {
+                    defaultYearField.disabled = false;
+                    if (yearFormGroup) {
+                        yearFormGroup.style.opacity = '1';
+                    }
+                }
+            }
+            
+            // Initial state
+            toggleYearField();
+            
+            // Listen for changes
+            useFileDateCheckbox.addEventListener('change', toggleYearField);
+        }
+
+        // Dynamic tags filtering based on course and category
+        if (courseField && categoryField && tagsField) {
+            let debounceTimer;
+
+            const newTagInput = document.getElementById('newTagInput');
+            const createTagBtn = document.getElementById('createTagBtn');
+            const tagsCheckboxList = document.getElementById('tagsCheckboxList');
+            const tagsSelectedCount = document.getElementById('tagsSelectedCount');
+            
+            function updateTagsDisplay() {
+                const selectedCount = Array.from(tagsField.selectedOptions).length;
+                if (selectedCount > 0) {
+                    tagsSelectedCount.textContent = `${selectedCount} tag${selectedCount !== 1 ? 's' : ''} selected`;
+                } else {
+                    tagsSelectedCount.textContent = '';
+                }
+            }
+            
+            function updateTags() {
+                const courseId = courseField.value;
+                const categoryId = categoryField.value;
+                
+                // Clear debounce timer
+                clearTimeout(debounceTimer);
+                
+                // Debounce the API call
+                debounceTimer = setTimeout(() => {
+                    // Build query string (can be empty if no course/category selected)
+                    const params = new URLSearchParams();
+                    if (courseId) params.append('course', courseId);
+                    if (categoryId) params.append('category', categoryId);
+                    
+                    // Show loading state
+                    tagsCheckboxList.innerHTML = '';
+                    tagsCheckboxList.classList.add('disabled');
+                    
+                    // Fetch tags (including tags with no documents)
+                    fetch('{{ path("admin_bulk_upload_get_tags") }}?' + params.toString())
+                        .then(response => response.json())
+                        .then(tags => {
+                            // Store currently selected values from the hidden select
+                            const selectedValues = Array.from(tagsField.selectedOptions).map(opt => opt.value);
+                            
+                            // Clear and rebuild both select and checkbox list
+                            tagsField.innerHTML = '';
+                            tagsCheckboxList.innerHTML = '';
+                            tagsCheckboxList.classList.remove('disabled');
+                            
+                            if (tags.length > 0) {
+                                // Sort tags alphabetically
+                                tags.sort((a, b) => a.name.localeCompare(b.name));
+                                
+                                tags.forEach(tag => {
+                                    // Add to hidden select
+                                    const option = document.createElement('option');
+                                    option.value = tag.id;
+                                    option.textContent = tag.name;
+                                    // Restore selection if it was previously selected
+                                    if (selectedValues.includes(String(tag.id))) {
+                                        option.selected = true;
+                                    }
+                                    tagsField.appendChild(option);
+                                    
+                                    // Create checkbox item
+                                    const checkboxItem = document.createElement('div');
+                                    checkboxItem.className = 'tag-checkbox-item';
+                                    
+                                    const checkbox = document.createElement('input');
+                                    checkbox.type = 'checkbox';
+                                    checkbox.id = `tag-${tag.id}`;
+                                    checkbox.value = tag.id;
+                                    checkbox.className = 'form-check-input';
+                                    checkbox.checked = selectedValues.includes(String(tag.id));
+                                    
+                                    const label = document.createElement('label');
+                                    label.htmlFor = `tag-${tag.id}`;
+                                    label.textContent = tag.name;
+                                    
+                                    // Handle checkbox change - sync with hidden select
+                                    checkbox.addEventListener('change', function() {
+                                        const option = Array.from(tagsField.options).find(opt => opt.value === String(tag.id));
+                                        if (option) {
+                                            option.selected = this.checked;
+                                        }
+                                        updateTagsDisplay();
+                                    });
+                                    
+                                    checkboxItem.appendChild(checkbox);
+                                    checkboxItem.appendChild(label);
+                                    tagsCheckboxList.appendChild(checkboxItem);
+                                });
+                                
+                                updateTagsDisplay();
+                            } else {
+                                const noTags = document.createElement('div');
+                                noTags.className = 'text-muted fst-italic p-2';
+                                noTags.textContent = 'No tags available';
+                                tagsCheckboxList.appendChild(noTags);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching tags:', error);
+                            tagsCheckboxList.innerHTML = '<div class="text-danger p-2">Error loading tags</div>';
+                            tagsCheckboxList.classList.remove('disabled');
+                        });
+                }, 300); // 300ms debounce
+            }
+            
+            // Listen for changes
+            courseField.addEventListener('change', updateTags);
+            categoryField.addEventListener('change', updateTags);
+            
+            // Initial load - fetch all tags (including those with no documents)
+            updateTags();
+
+            // Handle tag creation
+            if (createTagBtn && newTagInput) {
+                function createNewTag() {
+                    const tagName = newTagInput.value.trim();
+                    
+                    if (!tagName) {
+                        alert('Please enter a tag name');
+                        return;
+                    }
+                    
+                    // Disable button during creation
+                    createTagBtn.disabled = true;
+                    createTagBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating...';
+                    
+                    // Send request to create tag
+                    fetch('{{ path("admin_bulk_upload_create_tag") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ name: tagName })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to create tag');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Check if tag already exists in the select
+                        let optionExists = false;
+                        Array.from(tagsField.options).forEach(option => {
+                            if (option.value === String(data.id)) {
+                                optionExists = true;
+                                option.selected = true;
+                            }
+                        });
+                        
+                        // If tag doesn't exist in the list, add it
+                        if (!optionExists) {
+                            // Add to hidden select
+                            const option = document.createElement('option');
+                            option.value = data.id;
+                            option.textContent = data.name;
+                            option.selected = true;
+                            tagsField.appendChild(option);
+                            
+                            // Add to checkbox list
+                            const checkboxItem = document.createElement('div');
+                            checkboxItem.className = 'tag-checkbox-item';
+                            
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.id = `tag-${data.id}`;
+                            checkbox.value = data.id;
+                            checkbox.className = 'form-check-input';
+                            checkbox.checked = true;
+                            
+                            const label = document.createElement('label');
+                            label.htmlFor = `tag-${data.id}`;
+                            label.textContent = data.name;
+                            
+                            // Sync checkbox with select
+                            checkbox.addEventListener('change', function() {
+                                const option = Array.from(tagsField.options).find(opt => opt.value === String(data.id));
+                                if (option) {
+                                    option.selected = this.checked;
+                                }
+                                updateTagsDisplay();
+                            });
+                            
+                            checkboxItem.appendChild(checkbox);
+                            checkboxItem.appendChild(label);
+                            tagsCheckboxList.appendChild(checkboxItem);
+                        } else {
+                            // Just check the existing checkbox
+                            const existingCheckbox = document.getElementById(`tag-${data.id}`);
+                            if (existingCheckbox) {
+                                existingCheckbox.checked = true;
+                                existingCheckbox.dispatchEvent(new Event('change'));
+                            }
+                        }
+                        
+                        updateTagsDisplay();
+                        
+                        // Clear input
+                        newTagInput.value = '';
+                        
+                        // Show success message
+                        if (data.existing) {
+                            // Create a temporary info message
+                            const infoMsg = document.createElement('div');
+                            infoMsg.className = 'alert alert-info alert-dismissible fade show mt-2';
+                            infoMsg.innerHTML = `
+                                <i class="fa fa-info-circle"></i> Tag "${data.name}" already exists and has been selected
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            `;
+                            newTagInput.parentElement.parentElement.appendChild(infoMsg);
+                            setTimeout(() => infoMsg.remove(), 3000);
+                        } else {
+                            // Create a temporary success message
+                            const successMsg = document.createElement('div');
+                            successMsg.className = 'alert alert-success alert-dismissible fade show mt-2';
+                            successMsg.innerHTML = `
+                                <i class="fa fa-check-circle"></i> Tag "${data.name}" created successfully!
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            `;
+                            newTagInput.parentElement.parentElement.appendChild(successMsg);
+                            setTimeout(() => successMsg.remove(), 3000);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error creating tag:', error);
+                        alert('Failed to create tag. Please try again.');
+                    })
+                    .finally(() => {
+                        // Re-enable button
+                        createTagBtn.disabled = false;
+                        createTagBtn.innerHTML = '<i class="fa fa-plus"></i> Create Tag';
+                    });
+                }
+                
+                createTagBtn.addEventListener('click', createNewTag);
+                
+                // Allow Enter key to create tag
+                newTagInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        createNewTag();
+                    }
+                });
+            }
+        }
+
+        // Capture file timestamps before form submission
+        if (form && fileInput) {
+            form.addEventListener('submit', function(e) {
+                // Remove any existing timestamp fields
+                form.querySelectorAll('.file-timestamp').forEach(el => el.remove());
+                
+                // Add timestamp for each file
+                const files = fileInput.files;
+                const timestamps = [];
+                
+                for (let i = 0; i < files.length; i++) {
+                    // Convert to Unix timestamp (seconds)
+                    const timestamp = Math.floor(files[i].lastModified / 1000);
+                    timestamps.push(timestamp);
+                }
+                
+                // Add as JSON array to form
+                if (timestamps.length > 0) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'file_timestamps';
+                    input.value = JSON.stringify(timestamps);
+                    input.className = 'file-timestamp';
+                    form.appendChild(input);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+
