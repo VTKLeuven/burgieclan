@@ -502,7 +502,7 @@
                     tagsCheckboxList.classList.add('disabled');
                     
                     // Fetch tags (including tags with no documents)
-                    fetch('{{ path('admin_bulk_upload_get_tags') }}?' + params.toString())
+                    fetch('{{ path("admin_bulk_upload_get_tags") }}?' + params.toString())
                         .then(response => response.json())
                         .then(tags => {
                             // Store currently selected values from the hidden select
@@ -595,7 +595,7 @@
                     createTagBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating...';
                     
                     // Send request to create tag
-                    fetch('{{ path('admin_bulk_upload_create_tag') }}', {
+                    fetch('{{ path("admin_bulk_upload_create_tag") }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
