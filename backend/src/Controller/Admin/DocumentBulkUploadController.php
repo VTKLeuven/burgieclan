@@ -119,6 +119,8 @@ class DocumentBulkUploadController extends AbstractController
                             'mimeTypes' => [
                                 'application/pdf',
                                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
                                 'application/msword',
                                 'text/plain',
                                 'image/jpeg',
