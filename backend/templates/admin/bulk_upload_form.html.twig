@@ -3,11 +3,14 @@
 {% block configured_head_contents %}
 {{ parent() }}
 <style>
-    .course-search-wrapper {
+    /* Course and Category autocomplete styles */
+    .course-search-wrapper,
+    .category-search-wrapper {
         position: relative;
     }
     
-    #courseSearch {
+    #courseSearch,
+    #categorySearch {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: 10px center;
@@ -15,12 +18,14 @@
         padding-left: 35px;
     }
     
-    #courseSearch:focus {
+    #courseSearch:focus,
+    #categorySearch:focus {
         border-color: #80bdff;
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
     
-    #courseSearch.is-invalid {
+    #courseSearch.is-invalid,
+    #categorySearch.is-invalid {
         border-color: #dc3545;
         padding-right: calc(1.5em + 0.75rem);
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
@@ -29,20 +34,21 @@
         background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
     }
     
-    #courseSearch.is-invalid:focus {
+    #courseSearch.is-invalid:focus,
+    #categorySearch.is-invalid:focus {
         border-color: #dc3545;
         box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
     }
     
-    #courseDropdown {
+    .form-dropdown {
         position: absolute;
         top: 100%;
         left: 0;
         right: 0;
         max-height: 300px;
         overflow-y: auto;
-        background: white;
-        border: 1px solid #ced4da;
+        background: var(--bs-body-bg);
+        border: 1px solid var(--bs-border-color);
         border-radius: 0.25rem;
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         z-index: 1000;
@@ -50,35 +56,37 @@
         margin-top: 0.25rem;
     }
     
-    #courseDropdown.show {
+    .form-dropdown.show {
         display: block;
     }
     
-    .course-option {
+    .form-dropdown-option {
         padding: 0.5rem 1rem;
         cursor: pointer;
-        border-bottom: 1px solid #f0f0f0;
+        border-bottom: 1px solid var(--bs-border-color);
+        color: var(--bs-body-color);
     }
     
-    .course-option:hover,
-    .course-option.active {
-        background-color: #f8f9fa;
+    .form-dropdown-option:hover,
+    .form-dropdown-option.active {
+        background-color: var(--bs-secondary-bg);
     }
     
-    .course-option:last-child {
+    .form-dropdown-option:last-child {
         border-bottom: none;
     }
     
-    .course-option.no-results {
-        color: #6c757d;
+    .form-dropdown-option.no-results {
+        color: var(--bs-secondary-color);
         cursor: default;
     }
     
-    .course-option.no-results:hover {
-        background-color: white;
+    .form-dropdown-option.no-results:hover {
+        background-color: var(--bs-body-bg);
     }
     
-    #courseFieldHidden {
+    #courseFieldHidden,
+    #categoryFieldHidden {
         display: none;
     }
     
@@ -93,15 +101,15 @@
     #tagsCheckboxList {
         max-height: 250px;
         overflow-y: auto;
-        border: 1px solid #ced4da;
+        border: 1px solid var(--bs-border-color);
         border-radius: 0.25rem;
         padding: 0.5rem;
-        background: white;
+        background: var(--bs-body-bg);
     }
     
     #tagsCheckboxList:empty::before {
         content: 'Loading tags...';
-        color: #6c757d;
+        color: var(--bs-secondary-color);
         font-style: italic;
         display: block;
         padding: 0.5rem;
@@ -117,7 +125,7 @@
     }
     
     .tag-checkbox-item:hover {
-        background-color: #f8f9fa;
+        background-color: var(--bs-secondary-bg);
     }
     
     .tag-checkbox-item input[type="checkbox"] {
@@ -134,7 +142,7 @@
     
     .tags-selected-count {
         font-size: 0.875rem;
-        color: #6c757d;
+        color: var(--bs-secondary-color);
         margin-top: 0.25rem;
     }
     
@@ -173,13 +181,13 @@
                         <div class="mb-3">
                             <label for="courseSearch" class="required">{{ form.course.vars.label }}</label>
                             <div class="course-search-wrapper">
-                                    {{ form_errors(form.course) }}
-                                    <input type="text" 
+                                {{ form_errors(form.course) }}
+                                <input type="text" 
                                        class="form-control" 
                                        id="courseSearch" 
                                        placeholder="Search courses..."
                                        autocomplete="off">
-                                <div id="courseDropdown"></div>
+                                <div id="courseDropdown" class="form-dropdown"></div>
                             </div>
                             <div id="courseFieldHidden">
                                 {{ form_widget(form.course) }}
@@ -189,10 +197,20 @@
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            {{ form_label(form.category) }}
-                            {{ form_widget(form.category) }}
+                            <label for="categorySearch" class="required">{{ form.category.vars.label }}</label>
+                            <div class="category-search-wrapper">
+                                {{ form_errors(form.category) }}
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="categorySearch" 
+                                       placeholder="Search categories..."
+                                       autocomplete="off">
+                                <div id="categoryDropdown" class="form-dropdown"></div>
+                            </div>
+                            <div id="categoryFieldHidden">
+                                {{ form_widget(form.category) }}
+                            </div>
                             {{ form_help(form.category) }}
-                            {# {{ form_errors(form.category) }} #}
                         </div>
                     </div>
                 </div>
@@ -256,6 +274,9 @@
                     {{ form_row(form.files) }}
                 </div>
                 
+                {# Manually render CSRF token #}
+                {{ form_row(form._token) }}
+                
                 <div class="form-actions d-flex gap-2">
                     <twig:ea:Button 
                         variant="primary" 
@@ -274,7 +295,7 @@
                         Cancel
                     </twig:ea:Button>
                 </div>
-            {# {{ form_end(form) }} #}
+            {{ form_end(form, {'render_rest': false}) }}
         </div>
     </div>
 {% endblock %}
@@ -329,13 +350,13 @@
                 
                 if (courses.length === 0) {
                     const noResults = document.createElement('div');
-                    noResults.className = 'course-option no-results';
+                    noResults.className = 'form-dropdown-option no-results';
                     noResults.textContent = 'No courses found';
                     courseDropdown.appendChild(noResults);
                 } else {
                     courses.forEach(course => {
                         const option = document.createElement('div');
-                        option.className = 'course-option';
+                        option.className = 'form-dropdown-option';
                         option.textContent = course.text;
                         option.dataset.value = course.value;
                         
@@ -373,6 +394,12 @@
             
             // Show all courses when focusing
             courseSearch.addEventListener('focus', function() {
+                // Close category dropdown if open
+                const categoryDropdown = document.getElementById('categoryDropdown');
+                if (categoryDropdown) {
+                    categoryDropdown.classList.remove('show');
+                }
+                
                 const searchTerm = this.value;
                 const filtered = searchTerm ? filterCourses(searchTerm) : allCourses;
                 showDropdown(filtered);
@@ -392,8 +419,8 @@
             
             // Handle keyboard navigation
             courseSearch.addEventListener('keydown', function(e) {
-                const options = courseDropdown.querySelectorAll('.course-option:not(.no-results)');
-                const activeOption = courseDropdown.querySelector('.course-option.active');
+                const options = courseDropdown.querySelectorAll('.form-dropdown-option:not(.no-results)');
+                const activeOption = courseDropdown.querySelector('.form-dropdown-option.active');
                 let currentIndex = Array.from(options).indexOf(activeOption);
                 
                 if (e.key === 'ArrowDown') {
@@ -437,6 +464,161 @@
                 if (course) {
                     selectedCourse = course;
                     courseSearch.value = course.text;
+                }
+            }
+        }
+        
+        // Category autocomplete functionality
+        const categorySearch = document.getElementById('categorySearch');
+        const categoryDropdown = document.getElementById('categoryDropdown');
+        
+        if (categorySearch && categoryField && categoryDropdown) {
+            // Check if category field has errors and apply styling
+            const categoryFieldWrapper = categoryField.closest('.mb-3');
+            const hasCategoryErrors = categoryFieldWrapper && categoryFieldWrapper.querySelector('.invalid-feedback');
+            
+            if (hasCategoryErrors) {
+                categorySearch.classList.add('is-invalid');
+            }
+            
+            // Remove error styling when user interacts with the field
+            categorySearch.addEventListener('input', function() {
+                categorySearch.classList.remove('is-invalid');
+            });
+            
+            categorySearch.addEventListener('change', function() {
+                categorySearch.classList.remove('is-invalid');
+            });
+            
+            // Store all categories as data
+            const allCategories = Array.from(categoryField.options)
+                .filter(opt => opt.value !== '') // Exclude placeholder
+                .map(opt => ({
+                    value: opt.value,
+                    text: opt.textContent.trim()
+                }));
+            
+            let selectedCategory = null;
+            
+            function showCategoryDropdown(categories) {
+                categoryDropdown.innerHTML = '';
+                
+                if (categories.length === 0) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'form-dropdown-option no-results';
+                    noResults.textContent = 'No categories found';
+                    categoryDropdown.appendChild(noResults);
+                } else {
+                    categories.forEach(category => {
+                        const option = document.createElement('div');
+                        option.className = 'form-dropdown-option';
+                        option.textContent = category.text;
+                        option.dataset.value = category.value;
+                        
+                        option.addEventListener('click', function() {
+                            selectCategory(category);
+                        });
+                        
+                        categoryDropdown.appendChild(option);
+                    });
+                }
+                
+                categoryDropdown.classList.add('show');
+            }
+            
+            function hideCategoryDropdown() {
+                categoryDropdown.classList.remove('show');
+            }
+            
+            function selectCategory(category) {
+                selectedCategory = category;
+                categorySearch.value = category.text;
+                categoryField.value = category.value;
+                hideCategoryDropdown();
+                
+                // Trigger change event for tags update
+                categoryField.dispatchEvent(new Event('change'));
+            }
+            
+            function filterCategories(searchTerm) {
+                const searchLower = searchTerm.toLowerCase();
+                return allCategories.filter(category => 
+                    category.text.toLowerCase().includes(searchLower)
+                );
+            }
+            
+            // Show all categories when focusing
+            categorySearch.addEventListener('focus', function() {
+                // Close course dropdown if open
+                const courseDropdown = document.getElementById('courseDropdown');
+                if (courseDropdown) {
+                    courseDropdown.classList.remove('show');
+                }
+                
+                const searchTerm = this.value;
+                const filtered = searchTerm ? filterCategories(searchTerm) : allCategories;
+                showCategoryDropdown(filtered);
+            });
+            
+            // Filter as user types
+            categorySearch.addEventListener('input', function() {
+                const filtered = filterCategories(this.value);
+                showCategoryDropdown(filtered);
+                
+                // Clear selection if user modifies the text
+                if (selectedCategory && this.value !== selectedCategory.text) {
+                    selectedCategory = null;
+                    categoryField.value = '';
+                }
+            });
+            
+            // Handle keyboard navigation
+            categorySearch.addEventListener('keydown', function(e) {
+                const options = categoryDropdown.querySelectorAll('.form-dropdown-option:not(.no-results)');
+                const activeOption = categoryDropdown.querySelector('.form-dropdown-option.active');
+                let currentIndex = Array.from(options).indexOf(activeOption);
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (currentIndex < options.length - 1) {
+                        if (activeOption) activeOption.classList.remove('active');
+                        options[currentIndex + 1].classList.add('active');
+                        options[currentIndex + 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (currentIndex > 0) {
+                        if (activeOption) activeOption.classList.remove('active');
+                        options[currentIndex - 1].classList.add('active');
+                        options[currentIndex - 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (activeOption) {
+                        const value = activeOption.dataset.value;
+                        const category = allCategories.find(c => c.value === value);
+                        if (category) {
+                            selectCategory(category);
+                        }
+                    }
+                } else if (e.key === 'Escape') {
+                    hideCategoryDropdown();
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!categorySearch.contains(e.target) && !categoryDropdown.contains(e.target)) {
+                    hideCategoryDropdown();
+                }
+            });
+            
+            // Initialize with existing value if any
+            if (categoryField.value) {
+                const category = allCategories.find(c => c.value === categoryField.value);
+                if (category) {
+                    selectedCategory = category;
+                    categorySearch.value = category.text;
                 }
             }
         }
@@ -560,7 +742,8 @@
                                 updateTagsDisplay();
                             } else {
                                 const noTags = document.createElement('div');
-                                noTags.className = 'text-muted fst-italic p-2';
+                                noTags.className = 'fst-italic p-2';
+                                noTags.style.color = 'var(--bs-secondary-color)';
                                 noTags.textContent = 'No tags available';
                                 tagsCheckboxList.appendChild(noTags);
                             }
