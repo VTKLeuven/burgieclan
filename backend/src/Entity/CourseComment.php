@@ -32,6 +32,11 @@ class CourseComment extends AbstractComment implements VotableInterface
         $this->votes = new ArrayCollection();
     }
 
+    public function __toString(): string
+    {
+        return sprintf('%s (%s)', $this->getContent(), $this->getCourse()->getName());
+    }
+
     public function getId(): ?int
     {
         return $this->id;

@@ -24,4 +24,9 @@ class DocumentVote extends AbstractVote
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return sprintf('%s (%s)', $this->getVoteType(), $this->getDocument()->getName());
+    }
 }
