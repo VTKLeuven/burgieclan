@@ -38,7 +38,7 @@ class CommentCategory
 
     public function __toString(): string
     {
-        return $this->getNameNl();
+        return sprintf('%s (%s)', $this->getNameNl(), $this->getNameEn());
     }
 
     public function getId(): ?int

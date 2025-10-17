@@ -76,4 +76,9 @@ class UserDocumentView
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return sprintf('%s (%s)', $this->getUser()->getFullName(), $this->getDocument()->getName());
+    }
 }
