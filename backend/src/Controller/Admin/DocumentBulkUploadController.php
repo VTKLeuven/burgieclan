@@ -147,6 +147,11 @@ class DocumentBulkUploadController extends AbstractController
             return $this->handleUpload($form);
         }
 
+        if ($form->isSubmitted() && !$form->isValid()) {
+            $this->addFlash('error', 'Please check your input and try again.');
+            error_log($form->getErrors());
+        }
+
         return $this->render('admin/bulk_upload_form.html.twig', [
             'form' => $form->createView(),
         ]);
