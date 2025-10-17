@@ -119,6 +119,8 @@ class DocumentBulkUploadController extends AbstractController
                             'mimeTypes' => [
                                 'application/pdf',
                                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
                                 'application/msword',
                                 'text/plain',
                                 'image/jpeg',
@@ -143,6 +145,11 @@ class DocumentBulkUploadController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             return $this->handleUpload($form);
+        }
+
+        if ($form->isSubmitted() && !$form->isValid()) {
+            $this->addFlash('error', 'Please check your input and try again.');
+            error_log($form->getErrors());
         }
 
         return $this->render('admin/bulk_upload_form.html.twig', [
