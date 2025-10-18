@@ -20,21 +20,21 @@ class Document extends Node implements VotableInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private string $name;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Course $course = null;
+    private Course $course;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?DocumentCategory $category = null;
+    private DocumentCategory $category;
 
     #[ORM\Column]
-    private ?bool $under_review = null;
+    private bool $under_review;
 
     #[ORM\Column]
-    private ?bool $anonymous = null;
+    private bool $anonymous;
 
     #[Vich\UploadableField(mapping: 'document_object', fileNameProperty: 'file_name', size: 'file_size')]
     private ?File $file = null;
@@ -48,10 +48,21 @@ class Document extends Node implements VotableInterface
     #[ORM\Column(length: 11, nullable: true)]
     private ?string $year = null; // Ex. 2024 - 2025
 
+    /**
+     * @var Collection<int, Tag>
+     */
     #[ORM\ManyToMany(targetEntity: Tag::class, mappedBy: 'documents', cascade: ['persist'])]
     private Collection $tags;
 
-    #[ORM\OneToMany(mappedBy: 'document', targetEntity: DocumentVote::class, cascade: ['persist', 'remove'])]
+    /**
+     * @var Collection<int, DocumentVote>
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'document',
+        targetEntity: DocumentVote::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
     private Collection $votes;
 
     public function __construct($creator)
@@ -66,7 +77,7 @@ class Document extends Node implements VotableInterface
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -77,7 +88,7 @@ class Document extends Node implements VotableInterface
         return $this;
     }
 
-    public function getCourse(): ?Course
+    public function getCourse(): Course
     {
         return $this->course;
     }
@@ -89,7 +100,7 @@ class Document extends Node implements VotableInterface
         return $this;
     }
 
-    public function getCategory(): ?DocumentCategory
+    public function getCategory(): DocumentCategory
     {
         return $this->category;
     }
@@ -101,7 +112,7 @@ class Document extends Node implements VotableInterface
         return $this;
     }
 
-    public function isUnderReview(): ?bool
+    public function isUnderReview(): bool
     {
         return $this->under_review;
     }
@@ -113,7 +124,7 @@ class Document extends Node implements VotableInterface
         return $this;
     }
 
-    public function isAnonymous(): ?bool
+    public function isAnonymous(): bool
     {
         return $this->anonymous;
     }
@@ -249,7 +260,7 @@ class Document extends Node implements VotableInterface
      */
     public function getVotes(): Collection
     {
-        return $this->votes ?? new ArrayCollection();
+        return $this->votes;
     }
 
     /**
@@ -336,7 +347,7 @@ class Document extends Node implements VotableInterface
      *
      * @param DocumentVote $vote
      *
-     * @return Document
+     * @return static
      */
     public function addVote(DocumentVote $vote): static
     {
@@ -350,19 +361,15 @@ class Document extends Node implements VotableInterface
 
     /**
      * Remove a vote from this document
+     * The vote will be deleted from the database due to the orphanRemoval setting
      *
      * @param DocumentVote $vote
      *
-     * @return Document
+     * @return static
      */
     public function removeVote(DocumentVote $vote): static
     {
-        if ($this->votes->removeElement($vote)) {
-            // Set the owning side to null (unless already changed)
-            if ($vote->getDocument() === $this) {
-                $vote->setDocument(null);
-            }
-        }
+        $this->votes->removeElement($vote);
 
         return $this;
     }

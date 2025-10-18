@@ -5,6 +5,7 @@ namespace App\Mapper;
 use App\ApiResource\CourseCommentVoteApi;
 use App\Entity\CourseComment;
 use App\Entity\CourseCommentVote;
+use App\Entity\User;
 use App\Repository\CourseCommentVoteRepository;
 use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -29,7 +30,10 @@ class CourseCommentVoteApiToEntityMapper implements MapperInterface
     {
         assert($from instanceof CourseCommentVoteApi);
 
-        $entity = $from->id ? $this->repository->find($from->id) : new CourseCommentVote($this->security->getUser());
+        $user = $this->security->getUser();
+        assert($user instanceof User);
+
+        $entity = $from->id ? $this->repository->find($from->id) : new CourseCommentVote($user);
         if (!$entity) {
             throw new Exception('Course comment vote not found');
         }

@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use DateTime;
 use DateTimeImmutable;
-use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -17,16 +16,16 @@ abstract class Node
     private User $creator;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    protected DateTimeInterface $createDate;
+    protected DateTimeImmutable $createDate;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    protected DateTimeInterface $updateDate;
+    protected DateTime $updateDate;
 
     public function __construct(User $creator)
     {
         $this->creator = $creator;
         $this->createDate = new DateTimeImmutable();
-        $this->updateDate = $this->createDate;
+        $this->updateDate = new DateTime();
     }
 
     public function getCreator(): User
@@ -41,12 +40,12 @@ abstract class Node
         return $this;
     }
 
-    public function getCreateDate(): DateTimeInterface
+    public function getCreateDate(): DateTimeImmutable
     {
         return $this->createDate;
     }
 
-    public function getUpdateDate(): DateTimeInterface
+    public function getUpdateDate(): DateTime
     {
         return $this->updateDate;
     }

@@ -65,28 +65,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $accesstoken;
 
     /**
-     * @var Collection
+     * @var Collection<int, Program>
      */
     #[ORM\ManyToMany(targetEntity: Program::class, inversedBy: 'users')]
     #[ORM\JoinTable(name: 'favorite_user_program')]
     private Collection $favoritePrograms;
 
     /**
-     * @var Collection
+     * @var Collection<int, Module>
      */
     #[ORM\ManyToMany(targetEntity: Module::class, inversedBy: 'users')]
     #[ORM\JoinTable(name: 'favorite_user_module')]
     private Collection $favoriteModules;
 
     /**
-     * @var Collection
+     * @var Collection<int, Course>
      */
     #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'users')]
     #[ORM\JoinTable(name: 'favorite_user_course')]
     private Collection $favoriteCourses;
 
     /**
-     * @var Collection
+     * @var Collection<int, Document>
      */
     #[ORM\ManyToMany(targetEntity: Document::class, inversedBy: 'users')]
     #[ORM\JoinTable(name: 'favorite_user_document')]
@@ -98,12 +98,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
     private bool $defaultAnonymous = true;
 
-
+    /**
+     * @var Collection<int, UserDocumentView>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserDocumentView::class)]
     private Collection $viewedDocuments;
 
         /**
-     * @var Collection
+     * @var Collection<int, DocumentVote>
      */
     #[ORM\OneToMany(
         mappedBy: 'creator',
@@ -114,7 +116,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $documentVotes;
 
     /**
-     * @var Collection
+     * @var Collection<int, DocumentCommentVote>
      */
     #[ORM\OneToMany(
         mappedBy: 'creator',
@@ -125,7 +127,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $documentCommentVotes;
 
     /**
-     * @var Collection
+     * @var Collection<int, CourseCommentVote>
      */
     #[ORM\OneToMany(
         mappedBy: 'creator',

@@ -17,7 +17,7 @@ class Announcement extends Node
     private ?int $id = null;
 
     #[ORM\Column(type: Types::BOOLEAN)]
-    private ?bool $priority = null;
+    private bool $priority;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $title_nl = null;
@@ -26,10 +26,10 @@ class Announcement extends Node
     private ?string $title_en = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $content_nl = null;
+    private string $content_nl;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $content_en = null;
+    private string $content_en;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\GreaterThanOrEqual('now Europe/Brussels')]
@@ -95,12 +95,12 @@ class Announcement extends Node
         return $this;
     }
 
-    public function getContentEn(): ?string
+    public function getContentEn(): string
     {
         return $this->content_en;
     }
 
-    public function getContentNl(): ?string
+    public function getContentNl(): string
     {
         return $this->content_nl;
     }

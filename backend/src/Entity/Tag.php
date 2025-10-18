@@ -18,6 +18,9 @@ class Tag
     #[ORM\Column(length: 255, unique: true)]
     private string $name;
 
+    /**
+     * @var Collection<int, Document>
+     */
     #[ORM\ManyToMany(targetEntity: Document::class, inversedBy: 'tags', cascade: ['persist'])]
     private Collection $documents;
 

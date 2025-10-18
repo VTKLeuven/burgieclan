@@ -17,12 +17,16 @@ class DocumentComment extends AbstractComment implements VotableInterface
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'cascade')]
-    private ?Document $document = null;
+    private Document $document;
 
+    /**
+     * @var Collection<int, DocumentCommentVote>
+     */
     #[ORM\OneToMany(
         mappedBy: 'documentComment',
         targetEntity: DocumentCommentVote::class,
-        cascade: ['persist', 'remove']
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
     )]
     private Collection $votes;
     
@@ -42,12 +46,12 @@ class DocumentComment extends AbstractComment implements VotableInterface
         return $this->id;
     }
 
-    public function getDocument(): ?Document
+    public function getDocument(): Document
     {
         return $this->document;
     }
 
-    public function setDocument(?Document $document): static
+    public function setDocument(Document $document): static
     {
         $this->document = $document;
 
@@ -61,7 +65,7 @@ class DocumentComment extends AbstractComment implements VotableInterface
      */
     public function getVotes(): Collection
     {
-        return $this->votes ?? new ArrayCollection();
+        return $this->votes;
     }
 
     /**
@@ -144,7 +148,7 @@ class DocumentComment extends AbstractComment implements VotableInterface
      *
      * @param DocumentCommentVote $vote
      *
-     * @return DocumentComment
+     * @return static
      */
     public function addVote(DocumentCommentVote $vote): static
     {
@@ -160,16 +164,12 @@ class DocumentComment extends AbstractComment implements VotableInterface
      *
      * @param DocumentCommentVote $vote
      *
-     * @return DocumentComment
+     * @return static
      */
     public function removeVote(DocumentCommentVote $vote): static
     {
-        if ($this->votes->removeElement($vote)) {
-            // Set the owning side to null (unless already changed)
-            if ($vote->getDocumentComment() === $this) {
-                $vote->setDocumentComment(null);
-            }
-        }
+        $this->votes->removeElement($vote);
+
         return $this;
     }
 }

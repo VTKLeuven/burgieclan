@@ -22,7 +22,7 @@ class QuickLink
     private ?string $name_en = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $linkTo = null;
+    private string $linkTo;
 
     public function getId(): ?int
     {
@@ -58,7 +58,7 @@ class QuickLink
         return $this;
     }
 
-    public function getLinkTo(): ?string
+    public function getLinkTo(): string
     {
         return $this->linkTo;
     }

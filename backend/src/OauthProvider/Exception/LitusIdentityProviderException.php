@@ -29,8 +29,8 @@ class LitusIdentityProviderException extends IdentityProviderException
      * @param string|null $message
      * @return IdentityProviderException
      */
-    protected static function fromResponse(ResponseInterface $response, string $message = null)
+    protected static function fromResponse(ResponseInterface $response, ?string $message = null)
     {
-        return new static($message, $response->getStatusCode(), (string)$response->getBody());
+        return new self($message ?? 'Unknown error', $response->getStatusCode(), (string)$response->getBody());
     }
 }
