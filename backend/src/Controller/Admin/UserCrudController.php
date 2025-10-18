@@ -75,7 +75,7 @@ class UserCrudController extends AbstractCrudController
             ->setLabel('Favorite Documents');
     }
 
-    public function createEntity(string $entityFqcn)
+    public function createEntity(string $entityFqcn): User
     {
         $user = new User();
         // Set a temporary password that will be replaced by the form submission
