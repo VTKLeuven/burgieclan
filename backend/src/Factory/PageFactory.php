@@ -73,7 +73,7 @@ final class PageFactory extends PersistentProxyObjectFactory
      */
     protected function defaults(): array
     {
-        $name = self::faker()->text(20);
+        $name = self::faker()->unique()->text(20);
         return [
             'name_nl' => $name,
             'content_nl' => self::faker()->text(2000),
