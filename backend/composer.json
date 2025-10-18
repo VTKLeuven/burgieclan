@@ -13,7 +13,7 @@
     "symfony/polyfill-php81": "*"
   },
   "require": {
-    "php": ">=8.3",
+    "php": ">=8.4",
     "ext-iconv": "*",
     "ext-pdo_sqlite": "*",
     "ext-zip": "*",
@@ -95,7 +95,7 @@
       "php-http/discovery": true
     },
     "platform": {
-      "php": "8.3"
+      "php": "8.4"
     },
     "preferred-install": {
       "*": "dist"
