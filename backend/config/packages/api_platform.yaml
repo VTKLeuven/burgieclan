@@ -1,6 +1,8 @@
 api_platform:
   title: Burgieclan API Platform
   version: 1.0.0
+  serializer:
+    hydra_prefix: true
   formats:
     jsonld: ["application/ld+json"]
     multipart: ["multipart/form-data"] # Needed for file upload
