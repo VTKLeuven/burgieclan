@@ -58,7 +58,7 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           cd backend
-          APP_ENV=test vendor/bin/phpunit tests
+          APP_ENV=test vendor/bin/paratest --processes=8 tests
 
       - name: Block merge if tests fail
         if: failure() # This step runs only if the previous steps failed
