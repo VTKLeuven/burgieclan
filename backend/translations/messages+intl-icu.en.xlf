@@ -58,7 +58,7 @@
 
             <trans-unit id="title.homepage">
                 <source>title.homepage</source>
-                <target><![CDATA[Welcome to the <strong>Symfony Demo</strong> application]]></target>
+                <target><![CDATA[Welcome to <strong>Burgieclan</strong>]]></target>
             </trans-unit>
             <trans-unit id="title.source_code">
                 <source>title.source_code</source>
@@ -419,15 +419,6 @@
             <trans-unit id="info.change_password">
                 <source>info.change_password</source>
                 <target>After changing your password, you will be logged out of the application.</target>
-            </trans-unit>
-
-            <trans-unit id="rss.title">
-                <source>rss.title</source>
-                <target>Symfony Demo blog</target>
-            </trans-unit>
-            <trans-unit id="rss.description">
-                <source>rss.description</source>
-                <target>Most recent posts published on the Symfony Demo blog</target>
             </trans-unit>
 
             <trans-unit id="paginator.previous">
