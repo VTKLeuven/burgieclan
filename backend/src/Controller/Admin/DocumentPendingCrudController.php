@@ -117,10 +117,19 @@ class DocumentPendingCrudController extends DocumentCrudController
         EntityManagerInterface $entityManagerInterface,
         AdminUrlGenerator      $adminUrlGenerator
     ): RedirectResponse {
-        $document = $adminContext->getEntity()->getInstance();
-        if (!$document instanceof Document) {
-            throw new LogicException('Entity is missing or not a Document');
+        // In EasyAdmin 4.26+, when POSTing to a custom action, the entity might not be in the context
+        // We need to retrieve the entity ID from the request and load it manually
+        $entityId = $adminContext->getRequest()->query->get('entityId');
+        if (!$entityId) {
+            throw new LogicException('Entity ID is missing from the request');
         }
+
+        // Load the entity manually
+        $document = $entityManagerInterface->getRepository(Document::class)->find($entityId);
+        if (!$document instanceof Document) {
+            throw new LogicException('Document not found with ID: ' . $entityId);
+        }
+
         $document->setUnderReview(false);
 
         $entityManagerInterface->flush();
