@@ -16,8 +16,11 @@ class Module
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private string $name;
 
+    /**
+     * @var Collection<int, Course>
+     */
     #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'modules')]
     private Collection $courses;
 
@@ -25,6 +28,9 @@ class Module
     #[ORM\JoinColumn(nullable: true)]
     private ?Program $program = null;
 
+    /**
+     * @var Collection<int, Module>
+     */
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'modules')]
     private Collection $modules;
 
@@ -44,7 +50,7 @@ class Module
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }

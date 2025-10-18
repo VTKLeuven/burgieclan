@@ -39,7 +39,7 @@ final class DocumentVoteFactory extends PersistentProxyObjectFactory
      *
      * @todo add your default values here
      */
-    protected function defaults(): array|callable
+    protected function defaults(): array
     {
         return [
             'creator' => UserFactory::randomOrCreate(),

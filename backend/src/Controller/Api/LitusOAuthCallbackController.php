@@ -4,13 +4,12 @@ namespace App\Controller\Api;
 
 use App\OauthProvider\LitusResourceOwner;
 use App\Repository\UserRepository;
-use DateTime;
-use DateTimeInterface;
 use Exception;
 use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface;
 use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2Client;
+use League\OAuth2\Client\Token\AccessToken;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -82,6 +81,7 @@ class LitusOAuthCallbackController extends AbstractController
             $client = $this->clientRegistry->getClient('litus_api');
 
             // Exchange code for access token
+            /** @var AccessToken $accessToken */
             $accessToken = $client->getAccessToken();
 
             // Get user info using your existing LitusResourceOwner

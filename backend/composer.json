@@ -67,7 +67,7 @@
   },
   "require-dev": {
     "dama/doctrine-test-bundle": "^8.4",
-    "doctrine/doctrine-fixtures-bundle": "^3.5",
+    "doctrine/doctrine-fixtures-bundle": "^4.2",
     "mtdowling/jmespath.php": "^2.7",
     "phpro/grumphp": "^2.2",
     "phpstan/extension-installer": "^1.2",

@@ -65,7 +65,7 @@ class ArrayContainsFilter implements FilterInterface
         }
 
         // Use LIKE for scalar array fields stored as JSON (e.g., roles)
-        if (($comparison === 'CONTAINS_ANY' || $comparison === 'CONTAINS_ALL') && $values) {
+        if (($comparison === 'CONTAINS_ANY' || $comparison === 'CONTAINS_ALL')) {
             $expr = $comparison === 'CONTAINS_ANY' ? $queryBuilder->expr()->orX() : $queryBuilder->expr()->andX();
             foreach ($values as $i => $v) {
                 // Match the value as a whole word in the JSON array string

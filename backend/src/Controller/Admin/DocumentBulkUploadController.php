@@ -163,10 +163,8 @@ class DocumentBulkUploadController extends AbstractController
         $data = $form->getData();
         $files = $form->get('files')->getData();
 
-        if (!$files || !is_array($files) || count($files) === 0) {
-            $this->addFlash('error', 'Please select at least one file to upload.');
-            return $this->redirectToRoute('admin_bulk_upload_index');
-        }
+        // Form validation ensures files are present and valid
+        assert(is_array($files) && count($files) > 0);
 
         // Get file timestamps from JavaScript
         $request = $this->requestStack->getCurrentRequest();

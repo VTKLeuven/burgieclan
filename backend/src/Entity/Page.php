@@ -3,12 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PageRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
-use App\Validator as CustomAssert;
 
 #[ORM\Entity(repositoryClass: PageRepository::class)]
 class Page
@@ -35,7 +31,7 @@ class Page
     public static string $DEFAULT_LANGUAGE = 'nl';
 
     #[ORM\Column(length: 255)]
-    private ?string $name_nl = null;
+    private string $name_nl;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $content_nl = null;
@@ -88,7 +84,7 @@ class Page
         return $this->{'name_'.$lang} ?? $this->{'name_'.self::$DEFAULT_LANGUAGE};
     }
 
-    public function getNameNl(): ?string
+    public function getNameNl(): string
     {
         return $this->name_nl;
     }

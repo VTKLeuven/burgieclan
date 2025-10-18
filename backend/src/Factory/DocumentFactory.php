@@ -12,7 +12,6 @@
 namespace App\Factory;
 
 use App\Entity\Document;
-use App\Entity\Tag;
 use App\Repository\DocumentRepository;
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
@@ -72,7 +71,7 @@ final class DocumentFactory extends PersistentProxyObjectFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      */
-    protected function defaults(): array|callable
+    protected function defaults(): callable
     {
         return function () {
             $tagsNeeded = self::faker()->numberBetween(1, 3);
