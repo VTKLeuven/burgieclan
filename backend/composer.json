@@ -80,7 +80,7 @@
     "symfony/css-selector": "^6.4",
     "symfony/debug-bundle": "^6.4",
     "symfony/maker-bundle": "^1.36",
-    "symfony/phpunit-bridge": "^6.4",
+    "symfony/phpunit-bridge": "^7.3",
     "symfony/stopwatch": "^6.4",
     "symfony/web-profiler-bundle": "^6.4",
     "zenstruck/browser": "^1.9",
