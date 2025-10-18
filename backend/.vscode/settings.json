@@ -1,6 +1,0 @@
-{
-    "phpunit.phpunit": "./vendor/bin/paratest",
-    "phpunit.args": [
-        "--processes=8"
-    ]
-}
