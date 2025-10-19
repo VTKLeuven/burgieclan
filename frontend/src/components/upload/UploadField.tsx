@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
-import { X } from 'lucide-react';
-import { FieldError, FieldErrorsImpl, UseFormSetValue } from 'react-hook-form';
+import { cn } from '@/lib/utils';
 import { UploadFormData } from '@/types/upload';
 import { ALLOWED_MIME_TYPES, FILE_SIZE_MB } from '@/utils/constants/upload';
 import { fileTypeFromBlob } from 'file-type';
-import { Merge } from "type-fest";
+import { X } from 'lucide-react';
+import Image from 'next/image';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FieldError, FieldErrorsImpl, UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { cn } from '@/lib/utils';
+import { Merge } from "type-fest";
 
 interface FileUploadProps {
     error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
@@ -23,10 +23,10 @@ interface FilePreview {
 }
 
 export const UploadField: React.FC<FileUploadProps> = ({
-                                                           error,
-                                                           setValue,
-                                                           initialFile,
-                                                           className
+    error,
+    setValue,
+    initialFile,
+    className
 }) => {
     const [isDragging, setIsDragging] = useState(false);
     const [filePreview, setFilePreview] = useState<FilePreview | null>(null);
@@ -37,9 +37,14 @@ export const UploadField: React.FC<FileUploadProps> = ({
         const iconMap: Record<string, string> = {
             'application/pdf': '/images/icons/PDF.svg',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '/images/icons/DOCX.svg',
+            'application/msword': '/images/icons/DOC.svg',
+            'application/vnd.ms-powerpoint': '/images/icons/PPT.svg',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation': '/images/icons/PPT.svg',
             'image/jpeg': '/images/icons/JPG.svg',
+            'image/jpg': '/images/icons/JPG.svg',
             'image/png': '/images/icons/PNG.svg',
-            'application/zip': '/images/icons/ZIP.svg'
+            'application/zip': '/images/icons/ZIP.svg',
+            'text/csv': '/images/icons/CSV.svg',
         };
 
         const iconSrc = iconMap[type?.mime || ''] || '/images/icons/default.svg';
