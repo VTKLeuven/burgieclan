@@ -71,7 +71,7 @@ jobs:
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
           ln -sfn \$RELEASE_DIR ${{ secrets.DEPLOY_PATH }}/backend/current && \
-          sudo systemctl reload php8.3-fpm"
+          sudo systemctl reload php8.4-fpm"
       # Cleanup old releases keeping last 2
       - name: Cleanup old backend releases
         run: |

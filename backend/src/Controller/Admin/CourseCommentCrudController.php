@@ -32,7 +32,7 @@ class CourseCommentCrudController extends AbstractCrudController
             ->setEntityLabelInPlural('Course Comments');
     }
 
-    public function createEntity(string $entityFqcn)
+    public function createEntity(string $entityFqcn): CourseComment
     {
         $user = $this->getUser();
         assert($user instanceof User);

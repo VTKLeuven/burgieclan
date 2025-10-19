@@ -26,7 +26,7 @@ class DocumentCrudController extends AbstractCrudController
         return Document::class;
     }
 
-    public function createEntity(string $entityFqcn)
+    public function createEntity(string $entityFqcn): Document
     {
         $user = $this->getUser();
         assert($user instanceof User);

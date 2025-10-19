@@ -11,14 +11,14 @@ class CourseCommentVote extends AbstractVote
 {
     #[ORM\ManyToOne(targetEntity: CourseComment::class, inversedBy: 'votes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?CourseComment $courseComment = null;
+    private CourseComment $courseComment;
 
     public function getCourseComment(): ?CourseComment
     {
         return $this->courseComment;
     }
 
-    public function setCourseComment(?CourseComment $courseComment): static
+    public function setCourseComment(CourseComment $courseComment): static
     {
         $this->courseComment = $courseComment;
 

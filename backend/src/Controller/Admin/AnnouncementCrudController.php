@@ -20,7 +20,7 @@ class AnnouncementCrudController extends AbstractCrudController
         return Announcement::class;
     }
 
-    public function createEntity(string $entityFqcn)
+    public function createEntity(string $entityFqcn): Announcement
     {
         $user = $this->getUser();
         assert($user instanceof User);

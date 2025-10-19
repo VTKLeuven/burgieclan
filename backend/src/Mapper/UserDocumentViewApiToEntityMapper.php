@@ -4,6 +4,7 @@ namespace App\Mapper;
 
 use App\ApiResource\UserDocumentViewApi;
 use App\Entity\Document;
+use App\Entity\User;
 use App\Entity\UserDocumentView;
 use App\Repository\UserDocumentViewRepository;
 use Exception;
@@ -36,8 +37,10 @@ class UserDocumentViewApiToEntityMapper implements MapperInterface
             $document = $this->microMapper->map($from->document, Document::class, [
                 MicroMapperInterface::MAX_DEPTH => 0,
             ]);
+            $user = $this->security->getUser();
+            assert($user instanceof User);
             $entity = new UserDocumentView(
-                $this->security->getUser(),
+                $user,
                 $document,
                 $from->lastViewed
             );

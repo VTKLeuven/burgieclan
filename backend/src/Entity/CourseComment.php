@@ -17,13 +17,21 @@ class CourseComment extends AbstractComment implements VotableInterface
 
     #[ORM\ManyToOne(inversedBy: 'courseComments')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Course $course = null;
+    private Course $course;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?CommentCategory $category = null;
+    private CommentCategory $category;
 
-    #[ORM\OneToMany(mappedBy: 'courseComment', targetEntity: CourseCommentVote::class, cascade: ['persist', 'remove'])]
+    /**
+     * @var Collection<int, CourseCommentVote>
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'courseComment',
+        targetEntity: CourseCommentVote::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
     private Collection $votes;
 
     public function __construct(User $creator)
@@ -42,24 +50,24 @@ class CourseComment extends AbstractComment implements VotableInterface
         return $this->id;
     }
 
-    public function getCourse(): ?Course
+    public function getCourse(): Course
     {
         return $this->course;
     }
 
-    public function setCourse(?Course $course): self
+    public function setCourse(Course $course): self
     {
         $this->course = $course;
 
         return $this;
     }
 
-    public function getCategory(): ?CommentCategory
+    public function getCategory(): CommentCategory
     {
         return $this->category;
     }
 
-    public function setCategory(?CommentCategory $category): self
+    public function setCategory(CommentCategory $category): self
     {
         $this->category = $category;
 
@@ -73,7 +81,7 @@ class CourseComment extends AbstractComment implements VotableInterface
      */
     public function getVotes(): Collection
     {
-        return $this->votes ?? new ArrayCollection();
+        return $this->votes;
     }
 
     /**
@@ -160,7 +168,7 @@ class CourseComment extends AbstractComment implements VotableInterface
      *
      * @param CourseCommentVote $vote
      *
-     * @return CourseCommentVote
+     * @return static
      */
     public function addVote(CourseCommentVote $vote): static
     {
@@ -177,16 +185,11 @@ class CourseComment extends AbstractComment implements VotableInterface
      *
      * @param CourseCommentVote $vote
      *
-     * @return CourseCommentVote
+     * @return static
      */
     public function removeVote(CourseCommentVote $vote): static
     {
-        if ($this->votes->removeElement($vote)) {
-            // Set the owning side to null (unless already changed)
-            if ($vote->getCourseComment() === $this) {
-                $vote->setCourseComment(null);
-            }
-        }
+        $this->votes->removeElement($vote);
 
         return $this;
     }
