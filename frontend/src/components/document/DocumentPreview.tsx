@@ -6,12 +6,15 @@ import UnderReviewBox from "@/components/document/UnderReviewBox";
 import ErrorPage from "@/components/error/ErrorPage";
 import LoadingPage from "@/components/loading/LoadingPage";
 import DownloadSingleDocumentButton from "@/components/ui/buttons/DownloadSingleDocumentButton";
-import VoteButton, { VoteDirection } from "@/components/ui/buttons/VoteButton";
+import VoteButton from "@/components/ui/buttons/VoteButton";
+import DynamicBreadcrumb from "@/components/ui/DynamicBreadcrumb";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import { useUser } from "@/components/UserContext";
+import { logDocumentView } from "@/hooks/logDocumentView";
 import { useApi } from "@/hooks/useApi";
 import type { Document } from "@/types/entities";
 import { convertToDocument } from "@/utils/convertToEntity";
+import { formatFileSize } from "@/utils/fileSize";
 import { Calendar, ChartPie, CircleUser, File, Package } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
@@ -29,21 +32,25 @@ export default function DocumentPreview({ id }: { id: string }) {
     const { user } = useUser();
     const { request, loading, error } = useApi();
     const { t } = useTranslation();
-
+    const { i18n } = useTranslation();
+    const currentLocale = i18n.language;
     const MAXWIDTH = 1000;
 
     useEffect(() => {
         const fetchDocumentData = async () => {
-            const documentData = await request('GET', `/api/documents/${id}`);
+            const documentData = await request('GET', `/api/documents/${id}?lang=${currentLocale}`);
             if (!documentData) {
                 return null;
             }
-
             setDocument(convertToDocument(documentData));
         };
 
         fetchDocumentData();
-    }, [id, request]);
+    }, [id, request, currentLocale]);
+
+    useEffect(() => {
+        logDocumentView(id);
+    }, [id]);
 
     // Set window title based on document name
     useEffect(() => {
@@ -73,6 +80,15 @@ export default function DocumentPreview({ id }: { id: string }) {
 
     return (document &&
         <div className="p-8 flex-auto text-sm w-full">
+            {/* Breadcrumb */}
+            <div className="mb-2">
+                <DynamicBreadcrumb
+                    course={document.course}
+                    category={document.category}
+                    document={document}
+                />
+            </div>
+
             {/* Filename */}
             <span className="inline-flex items-center space-x-4">
                 <File />
@@ -83,7 +99,10 @@ export default function DocumentPreview({ id }: { id: string }) {
             <div className="flex flex-row justify-between py-5">
                 <div className="flex space-x-8">
                     {document.createdAt && <DocumentInfoField icon={Calendar} value={document.createdAt?.toLocaleDateString()} />}
-                    <DocumentInfoField icon={Package} value="4 MB" />  {/*TODO: retrieve from api endpoint or calculate here*/}
+                    <DocumentInfoField
+                        icon={Package}
+                        value={document.fileSize ? formatFileSize(document.fileSize) : ""}
+                    />
                     {document.year && <DocumentInfoField icon={ChartPie} value={document.year} />}
                 </div>
                 <div>
@@ -106,16 +125,16 @@ export default function DocumentPreview({ id }: { id: string }) {
             <div className="flex flex-row space-x-4 w-full justify-center">
                 <div style={{ width: containerWidth }} className="py-5">
                     <div className="flex flex-row h-8 justify-between place-items-center">
-                        <VoteButton /* TODO: implement voting functionality */
-                            initialVotes={10}
-                            initialVote={VoteDirection.UP}
+                        <VoteButton
+                            type="document"
+                            objectId={Number(id)}
                             disabled={!user}
                             className="border-gray-500"
                         />
                         <div className="flex space-x-2">
                             <DownloadSingleDocumentButton
                                 document={document}
-                                fileSize="3.6 MB" /* TODO: retrieve from api endpoint or calculate here*/
+                                fileSize={document.fileSize ? formatFileSize(document.fileSize) : "Unknown size"}
                                 disabled={!user}
                             />
                             <FavoriteButton

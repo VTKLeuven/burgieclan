@@ -2,8 +2,13 @@
 
 namespace App\Tests\Api;
 
+use App\Factory\CourseCommentFactory;
+use App\Factory\CourseCommentVoteFactory;
 use App\Factory\CourseFactory;
+use App\Factory\DocumentCommentFactory;
+use App\Factory\DocumentCommentVoteFactory;
 use App\Factory\DocumentFactory;
+use App\Factory\DocumentVoteFactory;
 use App\Factory\ModuleFactory;
 use App\Factory\ProgramFactory;
 use App\Factory\UserFactory;
@@ -48,7 +53,7 @@ class UserResourceTest extends ApiTestCase
             'favoriteDocuments',
             'favoriteModules',
             'favoritePrograms',
-            'defaultAnonymous'
+            'defaultAnonymous',
         ], array_keys($json->decoded()));
 
         $json = $this->browser()

@@ -45,6 +45,9 @@
             "payload_too_large": "De bestandsgrootte overschrijdt de limiet van {{size}}MB. Comprimeer je bestand of upload een kleiner bestand.",
             "rate_limit": "Te veel uploadpogingen. Wacht even voordat je het opnieuw probeert."
         },
+        "button": {
+            "create_document": "Document toevoegen"
+        },
         "dialog": {
             "title": "Document uploaden",
             "description": "Upload hier je geweldige document. Je kunt een PDF-, Word- of Markdown-bestand uploaden. We controleren of het voldoet aan de richtlijnen. Bedankt voor het delen van je kennis met de wereld!",
@@ -111,6 +114,7 @@
         "title": "Home",
         "description": "Welkom bij Burgieclan! Je beste vriend bij het studeren voor examens. We bieden een platform waar studenten hun studiemateriaal met elkaar kunnen delen. Op deze manier kunnen jullie elkaar helpen en wordt studeren een stuk makkelijker. Dus waar wacht je nog op? Duik in de wereld van Burgieclan en begin met het delen van je kennis!",
         "recent_activities": "Ga verder waar je gebleven was",
+        "no_recent_activities": "Nog geen recente activiteiten gevonden",
         "news": "Nieuws",
         "navigate_to": "Navigeer naar",
         "no_quick_links": "Geen snelkoppelingen gevonden"

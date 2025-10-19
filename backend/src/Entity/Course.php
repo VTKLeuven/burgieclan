@@ -31,12 +31,12 @@ class Course
 
     #[ORM\Column(type: Types::STRING, length: 255)]
     #[Assert\NotBlank]
-    private ?string $name = null;
+    private string $name;
 
     #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(6)]
-    private ?string $code = null;
+    private string $code;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private array $professors = [];
@@ -47,25 +47,39 @@ class Course
     #[ORM\Column(type: Types::STRING, length: 7)]
     #[Assert\NotBlank]
     #[Assert\Choice(choices: ['nl', 'en'], message: 'Choose a valid language.')]
-    private ?string $language = null;
+    private string $language;
 
     #[ORM\Column(nullable: true)]
     #[Assert\Positive]
     private ?int $credits = null;
 
+    /**
+     * @var Collection<int, self>
+     */
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'newCourses')]
     private Collection $oldCourses;
 
+    /**
+     * @var Collection<int, self>
+     */
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'oldCourses')]
     private Collection $newCourses;
 
+    /**
+     * @var Collection<int, Module>
+     */
     #[ORM\ManyToMany(targetEntity: Module::class, mappedBy: 'courses')]
     private Collection $modules;
 
+    /**
+     * @var Collection<int, CourseComment>
+     */
     #[ORM\OneToMany(mappedBy: 'course', targetEntity: CourseComment::class, orphanRemoval: true)]
     private Collection $courseComments;
 
-    // This is the self-referential many-to-many relationship
+    /**
+     * @var Collection<int, self>
+     */
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: "identicalCourses")]
     #[ORM\JoinTable(name: "course_identical_courses")]
     private Collection $identicalCourses;
@@ -81,7 +95,7 @@ class Course
 
     public function __toString(): string
     {
-        return $this->getName();
+        return sprintf('%s (%s)', $this->getName(), $this->getCode());
     }
 
     public function getId(): ?int
@@ -89,7 +103,7 @@ class Course
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -137,7 +151,7 @@ class Course
         return $this;
     }
 
-    public function getLanguage(): ?string
+    public function getLanguage(): string
     {
         return $this->language;
     }
@@ -149,7 +163,7 @@ class Course
         return $this;
     }
 
-    public function getCode(): ?string
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -258,12 +272,7 @@ class Course
 
     public function removeCourseComment(CourseComment $courseComment): self
     {
-        if ($this->courseComments->removeElement($courseComment)) {
-            // set the owning side to null (unless already changed)
-            if ($courseComment->getCourse() === $this) {
-                $courseComment->setCourse(null);
-            }
-        }
+        $this->courseComments->removeElement($courseComment);
 
         return $this;
     }

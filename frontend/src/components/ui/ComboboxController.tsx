@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 interface ComboboxControllerProps {
     value: string | undefined;
-    onChange: (value: string | number) => void;
+    onChange: (value: string | number | undefined) => void;
     onBlur: () => void;
     options: Option[];
     placeholder?: string;
@@ -59,7 +59,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
 
     return (
         <div>
-            <Combobox value={selectedOption} onChange={(option: Option) => onChange(option.id)} disabled={disabled}>
+            <Combobox value={selectedOption} onChange={(option: Option) => onChange(option?.id)} disabled={disabled}>
                 {({ open }) => (
                     <div className="relative">
                         <Combobox.Button className="w-full">

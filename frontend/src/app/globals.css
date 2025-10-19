@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .primary-button {
-    @apply flex w-full items-center justify-center rounded-md bg-amber-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600 !important;
+    @apply flex items-center justify-center rounded-md bg-amber-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600 !important;
 }
 
 .white-button {
@@ -12,10 +12,6 @@
 
 body {
     @apply leading-relaxed m-0 p-0 h-full
-}
-
-a {
-    @apply text-sm font-semibold leading-6 text-gray-900
 }
 
 h1, h2, h3, h4, h5, h6 {

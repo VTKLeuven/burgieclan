@@ -47,7 +47,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
         <button
             onClick={handleDownload}
             disabled={loading}
-            className={`inline-flex items-center justify-center rounded-md text-gray-600 hover:text-gray-800 hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+            className={`primary-button ${className}`}
         >
             {loading ? (
                 <LoaderCircle size={size} className="animate-spin" />

@@ -711,8 +711,8 @@ final class DownloadZipController extends AbstractController
         $filePath = '';
 
         // Create a relative path for the document within the ZIP
-        $courseName = $document->getCourse() ? $document->getCourse()->getName() : '';
-        $categoryName = $document->getCategory() ? $document->getCategory()->getNameEn() : '';
+        $courseName = $document->getCourse()->getName();
+        $categoryName = $document->getCategory()->getNameEn();
 
         if ($courseName && $categoryName) {
             if ($parentPath) {
@@ -732,7 +732,7 @@ final class DownloadZipController extends AbstractController
 
         // Create a link that opens the document in the browser when clicked
         // Use document name as the link text but keep the file path as the link target
-        $displayName = $document->getName() ? $document->getName() : $fileName;
+        $displayName = $document->getName();
 
         // Get file extension to display
         $fileExt = pathinfo($fileName, PATHINFO_EXTENSION);
@@ -751,7 +751,7 @@ final class DownloadZipController extends AbstractController
         $html .= '<div class="metadata">';
 
         // Tags field
-        if ($document->getTags() && count($document->getTags()) > 0) {
+        if (count($document->getTags()) > 0) {
             $tagNames = array_map(function ($tag) {
                 return $tag->getName();
             }, $document->getTags()->toArray());
@@ -772,20 +772,16 @@ final class DownloadZipController extends AbstractController
         }
 
         // Create date
-        if ($document->getCreateDate()) {
-            $html .= '<div class="metadata-pair">';
-            $html .= '<span class="metadata-label">Created:</span>';
-            $html .= '<span class="metadata-value">' . $document->getCreateDate()->format('Y-m-d') . '</span>';
-            $html .= '</div>';
-        }
+        $html .= '<div class="metadata-pair">';
+        $html .= '<span class="metadata-label">Created:</span>';
+        $html .= '<span class="metadata-value">' . $document->getCreateDate()->format('Y-m-d') . '</span>';
+        $html .= '</div>';
 
         // Update date
-        if ($document->getUpdateDate()) {
-            $html .= '<div class="metadata-pair">';
-            $html .= '<span class="metadata-label">Updated:</span>';
-            $html .= '<span class="metadata-value">' . $document->getUpdateDate()->format('Y-m-d') . '</span>';
-            $html .= '</div>';
-        }
+        $html .= '<div class="metadata-pair">';
+        $html .= '<span class="metadata-label">Updated:</span>';
+        $html .= '<span class="metadata-value">' . $document->getUpdateDate()->format('Y-m-d') . '</span>';
+        $html .= '</div>';
 
         // Add file size if we can calculate it
         if ($document->getFile()) {
@@ -1052,7 +1048,7 @@ final class DownloadZipController extends AbstractController
         $response->headers->set('Content-Type', 'application/zip');
         $response->headers->set('Content-Disposition', 'attachment;filename="' . $displayFilename . '"');
         $response->headers->set('Accept-Ranges', 'bytes');
-        $response->headers->set('Content-Length', $fileSize);
+        $response->headers->set('Content-Length', (string) $fileSize);
         // disables FastCGI buffering in nginx only for this response
         $response->headers->set('X-Accel-Buffering', 'no');
 
@@ -1064,7 +1060,7 @@ final class DownloadZipController extends AbstractController
                 $start = intval($matches[1]);
                 $end = isset($matches[2]) ? intval($matches[2]) : ($fileSize - 1);
                 $response->headers->set('Content-Range', sprintf('bytes %d-%d/%d', $start, $end, $fileSize));
-                $response->headers->set('Content-Length', $end - $start + 1);
+                $response->headers->set('Content-Length', (string) ($end - $start + 1));
             }
         }
         return $response;

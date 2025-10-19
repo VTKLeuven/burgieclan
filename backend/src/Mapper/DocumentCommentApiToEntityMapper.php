@@ -5,6 +5,7 @@ namespace App\Mapper;
 use App\ApiResource\DocumentCommentApi;
 use App\Entity\Document;
 use App\Entity\DocumentComment;
+use App\Entity\User;
 use App\Repository\DocumentCommentRepository;
 use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -29,7 +30,10 @@ class DocumentCommentApiToEntityMapper implements MapperInterface
     {
         assert($from instanceof DocumentCommentApi);
 
-        $entity = $from->id ? $this->repository->find($from->id) : new DocumentComment($this->security->getUser());
+        $user = $this->security->getUser();
+        assert($user instanceof User);
+
+        $entity = $from->id ? $this->repository->find($from->id) : new DocumentComment($user);
         if (!$entity) {
             throw new Exception('Document comment not found');
         }

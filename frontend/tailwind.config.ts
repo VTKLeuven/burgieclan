@@ -35,7 +35,9 @@ const config = {
 						blue: "#1A1F4A",
 						panache: "#FFD400",
 					},
-				}
+					content: "#1A1F4A",
+
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

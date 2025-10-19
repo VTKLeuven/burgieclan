@@ -21,7 +21,7 @@ class DocumentCategory
     public static string $DEFAULT_LANGUAGE = 'nl';
 
     #[ORM\Column(length: 255)]
-    private ?string $name_nl = null;
+    private string $name_nl;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $name_en = null;
@@ -33,7 +33,7 @@ class DocumentCategory
 
     public function __toString(): string
     {
-        return $this->getNameNl();
+        return sprintf('%s (%s)', $this->getNameNl(), $this->getNameEn());
     }
 
     public function getName(string $lang): ?string
@@ -41,7 +41,7 @@ class DocumentCategory
         return $this->{'name_' . $lang} ?? $this->{'name_' . self::$DEFAULT_LANGUAGE};
     }
 
-    public function getNameNl(): ?string
+    public function getNameNl(): string
     {
         return $this->name_nl;
     }

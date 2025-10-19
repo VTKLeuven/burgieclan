@@ -34,7 +34,6 @@ class EntityClassDtoStateProvider implements ProviderInterface
                                 || $request->query->get('pagination') === '0');
 
             $entities = $this->collectionProvider->provide($operation, $uriVariables, $context);
-            assert($entities instanceof Paginator);
 
             $dtos = [];
             foreach ($entities as $entity) {
@@ -45,6 +44,8 @@ class EntityClassDtoStateProvider implements ProviderInterface
             if ($disablePagination) {
                 return $dtos;
             }
+
+            assert($entities instanceof Paginator);
 
             // Otherwise return a paginated result
             return new TraversablePaginator(

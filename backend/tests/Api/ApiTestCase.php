@@ -29,16 +29,17 @@ abstract class ApiTestCase extends KernelTestCase
         $this->token = $this->getToken($user->getUsername(), 'password');
     }
 
-    protected function getToken(string $username, string $password){
+    protected function getToken(string $username, string $password)
+    {
         $tokenResponse = $this->browser()
             ->post('/api/auth/login', HttpOptions::json([
                 'username' => $username,
-                'password' => 'password',
+                'password' => $password,
             ]))
             ->json()
             ->decoded();
 
-        if(!isset($tokenResponse['token'])){
+        if (!isset($tokenResponse['token'])) {
             throw new AuthenticationException('Token not found');
         }
         return $tokenResponse['token'];

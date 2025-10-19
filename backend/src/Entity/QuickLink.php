@@ -22,7 +22,7 @@ class QuickLink
     private ?string $name_en = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $linkTo = null;
+    private string $linkTo;
 
     public function getId(): ?int
     {
@@ -31,7 +31,7 @@ class QuickLink
 
     public function getName(string $lang): ?string
     {
-        return $this->{'name_'.$lang} ?? $this->{'name_'.self::$DEFAULT_LANGUAGE};
+        return $this->{'name_' . $lang} ?? $this->{'name_' . self::$DEFAULT_LANGUAGE};
     }
 
     public function getNameNl(): ?string
@@ -58,7 +58,7 @@ class QuickLink
         return $this;
     }
 
-    public function getLinkTo(): ?string
+    public function getLinkTo(): string
     {
         return $this->linkTo;
     }
@@ -68,5 +68,15 @@ class QuickLink
         $this->linkTo = $linkTo;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return sprintf(
+            '%s (%s) -> %s',
+            $this->getNameNl(),
+            $this->getNameEn(),
+            mb_strimwidth($this->getLinkTo(), 0, 30, '...')
+        );
     }
 }

@@ -5,11 +5,12 @@ import CommentCategories from "@/components/coursepage/comment/CommentCategories
 import DocumentSections from "@/components/coursepage/DocumentSections";
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import ErrorPage from "@/components/error/ErrorPage";
+import DynamicBreadcrumb from "@/components/ui/DynamicBreadcrumb";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import { useUser } from '@/components/UserContext';
 import { useApi } from "@/hooks/useApi";
-import { Breadcrumb, Course, CourseComment } from "@/types/entities";
+import { Course, CourseComment } from "@/types/entities";
 import { convertToCourse } from "@/utils/convertToEntity";
 import { ChartPie, Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
@@ -23,11 +24,6 @@ export default function CoursePage() {
     const { loading: userLoading, refreshUser } = useUser();
     const { t } = useTranslation();
     const { request, loading, error } = useApi();
-
-    const breadcrumb: Breadcrumb = {
-        id: 1,
-        breadcrumb: ['Home', 'Courses', `Course ${courseId}`]
-    };
 
     useEffect(() => {
         async function getCourse() {
@@ -80,17 +76,8 @@ export default function CoursePage() {
             <div className="w-full h-full">
                 <div className="bg-gray-100 border-b border-gray-200 px-6 py-4">
                     {/* Breadcrumb */}
-                    <div className="flex items-center space-x-2 mb-2">
-                        {breadcrumb.breadcrumb.map((item, index) => (
-                            <div key={item} className="flex items-center">
-                                <span className="text-sm text-gray-500 hover:text-gray-700 hover:underline cursor-pointer">
-                                    {item}
-                                </span>
-                                {index + 1 < breadcrumb.breadcrumb.length && (
-                                    <span className="text-gray-400 mx-2">/</span>
-                                )}
-                            </div>
-                        ))}
+                    <div className="mb-4">
+                        <DynamicBreadcrumb course={course} />
                     </div>
 
                     {/* Main Content Grid */}

@@ -65,7 +65,7 @@ final class TagFilter extends AbstractFilter
                         ->setParameter($paramName, $tag->id);
                 } catch (\Exception $e) {
                     // Log invalid IRI and continue
-                    $this->logger?->notice('Invalid IRI passed to tag filter', [
+                    $this->logger->notice('Invalid IRI passed to tag filter', [
                         'iri' => $tagIri,
                         'exception' => $e->getMessage()
                     ]);

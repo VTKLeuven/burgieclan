@@ -1,17 +1,7 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace App\Entity;
 
-use App\Factory\UserFactory;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -22,16 +12,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * Defines the properties of the User entity to represent the application users.
- * See https://symfony.com/doc/current/doctrine.html#creating-an-entity-class.
- *
- * Tip: if you have an existing database, you can generate these entity class automatically.
- * See https://symfony.com/doc/current/doctrine/reverse_engineering.html
- *
- * @author Ryan Weaver <weaverryan@gmail.com>
- * @author Javier Eguiluz <javier.eguiluz@gmail.com>
- */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'user')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -51,19 +31,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: Types::STRING)]
     #[Assert\NotBlank]
-    private ?string $fullName = null;
+    private string $fullName;
 
     #[ORM\Column(type: Types::STRING, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 2, max: 50)]
-    private ?string $username = null;
+    private string $username;
 
     #[ORM\Column(type: Types::STRING, unique: true)]
     #[Assert\Email]
-    private ?string $email = null;
+    private string $email;
 
     #[ORM\Column(type: Types::STRING)]
-    private ?string $password = null;
+    private string $password;
 
     /**
      * @var string|null $plainPassword
@@ -85,28 +65,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $accesstoken;
 
     /**
-     * @var Collection
+     * @var Collection<int, Program>
      */
     #[ORM\ManyToMany(targetEntity: Program::class, inversedBy: 'users')]
     #[ORM\JoinTable(name: 'favorite_user_program')]
     private Collection $favoritePrograms;
 
     /**
-     * @var Collection
+     * @var Collection<int, Module>
      */
     #[ORM\ManyToMany(targetEntity: Module::class, inversedBy: 'users')]
     #[ORM\JoinTable(name: 'favorite_user_module')]
     private Collection $favoriteModules;
 
     /**
-     * @var Collection
+     * @var Collection<int, Course>
      */
     #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'users')]
     #[ORM\JoinTable(name: 'favorite_user_course')]
     private Collection $favoriteCourses;
 
     /**
-     * @var Collection
+     * @var Collection<int, Document>
      */
     #[ORM\ManyToMany(targetEntity: Document::class, inversedBy: 'users')]
     #[ORM\JoinTable(name: 'favorite_user_document')]
@@ -116,8 +96,46 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Indicates if the user wants uploads/comments to be anonymous by default.
      */
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
-    private ?bool $defaultAnonymous = true;
+    private bool $defaultAnonymous = true;
 
+    /**
+     * @var Collection<int, UserDocumentView>
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserDocumentView::class)]
+    private Collection $viewedDocuments;
+
+        /**
+     * @var Collection<int, DocumentVote>
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'creator',
+        targetEntity: DocumentVote::class,
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
+    private Collection $documentVotes;
+
+    /**
+     * @var Collection<int, DocumentCommentVote>
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'creator',
+        targetEntity: DocumentCommentVote::class,
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
+    private Collection $documentCommentVotes;
+
+    /**
+     * @var Collection<int, CourseCommentVote>
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'creator',
+        targetEntity: CourseCommentVote::class,
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
+    private Collection $courseCommentVotes;
 
     public function __construct()
     {
@@ -125,6 +143,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->favoriteModules = new ArrayCollection();
         $this->favoriteCourses = new ArrayCollection();
         $this->favoriteDocuments = new ArrayCollection();
+        $this->viewedDocuments = new ArrayCollection();
+        $this->documentVotes = new ArrayCollection();
+        $this->documentCommentVotes = new ArrayCollection();
+        $this->courseCommentVotes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -137,7 +159,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->fullName = $fullName;
     }
 
-    public function getFullName(): ?string
+    public function getFullName(): string
     {
         return $this->fullName;
     }
@@ -157,7 +179,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->username = $username;
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -167,7 +189,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->email = $email;
     }
 
-    public function getPassword(): ?string
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -270,7 +292,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __toString(): string
     {
-        return $this->getFullName() ?? '';
+        return $this->getFullName();
     }
 
     /**
@@ -365,7 +387,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isDefaultAnonymous(): ?bool
+    public function isDefaultAnonymous(): bool
     {
         return $this->defaultAnonymous;
     }
@@ -373,6 +395,161 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDefaultAnonymous(bool $defaultAnonymous): static
     {
         $this->defaultAnonymous = $defaultAnonymous;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserDocumentView>
+     */
+    public function getViewedDocuments(): Collection
+    {
+        return $this->viewedDocuments;
+    }
+
+    public function addViewedDocument(UserDocumentView $viewedDocument): static
+    {
+        if (!$this->viewedDocuments->contains($viewedDocument)) {
+            $this->viewedDocuments->add($viewedDocument);
+            $viewedDocument->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeViewedDocument(UserDocumentView $viewedDocument): static
+    {
+        if ($this->viewedDocuments->removeElement($viewedDocument)) {
+            $this->viewedDocuments->removeElement($viewedDocument);
+        }
+
+        return $this;
+    }
+
+    public function getVotes(): Collection
+    {
+        $allVotes = new ArrayCollection();
+
+        foreach ($this->getDocumentVotes() as $vote) {
+            $allVotes->add($vote);
+        }
+
+        foreach ($this->getDocumentCommentVotes() as $vote) {
+            $allVotes->add($vote);
+        }
+
+        foreach ($this->getCourseCommentVotes() as $vote) {
+            $allVotes->add($vote);
+        }
+
+        return $allVotes;
+    }
+
+    public function addVote(AbstractVote $vote): self
+    {
+        switch (true) {
+            case $vote instanceof DocumentVote:
+                $this->addDocumentVote($vote);
+                break;
+            case $vote instanceof DocumentCommentVote:
+                $this->addDocumentCommentVote($vote);
+                break;
+            case $vote instanceof CourseCommentVote:
+                $this->addCourseCommentVote($vote);
+                break;
+        }
+
+        return $this;
+    }
+
+    public function removeVote(AbstractVote $vote): self
+    {
+        switch (true) {
+            case $vote instanceof DocumentVote:
+                $this->removeDocumentVote($vote);
+                break;
+            case $vote instanceof DocumentCommentVote:
+                $this->removeDocumentCommentVote($vote);
+                break;
+            case $vote instanceof CourseCommentVote:
+                $this->removeCourseCommentVote($vote);
+                break;
+        }
+
+        return $this;
+    }
+
+    public function getDocumentVotes(): Collection
+    {
+        return $this->documentVotes;
+    }
+
+    public function addDocumentVote(DocumentVote $documentVote): self
+    {
+        if (!$this->documentVotes->contains($documentVote)) {
+            $this->documentVotes->add($documentVote);
+
+            $documentVote->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDocumentVote(DocumentVote $documentVote): self
+    {
+        if ($this->documentVotes->contains($documentVote)) {
+            $this->documentVotes->removeElement($documentVote);
+        }
+
+        return $this;
+    }
+
+    public function getDocumentCommentVotes(): Collection
+    {
+        return $this->documentCommentVotes;
+    }
+
+    public function addDocumentCommentVote(DocumentCommentVote $documentCommentVote): self
+    {
+        if (!$this->documentCommentVotes->contains($documentCommentVote)) {
+            $this->documentCommentVotes->add($documentCommentVote);
+
+            $documentCommentVote->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDocumentCommentVote(DocumentCommentVote $documentCommentVote): self
+    {
+        if ($this->documentCommentVotes->contains($documentCommentVote)) {
+            $this->documentCommentVotes->removeElement($documentCommentVote);
+        }
+
+        return $this;
+    }
+
+    public function getCourseCommentVotes(): Collection
+    {
+        return $this->courseCommentVotes;
+    }
+
+    public function addCourseCommentVote(CourseCommentVote $courseCommentVote): self
+    {
+        if (!$this->courseCommentVotes->contains($courseCommentVote)) {
+            $this->courseCommentVotes->add($courseCommentVote);
+
+            $courseCommentVote->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCourseCommentVote(CourseCommentVote $courseCommentVote): self
+    {
+        if ($this->courseCommentVotes->contains($courseCommentVote)) {
+            $this->courseCommentVotes->removeElement($courseCommentVote);
+        }
 
         return $this;
     }

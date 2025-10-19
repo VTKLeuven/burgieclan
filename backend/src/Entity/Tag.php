@@ -16,8 +16,11 @@ class Tag
     private ?int $id = null;
 
     #[ORM\Column(length: 255, unique: true)]
-    private ?string $name = null;
+    private string $name;
 
+    /**
+     * @var Collection<int, Document>
+     */
     #[ORM\ManyToMany(targetEntity: Document::class, inversedBy: 'tags', cascade: ['persist'])]
     private Collection $documents;
 
@@ -71,6 +74,6 @@ class Tag
 
     public function __toString(): string
     {
-        return $this->name ?? '';
+        return $this->name;
     }
 }
