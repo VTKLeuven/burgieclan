@@ -180,9 +180,9 @@ export const CourseRow = memo(({
                     )}
                 </div>
             </div>
-            {/* <div className="col-span-1 flex justify-center items-center"> */}
+            <div className="col-span-1 flex justify-end items-center">
                 {!loading && course && <DownloadButton courses={[course]} size={16} />}
-            {/* </div> */}
+            </div>
         </div>
     );
 });
