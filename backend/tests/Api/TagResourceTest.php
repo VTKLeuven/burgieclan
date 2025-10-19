@@ -200,6 +200,22 @@ class TagResourceTest extends ApiTestCase
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"name"', 'New Test Tag');
+
+        // We get the same tag when creating one with the same name
+        $response = $this->browser()
+            ->post('/api/tags', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token,
+                    'Content-Type' => 'application/ld+json'
+                ],
+                'json' => [
+                    'name' => $tagData['name'],
+                ]
+            ])
+            ->assertStatus(201)
+            ->assertJson()
+            ->assertJsonMatches('"name"', 'New Test Tag')
+            ->assertJsonMatches('"@id"', $tagIRI);
     }
 
     public function testCreateTagWithDocuments(): void
