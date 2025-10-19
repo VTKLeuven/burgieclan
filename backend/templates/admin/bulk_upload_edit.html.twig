@@ -40,6 +40,7 @@ Review and Edit Document Metadata
     
     .table td:nth-child(2) .text-truncate {
         max-width: 100%;
+        cursor: help;
     }
 
     .table td:nth-child(3) {
@@ -364,6 +365,37 @@ Review and Edit Document Metadata
         color: var(--bs-secondary-color);
         font-style: italic;
     }
+    
+    /* Custom tooltip for filename */
+    .filename-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+    
+    .filename-tooltip {
+        visibility: hidden;
+        opacity: 0;
+        position: fixed;
+        background-color: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        white-space: nowrap;
+        z-index: 9999;
+        font-size: 0.875rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        pointer-events: none;
+        transition: opacity 0.15s ease-in-out, visibility 0.15s ease-in-out;
+        max-width: 500px;
+        word-wrap: break-word;
+        white-space: normal;
+    }
+    
+    .filename-tooltip.show {
+        visibility: visible;
+        opacity: 1;
+    }
 </style>
 {% endblock %}
 
@@ -533,9 +565,12 @@ Review and Edit Document Metadata
                                         value="{{ index }}">
                                 </td>
                                 <td>
-                                    <span class="d-inline-block text-truncate" title="{{ doc.originalName }}">
-                                        {{ doc.originalName }}
-                                    </span>
+                                    <div class="filename-wrapper">
+                                        <span class="d-inline-block text-truncate">
+                                            {{ doc.originalName }}
+                                        </span>
+                                        <span class="filename-tooltip">{{ doc.originalName }}</span>
+                                    </div>
                                 </td>
                                 <td>
                                     <input type="text" name="name[{{ index }}]" value="{{ doc.name }}"
@@ -1130,6 +1165,70 @@ Review and Edit Document Metadata
             });
             
             updateTagsDisplay();
+        });
+        
+        // Setup filename tooltips that follow the mouse
+        document.querySelectorAll('.filename-wrapper').forEach(wrapper => {
+            const tooltip = wrapper.querySelector('.filename-tooltip');
+            const filenameSpan = wrapper.querySelector('.text-truncate');
+            
+            if (tooltip && filenameSpan) {
+                let isHovering = false;
+                
+                filenameSpan.addEventListener('mouseenter', function() {
+                    isHovering = true;
+                    tooltip.classList.add('show');
+                });
+                
+                filenameSpan.addEventListener('mouseleave', function() {
+                    isHovering = false;
+                    tooltip.classList.remove('show');
+                });
+                
+                filenameSpan.addEventListener('mousemove', function(e) {
+                    if (isHovering) {
+                        // Position tooltip near the mouse cursor with offset
+                        const offsetX = 15;
+                        const offsetY = 15;
+                        
+                        // Get viewport dimensions
+                        const viewportWidth = window.innerWidth;
+                        const viewportHeight = window.innerHeight;
+                        
+                        // Get tooltip dimensions
+                        const tooltipRect = tooltip.getBoundingClientRect();
+                        const tooltipWidth = tooltipRect.width;
+                        const tooltipHeight = tooltipRect.height;
+                        
+                        // Calculate position
+                        let left = e.clientX + offsetX;
+                        let top = e.clientY + offsetY;
+                        
+                        // Adjust if tooltip would go off the right edge
+                        if (left + tooltipWidth > viewportWidth - 10) {
+                            left = e.clientX - tooltipWidth - offsetX;
+                        }
+                        
+                        // Adjust if tooltip would go off the bottom edge
+                        if (top + tooltipHeight > viewportHeight - 10) {
+                            top = e.clientY - tooltipHeight - offsetY;
+                        }
+                        
+                        // Ensure tooltip doesn't go off the left edge
+                        if (left < 10) {
+                            left = 10;
+                        }
+                        
+                        // Ensure tooltip doesn't go off the top edge
+                        if (top < 10) {
+                            top = 10;
+                        }
+                        
+                        tooltip.style.left = left + 'px';
+                        tooltip.style.top = top + 'px';
+                    }
+                });
+            }
         });
     });
 </script>
