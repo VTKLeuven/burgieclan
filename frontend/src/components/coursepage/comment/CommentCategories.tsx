@@ -14,7 +14,6 @@ type CommentCategoriesProps = {
 
 const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCategoriesProps) => {
     const [allCategories, setAllCategories] = useState<CommentCategory[]>([]);
-    const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false);
     const [localComments, setLocalComments] = useState<CourseComment[]>(comments);
     const { t, i18n } = useTranslation();
     const { request, loading } = useApi();
@@ -58,14 +57,6 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
         return commentsByCategory[categoryId] || [];
     }, [commentsByCategory]);
 
-    const handleOpenCommentDialog = () => {
-        setIsCommentDialogOpen(true);
-    };
-
-    const handleCloseCommentDialog = () => {
-        setIsCommentDialogOpen(false);
-    };
-
     const handleCommentAdded = useCallback((newComment: CourseComment) => {
         setLocalComments(prevComments => {
             const updatedComments = [...prevComments, newComment];
@@ -76,11 +67,6 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
             return updatedComments;
         });
     }, [onCommentsUpdate]);
-
-    const handleCommentAddedFromDialog = useCallback((newCommentData: any) => {
-        const newComment = convertToCourseComment(newCommentData);
-        handleCommentAdded(newComment);
-    }, [handleCommentAdded]);
 
     if (loading) {
         return (
