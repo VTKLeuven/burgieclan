@@ -143,7 +143,7 @@ class DocumentApiProvider implements ProviderInterface
         $documentApi->fileSize = $document->getFileSize();
 
         if ($document->isAnonymous()) {
-            unset($documentApi->creator); // Remove author in GET-requests if document is anonymous
+            $documentApi->creator = null; // Remove author in GET-requests if document is anonymous
         }
 
         if ($document->getFileName()) {
