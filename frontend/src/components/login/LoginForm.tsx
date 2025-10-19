@@ -4,6 +4,7 @@ import { storeTokensInCookies } from "@/actions/auth";
 import Logo from "@/components/common/Logo";
 import LitusOAuthButton from "@/components/login/LitusOAuthButton";
 import { useToast } from "@/components/ui/Toast";
+import { useUser } from "@/components/UserContext";
 import { useApi } from "@/hooks/useApi";
 import { ChevronDown, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import Link from 'next/link';
@@ -79,6 +80,11 @@ export default function LoginForm() {
             }
         }
     }, [apiError, t]);
+
+    const { user } = useUser();
+    if (user) {
+        router.push(redirectTo);
+    }
 
     return (
         <>
