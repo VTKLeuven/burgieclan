@@ -80,7 +80,7 @@ class DocumentBulkUploadController extends AbstractController
                 'help' => 'Automatically determine academic year from file creation/modification date',
             ])
             ->add('defaultYear', ChoiceType::class, [
-                'choices' => Document::getAcademicYearChoices(amountOfYears: 10),
+                'choices' => Document::getAcademicYearChoices(amountOfYears: 40),
                 'label' => 'Default Year',
                 'required' => false,
                 'data' => $this->getCurrentAcademicYear(),
@@ -316,7 +316,7 @@ class DocumentBulkUploadController extends AbstractController
             'courses' => $courseRepo->findBy([], ['name' => 'ASC']),
             'categories' => $categoryRepo->findBy([], ['name_nl' => 'ASC']),
             'tags' => $tagRepo->findAll(),
-            'yearChoices' => Document::getAcademicYearChoices(amountOfYears: 10),
+            'yearChoices' => Document::getAcademicYearChoices(amountOfYears: 40),
         ]);
     }
 
