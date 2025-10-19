@@ -35,7 +35,7 @@ const CookieBanner = () => {
                         <button
                             type="button"
                             onClick={handleAcceptCookies}
-                            className="primary-button">
+                            className="primary-button w-full">
                             {t('cookie_banner_accept')}
                         </button>
                     </div>
