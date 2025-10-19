@@ -81,7 +81,6 @@ class UserApiToEntityMapper implements MapperInterface
         $this->propertyAccessor->setValue($to, 'favoriteDocuments', $favoriteDocuments);
 
         $to->setDefaultAnonymous($from->defaultAnonymous);
-
         return $to;
     }
 }

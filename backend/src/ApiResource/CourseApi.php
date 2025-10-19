@@ -32,7 +32,7 @@ class CourseApi
 
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups(['course:get', 'program:get', 'module:get', 'search', 'user', 'document:get'])]
+    #[Groups(['course:get', 'program:get', 'module:get', 'search', 'user', 'document:get', 'user:document_views'])]
     public ?string $name = null;
 
     #[Assert\NotBlank]

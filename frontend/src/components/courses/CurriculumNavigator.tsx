@@ -1,20 +1,21 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
 import Loading from '@/app/[locale]/loading';
-import { convertToProgram } from "@/utils/convertToEntity";
-import type { Program } from '@/types/entities';
+import CurriculumSearchBar, { SearchFilters } from '@/components/courses/CurriculumSearchBar';
 import ProgramNode from '@/components/courses/ProgramNode';
-import { useApi } from '@/hooks/useApi';
-import { useTranslation } from 'react-i18next';
-import CurriculumSearchBar, { SearchFilters } from './CurriculumSearchBar';
+import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
 import { useUser } from "@/components/UserContext";
-import { 
-  filterCurriculum, 
-  initializeFuseInstances, 
+import { useApi } from '@/hooks/useApi';
+import type { Program } from '@/types/entities';
+import { convertToProgram } from "@/utils/convertToEntity";
+import {
   extractEntities,
+  filterCurriculum,
+  initializeFuseInstances,
   searchWithAnalytics
 } from '@/utils/curriculumSearchUtils';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function CurriculumNavigator() {
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -45,17 +46,17 @@ export default function CurriculumNavigator() {
       const fetchedPrograms = result["hydra:member"].map((program: any) => convertToProgram(program));
       setPrograms(fetchedPrograms);
       setOriginalPrograms(fetchedPrograms);
-      
+
       // Extract all entities and initialize budget-aware Fuse instances
       const { courses, modules, programs } = extractEntities(fetchedPrograms);
-      
+
       // Store total entity counts
       setTotalEntities({
         courses: courses.length,
         modules: modules.length,
         programs: programs.length
       });
-      
+
       initializeFuseInstances(courses, modules, programs);
     };
 
@@ -66,7 +67,7 @@ export default function CurriculumNavigator() {
     setSearchFilters(filters);
 
     if (!filters.query && !filters.semester && !filters.minCredits &&
-        !filters.maxCredits && !filters.showOnlyFavorites) {
+      !filters.maxCredits && !filters.showOnlyFavorites) {
       setPrograms(originalPrograms);
       setMatchCounts({ programs: 0, modules: 0, courses: 0 });
       setSearchAnalytics(null);
@@ -77,12 +78,12 @@ export default function CurriculumNavigator() {
     if (filters.query) {
       const searchResults = searchWithAnalytics(filters.query);
       setSearchAnalytics(searchResults.analytics);
-      
+
       // Apply additional filters to the budget-filtered results
       const { filteredPrograms, matchCounts: newMatchCounts } = filterCurriculum(
         originalPrograms, filters, user?.favoriteCourses || []
       );
-      
+
       setPrograms(filteredPrograms);
       setMatchCounts(newMatchCounts);
     } else {
@@ -90,7 +91,7 @@ export default function CurriculumNavigator() {
       const { filteredPrograms, matchCounts: newMatchCounts } = filterCurriculum(
         originalPrograms, filters, user?.favoriteCourses || []
       );
-      
+
       setPrograms(filteredPrograms);
       setMatchCounts(newMatchCounts);
       setSearchAnalytics(null);
@@ -115,6 +116,12 @@ export default function CurriculumNavigator() {
 
   return (
     <div className="container mx-auto py-8">
+
+      {/* Breadcrumb */}
+      <div className="mb-4">
+        <DynamicBreadcrumb />
+      </div>
+
       <h1 className="text-3xl font-bold mb-8 text-wireframe-primary-blue">Curriculum Navigator</h1>
 
       <CurriculumSearchBar onSearch={handleSearch} clearSearch={clearSearch} />
@@ -149,7 +156,7 @@ export default function CurriculumNavigator() {
       {process.env.NODE_ENV === 'development' && searchAnalytics && (
         <div className="mt-8 p-4 bg-gray-100 rounded-md text-xs">
           <h4 className="font-bold mb-2">Debug: Search Analytics</h4>
-          
+
           <div className="mb-4">
             <p><strong>Total entities in dataset:</strong></p>
             <ul className="ml-4">

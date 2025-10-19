@@ -33,8 +33,11 @@ class AnnouncementEntityToApiMapper implements MapperInterface
         assert($from instanceof Announcement);
         assert($to instanceof AnnouncementApi);
 
-        $to->title = $from->getTitle();
-        $to->content = $from->getContent();
+        $lang = $context['lang'] ?? Announcement::$DEFAULT_LANGUAGE;
+
+        $to->title = $from->getTitle($lang);
+        $to->content = $from->getContent($lang);
+        $to->priority = $from->isPriority();
 
         $to->creator = $this->microMapper->map($from->getCreator(), UserApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
@@ -42,8 +45,8 @@ class AnnouncementEntityToApiMapper implements MapperInterface
 
         $to->startTime = $from->getStartTime()->format('Y-m-d H:i:s');
         $to->endTime = $from->getEndTime()->format('Y-m-d H:i:s');
-        $to->createdAt = DateTime::createFromInterface($from->getCreateDate());
-        $to->updatedAt = DateTime::createFromInterface($from->getUpdateDate());
+        $to->createdAt = DateTime::createFromInterface($from->getCreateDate())->format('Y-m-d H:i:s');
+        $to->updatedAt = DateTime::createFromInterface($from->getUpdateDate())->format('Y-m-d H:i:s');
 
         return $to;
     }

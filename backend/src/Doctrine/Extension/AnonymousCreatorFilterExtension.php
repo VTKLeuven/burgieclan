@@ -14,7 +14,7 @@ class AnonymousCreatorFilterExtension implements QueryCollectionExtensionInterfa
         QueryBuilder                $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string                      $resourceClass,
-        Operation                   $operation = null,
+        ?Operation                   $operation = null,
         array                       $context = []
     ): void {
         // Only apply to Document entities
@@ -41,7 +41,7 @@ class AnonymousCreatorFilterExtension implements QueryCollectionExtensionInterfa
 
         // Create parameter name
         $creatorNameParam = $queryNameGenerator->generateParameterName('creatorName');
-        
+
         // Only allow filtering non-anonymous documents
         $queryBuilder->andWhere(
             $queryBuilder->expr()->andX(

@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -19,17 +20,19 @@ class LitusOAuthInitiateController extends AbstractController
     {
         $redirectTo = $request->query->get('redirect_to', '/');
 
-        // Store the frontend redirect URL in session for later use
-        $request->getSession()->set('frontend_redirect_to', $redirectTo);
-
         // Use existing Litus client to initiate OAuth
         $client = $this->clientRegistry->getClient('litus_api');
 
         $redirectUrl = $client->getOAuth2Provider()->getAuthorizationUrl();
 
-        // Store the OAuth2 provider's generated state for verification
-        $request->getSession()->set('oauth_state', $client->getOAuth2Provider()->getState());
+        $response = new RedirectResponse($redirectUrl);
 
-        return new RedirectResponse($redirectUrl);
+        // Store the frontend redirect URL in cookie for later use
+        // Session can't be used because it is stateless
+        $response->headers->setCookie(new Cookie('x-frontend-redirect-to', $redirectTo));
+        // Store the OAuth2 provider's generated state for verification
+        $response->headers->setCookie(new Cookie('x-oauth-state', $client->getOAuth2Provider()->getState()));
+
+        return $response;
     }
 }

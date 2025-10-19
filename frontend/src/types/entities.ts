@@ -1,3 +1,4 @@
+import { VoteDirection } from "@/components/ui/buttons/VoteButton";
 interface BaseEntity {
     id: number;
 }
@@ -66,6 +67,7 @@ export interface Document extends NodeEntity {
     underReview?: boolean;
     anonymous?: boolean;
     contentUrl?: string;
+    fileSize?: number;
     mimetype?: string;
     filename?: string;
     tags?: Tag[];
@@ -89,10 +91,6 @@ export interface Page extends BaseEntity {
     isPublic?: boolean;
 }
 
-export interface Breadcrumb extends BaseEntity {
-    breadcrumb: string[];
-}
-
 export interface QuickLink extends BaseEntity {
     name?: string;
     linkTo: string;
@@ -101,4 +99,24 @@ export interface QuickLink extends BaseEntity {
 export interface Tag extends BaseEntity {
     name?: string;
     documents?: Document[];
+}
+
+export interface Announcement extends NodeEntity {
+    title?: string;
+    content?: string;
+    priority?: boolean;
+    startTime?: Date;
+    endTime?: Date;
+}
+
+export interface DocumentView extends BaseEntity {
+    document?: Document;
+    lastViewed?: Date;
+}
+
+export interface VoteSummary {
+    upvotes: number;
+    downvotes: number;
+    sum: number;
+    currentUserVote: VoteDirection;
 }

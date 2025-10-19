@@ -49,9 +49,9 @@ export default function DocumentCommentSection({ documentId, file }: DocumentCom
                 {comments.map((comment) => (
                     <DocumentComment
                         key={comment.id}
+                        id={comment.id}
                         author={comment.creator?.fullName || t("document.anonymous")}
                         content={comment.content ?? ''}
-                        initialVotes={Math.floor(Math.random() * 10)} // TODO replace with actual vote count
                     />
                 ))}
             </div>

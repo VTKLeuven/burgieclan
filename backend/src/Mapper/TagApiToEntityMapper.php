@@ -28,9 +28,21 @@ class TagApiToEntityMapper implements MapperInterface
     {
         assert($from instanceof TagApi);
 
-        $entity = $from->id ? $this->repository->find($from->id) : new Tag();
-        if ($from->id && !$entity) {
-            throw new Exception('Tag not found');
+        $entity = null;
+
+        // First try to find by ID if provided
+        if ($from->id) {
+            $entity = $this->repository->find($from->id);
+        }
+
+        // If not found by ID, try to find by name
+        if (!$entity && $from->name) {
+            $entity = $this->repository->findOneBy(['name' => $from->name]);
+        }
+
+        // If still not found, create a new Tag
+        if (!$entity) {
+            $entity = new Tag();
         }
 
         return $entity;

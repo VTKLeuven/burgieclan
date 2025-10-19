@@ -3,10 +3,10 @@
 import { logOut } from '@/actions/auth';
 import Loading from "@/app/[locale]/loading";
 import ItemList from '@/components/layout/ItemList';
-import UploadDialog from '@/components/upload/UploadDialog';
 import { useUser } from "@/components/UserContext";
+import CreateDocumentButton from '@/components/ui/CreateDocumentButton';
 import type { Course, Document } from "@/types/entities";
-import { ChevronDown, File, FolderClosed, Home, PanelLeft, PanelLeftClose, Plus } from 'lucide-react';
+import { ChevronDown, File, FolderClosed, Home, PanelLeft, PanelLeftClose } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -41,7 +41,6 @@ const NavigationSidebar = () => {
     courses: true,
     documents: false
   });
-  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
   if (!user) {
     return null;
@@ -57,14 +56,6 @@ const NavigationSidebar = () => {
       ...prev,
       [section]: !prev[section]
     }));
-  };
-
-  const handleUploadButtonClick = () => {
-    setIsUploadDialogOpen(true);
-  };
-
-  const handleUploadDialogClose = () => {
-    setIsUploadDialogOpen(false);
   };
 
   if (loading) {
@@ -144,14 +135,7 @@ const NavigationSidebar = () => {
         </nav>
 
         {/* Add Document Button */}
-        <button
-          className={`mx-4 my-2 flex items-center space-x-2 ${isCollapsed ? 'bg-transparent' : 'bg-amber-600 hover:bg-amber-700 transition-all duration-200 hover:scale-[1.01]'} text-white rounded-md py-2 px-4 hover:${isCollapsed ? 'bg-transparent' : 'bg-indigo-700'} flex-shrink-0`}
-          aria-label={t('sidebar.add_document')}
-          onClick={handleUploadButtonClick}
-        >
-          <Plus size={20} />
-          {!isCollapsed && <span>{t('sidebar.add_document')}</span>}
-        </button>
+        <CreateDocumentButton className='mx-2 my-2' />
 
         {/* User Profile - Fixed at Bottom */}
         <div className="border-t border-gray-200 flex-shrink-0">
@@ -176,12 +160,6 @@ const NavigationSidebar = () => {
             </div>
           )}
         </div>
-
-        <UploadDialog
-          isOpen={isUploadDialogOpen}
-          onClose={handleUploadDialogClose}
-          initialFile={null}
-        />
       </div>
     </aside>
   );

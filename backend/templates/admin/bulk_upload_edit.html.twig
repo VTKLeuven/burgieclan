@@ -1,0 +1,1235 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}Edit Document Metadata - Bulk Upload{% endblock %}
+
+{% block content_title %}
+<twig:ea:Icon name="fa fa-pen-to-square" class="me-1" />
+Review and Edit Document Metadata
+{% endblock %}
+
+{% block configured_head_contents %}
+{{ parent() }}
+<style>
+    .bulk-edit-panel {
+        display: none;
+    }
+
+    .bulk-edit-panel.active {
+        display: block;
+    }
+
+    .bulk-edit-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .checkbox-cell {
+        width: 40px;
+        text-align: center;
+    }
+
+    /* Set maximum widths for table columns to enable proper truncation */
+    .table td:nth-child(2) {
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .table td:nth-child(2) .text-truncate {
+        max-width: 100%;
+        cursor: help;
+    }
+
+    .table td:nth-child(3) {
+        max-width: 180px;
+    }
+
+    .table td:nth-child(4),
+    .table td:nth-child(5),
+    .table td:nth-child(6) {
+        max-width: 150px;
+    }
+
+    .table td:nth-child(7) {
+        max-width: 250px;
+    }
+
+    .table .form-control-sm,
+    .table .form-select-sm {
+        max-width: 100%;
+    }
+    
+    /* Course autocomplete styles */
+    .bulk-course-wrapper,
+    .bulk-category-wrapper {
+        position: relative;
+    }
+    
+    .bulk-course-search,
+    .bulk-category-search {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: 10px center;
+        background-size: 16px;
+        padding-left: 35px;
+    }
+    
+    .bulk-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        max-height: 300px;
+        overflow-y: auto;
+        background: var(--bs-body-bg);
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.25rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: none;
+        margin-top: 0.25rem;
+    }
+    
+    .bulk-dropdown.show {
+        display: block;
+    }
+    
+    .bulk-dropdown-option {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        border-bottom: 1px solid var(--bs-border-color);
+        color: var(--bs-body-color);
+    }
+    
+    .bulk-dropdown-option:hover,
+    .bulk-dropdown-option.active {
+        background-color: var(--bs-secondary-bg);
+    }
+    
+    .bulk-dropdown-option:last-child {
+        border-bottom: none;
+    }
+    
+    .bulk-dropdown-option.no-results {
+        color: var(--bs-secondary-color);
+        cursor: default;
+    }
+    
+    .bulk-dropdown-option.no-results:hover {
+        background-color: var(--bs-body-bg);
+    }
+    
+    .bulk-field-hidden {
+        display: none;
+    }
+    
+    /* Tags checkbox styles */
+    .bulk-tags-wrapper {
+        position: relative;
+    }
+    
+    .bulk-tags-display {
+        cursor: pointer;
+        min-height: 38px;
+        display: flex;
+        align-items: center;
+        padding: 0.375rem 0.75rem;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.25rem;
+        font-size: 1rem;
+        background: var(--bs-body-bg);
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .bulk-tags-display:hover {
+        border-color: #86b7fe;
+    }
+    
+    .bulk-tags-display.active {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .bulk-tags-display-text {
+        color: var(--bs-body-color);
+    }
+    
+    .bulk-tags-display-text.placeholder {
+        color: var(--bs-secondary-color);
+        font-style: italic;
+    }
+    
+    .bulk-tags-checkbox-list {
+        max-height: 250px;
+        overflow-y: auto;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.25rem;
+        padding: 0.5rem;
+        background: var(--bs-body-bg);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 1100;
+        display: none;
+        margin-top: 0.25rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .bulk-tags-checkbox-list.show {
+        display: block;
+    }
+    
+    .bulk-tag-checkbox-item {
+        display: flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        cursor: pointer;
+        border-radius: 0.25rem;
+        transition: background-color 0.15s ease-in-out;
+    }
+    
+    .bulk-tag-checkbox-item:hover {
+        background-color: var(--bs-secondary-bg);
+    }
+    
+    .bulk-tag-checkbox-item input[type="checkbox"] {
+        margin-right: 0.5rem;
+        cursor: pointer;
+    }
+    
+    .bulk-tag-checkbox-item label {
+        margin: 0;
+        cursor: pointer;
+        flex: 1;
+        user-select: none;
+        font-size: 0.875rem;
+    }
+    
+    .bulk-tags-selected-count {
+        font-size: 0.75rem;
+        color: var(--bs-secondary-color);
+        margin-top: 0.25rem;
+    }
+    
+    /* Table row autocomplete and checkbox styles */
+    .row-course-wrapper,
+    .row-category-wrapper,
+    .row-tags-wrapper {
+        position: relative;
+    }
+    
+    .row-search-input {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: 6px center;
+        background-size: 12px;
+        padding-left: 24px;
+    }
+    
+    .row-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        max-height: 250px;
+        overflow-y: auto;
+        background: var(--bs-body-bg);
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.25rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        z-index: 1050;
+        display: none;
+        margin-top: 0.25rem;
+    }
+    
+    .row-dropdown.show {
+        display: block;
+    }
+    
+    .row-dropdown-option {
+        padding: 0.375rem 0.75rem;
+        cursor: pointer;
+        border-bottom: 1px solid var(--bs-border-color);
+        font-size: 0.875rem;
+        color: var(--bs-body-color);
+    }
+    
+    .row-dropdown-option:hover,
+    .row-dropdown-option.active {
+        background-color: var(--bs-secondary-bg);
+    }
+    
+    .row-dropdown-option:last-child {
+        border-bottom: none;
+    }
+    
+    .row-dropdown-option.no-results {
+        color: var(--bs-secondary-color);
+        cursor: default;
+    }
+    
+    .row-tags-checkbox-list {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.25rem;
+        padding: 0.25rem;
+        background: var(--bs-body-bg);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 1050;
+        display: none;
+        margin-top: 0.25rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        min-width: 200px;
+    }
+    
+    .row-tags-checkbox-list.show {
+        display: block;
+    }
+    
+    /* Make table rows expand when tag list is open */
+    tr {
+        position: relative;
+    }
+    
+    tr:has(.row-tags-checkbox-list.show) {
+        /* This row has an open tag list, so we need space for it */
+    }
+    
+    .row-tags-wrapper {
+        position: static;
+    }
+    
+    /* Position the tags display relative to the cell */
+    td:has(.row-tags-wrapper) {
+        position: relative;
+        vertical-align: top;
+    }
+    
+    .row-tag-checkbox-item {
+        display: flex;
+        align-items: center;
+        padding: 0.25rem 0.375rem;
+        cursor: pointer;
+        border-radius: 0.25rem;
+        transition: background-color 0.15s ease-in-out;
+    }
+    
+    .row-tag-checkbox-item:hover {
+        background-color: var(--bs-secondary-bg);
+    }
+    
+    .row-tag-checkbox-item input[type="checkbox"] {
+        margin-right: 0.375rem;
+        cursor: pointer;
+    }
+    
+    .row-tag-checkbox-item label {
+        margin: 0;
+        cursor: pointer;
+        flex: 1;
+        user-select: none;
+        font-size: 0.8125rem;
+    }
+    
+    .row-tags-display {
+        cursor: pointer;
+        min-height: 31px;
+        display: flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        background: var(--bs-body-bg);
+    }
+    
+    .row-tags-display:hover {
+        border-color: #86b7fe;
+        background-color: var(--bs-secondary-bg);
+    }
+    
+    .row-tags-display.active {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .row-tags-count {
+        color: var(--bs-secondary-color);
+        font-style: italic;
+    }
+    
+    /* Custom tooltip for filename */
+    .filename-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+    
+    .filename-tooltip {
+        visibility: hidden;
+        opacity: 0;
+        position: fixed;
+        background-color: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        white-space: nowrap;
+        z-index: 9999;
+        font-size: 0.875rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        pointer-events: none;
+        transition: opacity 0.15s ease-in-out, visibility 0.15s ease-in-out;
+        max-width: 500px;
+        word-wrap: break-word;
+        white-space: normal;
+    }
+    
+    .filename-tooltip.show {
+        visibility: visible;
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+    <twig:ea:Alert variant="info" class="mb-3">
+        <h5 class="alert-heading">
+            <twig:ea:Icon name="fa fa-circle-info" class="me-1" />
+            Instructions
+        </h5>
+        <ul class="mb-0">
+            <li>Review the document metadata below</li>
+            <li>Edit individual fields directly in the table</li>
+            <li>Select multiple documents and use "Bulk Edit" to change course, category, year, or tags for all selected</li>
+            <li>Click "Create All Documents" when ready to finalize the upload</li>
+            <li>Click "Cancel" to abort the upload</li>
+        </ul>
+    </twig:ea:Alert>
+
+    <div class="bulk-edit-panel card shadow-sm mb-3" id="bulkEditPanel">
+        <div class="card-body">
+            <h5 class="card-title">
+                <twig:ea:Icon name="fa fa-pen-to-square" class="me-2" />
+                Bulk Edit Selected Documents
+                (<span id="selectedCount" class="fw-bold text-primary">0</span> selected)
+            </h5>
+            <form method="POST" action="{{ path('admin_bulk_upload_update_metadata') }}" id="bulkEditForm" class="ea-form">
+                <div class="bulk-edit-form">
+                    <div class="mb-3">
+                        <label for="bulk_course_search" class="form-label">
+                            <twig:ea:Icon name="fa fa-book" class="me-1" />
+                            Course
+                        </label>
+                        <div class="bulk-course-wrapper">
+                            <input type="text" 
+                                   class="form-control bulk-course-search" 
+                                   id="bulk_course_search" 
+                                   placeholder="Search courses..."
+                                   autocomplete="off">
+                            <div class="bulk-dropdown" id="bulk_course_dropdown"></div>
+                        </div>
+                        <div class="bulk-field-hidden">
+                            <select name="bulk_course" id="bulk_course" class="form-select">
+                                {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course.name }} ({{ course.code }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="bulk_category_search" class="form-label">
+                            <twig:ea:Icon name="fa fa-folder" class="me-1" />
+                            Category
+                        </label>
+                        <div class="bulk-category-wrapper">
+                            <input type="text" 
+                                   class="form-control bulk-category-search" 
+                                   id="bulk_category_search" 
+                                   placeholder="Search categories..."
+                                   autocomplete="off">
+                            <div class="bulk-dropdown" id="bulk_category_dropdown"></div>
+                        </div>
+                        <div class="bulk-field-hidden">
+                            <select name="bulk_category" id="bulk_category" class="form-select">
+                                {% for category in categories %}
+                                <option value="{{ category.id }}">{{ category.nameNl }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="bulk_year" class="form-label">
+                            <twig:ea:Icon name="fa fa-calendar-days" class="me-1" />
+                            Year
+                        </label>
+                        <select name="bulk_year" id="bulk_year" class="form-select">
+                            <option value="">-- No change --</option>
+                            {% for year, yearLabel in yearChoices %}
+                            <option value="{{ year }}">{{ yearLabel }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <twig:ea:Icon name="fa fa-tags" class="me-1" />
+                            Tags
+                        </label>
+                        <div class="bulk-tags-wrapper">
+                            <div class="bulk-tags-display" id="bulk_tags_display">
+                                <span class="bulk-tags-display-text">Click to select tags</span>
+                            </div>
+                            <div class="bulk-tags-checkbox-list" id="bulk_tags_checkbox_list">
+                                {% for tag in tags %}
+                                <div class="bulk-tag-checkbox-item">
+                                    <input type="checkbox" 
+                                           class="form-check-input bulk-tag-checkbox" 
+                                           id="bulk_tag_{{ tag.id }}" 
+                                           value="{{ tag.id }}">
+                                    <label for="bulk_tag_{{ tag.id }}">{{ tag.name }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="bulk-field-hidden">
+                                <select name="bulk_tags[]" id="bulk_tags" multiple class="form-select">
+                                    {% for tag in tags %}
+                                    <option value="{{ tag.id }}">{{ tag.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-end">
+                        <twig:ea:Button type="submit" variant="primary" icon="fa fa-check">
+                            Apply to Selected
+                        </twig:ea:Button>
+                    </div>
+                </div>
+                <div id="selectedInputs"></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="POST" action="{{ path('admin_bulk_upload_update_metadata') }}" id="mainForm" class="ea-form">
+                <div class="table">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell">
+                                    <input type="checkbox" id="selectAll" class="form-check-input">
+                                </th>
+                                <th>
+                                    <twig:ea:Icon name="fa fa-file-lines" class="me-1" />
+                                    Filename
+                                </th>
+                                <th>
+                                    <twig:ea:Icon name="fa fa-signature" class="me-1" />
+                                    Document Name
+                                </th>
+                                <th>
+                                    <twig:ea:Icon name="fa fa-book" class="me-1" />
+                                    Course
+                                </th>
+                                <th>
+                                    <twig:ea:Icon name="fa fa-folder-open" class="me-1" />
+                                    Category
+                                </th>
+                                <th>
+                                    <twig:ea:Icon name="fa fa-calendar-days" class="me-1" />
+                                    Year
+                                </th>
+                                <th>
+                                    <twig:ea:Icon name="fa fa-tags" class="me-1" />
+                                    Tags
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for index, doc in documents %}
+                            <tr>
+                                <td class="checkbox-cell">
+                                    <input type="checkbox" class="doc-select form-check-input" name="selected[]"
+                                        value="{{ index }}">
+                                </td>
+                                <td>
+                                    <div class="filename-wrapper">
+                                        <span class="d-inline-block text-truncate">
+                                            {{ doc.originalName }}
+                                        </span>
+                                        <span class="filename-tooltip">{{ doc.originalName }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="text" name="name[{{ index }}]" value="{{ doc.name }}"
+                                        class="form-control form-control-sm">
+                                </td>
+                                <td>
+                                    <div class="row-course-wrapper">
+                                        <input type="text" 
+                                               class="form-control form-control-sm row-search-input row-course-search" 
+                                               data-index="{{ index }}"
+                                               placeholder="Search..."
+                                               autocomplete="off">
+                                        <div class="row-dropdown row-course-dropdown" data-index="{{ index }}"></div>
+                                        <select name="course[{{ index }}]" 
+                                                class="form-select form-select-sm row-course-select" 
+                                                data-index="{{ index }}"
+                                                style="display: none;">
+                                            {% for course in courses %}
+                                            <option value="{{ course.id }}" 
+                                                    {% if doc.courseEntity and doc.courseEntity.id==course.id %}selected{% endif %}>
+                                                {{ course.name }} ({{ course.code }})
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="row-category-wrapper">
+                                        <input type="text" 
+                                               class="form-control form-control-sm row-search-input row-category-search" 
+                                               data-index="{{ index }}"
+                                               placeholder="Search..."
+                                               autocomplete="off">
+                                        <div class="row-dropdown row-category-dropdown" data-index="{{ index }}"></div>
+                                        <select name="category[{{ index }}]" 
+                                                class="form-select form-select-sm row-category-select" 
+                                                data-index="{{ index }}"
+                                                style="display: none;">
+                                            {% for category in categories %}
+                                            <option value="{{ category.id }}" 
+                                                    {% if doc.categoryEntity and doc.categoryEntity.id==category.id %}selected{% endif %}>
+                                                {{ category.nameNl }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
+                                    <select name="year[{{ index }}]" class="form-select form-select-sm" title="{{ doc.year }}">
+                                        {% for year, yearLabel in yearChoices %}
+                                        <option value="{{ year }}" {% if doc.year==year %}selected{% endif %}
+                                            title="{{ yearLabel }}">
+                                            {{ yearLabel }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td>
+                                    <div class="row-tags-wrapper">
+                                        <div class="row-tags-display" data-index="{{ index }}">
+                                            <span class="row-tags-count">
+                                                {% if doc.tagEntities|length > 0 %}
+                                                    {{ doc.tagEntities|length }} tag{{ doc.tagEntities|length != 1 ? 's' : '' }}
+                                                {% else %}
+                                                    Click to select tags
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="row-tags-checkbox-list" data-index="{{ index }}">
+                                            {% for tag in tags %}
+                                            <div class="row-tag-checkbox-item">
+                                                <input type="checkbox" 
+                                                       class="form-check-input row-tag-checkbox" 
+                                                       data-index="{{ index }}"
+                                                       data-tag-id="{{ tag.id }}"
+                                                       value="{{ tag.id }}"
+                                                       {% if doc.tagEntities and tag in doc.tagEntities %}checked{% endif %}>
+                                                <label>{{ tag.name }}</label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        <select name="tags[{{ index }}][]" 
+                                                multiple 
+                                                class="form-select form-select-sm row-tags-select" 
+                                                data-index="{{ index }}"
+                                                style="display: none;">
+                                            {% for tag in tags %}
+                                            <option value="{{ tag.id }}" 
+                                                    {% if doc.tagEntities and tag in doc.tagEntities %}selected{% endif %}>
+                                                {{ tag.name }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex gap-2 mt-3 justify-content-end">
+                    <twig:ea:Button htmlElement="a" href="{{ path('admin_bulk_upload_create_all') }}" variant="success"
+                        icon="fa fa-circle-check"
+                        htmlAttributes="{{ {onclick: 'return confirm(\'Create ' ~ documents|length ~ ' document(s)?\')' } }}">
+                        Create All Documents ({{ documents|length }})
+                    </twig:ea:Button>
+
+                    <twig:ea:Button htmlElement="a" href="{{ path('admin_bulk_upload_cancel') }}" variant="default"
+                        icon="fa fa-xmark"
+                        htmlAttributes="{{ {onclick: 'return confirm(\'Are you sure you want to cancel? All uploaded files will be removed.\')' } }}">
+                        Cancel
+                    </twig:ea:Button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block configured_body_contents %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.doc-select');
+        const bulkEditPanel = document.getElementById('bulkEditPanel');
+        const selectedCount = document.getElementById('selectedCount');
+        const selectedInputs = document.getElementById('selectedInputs');
+        const bulkEditForm = document.getElementById('bulkEditForm');
+
+        // Bulk Course Autocomplete
+        const bulkCourseSearch = document.getElementById('bulk_course_search');
+        const bulkCourseDropdown = document.getElementById('bulk_course_dropdown');
+        const bulkCourseField = document.getElementById('bulk_course');
+        
+        if (bulkCourseSearch && bulkCourseDropdown && bulkCourseField) {
+            setupAutocomplete(
+                bulkCourseSearch,
+                bulkCourseDropdown,
+                bulkCourseField,
+                'course'
+            );
+        }
+        
+        // Bulk Category Autocomplete
+        const bulkCategorySearch = document.getElementById('bulk_category_search');
+        const bulkCategoryDropdown = document.getElementById('bulk_category_dropdown');
+        const bulkCategoryField = document.getElementById('bulk_category');
+        
+        if (bulkCategorySearch && bulkCategoryDropdown && bulkCategoryField) {
+            setupAutocomplete(
+                bulkCategorySearch,
+                bulkCategoryDropdown,
+                bulkCategoryField,
+                'category'
+            );
+        }
+        
+        // Generic autocomplete setup function
+        function setupAutocomplete(searchInput, dropdown, selectField, type) {
+            const allItems = Array.from(selectField.options)
+                .map(opt => ({
+                    value: opt.value,
+                    text: opt.textContent.trim()
+                }));
+            
+            let selectedItem = null;
+            
+            function showDropdown(items) {
+                dropdown.innerHTML = '';
+                
+                const filteredItems = items.filter(item => item.value !== '');
+                
+                if (filteredItems.length === 0) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'bulk-dropdown-option no-results';
+                    const pluralType = type === 'category' ? 'categories' : `${type}s`;
+                    noResults.textContent = `No ${pluralType} found`;
+                    dropdown.appendChild(noResults);
+                } else {
+                    filteredItems.forEach(item => {
+                        const option = document.createElement('div');
+                        option.className = 'bulk-dropdown-option';
+                        option.textContent = item.text;
+                        option.dataset.value = item.value;
+                        
+                        option.addEventListener('click', function() {
+                            selectItem(item);
+                        });
+                        
+                        dropdown.appendChild(option);
+                    });
+                }
+                
+                dropdown.classList.add('show');
+            }
+            
+            function hideDropdown() {
+                dropdown.classList.remove('show');
+            }
+            
+            function selectItem(item) {
+                selectedItem = item;
+                searchInput.value = item.text;
+                selectField.value = item.value;
+                hideDropdown();
+            }
+            
+            function filterItems(searchTerm) {
+                const searchLower = searchTerm.toLowerCase();
+                return allItems.filter(item => 
+                    item.text.toLowerCase().includes(searchLower)
+                );
+            }
+            
+            searchInput.addEventListener('focus', function() {
+                const searchTerm = this.value;
+                const filtered = searchTerm ? filterItems(searchTerm) : allItems;
+                showDropdown(filtered);
+            });
+            
+            searchInput.addEventListener('input', function() {
+                const filtered = filterItems(this.value);
+                showDropdown(filtered);
+                
+                if (selectedItem && this.value !== selectedItem.text) {
+                    selectedItem = null;
+                    selectField.value = '';
+                }
+            });
+            
+            searchInput.addEventListener('keydown', function(e) {
+                const options = dropdown.querySelectorAll('.bulk-dropdown-option:not(.no-results)');
+                const activeOption = dropdown.querySelector('.bulk-dropdown-option.active');
+                let currentIndex = Array.from(options).indexOf(activeOption);
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (currentIndex < options.length - 1) {
+                        if (activeOption) activeOption.classList.remove('active');
+                        options[currentIndex + 1].classList.add('active');
+                        options[currentIndex + 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (currentIndex > 0) {
+                        if (activeOption) activeOption.classList.remove('active');
+                        options[currentIndex - 1].classList.add('active');
+                        options[currentIndex - 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (activeOption) {
+                        const value = activeOption.dataset.value;
+                        const item = allItems.find(i => i.value === value);
+                        if (item) {
+                            selectItem(item);
+                        }
+                    } else {
+                        // If no option is active, just close the dropdown
+                        hideDropdown();
+                    }
+                } else if (e.key === 'Escape') {
+                    hideDropdown();
+                }
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                    hideDropdown();
+                }
+            });
+            
+            // Initialize with empty value and placeholder
+            selectedItem = null;
+            const pluralType = type === 'category' ? 'categories' : `${type}s`;
+            searchInput.placeholder = `Search ${pluralType}...`;
+            selectField.value = '';
+        }
+        
+        // Bulk Tags Checkboxes
+        const bulkTagsCheckboxList = document.getElementById('bulk_tags_checkbox_list');
+        const bulkTagsField = document.getElementById('bulk_tags');
+        const bulkTagsDisplay = document.getElementById('bulk_tags_display');
+        
+        if (bulkTagsCheckboxList && bulkTagsField && bulkTagsDisplay) {
+            const tagCheckboxes = bulkTagsCheckboxList.querySelectorAll('.bulk-tag-checkbox');
+            const displayText = bulkTagsDisplay.querySelector('.bulk-tags-display-text');
+            
+            function updateBulkTagsSelection() {
+                const checkedBoxes = Array.from(tagCheckboxes).filter(cb => cb.checked);
+                const checkedCount = checkedBoxes.length;
+                
+                // Update display text
+                if (checkedCount > 0) {
+                    displayText.textContent = `${checkedCount} tag${checkedCount !== 1 ? 's' : ''} selected`;
+                } else {
+                    displayText.textContent = 'Click to select tags';
+                }
+                
+                // Update hidden select
+                Array.from(bulkTagsField.options).forEach(option => {
+                    const checkbox = document.getElementById(`bulk_tag_${option.value}`);
+                    if (checkbox) {
+                        option.selected = checkbox.checked;
+                    }
+                });
+            }
+            
+            // Toggle dropdown on display click
+            bulkTagsDisplay.addEventListener('click', function(e) {
+                e.stopPropagation();
+                bulkTagsCheckboxList.classList.toggle('show');
+                bulkTagsDisplay.classList.toggle('active');
+            });
+            
+            tagCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateBulkTagsSelection);
+                
+                // Make the whole item clickable
+                const item = checkbox.closest('.bulk-tag-checkbox-item');
+                if (item) {
+                    item.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        if (e.target !== checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            checkbox.dispatchEvent(new Event('change'));
+                        }
+                    });
+                }
+            });
+            
+            // Close on click outside
+            document.addEventListener('click', function(e) {
+                if (!bulkTagsDisplay.contains(e.target) && !bulkTagsCheckboxList.contains(e.target)) {
+                    bulkTagsCheckboxList.classList.remove('show');
+                    bulkTagsDisplay.classList.remove('active');
+                }
+            });
+            
+            updateBulkTagsSelection();
+        }
+
+        function updateBulkEditPanel() {
+            const checked = document.querySelectorAll('.doc-select:checked');
+            selectedCount.textContent = checked.length;
+
+            if (checked.length > 0) {
+                bulkEditPanel.classList.add('active');
+
+                // Update hidden inputs for selected items
+                selectedInputs.innerHTML = '';
+                checked.forEach(checkbox => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'selected[]';
+                    input.value = checkbox.value;
+                    selectedInputs.appendChild(input);
+                });
+            } else {
+                bulkEditPanel.classList.remove('active');
+            }
+        }
+
+        selectAll.addEventListener('change', function () {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+            updateBulkEditPanel();
+        });
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                updateBulkEditPanel();
+
+                // Update "select all" checkbox state
+                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                const someChecked = Array.from(checkboxes).some(cb => cb.checked);
+                selectAll.checked = allChecked;
+                selectAll.indeterminate = someChecked && !allChecked;
+            });
+        });
+
+        // Initial state
+        updateBulkEditPanel();
+        
+        // Setup row-level course autocomplete
+        document.querySelectorAll('.row-course-search').forEach(searchInput => {
+            const index = searchInput.dataset.index;
+            const dropdown = document.querySelector(`.row-course-dropdown[data-index="${index}"]`);
+            const selectField = document.querySelector(`.row-course-select[data-index="${index}"]`);
+            
+            setupRowAutocomplete(searchInput, dropdown, selectField, 'course');
+        });
+        
+        // Setup row-level category autocomplete
+        document.querySelectorAll('.row-category-search').forEach(searchInput => {
+            const index = searchInput.dataset.index;
+            const dropdown = document.querySelector(`.row-category-dropdown[data-index="${index}"]`);
+            const selectField = document.querySelector(`.row-category-select[data-index="${index}"]`);
+            
+            setupRowAutocomplete(searchInput, dropdown, selectField, 'category');
+        });
+        
+        // Generic row autocomplete setup
+        function setupRowAutocomplete(searchInput, dropdown, selectField, type) {
+            const allItems = Array.from(selectField.options)
+                .map(opt => ({
+                    value: opt.value,
+                    text: opt.textContent.trim()
+                }));
+            
+            let selectedItem = null;
+            
+            // Initialize with current value
+            if (selectField.value) {
+                const current = allItems.find(i => i.value === selectField.value);
+                if (current) {
+                    selectedItem = current;
+                    searchInput.value = current.text;
+                }
+            }
+            
+            function showDropdown(items) {
+                dropdown.innerHTML = '';
+                
+                if (items.length === 0) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'row-dropdown-option no-results';
+                    const pluralType = type === 'category' ? 'categories' : `${type}s`;
+                    noResults.textContent = `No ${pluralType} found`;
+                    dropdown.appendChild(noResults);
+                } else {
+                    items.forEach(item => {
+                        const option = document.createElement('div');
+                        option.className = 'row-dropdown-option';
+                        option.textContent = item.text;
+                        option.dataset.value = item.value;
+                        
+                        option.addEventListener('click', function() {
+                            selectItem(item);
+                        });
+                        
+                        dropdown.appendChild(option);
+                    });
+                }
+                
+                dropdown.classList.add('show');
+            }
+            
+            function hideDropdown() {
+                dropdown.classList.remove('show');
+            }
+            
+            function selectItem(item) {
+                selectedItem = item;
+                searchInput.value = item.text;
+                selectField.value = item.value;
+                hideDropdown();
+            }
+            
+            function filterItems(searchTerm) {
+                const searchLower = searchTerm.toLowerCase();
+                return allItems.filter(item => 
+                    item.text.toLowerCase().includes(searchLower)
+                );
+            }
+            
+            searchInput.addEventListener('focus', function() {
+                const searchTerm = this.value;
+                const filtered = searchTerm ? filterItems(searchTerm) : allItems;
+                showDropdown(filtered);
+            });
+            
+            searchInput.addEventListener('input', function() {
+                const filtered = filterItems(this.value);
+                showDropdown(filtered);
+                
+                if (selectedItem && this.value !== selectedItem.text) {
+                    selectedItem = null;
+                }
+            });
+            
+            searchInput.addEventListener('keydown', function(e) {
+                const options = dropdown.querySelectorAll('.row-dropdown-option:not(.no-results)');
+                const activeOption = dropdown.querySelector('.row-dropdown-option.active');
+                let currentIndex = Array.from(options).indexOf(activeOption);
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (options.length === 0) return;
+                    if (currentIndex < options.length - 1) {
+                        if (activeOption) activeOption.classList.remove('active');
+                        options[currentIndex + 1].classList.add('active');
+                        options[currentIndex + 1].scrollIntoView({ block: 'nearest' });
+                    } else if (currentIndex === -1 && options.length > 0) {
+                        options[0].classList.add('active');
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (currentIndex > 0) {
+                        if (activeOption) activeOption.classList.remove('active');
+                        options[currentIndex - 1].classList.add('active');
+                        options[currentIndex - 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (activeOption) {
+                        const value = activeOption.dataset.value;
+                        const item = allItems.find(i => i.value === value);
+                        if (item) {
+                            selectItem(item);
+                        }
+                    }
+                } else if (e.key === 'Escape') {
+                    hideDropdown();
+                }
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                    hideDropdown();
+                }
+            });
+        }
+        
+        // Setup row-level tags checkboxes
+        document.querySelectorAll('.row-tags-display').forEach(display => {
+            const index = display.dataset.index;
+            const checkboxList = document.querySelector(`.row-tags-checkbox-list[data-index="${index}"]`);
+            const selectField = document.querySelector(`.row-tags-select[data-index="${index}"]`);
+            const checkboxes = checkboxList.querySelectorAll('.row-tag-checkbox');
+            
+            function updateTagsDisplay() {
+                const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+                const countSpan = display.querySelector('.row-tags-count');
+                
+                if (checkedCount > 0) {
+                    countSpan.textContent = `${checkedCount} tag${checkedCount !== 1 ? 's' : ''}`;
+                } else {
+                    countSpan.textContent = 'Click to select tags';
+                }
+                
+                // Update hidden select
+                Array.from(selectField.options).forEach(option => {
+                    const checkbox = Array.from(checkboxes).find(cb => cb.value === option.value);
+                    if (checkbox) {
+                        option.selected = checkbox.checked;
+                    }
+                });
+            }
+            
+            display.addEventListener('click', function(e) {
+                e.stopPropagation();
+                // Close all other tag lists
+                document.querySelectorAll('.row-tags-checkbox-list').forEach(list => {
+                    if (list !== checkboxList) {
+                        list.classList.remove('show');
+                    }
+                });
+                document.querySelectorAll('.row-tags-display').forEach(d => {
+                    if (d !== display) {
+                        d.classList.remove('active');
+                    }
+                });
+                
+                checkboxList.classList.toggle('show');
+                display.classList.toggle('active');
+            });
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateTagsDisplay);
+                
+                const item = checkbox.closest('.row-tag-checkbox-item');
+                if (item) {
+                    item.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        if (e.target !== checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            checkbox.dispatchEvent(new Event('change'));
+                        }
+                    });
+                }
+            });
+            
+            // Close on click outside
+            document.addEventListener('click', function(e) {
+                if (!display.contains(e.target) && !checkboxList.contains(e.target)) {
+                    checkboxList.classList.remove('show');
+                    display.classList.remove('active');
+                }
+            });
+            
+            updateTagsDisplay();
+        });
+        
+        // Setup filename tooltips that follow the mouse
+        document.querySelectorAll('.filename-wrapper').forEach(wrapper => {
+            const tooltip = wrapper.querySelector('.filename-tooltip');
+            const filenameSpan = wrapper.querySelector('.text-truncate');
+            
+            if (tooltip && filenameSpan) {
+                let isHovering = false;
+                
+                filenameSpan.addEventListener('mouseenter', function() {
+                    isHovering = true;
+                    tooltip.classList.add('show');
+                });
+                
+                filenameSpan.addEventListener('mouseleave', function() {
+                    isHovering = false;
+                    tooltip.classList.remove('show');
+                });
+                
+                filenameSpan.addEventListener('mousemove', function(e) {
+                    if (isHovering) {
+                        // Position tooltip near the mouse cursor with offset
+                        const offsetX = 15;
+                        const offsetY = 15;
+                        
+                        // Get viewport dimensions
+                        const viewportWidth = window.innerWidth;
+                        const viewportHeight = window.innerHeight;
+                        
+                        // Get tooltip dimensions
+                        const tooltipRect = tooltip.getBoundingClientRect();
+                        const tooltipWidth = tooltipRect.width;
+                        const tooltipHeight = tooltipRect.height;
+                        
+                        // Calculate position
+                        let left = e.clientX + offsetX;
+                        let top = e.clientY + offsetY;
+                        
+                        // Adjust if tooltip would go off the right edge
+                        if (left + tooltipWidth > viewportWidth - 10) {
+                            left = e.clientX - tooltipWidth - offsetX;
+                        }
+                        
+                        // Adjust if tooltip would go off the bottom edge
+                        if (top + tooltipHeight > viewportHeight - 10) {
+                            top = e.clientY - tooltipHeight - offsetY;
+                        }
+                        
+                        // Ensure tooltip doesn't go off the left edge
+                        if (left < 10) {
+                            left = 10;
+                        }
+                        
+                        // Ensure tooltip doesn't go off the top edge
+                        if (top < 10) {
+                            top = 10;
+                        }
+                        
+                        tooltip.style.left = left + 'px';
+                        tooltip.style.top = top + 'px';
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

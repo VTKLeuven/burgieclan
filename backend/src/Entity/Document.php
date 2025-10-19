@@ -12,7 +12,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: DocumentRepository::class)]
-class Document extends Node
+class Document extends Node implements VotableInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -20,38 +20,56 @@ class Document extends Node
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private string $name;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Course $course = null;
+    private Course $course;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?DocumentCategory $category = null;
+    private DocumentCategory $category;
 
     #[ORM\Column]
-    private ?bool $under_review = null;
+    private bool $under_review;
 
     #[ORM\Column]
-    private ?bool $anonymous = null;
+    private bool $anonymous;
 
-    #[Vich\UploadableField(mapping: 'document_object', fileNameProperty: 'file_name')]
+    #[Vich\UploadableField(mapping: 'document_object', fileNameProperty: 'file_name', size: 'file_size')]
     private ?File $file = null;
 
     #[ORM\Column(nullable: true)]
     private ?string $file_name = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $file_size = null;
+
     #[ORM\Column(length: 11, nullable: true)]
     private ?string $year = null; // Ex. 2024 - 2025
 
+    /**
+     * @var Collection<int, Tag>
+     */
     #[ORM\ManyToMany(targetEntity: Tag::class, mappedBy: 'documents', cascade: ['persist'])]
     private Collection $tags;
+
+    /**
+     * @var Collection<int, DocumentVote>
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'document',
+        targetEntity: DocumentVote::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    private Collection $votes;
 
     public function __construct($creator)
     {
         parent::__construct($creator);
         $this->tags = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -59,7 +77,7 @@ class Document extends Node
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -70,7 +88,7 @@ class Document extends Node
         return $this;
     }
 
-    public function getCourse(): ?Course
+    public function getCourse(): Course
     {
         return $this->course;
     }
@@ -82,7 +100,7 @@ class Document extends Node
         return $this;
     }
 
-    public function getCategory(): ?DocumentCategory
+    public function getCategory(): DocumentCategory
     {
         return $this->category;
     }
@@ -94,7 +112,7 @@ class Document extends Node
         return $this;
     }
 
-    public function isUnderReview(): ?bool
+    public function isUnderReview(): bool
     {
         return $this->under_review;
     }
@@ -106,7 +124,7 @@ class Document extends Node
         return $this;
     }
 
-    public function isAnonymous(): ?bool
+    public function isAnonymous(): bool
     {
         return $this->anonymous;
     }
@@ -127,6 +145,17 @@ class Document extends Node
     {
         $this->file_name = $file_name;
 
+        return $this;
+    }
+
+    public function getFileSize(): ?int
+    {
+        return $this->file_size;
+    }
+
+    public function setFileSize(?int $file_size): static
+    {
+        $this->file_size = $file_size;
         return $this;
     }
 
@@ -170,7 +199,7 @@ class Document extends Node
      * @param string|null $firstYear The first year to start generating choices from, default is null
      * @return array The array of academic year choices, formatted like '2024 - 2025' => '2024 - 2025'
      */
-    public static function getAcademicYearChoices(int $amountOfYears = 10, string $firstYear = null): array
+    public static function getAcademicYearChoices(int $amountOfYears = 10, ?string $firstYear = null): array
     {
         $currentYear = (int)date('Y');
         // Calculate the date of the last Monday of September
@@ -220,6 +249,127 @@ class Document extends Node
         if ($this->tags->removeElement($tag)) {
             $tag->removeDocument($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * Get votes for this document
+     *
+     * @return Collection<int, DocumentVote>
+     */
+    public function getVotes(): Collection
+    {
+        return $this->votes;
+    }
+
+    /**
+     * Calculate the vote score (upvotes - downvotes) for this document
+     *
+     * @return int
+     */
+    public function getVoteScore(): int
+    {
+        $score = 0;
+        foreach ($this->getVotes() as $vote) {
+            $score += $vote->getVoteType();
+        }
+
+        return $score;
+    }
+
+    /**
+     * Get a specific user's vote on this document
+     *
+     * @param User $user
+     *
+     * @return DocumentVote|null
+     */
+    public function getUserVote(User $user): ?DocumentVote
+    {
+        foreach ($this->getVotes() as $vote) {
+            if ($vote->getCreator() === $user) {
+                return $vote;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the number of upvotes
+     *
+     * @return int
+     */
+    public function getUpvoteCount(): int
+    {
+        $count = 0;
+        foreach ($this->getVotes() as $vote) {
+            if ($vote->isUpvote()) {
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * Get the number of downvotes
+     *
+     * @return int
+     */
+    public function getDownvoteCount(): int
+    {
+        $count = 0;
+        foreach ($this->getVotes() as $vote) {
+            if ($vote->isDownvote()) {
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * Check if a specific user has voted on this document
+     *
+     * @param User $user
+     *
+     * @return bool
+     */
+    public function hasUserVoted(User $user): bool
+    {
+        return $this->getUserVote($user) !== null;
+    }
+
+    /**
+     * Add a vote to this document
+     *
+     * @param DocumentVote $vote
+     *
+     * @return static
+     */
+    public function addVote(DocumentVote $vote): static
+    {
+        if (!$this->votes->contains($vote)) {
+            $this->votes->add($vote);
+            $vote->setDocument($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove a vote from this document
+     * The vote will be deleted from the database due to the orphanRemoval setting
+     *
+     * @param DocumentVote $vote
+     *
+     * @return static
+     */
+    public function removeVote(DocumentVote $vote): static
+    {
+        $this->votes->removeElement($vote);
 
         return $this;
     }

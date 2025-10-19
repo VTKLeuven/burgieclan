@@ -67,7 +67,6 @@ class CreateDocumentController extends AbstractController
 
         // Convert the documentDto to an actual Document.
         $document = $this->microMapper->map($dto, Document::class);
-        assert($document instanceof Document);
 
         $uploadedFile = $request->files->get('file');
         if (!$uploadedFile) {

@@ -24,7 +24,7 @@ class CommentCategory
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    private ?string $name_nl = null;
+    private string $name_nl;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description_nl = null;
@@ -38,7 +38,7 @@ class CommentCategory
 
     public function __toString(): string
     {
-        return $this->getNameNl();
+        return sprintf('%s (%s)', $this->getNameNl(), $this->getNameEn());
     }
 
     public function getId(): ?int
@@ -51,7 +51,7 @@ class CommentCategory
         return $this->{'name_' . $lang} ?? $this->{'name_' . self::$DEFAULT_LANGUAGE};
     }
 
-    public function getNameNl(): ?string
+    public function getNameNl(): string
     {
         return $this->name_nl;
     }

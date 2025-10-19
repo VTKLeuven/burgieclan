@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import useRetrieveDocuments from '@/hooks/useRetrieveDocuments';
-import Link from 'next/link';
-import { LoaderCircle } from 'lucide-react';
-import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import Badge from '@/components/ui/Badge';
-import { useTranslation } from 'react-i18next';
+import VoteButton from '@/components/ui/buttons/VoteButton';
+import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import Pagination from '@/components/ui/Pagination';
+import useRetrieveDocuments from '@/hooks/useRetrieveDocuments';
+import { LoaderCircle } from 'lucide-react';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const DocumentList: React.FC = () => {
     const [page, setPage] = useState(1);
@@ -58,16 +59,22 @@ const DocumentList: React.FC = () => {
                                                 )}
                                             </div>
                                             <p className="text-gray-700 truncate max-w-[75%]">{document.course!.name}</p>
-                                            {/* TODO add rating */}
                                             <p className="text-gray-700 truncate max-w-[65%]">{document.category!.name}</p>
-                                            <p className="text-gray-500 text-xs absolute bottom-2 right-2">{new Date(document.createdAt!).toLocaleString('en-GB', {
-                                                day: '2-digit',
-                                                month: '2-digit',
-                                                year: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit',
-                                                hour12: false
-                                            })}</p>
+                                            <div className="flex justify-between items-end mt-2">
+                                                <VoteButton
+                                                    type="document"
+                                                    objectId={document.id}
+                                                    size="small"
+                                                />
+                                                <p className="text-gray-500 text-xs">{new Date(document.createdAt!).toLocaleString('en-GB', {
+                                                    day: '2-digit',
+                                                    month: '2-digit',
+                                                    year: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                    hour12: false
+                                                })}</p>
+                                            </div>
                                         </div>
                                     </Link>
                                 ))}

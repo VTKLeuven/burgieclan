@@ -1,4 +1,19 @@
-import { type CommentCategory, type Course, type CourseComment, type Document, type DocumentComment, type Module, type Page, type Program, type QuickLink, type Tag, type User } from '@/types/entities';
+import {
+    type Announcement,
+    type CommentCategory,
+    type Course,
+    type CourseComment,
+    type Document,
+    type DocumentComment,
+    type DocumentView,
+    type Module,
+    type Page,
+    type Program,
+    type QuickLink,
+    type Tag,
+    type User,
+    type VoteSummary
+} from '@/types/entities';
 
 export function convertToUser(user: any): User {
     if (typeof user === 'string') {
@@ -77,6 +92,7 @@ export function convertToDocument(doc: any): Document {
         contentUrl: doc.contentUrl ? process.env.NEXT_PUBLIC_BACKEND_URL + doc.contentUrl : undefined,
         mimetype: doc.mimetype,
         filename: doc.filename,
+        fileSize: doc.fileSize,
         tags: doc.tags?.map(convertToTag)
     };
 }
@@ -159,6 +175,43 @@ export function convertToTag(tag: any): Tag {
         id: parseId(tag['@id']),
         name: tag.name,
         documents: tag.documents?.map(convertToDocument)
+    };
+}
+
+export function convertToAnnouncement(announcement: any): Announcement {
+    if (typeof announcement === 'string') {
+        return { id: parseId(announcement) };
+    }
+    return {
+        id: parseId(announcement['@id']),
+        creator: announcement.creator ? convertToUser(announcement.creator) : undefined,
+        createdAt: announcement.createdAt ? new Date(announcement.createdAt) : undefined,
+        updatedAt: announcement.updatedAt ? new Date(announcement.updatedAt) : undefined,
+        title: announcement.title,
+        content: announcement.content,
+        priority: announcement.priority,
+        startTime: announcement.startTime ? new Date(announcement.startTime) : undefined,
+        endTime: announcement.endTime ? new Date(announcement.endTime) : undefined,
+    };
+}
+
+export function convertToDocumentView(documentView: any): DocumentView {
+    if (typeof documentView === 'string') {
+        return { id: parseId(documentView) };
+    }
+    return {
+        id: parseId(documentView['@id']),
+        document: documentView.document ? convertToDocument(documentView.document) : undefined,
+        lastViewed: documentView.lastViewed ? new Date(documentView.lastViewed) : undefined,
+    };
+}
+
+export function convertToVoteSummary(voteSummary: any): VoteSummary {
+    return {
+        upvotes: voteSummary.upvotes,
+        downvotes: voteSummary.downvotes,
+        sum: voteSummary.sum,
+        currentUserVote: voteSummary.currentUserVote
     };
 }
 
