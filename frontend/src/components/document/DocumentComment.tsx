@@ -23,7 +23,7 @@ export default function DocumentComment({ id, author, content }: DocumentComment
                 <p className="font-bold">{author}</p>
                 <VoteButton type='document_comment' objectId={id} className="py-1" />
             </div>
-            <p className="text-sm">{content}</p>
+            <p className="text-sm" dangerouslySetInnerHTML={{ __html: content }} />
         </div>
     );
 }
