@@ -1,13 +1,11 @@
 'use client';
 
-import { logOut } from '@/actions/auth';
 import Loading from "@/app/[locale]/loading";
 import ItemList from '@/components/layout/ItemList';
-import { useUser } from "@/components/UserContext";
 import CreateDocumentButton from '@/components/ui/CreateDocumentButton';
+import { useUser } from "@/components/UserContext";
 import type { Course, Document } from "@/types/entities";
 import { ChevronDown, File, FolderClosed, Home, PanelLeft, PanelLeftClose } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -44,11 +42,6 @@ const NavigationSidebar = () => {
 
   if (!user) {
     return null;
-  }
-
-  async function handleLogout() {
-    await logOut();
-    await router.push('/login');
   }
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -138,30 +131,6 @@ const NavigationSidebar = () => {
         {!isCollapsed && (
           <CreateDocumentButton className='mx-2 my-2 transition duration-150 ease-in-out' />
         )}
-
-        {/* User Profile - Fixed at Bottom */}
-        <div className="border-t border-gray-200 flex-shrink-0">
-          <div className="p-4 flex items-center space-x-3">
-            <Image
-              src={'/images/icons/empty_profile.png'}
-              alt={t('sidebar.user_avatar')}
-              className="w-8 h-8 rounded-full"
-              width={32}
-              height={32}
-            />
-            {!isCollapsed && <span className="text-sm text-gray-700">{user?.fullName}</span>}
-          </div>
-          {!isCollapsed && (
-            <div className="px-4 pb-2 space-y-2">
-              <Link href="https://vtk.be" className="block text-sm text-gray-600 hover:text-gray-800">
-                {t('sidebar.go_to_vtk')}
-              </Link>
-              <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded mt-8 hover:bg-red-600 active:bg-red-700 transition duration-150 ease-in-out">
-                {t('sidebar.log_out')}
-              </button>
-            </div>
-          )}
-        </div>
       </div>
     </aside>
   );
