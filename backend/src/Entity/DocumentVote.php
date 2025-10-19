@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 class DocumentVote extends AbstractVote
 {
     #[ORM\ManyToOne(targetEntity: Document::class, inversedBy: 'votes')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Document $document;
 
     public function getDocument(): Document

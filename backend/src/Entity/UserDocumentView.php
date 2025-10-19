@@ -19,11 +19,11 @@ class UserDocumentView
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'viewedDocuments')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private User $user;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Document $document;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]

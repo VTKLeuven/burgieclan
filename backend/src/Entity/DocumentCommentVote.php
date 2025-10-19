@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 class DocumentCommentVote extends AbstractVote
 {
     #[ORM\ManyToOne(targetEntity: DocumentComment::class, inversedBy: 'votes')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private DocumentComment $documentComment;
 
     public function getDocumentComment(): DocumentComment

@@ -16,7 +16,7 @@ class DocumentComment extends AbstractComment implements VotableInterface
     private ?int $id = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'cascade')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Document $document;
 
     /**
@@ -29,7 +29,7 @@ class DocumentComment extends AbstractComment implements VotableInterface
         orphanRemoval: true
     )]
     private Collection $votes;
-    
+
     public function __construct(User $creator)
     {
         parent::__construct($creator);
