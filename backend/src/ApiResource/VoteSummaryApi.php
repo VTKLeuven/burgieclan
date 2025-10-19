@@ -67,6 +67,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class VoteSummaryApi
 {
+    #[ApiProperty(readable: false, writable: false, identifier: true)]
+    public ?int $id = null;
+
     #[ApiProperty(description: 'Number of upvotes')]
     public int $upvotes = 0;
 

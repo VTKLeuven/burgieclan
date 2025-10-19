@@ -5,6 +5,7 @@ namespace App\Mapper;
 use App\ApiResource\DocumentVoteApi;
 use App\Entity\Document;
 use App\Entity\DocumentVote;
+use App\Entity\User;
 use App\Repository\DocumentVoteRepository;
 use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -29,7 +30,10 @@ class DocumentVoteApiToEntityMapper implements MapperInterface
     {
         assert($from instanceof DocumentVoteApi);
 
-        $entity = $from->id ? $this->repository->find($from->id) : new DocumentVote($this->security->getUser());
+        $user = $this->security->getUser();
+        assert($user instanceof User);
+
+        $entity = $from->id ? $this->repository->find($from->id) : new DocumentVote($user);
         if (!$entity) {
             throw new Exception('Document  vote not found');
         }

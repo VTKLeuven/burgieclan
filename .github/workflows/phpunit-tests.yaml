@@ -41,7 +41,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2 # Sets up the specified PHP version
         with:
-          php-version: "8.3"
+          php-version: "8.4"
 
       - name: Install dependencies
         run: |
@@ -58,7 +58,7 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           cd backend
-          APP_ENV=test vendor/bin/paratest --processes=8 tests
+          APP_ENV=test vendor/bin/phpunit tests
 
       - name: Block merge if tests fail
         if: failure() # This step runs only if the previous steps failed

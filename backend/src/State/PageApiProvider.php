@@ -7,12 +7,10 @@ use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Metadata\Operation;
 use App\ApiResource\PageApi;
 use App\Entity\Page;
-use App\Entity\PageTranslation;
 use App\Repository\PageRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Custom provider for PageApi because it uses urlKey as identifier, while Page uses id as identifier
@@ -52,12 +50,6 @@ class PageApiProvider implements ProviderInterface
             throw new NotFoundHttpException(sprintf('Page not found for urlKey: %s', $urlKey));
         }
 
-        //$pageApiObject = $this->mapper->map($page, PageApi::class);
-        $pageApiObject = $this->microMapper->map($page, PageApi::class, ["lang"=>$lang]);
-        if (!$pageApiObject instanceof PageApi) {
-            throw new HttpException(500, 'Page could not be converted to PageApi object');
-        }
-
-        return $pageApiObject;
+        return $this->microMapper->map($page, PageApi::class, ["lang"=>$lang]);
     }
 }

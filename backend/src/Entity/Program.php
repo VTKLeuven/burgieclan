@@ -16,8 +16,11 @@ class Program
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private string $name;
 
+    /**
+     * @var Collection<int, Module>
+     */
     #[ORM\OneToMany(mappedBy: 'program', targetEntity: Module::class)]
     private Collection $modules;
 
@@ -36,7 +39,7 @@ class Program
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }

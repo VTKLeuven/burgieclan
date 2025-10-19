@@ -6,6 +6,7 @@ use App\ApiResource\VoteSummaryApi;
 use App\Entity\CourseComment;
 use App\Entity\Document;
 use App\Entity\DocumentComment;
+use App\Entity\User;
 use App\Entity\VotableInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,7 +44,9 @@ class GetVoteSummaryController extends AbstractController
         $voteSummary->upvotes = $entity->getUpvoteCount();
         $voteSummary->downvotes = $entity->getDownvoteCount();
         $voteSummary->sum = $entity->getVoteScore();
-        $voteSummary->currentUserVote = $entity->getUserVote($this->getUser())?->getVoteType() ?? 0;
+        $user = $this->getUser();
+        assert($user instanceof User);
+        $voteSummary->currentUserVote = $entity->getUserVote($user)?->getVoteType() ?? 0;
 
         return $voteSummary;
     }

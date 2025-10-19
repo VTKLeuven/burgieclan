@@ -11,14 +11,14 @@ class DocumentVote extends AbstractVote
 {
     #[ORM\ManyToOne(targetEntity: Document::class, inversedBy: 'votes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Document $document = null;
+    private Document $document;
 
-    public function getDocument(): ?Document
+    public function getDocument(): Document
     {
         return $this->document;
     }
 
-    public function setDocument(?Document $document): static
+    public function setDocument(Document $document): static
     {
         $this->document = $document;
 

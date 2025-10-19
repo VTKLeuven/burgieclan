@@ -6,6 +6,7 @@ use App\ApiResource\CourseCommentApi;
 use App\Entity\CommentCategory;
 use App\Entity\Course;
 use App\Entity\CourseComment;
+use App\Entity\User;
 use App\Repository\CourseCommentRepository;
 use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -30,7 +31,10 @@ class CourseCommentApiToEntityMapper implements MapperInterface
     {
         assert($from instanceof CourseCommentApi);
 
-        $entity = $from->id ? $this->repository->find($from->id) : new CourseComment($this->security->getUser());
+        $user = $this->security->getUser();
+        assert($user instanceof User);
+
+        $entity = $from->id ? $this->repository->find($from->id) : new CourseComment($user);
         if (!$entity) {
             throw new Exception('Course comment not found');
         }

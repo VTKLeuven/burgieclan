@@ -11,14 +11,14 @@ class DocumentCommentVote extends AbstractVote
 {
     #[ORM\ManyToOne(targetEntity: DocumentComment::class, inversedBy: 'votes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?DocumentComment $documentComment = null;
+    private DocumentComment $documentComment;
 
-    public function getDocumentComment(): ?DocumentComment
+    public function getDocumentComment(): DocumentComment
     {
         return $this->documentComment;
     }
 
-    public function setDocumentComment(?DocumentComment $documentComment): static
+    public function setDocumentComment(DocumentComment $documentComment): static
     {
         $this->documentComment = $documentComment;
 

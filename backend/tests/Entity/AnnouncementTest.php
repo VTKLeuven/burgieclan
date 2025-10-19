@@ -11,7 +11,6 @@ class AnnouncementTest extends KernelTestCase
 {
     public function testSetTitleNl(): void
     {
-        /** @var User $user */
         $user = $this->createMock(User::class);
         $announcement = new Announcement($user);
         $announcement->setTitleNl("Dutch Announcement");
@@ -21,7 +20,6 @@ class AnnouncementTest extends KernelTestCase
 
     public function testSetTitleEn(): void
     {
-        /** @var User $user */
         $user = $this->createMock(User::class);
         $announcement = new Announcement($user);
         $announcement->setTitleEn("English Announcement");
@@ -31,7 +29,6 @@ class AnnouncementTest extends KernelTestCase
 
     public function testSetContentNl(): void
     {
-        /** @var User $user */
         $user = $this->createMock(User::class);
         $announcement = new Announcement($user);
         $announcement->setContentNl("Dutch announcement content");
@@ -41,7 +38,6 @@ class AnnouncementTest extends KernelTestCase
 
     public function testSetContentEn(): void
     {
-        /** @var User $user */
         $user = $this->createMock(User::class);
         $announcement = new Announcement($user);
         $announcement->setContentEn("English announcement content");
@@ -51,7 +47,6 @@ class AnnouncementTest extends KernelTestCase
 
     public function testSetStartTime(): void
     {
-        /** @var User $user */
         $user = $this->createMock(User::class);
         $announcement = new Announcement($user);
         $starttime = new DateTime();
@@ -62,7 +57,6 @@ class AnnouncementTest extends KernelTestCase
 
     public function testSetEndTime(): void
     {
-        /** @var User $user */
         $user = $this->createMock(User::class);
         $announcement = new Announcement($user);
         $endtime = new DateTime();
@@ -73,7 +67,6 @@ class AnnouncementTest extends KernelTestCase
 
     public function testSetPriority(): void
     {
-        /** @var User $user */
         $user = $this->createMock(User::class);
         $announcement = new Announcement($user);
         $announcement->setPriority(true);

@@ -30,7 +30,7 @@ class DocumentCommentCrudController extends AbstractCrudController
             ->setEntityLabelInPlural('Document Comments');
     }
 
-    public function createEntity(string $entityFqcn)
+    public function createEntity(string $entityFqcn): DocumentComment
     {
         $user = $this->getUser();
         assert($user instanceof User);

@@ -11,12 +11,12 @@ abstract class AbstractComment extends Node
 {
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank]
-    private ?string $content = null;
+    private string $content;
 
     #[ORM\Column]
-    private ?bool $anonymous = false;
+    private bool $anonymous;
 
-    public function getContent(): ?string
+    public function getContent(): string
     {
         return $this->content;
     }
@@ -28,7 +28,7 @@ abstract class AbstractComment extends Node
         return $this;
     }
 
-    public function isAnonymous(): ?bool
+    public function isAnonymous(): bool
     {
         return $this->anonymous;
     }

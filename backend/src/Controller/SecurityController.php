@@ -13,6 +13,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
+use KnpU\OAuth2ClientBundle\Client\OAuth2Client;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -69,7 +70,9 @@ final class SecurityController extends AbstractController
     #[Route("/login/litus/start", name: "login_litus_start")]
     public function loginLitusStart(ClientRegistry $clientRegistry): RedirectResponse
     {
-        return $clientRegistry->getClient("litus_backend")->redirect();
+        /** @var OAuth2Client $oauthClient */
+        $oauthClient = $clientRegistry->getClient("litus_backend");
+        return $oauthClient->redirect();
     }
 
     /**

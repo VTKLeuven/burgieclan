@@ -72,7 +72,7 @@ final class AnnouncementFactory extends PersistentProxyObjectFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      */
-    protected function defaults(): array|callable
+    protected function defaults(): array
     {
         $createDate = new DateTimeImmutable();
         $startTime = $createDate->add(new DateInterval('P'. self::faker()->numberBetween(1, 10) . 'D'));
