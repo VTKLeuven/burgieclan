@@ -135,7 +135,9 @@ const NavigationSidebar = () => {
         </nav>
 
         {/* Add Document Button */}
-        <CreateDocumentButton className='mx-2 my-2' />
+        {!isCollapsed && (
+          <CreateDocumentButton className='mx-2 my-2 transition duration-150 ease-in-out' />
+        )}
 
         {/* User Profile - Fixed at Bottom */}
         <div className="border-t border-gray-200 flex-shrink-0">
