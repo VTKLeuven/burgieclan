@@ -74,7 +74,6 @@ export default function DocumentPreview({ id }: { id: string }) {
     if (loading) return <LoadingPage />;
 
     if (error) {
-        console.error(error);
         return <ErrorPage status={error.status} detail={error.message} />;
     }
 
