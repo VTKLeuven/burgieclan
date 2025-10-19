@@ -125,6 +125,9 @@ class DocumentApiProvider implements ProviderInterface
 
         if ($operation instanceof Get) {
             $document = $this->itemProvider->provide($operation, $uriVariables, $context);
+            if (!$document) {
+                return null;
+            }
             return $this->processDocument($document, $mapperContext);
         }
 
