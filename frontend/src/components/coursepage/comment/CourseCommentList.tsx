@@ -156,7 +156,7 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
                     {category.description && (
                         <div className="py-2 px-3 bg-gray-50 border border-gray-200 rounded-md flex items-start">
                             <Info className="h-4 w-4 mr-2 text-gray-500 mt-0.5 flex-shrink-0" />
-                            <p className="text-sm text-gray-600">{category.description}</p>
+                            <p className="text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: category.description }} />
                         </div>
                     )}
 
