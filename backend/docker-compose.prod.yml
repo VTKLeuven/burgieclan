@@ -1,0 +1,71 @@
+services:
+  backend:
+    # Image from GitHub Container Registry
+    image: ghcr.io/${GITHUB_REPOSITORY}/backend:test
+    container_name: burgieclan-backend
+
+    # Restart policy - always restart unless manually stopped
+    restart: unless-stopped
+
+    # Port mapping
+    ports:
+      - "${HOST_PORT:-8080}:${PORT:-8080}"
+
+    # Environment variables
+    environment:
+      # Container port (internal)
+      PORT: ${PORT:-8080}
+
+      # PHP-FPM worker processes
+      # Calculate: (Available RAM - System RAM) / 256MB per process
+      MAX_REQUESTS: ${MAX_REQUESTS:-8}
+
+      # Symfony environment
+      APP_ENV: ${APP_ENV:-prod}
+      APP_DEBUG: ${APP_DEBUG:-0}
+      APP_SECRET: ${APP_SECRET:?APP_SECRET is required}
+
+      # Database configuration
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+
+      # JWT Configuration
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-%kernel.project_dir%/config/jwt/private.pem}
+      JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY:-%kernel.project_dir%/config/jwt/public.pem}
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:-}
+
+      # CORS configuration (if needed)
+      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:-^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$$}
+
+      # Sentry error tracking
+      SENTRY_DSN: ${SENTRY_DSN:-}
+
+    # Volume mounts
+    volumes:
+      # Data directory - where uploaded files and SQLite database are stored
+      # This must be an absolute path on the host
+      - ${DATA_DIR:?DATA_DIR is required}:/app/data
+      # Var directory for cache and logs
+      # Using named volume for better performance
+      - backend_var:/app/var
+
+    # Logging configuration - prevent logs from filling disk
+    # logging:
+    #   driver: "json-file"
+    #   options:
+    #     max-size: "10m"
+    #     max-file: "3"
+    # Resource limits (optional - adjust based on your server)
+    # Uncomment to set limits
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '2'
+    #       memory: 2G
+    #     reservations:
+    #       cpus: '1'
+    #       memory: 1G
+
+    # Named volumes
+volumes:
+  backend_var:
+    driver: local
