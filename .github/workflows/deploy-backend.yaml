@@ -1,0 +1,151 @@
+name: "Build and Deploy Backend Docker Container"
+
+on:
+  push:
+    branches:
+      - test
+  workflow_dispatch:
+
+# Ensure only one backend deployment runs at a time
+concurrency:
+  group: deploy-backend-docker-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build_and_push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+      image_digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Convert repository name to lowercase
+        id: repo_name
+        run: echo "lowercase=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ steps.repo_name.outputs.lowercase }}/backend
+          tags: |
+            # Tag with branch name
+            type=ref,event=branch
+            # Tag with 'test' for test branch
+            type=raw,value=test,enable=${{ github.ref == 'refs/heads/test' }}
+            # Tag with commit SHA
+            type=sha,prefix={{branch}}-
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/.docker/production/Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64 
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=ghcr.io/${{ steps.repo_name.outputs.lowercase }}/backend:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ steps.repo_name.outputs.lowercase }}/backend:buildcache,mode=max
+          build-args: |
+            API_ENV=prod
+
+  deploy_backend:
+    name: Deploy Backend Container
+    runs-on: ubuntu-latest
+    needs: build_and_push
+    if: false
+
+    steps:
+      - name: Install SSH keys
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+
+      - name: Pull and deploy new container
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            # Variables
+            DEPLOY_DIR="${{ secrets.DEPLOY_DIR_BACKEND }}"
+            COMPOSE_FILE="$DEPLOY_DIR/docker-compose.prod.yml"
+            
+            # Change to deployment directory
+            cd $DEPLOY_DIR
+            
+            # Ensure data directory exists
+            mkdir -p ${{ secrets.DATA_DIR }}
+            
+            # Log in to GitHub Container Registry
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # Pull the latest image
+            docker compose -f $COMPOSE_FILE pull
+            
+            # Stop and remove old container
+            docker compose -f $COMPOSE_FILE down
+            
+            # Start new container with latest image
+            docker compose -f $COMPOSE_FILE up -d
+            
+            # Wait for container to be healthy
+            echo "Waiting for container to start..."
+            sleep 5
+            
+            # Check if container is running
+            if docker compose -f $COMPOSE_FILE ps | grep -q "burgieclan-backend"; then
+              echo "✅ Container deployed successfully"
+              docker compose -f $COMPOSE_FILE ps
+            else
+              echo "❌ Container failed to start"
+              docker compose -f $COMPOSE_FILE logs
+              exit 1
+            fi
+            
+            # Run database migrations
+            echo "Running database migrations..."
+            docker compose -f $COMPOSE_FILE exec -T backend php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+            
+            # Cleanup old images on VM (keep last 3 to save disk space)
+            echo "Cleaning up old images..."
+            REPO_LOWERCASE=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+            docker images "ghcr.io/${REPO_LOWERCASE}/backend" --format "{{.ID}} {{.CreatedAt}}" | sort -rk 2 | awk 'NR>3 {print $1}' | xargs -r docker rmi || true
+            
+            echo "✅ Deployment complete"
+          EOF
+
+      - name: Verify deployment
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            DEPLOY_DIR="${{ secrets.DEPLOY_DIR_BACKEND }}"
+            COMPOSE_FILE="$DEPLOY_DIR/docker-compose.prod.yml"
+            
+            cd $DEPLOY_DIR
+            
+            # Show container status
+            echo "Container status:"
+            docker compose -f $COMPOSE_FILE ps
+            
+            # Show container logs (last 20 lines)
+            echo -e "\nRecent logs:"
+            docker compose -f $COMPOSE_FILE logs --tail 20 backend
+          EOF
