@@ -1,0 +1,154 @@
+services:
+  nginx:
+    # Official nginx image
+    image: nginx:alpine
+    container_name: burgieclan-nginx
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Port mapping - nginx is the entry point
+    # Only expose HTTP port 80 (mapped to host port 8080)
+    # External reverse proxy should handle HTTPS and forward to this port
+    ports:
+      - "8000:80"
+
+    # Volume mounts
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+    # Depends on backend service
+    depends_on:
+      - backend
+
+    # Use host network mode if frontend is running on host
+    # Comment this out if frontend is also containerized
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # Logging configuration
+    # logging:
+    #   driver: "json-file"
+    #   options:
+    #     max-size: "10m"
+    #     max-file: "3"
+
+  backend:
+    # Image from GitHub Container Registry
+    image: ghcr.io/vtkleuven/burgieclan/backend:test
+    container_name: burgieclan-backend
+
+    # Restart policy - always restart unless manually stopped
+    restart: unless-stopped
+
+    # Port mapping - only expose internally to nginx
+    expose:
+      - "8080"
+
+    # Environment variables
+    environment:
+      # PHP-FPM worker processes
+      # Calculate: (Available RAM - System RAM) / 256MB per process
+      MAX_REQUESTS: 8
+
+      # Symfony environment
+      APP_ENV: ${APP_ENV:-prod}
+      APP_SECRET: ${APP_SECRET:?APP_SECRET is required}
+
+      # Database configuration
+      # DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+      DATABASE_URL: mysql://burgieclan_db_user:${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}@burgieclan-db:3306/burgieclan_db?serverVersion=8.0
+
+      # Frontend URL
+      FRONTEND_URL: 'http://localhost:3000'
+
+      # Litus oauth
+      LITUS_OAUTH_AUTHORIZE: "https://vtk.be/api/oauth/authorize"
+      LITUS_OAUTH_TOKEN: "https://vtk.be/api/oauth/token"
+      LITUS_OAUTH_RESOURCE_OWNER_DETAILS: "https://vtk.be/api/auth/me"
+      LITUS_API_KEY: ${LITUS_API_KEY:?LITUS_API_KEY is required}
+      LITUS_SECRET: ${LITUS_SECRET:?LITUS_SECRET is required}
+
+      # Sentry error tracking
+      SENTRY_DSN: ${SENTRY_DSN:-}
+
+      # CORS configuration
+      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:-^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$$}
+
+      # JWT Configuration
+      JWT_SECRET_KEY: /app/config/jwt/private.pem
+      JWT_PUBLIC_KEY: /app/config/jwt/public.pem
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:-}
+      JWT_TTL: 3600
+
+    # Volume mounts
+    volumes:
+      # Data directory - where uploaded files are stored
+      - ${DATA_DIR:?DATA_DIR is required}:/app/data
+      # JWT directory - where JWT keys are stored
+      - ${JWT_DIR:?JWT_DIR is required}:/app/config/jwt
+      # Var directory for cache and logs
+      # Using named volume for better performance
+      - backend_var:/app/var
+
+    # Depends on database service
+    depends_on:
+      db:
+        condition: service_healthy
+    # Logging configuration - prevent logs from filling disk
+    # logging:
+    #   driver: "json-file"
+    #   options:
+    #     max-size: "10m"
+    #     max-file: "3"
+    # Resource limits (optional - adjust based on your server)
+    # Uncomment to set limits
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '2'
+    #       memory: 2G
+    #     reservations:
+    #       cpus: '1'
+    #       memory: 1G
+
+  db:
+    # Official MySQL 8.0 image
+    image: mysql:8.0
+    container_name: burgieclan-db
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Only expose internally - no external port mapping for security
+    expose:
+      - "3306"
+
+    # Environment variables - all from .env file for security
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required}
+      MYSQL_DATABASE: burgieclan_db
+      MYSQL_USER: burgieclan_db_user
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}
+      # Performance tuning for production
+      MYSQL_INITDB_SKIP_TZINFO: 1
+
+    # Volume mounts for data persistence
+    volumes:
+      # Database data - use absolute path on host for production
+      # This ensures data persists across container recreations
+      - ${MYSQL_DATA_DIR:?MYSQL_DATA_DIR is required}:/var/lib/mysql
+      # Optional: custom MySQL configuration
+      # - ${MYSQL_CONFIG_DIR}:/etc/mysql/conf.d:ro
+
+      # Health check to ensure database is ready before backend starts
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  backend_var:
+    driver: local
