@@ -92,8 +92,22 @@ jobs:
             # Change to deployment directory
             cd $DEPLOY_DIR
             
-            # Ensure data directory exists
-            mkdir -p ${{ secrets.DATA_DIR }}
+            # Ensure data directory is present
+            if [ ! -d ${{ secrets.DATA_DIR }} ]; then
+              echo "❌ Data directory does not exist"
+              exit 1
+            fi
+
+            # Ensure JWT directory is present
+            if [ ! -d ${{ secrets.JWT_DIR }} ]; then
+              echo "❌ JWT directory does not exist"
+              exit 1
+            fi
+            # Ensure JWT keys (public and private) are present
+            if [ ! -f ${{ secrets.JWT_DIR }}/private.pem ] || [ ! -f ${{ secrets.JWT_DIR }}/public.pem ]; then
+              echo "❌ JWT keys do not exist"
+              exit 1
+            fi
             
             # Log in to GitHub Container Registry
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -124,7 +138,16 @@ jobs:
             # Run database migrations
             echo "Running database migrations..."
             docker compose -f $COMPOSE_FILE exec -T backend php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
-            
+
+            # Generate JWT keys
+            echo "Generating JWT keys..."
+            docker compose -f $COMPOSE_FILE exec -T backend php bin/console lexik:jwt:generate-keypair --skip-if-exists
+
+            # Clearing and warming up cache
+            echo "Clearing and warming up cache..."
+            docker compose -f $COMPOSE_FILE exec -T backend php bin/console cache:clear --env=prod
+            docker compose -f $COMPOSE_FILE exec -T backend php bin/console cache:warmup --env=prod
+
             # Cleanup old images on VM (keep last 3 to save disk space)
             echo "Cleaning up old images..."
             REPO_LOWERCASE=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')

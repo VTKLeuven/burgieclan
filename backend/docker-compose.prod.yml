@@ -44,6 +44,8 @@ services:
       # Data directory - where uploaded files and SQLite database are stored
       # This must be an absolute path on the host
       - ${DATA_DIR:?DATA_DIR is required}:/app/data
+       # JWT keys (read-only mount for security)
+      - ${JWT_DIR:?JWT_DIR is required}:/app/config/jwt
       # Var directory for cache and logs
       # Using named volume for better performance
       - backend_var:/app/var

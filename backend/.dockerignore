@@ -48,6 +48,9 @@ Thumbs.db
 # Data directory (contains local data)
 /data/
 
+# JWT keys
+*.pem
+
 # DevContainer
 .devcontainer/
 
