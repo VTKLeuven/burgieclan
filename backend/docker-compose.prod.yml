@@ -1,4 +1,43 @@
 services:
+  nginx:
+    # Official nginx image
+    image: nginx:alpine
+    container_name: burgieclan-nginx
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Port mapping - nginx is the entry point
+    ports:
+      # - "80:80"
+      - "4000:443"
+
+    # Environment variables for nginx config
+    environment:
+      SERVER_NAME: ${SERVER_NAME:-_}
+      FRONTEND_HOST: ${FRONTEND_HOST:-host.docker.internal}
+      FRONTEND_PORT: ${FRONTEND_PORT:-3000}
+
+    # Volume mounts
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${SSL_CERT_DIR:-./ssl}:/etc/nginx/ssl:ro
+
+    # Depends on backend service
+    depends_on:
+      - backend
+
+    # Use host network mode if frontend is running on host
+    # Comment this out if frontend is also containerized
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # Logging configuration
+    # logging:
+    #   driver: "json-file"
+    #   options:
+    #     max-size: "10m"
+    #     max-file: "3"
+
   backend:
     # Image from GitHub Container Registry
     image: ghcr.io/${GITHUB_REPOSITORY}/backend:test
@@ -7,15 +46,12 @@ services:
     # Restart policy - always restart unless manually stopped
     restart: unless-stopped
 
-    # Port mapping
-    ports:
-      - "${HOST_PORT:-8080}:${PORT:-8080}"
+    # Port mapping - only expose internally to nginx
+    expose:
+      - "8080"
 
     # Environment variables
     environment:
-      # Container port (internal)
-      PORT: ${PORT:-8080}
-
       # PHP-FPM worker processes
       # Calculate: (Available RAM - System RAM) / 256MB per process
       MAX_REQUESTS: ${MAX_REQUESTS:-8}
@@ -67,7 +103,6 @@ services:
     #       cpus: '1'
     #       memory: 1G
 
-    # Named volumes
 volumes:
   backend_var:
     driver: local
