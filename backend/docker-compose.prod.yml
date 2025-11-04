@@ -8,9 +8,10 @@ services:
     restart: unless-stopped
 
     # Port mapping - nginx is the entry point
+    # Only expose HTTP port 80 (mapped to host port 8080)
+    # External reverse proxy should handle HTTPS and forward to this port
     ports:
-      - "8080:80"
-      - "4000:443"
+      - "8000:80"
 
     # Environment variables for nginx config
     environment:
@@ -21,7 +22,6 @@ services:
     # Volume mounts
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ${SSL_CERT_DIR:-./ssl}:/etc/nginx/ssl:ro
 
     # Depends on backend service
     depends_on:
@@ -79,13 +79,11 @@ services:
     volumes:
       # Data directory - where uploaded files and SQLite database are stored
       # This must be an absolute path on the host
-      - ${DATA_DIR:?DATA_DIR is required}:/app/data
-       # JWT keys (read-only mount for security)
+      - ${DATA_DIR:?DATA_DIR is required}:/app/data # JWT keys (read-only mount for security)
       - ${JWT_DIR:?JWT_DIR is required}:/app/config/jwt
       # Var directory for cache and logs
       # Using named volume for better performance
       - backend_var:/app/var
-
     # Logging configuration - prevent logs from filling disk
     # logging:
     #   driver: "json-file"
