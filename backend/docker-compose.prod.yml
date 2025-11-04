@@ -9,7 +9,7 @@ services:
 
     # Port mapping - nginx is the entry point
     ports:
-      # - "80:80"
+      - "8080:80"
       - "4000:443"
 
     # Environment variables for nginx config
@@ -65,8 +65,8 @@ services:
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
 
       # JWT Configuration
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-%kernel.project_dir%/config/jwt/private.pem}
-      JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY:-%kernel.project_dir%/config/jwt/public.pem}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT_SECRET_KEY is required}
+      JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY:?JWT_PUBLIC_KEY is required}
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:-}
 
       # CORS configuration (if needed)
