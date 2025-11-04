@@ -91,12 +91,12 @@ RUN php bin/console assets:install public --symlink --relative --env=$API_ENV --
 RUN chown -R www-data:www-data /app && \
     chmod -R 755 /app
 
-# Expose port 8080 (can be overridden with PORT env var at runtime)
+# Expose port 8080
 EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-8080}/api || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api || exit 1
 
 # Run startup script
 CMD ["/usr/local/bin/startup.sh"]
