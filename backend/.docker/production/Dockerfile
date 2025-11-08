@@ -78,9 +78,6 @@ RUN npm run build
 # The built assets in /app/public/build/ are all we need at runtime
 RUN rm -rf node_modules
 
-# Warm up Symfony cache for production
-RUN php -d memory_limit=512M bin/console cache:warmup --env=$API_ENV --no-debug
-
 # Install Symfony bundle assets (API Platform, etc.) into public/bundles directory
 RUN php bin/console assets:install public --symlink --relative --env=$API_ENV --no-debug
 
