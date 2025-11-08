@@ -1,60 +1,79 @@
 name: "Deploy Stack (Frontend + Backend)"
 
 on:
-  push:
-    branches:
-      - test
-  workflow_dispatch:
-
-# Ensure only one deployment runs at a time
-concurrency:
-  group: deploy-${{ github.ref }}
-  cancel-in-progress: false
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      url:
+        type: string
+        required: true
+    secrets:
+      SSH_USER:
+        required: true
+      SSH_HOST:
+        required: true
+      SSH_PRIVATE_KEY:
+        required: true
 
 jobs:
   build_backend:
     name: Build Backend
     uses: ./.github/workflows/build-backend.yaml
+    with:
+      environment: ${{ inputs.environment }}
 
   build_frontend:
     name: Build Frontend
     uses: ./.github/workflows/build-frontend.yaml
+    with:
+      environment: ${{ inputs.environment }}
 
-  verify_deployment:
-    name: Verify Deployment
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
     needs: [build_backend, build_frontend]
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ inputs.url }}
 
     steps:
-      - name: Install SSH keys
+      - name: Setup SSH access
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          ssh-keyscan -H "$SSH_HOST" > ~/.ssh/known_hosts
 
       - name: Pull and deploy containers
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          ssh "$SSH_USER@$SSH_HOST" << 'EOF'
             # Variables
-            DEPLOY_DIR="${{ secrets.DEPLOY_DIR }}"
+            DEPLOY_DIR="${{ vars.DEPLOY_DIR }}"
             COMPOSE_FILE="$DEPLOY_DIR/.docker/docker-compose.prod.yml"
             
             # Change to deployment directory
             cd $DEPLOY_DIR
             
             # Ensure data directory is present
-            if [ ! -d ${{ secrets.DATA_DIR }} ]; then
+            if [ ! -d ${{ vars.DATA_DIR }} ]; then
               echo "❌ Data directory does not exist"
               exit 1
             fi
 
             # Ensure JWT directory is present
-            if [ ! -d ${{ secrets.JWT_DIR }} ]; then
+            if [ ! -d ${{ vars.JWT_DIR }} ]; then
               echo "❌ JWT directory does not exist"
               exit 1
             fi
             # Ensure JWT keys (public and private) are present
-            if [ ! -f ${{ secrets.JWT_DIR }}/private.pem ] || [ ! -f ${{ secrets.JWT_DIR }}/public.pem ]; then
+            if [ ! -f ${{ vars.JWT_DIR }}/private.pem ] || [ ! -f ${{ vars.JWT_DIR }}/public.pem ]; then
               echo "❌ JWT keys do not exist"
               exit 1
             fi
