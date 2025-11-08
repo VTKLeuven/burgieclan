@@ -48,9 +48,20 @@ class TagDocumentCourseFilter extends AbstractFilter
                 $courseApi = $this->iriConverter->getResourceFromIri($value);
                 $courseId = $courseApi->id;
             } catch (\Exception $e) {
-                // If conversion fails, keep the original value
+                // If conversion fails (e.g., course doesn't exist), add a condition that returns no results
+                $queryBuilder->andWhere('1 = 0'); // This will ensure no results are returned
+                return;
             }
         }
+
+        // Ensure courseId is a valid integer
+        if (!is_numeric($courseId) || (int)$courseId != $courseId) {
+            // If courseId is not a valid integer, return no results
+            $queryBuilder->andWhere('1 = 0');
+            return;
+        }
+
+        $courseId = (int) $courseId;
 
         $alias = $queryBuilder->getRootAliases()[0];
         $valueParameter = $queryNameGenerator->generateParameterName('course');

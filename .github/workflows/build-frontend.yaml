@@ -9,7 +9,7 @@ on:
 
 jobs:
   build_and_push:
-    name: Build and Push Docker Image
+    name: Build and push frontend image
     runs-on: ubuntu-latest
     permissions:
       contents: read
