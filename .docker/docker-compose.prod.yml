@@ -52,7 +52,7 @@ services:
 
       # Database configuration
       # DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
-      DATABASE_URL: postgresql://burgieclan_db_user:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@burgieclan-db:5432/burgieclan_db?serverVersion=18&charset=utf8
+      DATABASE_URL: "postgresql://burgieclan_db_user:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@burgieclan-db:5432/burgieclan_db?serverVersion=18&charset=utf8"
 
       # Frontend URL
       FRONTEND_URL: 'http://localhost:3000'
