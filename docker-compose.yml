@@ -1,16 +1,15 @@
 services:
   db:
-    image: mysql:8.0
+    image: postgres:18
     container_name: burgieclan-db
     volumes:
-      - burgieclan-db:/var/lib/mysql
+      - burgieclan-db:/var/lib/postgresql
     ports:
-      - '3306:3306'
+      - '5432:5432'
     environment:
-      MYSQL_ROOT_PASSWORD: burgieclan_db_root
-      MYSQL_DATABASE: burgieclan_db
-      MYSQL_USER: burgieclan_db_user
-      MYSQL_PASSWORD: burgieclan_db_pass
+      POSTGRES_PASSWORD: burgieclan_db_pass
+      POSTGRES_DB: burgieclan_db
+      POSTGRES_USER: burgieclan_db_user
     networks:
       - burgieclan-network
 
@@ -30,7 +29,7 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: "mysql://burgieclan_db_user:burgieclan_db_pass@db:3306/burgieclan_db?serverVersion=8.0"
+      DATABASE_URL: "postgresql://burgieclan_db_user:burgieclan_db_pass@db:5432/burgieclan_db?serverVersion=18&charset=utf8"
       APP_ENV: dev
     networks:
       - burgieclan-network

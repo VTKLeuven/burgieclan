@@ -1,8 +1,6 @@
 # Production Symfony Dockerfile
 # Uses Alpine Linux with nginx + php-fpm for optimal performance
-
-ARG TARGETPLATFORM=linux/amd64
-FROM --platform=${TARGETPLATFORM} php:8.4-fpm-alpine3.22
+FROM php:8.4-fpm-alpine3.22
 
 # Build argument for Symfony environment
 ARG API_ENV=prod
@@ -21,7 +19,7 @@ RUN apk update && \
     libpng-dev \
     libzip-dev \
     icu-dev \
-    sqlite-dev \
+    postgresql-dev \
     nodejs \
     npm && \
     rm -rf /var/cache/apk/*
@@ -36,8 +34,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin -
 # Install required PHP extensions
 RUN docker-php-ext-install \
     pdo \
-    pdo_mysql \
-    pdo_sqlite \
+    pdo_pgsql \
     zip \
     intl \
     opcache
@@ -68,7 +65,7 @@ RUN COMPOSER_MEMORY_LIMIT=512M composer install \
 COPY package.json package-lock.json webpack.config.js ./
 
 # Install npm dependencies (including devDependencies needed for build)
-RUN npm ci
+RUN npm ci --no-audit
 
 # Copy assets directory and application code
 COPY assets ./assets
