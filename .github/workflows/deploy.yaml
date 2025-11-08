@@ -78,15 +78,10 @@ jobs:
               echo "❌ JWT directory does not exist"
               exit 1
             fi
-            # Ensure JWT keys (public and private) are present
-            if [ ! -f ${{ vars.JWT_DIR }}/private.pem ] || [ ! -f ${{ vars.JWT_DIR }}/public.pem ]; then
-              echo "❌ JWT keys do not exist"
-              exit 1
-            fi
             
             # Log in to GitHub Container Registry
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
+
             # Pull the latest images (backend and frontend)
             docker compose -f $COMPOSE_FILE pull
             
@@ -94,7 +89,7 @@ jobs:
             docker compose -f $COMPOSE_FILE down
             
             # Start new containers with latest images
-            docker compose -f $COMPOSE_FILE up -d --force-recreate --wait --wait-timeout 30s
+            docker compose -f $COMPOSE_FILE up -d --force-recreate --wait --wait-timeout 30
             
             # Verify all services are healthy
             if docker compose -f $COMPOSE_FILE ps --format json | jq -e 'all(.Health == "healthy" or .Health == "")' > /dev/null; then
@@ -106,7 +101,7 @@ jobs:
               docker compose -f $COMPOSE_FILE logs
               exit 1
             fi
-            
+
             # Run database migrations
             echo "Running database migrations..."
             docker compose -f $COMPOSE_FILE exec -T backend php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
