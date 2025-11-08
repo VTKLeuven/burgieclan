@@ -4,9 +4,11 @@ FROM php:8.4-fpm-alpine3.22
 
 # Build argument for Symfony environment
 ARG API_ENV=prod
+ARG FRONTEND_URL
 
 # Set environment variable for Composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV FRONTEND_URL=$FRONTEND_URL
 
 # Install system dependencies
 RUN apk update && \
