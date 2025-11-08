@@ -56,7 +56,6 @@ jobs:
           ssh "$SSH_USER@$SSH_HOST" << 'EOF'
             # Variables
             DEPLOY_DIR="${{ vars.DEPLOY_DIR }}"
-            COMPOSE_FILE="$DEPLOY_DIR/docker-compose.prod.yml"
 
             # Ensure DEPLOY_DIR is present
             if [ ! -d $DEPLOY_DIR ]; then
@@ -78,6 +77,16 @@ jobs:
               echo "❌ JWT directory does not exist"
               exit 1
             fi
+
+            COMPOSE_FILE="docker-compose.prod.yml"
+
+            # Download the latest compose file from GitHub
+            curl -o $COMPOSE_FILE \
+                 "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/.docker/docker-compose.prod.yml"
+
+            # Download the latest nginx.conf file from GitHub
+            curl -o nginx.conf \
+                 "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/.docker/nginx.conf"
             
             # Log in to GitHub Container Registry
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
