@@ -101,7 +101,7 @@ jobs:
             docker compose -f $COMPOSE_FILE up -d --force-recreate --wait --wait-timeout 30
             
             # Verify all services are healthy
-            if docker compose -f $COMPOSE_FILE ps --format json | jq -e 'all(.Health == "healthy" or .Health == "")' > /dev/null; then
+            if docker compose -f $COMPOSE_FILE ps --format json | jq -s -e 'all(.Health // "" | IN("healthy", ""))' > /dev/null; then
               echo "✅ All containers healthy"
               docker compose -f $COMPOSE_FILE ps
             else
