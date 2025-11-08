@@ -56,7 +56,7 @@ jobs:
           ssh "$SSH_USER@$SSH_HOST" << 'EOF'
             # Variables
             DEPLOY_DIR="${{ vars.DEPLOY_DIR }}"
-            COMPOSE_FILE="$DEPLOY_DIR/.docker/docker-compose.prod.yml"
+            COMPOSE_FILE="$DEPLOY_DIR/docker-compose.prod.yml"
 
             # Ensure DEPLOY_DIR is present
             if [ ! -d $DEPLOY_DIR ]; then
