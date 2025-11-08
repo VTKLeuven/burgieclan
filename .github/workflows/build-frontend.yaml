@@ -1,0 +1,70 @@
+name: "Build Frontend Docker Container"
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+# Ensure only one frontend deployment runs at a time
+concurrency:
+  group: deploy-frontend-docker-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build_and_push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+      image_digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Convert repository name to lowercase
+        id: repo_name
+        run: echo "lowercase=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ steps.repo_name.outputs.lowercase }}/frontend
+          tags: |
+            # Tag with branch name
+            type=ref,event=branch
+            # Tag with 'test' for test branch
+            type=raw,value=test,enable=${{ github.ref == 'refs/heads/test' }}
+            # Tag with commit SHA
+            type=sha,prefix={{branch}}-
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/.docker/production/Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=ghcr.io/${{ steps.repo_name.outputs.lowercase }}/frontend:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ steps.repo_name.outputs.lowercase }}/frontend:buildcache,mode=max
+          build-args: |
+            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+            NEXT_PUBLIC_FRONTEND_URL="http://nginx"
+            NEXT_PUBLIC_BACKEND_URL="http://nginx"
