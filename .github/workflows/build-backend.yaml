@@ -6,6 +6,9 @@ on:
       environment:
         type: string
         required: true
+      url:
+        type: string
+        required: true
 
 jobs:
   build_and_push:
@@ -64,3 +67,4 @@ jobs:
           cache-to: type=registry,ref=ghcr.io/${{ steps.repo_name.outputs.lowercase }}/backend:buildcache,mode=max
           build-args: |
             API_ENV=prod
+            FRONTEND_URL=${{ inputs.url }}

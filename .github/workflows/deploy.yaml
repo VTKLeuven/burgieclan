@@ -23,12 +23,14 @@ jobs:
     uses: ./.github/workflows/build-backend.yaml
     with:
       environment: ${{ inputs.environment }}
+      url: ${{ inputs.url }}
 
   build_frontend:
     name: Build Frontend
     uses: ./.github/workflows/build-frontend.yaml
     with:
       environment: ${{ inputs.environment }}
+      url: ${{ inputs.url }}
 
   deploy:
     name: Deploy

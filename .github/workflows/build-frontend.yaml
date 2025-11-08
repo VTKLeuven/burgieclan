@@ -6,7 +6,9 @@ on:
       environment:
         type: string
         required: true
-
+      url:
+        type: string
+        required: true
 jobs:
   build_and_push:
     name: Build and push frontend image
@@ -65,5 +67,5 @@ jobs:
           cache-to: type=registry,ref=ghcr.io/${{ steps.repo_name.outputs.lowercase }}/frontend:buildcache,mode=max
           build-args: |
             SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
-            NEXT_PUBLIC_FRONTEND_URL=http://nginx
-            NEXT_PUBLIC_BACKEND_URL=http://nginx
+            NEXT_PUBLIC_FRONTEND_URL=${{ inputs.url }}
+            NEXT_PUBLIC_BACKEND_URL=${{ inputs.url }}
