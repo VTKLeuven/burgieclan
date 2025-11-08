@@ -57,6 +57,12 @@ jobs:
             # Variables
             DEPLOY_DIR="${{ vars.DEPLOY_DIR }}"
             COMPOSE_FILE="$DEPLOY_DIR/.docker/docker-compose.prod.yml"
+
+            # Ensure DEPLOY_DIR is present
+            if [ ! -d $DEPLOY_DIR ]; then
+              echo "❌ DEPLOY_DIR does not exist"
+              exit 1
+            fi
             
             # Change to deployment directory
             cd $DEPLOY_DIR
