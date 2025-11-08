@@ -129,10 +129,6 @@ services:
 
     # Environment variables
     environment:
-      # Frontend and Backend URLs
-      NEXT_PUBLIC_FRONTEND_URL: "http://nginx"
-      NEXT_PUBLIC_BACKEND_URL: "http://nginx"
-
       # File upload configuration
       NEXT_PUBLIC_MAX_FILE_SIZE_MB: "200"
       NEXT_PUBLIC_ALLOWED_MIME_TYPES: "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.spreadsheet,application/vnd.oasis.opendocument.presentation,image/jpeg,image/jpg,image/png,image/svg+xml,image/gif,application/zip,text/csv,text/plain,text/markdown,text/x-matlab,text/x-python,video/mp4"

@@ -13,6 +13,18 @@ RUN npm ci
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+# Accept Sentry auth token as build arg
+# This is used to upload source maps to Sentry, see next.config.mjs for more details.
+ARG SENTRY_AUTH_TOKEN
+ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+
+# Accept Next.js public environment variables as build args
+# These are embedded at build time, not runtime
+ARG NEXT_PUBLIC_FRONTEND_URL
+ARG NEXT_PUBLIC_BACKEND_URL
+ENV NEXT_PUBLIC_FRONTEND_URL=$NEXT_PUBLIC_FRONTEND_URL
+ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
+
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 

@@ -1,0 +1,101 @@
+name: "Deploy Stack (Frontend + Backend)"
+
+on:
+  push:
+    branches:
+      - test
+  workflow_dispatch:
+
+# Ensure only one deployment runs at a time
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build_backend:
+    name: Build Backend
+    uses: ./.github/workflows/build-backend.yaml
+
+  build_frontend:
+    name: Build Frontend
+    uses: ./.github/workflows/build-frontend.yaml
+
+  verify_deployment:
+    name: Verify Deployment
+    runs-on: ubuntu-latest
+    needs: [build_backend, build_frontend]
+
+    steps:
+      - name: Install SSH keys
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+
+      - name: Pull and deploy containers
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            # Variables
+            DEPLOY_DIR="${{ secrets.DEPLOY_DIR }}"
+            COMPOSE_FILE="$DEPLOY_DIR/.docker/docker-compose.prod.yml"
+            
+            # Change to deployment directory
+            cd $DEPLOY_DIR
+            
+            # Ensure data directory is present
+            if [ ! -d ${{ secrets.DATA_DIR }} ]; then
+              echo "❌ Data directory does not exist"
+              exit 1
+            fi
+
+            # Ensure JWT directory is present
+            if [ ! -d ${{ secrets.JWT_DIR }} ]; then
+              echo "❌ JWT directory does not exist"
+              exit 1
+            fi
+            # Ensure JWT keys (public and private) are present
+            if [ ! -f ${{ secrets.JWT_DIR }}/private.pem ] || [ ! -f ${{ secrets.JWT_DIR }}/public.pem ]; then
+              echo "❌ JWT keys do not exist"
+              exit 1
+            fi
+            
+            # Log in to GitHub Container Registry
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # Pull the latest images (backend and frontend)
+            docker compose -f $COMPOSE_FILE pull
+            
+            # Stop and remove old containers
+            docker compose -f $COMPOSE_FILE down
+            
+            # Start new containers with latest images
+            docker compose -f $COMPOSE_FILE up -d --force-recreate --wait --wait-timeout 30s
+            
+            # Verify all services are healthy
+            if docker compose -f $COMPOSE_FILE ps --format json | jq -e 'all(.Health == "healthy" or .Health == "")' > /dev/null; then
+              echo "✅ All containers healthy"
+              docker compose -f $COMPOSE_FILE ps
+            else
+              echo "❌ Some containers unhealthy"
+              docker compose -f $COMPOSE_FILE ps
+              docker compose -f $COMPOSE_FILE logs
+              exit 1
+            fi
+            
+            # Run database migrations
+            echo "Running database migrations..."
+            docker compose -f $COMPOSE_FILE exec -T backend php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+
+            # Generate JWT keys
+            echo "Generating JWT keys..."
+            docker compose -f $COMPOSE_FILE exec -T backend php bin/console lexik:jwt:generate-keypair --skip-if-exists
+
+            # Clearing and warming up cache
+            echo "Clearing and warming up cache..."
+            docker compose -f $COMPOSE_FILE exec -T backend php bin/console cache:clear --env=prod
+            docker compose -f $COMPOSE_FILE exec -T backend php bin/console cache:warmup --env=prod
+
+            # Cleanup all old images on VM
+            echo "Cleaning up old images..."
+            docker image prune
+          EOF
