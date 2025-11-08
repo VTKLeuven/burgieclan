@@ -2,12 +2,10 @@ name: "Build Backend Docker Container"
 
 on:
   workflow_call:
-  workflow_dispatch:
-
-# Ensure only one backend deployment runs at a time
-concurrency:
-  group: deploy-backend-docker-${{ github.ref }}
-  cancel-in-progress: false
+    inputs:
+      environment:
+        type: string
+        required: true
 
 jobs:
   build_and_push:
@@ -16,7 +14,8 @@ jobs:
     permissions:
       contents: read
       packages: write
-
+    environment:
+      name: ${{ inputs.environment }}
     outputs:
       image_tag: ${{ steps.meta.outputs.tags }}
       image_digest: ${{ steps.build.outputs.digest }}
