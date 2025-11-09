@@ -21,12 +21,17 @@ services:
     depends_on:
       - backend
       - frontend
-    # Logging configuration
-    # logging:
-    #   driver: "json-file"
-    #   options:
-    #     max-size: "10m"
-    #     max-file: "3"
+
+    # Logging configuration - automatic rotation to prevent disk space issues
+    # View logs: docker logs burgieclan-nginx or docker compose -f docker-compose.prod.yml logs nginx
+    # Real-time: docker logs -f burgieclan-nginx
+    # Rotated logs: /var/lib/docker/containers/<container-id>/<container-id>-json.log.1.gz etc.
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m" # Rotate when file reaches 50MB
+        max-file: "5" # Keep 5 rotated files (250MB total per service)
+        compress: "true" # Compress rotated logs to save space
 
   backend:
     # Image from GitHub Container Registry
@@ -94,22 +99,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    # Logging configuration - prevent logs from filling disk
-    # logging:
-    #   driver: "json-file"
-    #   options:
-    #     max-size: "10m"
-    #     max-file: "3"
-    # Resource limits (optional - adjust based on your server)
-    # Uncomment to set limits
-    # deploy:
-    #   resources:
-    #     limits:
-    #       cpus: '2'
-    #       memory: 2G
-    #     reservations:
-    #       cpus: '1'
-    #       memory: 1G
+
+    # Logging configuration - automatic rotation to prevent disk space issues
+    # View logs: docker logs burgieclan-backend or docker compose -f docker-compose.prod.yml logs backend
+    # Real-time: docker logs -f burgieclan-backend
+    # Rotated logs: /var/lib/docker/containers/<container-id>/<container-id>-json.log.1.gz etc.
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m" # Rotate when file reaches 50MB
+        max-file: "5" # Keep 5 rotated files (250MB total per service)
+        compress: "true" # Compress rotated logs to save space
 
   frontend:
     # Image from GitHub Container Registry
@@ -135,22 +135,17 @@ services:
     depends_on:
       backend:
         condition: service_healthy
-    # Logging configuration
-    # logging:
-    #   driver: "json-file"
-    #   options:
-    #     max-size: "10m"
-    #     max-file: "3"
 
-    # Resource limits (optional - adjust based on your server)
-    # deploy:
-    #   resources:
-    #     limits:
-    #       cpus: '1'
-    #       memory: 1G
-    #     reservations:
-    #       cpus: '0.5'
-    #       memory: 512M
+    # Logging configuration - automatic rotation to prevent disk space issues
+    # View logs: docker logs burgieclan-frontend or docker compose -f docker-compose.prod.yml logs frontend
+    # Real-time: docker logs -f burgieclan-frontend
+    # Rotated logs: /var/lib/docker/containers/<container-id>/<container-id>-json.log.1.gz etc.
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m" # Rotate when file reaches 50MB
+        max-file: "5" # Keep 5 rotated files (250MB total per service)
+        compress: "true" # Compress rotated logs to save space
 
   db:
     # Official PostgreSQL latest image
@@ -183,6 +178,17 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
+    # Logging configuration - automatic rotation to prevent disk space issues
+    # View logs: docker logs burgieclan-db or docker compose -f docker-compose.prod.yml logs db
+    # Real-time: docker logs -f burgieclan-db
+    # Rotated logs: /var/lib/docker/containers/<container-id>/<container-id>-json.log.1.gz etc.
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m" # Rotate when file reaches 50MB
+        max-file: "5" # Keep 5 rotated files (250MB total per service)
+        compress: "true" # Compress rotated logs to save space
 
 volumes:
   backend_var:
