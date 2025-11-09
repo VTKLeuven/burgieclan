@@ -121,11 +121,6 @@ jobs:
             echo "Generating JWT keys..."
             docker compose -f $COMPOSE_FILE exec -T backend php bin/console lexik:jwt:generate-keypair --skip-if-exists < /dev/null
 
-            # Clearing and warming up cache
-            echo "Clearing and warming up cache..."
-            docker compose -f $COMPOSE_FILE exec -T backend php bin/console cache:clear --env=prod < /dev/null
-            docker compose -f $COMPOSE_FILE exec -T backend php bin/console cache:warmup --env=prod < /dev/null
-
             # Cleanup all old images on VM
             echo "Cleaning up old images..."
             docker image prune -a -f
