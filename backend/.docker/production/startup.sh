@@ -23,6 +23,16 @@ chown -R www-data:www-data /app/var
 # This ensures PHP-FPM can write to cache and logs
 chmod -R 755 /app/var
 
+# Ensure data directory exist with proper permissions
+# The data directory is mounted from the host and needs proper permissions
+mkdir -p /app/data
+
+# Set ownership to www-data for the data directory
+chown -R www-data:www-data /app/data
+
+# Set permissions for data directory
+chmod -R 755 /app/data
+
 # Clear and warm up cache as www-data user
 # This ensures all cache files are owned by www-data from the start
 su -s /bin/sh www-data -c "php bin/console cache:clear --env=$APP_ENV --no-debug"
