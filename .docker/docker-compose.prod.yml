@@ -72,10 +72,7 @@ services:
       CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:-^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$$}
 
       # JWT Configuration
-      JWT_SECRET_KEY: /app/config/jwt/private.pem
-      JWT_PUBLIC_KEY: /app/config/jwt/public.pem
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:-}
-      JWT_TTL: 3600
 
     # Volume mounts
     volumes:

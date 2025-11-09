@@ -9,6 +9,8 @@ ARG FRONTEND_URL
 # Set environment variable for Composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV FRONTEND_URL=$FRONTEND_URL
+ENV JWT_PUBLIC_KEY=/app/config/jwt/public.pem
+ENV JWT_SECRET_KEY=/app/config/jwt/private.pem
 
 # Install system dependencies
 RUN apk update && \
