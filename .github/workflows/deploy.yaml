@@ -128,5 +128,5 @@ jobs:
 
             # Cleanup all old images on VM
             echo "Cleaning up old images..."
-            docker image prune
+            docker image prune -a -f
           EOF
