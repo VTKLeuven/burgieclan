@@ -83,9 +83,15 @@ RUN rm -rf node_modules
 # Install Symfony bundle assets (API Platform, etc.) into public/bundles directory
 RUN php bin/console assets:install public --symlink --relative --env=$API_ENV --no-debug
 
-# Set proper permissions
+# Set proper permissions for application files
+# Note: var/ directory permissions will be set at runtime in startup.sh
+# This ensures cache is created by www-data user, not root
 RUN chown -R www-data:www-data /app && \
-    chmod -R 755 /app
+    chmod -R 755 /app && \
+    # Ensure var directory exists but don't pre-populate it
+    mkdir -p /app/var && \
+    chown -R www-data:www-data /app/var && \
+    chmod -R 755 /app/var
 
 # Expose port 8080
 EXPOSE 8080
