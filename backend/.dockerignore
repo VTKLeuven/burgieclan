@@ -51,9 +51,6 @@ Thumbs.db
 # JWT keys
 *.pem
 
-# DevContainer
-.devcontainer/
-
 # Documentation
 README.md
 LICENSE
