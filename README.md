@@ -1,6 +1,18 @@
 # burgieclan
 
-A web application built with Symfony (backend) and Next.js (frontend), designed for deployment in production using Docker.
+## Getting Started
+
+### Install Git Hooks
+
+After cloning the repository, install the git hooks to ensure commit message standards:
+
+```bash
+./.githooks/install-hooks.sh
+```
+
+This will enforce that all commit messages start with `BUR-XXX` (where XXX is a ticket number).
+
+See [.githooks/README.md](.githooks/README.md) for more details.
 
 ## Production Setup
 
