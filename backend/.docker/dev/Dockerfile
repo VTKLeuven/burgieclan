@@ -22,13 +22,17 @@ RUN docker-php-ext-install \
     intl \
     xml
 
+# Configure PHP
+RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/memory-limit.ini
+
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www/html
+WORKDIR /app/backend
 
 # Copy composer files first
-COPY composer.json composer.lock ./
+COPY backend/composer.json backend/composer.lock ./
+COPY backend/phpstan.neon.dist ./phpstan.neon.dist
 
 # Base directory setup
 RUN mkdir -p var/cache var/log var/sessions && \
