@@ -1,0 +1,9 @@
+{
+    "name": "Burgieclan Frontend",
+    "dockerComposeFile": [
+        "../../docker-compose.yml"
+    ],
+    "service": "frontend",
+    "workspaceFolder": "/app/frontend",
+    "shutdownAction": "none"
+}
