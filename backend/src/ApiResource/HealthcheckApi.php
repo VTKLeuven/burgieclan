@@ -57,4 +57,3 @@ use App\Controller\Api\HealthcheckController;
 class HealthcheckApi
 {
 }
-    # Port mapping - only expose internally to nginx
