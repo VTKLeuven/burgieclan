@@ -58,6 +58,14 @@ jobs:
           ssh "$SSH_USER@$SSH_HOST" << 'EOF'
             # Variables
             DEPLOY_DIR="${{ vars.DEPLOY_DIR }}"
+            
+            # Set IMAGE_TAG based on environment
+            if [ "${{ inputs.environment }}" = "production" ]; then
+              IMAGE_TAG="prod"
+            else
+              IMAGE_TAG="test"
+            fi
+            export IMAGE_TAG
 
             # Ensure DEPLOY_DIR is present
             if [ ! -d $DEPLOY_DIR ]; then
