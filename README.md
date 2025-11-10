@@ -16,6 +16,68 @@ This will install two hooks:
 
 See [.githooks/README.md](.githooks/README.md) for more details.
 
+### Local Development
+
+This project uses Docker and Dev Containers for local development.
+
+#### First Time Setup
+
+1. **Create your environment file**:
+   ```bash
+   cp .env.dist .env
+   ```
+   Replace the `LITUS_API_KEY` with a valid key to enable login with Litus Oauth2.
+
+2. **Start the development environment**:
+   ```bash
+   make up
+   ```
+
+3. **Set up the database**:
+   ```bash
+   make db
+   ```
+
+4. **Connect to the development container**:
+   - Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
+   - Select "Dev Containers: Reopen in Container"
+   - Choose either "Burgieclan Backend" or "Burgieclan Frontend"
+
+That's it! You can now work on the frontend or backend code within the containerized environment.
+ - Frontend: http://localhost:3000
+ - Backend: http://localhost:8000
+
+#### Stopping the Environment
+
+To stop all services:
+```bash
+make down
+```
+
+#### Subsequent Runs
+
+For future development sessions, simply run:
+```bash
+make up
+```
+
+Then reopen in your chosen development container (Backend or Frontend).
+
+#### Additional Makefile Commands
+
+The `Makefile` contains many useful commands designed to be run from the host machine. If you are running commands directly inside the container, run the underlying command itself (e.g., `php bin/console` instead of `docker compose exec backend php bin/console`).
+
+- `make ps`: Show running containers
+- `make logs`: Show logs from all services
+- `make backend-shell`: Open a shell in the backend container
+- `make frontend-shell`: Open a shell in the frontend container
+- `make admin`: Create an admin user
+- `make reset-password`: Reset a user's password
+- `make phpstan`: Run PHP static analysis
+- `make phpunit`: Run PHP unit tests
+- `make phpcs`: Run PHP code style checks
+- `make phpcbf`: Auto-fix PHP code style issues
+
 ## Production Setup
 
 This guide will help you deploy the application on a new server.
