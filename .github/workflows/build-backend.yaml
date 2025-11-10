@@ -47,10 +47,14 @@ jobs:
         with:
           images: ghcr.io/${{ steps.repo_name.outputs.lowercase }}/backend
           tags: |
+            # Tag with 'latest' for production environment
+            type=raw,value=latest,enable=${{ inputs.environment == 'production' }}
+            # Tag with 'prod' for production environment
+            type=raw,value=prod,enable=${{ inputs.environment == 'production' }}
+            # Tag with 'test' for test environment
+            type=raw,value=test,enable=${{ inputs.environment == 'dev' }}
             # Tag with branch name
             type=ref,event=branch
-            # Tag with 'test' for test branch
-            type=raw,value=test,enable=${{ github.ref == 'refs/heads/test' }}
             # Tag with commit SHA
             type=sha,prefix={{branch}}-
 
