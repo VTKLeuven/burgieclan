@@ -14,14 +14,15 @@ jobs:
 
     services:
       db:
-        image: mysql:8.0
+        image: postgres:18
         env:
-          MYSQL_ROOT_PASSWORD: burgieclan_db_root
-          MYSQL_DATABASE: burgieclan_db
+          POSTGRES_USER: burgieclan_db_user
+          POSTGRES_PASSWORD: burgieclan_db_pass
+          POSTGRES_DATABASE: burgieclan_db
         ports:
-          - 3306:3306
+          - 5432:5432
         options: >-
-          --health-cmd="mysqladmin ping --silent"
+          --health-cmd="pg_isready -U burgieclan_db_user -d burgieclan_db"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
