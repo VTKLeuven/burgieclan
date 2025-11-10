@@ -1,0 +1,33 @@
+#!/bin/sh
+#
+# Git commit-msg hook that enforces commit messages to start with BUR-XXX
+# where XXX is one or more digits
+#
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Pattern to match: BUR- followed by one or more digits at the start of the message
+PATTERN="^BUR-[0-9]+"
+
+# Check if the commit message matches the pattern
+if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
+    echo "❌ ERROR: Commit message must start with BUR-XXX (where XXX is a number)"
+    echo ""
+    echo "Your commit message:"
+    echo "  $COMMIT_MSG"
+    echo ""
+    echo "Valid examples:"
+    echo "  ✓ BUR-123 Add new feature"
+    echo "  ✓ BUR-1 Fix bug"
+    echo "  ✓ BUR-99999 Update documentation"
+    echo ""
+    echo "Invalid examples:"
+    echo "  ✗ Add new feature"
+    echo "  ✗ BUR- Fix bug (missing number)"
+    echo "  ✗ BUR-ABC Update docs (letters instead of numbers)"
+    exit 1
+fi
+
+exit 0
+
