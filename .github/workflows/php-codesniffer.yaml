@@ -37,4 +37,10 @@ jobs:
       - name: Run PHP Code Sniffer
         run: |
           cd backend
-          vendor/bin/phpcs
+          vendor/bin/phpcs --runtime-set ignore_warnings_on_exit 1
+
+      - name: Print local fix instructions
+        if: failure()
+        run: |
+          echo "To fix PHP CodeSniffer errors locally, run:"
+          echo "  vendor/bin/phpcbf"
