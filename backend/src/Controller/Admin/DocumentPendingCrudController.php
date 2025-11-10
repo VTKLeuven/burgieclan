@@ -53,9 +53,9 @@ class DocumentPendingCrudController extends DocumentCrudController
     }
 
     public function createIndexQueryBuilder(
-        SearchDto        $searchDto,
-        EntityDto        $entityDto,
-        FieldCollection  $fields,
+        SearchDto $searchDto,
+        EntityDto $entityDto,
+        FieldCollection $fields,
         FilterCollection $filters
     ): QueryBuilder {
         return parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters)
@@ -103,19 +103,21 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->renderAsSwitch(false);
         yield TextField::new('file')
             ->setFormType(VichFileType::class)
-            ->setFormTypeOptions([
+            ->setFormTypeOptions(
+                [
                 'download_label' => true,
                 'allow_delete' => false,
-            ])
+                ]
+            )
             ->hideOnIndex();
         yield TextField::new('file_name')
             ->onlyOnIndex();
     }
 
     public function approve(
-        AdminContext           $adminContext,
+        AdminContext $adminContext,
         EntityManagerInterface $entityManagerInterface,
-        AdminUrlGenerator      $adminUrlGenerator
+        AdminUrlGenerator $adminUrlGenerator
     ): RedirectResponse {
         // In EasyAdmin 4.26+, when POSTing to a custom action, the entity might not be in the context
         // We need to retrieve the entity ID from the request and load it manually

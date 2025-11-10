@@ -35,7 +35,7 @@ class PageApiProvider implements ProviderInterface
             $pages = $this->pageRepository->findAllPublicAvailable();
             $pagesApi = [];
             foreach ($pages as $page) {
-                $pagesApi[] = $this->microMapper->map($page, PageApi::class, ["lang"=>$lang]);
+                $pagesApi[] = $this->microMapper->map($page, PageApi::class, ["lang" => $lang]);
             }
             return $pagesApi;
         }
@@ -50,6 +50,6 @@ class PageApiProvider implements ProviderInterface
             throw new NotFoundHttpException(sprintf('Page not found for urlKey: %s', $urlKey));
         }
 
-        return $this->microMapper->map($page, PageApi::class, ["lang"=>$lang]);
+        return $this->microMapper->map($page, PageApi::class, ["lang" => $lang]);
     }
 }

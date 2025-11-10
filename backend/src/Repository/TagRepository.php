@@ -43,7 +43,7 @@ class TagRepository extends ServiceEntityRepository
             ->leftJoin('tag.documents', 'document');
 
         $expr = $queryBuilder->expr();
-        
+
         // Start with tags that have no documents
         $orConditions = $expr->orX();
         $orConditions->add($expr->isNull('document.id'));
@@ -51,7 +51,7 @@ class TagRepository extends ServiceEntityRepository
         // If filters are provided, add condition for tags with matching documents
         if ($courseId || $categoryId) {
             $andConditions = $expr->andX();
-            
+
             if ($courseId) {
                 $queryBuilder
                     ->leftJoin('document.course', 'course')

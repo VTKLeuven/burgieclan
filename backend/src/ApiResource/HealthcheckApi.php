@@ -22,7 +22,8 @@ use App\Controller\Api\HealthcheckController;
                 responses: [
                     '200' => new Response(
                         description: 'Service is healthy',
-                        content: new ArrayObject([
+                        content: new ArrayObject(
+                            [
                             'application/json' => [
                                 'example' => [
                                     'status' => 'ok',
@@ -31,11 +32,13 @@ use App\Controller\Api\HealthcheckController;
                                     'database' => 'connected'
                                 ]
                             ]
-                        ])
+                            ]
+                        )
                     ),
                     '503' => new Response(
                         description: 'Service is unhealthy',
-                        content: new ArrayObject([
+                        content: new ArrayObject(
+                            [
                             'application/json' => [
                                 'example' => [
                                     'status' => 'error',
@@ -45,7 +48,8 @@ use App\Controller\Api\HealthcheckController;
                                     'error' => 'Database connection failed'
                                 ]
                             ]
-                        ])
+                            ]
+                        )
                     )
                 ],
                 summary: 'Health check endpoint',

@@ -53,12 +53,15 @@ final class SecurityController extends AbstractController
         // browsed, to ensure that its locale is always the current one.
         $this->saveTargetPath($request->getSession(), 'main', $this->generateUrl('admin'));
 
-        return $this->render('security/login.html.twig', [
+        return $this->render(
+            'security/login.html.twig',
+            [
             // last username entered by the user (if any)
             'last_username' => $helper->getLastUsername(),
             // last authentication error (if any)
             'error' => $helper->getLastAuthenticationError(),
-        ]);
+            ]
+        );
     }
 
     #[Route("/login/litus", name: "login_litus")]

@@ -20,9 +20,9 @@ class CreateDocumentController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly IriConverterInterface  $iriConverter,
-        private readonly MicroMapperInterface   $microMapper,
-        private readonly StorageInterface       $storage,
+        private readonly IriConverterInterface $iriConverter,
+        private readonly MicroMapperInterface $microMapper,
+        private readonly StorageInterface $storage,
     ) {
     }
 
@@ -34,12 +34,16 @@ class CreateDocumentController extends AbstractController
         // If a variable is missing, throw a BadRequestHttpException.
         $dto->name = $request->request->get('name') ?? throw new BadRequestHttpException('"name" is required');
         /** @var CourseApi $course */
-        $course = $this->iriConverter->getResourceFromIri($request->request->get('course') ??
-            throw new BadRequestHttpException('"course" is required'));
+        $course = $this->iriConverter->getResourceFromIri(
+            $request->request->get('course') ??
+            throw new BadRequestHttpException('"course" is required')
+        );
         $dto->course = $course;
         /** @var DocumentCategoryApi $category */
-        $category = $this->iriConverter->getResourceFromIri($request->request->get('category') ??
-            throw new BadRequestHttpException('"category" is required'));
+        $category = $this->iriConverter->getResourceFromIri(
+            $request->request->get('category') ??
+            throw new BadRequestHttpException('"category" is required')
+        );
         $dto->category = $category;
 
         $dto->year = $request->request->get('year');

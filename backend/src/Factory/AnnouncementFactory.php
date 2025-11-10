@@ -75,8 +75,8 @@ final class AnnouncementFactory extends PersistentProxyObjectFactory
     protected function defaults(): array
     {
         $createDate = new DateTimeImmutable();
-        $startTime = $createDate->add(new DateInterval('P'. self::faker()->numberBetween(1, 10) . 'D'));
-        $endTime = $startTime->add(new DateInterval('P'. self::faker()->numberBetween(1, 10) . 'D'));
+        $startTime = $createDate->add(new DateInterval('P' . self::faker()->numberBetween(1, 10) . 'D'));
+        $endTime = $startTime->add(new DateInterval('P' . self::faker()->numberBetween(1, 10) . 'D'));
         return [
             'title_nl' => self::faker()->word(),
             'title_en' => self::faker()->word(),

@@ -18,8 +18,8 @@ class DocumentCommentApiToEntityMapper implements MapperInterface
 {
     public function __construct(
         private readonly DocumentCommentRepository $repository,
-        private readonly Security                  $security,
-        private readonly MicroMapperInterface      $microMapper,
+        private readonly Security $security,
+        private readonly MicroMapperInterface $microMapper,
     ) {
     }
 
@@ -48,9 +48,15 @@ class DocumentCommentApiToEntityMapper implements MapperInterface
 
         $to->setContent($from->content);
         $to->setAnonymous($from->anonymous);
-        $to->setDocument($this->microMapper->map($from->document, Document::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
-        ]));
+        $to->setDocument(
+            $this->microMapper->map(
+                $from->document,
+                Document::class,
+                [
+                MicroMapperInterface::MAX_DEPTH => 0,
+                ]
+            )
+        );
 
         return $to;
     }

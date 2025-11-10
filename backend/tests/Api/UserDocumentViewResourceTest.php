@@ -20,29 +20,38 @@ class UserDocumentViewResourceTest extends ApiTestCase
         $userToken = $this->getToken($user->getUsername(), 'password');
 
         $course = CourseFactory::createOne();
-        $document1 = DocumentFactory::createOne([
+        $document1 = DocumentFactory::createOne(
+            [
             'course' => $course,
-        ]);
+            ]
+        );
         $document2 = DocumentFactory::createOne();
 
-        UserDocumentViewFactory::createOne([
+        UserDocumentViewFactory::createOne(
+            [
             'user' => $user,
             'document' => $document1,
             'lastViewed' => new \DateTime('2024-02-01'),
-        ]);
-        UserDocumentViewFactory::createOne([
+            ]
+        );
+        UserDocumentViewFactory::createOne(
+            [
             'user' => $user,
             'document' => $document2,
             'lastViewed' => new \DateTime('2024-01-02'),
-        ]);
+            ]
+        );
 
         // Test getting own document views
         $this->browser()
-            ->get('/api/document_views', [
+            ->get(
+                '/api/document_views',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $userToken
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
@@ -62,7 +71,9 @@ class UserDocumentViewResourceTest extends ApiTestCase
 
         // Test adding document views for own user
         $this->browser()
-            ->post('/api/document_views/batch', [
+            ->post(
+                '/api/document_views/batch',
+                [
                 'headers' => [
                     'Content-Type' => 'application/ld+json',
                     'Authorization' => 'Bearer ' . $userToken
@@ -79,16 +90,20 @@ class UserDocumentViewResourceTest extends ApiTestCase
                         ]
                     ]
                 ]
-            ])
+                ]
+            )
             ->assertStatus(204);
 
         // Verify the views were recorded
         $this->browser()
-            ->get('/api/document_views', [
+            ->get(
+                '/api/document_views',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $userToken
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
@@ -105,15 +120,19 @@ class UserDocumentViewResourceTest extends ApiTestCase
         $document = DocumentFactory::createOne();
 
         // Create initial view
-        UserDocumentViewFactory::createOne([
+        UserDocumentViewFactory::createOne(
+            [
             'user' => $user,
             'document' => $document,
             'lastViewed' => new \DateTime('2024-01-01T10:00:00+00:00'),
-        ]);
+            ]
+        );
 
         // Update the view
         $this->browser()
-            ->post('/api/document_views/batch', [
+            ->post(
+                '/api/document_views/batch',
+                [
                 'headers' => [
                     'Content-Type' => 'application/ld+json',
                     'Authorization' => 'Bearer ' . $userToken
@@ -126,16 +145,20 @@ class UserDocumentViewResourceTest extends ApiTestCase
                         ]
                     ]
                 ]
-            ])
+                ]
+            )
             ->assertStatus(204);
 
         // Verify the view was updated
         $this->browser()
-            ->get('/api/document_views', [
+            ->get(
+                '/api/document_views',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $userToken
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)

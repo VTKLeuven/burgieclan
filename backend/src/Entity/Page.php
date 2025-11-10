@@ -81,7 +81,7 @@ class Page
 
     public function getName(string $lang): ?string
     {
-        return $this->{'name_'.$lang} ?? $this->{'name_'.self::$DEFAULT_LANGUAGE};
+        return $this->{'name_' . $lang} ?? $this->{'name_' . self::$DEFAULT_LANGUAGE};
     }
 
     public function getNameNl(): string
@@ -98,7 +98,7 @@ class Page
 
     public function getContent(string $lang): ?string
     {
-        return $this->{'content_'.$lang} ?? $this->{'content_'.self::$DEFAULT_LANGUAGE};
+        return $this->{'content_' . $lang} ?? $this->{'content_' . self::$DEFAULT_LANGUAGE};
     }
 
     public function getContentNl(): ?string

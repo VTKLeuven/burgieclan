@@ -17,23 +17,29 @@ class CourseCommentResourceTest extends ApiTestCase
 
     public function testGetCollectionOfCourseComments(): void
     {
-        CourseCommentFactory::createMany(5, [
+        CourseCommentFactory::createMany(
+            5,
+            [
             'anonymous' => false
-        ]);
+            ]
+        );
         $json = $this->browser()
-            ->get('/api/course_comments', [
+            ->get(
+                '/api/course_comments',
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
-            ->json()
-        ;
+            ->json();
 
-        $this->assertEqualsCanonicalizing([
+        $this->assertEqualsCanonicalizing(
+            [
             '@id',
             '@type',
             'content',
@@ -43,7 +49,9 @@ class CourseCommentResourceTest extends ApiTestCase
             'creator',
             'createdAt',
             'updatedAt',
-        ], array_keys($json->decoded()['hydra:member'][0]));
+            ],
+            array_keys($json->decoded()['hydra:member'][0])
+        );
     }
 
     public function testGetOneCourseComment(): void
@@ -51,125 +59,167 @@ class CourseCommentResourceTest extends ApiTestCase
         $comment = CourseCommentFactory::createOne();
 
         $this->browser()
-            ->get('/api/course_comments/' . $comment->getId(), [
+            ->get(
+                '/api/course_comments/' . $comment->getId(),
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
-            ->assertJsonMatches('"@id"', '/api/course_comments/'.$comment->getId());
+            ->assertJsonMatches('"@id"', '/api/course_comments/' . $comment->getId());
     }
 
     public function testGetCourseCommentFilterByContent(): void
     {
-        $comment1 = CourseCommentFactory::createOne([
+        $comment1 = CourseCommentFactory::createOne(
+            [
             'content' => 'comment1',
-        ]);
+            ]
+        );
 
-        $comment2 = CourseCommentFactory::createOne([
+        $comment2 = CourseCommentFactory::createOne(
+            [
             'content' => 'comment2',
-        ]);
+            ]
+        );
 
-        $comment3 = CourseCommentFactory::createOne([
+        $comment3 = CourseCommentFactory::createOne(
+            [
             'content' => 'comment3',
-        ]);
+            ]
+        );
 
         CourseCommentFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/course_comments?content=comment2', [
+            ->get(
+                '/api/course_comments?content=comment2',
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/course_comments?content=comment', [
+            ->get(
+                '/api/course_comments?content=comment',
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
-            ->assertJsonMatches('length("hydra:member")', 3)
-        ;
+            ->assertJsonMatches('length("hydra:member")', 3);
     }
 
     public function testGetCourseCommentFilterByAnonymous(): void
     {
-        CourseCommentFactory::createMany(3, [
+        CourseCommentFactory::createMany(
+            3,
+            [
             'anonymous' => true,
-        ]);
-        CourseCommentFactory::createMany(5, [
+            ]
+        );
+        CourseCommentFactory::createMany(
+            5,
+            [
             'anonymous' => false,
-        ]);
+            ]
+        );
 
         $this->browser()
-            ->get('/api/course_comments?anonymous=true', [
+            ->get(
+                '/api/course_comments?anonymous=true',
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
-            ->get('/api/course_comments?anonymous=false', [
+            ->get(
+                '/api/course_comments?anonymous=false',
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
-            ->assertJsonMatches('length("hydra:member")', 5)
-        ;
+            ->assertJsonMatches('length("hydra:member")', 5);
     }
 
     public function testGetCourseCommentFilterByCreator(): void
     {
         $user1 = UserFactory::createOne();
         $user2 = UserFactory::createOne();
-        CourseCommentFactory::createMany(1, [
+        CourseCommentFactory::createMany(
+            1,
+            [
             'creator' => $user1,
-        ]);
-        CourseCommentFactory::createMany(2, [
+            ]
+        );
+        CourseCommentFactory::createMany(
+            2,
+            [
             'creator' => $user2,
-        ]);
-        CourseCommentFactory::createMany(5, [
+            ]
+        );
+        CourseCommentFactory::createMany(
+            5,
+            [
             'creator' => UserFactory::createOne(),
-        ]);
+            ]
+        );
 
         $this->browser()
-            ->get('/api/course_comments?creator=/api/users/' . $user1->getId(), [
+            ->get(
+                '/api/course_comments?creator=/api/users/' . $user1->getId(),
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/course_comments?creator[]=/api/users/' . $user1->getId() .
-                '&creator[]=/api/users/' . $user2->getId(), [
+            ->get(
+                '/api/course_comments?creator[]=/api/users/' . $user1->getId() .
+                '&creator[]=/api/users/' . $user2->getId(),
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
-            ->get('/api/course_comments', [
+            ->get(
+                '/api/course_comments',
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 8)
-            ->assertJsonMatches('length("hydra:member")', 8)
-        ;
+            ->assertJsonMatches('length("hydra:member")', 8);
     }
 
     public function testPostToCreateCourseComment(): void
@@ -179,15 +229,20 @@ class CourseCommentResourceTest extends ApiTestCase
         $category = CommentCategoryFactory::createOne();
 
         $this->browser()
-            ->post('/api/course_comments', [
+            ->post(
+                '/api/course_comments',
+                [
                 'json' => [],
                 'headers' => [
                     'Content-Type' => 'application/ld+json',
                     'Authorization' => 'Bearer ' . $this->getToken($user->getUsername(), 'password')
                 ],
-            ])
+                ]
+            )
             ->assertStatus(422)
-            ->post('/api/course_comments', [
+            ->post(
+                '/api/course_comments',
+                [
                 'json' => [
                     'content' => 'The content of this comment',
                     'anonymous' => true,
@@ -197,10 +252,10 @@ class CourseCommentResourceTest extends ApiTestCase
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(201)
-            ->assertJsonMatches('content', 'The content of this comment')
-        ;
+            ->assertJsonMatches('content', 'The content of this comment');
     }
 
     public function testPatchToUpdateCourseComment()
@@ -209,85 +264,118 @@ class CourseCommentResourceTest extends ApiTestCase
             [
                 'username' => 'creator',
                 'plainPassword' => 'password'
-            ]);
+            ]
+        );
         $otherUser = UserFactory::createOne(
             [
                 'username' => 'other user',
-                'plainPassword' => 'password']);
+            'plainPassword' => 'password']
+        );
 
         $creatorTokenResponse = $this->browser()
-            ->post('/api/auth/login', HttpOptions::json([
-                'username' => $creator->getUsername(),
-                'password' => 'password',
-            ]))
+            ->post(
+                '/api/auth/login',
+                HttpOptions::json(
+                    [
+                    'username' => $creator->getUsername(),
+                    'password' => 'password',
+                    ]
+                )
+            )
             ->json()
             ->decoded();
         $creatorToken = $creatorTokenResponse['token'];
 
         $otherUserTokenResponse = $this->browser()
-            ->post('/api/auth/login', HttpOptions::json([
-                'username' => $otherUser->getUsername(),
-                'password' => 'password',
-            ]))
+            ->post(
+                '/api/auth/login',
+                HttpOptions::json(
+                    [
+                    'username' => $otherUser->getUsername(),
+                    'password' => 'password',
+                    ]
+                )
+            )
             ->json()
             ->decoded();
         $otherToken = $otherUserTokenResponse['token'];
 
-        $comment = CourseCommentFactory::createOne([
+        $comment = CourseCommentFactory::createOne(
+            [
             'creator' => $creator,
-        ]);
+            ]
+        );
 
         $this->browser()
-            ->patch('/api/course_comments/' . $comment->getId(), [
+            ->patch(
+                '/api/course_comments/' . $comment->getId(),
+                [
                 'json' => [
                     'content' => 'Some new content',
                 ],
                 'headers' => [
                     'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' =>'Bearer ' . $creatorToken
+                    'Authorization' => 'Bearer ' . $creatorToken
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJsonMatches('content', 'Some new content');
 
         $this->browser()
-            ->patch('/api/course_comments/' . $comment->getId(), [
+            ->patch(
+                '/api/course_comments/' . $comment->getId(),
+                [
                 'json' => [
                     'content' => 'Some new content',
                 ],
                 'headers' => [
                     'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' =>'Bearer ' . $otherToken
+                    'Authorization' => 'Bearer ' . $otherToken
                 ]
-            ])
+                ]
+            )
             ->assertStatus(403);
     }
 
-    public function testDeleteCourseComment(){
+    public function testDeleteCourseComment()
+    {
         $creator = UserFactory::createOne(
             [
                 'username' => 'creator',
                 'plainPassword' => 'password'
-            ]);
+            ]
+        );
         $otherUser = UserFactory::createOne(
             [
                 'username' => 'other user',
-                'plainPassword' => 'password']);
+            'plainPassword' => 'password']
+        );
 
         $creatorTokenResponse = $this->browser()
-            ->post('/api/auth/login', HttpOptions::json([
-                'username' => $creator->getUsername(),
-                'password' => 'password',
-            ]))
+            ->post(
+                '/api/auth/login',
+                HttpOptions::json(
+                    [
+                    'username' => $creator->getUsername(),
+                    'password' => 'password',
+                    ]
+                )
+            )
             ->json()
             ->decoded();
         $creatorToken = $creatorTokenResponse['token'];
 
         $otherUserTokenResponse = $this->browser()
-            ->post('/api/auth/login', HttpOptions::json([
-                'username' => $otherUser->getUsername(),
-                'password' => 'password',
-            ]))
+            ->post(
+                '/api/auth/login',
+                HttpOptions::json(
+                    [
+                    'username' => $otherUser->getUsername(),
+                    'password' => 'password',
+                    ]
+                )
+            )
             ->json()
             ->decoded();
         $otherToken = $otherUserTokenResponse['token'];
@@ -300,35 +388,47 @@ class CourseCommentResourceTest extends ApiTestCase
         $commentId = $comment->getId();
 
         $this->browser()
-            ->get('/api/course_comments/' . $commentId, [
+            ->get(
+                '/api/course_comments/' . $commentId,
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $creatorToken
+                    'Authorization' => 'Bearer ' . $creatorToken
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200);
 
         $this->browser()
-            ->delete('/api/course_comments/' . $commentId, [
+            ->delete(
+                '/api/course_comments/' . $commentId,
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $otherToken
+                    'Authorization' => 'Bearer ' . $otherToken
                 ]
-            ])
+                ]
+            )
             ->assertStatus(403);
 
         $this->browser()
-            ->delete('/api/course_comments/' . $commentId, [
+            ->delete(
+                '/api/course_comments/' . $commentId,
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $creatorToken
+                    'Authorization' => 'Bearer ' . $creatorToken
                 ]
-            ])
+                ]
+            )
             ->assertStatus(204);
 
         $this->browser()
-            ->get('/api/course_comments/' . $commentId, [
+            ->get(
+                '/api/course_comments/' . $commentId,
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $creatorToken
+                    'Authorization' => 'Bearer ' . $creatorToken
                 ]
-            ])
+                ]
+            )
             ->assertStatus(404);
     }
 }

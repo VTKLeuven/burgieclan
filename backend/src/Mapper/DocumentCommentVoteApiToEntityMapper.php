@@ -17,9 +17,9 @@ use Symfonycasts\MicroMapper\MicroMapperInterface;
 class DocumentCommentVoteApiToEntityMapper implements MapperInterface
 {
     public function __construct(
-        private readonly DocumentCommentVoteRepository  $repository,
-        private readonly Security                       $security,
-        private readonly MicroMapperInterface           $microMapper,
+        private readonly DocumentCommentVoteRepository $repository,
+        private readonly Security $security,
+        private readonly MicroMapperInterface $microMapper,
     ) {
     }
 
@@ -47,9 +47,15 @@ class DocumentCommentVoteApiToEntityMapper implements MapperInterface
         assert($to instanceof DocumentCommentVote);
 
         $to->setVoteType($from->voteType);
-        $to->setDocumentComment($this->microMapper->map($from->documentComment, DocumentComment::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
-        ]));
+        $to->setDocumentComment(
+            $this->microMapper->map(
+                $from->documentComment,
+                DocumentComment::class,
+                [
+                MicroMapperInterface::MAX_DEPTH => 0,
+                ]
+            )
+        );
 
         return $to;
     }

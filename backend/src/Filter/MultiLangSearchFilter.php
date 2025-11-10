@@ -20,9 +20,9 @@ final class MultiLangSearchFilter extends AbstractFilter
     private array $fieldMappings;
 
     public function __construct(
-        ManagerRegistry         $managerRegistry,
-        ?array                  $properties = null,
-        ?LoggerInterface        $logger = null,
+        ManagerRegistry $managerRegistry,
+        ?array $properties = null,
+        ?LoggerInterface $logger = null,
         ?NameConverterInterface $nameConverter = null
     ) {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
@@ -30,13 +30,13 @@ final class MultiLangSearchFilter extends AbstractFilter
     }
 
     protected function filterProperty(
-        string                      $property,
+        string $property,
         $value,
-        QueryBuilder                $queryBuilder,
+        QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
-        string                      $resourceClass,
-        ?Operation                  $operation = null,
-        array                       $context = []
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = []
     ): void {
         if (!isset($this->fieldMappings[$property]) || !$value) {
             return;
