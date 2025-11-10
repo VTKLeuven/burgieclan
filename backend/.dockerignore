@@ -50,3 +50,7 @@ Thumbs.db
 # Documentation
 README.md
 LICENSE
+
+# Docker and build files
+docker-compose*.yml
+Makefile
