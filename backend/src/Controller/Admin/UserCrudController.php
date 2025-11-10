@@ -115,10 +115,12 @@ class UserCrudController extends AbstractCrudController
             ->add('fullName')
             ->add('username')
             ->add('email')
-            ->add(ArrayContainsFilter::new(
-                'roles',
-                array_combine(User::getAvailableRoles(), User::getAvailableRoles())
-            ))
+            ->add(
+                ArrayContainsFilter::new(
+                    'roles',
+                    array_combine(User::getAvailableRoles(), User::getAvailableRoles())
+                )
+            )
             ->add(EntityContainsFilter::new('favoritePrograms', Program::class))
             ->add(EntityContainsFilter::new('favoriteModules', Module::class))
             ->add(EntityContainsFilter::new('favoriteCourses', Course::class))

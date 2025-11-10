@@ -32,7 +32,8 @@ use ArrayObject;
                     ],
                 ],
                 requestBody: new Model\RequestBody(
-                    content: new ArrayObject([
+                    content: new ArrayObject(
+                        [
                         'application/ld+json' => [
                             'schema' => [
                                 'type' => 'object',
@@ -60,7 +61,8 @@ use ArrayObject;
                                 ],
                             ],
                         ],
-                    ])
+                        ]
+                    )
                 ),
             ),
             name: 'Download zip file',

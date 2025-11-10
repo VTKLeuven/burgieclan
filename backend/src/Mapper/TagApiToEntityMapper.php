@@ -16,7 +16,7 @@ use Symfonycasts\MicroMapper\MicroMapperInterface;
 class TagApiToEntityMapper implements MapperInterface
 {
     public function __construct(
-        private readonly TagRepository        $repository,
+        private readonly TagRepository $repository,
         private readonly MicroMapperInterface $microMapper,
     ) {
     }
@@ -59,9 +59,13 @@ class TagApiToEntityMapper implements MapperInterface
         $to->setName($from->name);
 
         foreach ($from->documents as $document) {
-            $documentEntity = $this->microMapper->map($document, Document::class, [
+            $documentEntity = $this->microMapper->map(
+                $document,
+                Document::class,
+                [
                 MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
+                ]
+            );
             $to->addDocument($documentEntity);
         }
 

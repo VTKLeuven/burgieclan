@@ -57,8 +57,7 @@ class ModuleRepository extends ServiceEntityRepository
         foreach ($searchTerms as $key => $term) {
             $queryBuilder
                 ->orWhere('m.name LIKE :t_' . $key)
-                ->setParameter('t_' . $key, '%' . $term . '%')
-            ;
+                ->setParameter('t_' . $key, '%' . $term . '%');
         }
 
         /** @var Module[] $result */
@@ -66,8 +65,7 @@ class ModuleRepository extends ServiceEntityRepository
             ->orderBy('m.name', 'ASC')
             ->setMaxResults($limit)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
 
         return $result;
     }
@@ -83,8 +81,11 @@ class ModuleRepository extends ServiceEntityRepository
         $terms = array_unique($searchQuery->split(' '));
 
         // ignore the search terms that are too short
-        return array_filter($terms, static function ($term) {
-            return 2 <= $term->length();
-        });
+        return array_filter(
+            $terms,
+            static function ($term) {
+                return 2 <= $term->length();
+            }
+        );
     }
 }

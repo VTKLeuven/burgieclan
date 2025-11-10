@@ -44,9 +44,13 @@ class AbstractVoteVoter extends Voter
                 if (!isset($subject->creator)) {
                     return false;
                 }
-                $creator = $this->microMapper->map($subject->creator, User::class, [
+                $creator = $this->microMapper->map(
+                    $subject->creator,
+                    User::class,
+                    [
                     MicroMapperInterface::MAX_DEPTH => 0,
-                ]);
+                    ]
+                );
 
                 if ($creator->getId() === $user->getId()) {
                     return true;
@@ -58,9 +62,13 @@ class AbstractVoteVoter extends Voter
                 if (!isset($subject->creator)) {
                     return false;
                 }
-                $creator = $this->microMapper->map($subject->creator, User::class, [
+                $creator = $this->microMapper->map(
+                    $subject->creator,
+                    User::class,
+                    [
                     MicroMapperInterface::MAX_DEPTH => 0,
-                ]);
+                    ]
+                );
 
                 if ($creator == $user) {
                     return true;

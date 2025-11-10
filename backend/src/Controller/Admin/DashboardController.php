@@ -69,18 +69,21 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Modules', 'fa fa-folder', Module::class)
             ->setPermission(User::ROLE_ADMIN);
         yield MenuItem::subMenu('Courses', 'fa-solid fa-book')
-            ->setSubItems([
+            ->setSubItems(
+                [
                 MenuItem::linkToCrud('Courses', 'fa fa-book', Course::class)
                     ->setPermission(User::ROLE_ADMIN),
                 MenuItem::linkToCrud('Comment Categories', 'fa fa-tags', CommentCategory::class)
                     ->setPermission(User::ROLE_ADMIN),
                 MenuItem::linkToCrud('Comments', 'fa fa-comments', CourseComment::class)
                     ->setPermission(User::ROLE_ADMIN)
-            ]);
+                ]
+            );
         $pendingDocumentsMenu = MenuItem::linkToCrud('Pending Documents', 'fa-regular fa-file', Document::class)
             ->setController(DocumentPendingCrudController::class);
         $documentsMenu = MenuItem::subMenu('Documents', 'fa-solid fa-file')
-            ->setSubItems([
+            ->setSubItems(
+                [
                 MenuItem::linkToCrud('Documents', 'fa fa-file', Document::class)
                     ->setController(DocumentCrudController::class),
                 $pendingDocumentsMenu,
@@ -90,7 +93,8 @@ class DashboardController extends AbstractDashboardController
                 MenuItem::linkToCrud('Comments', 'fa-solid fa-comments', DocumentComment::class)
                     ->setPermission(User::ROLE_ADMIN),
                 MenuItem::linkToCrud('Tags', 'fa-solid fa-tags', Tag::class)
-            ]);
+                ]
+            );
         $amountPending = $this->documentRepository->getAmountPending();
         if ($amountPending > 0) {
             $documentsMenu->setBadge($amountPending, 'danger');

@@ -30,13 +30,19 @@ class CommentCategoryApi
     public ?int $id = null;
 
     #[Assert\NotBlank]
-    #[ApiFilter(MultiLangSearchFilter::class, properties: [
+    #[ApiFilter(
+        MultiLangSearchFilter::class,
+        properties: [
         'name' => ['name_nl', 'name_en'],
-    ])]
+        ]
+    )]
     public ?string $name = null;
 
-    #[ApiFilter(MultiLangSearchFilter::class, properties: [
+    #[ApiFilter(
+        MultiLangSearchFilter::class,
+        properties: [
         'description' => ['description_nl', 'description_en'],
-    ])]
+        ]
+    )]
     public ?string $description = null;
 }

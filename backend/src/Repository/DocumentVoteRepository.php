@@ -60,11 +60,13 @@ class DocumentVoteRepository extends ServiceEntityRepository
     public function getVoteStatsForDocument(Document $document): array
     {
         $result = $this->createQueryBuilder('v')
-            ->select('
+            ->select(
+                '
                 SUM(CASE WHEN v.voteType = :upvote THEN 1 ELSE 0 END) as upvotes,
                 SUM(CASE WHEN v.voteType = :downvote THEN 1 ELSE 0 END) as downvotes,
                 SUM(v.voteType) as score
-            ')
+            '
+            )
             ->andWhere('v.document = :document')
             ->setParameter('document', $document)
             ->setParameter('upvote', DocumentVote::UPVOTE)

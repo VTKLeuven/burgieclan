@@ -20,7 +20,7 @@ use Symfonycasts\MicroMapper\MicroMapperInterface;
 class UserEntityToApiMapper implements MapperInterface
 {
     public function __construct(
-        private readonly MicroMapperInterface      $microMapper,
+        private readonly MicroMapperInterface $microMapper,
     ) {
     }
 
@@ -42,26 +42,54 @@ class UserEntityToApiMapper implements MapperInterface
         $to->fullName = $from->getFullName();
         $to->username = $from->getUsername();
         $to->email = $from->getEmail();
-        $to->favoriteCourses = array_map(function (Course $course) {
-            return $this->microMapper->map($course, CourseApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 1,
-            ]);
-        }, $from->getFavoriteCourses()->getValues());
-        $to->favoriteModules = array_map(function (Module $module) {
-            return $this->microMapper->map($module, ModuleApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 1,
-            ]);
-        }, $from->getFavoriteModules()->getValues());
-        $to->favoritePrograms = array_map(function (Program $program) {
-            return $this->microMapper->map($program, ProgramApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 1,
-            ]);
-        }, $from->getFavoritePrograms()->getValues());
-        $to->favoriteDocuments = array_map(function (Document $document) {
-            return $this->microMapper->map($document, DocumentApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 1,
-            ]);
-        }, $from->getFavoriteDocuments()->getValues());
+        $to->favoriteCourses = array_map(
+            function (Course $course) {
+                return $this->microMapper->map(
+                    $course,
+                    CourseApi::class,
+                    [
+                    MicroMapperInterface::MAX_DEPTH => 1,
+                    ]
+                );
+            },
+            $from->getFavoriteCourses()->getValues()
+        );
+        $to->favoriteModules = array_map(
+            function (Module $module) {
+                return $this->microMapper->map(
+                    $module,
+                    ModuleApi::class,
+                    [
+                    MicroMapperInterface::MAX_DEPTH => 1,
+                    ]
+                );
+            },
+            $from->getFavoriteModules()->getValues()
+        );
+        $to->favoritePrograms = array_map(
+            function (Program $program) {
+                return $this->microMapper->map(
+                    $program,
+                    ProgramApi::class,
+                    [
+                    MicroMapperInterface::MAX_DEPTH => 1,
+                    ]
+                );
+            },
+            $from->getFavoritePrograms()->getValues()
+        );
+        $to->favoriteDocuments = array_map(
+            function (Document $document) {
+                return $this->microMapper->map(
+                    $document,
+                    DocumentApi::class,
+                    [
+                    MicroMapperInterface::MAX_DEPTH => 1,
+                    ]
+                );
+            },
+            $from->getFavoriteDocuments()->getValues()
+        );
         $to->defaultAnonymous = $from->isDefaultAnonymous();
 
         return $to;

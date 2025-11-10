@@ -18,6 +18,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
+
 use function Symfony\Component\String\u;
 
 /**
@@ -31,7 +32,7 @@ use function Symfony\Component\String\u;
 class DocumentRepository extends ServiceEntityRepository
 {
     public function __construct(
-        ManagerRegistry                  $registry,
+        ManagerRegistry $registry,
         private readonly LoggerInterface $logger
     ) {
         parent::__construct($registry, Document::class);
@@ -49,10 +50,13 @@ class DocumentRepository extends ServiceEntityRepository
                 ->setParameter('under_review', true)
                 ->getQuery()
                 ->getSingleScalarResult() ?? 0;
-        } catch (NoResultException|NonUniqueResultException $e) {
-            $this->logger->warning('Error counting pending documents', [
+        } catch (NoResultException | NonUniqueResultException $e) {
+            $this->logger->warning(
+                'Error counting pending documents',
+                [
                 'error' => $e->getMessage()
-            ]);
+                ]
+            );
             return 0;
         }
     }
@@ -88,8 +92,7 @@ class DocumentRepository extends ServiceEntityRepository
             $queryBuilder
                 ->orWhere('d.name LIKE :t_' . $key)
                 ->orWhere('d.file_name LIKE :t_' . $key)
-                ->setParameter('t_' . $key, '%' . $term . '%')
-            ;
+                ->setParameter('t_' . $key, '%' . $term . '%');
         }
 
         /** @var Document[] $result */
@@ -97,8 +100,7 @@ class DocumentRepository extends ServiceEntityRepository
             ->orderBy('d.updateDate', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
 
         return $result;
     }
@@ -114,8 +116,11 @@ class DocumentRepository extends ServiceEntityRepository
         $terms = array_unique($searchQuery->split(' '));
 
         // ignore the search terms that are too short
-        return array_filter($terms, static function ($term) {
-            return 2 <= $term->length();
-        });
+        return array_filter(
+            $terms,
+            static function ($term) {
+                return 2 <= $term->length();
+            }
+        );
     }
 }

@@ -41,34 +41,69 @@ class CourseEntityToApiMapper implements MapperInterface
         $to->professors = array_values($from->getProfessors());
         $to->semesters = $from->getSemesters();
         $to->credits = $from->getCredits();
-        $to->oldCourses = array_map(function (Course $course) {
-            return $this->microMapper->map($course, CourseApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
-        }, $from->getOldCourses()->getValues());
-        $to->newCourses = array_map(function (Course $course) {
-            return $this->microMapper->map($course, CourseApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
-        }, $from->getNewCourses()->getValues());
+        $to->oldCourses = array_map(
+            function (Course $course) {
+                return $this->microMapper->map(
+                    $course,
+                    CourseApi::class,
+                    [
+                    MicroMapperInterface::MAX_DEPTH => 0,
+                    ]
+                );
+            },
+            $from->getOldCourses()->getValues()
+        );
+        $to->newCourses = array_map(
+            function (Course $course) {
+                return $this->microMapper->map(
+                    $course,
+                    CourseApi::class,
+                    [
+                    MicroMapperInterface::MAX_DEPTH => 0,
+                    ]
+                );
+            },
+            $from->getNewCourses()->getValues()
+        );
 
-        $to->identicalCourses = array_map(function (Course $course) {
-            return $this->microMapper->map($course, CourseApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
-        }, $from->getIdenticalCourses()->getValues());
+        $to->identicalCourses = array_map(
+            function (Course $course) {
+                return $this->microMapper->map(
+                    $course,
+                    CourseApi::class,
+                    [
+                    MicroMapperInterface::MAX_DEPTH => 0,
+                    ]
+                );
+            },
+            $from->getIdenticalCourses()->getValues()
+        );
 
-        $to->modules = array_map(function (Module $module) {
-            return $this->microMapper->map($module, ModuleApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
-        }, $from->getModules()->getValues());
+        $to->modules = array_map(
+            function (Module $module) {
+                return $this->microMapper->map(
+                    $module,
+                    ModuleApi::class,
+                    [
+                    MicroMapperInterface::MAX_DEPTH => 0,
+                    ]
+                );
+            },
+            $from->getModules()->getValues()
+        );
 
-        $to->courseComments = array_map(function (CourseComment $comment) {
-            return $this->microMapper->map($comment, CourseCommentApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 2,
-            ]);
-        }, $from->getCourseComments()->getValues());
+        $to->courseComments = array_map(
+            function (CourseComment $comment) {
+                return $this->microMapper->map(
+                    $comment,
+                    CourseCommentApi::class,
+                    [
+                    MicroMapperInterface::MAX_DEPTH => 2,
+                    ]
+                );
+            },
+            $from->getCourseComments()->getValues()
+        );
         return $to;
     }
 }

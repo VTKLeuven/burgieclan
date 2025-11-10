@@ -23,7 +23,8 @@ class EntityContainsFilter implements FilterInterface
             ->setProperty($propertyName)
             ->setLabel($label)
             ->setFormType(EntityFilterType::class)
-            ->setFormTypeOptions([
+            ->setFormTypeOptions(
+                [
                 'value_type_options' => [
                     'class' => $entityClass,
                     'multiple' => true,
@@ -37,7 +38,8 @@ class EntityContainsFilter implements FilterInterface
                     ],
                 ],
                 'translation_domain' => 'EasyAdminBundle',
-            ]);
+                ]
+            );
     }
 
     public function canSelectMultiple(bool $selectMultiple = true): self
@@ -48,10 +50,10 @@ class EntityContainsFilter implements FilterInterface
     }
 
     public function apply(
-        QueryBuilder  $queryBuilder,
+        QueryBuilder $queryBuilder,
         FilterDataDto $filterDataDto,
-        ?FieldDto     $fieldDto,
-        EntityDto     $entityDto
+        ?FieldDto $fieldDto,
+        EntityDto $entityDto
     ): void {
         $alias = $filterDataDto->getEntityAlias();
         $property = $filterDataDto->getProperty();

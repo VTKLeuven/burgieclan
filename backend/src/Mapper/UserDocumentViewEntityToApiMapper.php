@@ -32,10 +32,14 @@ class UserDocumentViewEntityToApiMapper implements MapperInterface
         assert($from instanceof UserDocumentView);
         assert($to instanceof UserDocumentViewApi);
 
-        $to->document = $this->microMapper->map($from->getDocument(), DocumentApi::class, [
+        $to->document = $this->microMapper->map(
+            $from->getDocument(),
+            DocumentApi::class,
+            [
             // Depth: document (0), course (1), course props (2)
             MicroMapperInterface::MAX_DEPTH => 2,
-        ]);
+            ]
+        );
         $to->lastViewed = $from->getLastViewedAt();
 
         return $to;

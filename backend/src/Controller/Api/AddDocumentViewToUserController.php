@@ -19,10 +19,10 @@ use Symfonycasts\MicroMapper\MicroMapperInterface;
 class AddDocumentViewToUserController extends AbstractController
 {
     public function __construct(
-        private readonly Security               $security,
-        private readonly MicroMapperInterface   $microMapper,
+        private readonly Security $security,
+        private readonly MicroMapperInterface $microMapper,
         private readonly EntityManagerInterface $entityManager,
-        private readonly IriConverterInterface  $iriConverter,
+        private readonly IriConverterInterface $iriConverter,
         private readonly UserDocumentViewRepository $viewRepository,
     ) {
     }
@@ -45,9 +45,13 @@ class AddDocumentViewToUserController extends AbstractController
             $documentApi = $this->iriConverter->getResourceFromIri($documentApiIri);
             assert($documentApi instanceof DocumentApi);
 
-            $document = $this->microMapper->map($documentApi, Document::class, [
+            $document = $this->microMapper->map(
+                $documentApi,
+                Document::class,
+                [
                 MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
+                ]
+            );
 
             $this->viewRepository->recordView(
                 $user,

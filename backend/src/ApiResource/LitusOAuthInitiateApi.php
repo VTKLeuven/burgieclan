@@ -20,14 +20,16 @@ use App\Controller\Api\LitusOAuthInitiateController;
                     '302' => new Response(
                         description: 'Redirect to OAuth provider',
                         content: null,
-                        headers: new \ArrayObject([
+                        headers: new \ArrayObject(
+                            [
                             'Location' => [
                                 'description' => 'OAuth provider authorization URL',
                                 'schema' => [
                                     'type' => 'string'
                                 ]
                             ]
-                        ])
+                            ]
+                        )
                     )
                 ],
                 summary: 'Initiate OAuth flow with Litus',
