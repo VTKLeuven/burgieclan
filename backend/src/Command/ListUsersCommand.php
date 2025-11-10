@@ -54,7 +54,8 @@ final class ListUsersCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setHelp(<<<'HELP'
+            ->setHelp(
+                <<<'HELP'
                 The <info>%command.name%</info> command lists all the users registered in the application:
 
                   <info>php %command.full_name%</info>
@@ -81,8 +82,7 @@ final class ListUsersCommand extends Command
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'If set, the result is sent to the given email address'
-            )
-        ;
+            );
     }
 
     /**

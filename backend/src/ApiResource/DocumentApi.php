@@ -59,7 +59,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             controller: CreateDocumentController::class,
             openapi: new Model\Operation(
                 requestBody: new Model\RequestBody(
-                    content: new ArrayObject([
+                    content: new ArrayObject(
+                        [
                         'multipart/form-data' => [
                             'schema' => [
                                 'type' => 'object',
@@ -108,7 +109,8 @@ use Symfony\Component\Validator\Constraints as Assert;
                                 ]
                             ]
                         ]
-                    ])
+                        ]
+                    )
                 )
             ),
             validationContext: ['groups' => ['document:create']],
@@ -197,4 +199,3 @@ class DocumentApi
     #[Groups(['search', 'user', 'document:get', 'document:create'])]
     public array $tags = [];
 }
-

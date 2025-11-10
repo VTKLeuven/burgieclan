@@ -24,9 +24,12 @@ class VoteResourceTest extends ApiTestCase
 
         // No votes initially
         $this->browser()
-            ->get('/api/documents/' . $document->getId() . '/votes', [
+            ->get(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $this->token]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 0)
@@ -43,29 +46,38 @@ class VoteResourceTest extends ApiTestCase
         $user3Token = $this->getToken($user3->getUsername(), 'password');
 
         // Create votes directly through the entities (simulating existing votes)
-        $vote1 = DocumentVoteFactory::createOne([
+        $vote1 = DocumentVoteFactory::createOne(
+            [
             'creator' => $user1,
             'document' => $document,
             'voteType' => AbstractVote::UPVOTE,
-        ]);
+            ]
+        );
 
-        $vote2 = DocumentVoteFactory::createOne([
+        $vote2 = DocumentVoteFactory::createOne(
+            [
             'creator' => $user2,
             'document' => $document,
             'voteType' => AbstractVote::UPVOTE,
-        ]);
+            ]
+        );
 
-        $vote3 = DocumentVoteFactory::createOne([
+        $vote3 = DocumentVoteFactory::createOne(
+            [
             'creator' => $user3,
             'document' => $document,
             'voteType' => AbstractVote::DOWNVOTE,
-        ]);
+            ]
+        );
 
         // Test vote summary with votes
         $this->browser()
-            ->get('/api/documents/' . $document->getId() . '/votes', [
+            ->get(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $user1Token]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 2)
@@ -74,9 +86,12 @@ class VoteResourceTest extends ApiTestCase
             ->assertJsonMatches('currentUserVote', 1);
 
         $this->browser()
-            ->get('/api/documents/' . $document->getId() . '/votes', [
+            ->get(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $user2Token]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 2)
@@ -85,9 +100,12 @@ class VoteResourceTest extends ApiTestCase
             ->assertJsonMatches('currentUserVote', 1);
 
         $this->browser()
-            ->get('/api/documents/' . $document->getId() . '/votes', [
+            ->get(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $user3Token]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 2)
@@ -101,9 +119,12 @@ class VoteResourceTest extends ApiTestCase
         $documentComment = DocumentCommentFactory::createOne();
 
         $this->browser()
-            ->get('/api/document-comments/' . $documentComment->getId() . '/votes', [
+            ->get(
+                '/api/document-comments/' . $documentComment->getId() . '/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $this->token]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 0)
@@ -118,28 +139,37 @@ class VoteResourceTest extends ApiTestCase
         $user2Token = $this->getToken($user2->getUsername(), 'password');
         $user3Token = $this->getToken($user3->getUsername(), 'password');
 
-        $vote1 = DocumentCommentVoteFactory::createOne([
+        $vote1 = DocumentCommentVoteFactory::createOne(
+            [
             'creator' => $user1,
             'documentComment' => $documentComment,
             'voteType' => AbstractVote::UPVOTE,
-        ]);
+            ]
+        );
 
-        $vote2 = DocumentCommentVoteFactory::createOne([
+        $vote2 = DocumentCommentVoteFactory::createOne(
+            [
             'creator' => $user2,
             'documentComment' => $documentComment,
             'voteType' => AbstractVote::UPVOTE,
-        ]);
+            ]
+        );
 
-        $vote3 = DocumentCommentVoteFactory::createOne([
+        $vote3 = DocumentCommentVoteFactory::createOne(
+            [
             'creator' => $user3,
             'documentComment' => $documentComment,
             'voteType' => AbstractVote::DOWNVOTE,
-        ]);
+            ]
+        );
 
         $this->browser()
-            ->get('/api/document-comments/' . $documentComment->getId() . '/votes', [
+            ->get(
+                '/api/document-comments/' . $documentComment->getId() . '/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $user1Token]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 2)
@@ -148,9 +178,12 @@ class VoteResourceTest extends ApiTestCase
             ->assertJsonMatches('currentUserVote', 1);
 
         $this->browser()
-            ->get('/api/document-comments/' . $documentComment->getId() . '/votes', [
+            ->get(
+                '/api/document-comments/' . $documentComment->getId() . '/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $user2Token]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 2)
@@ -159,9 +192,12 @@ class VoteResourceTest extends ApiTestCase
             ->assertJsonMatches('currentUserVote', 1);
 
         $this->browser()
-            ->get('/api/document-comments/' . $documentComment->getId() . '/votes', [
+            ->get(
+                '/api/document-comments/' . $documentComment->getId() . '/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $user3Token]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 2)
@@ -175,9 +211,12 @@ class VoteResourceTest extends ApiTestCase
         $courseComment = CourseCommentFactory::createOne();
 
         $this->browser()
-            ->get('/api/course-comments/' . $courseComment->getId() . '/votes', [
+            ->get(
+                '/api/course-comments/' . $courseComment->getId() . '/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $this->token]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 0)
@@ -192,28 +231,37 @@ class VoteResourceTest extends ApiTestCase
         $user2Token = $this->getToken($user2->getUsername(), 'password');
         $user3Token = $this->getToken($user3->getUsername(), 'password');
 
-        $vote1 = CourseCommentVoteFactory::createOne([
+        $vote1 = CourseCommentVoteFactory::createOne(
+            [
             'creator' => $user1,
             'courseComment' => $courseComment,
             'voteType' => AbstractVote::UPVOTE,
-        ]);
+            ]
+        );
 
-        $vote2 = CourseCommentVoteFactory::createOne([
+        $vote2 = CourseCommentVoteFactory::createOne(
+            [
             'creator' => $user2,
             'courseComment' => $courseComment,
             'voteType' => AbstractVote::UPVOTE,
-        ]);
+            ]
+        );
 
-        $vote3 = CourseCommentVoteFactory::createOne([
+        $vote3 = CourseCommentVoteFactory::createOne(
+            [
             'creator' => $user3,
             'courseComment' => $courseComment,
             'voteType' => AbstractVote::DOWNVOTE,
-        ]);
+            ]
+        );
 
         $this->browser()
-            ->get('/api/course-comments/' . $courseComment->getId() . '/votes', [
+            ->get(
+                '/api/course-comments/' . $courseComment->getId() . '/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $user1Token]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 2)
@@ -222,9 +270,12 @@ class VoteResourceTest extends ApiTestCase
             ->assertJsonMatches('currentUserVote', 1);
 
         $this->browser()
-            ->get('/api/course-comments/' . $courseComment->getId() . '/votes', [
+            ->get(
+                '/api/course-comments/' . $courseComment->getId() . '/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $user2Token]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 2)
@@ -233,9 +284,12 @@ class VoteResourceTest extends ApiTestCase
             ->assertJsonMatches('currentUserVote', 1);
 
         $this->browser()
-            ->get('/api/course-comments/' . $courseComment->getId() . '/votes', [
+            ->get(
+                '/api/course-comments/' . $courseComment->getId() . '/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $user3Token]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('upvotes', 2)
@@ -247,21 +301,30 @@ class VoteResourceTest extends ApiTestCase
     public function testGetVoteSummaryForNonExistentEntity(): void
     {
         $this->browser()
-            ->get('/api/documents/99999/votes', [
+            ->get(
+                '/api/documents/99999/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $this->token]
-            ])
+                ]
+            )
             ->assertStatus(404);
 
         $this->browser()
-            ->get('/api/document-comments/99999/votes', [
+            ->get(
+                '/api/document-comments/99999/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $this->token]
-            ])
+                ]
+            )
             ->assertStatus(404);
 
         $this->browser()
-            ->get('/api/course-comments/99999/votes', [
+            ->get(
+                '/api/course-comments/99999/votes',
+                [
                 'headers' => ['Authorization' => 'Bearer ' . $this->token]
-            ])
+                ]
+            )
             ->assertStatus(404);
     }
 
@@ -273,13 +336,16 @@ class VoteResourceTest extends ApiTestCase
 
         // Create upvote
         $this->browser()
-            ->post('/api/documents/' . $document->getId() . '/votes', [
+            ->post(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'json' => ['voteType' => 1],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(201)
             ->assertJson()
             ->assertJsonMatches('voteType', 1)
@@ -287,26 +353,32 @@ class VoteResourceTest extends ApiTestCase
 
         // Try to create same vote again (should return existing vote)
         $this->browser()
-            ->post('/api/documents/' . $document->getId() . '/votes', [
+            ->post(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'json' => ['voteType' => 1],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('voteType', 1);
 
         // Update to downvote
         $this->browser()
-            ->post('/api/documents/' . $document->getId() . '/votes', [
+            ->post(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'json' => ['voteType' => -1],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('voteType', -1);
@@ -319,13 +391,16 @@ class VoteResourceTest extends ApiTestCase
         $token = $this->getToken($user->getUsername(), 'password');
 
         $this->browser()
-            ->post('/api/document-comments/' . $documentComment->getId() . '/votes', [
+            ->post(
+                '/api/document-comments/' . $documentComment->getId() . '/votes',
+                [
                 'json' => ['voteType' => 1],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(201)
             ->assertJson()
             ->assertJsonMatches('voteType', 1)
@@ -339,13 +414,16 @@ class VoteResourceTest extends ApiTestCase
         $token = $this->getToken($user->getUsername(), 'password');
 
         $this->browser()
-            ->post('/api/course-comments/' . $courseComment->getId() . '/votes', [
+            ->post(
+                '/api/course-comments/' . $courseComment->getId() . '/votes',
+                [
                 'json' => ['voteType' => -1],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(201)
             ->assertJson()
             ->assertJsonMatches('voteType', -1)
@@ -360,24 +438,30 @@ class VoteResourceTest extends ApiTestCase
 
         // Invalid vote type
         $this->browser()
-            ->post('/api/documents/' . $document->getId() . '/votes', [
+            ->post(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'json' => ['voteType' => 2],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(400);
 
         // Missing vote type
         $this->browser()
-            ->post('/api/documents/' . $document->getId() . '/votes', [
+            ->post(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'json' => [],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(400);
     }
 
@@ -387,33 +471,42 @@ class VoteResourceTest extends ApiTestCase
         $token = $this->getToken($user->getUsername(), 'password');
 
         $this->browser()
-            ->post('/api/documents/99999/votes', [
+            ->post(
+                '/api/documents/99999/votes',
+                [
                 'json' => ['voteType' => 1],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(404);
 
         $this->browser()
-            ->post('/api/document-comments/99999/votes', [
+            ->post(
+                '/api/document-comments/99999/votes',
+                [
                 'json' => ['voteType' => 1],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(404);
 
         $this->browser()
-            ->post('/api/course-comments/99999/votes', [
+            ->post(
+                '/api/course-comments/99999/votes',
+                [
                 'json' => ['voteType' => 1],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(404);
     }
 
@@ -424,30 +517,39 @@ class VoteResourceTest extends ApiTestCase
         $courseComment = CourseCommentFactory::createOne();
 
         $this->browser()
-            ->post('/api/documents/' . $document->getId() . '/votes', [
+            ->post(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'json' => ['voteType' => 1],
                 'headers' => [
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(401);
 
         $this->browser()
-            ->post('/api/document-comments/' . $documentComment->getId() . '/votes', [
+            ->post(
+                '/api/document-comments/' . $documentComment->getId() . '/votes',
+                [
                 'json' => ['voteType' => 1],
                 'headers' => [
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(401);
 
         $this->browser()
-            ->post('/api/course-comments/' . $courseComment->getId() . '/votes', [
+            ->post(
+                '/api/course-comments/' . $courseComment->getId() . '/votes',
+                [
                 'json' => ['voteType' => 1],
                 'headers' => [
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(401);
     }
 
@@ -459,23 +561,29 @@ class VoteResourceTest extends ApiTestCase
 
         // Create a vote first
         $this->browser()
-            ->post('/api/documents/' . $document->getId() . '/votes', [
+            ->post(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'json' => ['voteType' => 1],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(201);
 
         // Get vote summary
         $this->browser()
-            ->get('/api/documents/' . $document->getId() . '/votes', [
+            ->get(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJsonMatches('upvotes', 1)
             ->assertJsonMatches('downvotes', 0)
@@ -483,22 +591,28 @@ class VoteResourceTest extends ApiTestCase
 
         // Delete the vote
         $this->browser()
-            ->delete('/api/documents/' . $document->getId() . '/votes', [
+            ->delete(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(204);
 
         // Try to delete again (should return 404)
         $this->browser()
-            ->delete('/api/documents/' . $document->getId() . '/votes', [
+            ->delete(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(404);
     }
 
@@ -510,23 +624,29 @@ class VoteResourceTest extends ApiTestCase
 
         // Create a vote first
         $this->browser()
-            ->post('/api/document-comments/' . $documentComment->getId() . '/votes', [
+            ->post(
+                '/api/document-comments/' . $documentComment->getId() . '/votes',
+                [
                 'json' => ['voteType' => 1],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(201);
 
         // Delete the vote
         $this->browser()
-            ->delete('/api/document-comments/' . $documentComment->getId() . '/votes', [
+            ->delete(
+                '/api/document-comments/' . $documentComment->getId() . '/votes',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(204);
     }
 
@@ -538,23 +658,29 @@ class VoteResourceTest extends ApiTestCase
 
         // Create a vote first
         $this->browser()
-            ->post('/api/course-comments/' . $courseComment->getId() . '/votes', [
+            ->post(
+                '/api/course-comments/' . $courseComment->getId() . '/votes',
+                [
                 'json' => ['voteType' => 1],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(201);
 
         // Delete the vote
         $this->browser()
-            ->delete('/api/course-comments/' . $courseComment->getId() . '/votes', [
+            ->delete(
+                '/api/course-comments/' . $courseComment->getId() . '/votes',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(204);
     }
 
@@ -564,30 +690,39 @@ class VoteResourceTest extends ApiTestCase
         $token = $this->getToken($user->getUsername(), 'password');
 
         $this->browser()
-            ->delete('/api/documents/99999/votes', [
+            ->delete(
+                '/api/documents/99999/votes',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(404);
 
         $this->browser()
-            ->delete('/api/document-comments/99999/votes', [
+            ->delete(
+                '/api/document-comments/99999/votes',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(404);
 
         $this->browser()
-            ->delete('/api/course-comments/99999/votes', [
+            ->delete(
+                '/api/course-comments/99999/votes',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(404);
     }
 
@@ -618,34 +753,43 @@ class VoteResourceTest extends ApiTestCase
 
         // Initial state - no votes
         $this->browser()
-            ->get('/api/documents/' . $document->getId() . '/votes', [
+            ->get(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJsonMatches('sum', 0);
 
         // Create upvote
         $this->browser()
-            ->post('/api/documents/' . $document->getId() . '/votes', [
+            ->post(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'json' => ['voteType' => 1],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(201);
 
         // Check vote summary
         $this->browser()
-            ->get('/api/documents/' . $document->getId() . '/votes', [
+            ->get(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJsonMatches('upvotes', 1)
             ->assertJsonMatches('downvotes', 0)
@@ -653,23 +797,29 @@ class VoteResourceTest extends ApiTestCase
 
         // Change to downvote
         $this->browser()
-            ->post('/api/documents/' . $document->getId() . '/votes', [
+            ->post(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'json' => ['voteType' => -1],
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200);
 
         // Check updated vote summary
         $this->browser()
-            ->get('/api/documents/' . $document->getId() . '/votes', [
+            ->get(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJsonMatches('upvotes', 0)
             ->assertJsonMatches('downvotes', 1)
@@ -677,22 +827,28 @@ class VoteResourceTest extends ApiTestCase
 
         // Delete vote
         $this->browser()
-            ->delete('/api/documents/' . $document->getId() . '/votes', [
+            ->delete(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(204);
 
         // Check final vote summary
         $this->browser()
-            ->get('/api/documents/' . $document->getId() . '/votes', [
+            ->get(
+                '/api/documents/' . $document->getId() . '/votes',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/ld+json'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJsonMatches('upvotes', 0)
             ->assertJsonMatches('downvotes', 0)

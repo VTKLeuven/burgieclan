@@ -10,12 +10,9 @@
 
 # Development tools
 .editorconfig
-.php-cs-fixer.dist.php
-.php-cs-fixer.php
 phpcs.xml.dist
 phpstan.neon.dist
 phpunit.xml.dist
-grumphp.yml
 
 # Testing
 /tests/

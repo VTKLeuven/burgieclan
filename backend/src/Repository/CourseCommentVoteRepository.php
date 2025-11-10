@@ -60,11 +60,13 @@ class CourseCommentVoteRepository extends ServiceEntityRepository
     public function getVoteStatsForCourseComment(CourseComment $courseComment): array
     {
         $result = $this->createQueryBuilder('v')
-            ->select('
+            ->select(
+                '
                 SUM(CASE WHEN v.voteType = :upvote THEN 1 ELSE 0 END) as upvotes,
                 SUM(CASE WHEN v.voteType = :downvote THEN 1 ELSE 0 END) as downvotes,
                 SUM(v.voteType) as score
-            ')
+            '
+            )
             ->andWhere('v.courseComment = :courseComment')
             ->setParameter('courseComment', $courseComment)
             ->setParameter('upvote', CourseCommentVote::UPVOTE)

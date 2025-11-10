@@ -18,8 +18,8 @@ use Symfonycasts\MicroMapper\MicroMapperInterface;
 class DocumentApiToEntityMapper implements MapperInterface
 {
     public function __construct(
-        private readonly DocumentRepository   $repository,
-        private readonly Security             $security,
+        private readonly DocumentRepository $repository,
+        private readonly Security $security,
         private readonly MicroMapperInterface $microMapper,
     ) {
     }
@@ -45,20 +45,36 @@ class DocumentApiToEntityMapper implements MapperInterface
         assert($to instanceof Document);
 
         $to->setName($from->name);
-        $to->setCourse($this->microMapper->map($from->course, Course::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
-        ]));
-        $to->setCategory($this->microMapper->map($from->category, DocumentCategory::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
-        ]));
+        $to->setCourse(
+            $this->microMapper->map(
+                $from->course,
+                Course::class,
+                [
+                MicroMapperInterface::MAX_DEPTH => 0,
+                ]
+            )
+        );
+        $to->setCategory(
+            $this->microMapper->map(
+                $from->category,
+                DocumentCategory::class,
+                [
+                MicroMapperInterface::MAX_DEPTH => 0,
+                ]
+            )
+        );
         $to->setYear($from->year);
         $to->setUnderReview($from->under_review);
         $to->setAnonymous($from->anonymous);
 
         foreach ($from->tags as $tag) {
-            $tagEntity = $this->microMapper->map($tag, Tag::class, [
+            $tagEntity = $this->microMapper->map(
+                $tag,
+                Tag::class,
+                [
                 MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
+                ]
+            );
             $to->addTag($tagEntity);
         }
 

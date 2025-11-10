@@ -40,13 +40,7 @@ RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | b
     apt-get update && apt-get install -y symfony-cli && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy GrumPHP config
-COPY grumphp.yml ./
-
 # Install dependencies
 RUN composer install --no-scripts
-
-# Initialize GrumPHP
-RUN vendor/bin/grumphp git:init
 
 CMD ["sh", "-c", "symfony server:stop || true && symfony server:start --port=8000 --no-tls --allow-all-ip"]

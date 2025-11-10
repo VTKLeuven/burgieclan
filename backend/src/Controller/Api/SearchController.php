@@ -40,18 +40,30 @@ class SearchController extends AbstractController
         $documents = $this->documentRepository->findBySearchQuery($searchText);
 
         $searchApi = new SearchApi();
-        $searchApi->courses = array_map(function (Course $course) {
-            return $this->microMapper->map($course, CourseApi::class);
-        }, $courses);
-        $searchApi->modules = array_map(function (Module $module) {
-            return $this->microMapper->map($module, ModuleApi::class);
-        }, $modules);
-        $searchApi->programs = array_map(function (Program $program) {
-            return $this->microMapper->map($program, ProgramApi::class);
-        }, $programs);
-        $searchApi->documents = array_map(function (Document $document) {
-            return $this->microMapper->map($document, DocumentApi::class);
-        }, $documents);
+        $searchApi->courses = array_map(
+            function (Course $course) {
+                return $this->microMapper->map($course, CourseApi::class);
+            },
+            $courses
+        );
+        $searchApi->modules = array_map(
+            function (Module $module) {
+                return $this->microMapper->map($module, ModuleApi::class);
+            },
+            $modules
+        );
+        $searchApi->programs = array_map(
+            function (Program $program) {
+                return $this->microMapper->map($program, ProgramApi::class);
+            },
+            $programs
+        );
+        $searchApi->documents = array_map(
+            function (Document $document) {
+                return $this->microMapper->map($document, DocumentApi::class);
+            },
+            $documents
+        );
 
         return $searchApi;
     }

@@ -23,7 +23,7 @@ class PageResourceTest extends ApiTestCase
             ->get('/api/pages/' . $page->getUrlKey())
             ->assertStatus(200)
             ->assertJson()
-            ->assertJsonMatches('"@id"', '/api/pages/'.$page->getUrlKey());
+            ->assertJsonMatches('"@id"', '/api/pages/' . $page->getUrlKey());
     }
 
     public function testGetOnePagePublicNotAvailableUnauthorized(): void
@@ -44,13 +44,16 @@ class PageResourceTest extends ApiTestCase
         assert(!$page->isPublicAvailable());
 
         $this->browser()
-            ->get('/api/pages/' . $page->getUrlKey(), [
+            ->get(
+                '/api/pages/' . $page->getUrlKey(),
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
-            ->assertJsonMatches('"@id"', '/api/pages/'.$page->getUrlKey());
+            ->assertJsonMatches('"@id"', '/api/pages/' . $page->getUrlKey());
     }
 }

@@ -17,10 +17,10 @@ final class TagFilter extends AbstractFilter
     private IriConverterInterface $iriConverter;
 
     public function __construct(
-        ManagerRegistry         $managerRegistry,
-        IriConverterInterface   $iriConverter,
-        ?LoggerInterface        $logger = null,
-        ?array                  $properties = null,
+        ManagerRegistry $managerRegistry,
+        IriConverterInterface $iriConverter,
+        ?LoggerInterface $logger = null,
+        ?array $properties = null,
         ?NameConverterInterface $nameConverter = null
     ) {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
@@ -28,13 +28,13 @@ final class TagFilter extends AbstractFilter
     }
 
     protected function filterProperty(
-        string                      $property,
+        string $property,
         $value,
-        QueryBuilder                $queryBuilder,
+        QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
-        string                      $resourceClass,
-        ?Operation                  $operation = null,
-        array                       $context = []
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = []
     ): void {
         // Only apply to the relevant properties
         if (!$this->isPropertyEnabled($property, $resourceClass) || !$value) {
@@ -65,10 +65,13 @@ final class TagFilter extends AbstractFilter
                         ->setParameter($paramName, $tag->id);
                 } catch (\Exception $e) {
                     // Log invalid IRI and continue
-                    $this->logger->notice('Invalid IRI passed to tag filter', [
+                    $this->logger->notice(
+                        'Invalid IRI passed to tag filter',
+                        [
                         'iri' => $tagIri,
                         'exception' => $e->getMessage()
-                    ]);
+                        ]
+                    );
                     continue;
                 }
             }

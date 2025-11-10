@@ -32,10 +32,15 @@ abstract class ApiTestCase extends KernelTestCase
     protected function getToken(string $username, string $password)
     {
         $tokenResponse = $this->browser()
-            ->post('/api/auth/login', HttpOptions::json([
-                'username' => $username,
-                'password' => $password,
-            ]))
+            ->post(
+                '/api/auth/login',
+                HttpOptions::json(
+                    [
+                    'username' => $username,
+                    'password' => $password,
+                    ]
+                )
+            )
             ->json()
             ->decoded();
 

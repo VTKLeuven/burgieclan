@@ -39,7 +39,7 @@ class ModuleApiToEntityMapper implements MapperInterface
 
         // No need to set any fields from module.
         // It either gets pulled from the database in load() or doesn't exist.
-        
+
         return $to;
     }
 }

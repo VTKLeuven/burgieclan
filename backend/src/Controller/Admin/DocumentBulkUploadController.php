@@ -47,7 +47,10 @@ class DocumentBulkUploadController extends AbstractController
     {
         // Create the upload form
         $form = $this->createFormBuilder()
-            ->add('course', EntityType::class, [
+            ->add(
+                'course',
+                EntityType::class,
+                [
                 'class' => Course::class,
                 'choice_label' => function (Course $course) {
                     return $course->getName() . ' (' . $course->getCode() . ')';
@@ -60,8 +63,12 @@ class DocumentBulkUploadController extends AbstractController
                     return $repository->createQueryBuilder('c')
                         ->orderBy('c.name', 'ASC');
                 },
-            ])
-            ->add('category', EntityType::class, [
+                ]
+            )
+            ->add(
+                'category',
+                EntityType::class,
+                [
                 'class' => DocumentCategory::class,
                 'choice_label' => 'nameNl',
                 'placeholder' => 'Select a category',
@@ -72,21 +79,33 @@ class DocumentBulkUploadController extends AbstractController
                     return $repository->createQueryBuilder('c')
                         ->orderBy('c.name_nl', 'ASC');
                 },
-            ])
-            ->add('useFileDate', CheckboxType::class, [
+                ]
+            )
+            ->add(
+                'useFileDate',
+                CheckboxType::class,
+                [
                 'label' => 'Detect year from file date',
                 'required' => false,
                 'data' => true,
                 'help' => 'Automatically determine academic year from file creation/modification date',
-            ])
-            ->add('defaultYear', ChoiceType::class, [
+                ]
+            )
+            ->add(
+                'defaultYear',
+                ChoiceType::class,
+                [
                 'choices' => Document::getAcademicYearChoices(amountOfYears: 40),
                 'label' => 'Default Year',
                 'required' => false,
                 'data' => $this->getCurrentAcademicYear(),
                 'help' => 'This will be used as default when "Detect year from file date" is disabled or year cannot be determined',
-            ])
-            ->add('defaultTags', EntityType::class, [
+                ]
+            )
+            ->add(
+                'defaultTags',
+                EntityType::class,
+                [
                 'class' => Tag::class,
                 'choice_label' => 'name',
                 'label' => 'Default Tags',
@@ -94,27 +113,41 @@ class DocumentBulkUploadController extends AbstractController
                 'expanded' => false, // Keep as select, we'll customize the rendering
                 'required' => false,
                 'help' => 'These tags will be applied to all documents by default (filtered by selected course/category)',
-            ])
-            ->add('underReview', CheckboxType::class, [
+                ]
+            )
+            ->add(
+                'underReview',
+                CheckboxType::class,
+                [
                 'label' => 'Under Review',
                 'required' => false,
                 'data' => false,
                 'help' => 'Set to true if documents should be marked as under review',
-            ])
-            ->add('anonymous', CheckboxType::class, [
+                ]
+            )
+            ->add(
+                'anonymous',
+                CheckboxType::class,
+                [
                 'label' => 'Anonymous',
                 'required' => false,
                 'data' => true,
                 'help' => 'Set to true if documents should be marked as anonymous',
-            ])
-            ->add('files', FileType::class, [
+                ]
+            )
+            ->add(
+                'files',
+                FileType::class,
+                [
                 'label' => 'Documents',
                 'multiple' => true,
                 'mapped' => false,
                 'required' => true,
                 'constraints' => [
-                    new All([
-                        new FileConstraint([
+                    new All(
+                        [
+                        new FileConstraint(
+                            [
                             'maxSize' => '200M',
                             'mimeTypes' => [
                                 'application/pdf',
@@ -130,15 +163,22 @@ class DocumentBulkUploadController extends AbstractController
                                 'text/x-matlab',
                                 'text/x-python'
                             ],
-                        ]),
-                    ]),
+                            ]
+                        ),
+                        ]
+                    ),
                 ],
                 'help' => 'Select multiple documents to upload (PDF, Word, Excel, PowerPoint, or text files, max 200MB each)',
-            ])
-            ->add('submit', SubmitType::class, [
+                ]
+            )
+            ->add(
+                'submit',
+                SubmitType::class,
+                [
                 'label' => 'Upload & Preview',
                 'attr' => ['class' => 'btn btn-primary'],
-            ])
+                ]
+            )
             ->getForm();
         assert($form instanceof Form);
         $form->handleRequest($this->requestStack->getCurrentRequest());
@@ -152,9 +192,12 @@ class DocumentBulkUploadController extends AbstractController
             error_log($form->getErrors());
         }
 
-        return $this->render('admin/bulk_upload_form.html.twig', [
+        return $this->render(
+            'admin/bulk_upload_form.html.twig',
+            [
             'form' => $form->createView(),
-        ]);
+            ]
+        );
     }
 
     private function handleUpload(Form $form): Response
@@ -259,7 +302,9 @@ class DocumentBulkUploadController extends AbstractController
 
             // Store in session
             $session->set(self::SESSION_KEY, $documentsMetadata);
-            $session->set(self::SESSION_KEY . '_defaults', [
+            $session->set(
+                self::SESSION_KEY . '_defaults',
+                [
                 'course' => $courseId,
                 'category' => $categoryId,
                 'useFileDate' => $useFileDate,
@@ -267,7 +312,8 @@ class DocumentBulkUploadController extends AbstractController
                 'defaultTags' => $tagIds,
                 'underReview' => $underReview,
                 'anonymous' => $anonymous,
-            ]);
+                ]
+            );
 
             // Redirect to edit page
             return $this->redirectToRoute('admin_bulk_upload_edit_metadata');
@@ -310,14 +356,17 @@ class DocumentBulkUploadController extends AbstractController
             }
         }
 
-        return $this->render('admin/bulk_upload_edit.html.twig', [
+        return $this->render(
+            'admin/bulk_upload_edit.html.twig',
+            [
             'documents' => $documentsMetadata,
             'defaults' => $defaults,
             'courses' => $courseRepo->findBy([], ['name' => 'ASC']),
             'categories' => $categoryRepo->findBy([], ['name_nl' => 'ASC']),
             'tags' => $tagRepo->findAll(),
             'yearChoices' => Document::getAcademicYearChoices(amountOfYears: 40),
-        ]);
+            ]
+        );
     }
 
     #[AdminRoute('/bulk-upload/update-metadata', name: 'bulk_upload_update_metadata')]
@@ -511,9 +560,12 @@ class DocumentBulkUploadController extends AbstractController
 
         // Capitalize first letter of each word and trim
         $words = explode(' ', $nameWithSpaces);
-        $capitalizedWords = array_map(function ($word) {
-            return ucfirst(strtolower($word));
-        }, $words);
+        $capitalizedWords = array_map(
+            function ($word) {
+                return ucfirst(strtolower($word));
+            },
+            $words
+        );
 
         return trim(implode(' ', $capitalizedWords));
     }
@@ -562,12 +614,15 @@ class DocumentBulkUploadController extends AbstractController
         $tagRepository = $this->entityManager->getRepository(Tag::class);
         $tags = $tagRepository->findByCourseOrCategoryOrUnused($courseId, $categoryId);
 
-        $tagData = array_map(function (Tag $tag) {
-            return [
+        $tagData = array_map(
+            function (Tag $tag) {
+                return [
                 'id' => $tag->getId(),
                 'name' => $tag->getName(),
-            ];
-        }, $tags);
+                ];
+            },
+            $tags
+        );
 
         return $this->json($tagData);
     }
@@ -591,11 +646,13 @@ class DocumentBulkUploadController extends AbstractController
         $existingTag = $tagRepository->findOneBy(['name' => $tagName]);
 
         if ($existingTag) {
-            return $this->json([
+            return $this->json(
+                [
                 'id' => $existingTag->getId(),
                 'name' => $existingTag->getName(),
                 'existing' => true,
-            ]);
+                ]
+            );
         }
 
         // Create new tag
@@ -605,11 +662,14 @@ class DocumentBulkUploadController extends AbstractController
         $this->entityManager->persist($tag);
         $this->entityManager->flush();
 
-        return $this->json([
+        return $this->json(
+            [
             'id' => $tag->getId(),
             'name' => $tag->getName(),
             'existing' => false,
-        ], 201);
+            ],
+            201
+        );
     }
 
     private function cleanupTempFiles(array $documentsMetadata): void

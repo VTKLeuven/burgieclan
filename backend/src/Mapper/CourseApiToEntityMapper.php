@@ -17,8 +17,8 @@ use Symfonycasts\MicroMapper\MicroMapperInterface;
 class CourseApiToEntityMapper implements MapperInterface
 {
     public function __construct(
-        private readonly CourseRepository          $repository,
-        private readonly MicroMapperInterface      $microMapper,
+        private readonly CourseRepository $repository,
+        private readonly MicroMapperInterface $microMapper,
         private readonly PropertyAccessorInterface $propertyAccessor,
     ) {
     }
@@ -52,41 +52,61 @@ class CourseApiToEntityMapper implements MapperInterface
 
         $oldCourses = [];
         foreach ($from->oldCourses as $course) {
-            $oldCourses[] = $this->microMapper->map($course, Course::class, [
+            $oldCourses[] = $this->microMapper->map(
+                $course,
+                Course::class,
+                [
                 MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
+                ]
+            );
         }
         $this->propertyAccessor->setValue($to, 'oldCourses', $oldCourses);
 
         $newCourses = [];
         foreach ($from->newCourses as $course) {
-            $newCourses[] = $this->microMapper->map($course, Course::class, [
+            $newCourses[] = $this->microMapper->map(
+                $course,
+                Course::class,
+                [
                 MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
+                ]
+            );
         }
         $this->propertyAccessor->setValue($to, 'newCourses', $newCourses);
 
         $identicalCourses = [];
         foreach ($from->identicalCourses as $course) {
-            $identicalCourses[] = $this->microMapper->map($course, Course::class, [
+            $identicalCourses[] = $this->microMapper->map(
+                $course,
+                Course::class,
+                [
                 MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
+                ]
+            );
         }
         $this->propertyAccessor->setValue($to, 'identicalCourses', $identicalCourses);
 
         $modules = [];
         foreach ($from->modules as $module) {
-            $modules[] = $this->microMapper->map($module, Module::class, [
+            $modules[] = $this->microMapper->map(
+                $module,
+                Module::class,
+                [
                 MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
+                ]
+            );
         }
         $this->propertyAccessor->setValue($to, 'modules', $modules);
 
         $courseComments = [];
         foreach ($from->courseComments as $comment) {
-            $courseComments[] = $this->microMapper->map($comment, CourseComment::class, [
+            $courseComments[] = $this->microMapper->map(
+                $comment,
+                CourseComment::class,
+                [
                 MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
+                ]
+            );
         }
         $this->propertyAccessor->setValue($to, 'courseComments', $courseComments);
 

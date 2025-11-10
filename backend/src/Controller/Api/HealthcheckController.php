@@ -22,20 +22,26 @@ class HealthcheckController extends AbstractController
             $connection = $this->entityManager->getConnection();
             $connection->executeQuery('SELECT 1');
 
-            return new JsonResponse([
+            return new JsonResponse(
+                [
                 'status' => 'ok',
                 'timestamp' => date('c'),
                 'service' => 'burgieclan-api',
                 'database' => 'connected'
-            ], Response::HTTP_OK);
+                ],
+                Response::HTTP_OK
+            );
         } catch (Exception $e) {
-            return new JsonResponse([
+            return new JsonResponse(
+                [
                 'status' => 'error',
                 'timestamp' => date('c'),
                 'service' => 'burgieclan-api',
                 'database' => 'disconnected',
                 'error' => $e->getMessage()
-            ], Response::HTTP_SERVICE_UNAVAILABLE);
+                ],
+                Response::HTTP_SERVICE_UNAVAILABLE
+            );
         }
     }
 }

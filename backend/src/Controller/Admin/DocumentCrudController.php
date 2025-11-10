@@ -68,10 +68,12 @@ class DocumentCrudController extends AbstractCrudController
             ->renderAsSwitch(false);
         yield TextField::new('file')
             ->setFormType(VichFileType::class)
-            ->setFormTypeOptions([
+            ->setFormTypeOptions(
+                [
                 'download_label' => true,
                 'allow_delete' => false,
-            ])
+                ]
+            )
             ->hideOnIndex();
         yield TextField::new('file_name')
             ->onlyOnIndex();

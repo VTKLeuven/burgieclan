@@ -29,16 +29,16 @@ class AnonymousCreatorSortExtension implements QueryCollectionExtensionInterface
 
         $direction = $context['filters']['_anonymous_creator_sort']['direction'];
         $rootAlias = $queryBuilder->getRootAliases()[0];
-        
+
         // Join with creator table
         $creatorAlias = $queryNameGenerator->generateJoinAlias('creator');
         $queryBuilder->leftJoin("$rootAlias.creator", $creatorAlias);
-        
+
         // Use CASE statement to replace creator name with 'Anonymous' for anonymous documents
         $queryBuilder->addSelect(
             "CASE WHEN $rootAlias.anonymous = true THEN 'Anonymous' ELSE $creatorAlias.fullName END AS HIDDEN creatorSortName"
         );
-        
+
         // Sort by our computed field
         $queryBuilder->orderBy('creatorSortName', $direction);
     }

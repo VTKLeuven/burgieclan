@@ -15,24 +15,29 @@ class ProgramResourceTest extends ApiTestCase
     {
         ProgramFactory::createMany(5);
         $json = $this->browser()
-            ->get('/api/programs', [
+            ->get(
+                '/api/programs',
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
-            ->json()
-        ;
+            ->json();
 
-        $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
+        $this->assertSame(
+            array_keys($json->decoded()['hydra:member'][0]),
+            [
             '@id',
             '@type',
             'name',
             'modules',
-        ]);
+            ]
+        );
     }
 
     public function testGetOneProgram(): void
@@ -40,11 +45,14 @@ class ProgramResourceTest extends ApiTestCase
         $program = ProgramFactory::createOne();
 
         $this->browser()
-            ->get('/api/programs/' . $program->getId(), [
+            ->get(
+                '/api/programs/' . $program->getId(),
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/programs/' . $program->getId());
@@ -52,39 +60,50 @@ class ProgramResourceTest extends ApiTestCase
 
     public function testGetProgramFilterByName(): void
     {
-        $program1 = ProgramFactory::createOne([
+        $program1 = ProgramFactory::createOne(
+            [
             'name' => 'program1',
-        ]);
+            ]
+        );
 
-        $program2 = ProgramFactory::createOne([
+        $program2 = ProgramFactory::createOne(
+            [
             'name' => 'program2',
-        ]);
+            ]
+        );
 
-        $program3 = ProgramFactory::createOne([
+        $program3 = ProgramFactory::createOne(
+            [
             'name' => 'program3',
-        ]);
+            ]
+        );
 
         ProgramFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/programs?name=program2', [
+            ->get(
+                '/api/programs?name=program2',
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/programs?name=program', [
+            ->get(
+                '/api/programs?name=program',
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
-            ->assertJsonMatches('length("hydra:member")', 3)
-        ;
+            ->assertJsonMatches('length("hydra:member")', 3);
     }
 }
