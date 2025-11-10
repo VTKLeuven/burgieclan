@@ -1,0 +1,20 @@
+name: "Deploy Production Stack (Frontend + Backend)"
+
+on:
+  release:
+        types:
+            - published
+
+# Ensure only one deployment runs at a time
+concurrency:
+  group: deploy-production-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      environment: production
+      url: https://burgieclan.vtk.be
+    if: false

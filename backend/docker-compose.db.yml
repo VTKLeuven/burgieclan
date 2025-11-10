@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:18
+    volumes:
+      - burgieclan-db:/var/lib/postgresql/
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_PASSWORD: burgieclan_db_pass
+      POSTGRES_DB: burgieclan_db
+      POSTGRES_USER: burgieclan_db_user
+
+volumes:
+  burgieclan-db: {}

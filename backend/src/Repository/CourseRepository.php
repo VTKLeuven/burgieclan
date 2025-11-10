@@ -58,7 +58,6 @@ class CourseRepository extends ServiceEntityRepository
             $queryBuilder
                 ->orWhere('c.name LIKE :t_' . $key)
                 ->orWhere('c.code LIKE :t_' . $key)
-                ->orWhere('c.professors LIKE :t_' . $key)
                 ->setParameter('t_' . $key, '%' . $term . '%')
             ;
         }
@@ -68,8 +67,7 @@ class CourseRepository extends ServiceEntityRepository
             ->orderBy('c.name', 'ASC')
             ->setMaxResults($limit)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
 
         return $result;
     }
