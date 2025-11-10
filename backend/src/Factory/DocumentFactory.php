@@ -76,7 +76,7 @@ final class DocumentFactory extends PersistentProxyObjectFactory
         return function () {
             $tagsNeeded = self::faker()->numberBetween(1, 3);
             $totalTags = count(TagFactory::all());
-            
+
             // Only create extra tags if needed
             if ($totalTags < $tagsNeeded) {
                 for ($i = 0; $i < $tagsNeeded - $totalTags; $i++) {

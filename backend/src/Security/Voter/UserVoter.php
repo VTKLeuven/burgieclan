@@ -28,14 +28,17 @@ class UserVoter extends Voter
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
-        return in_array($attribute, [
+        return in_array(
+            $attribute,
+            [
                 self::VIEW_USERNAME,
                 self::VIEW_EMAIL,
                 self::VIEW_FAVORITES,
                 self::VIEW_USER_DEFAULT_ANONYMOUS,
                 self::PATCH_USER,
                 self::VIEW_VOTES,
-            ])
+            ]
+        )
             && $subject instanceof UserApi;
     }
 
@@ -57,9 +60,13 @@ class UserVoter extends Voter
             case self::VIEW_EMAIL:
             case self::VIEW_USERNAME:
                 // True if the current user is the same as the requested user
-                $requestedUser = $this->microMapper->map($subject, User::class, [
+                $requestedUser = $this->microMapper->map(
+                    $subject,
+                    User::class,
+                    [
                     MicroMapperInterface::MAX_DEPTH => 0,
-                ]);
+                    ]
+                );
 
                 if ($requestedUser == $currentUser) {
                     return true;

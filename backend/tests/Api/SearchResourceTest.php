@@ -17,36 +17,49 @@ class SearchResourceTest extends ApiTestCase
     public function testSearch(): void
     {
         CourseFactory::createMany(5);
-        $course = CourseFactory::createOne([
+        $course = CourseFactory::createOne(
+            [
             'name' => 'CoursewitUniqueName1',
-        ]);
+            ]
+        );
         ModuleFactory::createMany(5);
-        $module = ModuleFactory::createOne([
+        $module = ModuleFactory::createOne(
+            [
             'name' => 'ModulewitUniqueName1',
-        ]);
+            ]
+        );
         ProgramFactory::createMany(5);
-        $program = ProgramFactory::createOne([
+        $program = ProgramFactory::createOne(
+            [
             'name' => 'ProgramwitUniqueName1',
-        ]);
+            ]
+        );
         DocumentFactory::createMany(5);
-        $document = DocumentFactory::createOne([
+        $document = DocumentFactory::createOne(
+            [
             'name' => 'DocumentwitUniqueName1',
-        ]);
+            ]
+        );
 
         $json = $this->browser()
             ->get('/api/search?searchText=rsewitUnique')
             ->assertStatus(401)
-            ->get('/api/search?searchText=rsewitUnique', [
+            ->get(
+                '/api/search?searchText=rsewitUnique',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->json();
 
         $decoded_json = $json->decoded();
-        $this->assertSame(array_keys($decoded_json), [
+        $this->assertSame(
+            array_keys($decoded_json),
+            [
             '@context',
             '@id',
             '@type',
@@ -54,7 +67,8 @@ class SearchResourceTest extends ApiTestCase
             'modules',
             'programs',
             'documents',
-        ]);
+            ]
+        );
         $courses = $decoded_json['courses'];
         $this->assertSame(1, count($courses));
         $this->assertSame('/api/courses/' . $course->getId(), $courses[0]['@id']);
@@ -62,17 +76,22 @@ class SearchResourceTest extends ApiTestCase
         $json = $this->browser()
             ->get('/api/search?searchText=ulewitUniqueNa')
             ->assertStatus(401)
-            ->get('/api/search?searchText=ulewitUniqueName1', [
+            ->get(
+                '/api/search?searchText=ulewitUniqueName1',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->json();
 
         $decoded_json = $json->decoded();
-        $this->assertSame(array_keys($decoded_json), [
+        $this->assertSame(
+            array_keys($decoded_json),
+            [
             '@context',
             '@id',
             '@type',
@@ -80,7 +99,8 @@ class SearchResourceTest extends ApiTestCase
             'modules',
             'programs',
             'documents',
-        ]);
+            ]
+        );
         $modules = $decoded_json['modules'];
         $this->assertSame(1, count($modules));
         $this->assertSame('/api/modules/' . $module->getId(), $modules[0]['@id']);
@@ -88,17 +108,22 @@ class SearchResourceTest extends ApiTestCase
         $json = $this->browser()
             ->get('/api/search?searchText=gramwitUniqueNa')
             ->assertStatus(401)
-            ->get('/api/search?searchText=gramwitUniqueNa', [
+            ->get(
+                '/api/search?searchText=gramwitUniqueNa',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->json();
 
         $decoded_json = $json->decoded();
-        $this->assertSame(array_keys($decoded_json), [
+        $this->assertSame(
+            array_keys($decoded_json),
+            [
             '@context',
             '@id',
             '@type',
@@ -106,7 +131,8 @@ class SearchResourceTest extends ApiTestCase
             'modules',
             'programs',
             'documents',
-        ]);
+            ]
+        );
         $programs = $decoded_json['programs'];
         $this->assertSame(1, count($programs));
         $this->assertSame('/api/programs/' . $program->getId(), $programs[0]['@id']);
@@ -114,17 +140,22 @@ class SearchResourceTest extends ApiTestCase
         $json = $this->browser()
             ->get('/api/search?searchText=umentwitUniqueN')
             ->assertStatus(401)
-            ->get('/api/search?searchText=umentwitUniqueN', [
+            ->get(
+                '/api/search?searchText=umentwitUniqueN',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->json();
 
         $decoded_json = $json->decoded();
-        $this->assertSame(array_keys($decoded_json), [
+        $this->assertSame(
+            array_keys($decoded_json),
+            [
             '@context',
             '@id',
             '@type',
@@ -132,7 +163,8 @@ class SearchResourceTest extends ApiTestCase
             'modules',
             'programs',
             'documents',
-        ]);
+            ]
+        );
         $documents = $decoded_json['documents'];
         $this->assertSame(1, count($documents));
         $this->assertSame('/api/documents/' . $document->getId(), $documents[0]['@id']);
@@ -140,17 +172,22 @@ class SearchResourceTest extends ApiTestCase
         $json = $this->browser()
             ->get('/api/search?searchText=gwrergergherg')
             ->assertStatus(401)
-            ->get('/api/search?searchText=gwrergergherg', [
+            ->get(
+                '/api/search?searchText=gwrergergherg',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->json();
 
         $decoded_json = $json->decoded();
-        $this->assertSame(array_keys($decoded_json), [
+        $this->assertSame(
+            array_keys($decoded_json),
+            [
             '@context',
             '@id',
             '@type',
@@ -158,7 +195,8 @@ class SearchResourceTest extends ApiTestCase
             'modules',
             'programs',
             'documents',
-        ]);
+            ]
+        );
         $courses = $decoded_json['courses'];
         $modules = $decoded_json['modules'];
         $programs = $decoded_json['programs'];

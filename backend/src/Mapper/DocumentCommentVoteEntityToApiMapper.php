@@ -34,12 +34,20 @@ class DocumentCommentVoteEntityToApiMapper implements MapperInterface
         assert($to instanceof DocumentCommentVoteApi);
 
         $to->voteType = $from->getVoteType();
-        $to->documentComment = $this->microMapper->map($from->getDocumentComment(), DocumentCommentApi::class, [
+        $to->documentComment = $this->microMapper->map(
+            $from->getDocumentComment(),
+            DocumentCommentApi::class,
+            [
             MicroMapperInterface::MAX_DEPTH => 0,
-        ]);
-        $to->creator = $this->microMapper->map($from->getCreator(), UserApi::class, [
+            ]
+        );
+        $to->creator = $this->microMapper->map(
+            $from->getCreator(),
+            UserApi::class,
+            [
             MicroMapperInterface::MAX_DEPTH => 0,
-        ]);
+            ]
+        );
         $to->createdAt = $from->getCreateDate()->format('Y-m-d H:i:s');
         $to->updatedAt = $from->getUpdateDate()->format('Y-m-d H:i:s');
 

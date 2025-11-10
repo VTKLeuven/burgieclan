@@ -22,7 +22,9 @@ class DownloadZipResourceTest extends ApiTestCase
         $document = DocumentFactory::createOne();
 
         $this->browser()
-            ->post('/api/zip', [
+            ->post(
+                '/api/zip',
+                [
                 'headers' => [
                     'Content-Type' => 'application/ld+json',
                     'Authorization' => 'Bearer ' . $this->token
@@ -33,7 +35,8 @@ class DownloadZipResourceTest extends ApiTestCase
                     'courses' => ['/api/courses/' . $course->getId()],
                     'documents' => ['/api/documents/' . $document->getId()],
                 ],
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertHeaderContains('content-type', 'application/zip');
     }
@@ -41,7 +44,9 @@ class DownloadZipResourceTest extends ApiTestCase
     public function testDownloadZipFileNoContent()
     {
         $this->browser()
-            ->post('/api/zip', [
+            ->post(
+                '/api/zip',
+                [
                 'headers' => [
                     'Content-Type' => 'application/ld+json',
                     'Authorization' => 'Bearer ' . $this->token
@@ -52,14 +57,17 @@ class DownloadZipResourceTest extends ApiTestCase
                     'courses' => [],
                     'documents' => [],
                 ],
-            ])
+                ]
+            )
             ->assertStatus(204);
     }
 
     public function testDownloadZipFileInvalidData()
     {
         $this->browser()
-            ->post('/api/zip', [
+            ->post(
+                '/api/zip',
+                [
                 'headers' => [
                     'Content-Type' => 'application/ld+json',
                     'Authorization' => 'Bearer ' . $this->token
@@ -70,7 +78,8 @@ class DownloadZipResourceTest extends ApiTestCase
                     'courses' => 'invalid',
                     'documents' => 'invalid',
                 ],
-            ])
+                ]
+            )
             ->assertStatus(400);
     }
 }

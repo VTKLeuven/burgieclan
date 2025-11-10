@@ -11,11 +11,11 @@ use Doctrine\ORM\QueryBuilder;
 class AnonymousCreatorFilterExtension implements QueryCollectionExtensionInterface
 {
     public function applyToCollection(
-        QueryBuilder                $queryBuilder,
+        QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
-        string                      $resourceClass,
-        ?Operation                   $operation = null,
-        array                       $context = []
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = []
     ): void {
         // Only apply to Document entities
         if ($resourceClass !== Document::class) {

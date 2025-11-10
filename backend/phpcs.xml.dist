@@ -10,6 +10,33 @@
 
     <rule ref="PSR12"/>
 
+    <!-- Do not allow unreachable code. -->
+    <rule ref="Squiz.PHP.NonExecutableCode"/>
+
+    <!-- Do not allow ambiguous conditions. -->
+    <rule ref="Generic.CodeAnalysis.RequireExplicitBooleanOperatorPrecedence"/>
+
+    <!-- Forbidden functions and keywords -->
+    <rule ref="Generic.PHP.ForbiddenFunctions">
+        <properties>
+            <property name="forbiddenFunctions" type="array">
+                <element key="var_dump" value="dump"/>
+                <element key="exit" value="die"/>
+                <element key="die" value="die"/>
+                <element key="dd" value="dd"/>
+                <element key="dump" value="dump"/>
+                <element key="console.log" value="log"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Only one argument per line in multi-line function calls -->
+    <rule ref="PEAR.Functions.FunctionCallSignature">
+        <properties>
+            <property name="allowMultipleArguments" value="false"/>
+        </properties>
+    </rule>
+
     <file>bin/</file>
     <file>config/</file>
     <file>public/</file>

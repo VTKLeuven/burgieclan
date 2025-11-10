@@ -31,7 +31,8 @@ use ArrayObject;
                 summary: 'Logout user and invalidate refresh token',
                 description: 'Logs out the current user and invalidates their refresh token',
                 requestBody: new RequestBody(
-                    content: new ArrayObject([
+                    content: new ArrayObject(
+                        [
                         'application/json' => [
                             'schema' => [
                                 'type' => 'object',
@@ -43,7 +44,8 @@ use ArrayObject;
                                 ]
                             ]
                         ]
-                    ])
+                        ]
+                    )
                 )
             ),
             description: 'Logs out the current user and invalidates their refresh token',

@@ -29,12 +29,14 @@ class DocumentUnderReviewExtension implements QueryCollectionExtensionInterface
             // not under review OR created by the current user
             $paramName = $queryNameGenerator->generateParameterName('currentUserId');
             $queryBuilder
-                ->andWhere(sprintf(
-                    '(%s.under_review = false OR %s.creator = :%s)',
-                    $rootAlias,
-                    $rootAlias,
-                    $paramName
-                ))
+                ->andWhere(
+                    sprintf(
+                        '(%s.under_review = false OR %s.creator = :%s)',
+                        $rootAlias,
+                        $rootAlias,
+                        $paramName
+                    )
+                )
                 ->setParameter($paramName, $context['filters']['_under_review_filter']['currentUserId']);
         }
     }

@@ -84,8 +84,7 @@ final class AddUserCommand extends Command
                 null,
                 InputOption::VALUE_NONE,
                 'If set, the user is created as an administrator'
-            )
-        ;
+            );
     }
 
     /**
@@ -112,21 +111,24 @@ final class AddUserCommand extends Command
      */
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
-        if (null !== $input->getArgument('username') && null !== $input->getArgument('password') &&
+        if (
+            null !== $input->getArgument('username') && null !== $input->getArgument('password') &&
             null !== $input->getArgument('email') && null !== $input->getArgument('full-name')
         ) {
             return;
         }
 
         $this->io->title('Add User Command Interactive Wizard');
-        $this->io->text([
+        $this->io->text(
+            [
             'If you prefer to not use this interactive wizard, provide the',
             'arguments required by this command as follows:',
             '',
             ' $ php bin/console app:add-user username password email@example.com',
             '',
             'Now we\'ll ask you for the value of all the missing command arguments.',
-        ]);
+            ]
+        );
 
         // Ask for the username if it's not defined
         $username = $input->getArgument('username');
@@ -211,8 +213,13 @@ final class AddUserCommand extends Command
         $this->entityManager->flush();
 
         $this->io->success(
-            sprintf('%s was successfully created: %s (%s)', $isAdmin ?
-                'Administrator user' : 'User', $user->getUsername(), $user->getEmail())
+            sprintf(
+                '%s was successfully created: %s (%s)',
+                $isAdmin ?
+                'Administrator user' : 'User',
+                $user->getUsername(),
+                $user->getEmail()
+            )
         );
 
         $event = $stopwatch->stop('add-user-command');

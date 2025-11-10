@@ -16,7 +16,7 @@ class UserDocumentViewApiToEntityMapper implements MapperInterface
 {
     public function __construct(
         private readonly UserDocumentViewRepository $repository,
-        private readonly Security                $security,
+        private readonly Security $security,
         private readonly MicroMapperInterface $microMapper,
     ) {
     }
@@ -34,9 +34,13 @@ class UserDocumentViewApiToEntityMapper implements MapperInterface
                 throw new Exception('UserDocumentView not found');
             }
         } else {
-            $document = $this->microMapper->map($from->document, Document::class, [
+            $document = $this->microMapper->map(
+                $from->document,
+                Document::class,
+                [
                 MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
+                ]
+            );
             $user = $this->security->getUser();
             assert($user instanceof User);
             $entity = new UserDocumentView(

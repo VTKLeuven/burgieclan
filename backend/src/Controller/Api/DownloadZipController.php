@@ -23,9 +23,9 @@ final class DownloadZipController extends AbstractController
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
-        private readonly DocumentRepository   $documentRepository,
-        private readonly StorageInterface     $storage,
-        private readonly KernelInterface      $kernel,
+        private readonly DocumentRepository $documentRepository,
+        private readonly StorageInterface $storage,
+        private readonly KernelInterface $kernel,
     ) {
     }
 
@@ -52,9 +52,16 @@ final class DownloadZipController extends AbstractController
 
     private function mapEntities(array $entities, string $class): array
     {
-        return array_map(fn($entity) => $this->microMapper->map($entity, $class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
-        ]), $entities);
+        return array_map(
+            fn($entity) => $this->microMapper->map(
+                $entity,
+                $class,
+                [
+                MicroMapperInterface::MAX_DEPTH => 0,
+                ]
+            ),
+            $entities
+        );
     }
 
     /**
@@ -121,10 +128,10 @@ final class DownloadZipController extends AbstractController
 
     private function createZipFile(
         string $contentHash,
-        array  $programs,
-        array  $modules,
-        array  $courses,
-        array  $documents
+        array $programs,
+        array $modules,
+        array $courses,
+        array $documents
     ): string {
         $fileName = sprintf('%s/data/exports/%s.zip', $this->kernel->getProjectDir(), $contentHash);
 
@@ -752,9 +759,12 @@ final class DownloadZipController extends AbstractController
 
         // Tags field
         if (count($document->getTags()) > 0) {
-            $tagNames = array_map(function ($tag) {
-                return $tag->getName();
-            }, $document->getTags()->toArray());
+            $tagNames = array_map(
+                function ($tag) {
+                    return $tag->getName();
+                },
+                $document->getTags()->toArray()
+            );
 
             $html .= '<div class="tag-container">';
             foreach ($tagNames as $tag) {
@@ -1008,42 +1018,44 @@ final class DownloadZipController extends AbstractController
         $fileSize = filesize($fileName);
         // TODO check if this works on a proper production server. With big files (5GB) it fills up the memory.
         // This could be because of the symfony development server
-        $response = new StreamedResponse(function () use ($fileName, $fileSize) {
-            $handle = fopen($fileName, 'rb');
+        $response = new StreamedResponse(
+            function () use ($fileName, $fileSize) {
+                $handle = fopen($fileName, 'rb');
 
-            if ($handle === false) {
-                throw new RuntimeException('Could not open file for reading');
-            }
+                if ($handle === false) {
+                    throw new RuntimeException('Could not open file for reading');
+                }
 
-            $length = $fileSize;
-            $request = Request::createFromGlobals();
+                $length = $fileSize;
+                $request = Request::createFromGlobals();
 
             // Handle range requests
-            if ($request->headers->has('Range')) {
-                $range = $request->headers->get('Range');
-                if (preg_match('/bytes=(\d+)-(\d+)?/', $range, $matches)) {
-                    $start = intval($matches[1]);
-                    $length = isset($matches[2]) ? (intval($matches[2]) - $start + 1) : ($fileSize - $start);
-                    fseek($handle, $start);
+                if ($request->headers->has('Range')) {
+                    $range = $request->headers->get('Range');
+                    if (preg_match('/bytes=(\d+)-(\d+)?/', $range, $matches)) {
+                        $start = intval($matches[1]);
+                        $length = isset($matches[2]) ? (intval($matches[2]) - $start + 1) : ($fileSize - $start);
+                        fseek($handle, $start);
+                    }
                 }
-            }
 
-            $remaining = $length;
-            $chunkSize = 8192; // 8KB chunks
+                $remaining = $length;
+                $chunkSize = 8192; // 8KB chunks
 
-            while ($remaining > 0 && !feof($handle)) {
-                $readSize = min($chunkSize, $remaining);
-                $buffer = fread($handle, $readSize);
-                if ($buffer === false) {
-                    break;
+                while ($remaining > 0 && !feof($handle)) {
+                    $readSize = min($chunkSize, $remaining);
+                    $buffer = fread($handle, $readSize);
+                    if ($buffer === false) {
+                        break;
+                    }
+                    echo $buffer;
+                    flush();
+                    $remaining -= strlen($buffer);
                 }
-                echo $buffer;
-                flush();
-                $remaining -= strlen($buffer);
-            }
 
-            fclose($handle);
-        });
+                fclose($handle);
+            }
+        );
 
         $response->headers->set('Content-Type', 'application/zip');
         $response->headers->set('Content-Disposition', 'attachment;filename="' . $displayFilename . '"');
