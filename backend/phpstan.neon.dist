@@ -6,3 +6,7 @@ parameters:
     tmpDir: var/cache/phpstan
     excludePaths:
         - vendor
+    # TODO remove this error if api-platform updates their library.
+    # The function exists and works, but phpstan can't find it
+    ignoreErrors:
+        - '#Call to an undefined method ApiPlatform\\Metadata\\IriConverterInterface::getResourceFromIri\(\)\.#'
