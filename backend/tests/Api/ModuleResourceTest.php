@@ -14,71 +14,95 @@ class ModuleResourceTest extends ApiTestCase
 
     public function testGetCollectionOfModules(): void
     {
-        ModuleFactory::createMany(5, [
+        ModuleFactory::createMany(
+            5,
+            [
             'program' => ProgramFactory::createOne(),
             'modules' => [], // Ensure no nested modules
-        ]);
+            ]
+        );
         $json = $this->browser()
-            ->get('/api/modules', [
+            ->get(
+                '/api/modules',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
             ->json();
 
-        $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
+        $this->assertSame(
+            array_keys($json->decoded()['hydra:member'][0]),
+            [
             '@id',
             '@type',
             'name',
             'courses',
             'modules',
             'program',
-        ]);
+            ]
+        );
     }
 
     public function testGetCollectionOfModulesWithNoProgram(): void
     {
-        ModuleFactory::createMany(5, [
+        ModuleFactory::createMany(
+            5,
+            [
             'program' => null,
             'modules' => [], // Ensure no nested modules
-        ]);
+            ]
+        );
         $json = $this->browser()
-            ->get('/api/modules', [
+            ->get(
+                '/api/modules',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
             ->json();
 
-        $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
+        $this->assertSame(
+            array_keys($json->decoded()['hydra:member'][0]),
+            [
             '@id',
             '@type',
             'name',
             'courses',
             'modules',
-        ]);
+            ]
+        );
     }
 
     public function testGetCollectionOfModulesWithSubmodules(): void
     {
         // Create 3 modules, each with 2 submodules
-        ModuleFactory::createMany(3, [
+        ModuleFactory::createMany(
+            3,
+            [
             'modules' => ModuleFactory::new(['modules' => []])->many(2),
-        ]);
+            ]
+        );
         $json = $this->browser()
-            ->get('/api/modules', [
+            ->get(
+                '/api/modules',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('length("hydra:member")', 9) // 3 parents + 6 submodules
@@ -97,16 +121,21 @@ class ModuleResourceTest extends ApiTestCase
     public function testGetOneModuleWithSubmodules(): void
     {
         $submodules = ModuleFactory::createMany(2);
-        $module = ModuleFactory::createOne([
+        $module = ModuleFactory::createOne(
+            [
             'modules' => $submodules,
-        ]);
+            ]
+        );
 
         $json = $this->browser()
-            ->get('/api/modules/' . $module->getId(), [
+            ->get(
+                '/api/modules/' . $module->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->json();
@@ -124,11 +153,14 @@ class ModuleResourceTest extends ApiTestCase
         $module = ModuleFactory::createOne();
 
         $this->browser()
-            ->get('/api/modules/' . $module->getId(), [
+            ->get(
+                '/api/modules/' . $module->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/modules/' . $module->getId());
@@ -136,35 +168,47 @@ class ModuleResourceTest extends ApiTestCase
 
     public function testGetModuleFilterByName(): void
     {
-        $module1 = ModuleFactory::createOne([
+        $module1 = ModuleFactory::createOne(
+            [
             'name' => 'testmodule1',
-        ]);
+            ]
+        );
 
-        $module2 = ModuleFactory::createOne([
+        $module2 = ModuleFactory::createOne(
+            [
             'name' => 'testmodule2',
-        ]);
+            ]
+        );
 
-        $module3 = ModuleFactory::createOne([
+        $module3 = ModuleFactory::createOne(
+            [
             'name' => 'testmodule3',
-        ]);
+            ]
+        );
 
         ModuleFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/modules?name=module2', [
+            ->get(
+                '/api/modules?name=module2',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/modules?name=testmodule', [
+            ->get(
+                '/api/modules?name=testmodule',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)

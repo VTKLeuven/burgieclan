@@ -17,18 +17,22 @@ class AnnouncementResourceTest extends ApiTestCase
     {
         AnnouncementFactory::createMany(5);
         $json = $this->browser()
-            ->get('/api/announcements', [
+            ->get(
+                '/api/announcements',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
             ->json();
 
-        $this->assertEqualsCanonicalizing([
+        $this->assertEqualsCanonicalizing(
+            [
             '@id',
             '@type',
             'title',
@@ -39,7 +43,9 @@ class AnnouncementResourceTest extends ApiTestCase
             'createdAt',
             'updatedAt',
             'priority',
-        ], array_keys($json->decoded()['hydra:member'][0]));
+            ],
+            array_keys($json->decoded()['hydra:member'][0])
+        );
     }
 
     public function testGetOneAnnouncement(): void
@@ -47,11 +53,14 @@ class AnnouncementResourceTest extends ApiTestCase
         $announcement = AnnouncementFactory::createOne();
 
         $this->browser()
-            ->get('/api/announcements/' . $announcement->getId(), [
+            ->get(
+                '/api/announcements/' . $announcement->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/announcements/' . $announcement->getId());
@@ -59,214 +68,275 @@ class AnnouncementResourceTest extends ApiTestCase
 
     public function testGetAnnouncementFilterByTitle(): void
     {
-        $announcement1 = AnnouncementFactory::createOne([
+        $announcement1 = AnnouncementFactory::createOne(
+            [
             'title_nl' => 'testannouncement1',
             'title_en' => 'testannouncement1_en',
-        ]);
+            ]
+        );
 
-        $announcement2 = AnnouncementFactory::createOne([
+        $announcement2 = AnnouncementFactory::createOne(
+            [
             'title_nl' => 'testannouncement2',
             'title_en' => 'testannouncement2_en',
-        ]);
+            ]
+        );
 
-        $announcement3 = AnnouncementFactory::createOne([
+        $announcement3 = AnnouncementFactory::createOne(
+            [
             'title_nl' => 'testannouncement3',
             'title_en' => 'testannouncement3_en',
-        ]);
+            ]
+        );
 
         AnnouncementFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/announcements?title=testannouncement2', [
+            ->get(
+                '/api/announcements?title=testannouncement2',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/announcements?title=testannouncement', [
+            ->get(
+                '/api/announcements?title=testannouncement',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
-            ->assertJsonMatches('length("hydra:member")', 3)
-        ;
+            ->assertJsonMatches('length("hydra:member")', 3);
     }
 
     public function testGetAnnouncementFilterByContent(): void
     {
-        $announcement1 = AnnouncementFactory::createOne([
+        $announcement1 = AnnouncementFactory::createOne(
+            [
             'content_nl' => 'testannouncement1',
             'content_en' => 'testannouncement1_en',
-        ]);
+            ]
+        );
 
-        $announcement2 = AnnouncementFactory::createOne([
+        $announcement2 = AnnouncementFactory::createOne(
+            [
             'content_nl' => 'testannouncement2',
             'content_en' => 'testannouncement2_en',
-        ]);
+            ]
+        );
 
-        $announcement3 = AnnouncementFactory::createOne([
+        $announcement3 = AnnouncementFactory::createOne(
+            [
             'content_nl' => 'testannouncement3',
             'content_en' => 'testannouncement3_en',
-        ]);
+            ]
+        );
 
         AnnouncementFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/announcements?content=testannouncement2', [
+            ->get(
+                '/api/announcements?content=testannouncement2',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/announcements?content=testannouncement', [
+            ->get(
+                '/api/announcements?content=testannouncement',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
-            ->assertJsonMatches('length("hydra:member")', 3)
-        ;
+            ->assertJsonMatches('length("hydra:member")', 3);
     }
 
     public function testGetAnnouncementFilterByStartTime(): void
     {
         $startTime1 = (new DateTime());
-        $announcement1 = AnnouncementFactory::createOne([
+        $announcement1 = AnnouncementFactory::createOne(
+            [
             'startTime' => $startTime1,
-        ]);
+            ]
+        );
 
         $startTime2 = (new DateTime())->add(new DateInterval('P1D'));
-        $announcement2 = AnnouncementFactory::createOne([
+        $announcement2 = AnnouncementFactory::createOne(
+            [
             'startTime' => $startTime2,
-        ]);
+            ]
+        );
 
         $startTime3 = (new DateTime())->add(new DateInterval('P2D'));
-        $announcement3 = AnnouncementFactory::createOne([
+        $announcement3 = AnnouncementFactory::createOne(
+            [
             'startTime' => $startTime3,
-        ]);
+            ]
+        );
 
         $this->browser()
-            ->get('/api/announcements?startTime[before]=' . $startTime2->format('Y-m-d H:i:s'), [
+            ->get(
+                '/api/announcements?startTime[before]=' . $startTime2->format('Y-m-d H:i:s'),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->get('/api/announcements?startTime[strictly_before]=' . $startTime2->format('Y-m-d H:i:s'), [
+            ->get(
+                '/api/announcements?startTime[strictly_before]=' . $startTime2->format('Y-m-d H:i:s'),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/announcements?startTime[after]=' . $startTime2->format('Y-m-d H:i:s'), [
+            ->get(
+                '/api/announcements?startTime[after]=' . $startTime2->format('Y-m-d H:i:s'),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->get('/api/announcements?startTime[strictly_after]=' . $startTime2->format('Y-m-d H:i:s'), [
+            ->get(
+                '/api/announcements?startTime[strictly_after]=' . $startTime2->format('Y-m-d H:i:s'),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
-            ->assertJsonMatches('length("hydra:member")', 1)
-        ;
+            ->assertJsonMatches('length("hydra:member")', 1);
     }
 
     public function testGetAnnouncementFilterByEndTime(): void
     {
         $endTime1 = (new DateTime());
-        $announcement1 = AnnouncementFactory::createOne([
+        $announcement1 = AnnouncementFactory::createOne(
+            [
             'endTime' => $endTime1,
-        ]);
+            ]
+        );
 
         $endTime2 = (new DateTime())->add(new DateInterval('P1D'));
-        $announcement2 = AnnouncementFactory::createOne([
+        $announcement2 = AnnouncementFactory::createOne(
+            [
             'endTime' => $endTime2,
-        ]);
+            ]
+        );
 
         $endTime3 = (new DateTime())->add(new DateInterval('P2D'));
-        $announcement3 = AnnouncementFactory::createOne([
+        $announcement3 = AnnouncementFactory::createOne(
+            [
             'endTime' => $endTime3,
-        ]);
+            ]
+        );
 
         $this->browser()
-            ->get('/api/announcements?endTime[before]=' . $endTime2->format('Y-m-d H:i:s'), [
+            ->get(
+                '/api/announcements?endTime[before]=' . $endTime2->format('Y-m-d H:i:s'),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->get('/api/announcements?endTime[strictly_before]=' . $endTime2->format('Y-m-d H:i:s'), [
+            ->get(
+                '/api/announcements?endTime[strictly_before]=' . $endTime2->format('Y-m-d H:i:s'),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/announcements?endTime[after]=' . $endTime2->format('Y-m-d H:i:s'), [
+            ->get(
+                '/api/announcements?endTime[after]=' . $endTime2->format('Y-m-d H:i:s'),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->get('/api/announcements?endTime[strictly_after]=' . $endTime2->format('Y-m-d H:i:s'), [
+            ->get(
+                '/api/announcements?endTime[strictly_after]=' . $endTime2->format('Y-m-d H:i:s'),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
-            ->assertJsonMatches('length("hydra:member")', 1)
-        ;
+            ->assertJsonMatches('length("hydra:member")', 1);
     }
 
     public function testGetAnnouncementWithLanguageParameter(): void
     {
-        $announcement = AnnouncementFactory::createOne([
+        $announcement = AnnouncementFactory::createOne(
+            [
             'title_nl' => 'Nederlandse titel',
             'title_en' => 'English title',
             'content_nl' => 'Nederlandse inhoud',
             'content_en' => 'English content',
-        ]);
+            ]
+        );
 
         // Test Dutch (default)
         $json = $this->browser()
-            ->get('/api/announcements/' . $announcement->getId(), [
+            ->get(
+                '/api/announcements/' . $announcement->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('title', 'Nederlandse titel')
@@ -275,11 +345,14 @@ class AnnouncementResourceTest extends ApiTestCase
 
         // Test Dutch explicitly
         $this->browser()
-            ->get('/api/announcements/' . $announcement->getId() . '?lang=nl', [
+            ->get(
+                '/api/announcements/' . $announcement->getId() . '?lang=nl',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('title', 'Nederlandse titel')
@@ -287,11 +360,14 @@ class AnnouncementResourceTest extends ApiTestCase
 
         // Test English
         $this->browser()
-            ->get('/api/announcements/' . $announcement->getId() . '?lang=en', [
+            ->get(
+                '/api/announcements/' . $announcement->getId() . '?lang=en',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('title', 'English title')
@@ -300,27 +376,34 @@ class AnnouncementResourceTest extends ApiTestCase
 
     public function testGetAnnouncementCollectionWithLanguageParameter(): void
     {
-        $announcement1 = AnnouncementFactory::createOne([
+        $announcement1 = AnnouncementFactory::createOne(
+            [
             'title_nl' => 'Nederlandse titel 1',
             'title_en' => 'English title 1',
             'content_nl' => 'Nederlandse inhoud 1',
             'content_en' => 'English content 1',
-        ]);
+            ]
+        );
 
-        $announcement2 = AnnouncementFactory::createOne([
+        $announcement2 = AnnouncementFactory::createOne(
+            [
             'title_nl' => 'Nederlandse titel 2',
             'title_en' => 'English title 2',
             'content_nl' => 'Nederlandse inhoud 2',
             'content_en' => 'English content 2',
-        ]);
+            ]
+        );
 
         // Test Dutch (default)
         $json = $this->browser()
-            ->get('/api/announcements', [
+            ->get(
+                '/api/announcements',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
@@ -331,11 +414,14 @@ class AnnouncementResourceTest extends ApiTestCase
 
         // Test English
         $json = $this->browser()
-            ->get('/api/announcements?lang=en', [
+            ->get(
+                '/api/announcements?lang=en',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
@@ -348,20 +434,25 @@ class AnnouncementResourceTest extends ApiTestCase
     public function testGetAnnouncementLanguageFallback(): void
     {
         // Create announcement with only Dutch content (English fields empty but not null)
-        $announcement = AnnouncementFactory::createOne([
+        $announcement = AnnouncementFactory::createOne(
+            [
             'title_nl' => 'Nederlandse titel',
             'title_en' => '',
             'content_nl' => 'Nederlandse inhoud',
             'content_en' => '',
-        ]);
+            ]
+        );
 
         // Test English request should fallback to Dutch
         $this->browser()
-            ->get('/api/announcements/' . $announcement->getId() . '?lang=en', [
+            ->get(
+                '/api/announcements/' . $announcement->getId() . '?lang=en',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('title', 'Nederlandse titel')

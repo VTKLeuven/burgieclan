@@ -30,14 +30,17 @@ class TagCrudController extends AbstractCrudController
             // For edit/new forms, customize the dropdown display
             yield AssociationField::new('documents')
                 ->setLabel('Documents')
-                ->setFormTypeOption('choice_label', function ($document) {
-                    return sprintf(
-                        '%s (%s, %s)',
-                        $document->getName(),
-                        $document->getCourse()->getName(),
-                        $document->getCategory()->getName()
-                    );
-                })
+                ->setFormTypeOption(
+                    'choice_label',
+                    function ($document) {
+                        return sprintf(
+                            '%s (%s, %s)',
+                            $document->getName(),
+                            $document->getCourse()->getName(),
+                            $document->getCategory()->getName()
+                        );
+                    }
+                )
                 ->setFormTypeOption('by_reference', false); // This is crucial for ManyToMany
         }
     }

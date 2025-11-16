@@ -14,7 +14,7 @@ class NodeTest extends KernelTestCase
      */
     private function createNodeInstance(User $creator): Node
     {
-        return new class($creator) extends Node {
+        return new class ($creator) extends Node {
             // Anonymous class that extends Node with no additional implementation needed
         };
     }

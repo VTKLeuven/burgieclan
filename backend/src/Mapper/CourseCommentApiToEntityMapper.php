@@ -19,7 +19,7 @@ class CourseCommentApiToEntityMapper implements MapperInterface
 {
     public function __construct(
         private readonly CourseCommentRepository $repository,
-        private readonly Security                $security,
+        private readonly Security $security,
         private readonly MicroMapperInterface $microMapper,
     ) {
     }
@@ -49,12 +49,24 @@ class CourseCommentApiToEntityMapper implements MapperInterface
 
         $to->setContent($from->content);
         $to->setAnonymous($from->anonymous);
-        $to->setCourse($this->microMapper->map($from->course, Course::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
-        ]));
-        $to->setCategory($this->microMapper->map($from->category, CommentCategory::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
-        ]));
+        $to->setCourse(
+            $this->microMapper->map(
+                $from->course,
+                Course::class,
+                [
+                MicroMapperInterface::MAX_DEPTH => 0,
+                ]
+            )
+        );
+        $to->setCategory(
+            $this->microMapper->map(
+                $from->category,
+                CommentCategory::class,
+                [
+                MicroMapperInterface::MAX_DEPTH => 0,
+                ]
+            )
+        );
 
         return $to;
     }

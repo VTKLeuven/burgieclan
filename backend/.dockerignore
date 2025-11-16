@@ -1,7 +1,59 @@
+# Git
 .git
+.gitignore
+.github
+
+# Environment files
 .env
 .env.local
 .env.*.local
+
+# Development tools
+.editorconfig
+phpcs.xml.dist
+phpunit.xml.dist
+
+# Testing
+/tests/
+.phpunit.cache
 .phpunit.result.cache
-/vendor/
-/var/
+
+# Dependencies (will be installed during build)
+vendor/
+
+# Cache and logs (will be created during build)
+var/
+
+# Node modules (will be installed during build)
+node_modules/
+
+# Built frontend assets (will be built during Docker build)
+public/build/
+
+# Bundles
+public/bundles/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Data directory (contains local data)
+data/
+
+# JWT keys
+*.pem
+
+# Documentation
+README.md
+LICENSE
+
+# Docker and build files
+docker-compose*.yml
+Makefile

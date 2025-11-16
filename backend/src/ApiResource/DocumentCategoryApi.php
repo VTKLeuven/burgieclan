@@ -31,8 +31,12 @@ class DocumentCategoryApi
     public ?int $id = null;
 
     #[Assert\NotBlank]
-    #[ApiFilter(MultiLangSearchFilter::class, properties: [
-        'name' => ['name_nl', 'name_en']])]
+    #[ApiFilter(
+        MultiLangSearchFilter::class,
+        properties: [
+        'name' => ['name_nl',
+        'name_en']]
+    )]
     #[Groups(['document:get'])]
     public ?string $name = null;
 }

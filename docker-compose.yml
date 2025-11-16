@@ -1,53 +1,51 @@
 services:
   db:
-    image: mysql:8.0
+    image: postgres:18
     container_name: burgieclan-db
     volumes:
-      - burgieclan-db:/var/lib/mysql
+      - burgieclan-db:/var/lib/postgresql
     ports:
-      - '3306:3306'
+      - '5432:5432'
     environment:
-      MYSQL_ROOT_PASSWORD: burgieclan_db_root
-      MYSQL_DATABASE: burgieclan_db
-      MYSQL_USER: burgieclan_db_user
-      MYSQL_PASSWORD: burgieclan_db_pass
+      POSTGRES_PASSWORD: burgieclan_db_pass
+      POSTGRES_DB: burgieclan_db
+      POSTGRES_USER: burgieclan_db_user
     networks:
       - burgieclan-network
 
   backend:
     container_name: burgieclan-backend
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./backend/.docker/dev/Dockerfile
     volumes:
-      - ./backend:/var/www/html:cached
-      - ./.git:/var/www/html/.git:cached
-      - backend-vendor:/var/www/html/vendor
-      - backend-var:/var/www/html/var:delegated
-      - ./php.dev.ini:/usr/local/etc/php/conf.d/php.dev.ini:ro
+      - .:/app
+      - backend-vendor:/app/backend/vendor
+      - backend-var:/app/backend/var
+      - ./backend/php.dev.ini:/usr/local/etc/php/conf.d/php.dev.ini:ro
     ports:
       - "8000:8000"
     depends_on:
       - db
     environment:
-      DATABASE_URL: "mysql://burgieclan_db_user:burgieclan_db_pass@db:3306/burgieclan_db?serverVersion=8.0"
-      APP_ENV: dev
+      DATABASE_URL: "postgresql://burgieclan_db_user:burgieclan_db_pass@db:5432/burgieclan_db?serverVersion=18&charset=utf8"
+      LITUS_API_KEY: ${LITUS_API_KEY:?LITUS_API_KEY is required}
     networks:
       - burgieclan-network
 
   frontend:
     container_name: burgieclan-frontend
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./frontend/.docker/dev/Dockerfile
     volumes:
-      - ./frontend:/app:cached
-      - frontend-node-modules:/app/node_modules
-      - frontend-next:/app/.next:delegated
+      - .:/app
+      - frontend-node-modules:/app/frontend/node_modules
+      - frontend-next:/app/frontend/.next:delegated
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_BACKEND_URL=http://burgieclan-backend:8000
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
       - NEXT_PUBLIC_FRONTEND_URL=http://localhost:3000
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
@@ -55,6 +53,8 @@ services:
       - backend
     networks:
       - burgieclan-network
+    extra_hosts:
+      - "localhost:host-gateway"
 
 networks:
   burgieclan-network:

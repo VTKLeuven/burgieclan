@@ -16,10 +16,10 @@ class TagDocumentCategoryFilter extends AbstractFilter
     private IriConverterInterface $iriConverter;
 
     public function __construct(
-        ManagerRegistry         $managerRegistry,
-        IriConverterInterface   $iriConverter,
-        ?LoggerInterface        $logger = null,
-        ?array                  $properties = null,
+        ManagerRegistry $managerRegistry,
+        IriConverterInterface $iriConverter,
+        ?LoggerInterface $logger = null,
+        ?array $properties = null,
         ?NameConverterInterface $nameConverter = null
     ) {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
@@ -28,13 +28,13 @@ class TagDocumentCategoryFilter extends AbstractFilter
     }
 
     protected function filterProperty(
-        string                      $property,
+        string $property,
         $value,
-        QueryBuilder                $queryBuilder,
+        QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
-        string                      $resourceClass,
-        ?Operation                  $operation = null,
-        array                       $context = []
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = []
     ): void {
         if ($property !== 'category') {
             return;

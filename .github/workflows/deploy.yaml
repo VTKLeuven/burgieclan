@@ -1,131 +1,135 @@
-name: "Deploy to test"
+name: "Deploy Stack (Frontend + Backend)"
 
 on:
-  push:
-    branches:
-      - test
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      url:
+        type: string
+        required: true
+    secrets:
+      SSH_USER:
+        required: true
+      SSH_HOST:
+        required: true
+      SSH_PRIVATE_KEY:
+        required: true
 
 jobs:
-  git_pull:
-    name: Git pull
+  build_backend:
+    name: Build Backend
+    uses: ./.github/workflows/build-backend.yaml
+    with:
+      environment: ${{ inputs.environment }}
+      url: ${{ inputs.url }}
+
+  build_frontend:
+    name: Build Frontend
+    uses: ./.github/workflows/build-frontend.yaml
+    with:
+      environment: ${{ inputs.environment }}
+      url: ${{ inputs.url }}
+
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
-    outputs:
-      release_timestamp: ${{ steps.set-timestamp.outputs.timestamp }}
+    needs: [build_backend, build_frontend]
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ inputs.url }}
 
     steps:
-      - name: Install ssh keys
-        # check this thread to understand why its needed:
-        # https://stackoverflow.com/a/70447517
+      - name: Setup SSH access
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
-      - name: Connect and fetch
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git fetch && git reset --hard origin/test"
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          ssh-keyscan -H "$SSH_HOST" > ~/.ssh/known_hosts
 
-      # Create shared timestamp for both jobs
-      - name: Create release timestamp
-        id: set-timestamp
+      - name: Pull and deploy containers
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
-          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+          ssh "$SSH_USER@$SSH_HOST" << 'EOF'
+            # Variables
+            DEPLOY_DIR="${{ vars.DEPLOY_DIR }}"
+            
+            # Set IMAGE_TAG based on environment
+            if [ "${{ inputs.environment }}" = "production" ]; then
+              IMAGE_TAG="prod"
+            else
+              IMAGE_TAG="test"
+            fi
+            export IMAGE_TAG
 
-  deploy_backend:
-    name: Deploy Backend
-    runs-on: ubuntu-latest
-    needs: git_pull
-    steps:
-      - name: Install ssh keys
-        # check this thread to understand why its needed:
-        # https://stackoverflow.com/a/70447517
-        run: |
-          install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
-      # Prepare new release in a separate directory
-      - name: Backend - Prepare new release
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
-          RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
-          mkdir -p \$RELEASE_DIR && \
-          # Create data directory only if it doesn't exist
-          if [ ! -d ${{ secrets.DATA_DIR }} ]; then \
-            mkdir -p ${{ secrets.DATA_DIR }} ; \
-          fi && \
-          cp -r ${{ secrets.WORK_DIR_BACKEND }}/* \$RELEASE_DIR/ && \
-          # Copy environment file properly
-          if [ -f ${{ secrets.WORK_DIR_BACKEND }}/.env.local.php ]; then \
-            cp ${{ secrets.WORK_DIR_BACKEND }}/.env.local.php \$RELEASE_DIR/ ; \
-          fi && \
-          # Remove release data dir and symlink to shared data
-          rm -rf \$RELEASE_DIR/data && \
-          ln -sfn ${{ secrets.DATA_DIR }} \$RELEASE_DIR/data && \
-          cd \$RELEASE_DIR && \
-          composer install --no-dev --optimize-autoloader && \
-          bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration && \
-          bin/console cache:clear --env=prod && \
-          bin/console cache:warmup --env=prod"
-      # Switch to new release with minimal downtime
-      - name: Backend - Switch to new release
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/backend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
-          ln -sfn \$RELEASE_DIR ${{ secrets.DEPLOY_PATH }}/backend/current && \
-          sudo systemctl reload php8.4-fpm"
-      # Cleanup old releases keeping last 2
-      - name: Cleanup old backend releases
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOY_PATH }}/backend/releases && ls -t | tail -n +3 | xargs rm -rf"
+            # Ensure DEPLOY_DIR is present
+            if [ ! -d $DEPLOY_DIR ]; then
+              echo "❌ DEPLOY_DIR does not exist"
+              exit 1
+            fi
+            
+            # Change to deployment directory
+            cd $DEPLOY_DIR
+            
+            # Ensure data directory is present
+            if [ ! -d ${{ vars.DATA_DIR }} ]; then
+              echo "❌ Data directory does not exist"
+              exit 1
+            fi
 
-  deploy_frontend:
-    name: Deploy Frontend
-    runs-on: ubuntu-latest
-    needs: git_pull
-    steps:
-      - name: Install ssh keys
-        run: |
-          install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+            # Ensure JWT directory is present
+            if [ ! -d ${{ vars.JWT_DIR }} ]; then
+              echo "❌ JWT directory does not exist"
+              exit 1
+            fi
 
-      # Build in a temporary directory
-      - name: Frontend - Prepare new release
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/frontend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
-          mkdir -p \$RELEASE_DIR && \
-          cp -r ${{ secrets.WORK_DIR_FRONTEND }}/* \$RELEASE_DIR/ && \
-          # Copy environment file properly
-          if [ -f ${{ secrets.WORK_DIR_FRONTEND }}/.env.local ]; then \
-            cp ${{ secrets.WORK_DIR_FRONTEND }}/.env.local \$RELEASE_DIR/ ; \
-          fi && \
-          cd \$RELEASE_DIR && \
-          export NVM_DIR=~/.nvm && \
-          source ~/.nvm/nvm.sh && \
-          npm install && \
-          npm run build"
-      # Switch to new release with zero-downtime using pm2
-      - name: Frontend - Switch to new release
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/frontend/releases/${{ needs.git_pull.outputs.release_timestamp }} && \
-          ln -sfn \$RELEASE_DIR ${{ secrets.DEPLOY_PATH }}/frontend/current && \
-          export NVM_DIR=~/.nvm && \
-          source ~/.nvm/nvm.sh && \
-          cd \$RELEASE_DIR && \
-          # Stop the current process if it exists
-          pm2 delete ecosystem.config.js || true && \
-          # Start from the new directory with the new code
-          pm2 start ecosystem.config.js --update-env"
-      # Cleanup old releases keeping last 2
-      - name: Cleanup old releases
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOY_PATH }}/frontend/releases && ls -t | tail -n +3 | xargs rm -rf"
+            COMPOSE_FILE="docker-compose.prod.yml"
 
-  cleanup:
-    name: Clean up
-    runs-on: ubuntu-latest
-    needs:
-      - deploy_frontend
-      - deploy_backend
-    steps:
-      - name: Cleanup
-        run: rm -rf ~/.ssh
+            # Download the latest compose file from GitHub
+            curl -o $COMPOSE_FILE \
+                 "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/.docker/docker-compose.prod.yml"
+
+            # Download the latest nginx.conf file from GitHub
+            curl -o nginx.conf \
+                 "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/.docker/nginx.conf"
+            
+            # Log in to GitHub Container Registry
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # Pull the latest images (backend and frontend)
+            docker compose -f $COMPOSE_FILE pull
+            
+            # Stop and remove old containers
+            docker compose -f $COMPOSE_FILE down
+            
+            # Start new containers with latest images
+            docker compose -f $COMPOSE_FILE up -d --force-recreate --wait --wait-timeout 30
+            
+            # Verify all services are healthy
+            if docker compose -f $COMPOSE_FILE ps --format json | jq -s -e 'all(.Health // "" | IN("healthy", ""))' > /dev/null; then
+              echo "✅ All containers healthy"
+              docker compose -f $COMPOSE_FILE ps
+            else
+              echo "❌ Some containers unhealthy"
+              docker compose -f $COMPOSE_FILE ps
+              docker compose -f $COMPOSE_FILE logs
+              exit 1
+            fi
+
+            # Run database migrations
+            echo "Running database migrations..."
+            docker compose -f $COMPOSE_FILE exec -T backend php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration < /dev/null
+
+            # Generate JWT keys
+            echo "Generating JWT keys..."
+            docker compose -f $COMPOSE_FILE exec -T backend php bin/console lexik:jwt:generate-keypair --skip-if-exists < /dev/null
+
+            # Cleanup all old images on VM
+            echo "Cleaning up old images..."
+            docker image prune -a -f
+          EOF

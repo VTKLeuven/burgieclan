@@ -18,23 +18,29 @@ class TagResourceTest extends ApiTestCase
     {
         TagFactory::createMany(5);
         $json = $this->browser()
-            ->get('/api/tags', [
+            ->get(
+                '/api/tags',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
             ->json();
 
-        $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
+        $this->assertSame(
+            array_keys($json->decoded()['hydra:member'][0]),
+            [
             '@id',
             '@type',
             'name',
             'documents',
-        ]);
+            ]
+        );
     }
 
     public function testGetOneTag(): void
@@ -42,11 +48,14 @@ class TagResourceTest extends ApiTestCase
         $tag = TagFactory::createOne();
 
         $this->browser()
-            ->get('/api/tags/' . $tag->getId(), [
+            ->get(
+                '/api/tags/' . $tag->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/tags/' . $tag->getId());
@@ -67,37 +76,48 @@ class TagResourceTest extends ApiTestCase
         $tag4 = TagFactory::createOne();
 
         // Create documents with different combinations of courses and categories
-        $document1 = DocumentFactory::createOne([
+        $document1 = DocumentFactory::createOne(
+            [
             'course' => $course1,
             'category' => $category1,
             'tags' => [$tag1, $tag2],
-        ]);
+            ]
+        );
 
-        $document2 = DocumentFactory::createOne([
+        $document2 = DocumentFactory::createOne(
+            [
             'course' => $course1,
             'category' => $category2,
             'tags' => [$tag2],
-        ]);
+            ]
+        );
 
-        $document3 = DocumentFactory::createOne([
+        $document3 = DocumentFactory::createOne(
+            [
             'course' => $course2,
             'category' => $category1,
             'tags' => [$tag2],
-        ]);
+            ]
+        );
 
-        $document4 = DocumentFactory::createOne([
+        $document4 = DocumentFactory::createOne(
+            [
             'course' => $course2,
             'category' => $category2,
             'tags' => [$tag3],
-        ]);
+            ]
+        );
 
         // Test filtering by course
         $this->browser()
-            ->get('/api/tags?course=/api/courses/' . $course1->getId(), [
+            ->get(
+                '/api/tags?course=/api/courses/' . $course1->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2) // tag1 and tag2 have documents with course1
@@ -105,11 +125,14 @@ class TagResourceTest extends ApiTestCase
 
         // Test filtering by category
         $this->browser()
-            ->get('/api/tags?category=/api/document_categories/' . $category1->getId(), [
+            ->get(
+                '/api/tags?category=/api/document_categories/' . $category1->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2) // tag1 and tag2 have documents with category1
@@ -117,11 +140,14 @@ class TagResourceTest extends ApiTestCase
 
         // Test filtering by both course and category
         $this->browser()
-            ->get('/api/tags?course=/api/courses/' . $course2->getId() . '&category=/api/document_categories/' . $category2->getId(), [
+            ->get(
+                '/api/tags?course=/api/courses/' . $course2->getId() . '&category=/api/document_categories/' . $category2->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1) // Only tag3 has a document with both course2 and category2
@@ -130,22 +156,28 @@ class TagResourceTest extends ApiTestCase
 
         // Test with non-existent course
         $this->browser()
-            ->get('/api/tags?course=/api/courses/999', [
+            ->get(
+                '/api/tags?course=/api/courses/999',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 0);
 
         // Test with no filter (should return all tags)
         $this->browser()
-            ->get('/api/tags', [
+            ->get(
+                '/api/tags',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 4) // All tags
@@ -156,11 +188,14 @@ class TagResourceTest extends ApiTestCase
     {
         TagFactory::createOne();
         $this->browser()
-            ->get('/api/tags', [
+            ->get(
+                '/api/tags',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer invalid_token_here'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(401)
             ->assertJsonMatches('"title"', 'An error occurred')
             ->assertJsonMatches('"detail"', 'Invalid JWT, please login again to get a new one.');
@@ -174,13 +209,16 @@ class TagResourceTest extends ApiTestCase
         ];
 
         $response = $this->browser()
-            ->post('/api/tags', [
+            ->post(
+                '/api/tags',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token,
                     'Content-Type' => 'application/ld+json'
                 ],
                 'json' => $tagData
-            ])
+                ]
+            )
             ->assertStatus(201)
             ->assertJson()
             ->assertJsonMatches('"name"', 'New Test Tag')
@@ -192,18 +230,23 @@ class TagResourceTest extends ApiTestCase
 
         // Verify we can retrieve the created tag
         $this->browser()
-            ->get($tagIRI, [
+            ->get(
+                $tagIRI,
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"name"', 'New Test Tag');
 
         // We get the same tag when creating one with the same name
         $response = $this->browser()
-            ->post('/api/tags', [
+            ->post(
+                '/api/tags',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token,
                     'Content-Type' => 'application/ld+json'
@@ -211,7 +254,8 @@ class TagResourceTest extends ApiTestCase
                 'json' => [
                     'name' => $tagData['name'],
                 ]
-            ])
+                ]
+            )
             ->assertStatus(201)
             ->assertJson()
             ->assertJsonMatches('"name"', 'New Test Tag')
@@ -234,13 +278,16 @@ class TagResourceTest extends ApiTestCase
 
         // Create the tag with document references
         $response = $this->browser()
-            ->post('/api/tags', [
+            ->post(
+                '/api/tags',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token,
                     'Content-Type' => 'application/ld+json'
                 ],
                 'json' => $tagData
-            ])
+                ]
+            )
             ->assertStatus(201)
             ->assertJson()
             ->assertJsonMatches('"name"', 'Tag With Documents')
@@ -251,11 +298,14 @@ class TagResourceTest extends ApiTestCase
 
         // Verify the tag was created with the correct documents
         $response = $this->browser()
-            ->get($tagIRI, [
+            ->get(
+                $tagIRI,
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"name"', 'Tag With Documents')
@@ -267,11 +317,14 @@ class TagResourceTest extends ApiTestCase
 
         // Verify the relationship from the document side (optional)
         $response = $this->browser()
-            ->get('/api/documents/' . $document1->getId(), [
+            ->get(
+                '/api/documents/' . $document1->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->json()->decoded();
@@ -287,12 +340,15 @@ class TagResourceTest extends ApiTestCase
         ];
 
         $this->browser()
-            ->post('/api/tags', [
+            ->post(
+                '/api/tags',
+                [
                 'headers' => [
                     'Content-Type' => 'application/ld+json'
                 ],
                 'json' => $tagData
-            ])
+                ]
+            )
             ->assertStatus(401);
     }
 
@@ -304,13 +360,16 @@ class TagResourceTest extends ApiTestCase
         ];
 
         $this->browser()
-            ->post('/api/tags', [
+            ->post(
+                '/api/tags',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token,
                     'Content-Type' => 'application/ld+json'
                 ],
                 'json' => $tagData
-            ])
+                ]
+            )
             ->assertStatus(422) // Unprocessable Entity
             ->assertJson()
             ->assertJsonMatches('"hydra:description"', 'Tag name is required');

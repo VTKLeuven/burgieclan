@@ -34,11 +34,18 @@ class TagEntityToApiMapper implements MapperInterface
         assert($to instanceof TagApi);
 
         $to->name = $from->getName();
-        $to->documents = array_map(function (Document $document) {
-            return $this->microMapper->map($document, DocumentApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
-        }, $from->getDocuments()->getValues());
+        $to->documents = array_map(
+            function (Document $document) {
+                return $this->microMapper->map(
+                    $document,
+                    DocumentApi::class,
+                    [
+                    MicroMapperInterface::MAX_DEPTH => 0,
+                    ]
+                );
+            },
+            $from->getDocuments()->getValues()
+        );
 
         return $to;
     }

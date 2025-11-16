@@ -15,24 +15,29 @@ class QuickLinkResourceTest extends ApiTestCase
     {
         QuickLinkFactory::createMany(5);
         $json = $this->browser()
-            ->get('/api/quick_links', [
+            ->get(
+                '/api/quick_links',
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
-            ->json()
-        ;
+            ->json();
 
-        $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
+        $this->assertSame(
+            array_keys($json->decoded()['hydra:member'][0]),
+            [
             '@id',
             '@type',
             'name',
             'linkTo',
-        ]);
+            ]
+        );
     }
 
     public function testGetOneQuickLink(): void
@@ -40,11 +45,14 @@ class QuickLinkResourceTest extends ApiTestCase
         $quickLink = QuickLinkFactory::createOne();
 
         $this->browser()
-            ->get('/api/quick_links/' . $quickLink->getId(), [
+            ->get(
+                '/api/quick_links/' . $quickLink->getId(),
+                [
                 'headers' => [
-                    'Authorization' =>'Bearer ' . $this->token
+                    'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/quick_links/' . $quickLink->getId());
@@ -54,11 +62,14 @@ class QuickLinkResourceTest extends ApiTestCase
     {
         QuickLinkFactory::createOne();
         $this->browser()
-            ->get('/api/quick_links', [
+            ->get(
+                '/api/quick_links',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer invalid_token_here'
                 ]
-            ])
+                ]
+            )
             ->assertStatus(401)
             ->assertJsonMatches('"title"', 'An error occurred')
             ->assertJsonMatches('"detail"', 'Invalid JWT, please login again to get a new one.');

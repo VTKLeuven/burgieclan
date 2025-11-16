@@ -244,7 +244,7 @@
         ]
     },
     "squizlabs/php_codesniffer": {
-        "version": "3.7",
+        "version": "4.0",
         "recipe": {
             "repo": "github.com/symfony/recipes-contrib",
             "branch": "main",

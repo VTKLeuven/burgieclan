@@ -60,7 +60,8 @@ final class DeleteUserCommand extends Command
     {
         $this
             ->addArgument('username', InputArgument::REQUIRED, 'The username of an existing user')
-            ->setHelp(<<<'HELP'
+            ->setHelp(
+                <<<'HELP'
                 The <info>%command.name%</info> command deletes users from the database:
 
                   <info>php %command.full_name%</info> <comment>username</comment>
@@ -88,7 +89,8 @@ final class DeleteUserCommand extends Command
         }
 
         $this->io->title('Delete User Command Interactive Wizard');
-        $this->io->text([
+        $this->io->text(
+            [
             'If you prefer to not use this interactive wizard, provide the',
             'arguments required by this command as follows:',
             '',
@@ -96,7 +98,8 @@ final class DeleteUserCommand extends Command
             '',
             'Now we\'ll ask you for the value of all the missing command arguments.',
             '',
-        ]);
+            ]
+        );
 
         $username = $this->io->ask('Username', null, $this->validator->validateUsername(...));
         $input->setArgument('username', $username);

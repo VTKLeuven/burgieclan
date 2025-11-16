@@ -21,7 +21,8 @@ class ArrayContainsFilter implements FilterInterface
             ->setProperty($propertyName)
             ->setLabel($label)
             ->setFormType(ChoiceFilterType::class)
-            ->setFormTypeOptions([
+            ->setFormTypeOptions(
+                [
                 'value_type_options' => [
                     'choices' => $choices,
                     'multiple' => true,
@@ -35,7 +36,8 @@ class ArrayContainsFilter implements FilterInterface
                     ],
                 ],
                 'translation_domain' => 'EasyAdminBundle',
-            ]);
+                ]
+            );
     }
 
     public function apply(
