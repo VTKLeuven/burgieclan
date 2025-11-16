@@ -152,7 +152,7 @@ The deployment pipeline consists of 4 workflows in `.github/workflows/`:
 6. Tag with branch name and commit SHA
 
 **Build Arguments**:
-- `API_ENV=prod`
+- `APP_ENV=prod`
 - `FRONTEND_URL` (from workflow input)
 
 **Cache Strategy**: Registry cache to speed up subsequent builds

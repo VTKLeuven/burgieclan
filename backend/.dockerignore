@@ -19,16 +19,19 @@ phpunit.xml.dist
 .phpunit.result.cache
 
 # Dependencies (will be installed during build)
-/vendor/
+vendor/
 
 # Cache and logs (will be created during build)
-/var/
+var/
 
 # Node modules (will be installed during build)
 node_modules/
 
 # Built frontend assets (will be built during Docker build)
-/public/build/
+public/build/
+
+# Bundles
+public/bundles/
 
 # IDE files
 .vscode/
@@ -42,7 +45,7 @@ node_modules/
 Thumbs.db
 
 # Data directory (contains local data)
-/data/
+data/
 
 # JWT keys
 *.pem

@@ -70,5 +70,5 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/${{ steps.repo_name.outputs.lowercase }}/backend:buildcache
           cache-to: type=registry,ref=ghcr.io/${{ steps.repo_name.outputs.lowercase }}/backend:buildcache,mode=max
           build-args: |
-            API_ENV=prod
+            APP_ENV=prod
             FRONTEND_URL=${{ inputs.url }}
