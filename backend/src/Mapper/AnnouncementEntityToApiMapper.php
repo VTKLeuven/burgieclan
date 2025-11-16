@@ -39,9 +39,13 @@ class AnnouncementEntityToApiMapper implements MapperInterface
         $to->content = $from->getContent($lang);
         $to->priority = $from->isPriority();
 
-        $to->creator = $this->microMapper->map($from->getCreator(), UserApi::class, [
+        $to->creator = $this->microMapper->map(
+            $from->getCreator(),
+            UserApi::class,
+            [
             MicroMapperInterface::MAX_DEPTH => 0,
-        ]);
+            ]
+        );
 
         $to->startTime = $from->getStartTime()->format('Y-m-d H:i:s');
         $to->endTime = $from->getEndTime()->format('Y-m-d H:i:s');

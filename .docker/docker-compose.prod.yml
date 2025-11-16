@@ -1,0 +1,194 @@
+services:
+  nginx:
+    # Official nginx image
+    image: nginx:alpine
+    container_name: burgieclan-nginx
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Port mapping - nginx is the entry point
+    # Only expose HTTP port 80 (mapped to host port 8080)
+    # External reverse proxy should handle HTTPS and forward to this port
+    ports:
+      - "8000:80"
+
+    # Volume mounts
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+    # Depends on backend and frontend services
+    depends_on:
+      - backend
+      - frontend
+
+    # Logging configuration - automatic rotation to prevent disk space issues
+    # View logs: docker logs burgieclan-nginx or docker compose -f docker-compose.prod.yml logs nginx
+    # Real-time: docker logs -f burgieclan-nginx
+    # Rotated logs: /var/lib/docker/containers/<container-id>/<container-id>-json.log.1.gz etc.
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m" # Rotate when file reaches 50MB
+        max-file: "5" # Keep 5 rotated files (250MB total per service)
+        compress: "true" # Compress rotated logs to save space
+
+  backend:
+    # Image from GitHub Container Registry
+    # Use IMAGE_TAG environment variable to specify tag (test for dev, prod for production)
+    image: ghcr.io/vtkleuven/burgieclan/backend:${IMAGE_TAG:-test}
+    container_name: burgieclan-backend
+
+    # Restart policy - always restart unless manually stopped
+    restart: unless-stopped
+
+    # Port mapping - only expose internally to nginx
+    expose:
+      - "8080"
+
+    # Environment variables
+    environment:
+      # PHP-FPM worker processes
+      # Calculate: (Available RAM - System RAM) / 256MB per process
+      MAX_REQUESTS: 8
+
+      # Symfony environment
+      APP_ENV: ${APP_ENV:-prod}
+      APP_SECRET: ${APP_SECRET:?APP_SECRET is required}
+
+      # Database configuration
+      DATABASE_URL: "postgresql://burgieclan_db_user:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@burgieclan-db:5432/burgieclan_db?serverVersion=18&charset=utf8"
+
+      # Litus oauth
+      LITUS_OAUTH_AUTHORIZE: "https://vtk.be/api/oauth/authorize"
+      LITUS_OAUTH_TOKEN: "https://vtk.be/api/oauth/token"
+      LITUS_OAUTH_RESOURCE_OWNER_DETAILS: "https://vtk.be/api/auth/me"
+      LITUS_API_KEY: ${LITUS_API_KEY:?LITUS_API_KEY is required}
+      LITUS_SECRET: ${LITUS_SECRET:?LITUS_SECRET is required}
+
+      # Sentry error tracking
+      SENTRY_DSN: ${SENTRY_DSN:-}
+
+      # CORS configuration
+      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:-^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$$}
+
+      # JWT Configuration
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:-}
+
+    # Volume mounts
+    volumes:
+      # Data directory - where uploaded files are stored
+      - ${DATA_DIR:?DATA_DIR is required}:/app/data
+      # JWT directory - where JWT keys are stored
+      - ${JWT_DIR:?JWT_DIR is required}:/app/config/jwt
+      # Var directory for cache and logs
+      # Using named volume for better performance
+      - backend_var:/app/var
+
+    # Health check to ensure backend is ready before frontend starts
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/api/healthcheck" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Depends on database service
+    depends_on:
+      db:
+        condition: service_healthy
+
+    # Logging configuration - automatic rotation to prevent disk space issues
+    # View logs: docker logs burgieclan-backend or docker compose -f docker-compose.prod.yml logs backend
+    # Real-time: docker logs -f burgieclan-backend
+    # Rotated logs: /var/lib/docker/containers/<container-id>/<container-id>-json.log.1.gz etc.
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m" # Rotate when file reaches 50MB
+        max-file: "5" # Keep 5 rotated files (250MB total per service)
+        compress: "true" # Compress rotated logs to save space
+
+  frontend:
+    # Image from GitHub Container Registry
+    # Use IMAGE_TAG environment variable to specify tag (test for dev, prod for production)
+    image: ghcr.io/vtkleuven/burgieclan/frontend:${IMAGE_TAG:-test}
+    container_name: burgieclan-frontend
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Port mapping - only expose internally to nginx
+    expose:
+      - "3000"
+
+    # Environment variables
+    environment:
+      # File upload configuration
+      NEXT_PUBLIC_MAX_FILE_SIZE_MB: "200"
+      NEXT_PUBLIC_ALLOWED_MIME_TYPES: "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.spreadsheet,application/vnd.oasis.opendocument.presentation,image/jpeg,image/jpg,image/png,image/svg+xml,image/gif,application/zip,text/csv,text/plain,text/markdown,text/x-matlab,text/x-python,video/mp4"
+
+      # Sentry configuration
+      NEXT_PUBLIC_SENTRY_DSN: ${SENTRY_DSN:-}
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    # Logging configuration - automatic rotation to prevent disk space issues
+    # View logs: docker logs burgieclan-frontend or docker compose -f docker-compose.prod.yml logs frontend
+    # Real-time: docker logs -f burgieclan-frontend
+    # Rotated logs: /var/lib/docker/containers/<container-id>/<container-id>-json.log.1.gz etc.
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m" # Rotate when file reaches 50MB
+        max-file: "5" # Keep 5 rotated files (250MB total per service)
+        compress: "true" # Compress rotated logs to save space
+
+  db:
+    # Official PostgreSQL latest image
+    image: postgres:18
+    container_name: burgieclan-db
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Only expose internally - no external port mapping for security
+    expose:
+      - "5432"
+
+    # Environment variables - all from .env file for security
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: burgieclan_db
+      POSTGRES_USER: burgieclan_db_user
+
+    # Volume mounts for data persistence
+    volumes:
+      # Database data - use absolute path on host for production
+      # This ensures data persists across container recreations
+      - ${POSTGRES_DATA_DIR:?POSTGRES_DATA_DIR is required}:/var/lib/postgresql
+
+    # Health check to ensure database is ready before backend starts
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U burgieclan_db_user -d burgieclan_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+    # Logging configuration - automatic rotation to prevent disk space issues
+    # View logs: docker logs burgieclan-db or docker compose -f docker-compose.prod.yml logs db
+    # Real-time: docker logs -f burgieclan-db
+    # Rotated logs: /var/lib/docker/containers/<container-id>/<container-id>-json.log.1.gz etc.
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m" # Rotate when file reaches 50MB
+        max-file: "5" # Keep 5 rotated files (250MB total per service)
+        compress: "true" # Compress rotated logs to save space
+
+volumes:
+  backend_var:
+    driver: local

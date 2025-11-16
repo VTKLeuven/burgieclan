@@ -58,9 +58,7 @@ class CourseRepository extends ServiceEntityRepository
             $queryBuilder
                 ->orWhere('c.name LIKE :t_' . $key)
                 ->orWhere('c.code LIKE :t_' . $key)
-                ->orWhere('c.professors LIKE :t_' . $key)
-                ->setParameter('t_' . $key, '%' . $term . '%')
-            ;
+                ->setParameter('t_' . $key, '%' . $term . '%');
         }
 
         /** @var Course[] $result */
@@ -68,8 +66,7 @@ class CourseRepository extends ServiceEntityRepository
             ->orderBy('c.name', 'ASC')
             ->setMaxResults($limit)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
 
         return $result;
     }
@@ -85,8 +82,11 @@ class CourseRepository extends ServiceEntityRepository
         $terms = array_unique($searchQuery->split(' '));
 
         // ignore the search terms that are too short
-        return array_filter($terms, static function ($term) {
-            return 2 <= $term->length();
-        });
+        return array_filter(
+            $terms,
+            static function ($term) {
+                return 2 <= $term->length();
+            }
+        );
     }
 }

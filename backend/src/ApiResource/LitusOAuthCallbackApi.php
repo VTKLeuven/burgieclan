@@ -20,7 +20,8 @@ use App\Controller\Api\LitusOAuthCallbackController;
                     '302' => new Response(
                         description: 'Redirect to frontend with authentication tokens',
                         content: null,
-                        headers: new \ArrayObject([
+                        headers: new \ArrayObject(
+                            [
                             'Location' => [
                                 'description' => 'Frontend callback URL with JWT tokens and redirect parameters',
                                 'schema' => [
@@ -28,12 +29,14 @@ use App\Controller\Api\LitusOAuthCallbackController;
                                     'example' => 'http://localhost:3000/auth/callback?token=jwt&refresh_token=refresh'
                                 ]
                             ]
-                        ])
+                            ]
+                        )
                     ),
                     '400' => new Response(
                         description: 'Invalid OAuth state or missing authorization code',
                         content: null,
-                        headers: new \ArrayObject([
+                        headers: new \ArrayObject(
+                            [
                             'Location' => [
                                 'description' => 'Frontend callback URL with error parameter',
                                 'schema' => [
@@ -41,7 +44,8 @@ use App\Controller\Api\LitusOAuthCallbackController;
                                     'example' => 'http://localhost:3000/auth/callback?error=Invalid%20OAuth%20state'
                                 ]
                             ]
-                        ])
+                            ]
+                        )
                     )
                 ],
                 summary: 'OAuth callback from Litus',

@@ -64,14 +64,20 @@ class AnnouncementApi
     #[ApiProperty(readable: false, writable: false, identifier: true)]
     public ?int $id = null;
 
-    #[ApiFilter(MultiLangSearchFilter::class, properties: [
+    #[ApiFilter(
+        MultiLangSearchFilter::class,
+        properties: [
         'title' => ['title_nl', 'title_en'],
-    ])]
+        ]
+    )]
     public ?string $title = null;
 
-    #[ApiFilter(MultiLangSearchFilter::class, properties: [
+    #[ApiFilter(
+        MultiLangSearchFilter::class,
+        properties: [
         'content' => ['content_nl', 'content_en'],
-    ])]
+        ]
+    )]
     public ?string $content = null;
 
     public ?UserApi $creator;

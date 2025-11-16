@@ -20,12 +20,12 @@ use Symfony\Component\HttpFoundation\Request;
 class LitusOAuthCallbackController extends AbstractController
 {
     public function __construct(
-        private readonly JWTTokenManagerInterface       $jwtManager,
-        private readonly RefreshTokenManagerInterface   $refreshTokenManager,
+        private readonly JWTTokenManagerInterface $jwtManager,
+        private readonly RefreshTokenManagerInterface $refreshTokenManager,
         private readonly RefreshTokenGeneratorInterface $refreshTokenGenerator,
-        private readonly UserRepository                 $userRepository,
-        private readonly ClientRegistry                 $clientRegistry,
-        private readonly LoggerInterface                $logger
+        private readonly UserRepository $userRepository,
+        private readonly ClientRegistry $clientRegistry,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -42,22 +42,31 @@ class LitusOAuthCallbackController extends AbstractController
             }
             $frontendUrl = rtrim($frontendUrl, '/');
         } catch (ParameterNotFoundException $e) {
-            $this->logger->critical("Frontend URL parameter not configured", [
-                'exception' => $e,
-            ]);
+            $this->logger->critical(
+                "Frontend URL parameter not configured",
+                [
+                    'exception' => $e,
+                ]
+            );
             throw new Exception('Frontend URL configuration missing. Please configure app.frontend_url parameter.');
         } catch (Exception $e) {
-            $this->logger->critical("Invalid frontend URL configuration", [
-                'exception' => $e,
-            ]);
+            $this->logger->critical(
+                "Invalid frontend URL configuration",
+                [
+                    'exception' => $e,
+                ]
+            );
             throw new Exception('Invalid frontend URL configuration: ' . $e->getMessage());
         }
 
         // Handle OAuth error
         if ($error) {
-            $this->logger->error("OAuth error received", [
-                'oauth_error' => $error,
-            ]);
+            $this->logger->error(
+                "OAuth error received",
+                [
+                    'oauth_error' => $error,
+                ]
+            );
             return new RedirectResponse(
                 "{$frontendUrl}/auth/callback?error=oauth_failed"
             );
@@ -66,10 +75,13 @@ class LitusOAuthCallbackController extends AbstractController
         // Verify state parameter
         $sessionState = $request->cookies->get('x-oauth-state');
         if ($state !== $sessionState) {
-            $this->logger->error("OAuth state mismatch", [
-                'expected_state' => $sessionState,
-                'received_state' => $state,
-            ]);
+            $this->logger->error(
+                "OAuth state mismatch",
+                [
+                    'expected_state' => $sessionState,
+                    'received_state' => $state,
+                ]
+            );
             return new RedirectResponse(
                 "{$frontendUrl}/auth/callback?error=invalid_state"
             );
@@ -96,7 +108,7 @@ class LitusOAuthCallbackController extends AbstractController
 
             // Get refresh token TTL from configuration (in seconds)
             $refreshTokenTtl = $this->getParameter('gesdinet_jwt_refresh_token.ttl');
-            
+
             // Generate refresh token using the generator
             $refreshToken = $this->refreshTokenGenerator->createForUserWithTtl(
                 $user,
@@ -115,16 +127,19 @@ class LitusOAuthCallbackController extends AbstractController
             // Redirect to frontend with all tokens and expiration
             return new RedirectResponse(
                 "{$frontendUrl}/auth/callback?token=" . urlencode($jwt) .
-                "&refresh_token=" . urlencode($refreshToken->getRefreshToken()) .
-                "&refresh_token_expiration=" . $refreshTokenExpiration .
-                "&redirect_to=" . urlencode($frontendRedirectTo)
+                    "&refresh_token=" . urlencode($refreshToken->getRefreshToken()) .
+                    "&refresh_token_expiration=" . $refreshTokenExpiration .
+                    "&redirect_to=" . urlencode($frontendRedirectTo)
             );
         } catch (Exception $e) {
-            $this->logger->error("Litus OAuth callback error", [
-                'exception' => $e,
-                'oauth_state' => $state,
-            ]);
-            
+            $this->logger->error(
+                "Litus OAuth callback error",
+                [
+                    'exception' => $e,
+                    'oauth_state' => $state,
+                ]
+            );
+
             return new RedirectResponse(
                 "{$frontendUrl}/auth/callback?error=authentication_failed"
             );

@@ -1,0 +1,46 @@
+name: PHP Code Sniffer
+
+on:
+  push:
+    branches:
+      - release/**
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  php-codesniffer:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 # Checks out the repository code
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: backend/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2 # Sets up the specified PHP version
+        with:
+          php-version: "8.4"
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          composer install
+
+      - name: Run PHP Code Sniffer
+        run: |
+          cd backend
+          vendor/bin/phpcs --runtime-set ignore_warnings_on_exit 1
+
+      - name: Print local fix instructions
+        if: failure()
+        run: |
+          echo "To fix PHP CodeSniffer errors locally, run:"
+          echo "  vendor/bin/phpcbf"

@@ -10,7 +10,6 @@ use Symfonycasts\MicroMapper\MapperInterface;
 #[AsMapper(from: CommentCategory::class, to: CommentCategoryApi::class)]
 class CommentCategoryEntityToApiMapper implements MapperInterface
 {
-
     public function load(object $from, string $toClass, array $context): object
     {
         assert($from instanceof CommentCategory);

@@ -1,9 +1,8 @@
-import './styles/admin.scss';
-import 'typeahead.js';
 import Bloodhound from "bloodhound-js";
 import 'bootstrap-tagsinput';
+import './styles/admin.scss';
 
-$(function() {
+$(function () {
     // Bootstrap-tagsinput initialization
     // https://bootstrap-tagsinput.github.io/bootstrap-tagsinput/examples/
     var $input = $('input[data-toggle="tagsinput"]');

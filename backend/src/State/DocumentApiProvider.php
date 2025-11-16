@@ -24,11 +24,11 @@ class DocumentApiProvider implements ProviderInterface
     private MimeTypes $mimeTypes;
 
     public function __construct(
-        #[Autowire(service: ItemProvider::class)] private readonly ProviderInterface       $itemProvider,
+        #[Autowire(service: ItemProvider::class)] private readonly ProviderInterface $itemProvider,
         #[Autowire(service: CollectionProvider::class)] private readonly ProviderInterface $collectionProvider,
-        private readonly MicroMapperInterface                                              $microMapper,
+        private readonly MicroMapperInterface $microMapper,
         private readonly StorageInterface $storage,
-        private readonly Security                                                          $security,
+        private readonly Security $security,
     ) {
         $this->mimeTypes = new MimeTypes();
     }
@@ -125,6 +125,9 @@ class DocumentApiProvider implements ProviderInterface
 
         if ($operation instanceof Get) {
             $document = $this->itemProvider->provide($operation, $uriVariables, $context);
+            if (!$document) {
+                return null;
+            }
             return $this->processDocument($document, $mapperContext);
         }
 
@@ -140,7 +143,7 @@ class DocumentApiProvider implements ProviderInterface
         $documentApi->fileSize = $document->getFileSize();
 
         if ($document->isAnonymous()) {
-            unset($documentApi->creator); // Remove author in GET-requests if document is anonymous
+            $documentApi->creator = null; // Remove author in GET-requests if document is anonymous
         }
 
         if ($document->getFileName()) {

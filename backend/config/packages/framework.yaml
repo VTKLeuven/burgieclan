@@ -29,6 +29,17 @@ framework:
     # See https://symfony.com/doc/current/reference/configuration/framework.html#ide
     ide: null
 
+    # Trust all proxies (REMOTE_ADDR makes Symfony trust the direct proxy)
+    # This is safe because nginx container network is isolated
+    trusted_proxies: '127.0.0.1,REMOTE_ADDR'
+    
+    # Trust these headers from the reverse proxy chain
+    # These will be passed through from your external reverse proxy
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix']
+
+    property_info:
+        with_constructor_extractor: true
+
 when@test:
     framework:
         test: true

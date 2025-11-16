@@ -42,7 +42,7 @@ class EntityClassDtoStateProcessor implements ProcessorInterface
         }
 
         $this->persistProcessor->process($entity, $operation, $uriVariables, $context);
-        
+
         // Re-map the complete entity back to DTO to include all populated fields
         return $this->microMapper->map($entity, get_class($data));
     }

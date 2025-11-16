@@ -25,11 +25,11 @@ use Symfonycasts\MicroMapper\MicroMapperInterface;
 class AddFavoriteToUserController extends AbstractController
 {
     public function __construct(
-        private readonly Security               $security,
-        private readonly MicroMapperInterface   $microMapper,
+        private readonly Security $security,
+        private readonly MicroMapperInterface $microMapper,
         private readonly EntityManagerInterface $entityManager,
-        private readonly SerializerInterface    $serializer,
-        private readonly IriConverterInterface  $iriConverter,
+        private readonly SerializerInterface $serializer,
+        private readonly IriConverterInterface $iriConverter,
     ) {
     }
 
@@ -51,9 +51,13 @@ class AddFavoriteToUserController extends AbstractController
             assert($courseApi instanceof CourseApi);
 
             // Convert the DTO to an Entity
-            $course = $this->microMapper->map($courseApi, Course::class, [
+            $course = $this->microMapper->map(
+                $courseApi,
+                Course::class,
+                [
                 MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
+                ]
+            );
 
             // Add the entity
             $user->addFavoriteCourse($course);
@@ -61,33 +65,49 @@ class AddFavoriteToUserController extends AbstractController
         foreach ($modulesToAdd as $moduleApiIri) {
             $moduleApi = $this->iriConverter->getResourceFromIri($moduleApiIri);
             assert($moduleApi instanceof ModuleApi);
-            $module = $this->microMapper->map($moduleApi, Module::class, [
+            $module = $this->microMapper->map(
+                $moduleApi,
+                Module::class,
+                [
                 MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
+                ]
+            );
             $user->addFavoriteModule($module);
         }
         foreach ($programsToAdd as $programApiIri) {
             $programApi = $this->iriConverter->getResourceFromIri($programApiIri);
             assert($programApi instanceof ProgramApi);
-            $program = $this->microMapper->map($programApi, Program::class, [
+            $program = $this->microMapper->map(
+                $programApi,
+                Program::class,
+                [
                 MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
+                ]
+            );
             $user->addFavoriteProgram($program);
         }
         foreach ($documentsToAdd as $documentApiIri) {
             $documentApi = $this->iriConverter->getResourceFromIri($documentApiIri);
             assert($documentApi instanceof DocumentApi);
-            $document = $this->microMapper->map($documentApi, Document::class, [
+            $document = $this->microMapper->map(
+                $documentApi,
+                Document::class,
+                [
                 MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
+                ]
+            );
             $user->addFavoriteDocument($document);
         }
 
         $this->entityManager->flush();
 
-        $newUserApi = $this->microMapper->map($user, UserApi::class, [
+        $newUserApi = $this->microMapper->map(
+            $user,
+            UserApi::class,
+            [
             MicroMapperInterface::MAX_DEPTH => 1,
-        ]);
+            ]
+        );
         $serializedUserApi = $this->serializer->serialize(
             $newUserApi,
             'json',

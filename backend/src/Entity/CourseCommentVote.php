@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 class CourseCommentVote extends AbstractVote
 {
     #[ORM\ManyToOne(targetEntity: CourseComment::class, inversedBy: 'votes')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private CourseComment $courseComment;
 
     public function getCourseComment(): ?CourseComment

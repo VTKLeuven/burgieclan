@@ -8,8 +8,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted(User::ROLE_ADMIN)]
@@ -36,7 +37,7 @@ class AnnouncementCrudController extends AbstractCrudController
         yield TextField::new('title_nl')
             ->setRequired(true)
             ->setLabel('Title (Dutch)');
-        yield TextField::new('content_nl')
+        yield TextEditorField::new('content_nl')
             ->setLabel('Content (Dutch)')
             ->setTemplatePath('admin/text_editor.html.twig');
 
@@ -47,7 +48,7 @@ class AnnouncementCrudController extends AbstractCrudController
             ->collapsible();
         yield TextField::new('title_en')
             ->setLabel('Title (English)');
-        yield TextField::new('content_en')
+        yield TextEditorField::new('content_en')
             ->setLabel('Content (English)')
             ->setTemplatePath('admin/text_editor.html.twig');
     }

@@ -18,21 +18,29 @@ class DocumentResourceTest extends ApiTestCase
 
     public function testGetCollectionOfDocuments(): void
     {
-        DocumentFactory::createMany(5, [
+        DocumentFactory::createMany(
+            5,
+            [
             'anonymous' => false,
-        ]);
+            ]
+        );
         $json = $this->browser()
-            ->get('/api/documents', [
+            ->get(
+                '/api/documents',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
             ->json();
 
-        $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
+        $this->assertSame(
+            array_keys($json->decoded()['hydra:member'][0]),
+            [
             '@id',
             '@type',
             'name',
@@ -48,39 +56,49 @@ class DocumentResourceTest extends ApiTestCase
             'createdAt',
             'updatedAt',
             'tags',
-        ]);
+            ]
+        );
     }
 
     public function testGetCollectionOfAnonymousDocuments(): void
     {
-        DocumentFactory::createMany(5, [
+        DocumentFactory::createMany(
+            5,
+            [
             'anonymous' => true,
-        ]);
+            ]
+        );
         $json = $this->browser()
-            ->get('/api/documents', [
+            ->get(
+                '/api/documents',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
-            ->json();$this->assertSame(array_keys($json->decoded()['hydra:member'][0]), [
-            '@id',
-            '@type',
-            'name',
-            'course',
-            'category',
-            'year',
-            'under_review',
-            'anonymous',
-            'contentUrl',
-            'mimetype',
-            'filename',
-            'createdAt',
-            'updatedAt',
-            'tags',
-        ]); // Notice that creator is not included in the response.
+            ->json();$this->assertSame(
+                array_keys($json->decoded()['hydra:member'][0]),
+                [
+                '@id',
+                '@type',
+                'name',
+                'course',
+                'category',
+                'year',
+                'under_review',
+                'anonymous',
+                'contentUrl',
+                'mimetype',
+                'filename',
+                'createdAt',
+                'updatedAt',
+                'tags',
+                ]
+            ); // Notice that creator is not included in the response.
     }
 
     public function testGetOneDocument(): void
@@ -92,11 +110,14 @@ class DocumentResourceTest extends ApiTestCase
         );
 
         $this->browser()
-            ->get('/api/documents/' . $document->getId(), [
+            ->get(
+                '/api/documents/' . $document->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/documents/' . $document->getId())
             ->assertJsonMatches('anonymous', false);
@@ -111,11 +132,14 @@ class DocumentResourceTest extends ApiTestCase
         );
 
         $this->browser()
-            ->get('/api/documents/' . $document->getId(), [
+            ->get(
+                '/api/documents/' . $document->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/documents/' . $document->getId())
             ->assertJsonMatches('anonymous', true)
@@ -124,34 +148,46 @@ class DocumentResourceTest extends ApiTestCase
 
     public function testGetDocumentFilterByName(): void
     {
-        $document1 = DocumentFactory::createOne([
+        $document1 = DocumentFactory::createOne(
+            [
             'name' => 'document1',
-        ]);
+            ]
+        );
 
-        $document2 = DocumentFactory::createOne([
+        $document2 = DocumentFactory::createOne(
+            [
             'name' => 'document2',
-        ]);
+            ]
+        );
 
-        $document3 = DocumentFactory::createOne([
+        $document3 = DocumentFactory::createOne(
+            [
             'name' => 'document3',
-        ]);
+            ]
+        );
 
         DocumentFactory::createMany(5);
 
         $this->browser()
-            ->get('/api/documents?name=document2', [
+            ->get(
+                '/api/documents?name=document2',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/documents?name=document', [
+            ->get(
+                '/api/documents?name=document',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3);
@@ -159,27 +195,39 @@ class DocumentResourceTest extends ApiTestCase
 
     public function testGetDocumentFilterByUnderReview(): void
     {
-        DocumentFactory::createMany(3, [
+        DocumentFactory::createMany(
+            3,
+            [
             'under_review' => true,
-        ]);
-        DocumentFactory::createMany(5, [
+            ]
+        );
+        DocumentFactory::createMany(
+            5,
+            [
             'under_review' => false,
-        ]);
+            ]
+        );
 
         $this->browser()
-            ->get('/api/documents?under_review=true', [
+            ->get(
+                '/api/documents?under_review=true',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
-            ->get('/api/documents?under_review=false', [
+            ->get(
+                '/api/documents?under_review=false',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5);
@@ -189,39 +237,57 @@ class DocumentResourceTest extends ApiTestCase
     {
         $course1 = CourseFactory::createOne();
         $course2 = CourseFactory::createOne();
-        DocumentFactory::createMany(1, [
+        DocumentFactory::createMany(
+            1,
+            [
             'course' => $course1,
-        ]);
-        DocumentFactory::createMany(2, [
+            ]
+        );
+        DocumentFactory::createMany(
+            2,
+            [
             'course' => $course2,
-        ]);
-        DocumentFactory::createMany(5, [
+            ]
+        );
+        DocumentFactory::createMany(
+            5,
+            [
             'course' => CourseFactory::createOne(),
-        ]);
+            ]
+        );
 
         $this->browser()
-            ->get('/api/documents?course=/api/courses/' . $course1->getId(), [
+            ->get(
+                '/api/documents?course=/api/courses/' . $course1->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/documents?course[]=/api/courses/' . $course1->getId() .
-                '&course[]=/api/courses/' . $course2->getId(), [
+            ->get(
+                '/api/documents?course[]=/api/courses/' . $course1->getId() .
+                '&course[]=/api/courses/' . $course2->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
-            ->get('/api/documents', [
+            ->get(
+                '/api/documents',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 8)
             ->assertJsonMatches('length("hydra:member")', 8);
@@ -231,39 +297,57 @@ class DocumentResourceTest extends ApiTestCase
     {
         $category1 = DocumentCategoryFactory::createOne();
         $category2 = DocumentCategoryFactory::createOne();
-        DocumentFactory::createMany(1, [
+        DocumentFactory::createMany(
+            1,
+            [
             'category' => $category1,
-        ]);
-        DocumentFactory::createMany(2, [
+            ]
+        );
+        DocumentFactory::createMany(
+            2,
+            [
             'category' => $category2,
-        ]);
-        DocumentFactory::createMany(5, [
+            ]
+        );
+        DocumentFactory::createMany(
+            5,
+            [
             'category' => DocumentCategoryFactory::createOne(),
-        ]);
+            ]
+        );
 
         $this->browser()
-            ->get('/api/documents?category=/api/document_categories/' . $category1->getId(), [
+            ->get(
+                '/api/documents?category=/api/document_categories/' . $category1->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/documents?category[]=/api/document_categories/' . $category1->getId() .
-                '&category[]=/api/document_categories/' . $category2->getId(), [
+            ->get(
+                '/api/documents?category[]=/api/document_categories/' . $category1->getId() .
+                '&category[]=/api/document_categories/' . $category2->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
-            ->get('/api/documents', [
+            ->get(
+                '/api/documents',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 8)
             ->assertJsonMatches('length("hydra:member")', 8);
@@ -273,42 +357,60 @@ class DocumentResourceTest extends ApiTestCase
     {
         $user1 = UserFactory::createOne();
         $user2 = UserFactory::createOne();
-        DocumentFactory::createMany(1, [
+        DocumentFactory::createMany(
+            1,
+            [
             'creator' => $user1,
             'under_review' => false, // Only non-under-review documents are returned (except if the user is the creator)
-        ]);
-        DocumentFactory::createMany(2, [
+            ]
+        );
+        DocumentFactory::createMany(
+            2,
+            [
             'creator' => $user2,
             'under_review' => false,
-        ]);
-        DocumentFactory::createMany(5, [
+            ]
+        );
+        DocumentFactory::createMany(
+            5,
+            [
             'creator' => UserFactory::createOne(),
             'under_review' => false,
-        ]);
+            ]
+        );
 
         $this->browser()
-            ->get('/api/documents?creator=/api/users/' . $user1->getId(), [
+            ->get(
+                '/api/documents?creator=/api/users/' . $user1->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/documents?creator[]=/api/users/' . $user1->getId() .
-                '&creator[]=/api/users/' . $user2->getId(), [
+            ->get(
+                '/api/documents?creator[]=/api/users/' . $user1->getId() .
+                '&creator[]=/api/users/' . $user2->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3)
-            ->get('/api/documents', [
+            ->get(
+                '/api/documents',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 8)
             ->assertJsonMatches('length("hydra:member")', 8);
@@ -316,46 +418,67 @@ class DocumentResourceTest extends ApiTestCase
 
     public function testGetDocumentFilterByYear(): void
     {
-        DocumentFactory::createMany(1, [
+        DocumentFactory::createMany(
+            1,
+            [
             'year' => '2024 - 2025',
-        ]);
-        DocumentFactory::createMany(1, [
+            ]
+        );
+        DocumentFactory::createMany(
+            1,
+            [
             'year' => '2025 - 2026',
-        ]);
-        DocumentFactory::createMany(5, [
+            ]
+        );
+        DocumentFactory::createMany(
+            5,
+            [
             'year' => '2026 - 2027',
-        ]);
+            ]
+        );
 
         $this->browser()
-            ->get('/api/documents?year=2024 - 2025', [
+            ->get(
+                '/api/documents?year=2024 - 2025',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/documents?year=24', [
+            ->get(
+                '/api/documents?year=24',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1)
-            ->get('/api/documents?year=25', [
+            ->get(
+                '/api/documents?year=25',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2)
-            ->get('/api/documents?year=26', [
+            ->get(
+                '/api/documents?year=26',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 6)
             ->assertJsonMatches('length("hydra:member")', 6);
@@ -373,14 +496,19 @@ class DocumentResourceTest extends ApiTestCase
         $file = new UploadedFile($filePath, 'image-for-test.png');
 
         $json = $this->browser()
-            ->post('/api/documents', [
+            ->post(
+                '/api/documents',
+                [
                 'headers' => [
                     'Content-Type' => 'multipart/form-data',
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(400)
-            ->post('/api/documents', [
+            ->post(
+                '/api/documents',
+                [
                 'headers' => [
                     'Content-Type' => 'multipart/form-data',
                     'Authorization' => 'Bearer ' . $this->token
@@ -395,7 +523,8 @@ class DocumentResourceTest extends ApiTestCase
                 'files' => [
                     'file' => $file,
                 ],
-            ])
+                ]
+            )
             ->assertStatus(201)
             ->assertJsonMatches('name', 'Document name')
             ->json();
@@ -414,17 +543,22 @@ class DocumentResourceTest extends ApiTestCase
      */
     public function testAnonymousDocumentDoesNotHaveCreator(): void
     {
-        $document = DocumentFactory::createOne([
+        $document = DocumentFactory::createOne(
+            [
             'anonymous' => true,
             'creator' => UserFactory::createOne(),
-        ]);
+            ]
+        );
 
         $json = $this->browser()
-            ->get('/api/documents/' . $document->getId(), [
+            ->get(
+                '/api/documents/' . $document->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/documents/' . $document->getId())
             ->json();
@@ -436,11 +570,14 @@ class DocumentResourceTest extends ApiTestCase
         $document->_save();
 
         $json = $this->browser()
-            ->get('/api/documents/' . $document->getId(), [
+            ->get(
+                '/api/documents/' . $document->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/documents/' . $document->getId())
             ->json();
@@ -470,11 +607,14 @@ class DocumentResourceTest extends ApiTestCase
         $document->_save();
 
         $this->browser()
-            ->get('/api/documents/' . $document->getId(), [
+            ->get(
+                '/api/documents/' . $document->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('mimetype', 'application/pdf');
 
@@ -531,11 +671,14 @@ class DocumentResourceTest extends ApiTestCase
         $pdfDocument->_save();
 
         $json = $this->browser()
-            ->get('/api/documents', [
+            ->get(
+                '/api/documents',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->json();
 
@@ -583,16 +726,21 @@ class DocumentResourceTest extends ApiTestCase
      */
     public function testNonAnonymousDocumentHasCreator(): void
     {
-        $document = DocumentFactory::createOne([
+        $document = DocumentFactory::createOne(
+            [
             'anonymous' => false
-        ]);
+            ]
+        );
 
         $json = $this->browser()
-            ->get('/api/documents/' . $document->getId(), [
+            ->get(
+                '/api/documents/' . $document->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/documents/' . $document->getId())
             ->json();
@@ -604,11 +752,14 @@ class DocumentResourceTest extends ApiTestCase
         $document->_save();
 
         $json = $this->browser()
-            ->get('/api/documents/' . $document->getId(), [
+            ->get(
+                '/api/documents/' . $document->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"@id"', '/api/documents/' . $document->getId())
             ->json();
@@ -624,100 +775,131 @@ class DocumentResourceTest extends ApiTestCase
         $tagPHP = TagFactory::createOne(['name' => 'php']);
 
         // Create documents with different tag combinations
-        DocumentFactory::createOne([
+        DocumentFactory::createOne(
+            [
             'tags' => [$tagPython],
             'under_review' => false,
-        ]);
+            ]
+        );
 
-        DocumentFactory::createOne([
+        DocumentFactory::createOne(
+            [
             'tags' => [$tagJavascript],
             'under_review' => false,
-        ]);
+            ]
+        );
 
-        DocumentFactory::createOne([
+        DocumentFactory::createOne(
+            [
             'tags' => [$tagPHP],
             'under_review' => false,
-        ]);
+            ]
+        );
 
-        DocumentFactory::createOne([
+        DocumentFactory::createOne(
+            [
             'tags' => [$tagPython, $tagJavascript],
             'under_review' => false,
-        ]);
+            ]
+        );
 
-        DocumentFactory::createOne([
+        DocumentFactory::createOne(
+            [
             'tags' => [$tagJavascript, $tagPHP, $tagPython],
             'under_review' => false,
-        ]);
+            ]
+        );
 
         // Create documents without tags
-        DocumentFactory::createMany(3, [
+        DocumentFactory::createMany(
+            3,
+            [
             'tags' => [],
             'under_review' => false,
-        ]);
+            ]
+        );
 
         // Test filtering by single tag name (exact match)
         $this->browser()
-            ->get('/api/documents?tags.name=python', [
+            ->get(
+                '/api/documents?tags.name=python',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3);
 
         // Test filtering by partial tag name (using ipartial strategy)
         $this->browser()
-            ->get('/api/documents?tags.name=py', [
+            ->get(
+                '/api/documents?tags.name=py',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3);
 
         // Test filtering by multiple tag names
         $this->browser()
-            ->get('/api/documents?tags.name[]=python&tags.name[]=javascript', [
+            ->get(
+                '/api/documents?tags.name[]=python&tags.name[]=javascript',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2);
 
         // Test filtering by tag IRI
         $this->browser()
-            ->get('/api/documents?tags=/api/tags/' . $tagPHP->getId(), [
+            ->get(
+                '/api/documents?tags=/api/tags/' . $tagPHP->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 2)
             ->assertJsonMatches('length("hydra:member")', 2);
 
         // Test filtering by multiple tag IRIs
         $this->browser()
-            ->get('/api/documents?tags[]=/api/tags/' . $tagPython->getId() .
-                '&tags[]=/api/tags/' . $tagPHP->getId(), [
+            ->get(
+                '/api/documents?tags[]=/api/tags/' . $tagPython->getId() .
+                '&tags[]=/api/tags/' . $tagPHP->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('length("hydra:member")', 1);
 
         // Verify total count without filters
         $this->browser()
-            ->get('/api/documents', [
+            ->get(
+                '/api/documents',
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 8)
             ->assertJsonMatches('length("hydra:member")', 8);
@@ -738,7 +920,9 @@ class DocumentResourceTest extends ApiTestCase
 
         // Create document with tags
         $json = $this->browser()
-            ->post('/api/documents', [
+            ->post(
+                '/api/documents',
+                [
                 'headers' => [
                     'Content-Type' => 'multipart/form-data',
                     'Authorization' => 'Bearer ' . $this->token
@@ -753,7 +937,8 @@ class DocumentResourceTest extends ApiTestCase
                 'files' => [
                     'file' => $file,
                 ],
-            ])
+                ]
+            )
             ->assertStatus(201)
             ->assertJsonMatches('name', 'Document with tags')
             ->assertJsonMatches('length("tags")', 1)
@@ -763,27 +948,36 @@ class DocumentResourceTest extends ApiTestCase
 
         // Verify the tag association in the document
         $response = $this->browser()
-            ->get($documentIRI, [
+            ->get(
+                $documentIRI,
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->json()->decoded();
 
-        $tagIRIs = array_map(function ($tag) {
-            return $tag['@id'];
-        }, $response['tags']);
+        $tagIRIs = array_map(
+            function ($tag) {
+                return $tag['@id'];
+            },
+            $response['tags']
+        );
         $this->assertContains('/api/tags/' . $existingTag->getId(), $tagIRIs);
 
         // Also verify from the tag side
         $tagResponse = $this->browser()
-            ->get('/api/tags/' . $existingTag->getId(), [
+            ->get(
+                '/api/tags/' . $existingTag->getId(),
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->json()->decoded();
@@ -813,7 +1007,9 @@ class DocumentResourceTest extends ApiTestCase
 
         // Create document with multiple tags
         $json = $this->browser()
-            ->post('/api/documents', [
+            ->post(
+                '/api/documents',
+                [
                 'headers' => [
                     'Content-Type' => 'multipart/form-data',
                     'Authorization' => 'Bearer ' . $this->token
@@ -832,7 +1028,8 @@ class DocumentResourceTest extends ApiTestCase
                 'files' => [
                     'file' => $file,
                 ],
-            ])
+                ]
+            )
             ->assertStatus(201)
             ->assertJsonMatches('name', 'Document with multiple tags')
             ->assertJsonMatches('length("tags")', 2)
@@ -842,18 +1039,24 @@ class DocumentResourceTest extends ApiTestCase
 
         // Verify the tag associations in the document
         $response = $this->browser()
-            ->get($documentIRI, [
+            ->get(
+                $documentIRI,
+                [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token
                 ]
-            ])
+                ]
+            )
             ->assertStatus(200)
             ->assertJson()
             ->json()->decoded();
 
-        $tagIRIs = array_map(function ($tag) {
-            return $tag['@id'];
-        }, $response['tags']);
+        $tagIRIs = array_map(
+            function ($tag) {
+                return $tag['@id'];
+            },
+            $response['tags']
+        );
 
         $this->assertContains('/api/tags/' . $tag1->getId(), $tagIRIs);
         $this->assertContains('/api/tags/' . $tag2->getId(), $tagIRIs);

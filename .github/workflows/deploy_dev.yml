@@ -1,0 +1,23 @@
+name: "Deploy Dev Stack (Frontend + Backend)"
+
+on:
+  push:
+    branches:
+      - test
+
+# Ensure only one deployment runs at a time
+concurrency:
+  group: deploy-test-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      environment: dev
+      url: https://dev.burgieclan.vtk.be
+    secrets:
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}

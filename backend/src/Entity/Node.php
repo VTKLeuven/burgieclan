@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 abstract class Node
 {
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private User $creator;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]

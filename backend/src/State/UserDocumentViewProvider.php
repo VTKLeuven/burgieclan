@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class UserDocumentViewProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly Security               $security,
+        private readonly Security $security,
         private readonly UserDocumentViewRepository $viewRepository,
         private readonly MicroMapperInterface $microMapper,
     ) {
@@ -38,12 +38,19 @@ class UserDocumentViewProvider implements ProviderInterface
             $documentViews = $this->viewRepository->findRecentDocumentsByUser($user);
 
             // Map the document views to the API representation
-            return array_map(function ($view) {
-                return $this->microMapper->map($view, UserDocumentViewApi::class, [
-                    // Depth: document (0), document props (1), course (2), course props (3)
-                    MicroMapperInterface::MAX_DEPTH => 3,
-                ]);
-            }, $documentViews);
+            return array_map(
+                function ($view) {
+                    return $this->microMapper->map(
+                        $view,
+                        UserDocumentViewApi::class,
+                        [
+                        // Depth: document (0), document props (1), course (2), course props (3)
+                        MicroMapperInterface::MAX_DEPTH => 3,
+                        ]
+                    );
+                },
+                $documentViews
+            );
         }
 
         // If the operation is not a collection operation, throw an exception

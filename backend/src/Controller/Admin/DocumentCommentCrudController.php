@@ -40,7 +40,8 @@ class DocumentCommentCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnDetail();
-        yield TextEditorField::new('content');
+        yield TextEditorField::new('content')
+            ->setTemplatePath('admin/text_editor.html.twig');
         yield AssociationField::new('creator')
             ->hideOnForm();
         yield BooleanField::new('anonymous')
