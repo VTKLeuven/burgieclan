@@ -1,49 +1,68 @@
-# Production Symfony Dockerfile with Multi-Stage Build
-# Uses Alpine Linux with nginx + php-fpm for optimal performance
+# ===============================================
+# STAGE 1: CORE RUNTIME BASE (php_base)
+# Contains minimal system packages and compiled PHP extensions needed for R-U-N-T-I-M-E
+# ===============================================
+FROM php:8.4-fpm-alpine3.22 AS php_base
 
-# Build arguments
-ARG API_ENV=prod
-ARG FRONTEND_URL
-
-# ==================== BUILDER STAGE ====================
-FROM php:8.4-fpm-alpine3.22 AS builder
-
-# Set environment variables
-ENV COMPOSER_ALLOW_SUPERUSER=1
-
-# Install build dependencies (removed in production stage)
+# Install minimal runtime system dependencies
 RUN apk update && \
     apk add --no-cache \
-    git \
     curl \
-    wget \
-    libpng-dev \
-    libzip-dev \
-    icu-dev \
-    postgresql-dev \
-    libpng \
+    libpq \
     libzip \
-    icu-libs \
-    postgresql-libs \
-    nodejs \
-    npm && \
+    icu \
+    icu-data-full && \
     rm -rf /var/cache/apk/*
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
-
-# Install PHP extensions and immediately remove build dependencies
-RUN docker-php-ext-install \
+# Install required PHP extensions and immediately clean up the *-dev packages
+RUN apk add --no-cache --virtual .build-deps \
+    postgresql-dev \
+    libzip-dev \
+    icu-dev \
+    && docker-php-ext-install \
     pdo \
     pdo_pgsql \
     zip \
     intl \
-    opcache && \
-    # Remove development packages immediately to reduce intermediate layer size
-    apk del libpng-dev libzip-dev icu-dev postgresql-dev
+    opcache \
+    # Remove the build dependencies to keep the image lean
+    && apk del .build-deps \
+    && rm -rf /var/cache/apk/*
 
-# Set working directory
 WORKDIR /app
+
+# VOLUME DECLARATIONS
+# These folders are defined as volumes to ensure they use external persistence
+# (as configured in docker-compose) rather than being part of the image layers.
+# This is crucial for runtime data and external configuration mounts.
+# Logs and Cache. Persisted via the 'backend_var' named volume in Compose.
+VOLUME /app/var/
+# Application data/uploads. Mounted from the host via ${DATA_DIR} in Compose.
+VOLUME /app/data
+# Sensitive JWT keys. Mounted from the host via ${JWT_DIR} in Compose.
+VOLUME /app/config/jwt
+
+# ===============================================
+# STAGE 2: BUILDER (php_builder)
+# Extends php_base and adds BUILD-TIME tools (git, nodejs, composer, *-dev)
+# ===============================================
+FROM php_base AS php_builder
+
+ARG APP_ENV=prod
+
+# Add all heavy build-time dependencies
+RUN apk add --no-cache \
+    git \
+    nodejs \
+    npm \
+    # Required for building pdo_pgsql extension (even if already installed)
+    postgresql-dev \
+    libzip-dev \
+    icu-dev && \
+    rm -rf /var/cache/apk/*
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
 # Copy composer files for dependency installation
 COPY composer.json composer.lock symfony.lock ./
@@ -52,87 +71,69 @@ COPY composer.json composer.lock symfony.lock ./
 RUN COMPOSER_MEMORY_LIMIT=512M composer install \
     --no-dev \
     --optimize-autoloader \
-    --classmap-authoritative \
     --no-scripts \
     --no-interaction
 
-# Copy package files for npm installation
-COPY package.json package-lock.json webpack.config.js ./
+# Copy all source files
+COPY . .
 
-# Install npm dependencies and build assets
-RUN npm ci --no-audit
+# Install npm dependencies (including devDependencies needed for build)
+RUN npm ci --no-audit && \
+    # Build frontend assets
+    npm run build && \
+    # Remove node_modules to reduce image size
+    # The built assets in /app/public/build/ are all we need at runtime
+    rm -rf node_modules && \
+    # Install Symfony bundle assets (API Platform, etc.) into public/bundles directory
+    php bin/console assets:install public --symlink --relative --env=$APP_ENV --no-debug
 
-# Copy assets directory and application code
-COPY assets ./assets
-COPY . /app
+# ===============================================
+# STAGE 3: PRODUCTION IMAGE (php_prod)
+# Extends php_base and adds the final web server (nginx) and artifacts from builder
+# ===============================================
+FROM php_base AS php_prod
 
-# Build frontend assets with Webpack Encore
-RUN npm run build
-
-# Remove node_modules and npm after build (no longer needed)
-RUN rm -rf node_modules && \
-    apk del nodejs npm
-
-# Install Symfony bundle assets (API Platform, etc.) into public/bundles directory
-RUN php bin/console assets:install public --symlink --relative --env=$API_ENV --no-debug
-
-# Set proper permissions for application files
-RUN chown -R www-data:www-data /app && \
-    chmod -R 755 /app && \
-    mkdir -p /app/var && \
-    chown -R www-data:www-data /app/var && \
-    chmod -R 755 /app/var
-
-# ==================== PRODUCTION STAGE ====================
-FROM php:8.4-fpm-alpine3.22
-
-# Build argument for frontend URL
+# Build arguments
 ARG FRONTEND_URL
+ARG APP_ENV=prod
 
-# Set environment variables
+ENV APP_ENV=$APP_ENV
 ENV FRONTEND_URL=$FRONTEND_URL
 ENV JWT_PUBLIC_KEY=/app/config/jwt/public.pem
 ENV JWT_SECRET_KEY=/app/config/jwt/private.pem
 
-# Install ONLY runtime dependencies
-RUN apk update && \
-    apk add --no-cache \
+# Install additional production dependencies (nginx, nodejs for asset building)
+RUN apk add --no-cache \
     nginx \
-    curl \
-    libpng \
-    libzip \
-    icu-libs \
-    postgresql-libs && \
-    rm -rf /var/cache/apk/*
+    && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
-WORKDIR /app
-
-# Copy configuration files
+# Copy nginx configuration
 COPY .docker/production/nginx.conf /etc/nginx/nginx.conf
+
+# Copy PHP configuration
 COPY .docker/production/production.ini /usr/local/etc/php/conf.d/production.ini
 COPY .docker/production/pool.conf /usr/local/etc/php-fpm.d/pool.conf
-COPY .docker/production/startup.sh /usr/local/bin/startup.sh
 
-# Make startup script executable
+# Copy startup script
+COPY .docker/production/startup.sh /usr/local/bin/startup.sh
 RUN chmod +x /usr/local/bin/startup.sh
 
-# Copy built application from builder stage
-COPY --from=builder /app /app
+# Copy build artifacts from the php_builder stage
+COPY --from=php_builder /app/vendor/ /app/vendor/
+COPY --from=php_builder /app/public/build/ /app/public/build/
+COPY --from=php_builder /app/public/bundles/ /app/public/bundles/
 
-# Ensure proper permissions (may have been lost during copy)
-RUN chown -R www-data:www-data /app && \
-    chmod -R 755 /app && \
-    mkdir -p /app/var && \
-    chown -R www-data:www-data /app/var && \
-    chmod -R 755 /app/var
+# # Copy sources
+COPY . .
 
-# Expose port 8080
+# Set proper permissions
+RUN mkdir -p /app/var /app/data && \
+    chown -R www-data:www-data /app/var /app/data && \
+    chmod -R 755 /app/var /app/data
+
 EXPOSE 8080
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8080/api || exit 1
 
-# Run startup script
 CMD ["/usr/local/bin/startup.sh"]
