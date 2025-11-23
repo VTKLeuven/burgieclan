@@ -1,4 +1,4 @@
-import { withSentryConfig } from "@sentry/nextjs";
+import { withSentryConfig } from '@sentry/nextjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -24,7 +24,7 @@ const nextConfig = {
 
 export default withSentryConfig(nextConfig, {
     // For all available options, see:
-    // https://github.com/getsentry/sentry-webpack-plugin#options
+    // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
     org: "vtko-vzw",
     project: "burgieclan",
@@ -46,20 +46,12 @@ export default withSentryConfig(nextConfig, {
         enabled: true,
     },
 
-    // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+    // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
     // This can increase your server load as well as your hosting bill.
     // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
     // side errors will fail.
     tunnelRoute: "/monitoring",
 
-    // Hides source maps from generated client bundles
-    hideSourceMaps: true,
-
     // Automatically tree-shake Sentry logger statements to reduce bundle size
     disableLogger: true,
-
-    // Delete source maps after uploading them to Sentry
-    sourcemaps: {
-        deleteSourcemapsAfterUpload: true
-    }
 });

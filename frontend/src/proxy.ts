@@ -33,6 +33,7 @@ const startsWithAllowedPath = (pathWithoutLocale: string): boolean => {
     const allowedPaths = [
         'login',
         'auth', // for OAuth callback
+        'api',
     ];
 
     return allowedPaths.some((path) => pathWithoutLocale.startsWith(path));
@@ -99,7 +100,7 @@ const tryRefreshToken = async (request: NextRequest): Promise<string | null> => 
     }
 };
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || request.url;
 
     // Match and extract the locale from the URL path
