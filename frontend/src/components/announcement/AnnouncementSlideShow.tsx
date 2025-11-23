@@ -86,7 +86,7 @@ export default function AnnouncementSlideShow() {
                         {/* Left arrow button */}
                         <button
                             onClick={handlePrevious}
-                            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/2 bg-white hover:bg-gray-100 border border-gray-300 rounded-full p-1.5 shadow-sm transition-colors duration-200 z-10"
+                            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/2 bg-white hover:bg-gray-100 border border-gray-300 rounded-full p-1.5 shadow-xs transition-colors duration-200 z-10"
                             aria-label="Previous announcement"
                         >
                             <ChevronLeft className="w-4 h-4 text-gray-600" />
@@ -95,7 +95,7 @@ export default function AnnouncementSlideShow() {
                         {/* Right arrow button */}
                         <button
                             onClick={handleNext}
-                            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 bg-white hover:bg-gray-100 border border-gray-300 rounded-full p-1.5 shadow-sm transition-colors duration-200 z-10"
+                            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 bg-white hover:bg-gray-100 border border-gray-300 rounded-full p-1.5 shadow-xs transition-colors duration-200 z-10"
                             aria-label="Next announcement"
                         >
                             <ChevronRight className="w-4 h-4 text-gray-600" />

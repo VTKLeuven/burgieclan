@@ -138,7 +138,7 @@ export const UploadField: React.FC<FileUploadProps> = ({
                         <div className="flex text-sm leading-6 text-gray-600">
                             <label
                                 htmlFor="file-upload"
-                                className="relative cursor-pointer rounded-md bg-white font-semibold text-amber-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-amber-600 focus-within:ring-offset-2 hover:text-amber-500"
+                                className="relative cursor-pointer rounded-md bg-white font-semibold text-amber-600 focus-within:outline-hidden focus-within:ring-2 focus-within:ring-amber-600 focus-within:ring-offset-2 hover:text-amber-500"
                             >
                                 <p className={'text-sm'}>{t('upload.field.upload_button')}</p>
                                 <input
@@ -162,7 +162,7 @@ export const UploadField: React.FC<FileUploadProps> = ({
                         <span className="mr-3 min-h-8 min-w-8">
                             {filePreview.icon}
                         </span>
-                        <div className="flex-grow overflow-hidden whitespace-nowrap max-w-full">
+                        <div className="grow overflow-hidden whitespace-nowrap max-w-full">
                             <p className="text-sm">{filePreview.name}</p>
                             <p className="text-xs text-gray-400">{filePreview.size}</p>
                         </div>

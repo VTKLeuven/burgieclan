@@ -85,14 +85,14 @@ const CommentRow: React.FC<CommentRowProps> = ({
     };
 
     return (
-        <div className="py-2 px-3 leading-tight flex flex-col sm:flex-row overflow-visible relative items-center transition-colors border-b border-gray-200 hover:bg-gray-50 hover:shadow-sm group/comment">
+        <div className="py-2 px-3 leading-tight flex flex-col sm:flex-row overflow-visible relative items-center transition-colors border-b border-gray-200 hover:bg-gray-50 hover:shadow-xs group/comment">
             {/* Profile Picture - Left side (desktop only) */}
             <div className="hidden sm:flex items-center mr-2 overflow-visible">
                 <CommentUserIcon anonymous={comment.anonymous ?? true} creatorName={comment.creator?.fullName} />
             </div>
 
             {/* Comment content - Center */}
-            <div className="flex-grow mx-3 flex items-center min-w-0 w-full">
+            <div className="grow mx-3 flex items-center min-w-0 w-full">
                 {isEditing ? (
                     <form onSubmit={handleEditSubmit} className="space-y-2 w-full">
                         <textarea

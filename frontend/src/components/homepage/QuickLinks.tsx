@@ -52,7 +52,7 @@ export function QuickLinks() {
                                 href={link.linkTo}
                                 className="flex items-center text-gray-700 hover:text-primary hover:underline transition-colors"
                             >
-                                <ChevronRight className="mr-2 flex-shrink-0 text-amber-600" />
+                                <ChevronRight className="mr-2 shrink-0 text-amber-600" />
                                 <span>{link.name ?? link.linkTo}</span>
                             </Link>
                         </div>
