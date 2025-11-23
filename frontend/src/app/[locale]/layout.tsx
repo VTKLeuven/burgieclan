@@ -21,7 +21,11 @@ export const metadata: Metadata = {
   description: "Vlaamse Technische Kring Leuven Burgieclan",
 };
 
-export default async function RootLayout({ children, params: { locale }, }: Readonly<{ children: React.ReactNode; params: { locale: string }; }>) {
+type Params = Promise<{ locale: string }>;
+
+export default async function RootLayout({ children, params }: Readonly<{ children: React.ReactNode; params: Params; }>) {
+  const { locale } = await params;
+
   const [translations, userId] = await Promise.all([
     initTranslations(locale),
     getUserId()
