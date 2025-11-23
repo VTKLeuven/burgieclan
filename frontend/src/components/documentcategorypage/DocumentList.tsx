@@ -53,16 +53,6 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
         };
     }, []);
 
-    // Reset selection when documents change
-    useEffect(() => {
-        setSelectedDocuments([]);
-    }, [documents]);
-
-    // Reset page when filters or sort changes
-    useEffect(() => {
-        setPage(1);
-    }, [filters, sort]);
-
     const handleToggleSelect = (document: Document) => {
         setSelectedDocuments(prev => {
             const isSelected = prev.some(doc => doc.id === document.id);
@@ -92,14 +82,25 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
 
     const handleSortChange = (newSort: DocumentSortOptions) => {
         setSort(newSort);
+        setPage(1);
+        setSelectedDocuments([]);
     };
 
     const handleFilterChange = (newFilters: DocumentFilters) => {
         setFilters(newFilters);
+        setPage(1);
+        setSelectedDocuments([]);
     };
 
     const handleClearFilters = () => {
         setFilters({});
+        setPage(1);
+        setSelectedDocuments([]);
+    };
+
+    const handlePageChange = (newPage: number) => {
+        setPage(newPage);
+        setSelectedDocuments([]);
     };
 
     const allSelected = documents.length > 0 && selectedDocuments.length === documents.length;
@@ -178,7 +179,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                                 />
                             ))}
                         </div>
-                        <Pagination totalAmount={totalItems} currentPage={page} itemsPerPage={itemsPerPage} onPageChange={setPage} />
+                        <Pagination totalAmount={totalItems} currentPage={page} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} />
                     </div>
                 )}
             </div>

@@ -1,4 +1,3 @@
-import Loading from '@/app/[locale]/loading';
 import { CourseRow } from '@/components/courses/CourseRow';
 import { CourseTableHeader } from '@/components/courses/CourseTableHeader';
 import { SearchFilters } from '@/components/courses/CurriculumSearchBar';
@@ -71,6 +70,7 @@ const ModuleNode = ({
     // Don't auto-expand if it only matches itself
     useEffect(() => {
         if (autoExpand && hasChildMatches) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setExpanded(true);
         }
     }, [autoExpand, hasChildMatches]);

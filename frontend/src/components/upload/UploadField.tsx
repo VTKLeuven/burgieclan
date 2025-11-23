@@ -80,6 +80,7 @@ export const UploadField: React.FC<FileUploadProps> = ({
     // Handle initial file when component mounts or when initialFile changes
     useEffect(() => {
         if (initialFile) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             handleFileChange(initialFile);
         }
     }, [initialFile, handleFileChange]);
