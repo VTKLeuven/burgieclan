@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { X, Plus } from 'lucide-react';
-import { Course, DocumentCategory, Tag } from '@/types/entities';
 import useFetchTags from '@/hooks/useFetchTags';
+import { Course, DocumentCategory, Tag } from '@/types/entities';
+import { Plus, X } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface TagFilterProps {
     selectedTagIds: number[];
@@ -64,6 +64,7 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
         const handleClickOutside = (e: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
                 setShowSuggestions(false);
+                setSelectedSuggestionIndex(-1);
             }
         };
 
@@ -72,9 +73,6 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
     }, []);
 
     // Reset selected index when input changes or suggestions close
-    useEffect(() => {
-        setSelectedSuggestionIndex(-1);
-    }, [tagInput, showSuggestions]);
 
     // Add an existing tag by Tag object
     const addExistingTag = (tag: Tag) => {
@@ -161,12 +159,14 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
                 }
             } else if (e.key === 'Escape') {
                 setShowSuggestions(false);
+                setSelectedSuggestionIndex(-1);
             }
         } else if (e.key === 'Enter' && tagInput.trim()) {
             e.preventDefault();
             addCustomTagQuery(tagInput);
         } else if (e.key === 'Escape') {
             setShowSuggestions(false);
+            setSelectedSuggestionIndex(-1);
         }
         
         if (e.key === 'Backspace' && tagInput === '') {
@@ -244,8 +244,14 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
                 <input
                     type="text"
                     value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onFocus={() => setShowSuggestions(true)}
+                    onChange={(e) => {
+                        setTagInput(e.target.value);
+                        setSelectedSuggestionIndex(-1);
+                    }}
+                    onFocus={() => {
+                        setShowSuggestions(true);
+                        setSelectedSuggestionIndex(-1);
+                    }}
                     onKeyDown={handleKeyDown}
                     className="flex-1 min-w-0 py-0.5 px-0 text-sm border-0 focus:ring-0 outline-none bg-transparent"
                     placeholder={selectedTags.length > 0 || selectedTagQueries.length > 0 ? "" : t('upload.form.tags.placeholder')}

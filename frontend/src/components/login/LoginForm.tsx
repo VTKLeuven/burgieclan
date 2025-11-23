@@ -74,6 +74,7 @@ export default function LoginForm() {
     useEffect(() => {
         if (apiError) {
             if (apiError.status == 401) {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setCredentialsError(t('login_invalid_credentials'));
             } else {
                 setCredentialsError(t('unexpected'));

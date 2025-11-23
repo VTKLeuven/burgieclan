@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronRight } from 'lucide-react';
-import ModuleNode from '@/components/courses/ModuleNode';
-import type { Program, Course } from '@/types/entities';
 import { SearchFilters } from '@/components/courses/CurriculumSearchBar';
-import {
-  programMatchesText,
-  programContainsChildMatches,
-  countMatchesInProgram
-} from '@/utils/curriculumSearchUtils';
-import { useTranslation } from 'react-i18next';
+import ModuleNode from '@/components/courses/ModuleNode';
 import DownloadButton from '@/components/ui/DownloadButton';
+import type { Course, Program } from '@/types/entities';
+import {
+  countMatchesInProgram,
+  programContainsChildMatches,
+  programMatchesText
+} from '@/utils/curriculumSearchUtils';
+import { ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ProgramNodeProps {
   program: Program;
@@ -42,6 +42,7 @@ const ProgramNode = ({
   // Don't auto-expand if it just matches itself with no child matches
   useEffect(() => {
     if (autoExpand && hasChildMatches) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setExpanded(true);
     }
   }, [autoExpand, hasChildMatches]);
