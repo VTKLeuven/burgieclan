@@ -6,7 +6,7 @@
  * Based on sample: https://github.com/wojtekmaj/react-pdf/tree/main/sample/next-app/app
  */
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
@@ -17,7 +17,7 @@ const PAGES_PER_LOAD = 10;
 type PDFFile = string | File | null;
 
 // PDF worker from pdfjs-dist
-pdfjs.GlobalWorkerOptions.workerSrc = require("react-pdf/node_modules/pdfjs-dist/build/pdf.worker.min.mjs").toString();
+pdfjs.GlobalWorkerOptions.workerSrc = require("../../../../node_modules/react-pdf/node_modules/pdfjs-dist/build/pdf.worker.min.mjs").toString();
 
 export default function PDFViewer({ file, width }: { file: PDFFile, width: number }): JSX.Element {
     const { t } = useTranslation();

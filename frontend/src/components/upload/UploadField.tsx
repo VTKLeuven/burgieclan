@@ -4,7 +4,7 @@ import { ALLOWED_MIME_TYPES, FILE_SIZE_MB } from '@/utils/constants/upload';
 import { fileTypeFromBlob } from 'file-type';
 import { X } from 'lucide-react';
 import Image from 'next/image';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, type JSX } from 'react';
 import { FieldError, FieldErrorsImpl, UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Merge } from "type-fest";
