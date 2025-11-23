@@ -200,7 +200,7 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
         <div className="mt-2" ref={containerRef}>
             <div
                 className="block w-full rounded-md border-0 py-1.5 px-3
-                text-gray-900 shadow-sm ring-1 ring-inset
+                text-gray-900 shadow-xs ring-1 ring-inset
                 ring-gray-300 placeholder:text-gray-400
                 focus:ring-2 focus:ring-inset focus:ring-amber-600
                 sm:text-sm sm:leading-6 items-center flex flex-wrap gap-1"
@@ -253,7 +253,7 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
                         setSelectedSuggestionIndex(-1);
                     }}
                     onKeyDown={handleKeyDown}
-                    className="flex-1 min-w-0 py-0.5 px-0 text-sm border-0 focus:ring-0 outline-none bg-transparent"
+                    className="flex-1 min-w-0 py-0.5 px-0 text-sm border-0 focus:ring-0 outline-hidden bg-transparent"
                     placeholder={selectedTags.length > 0 || selectedTagQueries.length > 0 ? "" : t('upload.form.tags.placeholder')}
                     aria-label={t('upload.form.tags.placeholder')}
                 />

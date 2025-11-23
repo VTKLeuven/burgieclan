@@ -1,5 +1,6 @@
+import Input from '@/components/ui/Input';
+import { Filter, Search, X } from 'lucide-react';
 import React, { useState } from 'react';
-import { Search, X, Filter } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface SearchProps {
@@ -51,18 +52,15 @@ export default function CurriculumSearchBar({ onSearch, clearSearch }: SearchPro
     return (
         <div className="mb-6">
             <div className="flex items-center mb-2">
-                <div className="relative flex-grow">
-                    <input
+                <div className="relative grow">
+                    <Input
                         type="text"
-                        className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-wireframe-primary-blue"
                         placeholder={t('curriculum-navigator.search-placeholder')}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         onKeyDown={handleKeyDown}
+                        icon={Search}
                     />
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Search size={18} className="text-gray-400" />
-                    </div>
                     {(query || showFilters || semester || minCredits || maxCredits || showOnlyFavorites) && (
                         <button
                             onClick={handleClear}

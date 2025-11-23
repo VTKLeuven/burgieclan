@@ -3,6 +3,7 @@
 import { storeTokensInCookies } from "@/actions/auth";
 import Logo from "@/components/common/Logo";
 import LitusOAuthButton from "@/components/login/LitusOAuthButton";
+import Input from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
 import { useUser } from "@/components/UserContext";
 import { useApi } from "@/hooks/useApi";
@@ -123,15 +124,15 @@ export default function LoginForm() {
                                 <p className="mt-2 text-sm font-medium">{t('username')}</p>
                             </label>
                             <div className="mt-2">
-                                <input
+                                <Input
                                     id="username"
                                     name="username"
                                     type="text"
+                                    placeholder=""
                                     autoComplete={t('username')}
                                     required
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
                         </div>
@@ -141,15 +142,15 @@ export default function LoginForm() {
                                 <p className="mt-2 text-sm font-medium">{t('password')}</p>
                             </label>
                             <div className="mt-2 relative">
-                                <input
+                                <Input
                                     id="password"
                                     name="password"
                                     type={showPassword ? "text" : "password"}
+                                    placeholder=""
                                     autoComplete="current-password"
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full rounded-md border-0 py-1.5 text-vtk-blue-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-600 sm:text-sm sm:leading-6"
                                 />
                                 <button
                                     type="button"

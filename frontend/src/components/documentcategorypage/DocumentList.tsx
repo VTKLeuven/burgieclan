@@ -111,7 +111,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                 <h3>{t('course-page.documents.header')}</h3>
 
                 <div className="flex items-center space-x-2">
-                    <CreateDocumentButton className='mx-0' initialData={{ course, category }} />
+                    <CreateDocumentButton initialData={{ course, category }} />
 
                     <DocumentFilter
                         filters={filters}
@@ -149,7 +149,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                 </div>
             </div>
 
-            <div className="rounded-lg shadow-sm">
+            <div className="rounded-lg shadow-xs">
                 {loading ? (
                     <div className="flex justify-center items-center h-full py-12">
                         <LoaderCircle className="animate-spin text-vtk-blue-500" size={48} />
