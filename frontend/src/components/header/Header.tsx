@@ -22,7 +22,9 @@ export default function Header() {
     const isAuthenticated = user !== null;
 
     const navigation = [
-        { name: t('browse_courses'), href: '/courses' },
+        { name: t('courses'), href: '/courses' },
+        { name: t('FAQ'), href: '#' },
+        { name: t('overview'), href: '#' },
     ];
 
     return (
