@@ -19,6 +19,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "VTK Burgieclan",
   description: "Vlaamse Technische Kring Leuven Burgieclan",
+  icons: {
+    icon: "/favicon.ico",          // default favicon
+  },
 };
 
 export default async function RootLayout({ children, params: { locale }, }: Readonly<{ children: React.ReactNode; params: { locale: string }; }>) {
