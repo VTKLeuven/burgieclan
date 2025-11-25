@@ -10,6 +10,7 @@ import { CourseComment } from '@/types/entities';
 import { Send } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Dialog, DialogTitle, DialogBody, DialogActions } from '@/components/ui/Dialog';
 
 export type CommentRowProps = {
     comment: CourseComment;
@@ -33,6 +34,8 @@ const CommentRow: React.FC<CommentRowProps> = ({
     const { t } = useTranslation();
     const updateComment = useUpdateComment();
     const deleteComment = useDeleteComment();
+
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     // Handle click to edit comment
     const handleEditClick = () => {
@@ -79,7 +82,16 @@ const CommentRow: React.FC<CommentRowProps> = ({
         }
     };
 
-    const handleDeleteComment = async () => {
+    const handleDeleteComment = () => {
+        // 1. Open de dialog in plaats van direct te verwijderen
+        setIsDeleteDialogOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        // 2. Sluit de dialog
+        setIsDeleteDialogOpen(false);
+
+        // 3. Voer de verwijdering uit
         await deleteComment(comment.id);
         if (onDelete) onDelete(comment.id);
     };
@@ -183,7 +195,44 @@ const CommentRow: React.FC<CommentRowProps> = ({
                 />
                 <CommentActions onEdit={handleEditClick} onDelete={handleDeleteComment} show={isOwnComment && !isEditing} isMobile />
             </div>
-        </div>
+            <Dialog
+                isOpen={isDeleteDialogOpen}
+                onClose={() => setIsDeleteDialogOpen(false)}
+                size="sm"
+            >
+                <DialogTitle className="text-xl font-bold text-gray-900">
+                    {t('course-page.comments.dialog.title_delete')}
+                </DialogTitle>
+
+                <DialogBody>
+                    <p className="text-sm text-gray-500">
+                        {t('course-page.comments.dialog.message.confirm_delete')}
+                    </p>
+                </DialogBody>
+
+                <DialogActions>
+                    {/* Annuleer knop: Sluit de dialog */}
+                    <button
+                        type="button"
+                        onClick={() => setIsDeleteDialogOpen(false)}
+                        className="text-sm px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                    >
+                        {t('course-page.comments.dialog.button.cancel')}
+                    </button>
+
+                    {/* Bevestig knop: Voert de verwijdering uit */}
+                    <button
+                        type="button"
+                        onClick={handleConfirmDelete}
+                        className="text-sm px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                        {t('course-page.comments.dialog.button.delete_confirm')}
+                    </button>
+                </DialogActions>
+            </Dialog>
+            {/* Einde van de Dialog code */}
+
+        </div> // Dit is de afsluitende </div> van de hoofdcomponent
     );
 };
 
