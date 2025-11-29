@@ -4,7 +4,7 @@ import { ALLOWED_MIME_TYPES, FILE_SIZE_MB } from '@/utils/constants/upload';
 import { fileTypeFromBlob } from 'file-type';
 import { X } from 'lucide-react';
 import Image from 'next/image';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, type JSX } from 'react';
 import { FieldError, FieldErrorsImpl, UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Merge } from "type-fest";
@@ -80,6 +80,7 @@ export const UploadField: React.FC<FileUploadProps> = ({
     // Handle initial file when component mounts or when initialFile changes
     useEffect(() => {
         if (initialFile) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             handleFileChange(initialFile);
         }
     }, [initialFile, handleFileChange]);
@@ -137,7 +138,7 @@ export const UploadField: React.FC<FileUploadProps> = ({
                         <div className="flex text-sm leading-6 text-gray-600">
                             <label
                                 htmlFor="file-upload"
-                                className="relative cursor-pointer rounded-md bg-white font-semibold text-amber-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-amber-600 focus-within:ring-offset-2 hover:text-amber-500"
+                                className="relative cursor-pointer rounded-md bg-white font-semibold text-amber-600 focus-within:outline-hidden focus-within:ring-2 focus-within:ring-amber-600 focus-within:ring-offset-2 hover:text-amber-500"
                             >
                                 <p className={'text-sm'}>{t('upload.field.upload_button')}</p>
                                 <input
@@ -161,7 +162,7 @@ export const UploadField: React.FC<FileUploadProps> = ({
                         <span className="mr-3 min-h-8 min-w-8">
                             {filePreview.icon}
                         </span>
-                        <div className="flex-grow overflow-hidden whitespace-nowrap max-w-full">
+                        <div className="grow overflow-hidden whitespace-nowrap max-w-full">
                             <p className="text-sm">{filePreview.name}</p>
                             <p className="text-xs text-gray-400">{filePreview.size}</p>
                         </div>

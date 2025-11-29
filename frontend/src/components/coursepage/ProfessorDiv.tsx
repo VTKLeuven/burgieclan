@@ -70,7 +70,7 @@ export default function ProfessorDiv({ unumber, index, t }: { unumber: string, i
         <div className="relative group">
             <Link href={`https://www.kuleuven.be/wieiswie/${locale}/person/0${sanitizedUnumber}`}>
                 {!imageError ? (
-                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 border-2 border-white shadow-sm hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer relative z-10 group-hover:z-20">
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 border-2 border-white shadow-xs hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer relative z-10 group-hover:z-20">
                         <Image
                             src={imgSrc}
                             onError={handleError}
@@ -81,7 +81,7 @@ export default function ProfessorDiv({ unumber, index, t }: { unumber: string, i
                         />
                     </div>
                 ) : (
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-medium border-2 border-white shadow-sm hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer relative z-10 group-hover:z-20 ${getAvatarColor(professorName)}`}>
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-medium border-2 border-white shadow-xs hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer relative z-10 group-hover:z-20 ${getAvatarColor(professorName)}`}>
                         {getInitials(professorName)}
                     </div>
                 )}

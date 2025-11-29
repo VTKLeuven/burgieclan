@@ -1,3 +1,5 @@
+@reference "../../app/globals.css";
+
 .footerText {
     @apply text-xs leading-5 text-gray-500
 }

@@ -5,18 +5,17 @@
 
 import * as Sentry from "@sentry/nextjs";
 
-// Conditionally load Sentry based on the environment
-if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test') {
-  Sentry.init({
-    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+Sentry.init({
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
-    // Set custom Sentry environment
-    environment: "frontend-" + process.env.NODE_ENV,
+  environment: "frontend-" + process.env.NODE_ENV,
+  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
+  tracesSampleRate: 1,
 
-    // Adjust this value in production, or use tracesSampler for greater control
-    tracesSampleRate: 1,
+  // Enable logs to be sent to Sentry
+  enableLogs: true,
 
-    // Setting this option to true will print useful information to the console while you're setting up Sentry
-    debug: false,
-  });
-}
+  // Enable sending user PII (Personally Identifiable Information)
+  // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
+  sendDefaultPii: true,
+});

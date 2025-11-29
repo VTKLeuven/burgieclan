@@ -253,7 +253,7 @@ const Editor = ({ className = '', parentDialogOpen = true, onEditorReady }: Edit
         immediatelyRender: false, // Prevents hydration errors in Next.js
         editorProps: {
             attributes: {
-                class: 'tiptap overflow-auto mx-auto h-32 p-3 focus:outline-none',
+                class: 'tiptap overflow-auto mx-auto h-32 p-3 focus:outline-hidden',
             },
             // Strip styling from pasted content
             handlePaste(view, event, slice) {

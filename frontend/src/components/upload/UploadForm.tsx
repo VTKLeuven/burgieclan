@@ -13,7 +13,7 @@ import { getSuggestedNameFromFilename } from '@/utils/documentNameSuggestion';
 import { documentSchema } from '@/utils/validation/documentSchema';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useState } from 'react';
-import { useForm, type FieldError } from 'react-hook-form';
+import { useForm, useWatch, type FieldError } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 interface FormProps {
@@ -42,7 +42,6 @@ export default function UploadForm({
         handleSubmit,
         setValue,
         control,
-        watch,
         formState: { errors },
     } = useForm<UploadFormData>({
         resolver: yupResolver(documentSchema(t)),
@@ -56,9 +55,9 @@ export default function UploadForm({
     const { courses, categories, isLoading: isLoadingFields, error } = useFormFields();
     const yearOptions = useYearOptions();
 
-    // Watch the file and name fields
-    const watchedFile = watch('file');
-    const watchedName = watch('name');
+    // Watch the file and name fields using useWatch for better memoization compatibility
+    const watchedFile = useWatch({ control, name: 'file' });
+    const watchedName = useWatch({ control, name: 'name' });
 
     // Set initial file on mount if provided.
     useEffect(() => {

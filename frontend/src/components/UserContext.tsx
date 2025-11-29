@@ -46,6 +46,7 @@ export const UserProvider = ({ children, userId }: { children: ReactNode, userId
 
     // Initial fetch when component mounts or userId changes
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchUser();
     }, [fetchUser]);
 

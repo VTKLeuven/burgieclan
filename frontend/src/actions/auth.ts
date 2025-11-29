@@ -9,7 +9,7 @@ import { cookies } from 'next/headers';
  * This function can only be called in Server Components or Server Actions
  */
 export const getUserId = async (): Promise<number | null> => {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
 
     if (!jwt) {
@@ -37,7 +37,7 @@ export const isAuthenticated = async (): Promise<boolean> => {
  * Server-side function to get the JWT token from HTTP-only cookie
  */
 export const getServerJWT = async (): Promise<string | null> => {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
 
     if (!jwt) {
@@ -62,7 +62,7 @@ export const getActiveJWT = async (): Promise<string | null> => {
         throw new Error('Missing environment variable for backend base URL');
     }
 
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     let jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
     const refreshToken = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
 
@@ -121,7 +121,7 @@ export const storeTokensInCookies = async (
     refreshToken?: string,
     refreshTokenExpiration?: number
 ) => {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
 
     // Calculate JWT expiration from the token itself
     const jwtPayload = JSON.parse(atob(jwt.split('.')[1]));
@@ -160,7 +160,7 @@ export const storeTokensInCookies = async (
  * Clear all authentication cookies
  */
 export const clearTokenCookies = async () => {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     cookieStore.delete(COOKIE_NAMES.JWT);
     cookieStore.delete(COOKIE_NAMES.REFRESH_TOKEN);
 };
@@ -176,7 +176,7 @@ export const logOut = async (): Promise<{ success: boolean; error?: string }> =>
         }
 
         // Get the current JWT and refresh token for the logout request
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
         const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
         const refreshToken = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
 

@@ -8,7 +8,6 @@ import DocumentList from "@/components/account/DocumentList";
 import FavoriteList from "@/components/account/FavoriteList";
 import type { Course, Document, Module, Program } from "@/types/entities";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const mapCoursesToItems = (courses: Course[]) => {
@@ -53,25 +52,15 @@ export default function AccountPage() {
     const { t } = useTranslation();
     const router = useRouter();
 
-    // Local state to manage favorites lists
-    const [favoriteCourses, setFavoriteCourses] = useState<Course[]>([]);
-    const [favoriteModules, setFavoriteModules] = useState<Module[]>([]);
-    const [favoritePrograms, setFavoritePrograms] = useState<Program[]>([]);
-    const [favoriteDocuments, setFavoriteDocuments] = useState<Document[]>([]);
-
-    // Initialize favorite lists from user data when component mounts
-    useEffect(() => {
-        if (user) {
-            setFavoriteCourses(user.favoriteCourses || []);
-            setFavoriteModules(user.favoriteModules || []);
-            setFavoritePrograms(user.favoritePrograms || []);
-            setFavoriteDocuments(user.favoriteDocuments || []);
-        }
-    }, [user]);
-
     if (loading || !user) {
         return <Loading />;
     }
+
+    // Derive favorites directly from user data
+    const favoriteCourses = user.favoriteCourses || [];
+    const favoriteModules = user.favoriteModules || [];
+    const favoritePrograms = user.favoritePrograms || [];
+    const favoriteDocuments = user.favoriteDocuments || [];
 
 
     async function handleLogout() {

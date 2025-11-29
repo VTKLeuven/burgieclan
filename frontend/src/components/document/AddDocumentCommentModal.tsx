@@ -104,7 +104,7 @@ export default function AddDocumentCommentModal({ documentId, file, isModalOpen,
                 />
             </div>
 
-            <DialogActions className="!mt-0">
+            <DialogActions className="mt-0!">
                 <button
                     onClick={() => {
                         if (editorInstance && onSubmit) {

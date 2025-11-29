@@ -1,8 +1,8 @@
 'use client' // Error boundaries must be Client Components
 
-import { useEffect } from 'react'
-import * as Sentry from "@sentry/nextjs";
 import ErrorPage from "@/components/error/ErrorPage";
+import * as Sentry from "@sentry/nextjs";
+import { useEffect } from "react";
 
 /**
  * Catches unexpected client-side errors in all lower-level components
@@ -14,7 +14,7 @@ export default function Error({ error }: { error: Error & { digest?: string } })
 
     return (
         <div className="h-full">
-            <ErrorPage detail={error.message}/>
+            <ErrorPage detail={error.message} />
         </div>
     )
 }

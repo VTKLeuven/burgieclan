@@ -1,4 +1,5 @@
 import ComboboxController from '@/components/ui/ComboboxController';
+import Input from '@/components/ui/Input';
 import React from 'react';
 import { Controller, FieldError, UseFormRegisterReturn } from 'react-hook-form';
 
@@ -46,20 +47,10 @@ export const FormField: React.FC<FormFieldProps> = ({
                     {error && <p className="text-red-500 text-xs">{error?.message}</p>}
                 </div>
                 <div className="mt-2">
-                    <input
+                    <Input
                         type="text"
-                        placeholder={placeholder}
-                        className={`
-              block w-full rounded-md border-0 py-1.5 px-3
-              text-gray-900 shadow-sm ring-1 ring-inset
-              ring-gray-300 placeholder:text-gray-400
-              focus:ring-2 focus:ring-inset focus:ring-amber-600
-              sm:text-sm sm:leading-6
-              ${error ? 'ring-red-500' : 'ring-gray-300'}
-              ${disabled ? 'bg-gray-50 text-gray-500' : ''}
-              ${className}
-            `}
-                        disabled={disabled}
+                        placeholder={placeholder || ''}
+                        passive={!!error}
                         {...(registration || {})}
                     />
                 </div>
