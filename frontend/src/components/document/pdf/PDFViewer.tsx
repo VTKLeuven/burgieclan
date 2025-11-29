@@ -16,8 +16,11 @@ const PAGES_PER_LOAD = 10;
 
 type PDFFile = string | File | null;
 
-// PDF worker from pdfjs-dist
-pdfjs.GlobalWorkerOptions.workerSrc = require("../../../../node_modules/react-pdf/node_modules/pdfjs-dist/build/pdf.worker.min.mjs").toString();
+// Configure PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url,
+).toString();
 
 export default function PDFViewer({ file, width }: { file: PDFFile, width: number }): JSX.Element {
     const { t } = useTranslation();
@@ -27,13 +30,13 @@ export default function PDFViewer({ file, width }: { file: PDFFile, width: numbe
     // Number of pages currently displayed
     const [displayedPages, setDisplayedPages] = useState<number>(PAGES_PER_LOAD);
 
-    // Options for GET requests to PDF files
+    // Options for PDF.js configuration
     // Memoize the options object to prevent unnecessary rerenders
     const options = useMemo(() => ({
         cMapUrl: '/cmaps/',
         standardFontDataUrl: '/standard_fonts/',
         withCredentials: true,
-    }), []); // Empty dependency array since these values never change
+    }), []);
 
 
     function onDocumentLoadSuccess({ numPages: nextNumPages }: { numPages: number }): void {
