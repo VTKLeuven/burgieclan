@@ -20,6 +20,11 @@ const nextConfig = {
             },
         ],
     },
+    experimental: {
+        serverActions: {
+            bodySizeLimit: `${parseInt(process.env.NEXT_PUBLIC_MAX_FILE_SIZE_MB ?? '10') + 5}mb`,
+        },
+    },
 };
 
 export default withSentryConfig(nextConfig, {
