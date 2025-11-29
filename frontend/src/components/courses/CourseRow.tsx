@@ -154,7 +154,7 @@ export const CourseRow = memo(({
                     </div>
                 </div>
                 {loading || !course ? (
-                    <div className="flex-grow">
+                    <div className="grow">
                         {content.name}
                     </div>
                 ) : (

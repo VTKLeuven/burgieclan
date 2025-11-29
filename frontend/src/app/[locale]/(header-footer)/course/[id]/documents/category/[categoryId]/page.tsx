@@ -5,7 +5,10 @@ export const metadata = {
     description: 'Browse documents for this course and category on Burgieclan.',
 };
 
+type Params = Promise<{ id: number, categoryId: number }>;
 
-export default function CourseDocumentsPage({ params: { id: courseId, categoryId } }: { params: { id: number, categoryId: number } }) {
+export default async function CourseDocumentsPage({ params }: { params: Params }) {
+    const { id: courseId, categoryId } = await params;
+
     return <CourseDocumentsContent courseId={courseId} categoryId={categoryId} />;
 }

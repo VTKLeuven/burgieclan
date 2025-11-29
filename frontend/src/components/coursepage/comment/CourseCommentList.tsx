@@ -144,7 +144,7 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
                 )}
 
                 {/* Comment count badge */}
-                <div className="ml-3 bg-blue-100 text-blue-800 px-2 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center text-xs">
+                <div className="ml-3 bg-blue-100 text-blue-800 px-2 rounded-full min-w-6 h-6 flex items-center justify-center text-xs">
                     {comments.length}
                 </div>
             </div>
@@ -155,7 +155,7 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
                     {/* Category description */}
                     {category.description && (
                         <div className="py-2 px-3 bg-gray-50 border border-gray-200 rounded-md flex items-start">
-                            <Info className="h-4 w-4 mr-2 text-gray-500 mt-0.5 flex-shrink-0" />
+                            <Info className="h-4 w-4 mr-2 text-gray-500 mt-0.5 shrink-0" />
                             <p className="text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: category.description }} />
                         </div>
                     )}

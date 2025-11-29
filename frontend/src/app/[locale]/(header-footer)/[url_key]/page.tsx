@@ -12,6 +12,10 @@ export const metadata: Metadata = {
  * Each page is identified with a unique url_key. When visiting /[url_key], the page with that url_key is fetched
  * from the backend if it exists.
  */
-export default function Page({ params: { url_key } }: { params: { url_key: string } }) {
+type Params = Promise<{ url_key: string }>;
+
+export default async function Page({ params }: { params: Params }) {
+    const { url_key } = await params;
+
     return <PageContent url_key={url_key} />;
 }
