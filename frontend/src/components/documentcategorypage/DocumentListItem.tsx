@@ -35,7 +35,7 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                         className="my-0"
                     />
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                     <Link
                         href={`/document/${document.id}`}
                         className="cursor-pointer hover:text-vtk-blue-600 hover:underline inline-block"
@@ -43,7 +43,7 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                         <h3 className="text-lg font-semibold m-0">{document.name}</h3>
                     </Link>
                     <div className="flex items-center text-xs text-gray-700 space-x-4">
-                        <span className="truncate">{extractFilename(document.contentUrl)}</span>
+                        <span className="truncate max-w-xs pr-2">{extractFilename(document.contentUrl)}</span>
 
                         {/* Display tags if they exist */}
                         {document.tags && document.tags.length > 0 && (
@@ -63,8 +63,6 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                         )}
                     </div>
                 </div>
-
-                <div className="flex-grow"></div>
 
                 {document.underReview && (
                     <div className="mx-1">

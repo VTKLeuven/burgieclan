@@ -1,5 +1,7 @@
 # Stage 1: Dependencies
-FROM node:22-alpine AS deps
+FROM node:24-alpine AS base
+
+FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
@@ -10,7 +12,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --no-audit
 
 # Stage 2: Builder
-FROM node:20-alpine AS builder
+FROM base AS builder
 WORKDIR /app
 
 # Accept Sentry auth token as build arg
@@ -38,7 +40,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # Stage 3: Runner
-FROM node:20-alpine AS runner
+FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production

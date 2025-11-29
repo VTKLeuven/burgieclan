@@ -50,7 +50,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
 
     const inputClassName = `
     block w-full rounded-md border-0 py-1.5 px-3
-    text-gray-900 shadow-sm ring-1 ring-inset
+    text-gray-900 shadow-xs ring-1 ring-inset
     ring-gray-300 placeholder:text-gray-400
     focus:ring-2 focus:ring-inset focus:ring-amber-600
     sm:text-sm sm:leading-6 appearance-none
@@ -76,7 +76,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
                             </div>
                         </Combobox.Button>
                         {open && (
-                            <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                            <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-hidden sm:text-sm">
                                 {limitedOptions.map((option) => (
                                     <Combobox.Option
                                         key={option.id}

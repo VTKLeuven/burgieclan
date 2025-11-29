@@ -116,7 +116,7 @@ export default function VoteButton({
                     ${voteState === VoteDirection.UP ? 'text-amber-600 fill-amber-600' : 'text-gray-500'}
                 `}
             />
-            <div className={`${textSize} min-w-[1rem] text-center ${voteState === VoteDirection.UP
+            <div className={`${textSize} min-w-4 text-center ${voteState === VoteDirection.UP
                 ? 'text-amber-600'
                 : voteState === VoteDirection.DOWN
                     ? 'text-blue-500'

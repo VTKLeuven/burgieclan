@@ -62,7 +62,7 @@ const DocumentSort: React.FC<DocumentSortProps> = ({ currentSort, onSortChange }
     const currentFieldLabel = sortableFields.find(f => f.value === currentSort.field)?.label || t('document.sort-by');
 
     // Common button style to ensure consistent height
-    const buttonStyle = "h-10 flex items-center px-3 py-2 text-sm border focus:outline-none";
+    const buttonStyle = "h-10 flex items-center px-3 py-2 text-sm border focus:outline-hidden";
 
     return (
         <div className="relative">

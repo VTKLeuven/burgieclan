@@ -1,160 +1,251 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-.primary-button {
-    @apply flex items-center justify-center rounded-md bg-amber-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600 !important;
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --breakpoint-xs: 320px;
+
+  --color-vtk-blue-400: #353761;
+  --color-vtk-blue-500: #212347;
+  --color-vtk-blue-600: #1b1d40;
+
+  --color-vtk-yellow-400: #fce400;
+  --color-vtk-yellow-500: #ffd400;
+  --color-vtk-yellow-600: #febc00;
+
+  --color-wireframe-darkest-gray: #4a5a71;
+
+  --color-wireframe-lightest-gray: #f0f1f7;
+
+  --color-wireframe-mid-gray: #959eac;
+
+  --color-wireframe-primary-blue: #1a1f4a;
+  --color-wireframe-primary-panache: #ffd400;
+
+  --color-wireframe-content: #1a1f4a;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 }
 
-.white-button {
-    @apply flex w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+
+  /* Remove default focus outline on form inputs */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+
+  /* Tailwind v4: Add consistent horizontal padding to form elements (px-3 equivalent) */
+  input,
+  textarea,
+  select {
+    padding-left: 0.75rem; /* px-3 equivalent */
+    padding-right: 0.75rem;
+  }
+
+  /* Tailwind v4: Prevent outline color transitions (v4 includes outline-color in transitions) */
+  input,
+  textarea,
+  select,
+  button {
+    outline-color: transparent;
+  }
+
+  /* Tailwind v4: Ensure custom focus rings work (remove default Preflight focus outlines) */
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
 }
 
-body {
-    @apply leading-relaxed m-0 p-0 h-full
-}
+@layer utilities {
+  .primary-button {
+    @apply flex items-center rounded-md bg-amber-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-xs hover:bg-amber-500 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600;
+  }
 
-h1, h2, h3, h4, h5, h6 {
+  .white-button {
+    @apply flex w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-gray-900 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900;
+  }
+
+  body {
+    @apply leading-relaxed m-0 p-0 h-full;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply leading-tight text-gray-900;
-}
+  }
 
-h1 {
+  h1 {
     @apply text-4xl sm:text-5xl font-bold tracking-tight my-4;
-}
+  }
 
-h2 {
+  h2 {
     @apply text-3xl sm:text-4xl font-semibold my-3;
-}
+  }
 
-h3 {
+  h3 {
     @apply text-2xl sm:text-3xl font-semibold my-2;
-}
+  }
 
-h4 {
+  h4 {
     @apply text-xl sm:text-2xl font-medium my-2;
-}
+  }
 
-h5 {
+  h5 {
     @apply text-lg sm:text-xl font-medium my-1;
-}
+  }
 
-h6 {
+  h6 {
     @apply text-base sm:text-lg font-medium my-1;
-}
+  }
 
-p {
+  p {
     @apply text-base leading-6;
-}
+  }
 
-a {
+  a {
     @apply text-base leading-6 font-semibold;
-}
+  }
 
-ul {
+  ul {
     @apply list-disc list-inside pl-4;
-}
+  }
 
-ol {
+  ol {
     @apply list-decimal list-inside pl-4;
-}
+  }
 
-ul, ol {
+  ul,
+  ol {
     @apply px-4 my-1 ml-1;
-}
+  }
 
-ul li p,
-ol li p {
+  ul li p,
+  ol li p {
     @apply mt-1 mb-1;
-}
+  }
 
-/* TipTap editor */
-.tiptap {
+  /* TipTap editor */
+  .tiptap {
     > :first-child {
-        @apply mt-0;
+      @apply mt-0;
     }
 
     button {
-        @apply p-1 mx-2 rounded-md;
+      @apply p-1 mx-2 rounded-md;
     }
 
-    ul, ol {
-        @apply list-outside;
+    ul,
+    ol {
+      @apply list-outside;
     }
 
-    h1, h2, h3, h4, h5, h6 {
-        @apply mt-4 break-words;
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      @apply mt-4 wrap-break-word;
     }
 
-    h1, h2 {
-        @apply mt-2 mb-1;
+    h1,
+    h2 {
+      @apply mt-2 mb-1;
     }
 
     h1 {
-        @apply text-xl;
+      @apply text-xl;
     }
 
     h2 {
-        @apply text-lg;
+      @apply text-lg;
     }
 
     code {
-        @apply bg-gray-100 rounded-sm text-sm px-1 py-0.5;
+      @apply bg-gray-100 rounded-sm text-sm px-1 py-0.5;
     }
 
     pre {
-        @apply bg-black text-white font-mono rounded-lg my-6 p-4;
+      @apply bg-black text-white font-mono rounded-lg my-6 p-4;
     }
 
     pre code {
-        @apply bg-none text-inherit text-xs p-0;
+      @apply bg-none text-inherit text-xs p-0;
     }
 
     blockquote {
-        @apply border-l-4 border-gray-300 my-6 pl-4;
+      @apply border-l-4 border-gray-300 my-6 pl-4;
     }
 
     hr {
-        @apply border-none border-t border-gray-200 my-8;
+      @apply border-none border-t border-gray-200 my-8;
     }
 
     .isActive {
-        @apply bg-gray-200;
+      @apply bg-gray-200;
     }
 
     .clickable {
-        @apply hover:bg-gray-100 active:bg-gray-200;
+      @apply hover:bg-gray-100 active:bg-gray-200;
     }
 
     .clickable:active {
-        @apply transition duration-200 ease-in-out;
+      @apply transition duration-200 ease-in-out;
     }
 
     .icon {
-        @apply w-5 h-5 text-gray-900;
+      @apply w-5 h-5 text-gray-900;
     }
 
     /* Mathematics extension */
     .Tiptap-mathematics-editor {
-        @apply bg-gray-900 text-white font-mono px-2 py-1 rounded-md inline-block;
+      @apply bg-gray-900 text-white font-mono px-2 py-1 rounded-md inline-block;
     }
 
     .Tiptap-mathematics-render {
-        @apply p-1 rounded-md inline-block;
+      @apply p-1 rounded-md inline-block;
     }
 
     .Tiptap-mathematics-render--editable {
-        @apply cursor-pointer transition-colors duration-200;
+      @apply cursor-pointer transition-colors duration-200;
 
-        &:hover {
-            @apply bg-gray-200;
-        }
+      &:hover {
+        @apply bg-gray-200;
+      }
     }
 
     .Tiptap-mathematics-editor,
     .Tiptap-mathematics-render {
-        @apply rounded-md inline-block;
+      @apply rounded-md inline-block;
     }
-
+  }
 }
 
 @layer base {

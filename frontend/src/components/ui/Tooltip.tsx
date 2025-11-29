@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, ReactNode } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 export type TooltipProps = {
@@ -8,9 +8,9 @@ export type TooltipProps = {
   disabled?: boolean;
 };
 
-const TooltipPortal: React.FC<{ 
-  content: string; 
-  targetRef: React.RefObject<HTMLElement>; 
+const TooltipPortal: React.FC<{
+  content: string;
+  targetRef: React.RefObject<HTMLElement | null>;
   show: boolean;
   className?: string;
 }> = ({ content, targetRef, show, className }) => {
@@ -29,7 +29,7 @@ const TooltipPortal: React.FC<{
   if (!show) return null;
 
   return createPortal(
-    <div 
+    <div
       className={`fixed bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap shadow-lg pointer-events-none transform -translate-x-1/2 transition-opacity ${className || ''}`}
       style={{ top: position.top, left: position.left, zIndex: 10000 }}
     >
@@ -46,7 +46,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children, className, disable
   return (
     <>
       <div
-        ref={targetRef as React.RefObject<HTMLDivElement>}
+        ref={targetRef as React.RefObject<HTMLDivElement | null>}
         onMouseEnter={() => !disabled && setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
         className="inline-block"
