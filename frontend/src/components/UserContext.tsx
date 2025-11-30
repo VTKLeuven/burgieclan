@@ -2,6 +2,7 @@
 
 import { useApi } from '@/hooks/useApi';
 import type { User } from '@/types/entities';
+import { adminRoles } from '@/utils/constants/roles';
 import { convertToUser } from '@/utils/convertToEntity';
 import type { ApiError } from '@/utils/error/apiError';
 import { notFound } from 'next/navigation';
@@ -14,6 +15,7 @@ interface UserContextType {
     error: ApiError | null;
     refreshUser: () => Promise<void>;
     updateUserProperty: <K extends keyof User>(property: K, value: User[K]) => void;
+    isAdmin: () => boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -44,6 +46,10 @@ export const UserProvider = ({ children, userId }: { children: ReactNode, userId
         });
     }, []);
 
+    const isAdmin = useCallback(() => {
+        return user && user.roles ? user.roles.some(role => adminRoles.includes(role)) : false;
+    }, [user]);
+
     // Initial fetch when component mounts or userId changes
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -56,7 +62,8 @@ export const UserProvider = ({ children, userId }: { children: ReactNode, userId
         isRedirecting,
         error,
         refreshUser: fetchUser,
-        updateUserProperty
+        updateUserProperty,
+        isAdmin
     };
 
     return (

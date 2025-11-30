@@ -54,7 +54,9 @@ export const getServerJWT = async (): Promise<string | null> => {
 
 /**
  * Server-side function to get an active JWT, refreshing if necessary
- * This function handles automatic token refresh using the refresh token
+ * This function handles automatic token refresh using the refresh token when:
+ * - JWT is expired, or
+ * - JWT is missing but a refresh token is available
  */
 export const getActiveJWT = async (): Promise<string | null> => {
     const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -66,17 +68,12 @@ export const getActiveJWT = async (): Promise<string | null> => {
     let jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
     const refreshToken = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
 
-    // If no JWT at all, return null
-    if (!jwt) {
-        return null;
-    }
-
-    // If JWT is not expired, return it
-    if (!isJWTExpired(jwt)) {
+    // If JWT exists and is not expired, return it
+    if (jwt && !isJWTExpired(jwt)) {
         return jwt;
     }
 
-    // JWT is expired, try to refresh if we have a refresh token
+    // If we have a refresh token, try to refresh (whether JWT exists or not)
     if (!refreshToken) {
         return null;
     }

@@ -48,7 +48,7 @@ class UserEntityToApiMapper implements MapperInterface
                     $course,
                     CourseApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 1,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },
@@ -60,7 +60,7 @@ class UserEntityToApiMapper implements MapperInterface
                     $module,
                     ModuleApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 1,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },
@@ -72,7 +72,7 @@ class UserEntityToApiMapper implements MapperInterface
                     $program,
                     ProgramApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 1,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },
@@ -84,13 +84,14 @@ class UserEntityToApiMapper implements MapperInterface
                     $document,
                     DocumentApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 1,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },
             $from->getFavoriteDocuments()->getValues()
         );
         $to->defaultAnonymous = $from->isDefaultAnonymous();
+        $to->roles = $from->getRoles();
 
         return $to;
     }
