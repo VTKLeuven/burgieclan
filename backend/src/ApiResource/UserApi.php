@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(),
         new Patch(
-            security: 'is_granted("PATCH_USER", object)',
+            security: 'is_granted("VIEW_OWN_USER_DATA", object)',
         ),
     ],
     normalizationContext: ['groups' => ['user']],
@@ -46,7 +46,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => ['user:favorites']],
         ),
     ],
-    security: 'is_granted("VIEW_FAVORITES", object)',
+    security: 'is_granted("VIEW_OWN_USER_DATA", object)',
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: User::class),
@@ -64,12 +64,12 @@ class UserApi
 
     #[Assert\NotBlank]
     #[Assert\Length(min: 2, max: 50)]
-    #[ApiProperty(writable: false, security: 'is_granted("VIEW_USERNAME", object)')]
+    #[ApiProperty(writable: false, security: 'is_granted("VIEW_OWN_USER_DATA", object)')]
     #[Groups('user')]
     public ?string $username = null;
 
     #[Assert\Email]
-    #[ApiProperty(writable: false, security: 'is_granted("VIEW_EMAIL", object)')]
+    #[ApiProperty(writable: false, security: 'is_granted("VIEW_OWN_USER_DATA", object)')]
     #[Groups('user')]
     public ?string $email = null;
 
@@ -77,33 +77,40 @@ class UserApi
      * @var CourseApi[]
      */
     #[Groups(['user', 'user:favorites'])]
-    #[ApiProperty(security: 'is_granted("VIEW_FAVORITES", object)')]
+    #[ApiProperty(security: 'is_granted("VIEW_OWN_USER_DATA", object)')]
     public array $favoriteCourses = [];
 
     /**
      * @var ModuleApi[]
      */
     #[Groups(['user', 'user:favorites'])]
-    #[ApiProperty(security: 'is_granted("VIEW_FAVORITES", object)')]
+    #[ApiProperty(security: 'is_granted("VIEW_OWN_USER_DATA", object)')]
     public array $favoriteModules = [];
 
     /**
      * @var ProgramApi[]
      */
     #[Groups(['user', 'user:favorites'])]
-    #[ApiProperty(security: 'is_granted("VIEW_FAVORITES", object)')]
+    #[ApiProperty(security: 'is_granted("VIEW_OWN_USER_DATA", object)')]
     public array $favoritePrograms = [];
 
     /**
      * @var DocumentApi[]
      */
     #[Groups(['user', 'user:favorites'])]
-    #[ApiProperty(security: 'is_granted("VIEW_FAVORITES", object)')]
+    #[ApiProperty(security: 'is_granted("VIEW_OWN_USER_DATA", object)')]
     public array $favoriteDocuments = [];
 
     #[Groups(['user'])]
-    #[ApiProperty(security: 'object === null or is_granted("VIEW_USER_DEFAULT_ANONYMOUS", object)')]
+    #[ApiProperty(security: 'object === null or is_granted("VIEW_OWN_USER_DATA", object)')]
     // object === null is needed to circumvent a specific bug.
     // It is explained more in https://symfonycasts.com/screencast/api-platform-extending/patch-field-security#the-apiproperty-security-option-on-patch-operations
     public ?bool $defaultAnonymous = null;
+
+    /**
+     * @var string[]
+     */
+    #[ApiProperty(writable: false, security: 'is_granted("VIEW_OWN_USER_DATA", object)')]
+    #[Groups(['user'])]
+    public array $roles = [];
 }
