@@ -28,7 +28,8 @@ export function convertToUser(user: any): User {
         favoriteModules: user.favoriteModules?.map(convertToModule),
         favoritePrograms: user.favoritePrograms?.map(convertToProgram),
         favoriteDocuments: user.favoriteDocuments?.map(convertToDocument),
-        defaultAnonymous: user.defaultAnonymous
+        defaultAnonymous: user.defaultAnonymous,
+        roles: user.roles
     };
 }
 

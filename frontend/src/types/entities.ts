@@ -82,6 +82,7 @@ export interface User extends BaseEntity {
     favoritePrograms?: Program[];
     favoriteDocuments?: Document[];
     defaultAnonymous?: boolean;
+    roles?: string[];
 }
 
 export interface Page extends BaseEntity {
