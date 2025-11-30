@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 export default function HeaderProfileButton() {
     const { t } = useTranslation();
     const router = useRouter()
-    const { user } = useUser();
+    const { user, isAdmin } = useUser();
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -53,6 +53,14 @@ export default function HeaderProfileButton() {
                         <ExternalLink size={14} className="ml-1" />
                     </Link>
                 </DropdownMenuItem>
+                {isAdmin() && (
+                    <DropdownMenuItem onClick={handleMenuItemClick}>
+                        <Link className="font-normal text-sm flex items-center gap-1" href={`${process.env.NEXT_PUBLIC_BACKEND_URL ?? ''}/admin`}>
+                            {t('header.backend_admin')}
+                            <ExternalLink size={14} className="ml-1" />
+                        </Link>
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                     <button
