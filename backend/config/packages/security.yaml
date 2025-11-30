@@ -47,6 +47,7 @@ security:
 
             custom_authenticators:
                 - App\Security\LitusAuthenticator
+            jwt: ~
 
             # This allows the user to login by submitting a username and password
             # Reference: https://symfony.com/doc/current/security/form_login_setup.html
@@ -80,6 +81,14 @@ security:
                 target: admin
                 # Secure the logout against CSRF
                 enable_csrf: true
+                # Clear JWT cookies on logout
+                # This does not clear the JWT on frontend if it runs on another domain, so you will still be loged in there.
+                # If the domain is the same, the JWT will be cleared on both frontend and backend.
+                delete_cookies:
+                    - BUR_jwt
+                    - BUR_DEV_jwt
+                    - BUR_refresh_token
+                    - BUR_DEV_refresh_token
 
             # needed because in tests we redefine the 'main' firewall to use
             # HTTP Basic instead of the login form, so this firewall has
