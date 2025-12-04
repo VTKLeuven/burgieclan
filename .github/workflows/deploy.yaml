@@ -63,7 +63,7 @@ jobs:
             if [ "${{ inputs.environment }}" = "production" ]; then
               IMAGE_TAG="prod"
             else
-              IMAGE_TAG="test"
+              IMAGE_TAG="dev"
             fi
             export IMAGE_TAG
 
