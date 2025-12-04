@@ -71,12 +71,12 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Courses', 'fa-solid fa-book')
             ->setSubItems(
                 [
-                MenuItem::linkToCrud('Courses', 'fa fa-book', Course::class)
-                    ->setPermission(User::ROLE_ADMIN),
-                MenuItem::linkToCrud('Comment Categories', 'fa fa-tags', CommentCategory::class)
-                    ->setPermission(User::ROLE_ADMIN),
-                MenuItem::linkToCrud('Comments', 'fa fa-comments', CourseComment::class)
-                    ->setPermission(User::ROLE_ADMIN)
+                    MenuItem::linkToCrud('Courses', 'fa fa-book', Course::class)
+                        ->setPermission(User::ROLE_ADMIN),
+                    MenuItem::linkToCrud('Comment Categories', 'fa fa-tags', CommentCategory::class)
+                        ->setPermission(User::ROLE_ADMIN),
+                    MenuItem::linkToCrud('Comments', 'fa fa-comments', CourseComment::class)
+                        ->setPermission(User::ROLE_ADMIN)
                 ]
             );
         $pendingDocumentsMenu = MenuItem::linkToCrud('Pending Documents', 'fa-regular fa-file', Document::class)
@@ -84,15 +84,15 @@ class DashboardController extends AbstractDashboardController
         $documentsMenu = MenuItem::subMenu('Documents', 'fa-solid fa-file')
             ->setSubItems(
                 [
-                MenuItem::linkToCrud('Documents', 'fa fa-file', Document::class)
-                    ->setController(DocumentCrudController::class),
-                $pendingDocumentsMenu,
-                MenuItem::linkToRoute('Bulk Upload', 'fa fa-upload', 'admin_bulk_upload_index'),
-                MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class)
-                    ->setPermission(User::ROLE_ADMIN),
-                MenuItem::linkToCrud('Comments', 'fa-solid fa-comments', DocumentComment::class)
-                    ->setPermission(User::ROLE_ADMIN),
-                MenuItem::linkToCrud('Tags', 'fa-solid fa-tags', Tag::class)
+                    MenuItem::linkToCrud('Documents', 'fa fa-file', Document::class)
+                        ->setController(DocumentCrudController::class),
+                    $pendingDocumentsMenu,
+                    MenuItem::linkToRoute('Bulk Upload', 'fa fa-upload', 'admin_bulk_upload_index'),
+                    MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class)
+                        ->setPermission(User::ROLE_ADMIN),
+                    MenuItem::linkToCrud('Comments', 'fa-solid fa-comments', DocumentComment::class)
+                        ->setPermission(User::ROLE_ADMIN),
+                    MenuItem::linkToCrud('Tags', 'fa-solid fa-tags', Tag::class)
                 ]
             );
         $amountPending = $this->documentRepository->getAmountPending();
@@ -108,5 +108,16 @@ class DashboardController extends AbstractDashboardController
 
         yield MenuItem::section('Frontend');
         yield MenuItem::linkToUrl('Home', 'fa fa-window-maximize', '/');
+
+        $commitHash = getenv('COMMIT_HASH') ?: 'dev';
+        $version = getenv('VERSION') ?: '';
+        // Display version if available
+        if ($version) {
+            yield MenuItem::section('Version: ' . $version, 'fa fa-tag')
+                ->setCssClass('text-muted small');
+        }
+        // Display commit hash
+        yield MenuItem::section('Commit: ' . substr($commitHash, 0, 7), 'fa fa-code-commit')
+            ->setCssClass('text-muted small');
     }
 }

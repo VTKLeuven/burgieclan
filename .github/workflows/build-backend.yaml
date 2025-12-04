@@ -68,3 +68,6 @@ jobs:
           build-args: |
             APP_ENV=prod
             FRONTEND_URL=${{ inputs.url }}
+            COMMIT_HASH=${{ github.sha }}
+            VERSION=${{ (github.ref_type == 'tag' && github.ref_name) || '' }}
+            # VERSION is only set for tag releases, empty string for branch deployments
