@@ -109,8 +109,15 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Frontend');
         yield MenuItem::linkToUrl('Home', 'fa fa-window-maximize', '/');
 
-        $commitHash = getenv('COMMIT_HASH') ?: 'dev-local';
-        yield MenuItem::linkToUrl('Current version: ' . substr($commitHash, 0, 7), 'fa fa-code-commit', '#')
-            ->setCssClass('text-muted small mt-4');
+        $commitHash = getenv('COMMIT_HASH') ?: 'dev';
+        $version = getenv('VERSION') ?: '';
+        // Display version if available
+        if ($version) {
+            yield MenuItem::section('Version: ' . $version, 'fa fa-tag')
+                ->setCssClass('text-muted small');
+        }
+        // Display commit hash
+        yield MenuItem::section('Commit: ' . substr($commitHash, 0, 7), 'fa fa-code-commit')
+            ->setCssClass('text-muted small');
     }
 }
