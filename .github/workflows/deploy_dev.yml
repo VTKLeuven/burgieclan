@@ -3,11 +3,11 @@ name: "Deploy Dev Stack (Frontend + Backend)"
 on:
   push:
     branches:
-      - test
+      - main
 
 # Ensure only one deployment runs at a time
 concurrency:
-  group: deploy-test-${{ github.ref }}
+  group: deploy-dev-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
