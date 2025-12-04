@@ -96,9 +96,11 @@ FROM php_base AS php_prod
 # Build arguments
 ARG FRONTEND_URL
 ARG APP_ENV=prod
+ARG COMMIT_HASH
 
 ENV APP_ENV=$APP_ENV
 ENV FRONTEND_URL=$FRONTEND_URL
+ENV COMMIT_HASH=$COMMIT_HASH
 ENV JWT_PUBLIC_KEY=/app/config/jwt/public.pem
 ENV JWT_SECRET_KEY=/app/config/jwt/private.pem
 
