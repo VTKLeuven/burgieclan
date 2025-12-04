@@ -65,7 +65,7 @@ const UploadDialog = ({
                     initialData={initialData}
                 />
             </DialogBody>
-            <DialogActions className="!mt-0"> {/* !mt-0 removes the top margin */}
+            <DialogActions className="mt-0!"> {/* mt-0! removes the top margin */}
                 <button
                     type="submit"
                     form="upload-form"

@@ -43,7 +43,7 @@ export default function Pagination({ totalAmount, currentPage, itemsPerPage, onP
                     </p>
                 </div>
                 <div>
-                    <nav aria-label="Pagination" className="isolate inline-flex -space-x-px rounded-md shadow-sm">
+                    <nav aria-label="Pagination" className="isolate inline-flex -space-x-px rounded-md shadow-xs">
                         <button
                             onClick={() => onPageChange(currentPage - 1)}
                             className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
@@ -58,7 +58,7 @@ export default function Pagination({ totalAmount, currentPage, itemsPerPage, onP
                                 onClick={() => onPageChange(index + 1)}
                                 aria-current={currentPage === index + 1 ? 'page' : undefined}
                                 className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${currentPage === index + 1
-                                    ? 'z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
+                                    ? 'z-10 bg-indigo-600 text-white focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
                                     : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
                                     }`}
                             >

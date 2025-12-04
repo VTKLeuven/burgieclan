@@ -44,7 +44,7 @@ export function Dialog({ isOpen, onClose, size = 'lg', className, children }: Di
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 backdrop-blur-sm bg-gray-500 bg-opacity-75" />
+                    <div className="fixed inset-0 backdrop-blur-xs bg-gray-500 bg-opacity-75" />
                 </Headless.Transition.Child>
 
                 <div className="fixed inset-0 z-10 overflow-y-auto">

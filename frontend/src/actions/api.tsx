@@ -89,7 +89,7 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
         // Special case for login redirection
         if (error.message === 'REDIRECT_TO_LOGIN') {
             // Ensure we exit the function properly with this redirect
-            redirectToLogin(frontendBaseUrl!);
+            await redirectToLogin(frontendBaseUrl!);
         }
 
         // Handle all other errors
@@ -98,8 +98,8 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
 }
 
 // Separate function to handle the redirect logic
-function redirectToLogin(frontendBaseUrl: string) {
-    const headersList = headers();
+async function redirectToLogin(frontendBaseUrl: string) {
+    const headersList = await headers();
     const refererUrl = headersList.get('referer') || "";
     const loginUrl = `${frontendBaseUrl}/login`;
 

@@ -5,12 +5,10 @@ export const metadata: Metadata = {
     title: "Document | Burgieclan",
 };
 
-export default function DocumentPage({ params }: { params: { id: string } }) {
-    const { id } = params;
+type Params = Promise<{ id: string }>;
 
-    return (
-        <>
-            <DocumentPreview id={id} />
-        </>
-    );
+export default async function DocumentPage({ params }: { params: Params }) {
+    const { id } = await params;
+
+    return <DocumentPreview id={id} />;
 }

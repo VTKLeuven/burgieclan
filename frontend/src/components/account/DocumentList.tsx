@@ -34,7 +34,7 @@ const DocumentList: React.FC = () => {
 
     return (
         <CollapsibleSection header={<h3 className="text-xl font-semibold">{t('account.documents.my')} <span className="text-sm">({totalItems})</span></h3>}>
-            <div className="rounded-lg shadow-sm">
+            <div className="rounded-lg shadow-xs">
                 {loading ?
                     <div className="flex justify-center items-center h-full">
                         <LoaderCircle className="animate-spin text-vtk-blue-500" size={48} />
@@ -49,7 +49,7 @@ const DocumentList: React.FC = () => {
                                         href={`/document/${document.id}`}
                                         key={document.id}
                                     >
-                                        <div className="border p-4 rounded-md shadow-sm relative hover:shadow-md transition-shadow cursor-pointer">
+                                        <div className="border p-4 rounded-md shadow-xs relative hover:shadow-md transition-shadow cursor-pointer">
                                             <div className="flex justify-between items-center">
                                                 <h3 className="text-xl font-semibold truncate">{document.name}</h3>
                                                 {document.underReview ? (
