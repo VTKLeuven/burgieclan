@@ -68,3 +68,4 @@ jobs:
           build-args: |
             APP_ENV=prod
             FRONTEND_URL=${{ inputs.url }}
+            COMMIT_HASH=${{ github.sha }}
