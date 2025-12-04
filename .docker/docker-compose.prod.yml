@@ -35,8 +35,8 @@ services:
 
   backend:
     # Image from GitHub Container Registry
-    # Use IMAGE_TAG environment variable to specify tag (test for dev, prod for production)
-    image: ghcr.io/vtkleuven/burgieclan/backend:${IMAGE_TAG:-test}
+    # Use IMAGE_TAG environment variable to specify tag (dev for development, prod for production)
+    image: ghcr.io/vtkleuven/burgieclan/backend:${IMAGE_TAG:-dev}
     container_name: burgieclan-backend
 
     # Restart policy - always restart unless manually stopped
@@ -111,8 +111,8 @@ services:
 
   frontend:
     # Image from GitHub Container Registry
-    # Use IMAGE_TAG environment variable to specify tag (test for dev, prod for production)
-    image: ghcr.io/vtkleuven/burgieclan/frontend:${IMAGE_TAG:-test}
+    # Use IMAGE_TAG environment variable to specify tag (dev for dev, prod for production)
+    image: ghcr.io/vtkleuven/burgieclan/frontend:${IMAGE_TAG:-dev}
     container_name: burgieclan-frontend
 
     # Restart policy
