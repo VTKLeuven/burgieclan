@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { useApi } from '@/hooks/useApi';
-import { Tag, Course, DocumentCategory } from '@/types/entities';
+import { HydraCollection, useApi } from '@/hooks/useApi';
+import { Course, DocumentCategory, Tag } from '@/types/entities';
 import { convertToTag } from '@/utils/convertToEntity';
+import { useEffect, useState } from 'react';
 
 interface UseFetchTagsProps {
     course?: Course;
@@ -17,7 +17,7 @@ interface UseFetchTagsResult {
 export const useFetchTags = ({ course, category }: UseFetchTagsProps = {}): UseFetchTagsResult => {
     const [tags, setTags] = useState<Tag[]>([]);
     const [error, setError] = useState<string | null>(null);
-    const { request, loading } = useApi();
+    const { request, loading } = useApi<HydraCollection<unknown>>();
 
     useEffect(() => {
         const fetchAllTags = async () => {

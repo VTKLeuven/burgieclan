@@ -1,5 +1,5 @@
 import { useToast } from '@/components/ui/Toast';
-import { useApi } from '@/hooks/useApi';
+import { isErrorResponse, useApi } from '@/hooks/useApi';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -12,7 +12,7 @@ export function useDeleteComment() {
         const result = await request('DELETE', `/api/course_comments/${commentId}`);
 
         // result == null is a good thing
-        if (result && result.error) {
+        if (result && isErrorResponse(result)) {
             showToast(
                 t('course-page.comments.toast.delete-error'),
                 'error'

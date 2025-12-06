@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
-import { Pencil, Trash2 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import Tooltip from '@/components/ui/Tooltip';
+import { Pencil, Trash2 } from 'lucide-react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type CommentActionsProps = {
   onEdit: () => void;

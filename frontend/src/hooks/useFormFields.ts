@@ -1,4 +1,4 @@
-import { useApi } from '@/hooks/useApi';
+import { HydraCollection, useApi } from '@/hooks/useApi';
 import type { CommentCategory, Course } from '@/types/entities';
 import { convertToCommentCategory, convertToCourse } from '@/utils/convertToEntity';
 import { useCallback, useEffect, useState } from 'react';
@@ -10,7 +10,7 @@ export const useFormFields = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { t } = useTranslation();
-    const { request } = useApi();
+    const { request } = useApi<HydraCollection<unknown>>();
 
     const fetchData = useCallback(async () => {
         try {

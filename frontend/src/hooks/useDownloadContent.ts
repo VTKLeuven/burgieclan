@@ -51,7 +51,7 @@ const useDownloadContent = () => {
                     router.push(`/login?redirectTo=${encodeURIComponent(currentPath)}`);
                     return true;
                 }
-            } catch (jsonError) {
+            } catch {
                 // If we can't parse the JSON (e.g., not a JSON response), still handle as 401
                 const currentPath = window.location.pathname + window.location.search;
                 router.push(`/login?redirectTo=${encodeURIComponent(currentPath)}`);

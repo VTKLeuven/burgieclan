@@ -11,8 +11,6 @@ const DEFAULT_MIME_TYPES = [
     'text/x-python'
 ] as const;
 
-type AllowedMimeType = typeof DEFAULT_MIME_TYPES[number];
-
 const parseAllowedMimeTypes = (): readonly string[] => {
     const envMimeTypes = process.env.NEXT_PUBLIC_ALLOWED_MIME_TYPES?.split(',');
     return envMimeTypes ?? DEFAULT_MIME_TYPES;

@@ -1,9 +1,10 @@
-// hooks/useDocumentUpload.ts
-import { useState } from 'react';
-import { useApi } from '@/hooks/useApi';
-import { ApiError } from '@/utils/error/apiError';
+import { isErrorResponse, useApi } from '@/hooks/useApi';
 import { UploadFormData } from '@/types/upload';
 import { FILE_SIZE_MB } from '@/utils/constants/upload';
+import { convertToTag } from '@/utils/convertToEntity';
+import { ApiError } from '@/utils/error/apiError';
+import { type TFunction } from 'i18next';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface UploadStatus {
@@ -11,7 +12,7 @@ interface UploadStatus {
     message: string | null;
 }
 
-const getDetailedErrorMessage = (error: any, t: (key: string, options?: any) => string): string => {
+const getDetailedErrorMessage = (error: unknown, t: TFunction): string => {
     // Technical error to user-friendly message mapping
     const errorMessages: Record<string, string> = {
         'Body is unusable': t('upload.errors.unusable_body'),
@@ -45,17 +46,13 @@ export const useDocumentUpload = () => {
 
     // Create a new tag and return its ID
     const createTag = async (tagName: string): Promise<number | null> => {
-        try {
             const response = await request('POST', '/api/tags', { name: tagName });
 
-            if (response && response.id) {
-                return response.id;
+            if (response && !isErrorResponse(response)) {
+                const tag = convertToTag(response);
+                return tag.id;
             }
             return null;
-        } catch (error) {
-            console.error('Error creating tag:', error);
-            return null;
-        }
     };
 
     const uploadDocument = async (data: UploadFormData): Promise<boolean> => {
@@ -105,8 +102,10 @@ export const useDocumentUpload = () => {
                 throw new Error(t('unexpected'));
             }
 
-            if (result.error) {
-                throw new ApiError(result.error.message, result.error.status);
+            if (isErrorResponse(result)) {
+                const apiMessage = result.error?.message ?? result.error?.detail ?? t('unexpected');
+                const apiStatus = result.error?.status ?? 500;
+                throw new ApiError(apiMessage, apiStatus);
             }
 
             setStatus({
