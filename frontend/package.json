@@ -29,13 +29,13 @@
     "i18next-resources-to-backend": "^1.2.1",
     "katex": "^0.16.11",
     "lucide-react": "^0.554.0",
-    "next": "^16.0.3",
+    "next": "^16.0.7",
     "next-i18n-router": "^5.5.1",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-hook-form": "^7.53.1",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "react-hook-form": "^7.68.0",
     "react-hotkeys-hook": "^5.2.1",
-    "react-i18next": "^16.3.5",
+    "react-i18next": "^16.4.0",
     "react-loading-skeleton": "^3.5.0",
     "react-pdf": "^10.2.0",
     "sharp": "^0.34.5",
@@ -48,7 +48,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^24",
-    "@types/react": "^19.2.6",
+    "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "eslint": "^9",
     "eslint-config-next": "^16.0.3",
@@ -56,9 +56,5 @@
     "postcss": "^8.4.38",
     "tailwindcss": "^4.1.17",
     "typescript": "^5"
-  },
-  "overrides": {
-    "@types/react": "^19.2.6",
-    "@types/react-dom": "^19.2.3"
   }
 }
