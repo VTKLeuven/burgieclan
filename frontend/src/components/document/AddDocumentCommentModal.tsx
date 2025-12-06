@@ -90,7 +90,6 @@ export default function AddDocumentCommentModal({ documentId, file, isModalOpen,
             }
             <div className="border-t border-gray-200 mt-2">
                 <Editor
-                    parentDialogOpen={isModalOpen}
                     onEditorReady={handleEditorReady}
                 />
             </div>

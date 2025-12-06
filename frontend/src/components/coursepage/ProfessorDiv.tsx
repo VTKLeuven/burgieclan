@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react'
-import Image from 'next/image'
 import { TFunction } from 'i18next';
-import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function ProfessorDiv({ unumber, index, t }: { unumber: string, index: number, t: TFunction }) {
     const { i18n } = useTranslation();
     const locale = i18n.language || 'en';
 
     const sanitizedUnumber = unumber.replace(/\D/g, '').padStart(7, '0').slice(-7);
-    const [imgSrc, setImgSrc] = useState(`https://www.kuleuven.be/wieiswie/nl/person/0${sanitizedUnumber}/photo`);
+    const imgSrc = `https://www.kuleuven.be/wieiswie/nl/person/0${sanitizedUnumber}/photo`;
     const [professorName, setProfessorName] = useState("N.");
     const [imageError, setImageError] = useState(false);
 

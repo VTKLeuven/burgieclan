@@ -1,5 +1,5 @@
 import { useToast } from '@/components/ui/Toast';
-import { useApi } from '@/hooks/useApi';
+import { isErrorResponse, useApi } from '@/hooks/useApi';
 import { convertToCourseComment } from '@/utils/convertToEntity';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,12 +12,20 @@ export function useUpdateComment() {
     return useCallback(async (commentId: number, data: { content?: string, anonymous?: boolean }) => {
         const result = await request('PATCH', `/api/course_comments/${commentId}`, data);
 
-        if (!result || result.error) {
+        if (!result) {
             showToast(
                 t('course-page.comments.toast.update-error'),
                 'error'
             );
-            throw new Error(result?.error?.message || t('course-page.comments.toast.update-error'));
+            throw new Error(t('course-page.comments.toast.update-error'));
+        } 
+        
+        if(isErrorResponse(result)) {
+            showToast(
+                t('course-page.comments.toast.update-error'),
+                'error'
+            );
+            throw new Error(result.error.message ?? t('course-page.comments.toast.update-error'));
         }
 
         showToast(

@@ -3,8 +3,8 @@ import Loading from '@/app/[locale]/loading';
 import DocumentCategoryPage from "@/components/coursepage/DocumentCategory";
 import CreateDocumentButton from '@/components/ui/CreateDocumentButton';
 import DownloadButton from "@/components/ui/DownloadButton";
-import { useApi } from "@/hooks/useApi";
-import type { Course, DocumentCategory } from "@/types/entities";
+import { HydraCollection, useApi } from "@/hooks/useApi";
+import type { DocumentCategory } from "@/types/entities";
 import { convertToDocumentCategory } from "@/utils/convertToEntity";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 export default function DocumentSections({ courseId }: { courseId: number }) {
     const [documentCategories, setDocumentCategories] = useState<DocumentCategory[]>([]);
     const { t, i18n } = useTranslation();
-    const { request, loading } = useApi();
+    const { request, loading } = useApi<HydraCollection<unknown>>();
 
     useEffect(() => {
         async function fetchDocumentCategories() {

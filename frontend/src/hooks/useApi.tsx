@@ -4,8 +4,23 @@ import { ApiClient } from '@/actions/api';
 import { ApiError } from '@/utils/error/apiError';
 import { useCallback, useState } from 'react';
 
-export function useApi() {
-    const [data, setData] = useState<any>(null);
+type ApiErrorBody = { message?: string; detail?: string; status?: number };
+
+export type HydraCollection<T> = {
+    'hydra:member': T[];
+    'hydra:totalItems': number;
+    error?: ApiErrorBody;
+};
+
+export const isErrorResponse = (value: unknown): value is { error: ApiErrorBody } => {
+    if (!value || typeof value !== 'object') return false;
+    if (!('error' in value)) return false;
+    const error = (value as { error: unknown }).error;
+    return typeof error === 'object' && error !== null;
+};
+
+export function useApi<T = unknown>() {
+    const [data, setData] = useState<T | null>(null);
     const [error, setError] = useState<ApiError | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
@@ -13,9 +28,9 @@ export function useApi() {
     const request = useCallback(async (
         method: string,
         endpoint: string,
-        body?: any,
+        body?: unknown,
         customHeaders?: Headers
-    ): Promise<any> => {
+    ): Promise<T | null> => {
         setLoading(true);
         setError(null);
         setIsRedirecting(false);
@@ -24,17 +39,22 @@ export function useApi() {
             const result = await ApiClient(method, endpoint, body, customHeaders);
 
             // Check if the response contains an error
-            if (result && 'error' in result) {
+            if (isErrorResponse(result)) {
                 console.error(result.error.detail ?? result.error.message ?? 'An unexpected error occurred');
-                setError(new ApiError(result.error.detail ?? result.error.message ?? 'An unexpected error occurred', result.error.status));
+                setError(new ApiError(result.error.detail ?? result.error.message ?? 'An unexpected error occurred', result.error.status ?? 500));
+                setData(null);
+                return null;
+            }
+
+            if (result === null) {
                 setData(null);
                 return null;
             }
 
             // Success case
-            setData(result);
-            return result;
-        } catch (err) {
+            setData(result as T);
+            return result as T;
+        } catch (err: unknown) {
             setIsRedirecting(true);
             console.error('Error during API request');
             console.error(err);

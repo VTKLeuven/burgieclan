@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { i18nConfig } from "../../../i18nConfig";
 
 const LanguageSwitcher = () => {
     const { i18n } = useTranslation();
-    const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const currentLocale = i18n.language;
