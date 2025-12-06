@@ -1,14 +1,20 @@
 import ComboboxController from '@/components/ui/ComboboxController';
 import Input from '@/components/ui/Input';
-import React from 'react';
-import { Controller, FieldError, UseFormRegisterReturn } from 'react-hook-form';
+import {
+    Controller,
+    type Control,
+    type FieldError,
+    type FieldValues,
+    type Path,
+    type UseFormRegisterReturn,
+} from 'react-hook-form';
 
 export interface Option {
     id: number | string;
     name?: string;
 }
 
-export interface FormFieldProps {
+export interface FormFieldProps<TFieldValues extends FieldValues = FieldValues> {
     label: string;
     error?: FieldError;
     type?: 'text' | 'combobox';
@@ -17,15 +23,14 @@ export interface FormFieldProps {
     /** For fields that are registered with useForm (e.g. text inputs) */
     registration?: UseFormRegisterReturn;
     /** For fields that use RHF Controller (e.g. combobox) */
-    control?: any; // ideally use proper typing from react-hook-form
-    name: string;
-    className?: string;
+    control?: Control<TFieldValues>;
+    name: Path<TFieldValues>;
     disabled?: boolean;
     /** Optional: limit the number of visible options in the combobox */
     visibleOptions?: number;
 }
 
-export const FormField: React.FC<FormFieldProps> = ({
+export const FormField = <TFieldValues extends FieldValues = FieldValues>({
     label,
     error,
     type = 'text',
@@ -34,10 +39,9 @@ export const FormField: React.FC<FormFieldProps> = ({
     registration,
     control,
     name,
-    className = '',
     disabled,
     visibleOptions,
-}) => {
+}: FormFieldProps<TFieldValues>) => {
     // For text fields, use the registration props to bind RHF.
     if (type === 'text') {
         return (

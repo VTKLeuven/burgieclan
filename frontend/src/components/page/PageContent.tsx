@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Loading from "@/app/[locale]/loading";
 import ErrorPage from "@/components/error/ErrorPage";
 import { useApi } from "@/hooks/useApi";
 import { type Page } from "@/types/entities";
 import { convertToPage } from "@/utils/convertToEntity";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface PageContentProps {

@@ -1,6 +1,6 @@
 import Loading from '@/app/[locale]/loading';
 import { Activity } from '@/components/homepage/recent/Activity';
-import { useApi } from '@/hooks/useApi';
+import { HydraCollection, useApi } from '@/hooks/useApi';
 import type { DocumentView } from '@/types/entities';
 import { convertToDocumentView } from '@/utils/convertToEntity';
 import { useEffect, useState } from 'react';
@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 export const RecentActivities = () => {
     const { t } = useTranslation();
-    const { request, loading, error } = useApi();
+    const { request, loading, error } = useApi<HydraCollection<unknown>>();
     const [documentViews, setDocumentViews] = useState<DocumentView[]>([]);
 
     useEffect(() => {

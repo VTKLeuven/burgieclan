@@ -94,7 +94,7 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
             setFormContent('');
             setFormAnonymous(false);
             setShowAddForm(false);
-        } catch (error) {
+        } catch {
             // Error handling is done above
         } finally {
             setIsSubmitting(false);

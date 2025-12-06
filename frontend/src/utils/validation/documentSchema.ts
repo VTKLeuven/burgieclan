@@ -1,12 +1,14 @@
+import type { UploadFormData } from '@/types/upload';
+import { fileTypeFromBlob } from 'file-type';
+import type { TFunction } from 'i18next';
 import * as yup from 'yup';
 import { ALLOWED_MIME_TYPES, FILE_SIZE_LIMIT, FILE_SIZE_MB } from '../constants/upload';
-import { fileTypeFromBlob } from 'file-type';
 
 const isAllowedMimeType = (mime: string): mime is typeof ALLOWED_MIME_TYPES[number] => {
     return ALLOWED_MIME_TYPES.includes(mime as typeof ALLOWED_MIME_TYPES[number]);
 };
 
-export const documentSchema = (t: any) => yup.object().shape({
+export const documentSchema = (t: TFunction): yup.ObjectSchema<UploadFormData> => yup.object({
     name: yup
         .string()
         .required(t('upload.form.validation.name.required'))
@@ -53,7 +55,8 @@ export const documentSchema = (t: any) => yup.object().shape({
         .default([]),
 
     file: yup
-        .mixed()
+        .mixed<File>()
+        .nullable()
         .required(t('upload.form.validation.file.required'))
         .test('fileSize', t('upload.form.validation.file.size', { size: FILE_SIZE_MB }),
             (value) => !value || (value instanceof File && value.size <= FILE_SIZE_LIMIT))
@@ -63,4 +66,4 @@ export const documentSchema = (t: any) => yup.object().shape({
             if (!type?.mime) return false;
             return isAllowedMimeType(type.mime);
         })
-});
+}).required();

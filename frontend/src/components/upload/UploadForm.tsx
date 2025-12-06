@@ -44,7 +44,7 @@ export default function UploadForm({
         control,
         formState: { errors },
     } = useForm<UploadFormData>({
-        resolver: yupResolver(documentSchema(t)),
+        resolver: yupResolver<UploadFormData, unknown, UploadFormData>(documentSchema(t)),
         defaultValues: {
             anonymous: user?.defaultAnonymous,
             tagIds: [],

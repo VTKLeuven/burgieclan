@@ -1,7 +1,6 @@
-import Loading from '@/app/[locale]/loading';
 import Announcement from '@/components/announcement/Announcement';
 import ErrorPage from '@/components/error/ErrorPage';
-import { useApi } from '@/hooks/useApi';
+import { HydraCollection, useApi } from '@/hooks/useApi';
 import { Announcement as AnnouncementEntity } from '@/types/entities';
 import { convertToAnnouncement } from '@/utils/convertToEntity';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -9,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function AnnouncementSlideShow() {
-    const { request, loading, error } = useApi();
+    const { request, loading, error } = useApi<HydraCollection<unknown>>();
     const [announcements, setAnnouncements] = useState<AnnouncementEntity[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const { i18n } = useTranslation();

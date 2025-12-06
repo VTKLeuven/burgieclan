@@ -1,4 +1,3 @@
-// hooks/useYearOptions.ts
 import { useMemo } from 'react';
 
 const MAX_YEARS_HISTORY = 30;
