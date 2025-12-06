@@ -1,6 +1,6 @@
 "use client";
 
-import { useApi } from '@/hooks/useApi';
+import { isErrorResponse, useApi } from '@/hooks/useApi';
 import type { User } from '@/types/entities';
 import { convertToUser } from '@/utils/convertToEntity';
 import type { ApiError } from '@/utils/error/apiError';
@@ -30,7 +30,7 @@ export const UserProvider = ({ children, userId }: { children: ReactNode, userId
 
 
         const userData = await request('GET', `/api/users/${userId}`);
-        if (userData && !userData.error) {
+        if (userData && !isErrorResponse(userData)) {
             setUser(convertToUser(userData));
         } else {
             notFound();

@@ -13,6 +13,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+type LoginResponse = {
+    token: string;
+    refresh_token: string;
+    refresh_token_expiration: number;
+};
+
 /**
  * Login form component, displays initial login form with VTK login option and expands
  * when user chooses to log in manually.
@@ -25,7 +31,7 @@ export default function LoginForm() {
 
     const [isOpen, setIsOpen] = useState(false);
     const { showToast } = useToast();
-    const { request, loading, error: apiError } = useApi();
+    const { request, loading, error: apiError } = useApi<LoginResponse>();
 
     const redirectTo = searchParams.get('redirectTo') || '/';
 
@@ -59,14 +65,21 @@ export default function LoginForm() {
             password: password,
         });
 
-        if (!response) {
+        if (!response || !response.token || !response.refresh_token || response.refresh_token_expiration === undefined) {
+            setCredentialsError(t('unexpected'));
+            return;
+        }
+
+        const refreshExpiration = Number(response.refresh_token_expiration);
+        if (Number.isNaN(refreshExpiration)) {
+            setCredentialsError(t('unexpected'));
             return;
         }
 
         await storeTokensInCookies(
             response.token,
             response.refresh_token,
-            response.refresh_token_expiration
+            refreshExpiration
         );
         showToast(t('login_success'), 'success');
         router.push(redirectTo);

@@ -4,7 +4,7 @@ import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/
 import { Code, Text } from '@/components/ui/Text';
 import { Mathematics } from '@tiptap/extension-mathematics';
 import { TextSelection } from '@tiptap/pm/state';
-import { EditorContent, useEditor } from '@tiptap/react';
+import { EditorContent, useEditor, type Editor as TipTapEditor } from '@tiptap/react';
 import { StarterKit } from "@tiptap/starter-kit";
 import 'katex/dist/katex.min.css';
 import {
@@ -43,12 +43,6 @@ const InfoDialog = ({ isOpen, setIsOpen, parentDialogOpen }: InfoDialogProps) =>
         }
     }, [parentDialogOpen, setIsOpen]);
 
-    // Stop event propagation to prevent affecting parent dialog
-    const handleClose = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setIsOpen(false);
-    };
-
     return (
         <Dialog
             isOpen={isOpen}
@@ -81,17 +75,12 @@ const InfoDialog = ({ isOpen, setIsOpen, parentDialogOpen }: InfoDialogProps) =>
     )
 }
 
-const Toolbar = ({ editor, parentDialogOpen }: { editor: any; parentDialogOpen?: boolean }) => {
+const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
     const [isInfoOpen, setIsInfoOpen] = useState(false);
 
     if (!editor) {
         return null
     }
-
-    const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
-        e.stopPropagation();
-        action();
-    };
 
     return (
         <div className="tiptap flex justify-between p-2 items-center border-b border-gray-900/10">
@@ -229,8 +218,7 @@ const Toolbar = ({ editor, parentDialogOpen }: { editor: any; parentDialogOpen?:
 
 export interface EditorProps {
     className?: string;
-    parentDialogOpen?: boolean;
-    onEditorReady?: (editor: any) => void;
+    onEditorReady?: (editor: TipTapEditor) => void;
 }
 
 /**
@@ -238,7 +226,7 @@ export interface EditorProps {
  * - https://tiptap.dev/docs/editor/getting-started/overview
  * - https://tiptap.dev/docs/editor/extensions/functionality/mathematics
  */
-const Editor = ({ className = '', parentDialogOpen = true, onEditorReady }: EditorProps) => {    // Create the editor instance
+const Editor = ({ className = '', onEditorReady }: EditorProps) => {    // Create the editor instance
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -256,7 +244,7 @@ const Editor = ({ className = '', parentDialogOpen = true, onEditorReady }: Edit
                 class: 'tiptap overflow-auto mx-auto h-32 p-3 focus:outline-hidden',
             },
             // Strip styling from pasted content
-            handlePaste(view, event, slice) {
+            handlePaste(view, event) {
                 event.preventDefault();
                 const text = event.clipboardData?.getData('text/plain');
                 view.dispatch(view.state.tr.insertText(text ?? '')); // Insert plain text as a new paragraph in the editor
@@ -274,7 +262,7 @@ const Editor = ({ className = '', parentDialogOpen = true, onEditorReady }: Edit
 
     return (
         <div className={`editor-container border border-gray-900/10 rounded-md h-fit ${className}`}>
-            <Toolbar editor={editor} parentDialogOpen={parentDialogOpen} />
+            <Toolbar editor={editor} />
             <EditorContent editor={editor} />
         </div>
     )

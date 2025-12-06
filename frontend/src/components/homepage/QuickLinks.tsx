@@ -1,18 +1,17 @@
+import { HydraCollection, useApi } from '@/hooks/useApi';
 import type { QuickLink } from '@/types/entities';
-import { convertToQuickLink } from '@/utils/convertToEntity';
-import { ApiError } from '@/utils/error/apiError';
 import { MAX_QUICK_LINKS } from '@/utils/constants/homepage';
+import { convertToQuickLink } from '@/utils/convertToEntity';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useApi } from '@/hooks/useApi';
 
 export function QuickLinks() {
     const [links, setLinks] = useState<QuickLink[]>([]);
     const { t, i18n } = useTranslation();
     const currentLanguage = i18n.language;
-    const { request, loading, error } = useApi();
+    const { request, loading, error } = useApi<HydraCollection<unknown>>();
 
     useEffect(() => {
         const fetchQuickLinks = async () => {

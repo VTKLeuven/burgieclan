@@ -24,6 +24,9 @@ export default function VoteButton({
     className = '',
     size = 'normal'
 }: VoteButtonProps) {
+    const hasError = (value: unknown): value is { error: unknown } =>
+        typeof value === 'object' && value !== null && 'error' in value;
+
     const [voteState, setVoteState] = useState<VoteDirection>(VoteDirection.NONE);
     const [voteCount, setVoteCount] = useState(0);
     const [isUpvoteHovered, setIsUpvoteHovered] = useState(false);
@@ -73,7 +76,7 @@ export default function VoteButton({
             voteType: direction
         });
 
-        if (!result || result.error) {
+        if (!result || hasError(result)) {
             setVoteState(voteState);
             setVoteCount(voteCount);
         }
