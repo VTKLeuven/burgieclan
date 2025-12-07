@@ -2,7 +2,8 @@
 // The added config here will be used whenever a users loads a page in their browser.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-import { captureRouterTransitionStart, init, replayIntegration } from "@sentry/nextjs";
+import { dropAndLogInLocal } from "@/utils/sentryLocalLogger";
+import { captureConsoleIntegration, captureRouterTransitionStart, init, replayIntegration } from "@sentry/nextjs";
 
 init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
@@ -11,6 +12,7 @@ init({
 
   // Add optional integrations for additional features
   integrations: [
+    captureConsoleIntegration({ levels: ["error", "warn", "log"] }),
     replayIntegration(),
   ],
 
@@ -30,6 +32,9 @@ init({
   // Enable sending user PII (Personally Identifiable Information)
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
   sendDefaultPii: true,
+
+  // In local dev, log and drop events instead of sending them.
+  beforeSend: dropAndLogInLocal("client"),
 });
 
 export const onRouterTransitionStart = captureRouterTransitionStart;
