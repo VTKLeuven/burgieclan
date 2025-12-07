@@ -1,3 +1,4 @@
+import { captureException } from "@sentry/nextjs";
 import { useToast } from '@/components/ui/Toast';
 import type { Document } from '@/types/entities';
 import { useRouter } from 'next/navigation';
@@ -26,7 +27,12 @@ const useDownloadContent = () => {
     // Handle download status notifications
     useEffect(() => {
         if (error) {
-            console.error('Download error:', error);
+            captureException(
+                new Error(error),
+                {
+                    extra: { context: "Download error" },
+                }
+            );
             showToast(t('download.download-error', { error }), 'error');
         }
 

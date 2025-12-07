@@ -2,6 +2,7 @@
 
 import { COOKIE_NAMES } from '@/utils/cookieNames';
 import { getUserIdFromJWT, isJWTExpired } from '@/utils/jwt';
+import { captureException } from '@sentry/nextjs';
 import { cookies } from 'next/headers';
 
 /**
@@ -101,13 +102,26 @@ export const getActiveJWT = async (): Promise<string | null> => {
             await storeTokensInCookies(newJwt, newRefreshToken, refreshTokenExpiration);
             return newJwt;
         } else {
-            console.error('Token refresh failed with status:', response.status, 'Response:', await response.text());
+            const responseText = await response.text();
+            captureException(
+                new Error(`Token refresh failed with status: ${response.status}; Response: ${responseText}`),
+                {
+                    extra: {
+                        context: "Token refresh failed",
+                        status: response.status,
+                        response: responseText,
+                    },
+                }
+            );
             // Refresh failed, clear the tokens
             await clearTokenCookies();
             return null;
         }
     } catch (error) {
-        console.error('Token refresh failed:', error);
+        captureException(
+            error instanceof Error ? error : new Error(String(error)),
+            { extra: { context: "Token refresh failed" } }
+        );
         await clearTokenCookies();
         return null;
     }
@@ -204,7 +218,10 @@ export const logOut = async (): Promise<{ success: boolean; error?: string }> =>
 
         return { success: true };
     } catch (error) {
-        console.error('Logout error:', error);
+        captureException(
+            error instanceof Error ? error : new Error(String(error)),
+            { extra: { context: "Logout error" } }
+        );
 
         // Even if the backend call fails, still clear local cookies
         await clearTokenCookies();

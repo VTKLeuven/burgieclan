@@ -5,6 +5,7 @@ import { useApi } from "@/hooks/useApi";
 import { useFavorites } from '@/hooks/useFavorites';
 import type { Course } from '@/types/entities';
 import { convertToCourse } from "@/utils/convertToEntity";
+import { captureException } from '@sentry/nextjs';
 import { Star, UserRound } from "lucide-react";
 import Link from "next/link";
 import { memo, useCallback, useEffect, useState } from 'react';
@@ -53,7 +54,12 @@ export const CourseRow = memo(({
                     setCourse(fullCourse);
                 }
             } catch (error) {
-                console.error("Failed to fetch course data:", error);
+                captureException(
+                    error instanceof Error ? error : new Error(String(error)),
+                    {
+                        extra: { context: "Failed to fetch course data" },
+                    }
+                );
             } finally {
                 setLoading(false);
             }
