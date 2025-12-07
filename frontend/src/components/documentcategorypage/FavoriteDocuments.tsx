@@ -8,6 +8,7 @@ import { useUser } from '@/components/UserContext';
 import { useApi } from '@/hooks/useApi';
 import type { Course, Document, DocumentCategory } from '@/types/entities';
 import { convertToDocument } from '@/utils/convertToEntity';
+import { captureException } from '@sentry/nextjs';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
@@ -63,7 +64,12 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
 
                 setFavoriteDocuments(documents);
             } catch (error) {
-                console.error('Error fetching favorite documents:', error);
+                captureException(
+                    error instanceof Error ? error : new Error(String(error)),
+                    {
+                        extra: { context: "Error fetching favorite documents" },
+                    }
+                );
             } finally {
                 setLoading(false);
             }

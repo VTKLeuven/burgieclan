@@ -1,3 +1,4 @@
+import { captureException } from "@sentry/nextjs";
 import { HydraCollection, useApi } from '@/hooks/useApi';
 import { Course, DocumentCategory, Tag } from '@/types/entities';
 import { convertToTag } from '@/utils/convertToEntity';
@@ -44,7 +45,12 @@ export const useFetchTags = ({ course, category }: UseFetchTagsProps = {}): UseF
                 }
             } catch (err) {
                 setError('Failed to fetch tags');
-                console.error('Error fetching tags:', err);
+                captureException(
+                    err instanceof Error ? err : new Error(String(err)),
+                    {
+                        extra: { context: "Error fetching tags" },
+                    }
+                );
             }
         };
 

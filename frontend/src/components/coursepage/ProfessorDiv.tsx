@@ -1,3 +1,4 @@
+import { captureException } from '@sentry/nextjs';
 import { TFunction } from 'i18next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -23,7 +24,12 @@ export default function ProfessorDiv({ unumber, index, t }: { unumber: string, i
                     return `${data._source.firstName[0]}. ${data._source.surname}`;
                 }
             } catch (error) {
-                console.error("Error fetching professor name:", error);
+                captureException(
+                    error instanceof Error ? error : new Error(String(error)),
+                    {
+                        extra: { context: "Error fetching professor name" },
+                    }
+                );
             }
             return "N.";
         }

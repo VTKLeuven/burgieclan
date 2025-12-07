@@ -1,5 +1,6 @@
 import type { SearchFilters } from '@/components/courses/CurriculumSearchBar';
 import type { Course, Module, Program } from '@/types/entities';
+import { captureException } from "@sentry/nextjs";
 import type { FuseResult } from 'fuse.js';
 import { FuseBudgetSearch } from './fuseBudgetSearch';
 
@@ -50,7 +51,10 @@ export function initializeFuseInstances(
     }, SEARCH_CONFIG);
 
   } catch (error) {
-    console.error('Error initializing Fuse instances:', error);
+    captureException(
+      error instanceof Error ? error : new Error(String(error)),
+      { extra: { context: "Error initializing Fuse instances" } }
+    );
   }
 }
 
@@ -112,7 +116,10 @@ export function courseMatchesText(course: Course, searchQuery?: string): boolean
       const isMatch = results.some(result => result.item.id === course.id);
       return isMatch;
     } catch (error) {
-      console.error('Error in budget search for course:', error);
+      captureException(
+        error instanceof Error ? error : new Error(String(error)),
+        { extra: { context: "Error in budget search for course" } }
+      );
     }
   }
 
@@ -127,7 +134,10 @@ export function courseMatchesText(course: Course, searchQuery?: string): boolean
     const results = tempFuse.search(searchQuery);
     return results.length > 0;
   } catch (error) {
-    console.error('Error in fallback search for course:', error);
+    captureException(
+      error instanceof Error ? error : new Error(String(error)),
+      { extra: { context: "Error in fallback search for course" } }
+    );
     return false;
   }
 }
@@ -150,7 +160,10 @@ export function moduleMatchesText(module: Module, searchQuery?: string): boolean
       const isMatch = results.some(result => result.item.id === module.id);
       return isMatch;
     } catch (error) {
-      console.error('Error in budget search for module:', error);
+      captureException(
+        error instanceof Error ? error : new Error(String(error)),
+        { extra: { context: "Error in budget search for module" } }
+      );
     }
   }
 
@@ -165,7 +178,10 @@ export function moduleMatchesText(module: Module, searchQuery?: string): boolean
     const results = tempFuse.search(searchQuery);
     return results.length > 0;
   } catch (error) {
-    console.error('Error in fallback search for module:', error);
+    captureException(
+      error instanceof Error ? error : new Error(String(error)),
+        { extra: { context: "Error in fallback search for module" } }
+    );
     return false;
   }
 }
@@ -188,7 +204,10 @@ export function programMatchesText(program: Program, searchQuery?: string): bool
       const isMatch = results.some(result => result.item.id === program.id);
       return isMatch;
     } catch (error) {
-      console.error('Error in budget search for program:', error);
+      captureException(
+        error instanceof Error ? error : new Error(String(error)),
+        { extra: { context: "Error in budget search for program" } }
+      );
     }
   }
 
@@ -203,7 +222,10 @@ export function programMatchesText(program: Program, searchQuery?: string): bool
     const results = tempFuse.search(searchQuery);
     return results.length > 0;
   } catch (error) {
-    console.error('Error in fallback search for program:', error);
+    captureException(
+      error instanceof Error ? error : new Error(String(error)),
+      { extra: { context: "Error in fallback search for program" } }
+    );
     return false;
   }
 }
@@ -227,7 +249,10 @@ export function getMatchingCourses(
     const results = tempFuse.search(searchQuery).map(result => result.item);
     return results;
   } catch (error) {
-    console.error('Error in getMatchingCourses:', error);
+    captureException(
+      error instanceof Error ? error : new Error(String(error)),
+      { extra: { context: "Error in getMatchingCourses" } }
+    );
     return [];
   }
 }
@@ -290,7 +315,10 @@ export function searchWithAnalytics(
       programsResults = programsAnalytics.results;
     }
   } catch (error) {
-    console.error('Error in searchWithAnalytics:', error);
+    captureException(
+      error instanceof Error ? error : new Error(String(error)),
+      { extra: { context: "Error in searchWithAnalytics" } }
+    );
   }
 
   const totalMatches = coursesResults.length + modulesResults.length + programsResults.length;
