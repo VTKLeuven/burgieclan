@@ -1,4 +1,4 @@
-import * as Headless from '@headlessui/react';
+import { Dialog as HeadlessDialog, Transition } from '@headlessui/react';
 import clsx from 'clsx';
 import { X } from 'lucide-react';
 import React from 'react';
@@ -28,14 +28,14 @@ interface DialogProps {
 
 export function Dialog({ isOpen, onClose, size = 'lg', className, children }: DialogProps) {
     return (
-        <Headless.Transition appear show={isOpen} as={React.Fragment}>
-            <Headless.Dialog
+        <Transition appear show={isOpen} as={React.Fragment}>
+            <HeadlessDialog
                 as="div"
                 className="relative z-10"
                 onClose={() => onClose()}
                 open={isOpen}
             >
-                <Headless.Transition.Child
+                <Transition.Child
                     as={React.Fragment}
                     enter="ease-out duration-300"
                     enterFrom="opacity-0"
@@ -45,11 +45,11 @@ export function Dialog({ isOpen, onClose, size = 'lg', className, children }: Di
                     leaveTo="opacity-0"
                 >
                     <div className="fixed inset-0 backdrop-blur-xs bg-gray-500 bg-opacity-75" />
-                </Headless.Transition.Child>
+                </Transition.Child>
 
                 <div className="fixed inset-0 z-10 overflow-y-auto">
                     <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                        <Headless.Transition.Child
+                        <Transition.Child
                             as={React.Fragment}
                             enter="ease-out duration-300"
                             enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
@@ -58,7 +58,7 @@ export function Dialog({ isOpen, onClose, size = 'lg', className, children }: Di
                             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         >
-                            <Headless.Dialog.Panel
+                            <HeadlessDialog.Panel
                                 className={clsx(
                                     className,
                                     sizes[size],
@@ -67,12 +67,12 @@ export function Dialog({ isOpen, onClose, size = 'lg', className, children }: Di
                             >
                                 <DialogCloseButton onClose={onClose} />
                                 {children}
-                            </Headless.Dialog.Panel>
-                        </Headless.Transition.Child>
+                            </HeadlessDialog.Panel>
+                        </Transition.Child>
                     </div>
                 </div>
-            </Headless.Dialog>
-        </Headless.Transition>
+            </HeadlessDialog>
+        </Transition>
     )
 }
 
@@ -83,12 +83,12 @@ interface DialogTitleProps {
 
 export function DialogTitle({ className, children }: DialogTitleProps) {
     return (
-        <Headless.Dialog.Title
+        <HeadlessDialog.Title
             as="h3"
             className={clsx(className, 'px-10')}
         >
             {children}
-        </Headless.Dialog.Title>
+        </HeadlessDialog.Title>
     )
 }
 
