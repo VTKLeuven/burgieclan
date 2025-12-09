@@ -129,7 +129,10 @@ export default function UploadForm({
                     <FormField
                         label={t('upload.form.course.label')}
                         type="combobox"
-                        options={courses}
+                        options={courses.map((course) => ({
+                            id: course.id,
+                            name: `${course.code} - ${course.name}`,
+                        }))}
                         error={errors.course}
                         name="course"
                         control={control}
