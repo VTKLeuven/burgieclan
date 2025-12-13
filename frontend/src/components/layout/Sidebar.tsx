@@ -7,7 +7,6 @@ import { useUser } from "@/components/UserContext";
 import type { Course, Document } from "@/types/entities";
 import { ChevronDown, File, FolderClosed, Home, PanelLeft, PanelLeftClose } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -33,7 +32,6 @@ const mapDocumentsToItems = (documents: Document[]) => {
 const NavigationSidebar = () => {
   const { user, loading } = useUser();
   const { t, i18n } = useTranslation();
-  const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     courses: true,

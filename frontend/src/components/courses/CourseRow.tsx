@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
-import type { Course } from '@/types/entities';
-import Link from "next/link";
-import SemesterIndicator from "@/components/ui/SemesterIndicator";
-import { Star, UserRound } from "lucide-react";
-import { useUser } from '@/components/UserContext';
-import { useFavorites } from '@/hooks/useFavorites';
-import { useApi } from "@/hooks/useApi";
-import { convertToCourse } from "@/utils/convertToEntity";
-import Skeleton from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
 import DownloadButton from '@/components/ui/DownloadButton';
+import SemesterIndicator from "@/components/ui/SemesterIndicator";
+import { useUser } from '@/components/UserContext';
+import { useApi } from "@/hooks/useApi";
+import { useFavorites } from '@/hooks/useFavorites';
+import type { Course } from '@/types/entities';
+import { convertToCourse } from "@/utils/convertToEntity";
+import { Star, UserRound } from "lucide-react";
+import Link from "next/link";
+import { memo, useCallback, useEffect, useState } from 'react';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 interface CourseRowProps {
     course: Course;
@@ -107,7 +107,7 @@ export const CourseRow = memo(({
 
             const names = await Promise.all(namePromises);
             setProfessorNames(names.filter(name => name));
-        } catch (error) {
+        } catch {
             setProfessorNames([]);
         }
     }, [course?.professors, professorsLoaded]);

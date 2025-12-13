@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { Merge } from "type-fest";
 
 interface FileUploadProps {
-    error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
+    error?: FieldError | Merge<FieldError, FieldErrorsImpl<UploadFormData>>;
     setValue: UseFormSetValue<UploadFormData>;
     initialFile: File | null;
     className?: string;

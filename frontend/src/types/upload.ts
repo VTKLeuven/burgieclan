@@ -4,7 +4,7 @@ export interface UploadFormData {
     category: number;
     year: string;
     anonymous: boolean;
-    file: any;
+    file: File | null;
     tagIds: number[];
     tagQueries: string[];
 }

@@ -5,7 +5,7 @@ import CurriculumSearchBar, { SearchFilters } from '@/components/courses/Curricu
 import ProgramNode from '@/components/courses/ProgramNode';
 import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
 import { useUser } from "@/components/UserContext";
-import { useApi } from '@/hooks/useApi';
+import { HydraCollection, useApi } from '@/hooks/useApi';
 import type { Program } from '@/types/entities';
 import { convertToProgram } from "@/utils/convertToEntity";
 import {
@@ -21,7 +21,7 @@ export default function CurriculumNavigator() {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [originalPrograms, setOriginalPrograms] = useState<Program[]>([]);
   const [searchFilters, setSearchFilters] = useState<SearchFilters | null>(null);
-  const { request, loading, error } = useApi();
+  const { request, loading, error } = useApi<HydraCollection<unknown>>();
   const { t } = useTranslation();
   const { user } = useUser();
   const [matchCounts, setMatchCounts] = useState({
@@ -29,7 +29,7 @@ export default function CurriculumNavigator() {
     modules: 0,
     courses: 0
   });
-  const [searchAnalytics, setSearchAnalytics] = useState<any>(null);
+  const [searchAnalytics, setSearchAnalytics] = useState<ReturnType<typeof searchWithAnalytics>['analytics'] | null>(null);
   const [totalEntities, setTotalEntities] = useState({
     courses: 0,
     modules: 0,
@@ -43,7 +43,7 @@ export default function CurriculumNavigator() {
         return null;
       }
 
-      const fetchedPrograms = result["hydra:member"].map((program: any) => convertToProgram(program));
+      const fetchedPrograms = result['hydra:member'].map(convertToProgram);
       setPrograms(fetchedPrograms);
       setOriginalPrograms(fetchedPrograms);
 

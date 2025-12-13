@@ -25,19 +25,16 @@ type SearchResults = {
     documents: Document[];
 };
 
+type SearchApiResponse = Partial<Record<keyof SearchResults, unknown[]>>;
+
 export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
     const [query, setQuery] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState('');
     const [items, setItems] = useState<SearchResults>({ courses: [], modules: [], programs: [], documents: [] });
-    const { error, loading, isRedirecting, request } = useApi();
+    const { error, loading, isRedirecting, request } = useApi<SearchApiResponse | null>();
     const { t } = useTranslation();
 
-    /**
-     * Remove all fields starting with '@' from the object
-     * @param obj - The object to clean
-     * @returns The cleaned object
-     */
-    function convertToObjects(obj: Record<string, any[]>): SearchResults {
+    function convertToObjects(obj: SearchApiResponse): SearchResults {
         const items: SearchResults = { courses: [], modules: [], programs: [], documents: [] };
         obj['courses']?.forEach((course) => {
             items.courses.push(convertToCourse(course));
@@ -74,9 +71,12 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
             }
 
             const result = await request('GET', `/api/search?searchText=${debouncedQuery}`);
-            if (result) {
-                setItems(convertToObjects(result));
+            if (!result) {
+                setItems({ courses: [], modules: [], programs: [], documents: [] });
+                return;
             }
+
+            setItems(convertToObjects(result));
         };
 
         fetchData();
@@ -103,9 +103,11 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                     className="mx-auto max-w-xl transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all data-closed:scale-95 data-closed:opacity-0 data-enter:duration-300 data-leave:duration-200 data-enter:ease-out data-leave:ease-in"
                 >
                     <Combobox
-                        onChange={(param: { redirect: Location | (string & Location) } | null) => {
+                        onChange={(param: { redirect: Location | string } | null) => {
                             if (param?.redirect) {
-                                window.location = param.redirect;
+                                window.location.href = typeof param.redirect === 'string'
+                                    ? param.redirect
+                                    : param.redirect.href;
                             }
                         }}
                     >

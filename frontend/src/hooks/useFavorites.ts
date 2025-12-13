@@ -1,4 +1,4 @@
-import { useApi } from "@/hooks/useApi";
+import { isErrorResponse, useApi } from "@/hooks/useApi";
 import { User } from "@/types/entities";
 import { ApiError } from "@/utils/error/apiError";
 import { useState } from "react";
@@ -41,14 +41,18 @@ export function useFavorites(user: User | null) {
                 throw new ApiError('Failed to update favorites', 500);
             }
 
-            if (result.error) {
-                throw new ApiError(result.error.message, result.error.status || 500);
+            if (isErrorResponse(result)) {
+                throw new ApiError(result.error?.message ?? 'Failed to update favorites', result.error?.status || 500);
             }
 
             return result;
-        } catch (err: any) {
-            setError(err);
-            throw new ApiError(err.message, 500);
+        } catch (err: unknown) {
+            const normalizedError =
+                err instanceof ApiError
+                    ? err
+                    : new ApiError(err instanceof Error ? err.message : 'Failed to update favorites', 500);
+            setError(normalizedError);
+            throw normalizedError;
         }
     };
 

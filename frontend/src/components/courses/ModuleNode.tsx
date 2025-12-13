@@ -30,7 +30,7 @@ const ModuleNode = ({
     parentVisible = true
 }: ModuleNodeProps) => {
     const { t } = useTranslation();
-    const { request, loading } = useApi();
+    const { request } = useApi();
     const [expanded, setExpanded] = useState(false);
     const [module, setModule] = useState<Module>(initialModule);
 

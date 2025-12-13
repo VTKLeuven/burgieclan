@@ -63,7 +63,7 @@ export const getActiveJWT = async (): Promise<string | null> => {
     }
 
     const cookieStore = await cookies();
-    let jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
+    const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
     const refreshToken = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
 
     // If no JWT at all, return null

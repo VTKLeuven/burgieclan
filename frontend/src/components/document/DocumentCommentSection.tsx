@@ -1,6 +1,6 @@
 import AddDocumentCommentBox from "@/components/document/AddDocumentCommentBox";
 import DocumentComment from "@/components/document/DocumentComment";
-import { useApi } from "@/hooks/useApi";
+import { HydraCollection, useApi } from "@/hooks/useApi";
 import type { DocumentComment as DocumentCommentEntity } from "@/types/entities";
 import { convertToDocumentComment } from "@/utils/convertToEntity";
 import { useCallback, useEffect, useState } from "react";
@@ -13,7 +13,7 @@ interface DocumentCommentSectionProps {
 
 export default function DocumentCommentSection({ documentId, file }: DocumentCommentSectionProps) {
     const [comments, setComments] = useState<DocumentCommentEntity[]>([]);
-    const { request } = useApi();
+    const { request } = useApi<HydraCollection<unknown>>();
     const { t } = useTranslation();
 
     useEffect(() => {

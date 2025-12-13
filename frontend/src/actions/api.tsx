@@ -28,7 +28,7 @@ const handleError = async (response: Response) => {
  * - Redirects to login page if 401 error is returned (JWT not available or expired and not refreshable)
  * - Propagates errors in structured format to calling component
  */
-export const ApiClient = async (method: string, endpoint: string, body?: any, customHeaders?: Headers) => {
+export const ApiClient = async (method: string, endpoint: string, body?: unknown, customHeaders?: Headers) => {
     const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     const frontendBaseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL;
 
@@ -85,15 +85,16 @@ export const ApiClient = async (method: string, endpoint: string, body?: any, cu
         // Handle all other errors
         return await handleError(response);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         // Special case for login redirection
-        if (error.message === 'REDIRECT_TO_LOGIN') {
+        if (error instanceof Error && error.message === 'REDIRECT_TO_LOGIN') {
             // Ensure we exit the function properly with this redirect
             await redirectToLogin(frontendBaseUrl!);
         }
 
         // Handle all other errors
-        return { error: { message: error.message || 'Unexpected API Error.', status: 500 } };
+        const message = error instanceof Error ? error.message : 'Unexpected API Error.';
+        return { error: { message, status: 500 } };
     }
 }
 

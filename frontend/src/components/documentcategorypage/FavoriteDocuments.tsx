@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'lucide-react';
-import Link from 'next/link';
-import { useUser } from '@/components/UserContext';
-import { useApi } from '@/hooks/useApi';
-import { convertToDocument } from '@/utils/convertToEntity';
-import FavoriteButton from '@/components/ui/FavoriteButton';
-import DownloadButton from '@/components/ui/DownloadButton';
-import type { Course, DocumentCategory, Document } from '@/types/entities';
 import Loading from '@/app/[locale]/loading';
 import Badge from '@/components/ui/Badge';
+import DownloadButton from '@/components/ui/DownloadButton';
+import FavoriteButton from '@/components/ui/FavoriteButton';
+import { useUser } from '@/components/UserContext';
+import { useApi } from '@/hooks/useApi';
+import type { Course, Document, DocumentCategory } from '@/types/entities';
+import { convertToDocument } from '@/utils/convertToEntity';
+import { ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface FavoriteDocumentsProps {
     category: DocumentCategory;

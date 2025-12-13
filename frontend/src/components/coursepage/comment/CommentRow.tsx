@@ -72,7 +72,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
             const updatedComment = await updateComment(comment.id, { content: editContent, anonymous: editAnonymous });
             setComment({ ...comment, ...updatedComment });
             setIsEditing(false);
-        } catch (error) {
+        } catch {
             // Error handling can be added here
         } finally {
             setEditIsSubmitting(false);
