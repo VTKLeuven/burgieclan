@@ -15,10 +15,11 @@ RUN npm ci --no-audit
 FROM base AS builder
 WORKDIR /app
 
-# Accept Sentry auth token as build arg
-# This is used to upload source maps to Sentry, see next.config.mjs for more details.
+# Accept Sentry auth token as secret for build-time use
+# This is used to upload source maps to Sentry during build
+# Note: Using ARG is acceptable here since the token is only needed during build
+# and is not persisted in the final image layers
 ARG SENTRY_AUTH_TOKEN
-ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 
 # Accept Next.js public environment variables as build args
 # These are embedded at build time, not runtime
