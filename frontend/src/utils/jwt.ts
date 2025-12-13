@@ -1,3 +1,5 @@
+import { captureException } from "@sentry/nextjs";
+
 interface JWTPayload {
     id?: number;
     username?: string;
@@ -20,7 +22,10 @@ export function decodeJWT(token: string): JWTPayload | null {
 
         return parsedPayload;
     } catch (error) {
-        console.error('Failed to decode JWT:', error);
+        captureException(
+            error instanceof Error ? error : new Error(String(error)),
+            { extra: { context: "Failed to decode JWT" } }
+        );
         return null;
     }
 }
