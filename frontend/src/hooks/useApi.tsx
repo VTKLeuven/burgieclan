@@ -2,6 +2,7 @@
 
 import { ApiClient } from '@/actions/api';
 import { ApiError } from '@/utils/error/apiError';
+import { captureException } from "@sentry/nextjs";
 import { useCallback, useState } from 'react';
 
 type ApiErrorBody = { message?: string; detail?: string; status?: number };
@@ -40,7 +41,15 @@ export function useApi<T = unknown>() {
 
             // Check if the response contains an error
             if (isErrorResponse(result)) {
-                console.error(result.error.detail ?? result.error.message ?? 'An unexpected error occurred');
+                captureException(
+                    new Error(result.error.detail ?? result.error.message ?? 'An unexpected error occurred'),
+                    {
+                        extra: {
+                            context: "API error response",
+                            status: result.error.status ?? 500,
+                        },
+                    }
+                );
                 setError(new ApiError(result.error.detail ?? result.error.message ?? 'An unexpected error occurred', result.error.status ?? 500));
                 setData(null);
                 return null;
@@ -56,8 +65,12 @@ export function useApi<T = unknown>() {
             return result as T;
         } catch (err: unknown) {
             setIsRedirecting(true);
-            console.error('Error during API request');
-            console.error(err);
+            captureException(
+                err instanceof Error ? err : new Error(String(err)),
+                {
+                    extra: { context: "Error during API request" },
+                }
+            );
             // Let Next.js handle the redirect automatically
             return null;
         } finally {

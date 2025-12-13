@@ -68,7 +68,6 @@ export default function VoteButton({
 
         const delta = calculateVoteDelta(voteState, newVoteState);
 
-        console.log({ apiEndpoint, direction, delta, voteCount, newVoteCount: voteCount + delta });
         const result = await request('POST', apiEndpoint, {
             voteType: direction
         });
