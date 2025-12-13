@@ -1,17 +1,17 @@
-import { Combobox, ComboboxInput, ComboboxOptions, Dialog, DialogBackdrop, DialogPanel, } from '@headlessui/react'
-import { Frown, Globe, Search as SearchIcon } from 'lucide-react';
-import { useEffect, useState } from 'react'
 import FoldableSection from "@/components/common/FoldableSection";
-import type { Course, Document, Module, Program } from '@/types/entities';
 import {
     CourseSearchResult,
     DocumentSearchResult,
     ModuleSearchResult,
     ProgramSearchResult
 } from "@/components/search/SearchResult";
-import { objectToCourse, objectToDocument, objectToModule, objectToProgram } from '@/utils/objectToTypeConvertor';
-import { useTranslation } from 'react-i18next';
 import { useApi } from '@/hooks/useApi';
+import type { Course, Document, Module, Program } from '@/types/entities';
+import { convertToCourse, convertToDocument, convertToModule, convertToProgram } from '@/utils/convertToEntity';
+import { Combobox, ComboboxInput, ComboboxOptions, Dialog, DialogBackdrop, DialogPanel, } from '@headlessui/react';
+import { Frown, Globe, Search as SearchIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type SearchPopupProps = {
     open: boolean;
@@ -40,16 +40,16 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
     function convertToObjects(obj: Record<string, any[]>): SearchResults {
         const items: SearchResults = { courses: [], modules: [], programs: [], documents: [] };
         obj['courses']?.forEach((course) => {
-            items.courses.push(objectToCourse(course));
+            items.courses.push(convertToCourse(course));
         });
         obj['modules']?.forEach((module) => {
-            items.modules.push(objectToModule(module));
+            items.modules.push(convertToModule(module));
         });
         obj['programs']?.forEach((program) => {
-            items.programs.push(objectToProgram(program));
+            items.programs.push(convertToProgram(program));
         });
         obj['documents']?.forEach((document) => {
-            items.documents.push(objectToDocument(document));
+            items.documents.push(convertToDocument(document));
         });
         return items;
     }
