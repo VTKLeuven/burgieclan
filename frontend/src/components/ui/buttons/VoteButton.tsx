@@ -1,4 +1,4 @@
-import { useApi } from "@/hooks/useApi";
+import { isErrorResponse, useApi } from "@/hooks/useApi";
 import { convertToVoteSummary } from "@/utils/convertToEntity";
 import { ArrowBigDownIcon, ArrowBigUpIcon } from "lucide-react";
 import { useEffect, useState } from 'react';
@@ -73,7 +73,7 @@ export default function VoteButton({
             voteType: direction
         });
 
-        if (!result || result.error) {
+        if (!result || isErrorResponse(result)) {
             setVoteState(voteState);
             setVoteCount(voteCount);
         }

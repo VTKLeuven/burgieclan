@@ -1,5 +1,6 @@
-import type { Course, Module, Program } from '@/types/entities';
 import type { SearchFilters } from '@/components/courses/CurriculumSearchBar';
+import type { Course, Module, Program } from '@/types/entities';
+import type { FuseResult } from 'fuse.js';
 import { FuseBudgetSearch } from './fuseBudgetSearch';
 
 // Persistent budget-aware Fuse instances
@@ -253,12 +254,12 @@ export function searchWithAnalytics(
     maxBudgetLimit: number;
   };
 } {  
-  let coursesResults: any[] = [];
-  let modulesResults: any[] = [];
-  let programsResults: any[] = [];
-  let coursesAnalytics: any = null;
-  let modulesAnalytics: any = null;
-  let programsAnalytics: any = null;
+  let coursesResults: FuseResult<Course>[] = [];
+  let modulesResults: FuseResult<Module>[] = [];
+  let programsResults: FuseResult<Program>[] = [];
+  let coursesAnalytics: ReturnType<FuseBudgetSearch<Course>['searchWithDiagnostics']> | null = null;
+  let modulesAnalytics: ReturnType<FuseBudgetSearch<Module>['searchWithDiagnostics']> | null = null;
+  let programsAnalytics: ReturnType<FuseBudgetSearch<Program>['searchWithDiagnostics']> | null = null;
 
   try {
     // Create temporary instances with the desired config for analytics
