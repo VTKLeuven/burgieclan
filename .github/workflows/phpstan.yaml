@@ -25,7 +25,7 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@v2 # Sets up the specified PHP version
+        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2 # Sets up the specified PHP version
         with:
           php-version: "8.4"
 
