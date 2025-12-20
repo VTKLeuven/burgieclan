@@ -1,5 +1,5 @@
 # Stage 1: Dependencies
-FROM node:24-alpine3.22 AS base
+FROM dhi/node:24-alpine3.22 AS base
 
 FROM base AS deps
 RUN apk add --no-cache libc6-compat

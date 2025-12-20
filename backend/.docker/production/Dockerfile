@@ -2,7 +2,7 @@
 # STAGE 1: CORE RUNTIME BASE (php_base)
 # Contains minimal system packages and compiled PHP extensions needed for R-U-N-T-I-M-E
 # ===============================================
-FROM php:8.4-fpm-alpine3.22 AS php_base
+FROM dhi/php:8.4-fpm-alpine3.22 AS php_base
 
 # Install minimal runtime system dependencies
 RUN apk update && \

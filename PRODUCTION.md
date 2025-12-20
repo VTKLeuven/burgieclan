@@ -74,7 +74,7 @@ Images are hosted on GitHub Container Registry (GHCR) at `ghcr.io/vtkleuven/burg
 
 ### Backend Image
 
-**Base**: `php:8.4-fpm-alpine3.22`
+**Base**: `dhi/php:8.4-fpm-alpine3.22` (Docker Hardened Image)
 
 **Architecture**: Single container running both nginx and PHP-FPM
 - nginx listens on port 8080 and forwards PHP requests to PHP-FPM on 127.0.0.1:9000
@@ -99,7 +99,7 @@ Images are hosted on GitHub Container Registry (GHCR) at `ghcr.io/vtkleuven/burg
 
 ### Frontend Image
 
-**Base**: `node:24-alpine3.22`
+**Base**: `dhi/node:24-alpine3.22` (Docker Hardened Image)
 
 **Architecture**: Multi-stage build producing Next.js standalone server
 
