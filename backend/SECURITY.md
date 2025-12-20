@@ -28,8 +28,10 @@ CSP helps prevent Cross-Site Scripting (XSS) attacks by controlling which resour
 - **base-uri**: 'self' - Restrict base tag URLs
 - **form-action**: 'self' - Forms can only submit to same origin
 - **frame-ancestors**: 'none' - Prevent the site from being framed (equivalent to X-Frame-Options: DENY)
-- **block-all-mixed-content**: true - Block HTTP content on HTTPS pages
-- **upgrade-insecure-requests**: true - Automatically upgrade HTTP requests to HTTPS
+
+**HTTPS-only directives (production):**
+- **block-all-mixed-content**: Block HTTP content on HTTPS pages (configured for production environment)
+- **upgrade-insecure-requests**: Automatically upgrade HTTP requests to HTTPS (configured for production environment)
 
 **Environment-specific adjustments:**
 - **Development**: Additional 'unsafe-eval' allowed for debugging tools, WebSocket connections allowed
@@ -70,7 +72,8 @@ Restricts access to browser features and APIs.
 - **geolocation**: Blocked - No geolocation access
 - **payment**: Blocked - No payment API access
 - **usb**: Blocked - No USB access
-- **interest_cohort**: Blocked - Blocks FLoC tracking
+
+**Note**: The deprecated `interest_cohort` directive (for blocking FLoC tracking) has been removed as it's no longer needed for modern browsers (Chrome removed FLoC in 2022).
 
 ### 6. External Redirect Protection
 
