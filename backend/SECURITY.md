@@ -79,7 +79,7 @@ Prevents redirects to untrusted external domains.
 **Configuration:**
 - **abort**: true - Abort external redirects by default
 - **log**: true - Log external redirect attempts for monitoring
-- A whitelist can be configured for trusted external domains if needed
+- An allow_list can be configured for trusted external domains if needed
 
 ### 7. Forced HTTPS/SSL (HSTS)
 
@@ -128,7 +128,7 @@ If you need to redirect to trusted external domains:
 ```yaml
 nelmio_security:
     external_redirects:
-        whitelist:
+        allow_list:
             - 'example.com'
             - 'trusted-partner.com'
 ```

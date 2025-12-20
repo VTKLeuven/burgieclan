@@ -96,7 +96,7 @@ nelmio_security:
     external_redirects:
         abort: true  # Abort external redirects by default
         log: true  # Log external redirect attempts
-        # whitelist: []  # Add trusted external domains here if needed
+        # allow_list: []  # Add trusted external domains here if needed
 
     # Forced HTTPS/SSL with HSTS (HTTP Strict Transport Security)
     # Note: Only enable this in production when you have a valid SSL certificate
