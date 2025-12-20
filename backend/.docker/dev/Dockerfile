@@ -1,18 +1,18 @@
-FROM php:8.4-apache
+FROM php:8.4-cli-alpine3.22
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apk update && apk add --no-cache \
     git \
     curl \
     libpng-dev \
-    libonig-dev \
     libxml2-dev \
     zip \
     unzip \
     libzip-dev \
-    libicu-dev \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+    icu-dev \
+    postgresql-dev \
+    bash \
+    && rm -rf /var/cache/apk/*
 
 # Install PHP extensions
 RUN docker-php-ext-install \
@@ -40,9 +40,9 @@ RUN mkdir -p var/cache var/log var/sessions && \
     chmod -R 775 var
 
 # Install Symfony CLI
-RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | bash && \
-    apt-get update && apt-get install -y symfony-cli && \
-    rm -rf /var/lib/apt/lists/*
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.alpine.sh' | bash && \
+    apk add --no-cache symfony-cli && \
+    rm -rf /var/cache/apk/*
 
 # Install dependencies
 RUN composer install --no-scripts

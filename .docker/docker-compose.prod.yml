@@ -1,7 +1,7 @@
 services:
   nginx:
-    # Official nginx image
-    image: nginx:alpine
+    # Official nginx Alpine image (hardened, minimal) with specific version tag
+    image: nginx:1.27-alpine
     container_name: burgieclan-nginx
 
     # Restart policy
@@ -147,8 +147,8 @@ services:
         compress: "true" # Compress rotated logs to save space
 
   db:
-    # Official PostgreSQL latest image
-    image: postgres:18
+    # Official PostgreSQL Alpine image (hardened, minimal)
+    image: postgres:18-alpine
     container_name: burgieclan-db
 
     # Restart policy
