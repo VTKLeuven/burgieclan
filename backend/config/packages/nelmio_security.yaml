@@ -20,7 +20,9 @@ nelmio_security:
                 - 'self'
             script-src:
                 - 'self'
-                # Allow inline scripts for Symfony profiler in dev/test
+                # NOTE: 'unsafe-inline' weakens CSP protection against XSS attacks
+                # Consider using nonce-based or hash-based CSP for better security in production
+                # For now, this is needed for Symfony profiler and some dynamic scripts
                 - 'unsafe-inline'
                 # If you use CDNs or external scripts, add them here:
                 # - 'https://cdn.example.com'
@@ -49,8 +51,10 @@ nelmio_security:
                 - 'self'
             frame-ancestors:
                 - 'none'  # Equivalent to X-Frame-Options: DENY
-            block-all-mixed-content: true  # Block HTTP content over HTTPS
-            upgrade-insecure-requests: true  # Automatically upgrade HTTP requests to HTTPS
+            # NOTE: block-all-mixed-content and upgrade-insecure-requests are HTTPS-only
+            # They are disabled by default and should be enabled in production
+            # block-all-mixed-content: true  # Block HTTP content over HTTPS
+            # upgrade-insecure-requests: true  # Automatically upgrade HTTP requests to HTTPS
         report:
             level1_fallback: true
             browser_adaptive:
@@ -90,7 +94,7 @@ nelmio_security:
             geolocation: []  # No geolocation access
             payment: []  # No payment API access
             usb: []  # No USB access
-            interest_cohort: []  # Block FLoC tracking
+            interest_cohort: []  # Block FLoC tracking (deprecated, kept for legacy browser support)
 
     # External redirect protection
     external_redirects:
@@ -133,6 +137,11 @@ when@test:
 # Uncomment when you have a valid SSL certificate in production
 # when@prod:
 #     nelmio_security:
+#         csp:
+#             enforce:
+#                 # Enable HTTPS-only directives in production
+#                 block-all-mixed-content: true  # Block HTTP content over HTTPS
+#                 upgrade-insecure-requests: true  # Automatically upgrade HTTP requests to HTTPS
 #         forced_ssl:
 #             enabled: true
 #             hsts_max_age: 31536000  # 1 year
