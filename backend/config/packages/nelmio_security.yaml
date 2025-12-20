@@ -98,6 +98,14 @@ nelmio_security:
         log: true  # Log external redirect attempts
         # whitelist: []  # Add trusted external domains here if needed
 
+    # Forced HTTPS/SSL with HSTS (HTTP Strict Transport Security)
+    # Note: Only enable this in production when you have a valid SSL certificate
+    # forced_ssl:
+    #     enabled: true
+    #     hsts_max_age: 31536000  # 1 year in seconds
+    #     hsts_subdomains: true  # Apply to all subdomains
+    #     hsts_preload: false  # Set to true only if you want to be included in browser HSTS preload lists
+
 # When in development, relax some CSP rules for Symfony profiler and debugging
 when@dev:
     nelmio_security:
@@ -120,3 +128,14 @@ when@test:
         # Disable CSP in tests to avoid issues
         csp:
             enabled: false
+
+# Production environment - enable HTTPS enforcement with HSTS
+# Uncomment when you have a valid SSL certificate in production
+# when@prod:
+#     nelmio_security:
+#         forced_ssl:
+#             enabled: true
+#             hsts_max_age: 31536000  # 1 year
+#             hsts_subdomains: true
+#             hsts_preload: false  # Enable only after testing and if you want browser preload
+
