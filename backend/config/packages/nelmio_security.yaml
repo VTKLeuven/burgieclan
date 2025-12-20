@@ -1,0 +1,122 @@
+nelmio_security:
+    # Clickjacking protection - prevent the site from being loaded in iframes
+    clickjacking:
+        paths:
+            '^/.*': DENY  # Deny all by default, protecting against clickjacking attacks
+            # You can add exceptions for specific paths if needed, e.g.:
+            # '^/embed/.*': ALLOW
+
+    # Content Security Policy (CSP) - mitigate XSS attacks
+    csp:
+        enabled: true
+        hosts: []
+        content_types: []
+        enforce:
+            level1_fallback: true
+            browser_adaptive:
+                enabled: true
+            # Define strict CSP directives
+            default-src:
+                - 'self'
+            script-src:
+                - 'self'
+                # Allow inline scripts for Symfony profiler in dev/test
+                - 'unsafe-inline'
+                # If you use CDNs or external scripts, add them here:
+                # - 'https://cdn.example.com'
+            style-src:
+                - 'self'
+                - 'unsafe-inline'  # Required for some CSS frameworks and Symfony profiler
+            img-src:
+                - 'self'
+                - 'data:'  # Allow data URIs for images
+                - 'https:'  # Allow images from HTTPS sources
+            font-src:
+                - 'self'
+                - 'data:'
+                - 'https:'
+            connect-src:
+                - 'self'
+                # Add your API endpoints and WebSocket URLs here if needed
+            frame-src:
+                - 'self'
+                # Add trusted iframe sources here if needed
+            object-src:
+                - 'none'  # Disallow <object>, <embed>, <applet>
+            base-uri:
+                - 'self'
+            form-action:
+                - 'self'
+            frame-ancestors:
+                - 'none'  # Equivalent to X-Frame-Options: DENY
+            block-all-mixed-content: true  # Block HTTP content over HTTPS
+            upgrade-insecure-requests: true  # Automatically upgrade HTTP requests to HTTPS
+        report:
+            level1_fallback: true
+            browser_adaptive:
+                enabled: true
+            # Set up CSP reporting endpoint (you may need to implement this endpoint)
+            # report-uri: '/csp-report'
+            default-src:
+                - 'self'
+            script-src:
+                - 'self'
+                - 'unsafe-inline'
+            style-src:
+                - 'self'
+                - 'unsafe-inline'
+            img-src:
+                - 'self'
+                - 'data:'
+                - 'https:'
+
+    # Disable content type sniffing
+    content_type:
+        nosniff: true
+
+    # Referrer Policy - control how much referrer information is shared
+    referrer_policy:
+        enabled: true
+        policies:
+            - 'strict-origin-when-cross-origin'  # Send full URL for same-origin, only origin for cross-origin
+
+    # Permissions Policy (formerly Feature Policy)
+    permissions_policy:
+        enabled: true
+        policies:
+            # Block access to sensitive APIs by default
+            camera: []  # No camera access
+            microphone: []  # No microphone access
+            geolocation: []  # No geolocation access
+            payment: []  # No payment API access
+            usb: []  # No USB access
+            interest_cohort: []  # Block FLoC tracking
+
+    # External redirect protection
+    external_redirects:
+        abort: true  # Abort external redirects by default
+        log: true  # Log external redirect attempts
+        # whitelist: []  # Add trusted external domains here if needed
+
+# When in development, relax some CSP rules for Symfony profiler and debugging
+when@dev:
+    nelmio_security:
+        csp:
+            enforce:
+                script-src:
+                    - 'self'
+                    - 'unsafe-inline'
+                    - 'unsafe-eval'  # Allow eval for debugging tools
+                style-src:
+                    - 'self'
+                    - 'unsafe-inline'
+                connect-src:
+                    - 'self'
+                    - 'ws:'  # Allow WebSocket for Symfony dev tools
+                    - 'wss:'
+
+when@test:
+    nelmio_security:
+        # Disable CSP in tests to avoid issues
+        csp:
+            enabled: false

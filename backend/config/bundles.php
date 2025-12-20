@@ -21,6 +21,7 @@ return [
     Sentry\SentryBundle\SentryBundle::class => ['prod' => true],
     Symfony\UX\StimulusBundle\StimulusBundle::class => ['all' => true],
     Nelmio\CorsBundle\NelmioCorsBundle::class => ['all' => true],
+    Nelmio\SecurityBundle\NelmioSecurityBundle::class => ['all' => true],
     Symfonycasts\MicroMapper\SymfonycastsMicroMapperBundle::class => ['all' => true],
     Lexik\Bundle\JWTAuthenticationBundle\LexikJWTAuthenticationBundle::class => ['all' => true],
     Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],
