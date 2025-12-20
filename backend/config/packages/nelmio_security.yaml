@@ -51,10 +51,8 @@ nelmio_security:
                 - 'self'
             frame-ancestors:
                 - 'none'  # Equivalent to X-Frame-Options: DENY
-            # NOTE: block-all-mixed-content and upgrade-insecure-requests are HTTPS-only
-            # They are disabled by default and should be enabled in production
-            # block-all-mixed-content: true  # Block HTTP content over HTTPS
-            # upgrade-insecure-requests: true  # Automatically upgrade HTTP requests to HTTPS
+            # NOTE: HTTPS-only directives (block-all-mixed-content, upgrade-insecure-requests)
+            # are configured in the production environment section below
         report:
             level1_fallback: true
             browser_adaptive:
@@ -94,7 +92,9 @@ nelmio_security:
             geolocation: []  # No geolocation access
             payment: []  # No payment API access
             usb: []  # No USB access
-            interest_cohort: []  # Block FLoC tracking (deprecated, kept for legacy browser support)
+            # Note: interest_cohort is deprecated (Chrome removed FLoC in 2022)
+            # Can be removed once you no longer need to support Chrome versions < 100 (released March 2022)
+            interest_cohort: []  # Block FLoC tracking (legacy browser support)
 
     # External redirect protection
     external_redirects:
