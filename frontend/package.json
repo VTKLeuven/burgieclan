@@ -29,7 +29,7 @@
     "i18next": "^25.6.3",
     "i18next-resources-to-backend": "^1.2.1",
     "katex": "^0.16.11",
-    "lucide-react": "^0.554.0",
+    "lucide-react": "^0.562.0",
     "next": "^16.0.10",
     "next-i18n-router": "^5.5.1",
     "react": "^19.2.1",
