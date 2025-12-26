@@ -1,9 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import { Option } from '@/components/ui/FormField';
 import { Combobox } from '@headlessui/react';
 import { ChevronDown } from 'lucide-react';
-import { Option } from './FormField';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
 interface ComboboxControllerProps {
     value: string | undefined;
     onChange: (value: string | number | undefined) => void;
@@ -59,7 +58,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
 
     return (
         <div>
-            <Combobox value={selectedOption} onChange={(option: Option) => onChange(option?.id)} disabled={disabled}>
+            <Combobox value={selectedOption} onChange={(option: Option | null) => onChange(option?.id)} disabled={disabled}>
                 {({ open }) => (
                     <div className="relative">
                         <Combobox.Button className="w-full">
