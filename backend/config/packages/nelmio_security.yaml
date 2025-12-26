@@ -28,6 +28,10 @@ nelmio_security:
             style-src: [ 'self', 'unsafe-inline', 'data:' ]
             img-src: [ 'self', 'data:' ]
 
+    # Permissions Policy - control access to browser features
+    permissions_policy:
+        enabled: false
+
     # Forced HTTPS/SSL with HSTS (HTTP Strict Transport Security)
     forced_ssl:
         enabled: true
