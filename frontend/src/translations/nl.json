@@ -157,17 +157,22 @@
             },
             "dialog": {
                 "title": "Nieuwe opmerking toevoegen",
+                "title_delete": "Ben je zeker dat je deze opmerking wilt verwijderen?",
                 "description": "Deel je ervaring met dit vak. Je feedback helpt andere studenten bij het maken van geïnformeerde keuzes.",
                 "category": "Categorie",
                 "content": "Je opmerking",
                 "content-placeholder": "Deel je ervaring met dit vak...",
                 "anonymous": "Anoniem",
+                "message": {
+                  "confirm_delete": "Weet u zeker dat u deze reactie definitief wilt verwijderen? Deze actie kan niet ongedaan gemaakt worden."
+                },
                 "button": {
                     "submit": "Opmerking plaatsen",
                     "submitting": "Plaatsen...",
                     "cancel": "Annuleren",
                     "edit": "Opmerking bewerken",
-                    "delete": "Opmerking verwijderen"
+                    "delete": "Opmerking verwijderen",
+                    "delete_confirm": "Verwijder"
                 }
             },
             "no-categories": "Geen opmerking-categorieën beschikbaar"
