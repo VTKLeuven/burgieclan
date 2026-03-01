@@ -45,7 +45,7 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->setTemplatePath('admin/approve_action.html.twig')
             ->addCssClass('btn btn-success')
             ->setIcon('fa fa-check-circle')
-            ->displayAsButton();
+            ->renderAsButton();
 
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $approveAction)

@@ -1,10 +1,10 @@
 {#This file is copied from vendor/easycorp/easyadmin-bundle/src/Resources/views/crud/field/text_editor.html.twig#}
 {#The onlything changed is that nl2br is changed to raw on line 23 to render html content#}
 
-{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var ea() \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
 {# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
 {# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
-{% if ea.crud.currentAction == 'detail' %}
+{% if ea().crud.currentAction == 'detail' %}
     {{ field.formattedValue|nl2br }}
 {% else %}
     {% set html_id = 'ea-text-editor-' ~ field.uniqueId %}
