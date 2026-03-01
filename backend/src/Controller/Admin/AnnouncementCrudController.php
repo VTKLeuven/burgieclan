@@ -44,7 +44,7 @@ class AnnouncementCrudController extends AbstractCrudController
         yield DateTimeField::new('startTime');
         yield DateTimeField::new('endTime');
 
-        yield FormField::addPanel('English Content')->setIcon('fa fa-language')
+        yield FormField::addFieldset('English Content')->setIcon('fa fa-language')
             ->collapsible();
         yield TextField::new('title_en')
             ->setLabel('Title (English)');

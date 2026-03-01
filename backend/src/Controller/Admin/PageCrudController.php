@@ -39,7 +39,7 @@ class PageCrudController extends AbstractCrudController
             ->setLabel('Content (NL)')
             ->setTemplatePath('admin/text_editor.html.twig');
 
-        yield FormField::addPanel('English Content')->setIcon('fa fa-language')
+        yield FormField::addFieldset('English Content')->setIcon('fa fa-language')
             ->collapsible()
             ->renderCollapsed();
         yield Textfield::new('name_en')
