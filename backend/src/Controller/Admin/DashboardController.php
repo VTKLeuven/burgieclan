@@ -2,18 +2,6 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Announcement;
-use App\Entity\CommentCategory;
-use App\Entity\Course;
-use App\Entity\CourseComment;
-use App\Entity\Document;
-use App\Entity\DocumentCategory;
-use App\Entity\DocumentComment;
-use App\Entity\Module;
-use App\Entity\Page;
-use App\Entity\Program;
-use App\Entity\QuickLink;
-use App\Entity\Tag;
 use App\Entity\User;
 use App\Repository\DocumentRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
@@ -60,39 +48,37 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linktoDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Users', 'fa fa-users', User::class)
+        yield MenuItem::linkTo(UserCrudController::class, 'Users', 'fa fa-users')
             ->setPermission(User::ROLE_SUPER_ADMIN);
-        yield MenuItem::linkToCrud('Announcements', "fa-solid fa-bullhorn", Announcement::class)
+        yield MenuItem::linkTo(AnnouncementCrudController::class, 'Announcements', "fa-solid fa-bullhorn")
             ->setPermission(User::ROLE_ADMIN);
-        yield MenuItem::linkToCrud('Programs', 'fa fa-briefcase', Program::class)
+        yield MenuItem::linkTo(ProgramCrudController::class, 'Programs', 'fa fa-briefcase')
             ->setPermission(User::ROLE_ADMIN);
-        yield MenuItem::linkToCrud('Modules', 'fa fa-folder', Module::class)
+        yield MenuItem::linkTo(ModuleCrudController::class, 'Modules', 'fa fa-folder')
             ->setPermission(User::ROLE_ADMIN);
         yield MenuItem::subMenu('Courses', 'fa-solid fa-book')
             ->setSubItems(
                 [
-                    MenuItem::linkToCrud('Courses', 'fa fa-book', Course::class)
+                    MenuItem::linkTo(CourseCrudController::class, 'Courses', 'fa fa-book')
                         ->setPermission(User::ROLE_ADMIN),
-                    MenuItem::linkToCrud('Comment Categories', 'fa fa-tags', CommentCategory::class)
+                    MenuItem::linkTo(CommentCategoryCrudController::class, 'Comment Categories', 'fa fa-tags')
                         ->setPermission(User::ROLE_ADMIN),
-                    MenuItem::linkToCrud('Comments', 'fa fa-comments', CourseComment::class)
+                    MenuItem::linkTo(CourseCommentCrudController::class, 'Comments', 'fa fa-comments')
                         ->setPermission(User::ROLE_ADMIN)
                 ]
             );
-        $pendingDocumentsMenu = MenuItem::linkToCrud('Pending Documents', 'fa-regular fa-file', Document::class)
-            ->setController(DocumentPendingCrudController::class);
+        $pendingDocumentsMenu = MenuItem::linkTo(DocumentPendingCrudController::class, 'Pending Documents', 'fa-regular fa-file');
         $documentsMenu = MenuItem::subMenu('Documents', 'fa-solid fa-file')
             ->setSubItems(
                 [
-                    MenuItem::linkToCrud('Documents', 'fa fa-file', Document::class)
-                        ->setController(DocumentCrudController::class),
+                    MenuItem::linkTo(DocumentCrudController::class, 'Documents', 'fa fa-file'),
                     $pendingDocumentsMenu,
                     MenuItem::linkToRoute('Bulk Upload', 'fa fa-upload', 'admin_bulk_upload_index'),
-                    MenuItem::linkToCrud('Categories', 'fa fa-tags', DocumentCategory::class)
+                    MenuItem::linkTo(DocumentCategoryCrudController::class, 'Categories', 'fa fa-tags')
                         ->setPermission(User::ROLE_ADMIN),
-                    MenuItem::linkToCrud('Comments', 'fa-solid fa-comments', DocumentComment::class)
+                    MenuItem::linkTo(DocumentCommentCrudController::class, 'Comments', 'fa-solid fa-comments')
                         ->setPermission(User::ROLE_ADMIN),
-                    MenuItem::linkToCrud('Tags', 'fa-solid fa-tags', Tag::class)
+                    MenuItem::linkTo(TagCrudController::class, 'Tags', 'fa-solid fa-tags')
                 ]
             );
         $amountPending = $this->documentRepository->getAmountPending();
@@ -101,9 +87,9 @@ class DashboardController extends AbstractDashboardController
             $pendingDocumentsMenu->setBadge($amountPending, 'danger');
         }
         yield $documentsMenu;
-        yield MenuItem::linkToCrud('Pages', 'fa-solid fa-newspaper', Page::class)
+        yield MenuItem::linkTo(PageCrudController::class, 'Pages', 'fa-solid fa-newspaper')
             ->setPermission(User::ROLE_ADMIN);
-        yield MenuItem::linkToCrud('Quick Links', 'fa-solid fa-link', QuickLink::class)
+        yield MenuItem::linkTo(QuickLinkCrudController::class, 'Quick Links', 'fa-solid fa-link')
             ->setPermission(User::ROLE_ADMIN);
 
         yield MenuItem::section('Frontend');
