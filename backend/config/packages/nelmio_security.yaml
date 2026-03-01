@@ -23,9 +23,9 @@ nelmio_security:
     csp:
         enforce:
             level1_fallback: true
-            default-src: [ 'self' ]
+            # default-src: [ 'self' ] # Disabled to allow text_editor.html.twig in o.a. PageCrudController, check for future updates of EasyAdminBundle to fix this.
             script-src: [ 'self', 'unsafe-inline' ]
-            style-src: [ 'self', 'unsafe-inline', 'data:' ]
+            # style-src: [ 'self', 'unsafe-inline', 'data:' ] # Disabled to allow text_editor.html.twig in o.a. PageCrudController, check for future updates of EasyAdminBundle to fix this.
             img-src: [ 'self', 'data:', 'https://www.gravatar.com' ]
 
     # Permissions Policy - control access to browser features
