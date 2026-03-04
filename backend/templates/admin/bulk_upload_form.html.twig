@@ -283,7 +283,7 @@ Bulk Upload Documents
 
 {% block configured_body_contents %}
 {{ parent() }}
-<script>
+<script nonce="{{ csp_nonce('script') }}">
     document.addEventListener('DOMContentLoaded', function () {
         const useFileDateCheckbox = document.querySelector('input[name="form[useFileDate]"]');
         const defaultYearField = document.querySelector('select[name="form[defaultYear]"]');
