@@ -6,5 +6,6 @@
     ":semanticCommitScopeDisabled",
     "mergeConfidence:all-badges"
   ],
-  "labels": ["dependencies"]
+  "labels": ["dependencies"],
+  "branchConcurrentLimit": 1
 }
