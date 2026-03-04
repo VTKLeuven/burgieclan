@@ -190,7 +190,7 @@
         ]
     },
     "nelmio/security-bundle": {
-        "version": "3.6",
+        "version": "3.9",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
