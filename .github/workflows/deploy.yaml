@@ -54,13 +54,14 @@ jobs:
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          ssh "$SSH_USER@$SSH_HOST" << 'EOF'
+          ssh "$SSH_USER@$SSH_HOST" << EOF
             # Variables
             DEPLOY_DIR="${{ vars.DEPLOY_DIR }}"
             
             # Set IMAGE_TAG based on environment
-            if [ "${{ inputs.environment }}" = "production" ]; then
+            if [ "$ENVIRONMENT" = "production" ]; then
               IMAGE_TAG="prod"
             else
               IMAGE_TAG="dev"
@@ -68,13 +69,13 @@ jobs:
             export IMAGE_TAG
 
             # Ensure DEPLOY_DIR is present
-            if [ ! -d $DEPLOY_DIR ]; then
+            if [ ! -d \$DEPLOY_DIR ]; then
               echo "❌ DEPLOY_DIR does not exist"
               exit 1
             fi
             
             # Change to deployment directory
-            cd $DEPLOY_DIR
+            cd \$DEPLOY_DIR
             
             # Ensure data directory is present
             if [ ! -d ${{ vars.DATA_DIR }} ]; then
@@ -91,43 +92,43 @@ jobs:
             COMPOSE_FILE="docker-compose.prod.yml"
 
             # Download the latest compose file from GitHub
-            curl -o $COMPOSE_FILE \
+            curl -o \$COMPOSE_FILE \\
                  "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/.docker/docker-compose.prod.yml"
 
             # Download the latest nginx.conf file from GitHub
-            curl -o nginx.conf \
+            curl -o nginx.conf \\
                  "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/.docker/nginx.conf"
             
             # Log in to GitHub Container Registry
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             # Pull the latest images (backend and frontend)
-            docker compose -f $COMPOSE_FILE pull
+            docker compose -f \$COMPOSE_FILE pull
             
             # Stop and remove old containers
-            docker compose -f $COMPOSE_FILE down
+            docker compose -f \$COMPOSE_FILE down
             
             # Start new containers with latest images
-            docker compose -f $COMPOSE_FILE up -d --force-recreate --wait --wait-timeout 30
+            docker compose -f \$COMPOSE_FILE up -d --force-recreate --wait --wait-timeout 30
             
             # Verify all services are healthy
-            if docker compose -f $COMPOSE_FILE ps --format json | jq -s -e 'all(.Health // "" | IN("healthy", ""))' > /dev/null; then
+            if docker compose -f \$COMPOSE_FILE ps --format json | jq -s -e 'all(.Health // "" | IN("healthy", ""))' > /dev/null; then
               echo "✅ All containers healthy"
-              docker compose -f $COMPOSE_FILE ps
+              docker compose -f \$COMPOSE_FILE ps
             else
               echo "❌ Some containers unhealthy"
-              docker compose -f $COMPOSE_FILE ps
-              docker compose -f $COMPOSE_FILE logs
+              docker compose -f \$COMPOSE_FILE ps
+              docker compose -f \$COMPOSE_FILE logs
               exit 1
             fi
 
             # Run database migrations
             echo "Running database migrations..."
-            docker compose -f $COMPOSE_FILE exec -T backend php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration < /dev/null
+            docker compose -f \$COMPOSE_FILE exec -T backend php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration < /dev/null
 
             # Generate JWT keys
             echo "Generating JWT keys..."
-            docker compose -f $COMPOSE_FILE exec -T backend php bin/console lexik:jwt:generate-keypair --skip-if-exists < /dev/null
+            docker compose -f \$COMPOSE_FILE exec -T backend php bin/console lexik:jwt:generate-keypair --skip-if-exists < /dev/null
 
             # Cleanup all old images on VM
             echo "Cleaning up old images..."
