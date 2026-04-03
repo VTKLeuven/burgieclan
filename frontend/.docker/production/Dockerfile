@@ -1,5 +1,7 @@
 # Stage 1: Dependencies
-FROM node:22-alpine AS deps
+FROM node:24-alpine AS base
+
+FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
@@ -10,13 +12,14 @@ COPY package.json package-lock.json ./
 RUN npm ci --no-audit
 
 # Stage 2: Builder
-FROM node:20-alpine AS builder
+FROM base AS builder
 WORKDIR /app
 
-# Accept Sentry auth token as build arg
-# This is used to upload source maps to Sentry, see next.config.mjs for more details.
+# Accept Sentry auth token as secret for build-time use
+# This is used to upload source maps to Sentry during build
+# Note: Using ARG is acceptable here since the token is only needed during build
+# and is not persisted in the final image layers
 ARG SENTRY_AUTH_TOKEN
-ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 
 # Accept Next.js public environment variables as build args
 # These are embedded at build time, not runtime
@@ -38,7 +41,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # Stage 3: Runner
-FROM node:20-alpine AS runner
+FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production

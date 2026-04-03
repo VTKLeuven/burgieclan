@@ -1,6 +1,7 @@
-import { useApi } from '@/hooks/useApi';
+import { HydraCollection, useApi } from '@/hooks/useApi';
 import type { CommentCategory, Course } from '@/types/entities';
 import { convertToCommentCategory, convertToCourse } from '@/utils/convertToEntity';
+import { captureException } from "@sentry/nextjs";
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -10,7 +11,7 @@ export const useFormFields = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { t } = useTranslation();
-    const { request } = useApi();
+    const { request } = useApi<HydraCollection<unknown>>();
 
     const fetchData = useCallback(async () => {
         try {
@@ -31,7 +32,12 @@ export const useFormFields = () => {
             setCategories(categoryResponse['hydra:member']?.map(convertToCommentCategory) || []);
         } catch (err) {
             setError(t('form.errors.fetch_failed'));
-            console.error('Failed to fetch form data:', err);
+            captureException(
+                err instanceof Error ? err : new Error(String(err)),
+                {
+                    extra: { context: "Failed to fetch form data" },
+                }
+            );
         } finally {
             setIsLoading(false);
         }

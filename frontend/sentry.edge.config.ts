@@ -3,20 +3,24 @@
 // Note that this config is unrelated to the Vercel Edge Runtime and is also required when running locally.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-import * as Sentry from "@sentry/nextjs";
+import { dropAndLogInLocal } from "@/utils/sentryLocalLogger";
+import { captureConsoleIntegration, init } from "@sentry/nextjs";
 
-// Conditionally load Sentry based on the environment
-if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test') {
-  Sentry.init({
-    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+init({
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
-    // Set custom Sentry environment
-    environment: "frontend-" + process.env.NODE_ENV,
+  environment: "frontend-" + process.env.NODE_ENV,
+  integrations: [captureConsoleIntegration({ levels: ["error", "warn", "log"] })],
+  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
+  tracesSampleRate: 1,
 
-    // Adjust this value in production, or use tracesSampler for greater control
-    tracesSampleRate: 1,
+  // Enable logs to be sent to Sentry
+  enableLogs: true,
 
-    // Setting this option to true will print useful information to the console while you're setting up Sentry
-    debug: false,
-  });
-}
+  // Enable sending user PII (Personally Identifiable Information)
+  // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
+  sendDefaultPii: true,
+
+  // In local dev, log and drop events instead of sending them.
+  beforeSend: dropAndLogInLocal("edge"),
+});

@@ -126,11 +126,11 @@ The deployment pipeline will:
 
 #### Development Deployment
 
-**Trigger**: When code is **pushed to the `test` branch**
+**Trigger**: When code is **pushed to the `main` branch**
 
 **Target**: `https://dev.burgieclan.vtk.be`
 
-The development environment uses the same production-grade Docker setup but deploys automatically on every push to the `test` branch. This allows testing changes in a production-like environment before creating a release.
+The development environment uses the same production-grade Docker setup but deploys automatically on every push to the `main` branch. This allows testing changes in a production-like environment before creating a release.
 
 **Note**: Both environments require separate server configurations with their own GitHub secrets/variables (configure per environment in GitHub repository settings).
 
@@ -151,7 +151,7 @@ If you prefer manual deployment or GitHub Actions is not configured:
 
    ```bash
    # Docker Images
-   IMAGE_TAG=prod  # Use 'prod' for production, 'test' for development
+   IMAGE_TAG=prod  # Use 'prod' for production, 'dev' for development
    
    # Application
    APP_SECRET=your-generated-secret-here
@@ -193,9 +193,9 @@ If you prefer manual deployment or GitHub Actions is not configured:
    IMAGE_TAG=prod docker compose -f docker-compose.prod.yml pull
    IMAGE_TAG=prod docker compose -f docker-compose.prod.yml up -d
    
-   # For development deployment (use test images)
-   IMAGE_TAG=test docker compose -f docker-compose.prod.yml pull
-   IMAGE_TAG=test docker compose -f docker-compose.prod.yml up -d
+   # For development deployment (use dev images)
+   IMAGE_TAG=dev docker compose -f docker-compose.prod.yml pull
+   IMAGE_TAG=dev docker compose -f docker-compose.prod.yml up -d
    ```
 
 6. **Run database migrations**:

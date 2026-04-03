@@ -692,7 +692,7 @@ Review and Edit Document Metadata
 
 {% block configured_body_contents %}
 {{ parent() }}
-<script>
+<script nonce="{{ csp_nonce('script') }}">
     document.addEventListener('DOMContentLoaded', function () {
         const selectAll = document.getElementById('selectAll');
         const checkboxes = document.querySelectorAll('.doc-select');

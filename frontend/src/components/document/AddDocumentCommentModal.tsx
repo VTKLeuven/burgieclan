@@ -90,7 +90,6 @@ export default function AddDocumentCommentModal({ documentId, file, isModalOpen,
             }
             <div className="border-t border-gray-200 mt-2">
                 <Editor
-                    parentDialogOpen={isModalOpen}
                     onEditorReady={handleEditorReady}
                 />
             </div>
@@ -104,7 +103,7 @@ export default function AddDocumentCommentModal({ documentId, file, isModalOpen,
                 />
             </div>
 
-            <DialogActions className="!mt-0">
+            <DialogActions className="mt-0!">
                 <button
                     onClick={() => {
                         if (editorInstance && onSubmit) {

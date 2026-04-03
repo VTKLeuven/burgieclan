@@ -1,4 +1,4 @@
-import { useApi } from "@/hooks/useApi";
+import { isErrorResponse, useApi } from "@/hooks/useApi";
 import { convertToVoteSummary } from "@/utils/convertToEntity";
 import { ArrowBigDownIcon, ArrowBigUpIcon } from "lucide-react";
 import { useEffect, useState } from 'react';
@@ -68,12 +68,11 @@ export default function VoteButton({
 
         const delta = calculateVoteDelta(voteState, newVoteState);
 
-        console.log({ apiEndpoint, direction, delta, voteCount, newVoteCount: voteCount + delta });
         const result = await request('POST', apiEndpoint, {
             voteType: direction
         });
 
-        if (!result || result.error) {
+        if (!result || isErrorResponse(result)) {
             setVoteState(voteState);
             setVoteCount(voteCount);
         }
@@ -116,7 +115,7 @@ export default function VoteButton({
                     ${voteState === VoteDirection.UP ? 'text-amber-600 fill-amber-600' : 'text-gray-500'}
                 `}
             />
-            <div className={`${textSize} min-w-[1rem] text-center ${voteState === VoteDirection.UP
+            <div className={`${textSize} min-w-4 text-center ${voteState === VoteDirection.UP
                 ? 'text-amber-600'
                 : voteState === VoteDirection.DOWN
                     ? 'text-blue-500'

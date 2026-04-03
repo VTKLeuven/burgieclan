@@ -2,6 +2,7 @@ import type { Page } from "@/types/entities";
 import { convertToPage } from "@/utils/convertToEntity";
 import { COOKIE_NAMES } from "@/utils/cookieNames";
 import { decodeJWT, isJWTExpired } from "@/utils/jwt";
+import { captureException } from "@sentry/nextjs";
 import { i18nRouter } from 'next-i18n-router';
 import { NextRequest, NextResponse } from "next/server";
 import { i18nConfig } from '../i18nConfig';
@@ -24,8 +25,13 @@ const getPublicAvailablePages = async (): Promise<Page[]> => {
         const pages: Page[] = data['hydra:member'].map(convertToPage);
         return pages;
     } catch (error) {
-        console.error('Error fetching public pages:', error);
-        return []
+        captureException(
+            error instanceof Error ? error : new Error(String(error)),
+            {
+                extra: { context: "Error fetching public pages" },
+            }
+        );
+        return [];
     }
 }
 
@@ -33,6 +39,7 @@ const startsWithAllowedPath = (pathWithoutLocale: string): boolean => {
     const allowedPaths = [
         'login',
         'auth', // for OAuth callback
+        'api',
     ];
 
     return allowedPaths.some((path) => pathWithoutLocale.startsWith(path));
@@ -94,12 +101,17 @@ const tryRefreshToken = async (request: NextRequest): Promise<string | null> => 
 
         return null;
     } catch (error) {
-        console.error('Token refresh failed in middleware:', error);
+        captureException(
+            error instanceof Error ? error : new Error(String(error)),
+            {
+                extra: { context: "Token refresh failed in middleware" },
+            }
+        );
         return null;
     }
 };
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || request.url;
 
     // Match and extract the locale from the URL path

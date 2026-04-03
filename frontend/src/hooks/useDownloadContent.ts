@@ -1,3 +1,4 @@
+import { captureException } from "@sentry/nextjs";
 import { useToast } from '@/components/ui/Toast';
 import type { Document } from '@/types/entities';
 import { useRouter } from 'next/navigation';
@@ -26,7 +27,12 @@ const useDownloadContent = () => {
     // Handle download status notifications
     useEffect(() => {
         if (error) {
-            console.error('Download error:', error);
+            captureException(
+                new Error(error),
+                {
+                    extra: { context: "Download error" },
+                }
+            );
             showToast(t('download.download-error', { error }), 'error');
         }
 
@@ -51,7 +57,7 @@ const useDownloadContent = () => {
                     router.push(`/login?redirectTo=${encodeURIComponent(currentPath)}`);
                     return true;
                 }
-            } catch (jsonError) {
+            } catch {
                 // If we can't parse the JSON (e.g., not a JSON response), still handle as 401
                 const currentPath = window.location.pathname + window.location.search;
                 router.push(`/login?redirectTo=${encodeURIComponent(currentPath)}`);

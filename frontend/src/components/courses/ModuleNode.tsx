@@ -1,4 +1,3 @@
-import Loading from '@/app/[locale]/loading';
 import { CourseRow } from '@/components/courses/CourseRow';
 import { CourseTableHeader } from '@/components/courses/CourseTableHeader';
 import { SearchFilters } from '@/components/courses/CurriculumSearchBar';
@@ -31,7 +30,7 @@ const ModuleNode = ({
     parentVisible = true
 }: ModuleNodeProps) => {
     const { t } = useTranslation();
-    const { request, loading } = useApi();
+    const { request } = useApi();
     const [expanded, setExpanded] = useState(false);
     const [module, setModule] = useState<Module>(initialModule);
 
@@ -71,6 +70,7 @@ const ModuleNode = ({
     // Don't auto-expand if it only matches itself
     useEffect(() => {
         if (autoExpand && hasChildMatches) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setExpanded(true);
         }
     }, [autoExpand, hasChildMatches]);
@@ -108,7 +108,7 @@ const ModuleNode = ({
 
                 {/* Show badge with match count if matches exist */}
                 {searchFilters && searchQuery && totalMatches > 0 && (
-                    <div className="ml-auto bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center mr-2">
+                    <div className="ml-auto bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full min-w-6 h-6 flex items-center justify-center mr-2">
                         {totalMatches}
                     </div>
                 )}

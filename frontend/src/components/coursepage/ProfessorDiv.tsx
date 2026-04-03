@@ -1,15 +1,16 @@
-import { useEffect, useState } from 'react'
-import Image from 'next/image'
+import { captureException } from '@sentry/nextjs';
 import { TFunction } from 'i18next';
-import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function ProfessorDiv({ unumber, index, t }: { unumber: string, index: number, t: TFunction }) {
     const { i18n } = useTranslation();
     const locale = i18n.language || 'en';
 
     const sanitizedUnumber = unumber.replace(/\D/g, '').padStart(7, '0').slice(-7);
-    const [imgSrc, setImgSrc] = useState(`https://www.kuleuven.be/wieiswie/nl/person/0${sanitizedUnumber}/photo`);
+    const imgSrc = `https://www.kuleuven.be/wieiswie/nl/person/0${sanitizedUnumber}/photo`;
     const [professorName, setProfessorName] = useState("N.");
     const [imageError, setImageError] = useState(false);
 
@@ -23,7 +24,12 @@ export default function ProfessorDiv({ unumber, index, t }: { unumber: string, i
                     return `${data._source.firstName[0]}. ${data._source.surname}`;
                 }
             } catch (error) {
-                console.error("Error fetching professor name:", error);
+                captureException(
+                    error instanceof Error ? error : new Error(String(error)),
+                    {
+                        extra: { context: "Error fetching professor name" },
+                    }
+                );
             }
             return "N.";
         }
@@ -70,7 +76,7 @@ export default function ProfessorDiv({ unumber, index, t }: { unumber: string, i
         <div className="relative group">
             <Link href={`https://www.kuleuven.be/wieiswie/${locale}/person/0${sanitizedUnumber}`}>
                 {!imageError ? (
-                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 border-2 border-white shadow-sm hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer relative z-10 group-hover:z-20">
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 border-2 border-white shadow-xs hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer relative z-10 group-hover:z-20">
                         <Image
                             src={imgSrc}
                             onError={handleError}
@@ -81,7 +87,7 @@ export default function ProfessorDiv({ unumber, index, t }: { unumber: string, i
                         />
                     </div>
                 ) : (
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-medium border-2 border-white shadow-sm hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer relative z-10 group-hover:z-20 ${getAvatarColor(professorName)}`}>
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-medium border-2 border-white shadow-xs hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer relative z-10 group-hover:z-20 ${getAvatarColor(professorName)}`}>
                         {getInitials(professorName)}
                     </div>
                 )}

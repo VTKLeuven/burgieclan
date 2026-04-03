@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { X } from 'lucide-react';
-import { Course, DocumentCategory, Tag } from '@/types/entities';
+import Input from '@/components/ui/Input';
 import useFetchTags from '@/hooks/useFetchTags';
+import { Course, DocumentCategory, Tag } from '@/types/entities';
+import { X } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface TagFilterProps {
   selectedTagIds: number[];
@@ -134,8 +135,8 @@ const TagFilter: React.FC<TagFilterProps> = ({
 
   return (
     <div className="relative" ref={containerRef}>
-      <div 
-        className="flex flex-wrap items-center w-full border rounded-md px-2 py-1 border-[#6b7280] bg-white focus-within:ring-1 focus-within:ring-vtk-blue-500 focus-within:border-vtk-blue-500 min-h-[38px] cursor-text"
+      <div
+        className="flex flex-wrap items-center w-full bg-white min-h-[38px] cursor-text ring-1 ring-inset ring-gray-300 rounded-md px-2 focus-within:ring-2 focus-within:ring-inset focus-within:ring-amber-600"
         onClick={handleContainerClick}
       >
         {/* Display selected tags by ID */}
@@ -175,15 +176,15 @@ const TagFilter: React.FC<TagFilterProps> = ({
         ))}
         
         {/* Tag input */}
-        <input
+        <Input
           type="text"
+          placeholder={selectedTags.length > 0 || selectedTagQueries.length > 0 ? "" : t('document.add-tags')}
           value={tagInput}
           onChange={(e) => setTagInput(e.target.value)}
           onFocus={() => setShowSuggestions(true)}
           onKeyDown={handleKeyDown}
-          className="flex-grow min-w-[80px] p-1 text-sm border-0 focus:ring-0"
-          placeholder={selectedTags.length > 0 || selectedTagQueries.length > 0 ? "" : t('document.add-tags')}
           aria-label={t('document.add-tags')}
+          borderless
         />
       </div>
       

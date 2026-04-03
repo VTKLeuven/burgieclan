@@ -1,17 +1,17 @@
-import { Combobox, ComboboxInput, ComboboxOptions, Dialog, DialogBackdrop, DialogPanel, } from '@headlessui/react'
-import { Frown, Globe, Search as SearchIcon } from 'lucide-react';
-import { useEffect, useState } from 'react'
 import FoldableSection from "@/components/common/FoldableSection";
-import type { Course, Document, Module, Program } from '@/types/entities';
 import {
     CourseSearchResult,
     DocumentSearchResult,
     ModuleSearchResult,
     ProgramSearchResult
 } from "@/components/search/SearchResult";
-import { objectToCourse, objectToDocument, objectToModule, objectToProgram } from '@/utils/objectToTypeConvertor';
-import { useTranslation } from 'react-i18next';
 import { useApi } from '@/hooks/useApi';
+import type { Course, Document, Module, Program } from '@/types/entities';
+import { convertToCourse, convertToDocument, convertToModule, convertToProgram } from '@/utils/convertToEntity';
+import { Combobox, ComboboxInput, ComboboxOptions, Dialog, DialogBackdrop, DialogPanel, } from '@headlessui/react';
+import { Frown, Globe, Search as SearchIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type SearchPopupProps = {
     open: boolean;
@@ -25,31 +25,28 @@ type SearchResults = {
     documents: Document[];
 };
 
+type SearchApiResponse = Partial<Record<keyof SearchResults, unknown[]>>;
+
 export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
     const [query, setQuery] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState('');
     const [items, setItems] = useState<SearchResults>({ courses: [], modules: [], programs: [], documents: [] });
-    const { error, loading, isRedirecting, request } = useApi();
+    const { error, loading, isRedirecting, request } = useApi<SearchApiResponse | null>();
     const { t } = useTranslation();
 
-    /**
-     * Remove all fields starting with '@' from the object
-     * @param obj - The object to clean
-     * @returns The cleaned object
-     */
-    function convertToObjects(obj: Record<string, any[]>): SearchResults {
+    function convertToObjects(obj: SearchApiResponse): SearchResults {
         const items: SearchResults = { courses: [], modules: [], programs: [], documents: [] };
         obj['courses']?.forEach((course) => {
-            items.courses.push(objectToCourse(course));
+            items.courses.push(convertToCourse(course));
         });
         obj['modules']?.forEach((module) => {
-            items.modules.push(objectToModule(module));
+            items.modules.push(convertToModule(module));
         });
         obj['programs']?.forEach((program) => {
-            items.programs.push(objectToProgram(program));
+            items.programs.push(convertToProgram(program));
         });
         obj['documents']?.forEach((document) => {
-            items.documents.push(objectToDocument(document));
+            items.documents.push(convertToDocument(document));
         });
         return items;
     }
@@ -74,9 +71,12 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
             }
 
             const result = await request('GET', `/api/search?searchText=${debouncedQuery}`);
-            if (result) {
-                setItems(convertToObjects(result));
+            if (!result) {
+                setItems({ courses: [], modules: [], programs: [], documents: [] });
+                return;
             }
+
+            setItems(convertToObjects(result));
         };
 
         fetchData();
@@ -94,18 +94,20 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
         >
             <DialogBackdrop
                 transition
-                className="fixed inset-0 backdrop-blur-sm bg-gray-500 bg-opacity-25 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+                className="fixed inset-0 backdrop-blur-xs bg-gray-500 bg-opacity-25 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-leave:duration-200 data-enter:ease-out data-leave:ease-in"
             />
 
             <div className="fixed inset-0 z-10 w-screen overflow-y-auto p-4 sm:p-6 md:p-20">
                 <DialogPanel
                     transition
-                    className="mx-auto max-w-xl transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+                    className="mx-auto max-w-xl transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all data-closed:scale-95 data-closed:opacity-0 data-enter:duration-300 data-leave:duration-200 data-enter:ease-out data-leave:ease-in"
                 >
                     <Combobox
-                        onChange={(param: { redirect: Location | (string & Location) } | null) => {
+                        onChange={(param: { redirect: Location | string } | null) => {
                             if (param?.redirect) {
-                                window.location = param.redirect;
+                                window.location.href = typeof param.redirect === 'string'
+                                    ? param.redirect
+                                    : param.redirect.href;
                             }
                         }}
                     >

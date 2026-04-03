@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Filter, X } from 'lucide-react';
+import Input from '@/components/ui/Input';
 import { DocumentFilters } from '@/hooks/useRetrieveDocuments';
 import { Course, DocumentCategory } from '@/types/entities';
+import { Filter, X } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import TagFilter from './TagFilter';
 
 interface DocumentFilterProps {
@@ -82,7 +83,7 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
     <div className="relative" ref={filterRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center px-3 py-2 text-sm border rounded-md hover:bg-gray-50 focus:outline-none ${hasActiveFilters ? 'bg-vtk-blue-50 border-vtk-blue-200' : ''
+        className={`flex items-center px-3 py-2 text-sm border rounded-md hover:bg-gray-50 focus:outline-hidden ${hasActiveFilters ? 'bg-vtk-blue-50 border-vtk-blue-200' : ''
           }`}
         aria-expanded={isOpen}
       >
@@ -117,14 +118,13 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('document.name')}
               </label>
-              <input
+              <Input
                 type="text"
                 id="name"
                 name="name"
+                placeholder={t('document.search-by-name')}
                 value={tempFilters.name || ''}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded-md text-sm"
-                placeholder={t('document.search-by-name')}
               />
             </div>
 
@@ -132,14 +132,13 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
               <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('document.year')}
               </label>
-              <input
+              <Input
                 type="text"
                 id="year"
                 name="year"
+                placeholder={t('document.search-by-year')}
                 value={tempFilters.year || ''}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded-md text-sm"
-                placeholder={t('document.search-by-year')}
               />
             </div>
 
@@ -163,14 +162,13 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
               <label htmlFor="creator" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('document.creator')}
               </label>
-              <input
+              <Input
                 type="text"
                 id="creator"
                 name="creator"
+                placeholder={t('document.search-by-creator')}
                 value={tempFilters.creator || ''}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded-md text-sm"
-                placeholder={t('document.search-by-creator')}
               />
             </div>
           </div>
