@@ -7,7 +7,6 @@ import { useUser } from "@/components/UserContext";
 import type { Course, Document } from "@/types/entities";
 import { ChevronDown, File, FolderClosed, Home, PanelLeft, PanelLeftClose } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -33,7 +32,6 @@ const mapDocumentsToItems = (documents: Document[]) => {
 const NavigationSidebar = () => {
   const { user, loading } = useUser();
   const { t, i18n } = useTranslation();
-  const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     courses: true,
@@ -56,7 +54,7 @@ const NavigationSidebar = () => {
   }
 
   return (
-    <aside className="h-full flex-shrink-0">
+    <aside className="h-full shrink-0">
       <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-full bg-white border-r border-gray-200 flex flex-col`}>
         {/* Collapse Toggle Button */}
         <button
@@ -68,7 +66,7 @@ const NavigationSidebar = () => {
         </button>
 
         {/* Top Navigation */}
-        <div className="p-4 flex-shrink-0">
+        <div className="p-4 shrink-0">
           <Link href={`/${i18n.language}`} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-1 transition-all duration-200 hover:scale-[1.01]">
             <button onClick={() => setIsCollapsed(false)}>
               <Home size={20} />
@@ -79,7 +77,7 @@ const NavigationSidebar = () => {
         <nav className="flex-1 overflow-y-hidden overflow-x-hidden pl-4 flex flex-col">
           <div className="border-t border-gray-300 mb-2"></div>
           <button
-            className="flex items-center justify-between w-full p-1 text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0 flex-shrink-0"
+            className="flex items-center justify-between w-full p-1 text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0 shrink-0"
             onClick={() => {
               toggleSection('courses');
               setIsCollapsed(false);
@@ -101,10 +99,10 @@ const NavigationSidebar = () => {
               />
             </div>
           )}
-          <div className="border-t border-gray-300 my-2 flex-shrink-0"></div>
+          <div className="border-t border-gray-300 my-2 shrink-0"></div>
           <div className="flex-1 min-h-0">
             <button
-              className="flex items-center justify-between w-full p-1 text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0 flex-shrink-0"
+              className="flex items-center justify-between w-full p-1 text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0 shrink-0"
               onClick={() => {
                 toggleSection('documents');
                 setIsCollapsed(false);

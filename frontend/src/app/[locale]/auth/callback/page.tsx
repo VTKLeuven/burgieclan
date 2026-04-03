@@ -3,6 +3,7 @@
 import { storeTokensInCookies } from '@/actions/auth';
 import LoadingPage from '@/components/loading/LoadingPage';
 import { useToast } from '@/components/ui/Toast';
+import { captureException } from '@sentry/nextjs';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +23,10 @@ export default function AuthCallbackPage() {
             const redirectTo = searchParams.get('redirect_to') || '/';
 
             if (error) {
-                console.error('Login error:', error);
+                captureException(
+                    new Error(String(error)),
+                    { extra: { context: "Login error during OAuth callback" } }
+                );
                 showToast(t('login_failed') + ': ' + error, 'error');
                 router.push('/login');
                 return;
@@ -40,12 +44,18 @@ export default function AuthCallbackPage() {
                     showToast(t('login_success'), 'success');
                     router.push(decodeURIComponent(redirectTo));
                 } catch (err) {
-                    console.error('Error storing tokens:', err);
+                    captureException(
+                        err instanceof Error ? err : new Error(String(err)),
+                        { extra: { context: "Error storing tokens after OAuth callback" } }
+                    );
                     showToast(t('token_store_failed'), 'error');
                     router.push('/login');
                 }
             } else {
-                console.error('No token received');
+                captureException(
+                    new Error('No token received'),
+                    { extra: { context: "No token received in OAuth callback" } }
+                );
                 showToast(t('no_token_received'), 'error');
                 router.push('/login');
             }

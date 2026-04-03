@@ -1,8 +1,8 @@
 import Loading from '@/app/[locale]/loading';
 import CourseCommentList from '@/components/coursepage/comment/CourseCommentList';
-import { useApi } from '@/hooks/useApi';
+import { HydraCollection, useApi } from '@/hooks/useApi';
 import { CommentCategory, CourseComment } from '@/types/entities';
-import { convertToCommentCategory, convertToCourseComment } from '@/utils/convertToEntity';
+import { convertToCommentCategory } from '@/utils/convertToEntity';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -16,7 +16,7 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
     const [allCategories, setAllCategories] = useState<CommentCategory[]>([]);
     const [localComments, setLocalComments] = useState<CourseComment[]>(comments);
     const { t, i18n } = useTranslation();
-    const { request, loading } = useApi();
+    const { request, loading } = useApi<HydraCollection<unknown>>();
 
     // Sync local comments with props
     useEffect(() => {

@@ -3,7 +3,7 @@ name: NPM Build
 on:
   push:
     branches:
-      - release/**
+      - main
   pull_request:
     branches:
       - "**"
@@ -38,6 +38,11 @@ jobs:
         run: |
           cd frontend
           npm install
+
+      - name: Run linter
+        run: |
+          cd frontend
+          npm run lint
 
       - name: Run build
         run: |

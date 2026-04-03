@@ -12,7 +12,7 @@ const LitusOAuthButton = ({ loginHandler }: LitusOAuthButtonProps) => {
             <button
                 type="submit"
                 onClick={loginHandler}
-                className="flex flex-row w-full justify-center items-center rounded-md border-0 px-3 py-1.5 text-sm ring-1 ring-inset ring-gray-300 font-semibold leading-6 text-black shadow-sm hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-vtk-blue-400"
+                className="flex flex-row w-full justify-center items-center rounded-md border-0 px-3 py-1.5 text-sm ring-1 ring-inset ring-gray-300 font-semibold leading-6 text-black shadow-xs hover:bg-neutral-50 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-vtk-blue-400"
             >
                 <Image
                     src="/images/logos/vtk-logo-blue.png"

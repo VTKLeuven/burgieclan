@@ -3,6 +3,7 @@
 import { storeTokensInCookies } from "@/actions/auth";
 import Logo from "@/components/common/Logo";
 import LitusOAuthButton from "@/components/login/LitusOAuthButton";
+import Input from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
 import { useUser } from "@/components/UserContext";
 import { useApi } from "@/hooks/useApi";
@@ -11,6 +12,12 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+type LoginResponse = {
+    token: string;
+    refresh_token: string;
+    refresh_token_expiration: number;
+};
 
 /**
  * Login form component, displays initial login form with VTK login option and expands
@@ -24,7 +31,7 @@ export default function LoginForm() {
 
     const [isOpen, setIsOpen] = useState(false);
     const { showToast } = useToast();
-    const { request, loading, error: apiError } = useApi();
+    const { request, loading, error: apiError } = useApi<LoginResponse>();
 
     const redirectTo = searchParams.get('redirectTo') || '/';
 
@@ -58,14 +65,21 @@ export default function LoginForm() {
             password: password,
         });
 
-        if (!response) {
+        if (!response || !response.token || !response.refresh_token || response.refresh_token_expiration === undefined) {
+            setCredentialsError(t('unexpected'));
+            return;
+        }
+
+        const refreshExpiration = Number(response.refresh_token_expiration);
+        if (Number.isNaN(refreshExpiration)) {
+            setCredentialsError(t('unexpected'));
             return;
         }
 
         await storeTokensInCookies(
             response.token,
             response.refresh_token,
-            response.refresh_token_expiration
+            refreshExpiration
         );
         showToast(t('login_success'), 'success');
         router.push(redirectTo);
@@ -74,6 +88,7 @@ export default function LoginForm() {
     useEffect(() => {
         if (apiError) {
             if (apiError.status == 401) {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setCredentialsError(t('login_invalid_credentials'));
             } else {
                 setCredentialsError(t('unexpected'));
@@ -122,15 +137,15 @@ export default function LoginForm() {
                                 <p className="mt-2 text-sm font-medium">{t('username')}</p>
                             </label>
                             <div className="mt-2">
-                                <input
+                                <Input
                                     id="username"
                                     name="username"
                                     type="text"
+                                    placeholder=""
                                     autoComplete={t('username')}
                                     required
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
                         </div>
@@ -140,15 +155,15 @@ export default function LoginForm() {
                                 <p className="mt-2 text-sm font-medium">{t('password')}</p>
                             </label>
                             <div className="mt-2 relative">
-                                <input
+                                <Input
                                     id="password"
                                     name="password"
                                     type={showPassword ? "text" : "password"}
+                                    placeholder=""
                                     autoComplete="current-password"
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full rounded-md border-0 py-1.5 text-vtk-blue-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-600 sm:text-sm sm:leading-6"
                                 />
                                 <button
                                     type="button"

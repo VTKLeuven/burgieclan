@@ -1,6 +1,6 @@
 "use client";
 
-import { useApi } from '@/hooks/useApi';
+import { isErrorResponse, useApi } from '@/hooks/useApi';
 import type { User } from '@/types/entities';
 import { convertToUser } from '@/utils/convertToEntity';
 import type { ApiError } from '@/utils/error/apiError';
@@ -30,7 +30,7 @@ export const UserProvider = ({ children, userId }: { children: ReactNode, userId
 
 
         const userData = await request('GET', `/api/users/${userId}`);
-        if (userData && !userData.error) {
+        if (userData && !isErrorResponse(userData)) {
             setUser(convertToUser(userData));
         } else {
             notFound();
@@ -46,6 +46,7 @@ export const UserProvider = ({ children, userId }: { children: ReactNode, userId
 
     // Initial fetch when component mounts or userId changes
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchUser();
     }, [fetchUser]);
 

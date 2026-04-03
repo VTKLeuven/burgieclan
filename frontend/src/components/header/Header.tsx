@@ -34,7 +34,7 @@ export default function Header() {
 
                 {/* Logo and search */}
                 <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
-                    <Link href={`/${i18n.language}`} className="-m-1.5 p-1.5 flex-shrink-0">
+                    <Link href={`/${i18n.language}`} className="-m-1.5 p-1.5 shrink-0">
                         <span className="sr-only">Burgieclan</span>
                         <Logo width={50} height={50} />
                     </Link>
@@ -97,7 +97,7 @@ export default function Header() {
 
                         {/* Logo and search */}
                         <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
-                            <Link href={`/${i18n.language}`} className="-m-1.5 p-1.5 flex-shrink-0 flex sm:hidden">
+                            <Link href={`/${i18n.language}`} className="-m-1.5 p-1.5 shrink-0 flex sm:hidden">
                                 <span className="sr-only">Burgieclan</span>
                                 <Logo width={50} height={50} />
                             </Link>

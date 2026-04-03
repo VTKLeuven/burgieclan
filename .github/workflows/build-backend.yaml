@@ -49,12 +49,8 @@ jobs:
           tags: |
             # Tag with 'latest' for production environment
             type=raw,value=latest,enable=${{ inputs.environment == 'production' }}
-            # Tag with 'prod' for production environment
-            type=raw,value=prod,enable=${{ inputs.environment == 'production' }}
-            # Tag with 'test' for test environment
-            type=raw,value=test,enable=${{ inputs.environment == 'dev' }}
-            # Tag with branch name
-            type=ref,event=branch
+            # Tag with environment
+            type=raw,value=${{ inputs.environment }}
             # Tag with commit SHA
             type=sha,prefix={{branch}}-
 
@@ -72,3 +68,6 @@ jobs:
           build-args: |
             APP_ENV=prod
             FRONTEND_URL=${{ inputs.url }}
+            COMMIT_HASH=${{ github.sha }}
+            VERSION=${{ (github.ref_type == 'tag' && github.ref_name) || '' }}
+            # VERSION is only set for tag releases, empty string for branch deployments

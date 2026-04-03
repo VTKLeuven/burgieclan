@@ -199,7 +199,7 @@ The deployment pipeline consists of 4 workflows in `.github/workflows/`:
 2. **Deploy Phase** (after builds complete):
    - Set up SSH access to production server
    - Connect via SSH and execute deployment script:
-     - Set `IMAGE_TAG` environment variable based on environment (`prod` or `test`)
+     - Set `IMAGE_TAG` environment variable based on environment (`prod` or `dev`)
      - Download latest docker-compose.prod.yml and nginx.conf
      - Log in to GHCR
      - Pull latest images (using the appropriate tag)
@@ -232,9 +232,9 @@ Images are tagged based on the deployment environment:
 - `ghcr.io/vtkleuven/burgieclan/frontend:latest`
 - `ghcr.io/vtkleuven/burgieclan/frontend:prod`
 
-**Development Environment** (when pushed to `test` branch):
-- `ghcr.io/vtkleuven/burgieclan/backend:test`
-- `ghcr.io/vtkleuven/burgieclan/frontend:test`
+**Development Environment** (when pushed to `main` branch):
+- `ghcr.io/vtkleuven/burgieclan/backend:dev`
+- `ghcr.io/vtkleuven/burgieclan/frontend:dev`
 
 **Additional Tags** (all environments):
 - **Branch name**: `ghcr.io/vtkleuven/burgieclan/backend:main`
@@ -242,8 +242,8 @@ Images are tagged based on the deployment environment:
 
 The docker-compose.prod.yml uses the `IMAGE_TAG` environment variable to pull the correct image tag:
 - Set to `prod` for production deployments
-- Set to `test` for development deployments
-- Defaults to `test` if not specified
+- Set to `dev` for development deployments
+- Defaults to `dev` if not specified
 
 ---
 
@@ -257,10 +257,10 @@ The docker-compose.prod.yml uses the `IMAGE_TAG` environment variable to pull th
 
 **Key Configuration**:
 
-- **Image Tags**: Uses `${IMAGE_TAG:-test}` for dynamic tag selection
+- **Image Tags**: Uses `${IMAGE_TAG:-dev}` for dynamic tag selection
   - Set `IMAGE_TAG=prod` for production deployments
-  - Set `IMAGE_TAG=test` for development deployments
-  - Defaults to `test` if not specified
+  - Set `IMAGE_TAG=dev` for development deployments
+  - Defaults to `dev` if not specified
 - **Restart Policy**: `unless-stopped` (auto-restart on crash, but not if manually stopped)
 - **Volume Mounts**:
   - Backend: data directory, JWT directory, var directory (named volume)
@@ -391,7 +391,7 @@ These variables **must** be set in the `.env` file. The application will fail to
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `IMAGE_TAG` | Docker image tag to use | `test` |
+| `IMAGE_TAG` | Docker image tag to use | `dev` |
 | `APP_ENV` | Symfony environment | `prod` |
 | `MAX_REQUESTS` | PHP-FPM worker count | `8` |
 | `JWT_PASSPHRASE` | JWT passphrase | Empty |
@@ -608,10 +608,10 @@ docker compose -f docker-compose.prod.yml up -d --force-recreate
 docker compose -f docker-compose.prod.yml exec backend php bin/console doctrine:migrations:migrate --no-interaction
 ```
 
-**Development Update** (using `test` tag):
+**Development Update** (using `dev` tag):
 ```bash
 # Set image tag for development
-export IMAGE_TAG=test
+export IMAGE_TAG=dev
 
 # Pull latest images
 docker compose -f docker-compose.prod.yml pull

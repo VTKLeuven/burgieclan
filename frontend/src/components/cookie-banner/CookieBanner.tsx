@@ -1,4 +1,5 @@
 "use client"
+
 import { STORAGE_KEYS } from "@/utils/cookieNames";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,6 +16,7 @@ const CookieBanner = () => {
     useEffect(() => {
         // We want this to only run once the client loads
         // or else it causes a hydration error
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setConsentGiven(cookieConsentGiven());
     }, []);
 

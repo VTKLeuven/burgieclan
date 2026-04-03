@@ -1,13 +1,20 @@
 import ComboboxController from '@/components/ui/ComboboxController';
-import React from 'react';
-import { Controller, FieldError, UseFormRegisterReturn } from 'react-hook-form';
+import Input from '@/components/ui/Input';
+import {
+    Controller,
+    type Control,
+    type FieldError,
+    type FieldValues,
+    type Path,
+    type UseFormRegisterReturn,
+} from 'react-hook-form';
 
 export interface Option {
     id: number | string;
     name?: string;
 }
 
-export interface FormFieldProps {
+export interface FormFieldProps<TFieldValues extends FieldValues = FieldValues> {
     label: string;
     error?: FieldError;
     type?: 'text' | 'combobox';
@@ -16,15 +23,14 @@ export interface FormFieldProps {
     /** For fields that are registered with useForm (e.g. text inputs) */
     registration?: UseFormRegisterReturn;
     /** For fields that use RHF Controller (e.g. combobox) */
-    control?: any; // ideally use proper typing from react-hook-form
-    name: string;
-    className?: string;
+    control?: Control<TFieldValues>;
+    name: Path<TFieldValues>;
     disabled?: boolean;
     /** Optional: limit the number of visible options in the combobox */
     visibleOptions?: number;
 }
 
-export const FormField: React.FC<FormFieldProps> = ({
+export const FormField = <TFieldValues extends FieldValues = FieldValues>({
     label,
     error,
     type = 'text',
@@ -33,10 +39,9 @@ export const FormField: React.FC<FormFieldProps> = ({
     registration,
     control,
     name,
-    className = '',
     disabled,
     visibleOptions,
-}) => {
+}: FormFieldProps<TFieldValues>) => {
     // For text fields, use the registration props to bind RHF.
     if (type === 'text') {
         return (
@@ -46,20 +51,10 @@ export const FormField: React.FC<FormFieldProps> = ({
                     {error && <p className="text-red-500 text-xs">{error?.message}</p>}
                 </div>
                 <div className="mt-2">
-                    <input
+                    <Input
                         type="text"
-                        placeholder={placeholder}
-                        className={`
-              block w-full rounded-md border-0 py-1.5 px-3
-              text-gray-900 shadow-sm ring-1 ring-inset
-              ring-gray-300 placeholder:text-gray-400
-              focus:ring-2 focus:ring-inset focus:ring-amber-600
-              sm:text-sm sm:leading-6
-              ${error ? 'ring-red-500' : 'ring-gray-300'}
-              ${disabled ? 'bg-gray-50 text-gray-500' : ''}
-              ${className}
-            `}
-                        disabled={disabled}
+                        placeholder={placeholder || ''}
+                        passive={!!error}
                         {...(registration || {})}
                     />
                 </div>

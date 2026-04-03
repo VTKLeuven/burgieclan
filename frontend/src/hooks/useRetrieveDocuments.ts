@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Document, type Course, type DocumentCategory } from '@/types/entities';
 import { useUser } from '@/components/UserContext';
-import { useApi } from '@/hooks/useApi';
-import { ApiError } from '@/utils/error/apiError';
+import { HydraCollection, isErrorResponse, useApi } from '@/hooks/useApi';
+import { Document, type Course, type DocumentCategory } from '@/types/entities';
 import { convertToDocument } from '@/utils/convertToEntity';
+import { ApiError } from '@/utils/error/apiError';
+import { useEffect, useState } from 'react';
 
 export interface DocumentFilters {
     name?: string;
@@ -28,7 +28,7 @@ const useRetrieveDocuments = (
     sort?: DocumentSortOptions,
 ) => {
     const { user } = useUser();
-    const { request, loading } = useApi();
+    const { request, loading } = useApi<HydraCollection<unknown>>();
     const [documents, setDocuments] = useState<Document[]>([]);
     const [totalItems, setTotalItems] = useState<number>(0);
     const [error, setError] = useState<string | null>(null);
@@ -97,8 +97,8 @@ const useRetrieveDocuments = (
                     throw new ApiError('Failed to fetch documents', 500);
                 }
 
-                if (response.error) {
-                    throw new ApiError(response.error.message, response.error.status);
+                if (isErrorResponse(response)) {
+                    throw new ApiError(response.error.message ?? 'Failed to fetch documents', response.error.status ?? 500);
                 }
 
                 const documents: Document[] = response['hydra:member'].map(convertToDocument);

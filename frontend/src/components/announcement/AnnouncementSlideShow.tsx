@@ -1,7 +1,6 @@
-import Loading from '@/app/[locale]/loading';
 import Announcement from '@/components/announcement/Announcement';
 import ErrorPage from '@/components/error/ErrorPage';
-import { useApi } from '@/hooks/useApi';
+import { HydraCollection, useApi } from '@/hooks/useApi';
 import { Announcement as AnnouncementEntity } from '@/types/entities';
 import { convertToAnnouncement } from '@/utils/convertToEntity';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -9,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function AnnouncementSlideShow() {
-    const { request, loading, error } = useApi();
+    const { request, loading, error } = useApi<HydraCollection<unknown>>();
     const [announcements, setAnnouncements] = useState<AnnouncementEntity[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const { i18n } = useTranslation();
@@ -86,7 +85,7 @@ export default function AnnouncementSlideShow() {
                         {/* Left arrow button */}
                         <button
                             onClick={handlePrevious}
-                            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/2 bg-white hover:bg-gray-100 border border-gray-300 rounded-full p-1.5 shadow-sm transition-colors duration-200 z-10"
+                            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/2 bg-white hover:bg-gray-100 border border-gray-300 rounded-full p-1.5 shadow-xs transition-colors duration-200 z-10"
                             aria-label="Previous announcement"
                         >
                             <ChevronLeft className="w-4 h-4 text-gray-600" />
@@ -95,7 +94,7 @@ export default function AnnouncementSlideShow() {
                         {/* Right arrow button */}
                         <button
                             onClick={handleNext}
-                            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 bg-white hover:bg-gray-100 border border-gray-300 rounded-full p-1.5 shadow-sm transition-colors duration-200 z-10"
+                            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 bg-white hover:bg-gray-100 border border-gray-300 rounded-full p-1.5 shadow-xs transition-colors duration-200 z-10"
                             aria-label="Next announcement"
                         >
                             <ChevronRight className="w-4 h-4 text-gray-600" />

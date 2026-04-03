@@ -2,6 +2,7 @@
 
 import { COOKIE_NAMES } from '@/utils/cookieNames';
 import { getUserIdFromJWT, isJWTExpired } from '@/utils/jwt';
+import { captureException } from '@sentry/nextjs';
 import { cookies } from 'next/headers';
 
 /**
@@ -9,7 +10,7 @@ import { cookies } from 'next/headers';
  * This function can only be called in Server Components or Server Actions
  */
 export const getUserId = async (): Promise<number | null> => {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
 
     if (!jwt) {
@@ -37,7 +38,7 @@ export const isAuthenticated = async (): Promise<boolean> => {
  * Server-side function to get the JWT token from HTTP-only cookie
  */
 export const getServerJWT = async (): Promise<string | null> => {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
 
     if (!jwt) {
@@ -62,8 +63,8 @@ export const getActiveJWT = async (): Promise<string | null> => {
         throw new Error('Missing environment variable for backend base URL');
     }
 
-    const cookieStore = cookies();
-    let jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
+    const cookieStore = await cookies();
+    const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
     const refreshToken = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
 
     // If no JWT at all, return null
@@ -101,13 +102,26 @@ export const getActiveJWT = async (): Promise<string | null> => {
             await storeTokensInCookies(newJwt, newRefreshToken, refreshTokenExpiration);
             return newJwt;
         } else {
-            console.error('Token refresh failed with status:', response.status, 'Response:', await response.text());
+            const responseText = await response.text();
+            captureException(
+                new Error(`Token refresh failed with status: ${response.status}; Response: ${responseText}`),
+                {
+                    extra: {
+                        context: "Token refresh failed",
+                        status: response.status,
+                        response: responseText,
+                    },
+                }
+            );
             // Refresh failed, clear the tokens
             await clearTokenCookies();
             return null;
         }
     } catch (error) {
-        console.error('Token refresh failed:', error);
+        captureException(
+            error instanceof Error ? error : new Error(String(error)),
+            { extra: { context: "Token refresh failed" } }
+        );
         await clearTokenCookies();
         return null;
     }
@@ -121,7 +135,7 @@ export const storeTokensInCookies = async (
     refreshToken?: string,
     refreshTokenExpiration?: number
 ) => {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
 
     // Calculate JWT expiration from the token itself
     const jwtPayload = JSON.parse(atob(jwt.split('.')[1]));
@@ -160,7 +174,7 @@ export const storeTokensInCookies = async (
  * Clear all authentication cookies
  */
 export const clearTokenCookies = async () => {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     cookieStore.delete(COOKIE_NAMES.JWT);
     cookieStore.delete(COOKIE_NAMES.REFRESH_TOKEN);
 };
@@ -176,7 +190,7 @@ export const logOut = async (): Promise<{ success: boolean; error?: string }> =>
         }
 
         // Get the current JWT and refresh token for the logout request
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
         const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
         const refreshToken = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
 
@@ -204,7 +218,10 @@ export const logOut = async (): Promise<{ success: boolean; error?: string }> =>
 
         return { success: true };
     } catch (error) {
-        console.error('Logout error:', error);
+        captureException(
+            error instanceof Error ? error : new Error(String(error)),
+            { extra: { context: "Logout error" } }
+        );
 
         // Even if the backend call fails, still clear local cookies
         await clearTokenCookies();

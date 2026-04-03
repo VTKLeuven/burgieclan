@@ -12,7 +12,7 @@ interface NodeEntity extends BaseEntity {
 export interface Course extends BaseEntity {
     name?: string;
     courseComments?: CourseComment[];
-    modules?: string[];
+    modules?: Module[];
     code?: string;
     credits?: number;
     location?: string;

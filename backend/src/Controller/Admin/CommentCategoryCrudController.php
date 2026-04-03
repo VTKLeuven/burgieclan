@@ -38,7 +38,7 @@ class CommentCategoryCrudController extends AbstractCrudController
             ->setLabel('Description (NL)')
             ->setTemplatePath('admin/text_editor.html.twig');
 
-        yield FormField::addPanel('English Content')->setIcon('fa fa-language')
+        yield FormField::addFieldset('English Content')->setIcon('fa fa-language')
             ->collapsible();
         yield Textfield::new('name_en')
             ->setLabel('Name (EN)');

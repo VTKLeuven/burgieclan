@@ -1,8 +1,7 @@
-import * as React from "react"
+import { cn } from "@/lib/utils"
 import { Slot } from "@radix-ui/react-slot"
 import { ChevronRight, MoreHorizontal } from "lucide-react"
-
-import { cn } from "@/lib/utils"
+import React from "react"
 
 const Breadcrumb = React.forwardRef<
   HTMLElement,
@@ -19,7 +18,7 @@ const BreadcrumbList = React.forwardRef<
   <ol
     ref={ref}
     className={cn(
-      "flex flex-wrap pl-0 list-none items-center break-words text-sm text-neutral-500 dark:text-neutral-400",
+      "flex flex-wrap pl-0 list-none items-center wrap-break-word text-sm text-neutral-500 dark:text-neutral-400",
       className
     )}
     {...props}
@@ -106,10 +105,10 @@ BreadcrumbEllipsis.displayName = "BreadcrumbElipssis"
 
 export {
   Breadcrumb,
-  BreadcrumbList,
+  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
+  BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
-  BreadcrumbEllipsis,
+  BreadcrumbSeparator
 }

@@ -19,8 +19,8 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
     };
 
     return (
-        <div className="mt-6 border rounded-lg shadow-sm">
-            <button onClick={toggleCollapse} className="w-full text-left focus:outline-none">
+        <div className="mt-6 border rounded-lg shadow-xs">
+            <button onClick={toggleCollapse} className="w-full text-left focus:outline-hidden">
                 <div className="flex justify-between items-center px-4 py-1 bg-gray-100 rounded-t-lg">
                     {header}
                     <ChevronDown

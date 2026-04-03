@@ -17,4 +17,8 @@ jobs:
     with:
       environment: production
       url: https://burgieclan.vtk.be
+    secrets:
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
     if: false

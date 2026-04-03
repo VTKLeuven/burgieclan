@@ -80,9 +80,10 @@ class EntityContainsFilter implements FilterInterface
 
         // Determine association type
         $associationType = null;
-        if ($entityDto->isToManyAssociation($property)) {
+        $classMetadata = $entityDto->getClassMetadata();
+        if ($classMetadata->isCollectionValuedAssociation($property)) {
             $associationType = 'toMany';
-        } elseif ($entityDto->isAssociation($property)) {
+        } elseif ($classMetadata->hasAssociation($property)) {
             $associationType = 'toOne';
         }
 
