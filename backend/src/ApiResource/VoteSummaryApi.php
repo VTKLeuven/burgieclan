@@ -5,63 +5,71 @@ namespace App\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use App\Controller\Api\GetVoteSummaryController;
 use App\Entity\AbstractVote;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    shortName: 'Vote Summary',
+    shortName: 'VoteSummary',
     operations: [
         new Get(
             uriTemplate: '/documents/{id}/votes',
             controller: GetVoteSummaryController::class,
             read: false,
-            openapiContext: [
-                'summary' => 'Get vote summary for a document',
-                'parameters' => [
-                    [
-                        'name' => 'id',
-                        'in' => 'path',
-                        'required' => true,
-                        'schema' => ['type' => 'integer'],
-                        'description' => 'Document ID'
-                    ]
+            openapi: new Operation(
+                summary: 'Get vote summary for a document',
+                parameters: [
+                    new Parameter(
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: [
+                            'type' => 'integer',
+                        ],
+                        description: 'Document ID'
+                    )
                 ]
-            ]
+            )
         ),
         new Get(
             uriTemplate: '/document-comments/{id}/votes',
             controller: GetVoteSummaryController::class,
             read: false,
-            openapiContext: [
-                'summary' => 'Get vote summary for a document comment',
-                'parameters' => [
-                    [
-                        'name' => 'id',
-                        'in' => 'path',
-                        'required' => true,
-                        'schema' => ['type' => 'integer'],
-                        'description' => 'Document Comment ID'
-                    ]
+            openapi: new Operation(
+                summary: 'Get vote summary for a document comment',
+                parameters: [
+                    new Parameter(
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: [
+                            'type' => 'integer',
+                        ],
+                        description: 'Document Comment ID'
+                    )
                 ]
-            ]
+            )
         ),
         new Get(
             uriTemplate: '/course-comments/{id}/votes',
             controller: GetVoteSummaryController::class,
             read: false,
-            openapiContext: [
-                'summary' => 'Get vote summary for a course comment',
-                'parameters' => [
-                    [
-                        'name' => 'id',
-                        'in' => 'path',
-                        'required' => true,
-                        'schema' => ['type' => 'integer'],
-                        'description' => 'Course Comment ID'
-                    ]
+            openapi: new Operation(
+                summary: 'Get vote summary for a course comment',
+                parameters: [
+                    new Parameter(
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: [
+                            'type' => 'integer',
+                        ],
+                        description: 'Course Comment ID'
+                    )
                 ]
-            ]
+            )
         ),
     ],
 )]
