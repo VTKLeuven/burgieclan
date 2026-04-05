@@ -34,7 +34,7 @@ class UserDocumentViewApi
     public DocumentApi $document;
 
     #[Assert\NotNull]
-    #[Assert\Type(\DateTimeInterface::class)]
+    #[Assert\Type(DateTimeInterface::class)]
     #[ApiProperty(writable: true)]
     #[Groups(['user:document_views', 'user:document_views:batch'])]
     public DateTimeInterface $lastViewed;

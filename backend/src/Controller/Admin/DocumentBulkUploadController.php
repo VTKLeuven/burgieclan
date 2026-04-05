@@ -9,6 +9,7 @@ use App\Entity\Tag;
 use App\Entity\User;
 use App\Repository\CourseRepository;
 use App\Repository\DocumentCategoryRepository;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
@@ -39,8 +40,7 @@ class DocumentBulkUploadController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly RequestStack $requestStack,
-    ) {
-    }
+    ) {}
 
     #[AdminRoute('/bulk-upload', name: 'bulk_upload_index')]
     public function index(): Response
@@ -51,132 +51,132 @@ class DocumentBulkUploadController extends AbstractController
                 'course',
                 EntityType::class,
                 [
-                'class' => Course::class,
-                'choice_label' => function (Course $course) {
-                    return $course->getName() . ' (' . $course->getCode() . ')';
-                },
-                'placeholder' => 'Select a course',
-                'label' => 'Default Course',
-                'required' => true,
-                'constraints' => [new NotNull(message: 'Please select a course')],
-                'query_builder' => function (CourseRepository $repository) {
-                    return $repository->createQueryBuilder('c')
-                        ->orderBy('c.name', 'ASC');
-                },
+                    'class' => Course::class,
+                    'choice_label' => function (Course $course) {
+                        return $course->getName() . ' (' . $course->getCode() . ')';
+                    },
+                    'placeholder' => 'Select a course',
+                    'label' => 'Default Course',
+                    'required' => true,
+                    'constraints' => [new NotNull(message: 'Please select a course')],
+                    'query_builder' => function (CourseRepository $repository) {
+                        return $repository->createQueryBuilder('c')
+                            ->orderBy('c.name', 'ASC');
+                    },
                 ]
             )
             ->add(
                 'category',
                 EntityType::class,
                 [
-                'class' => DocumentCategory::class,
-                'choice_label' => 'nameNl',
-                'placeholder' => 'Select a category',
-                'label' => 'Default Category',
-                'required' => true,
-                'constraints' => [new NotNull(message: 'Please select a category')],
-                'query_builder' => function (DocumentCategoryRepository $repository) {
-                    return $repository->createQueryBuilder('c')
-                        ->orderBy('c.name_nl', 'ASC');
-                },
+                    'class' => DocumentCategory::class,
+                    'choice_label' => 'nameNl',
+                    'placeholder' => 'Select a category',
+                    'label' => 'Default Category',
+                    'required' => true,
+                    'constraints' => [new NotNull(message: 'Please select a category')],
+                    'query_builder' => function (DocumentCategoryRepository $repository) {
+                        return $repository->createQueryBuilder('c')
+                            ->orderBy('c.name_nl', 'ASC');
+                    },
                 ]
             )
             ->add(
                 'useFileDate',
                 CheckboxType::class,
                 [
-                'label' => 'Detect year from file date',
-                'required' => false,
-                'data' => true,
-                'help' => 'Automatically determine academic year from file creation/modification date',
+                    'label' => 'Detect year from file date',
+                    'required' => false,
+                    'data' => true,
+                    'help' => 'Automatically determine academic year from file creation/modification date',
                 ]
             )
             ->add(
                 'defaultYear',
                 ChoiceType::class,
                 [
-                'choices' => Document::getAcademicYearChoices(amountOfYears: 40),
-                'label' => 'Default Year',
-                'required' => false,
-                'data' => $this->getCurrentAcademicYear(),
-                'help' => 'This will be used as default when "Detect year from file date" is disabled or year cannot be determined',
+                    'choices' => Document::getAcademicYearChoices(amountOfYears: 40),
+                    'label' => 'Default Year',
+                    'required' => false,
+                    'data' => $this->getCurrentAcademicYear(),
+                    'help' => 'This will be used as default when "Detect year from file date" is disabled or year cannot be determined',
                 ]
             )
             ->add(
                 'defaultTags',
                 EntityType::class,
                 [
-                'class' => Tag::class,
-                'choice_label' => 'name',
-                'label' => 'Default Tags',
-                'multiple' => true,
-                'expanded' => false, // Keep as select, we'll customize the rendering
-                'required' => false,
-                'help' => 'These tags will be applied to all documents by default (filtered by selected course/category)',
+                    'class' => Tag::class,
+                    'choice_label' => 'name',
+                    'label' => 'Default Tags',
+                    'multiple' => true,
+                    'expanded' => false, // Keep as select, we'll customize the rendering
+                    'required' => false,
+                    'help' => 'These tags will be applied to all documents by default (filtered by selected course/category)',
                 ]
             )
             ->add(
                 'underReview',
                 CheckboxType::class,
                 [
-                'label' => 'Under Review',
-                'required' => false,
-                'data' => false,
-                'help' => 'Set to true if documents should be marked as under review',
+                    'label' => 'Under Review',
+                    'required' => false,
+                    'data' => false,
+                    'help' => 'Set to true if documents should be marked as under review',
                 ]
             )
             ->add(
                 'anonymous',
                 CheckboxType::class,
                 [
-                'label' => 'Anonymous',
-                'required' => false,
-                'data' => true,
-                'help' => 'Set to true if documents should be marked as anonymous',
+                    'label' => 'Anonymous',
+                    'required' => false,
+                    'data' => true,
+                    'help' => 'Set to true if documents should be marked as anonymous',
                 ]
             )
             ->add(
                 'files',
                 FileType::class,
                 [
-                'label' => 'Documents',
-                'multiple' => true,
-                'mapped' => false,
-                'required' => true,
-                'constraints' => [
-                    new All(
-                        [
-                        new FileConstraint(
+                    'label' => 'Documents',
+                    'multiple' => true,
+                    'mapped' => false,
+                    'required' => true,
+                    'constraints' => [
+                        new All(
                             [
-                            'maxSize' => '200M',
-                            'mimeTypes' => [
-                                'application/pdf',
-                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                                'application/msword',
-                                'text/plain',
-                                'image/jpeg',
-                                'image/png',
-                                'video/mp4',
-                                'application/zip',
-                                'text/x-matlab',
-                                'text/x-python'
-                            ],
+                                new FileConstraint(
+                                    [
+                                        'maxSize' => '200M',
+                                        'mimeTypes' => [
+                                            'application/pdf',
+                                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                                            'application/msword',
+                                            'text/plain',
+                                            'image/jpeg',
+                                            'image/png',
+                                            'video/mp4',
+                                            'application/zip',
+                                            'text/x-matlab',
+                                            'text/x-python'
+                                        ],
+                                    ]
+                                ),
                             ]
                         ),
-                        ]
-                    ),
-                ],
-                'help' => 'Select multiple documents to upload (PDF, Word, Excel, PowerPoint, or text files, max 200MB each)',
+                    ],
+                    'help' => 'Select multiple documents to upload (PDF, Word, Excel, PowerPoint, or text files, max 200MB each)',
                 ]
             )
             ->add(
                 'submit',
                 SubmitType::class,
                 [
-                'label' => 'Upload & Preview',
-                'attr' => ['class' => 'btn btn-primary'],
+                    'label' => 'Upload & Preview',
+                    'attr' => ['class' => 'btn btn-primary'],
                 ]
             )
             ->getForm();
@@ -195,7 +195,7 @@ class DocumentBulkUploadController extends AbstractController
         return $this->render(
             'admin/bulk_upload_form.html.twig',
             [
-            'form' => $form->createView(),
+                'form' => $form->createView(),
             ]
         );
     }
@@ -305,13 +305,13 @@ class DocumentBulkUploadController extends AbstractController
             $session->set(
                 self::SESSION_KEY . '_defaults',
                 [
-                'course' => $courseId,
-                'category' => $categoryId,
-                'useFileDate' => $useFileDate,
-                'defaultYear' => $defaultYear,
-                'defaultTags' => $tagIds,
-                'underReview' => $underReview,
-                'anonymous' => $anonymous,
+                    'course' => $courseId,
+                    'category' => $categoryId,
+                    'useFileDate' => $useFileDate,
+                    'defaultYear' => $defaultYear,
+                    'defaultTags' => $tagIds,
+                    'underReview' => $underReview,
+                    'anonymous' => $anonymous,
                 ]
             );
 
@@ -359,12 +359,12 @@ class DocumentBulkUploadController extends AbstractController
         return $this->render(
             'admin/bulk_upload_edit.html.twig',
             [
-            'documents' => $documentsMetadata,
-            'defaults' => $defaults,
-            'courses' => $courseRepo->findBy([], ['name' => 'ASC']),
-            'categories' => $categoryRepo->findBy([], ['name_nl' => 'ASC']),
-            'tags' => $tagRepo->findAll(),
-            'yearChoices' => Document::getAcademicYearChoices(amountOfYears: 40),
+                'documents' => $documentsMetadata,
+                'defaults' => $defaults,
+                'courses' => $courseRepo->findBy([], ['name' => 'ASC']),
+                'categories' => $categoryRepo->findBy([], ['name_nl' => 'ASC']),
+                'tags' => $tagRepo->findAll(),
+                'yearChoices' => Document::getAcademicYearChoices(amountOfYears: 40),
             ]
         );
     }
@@ -577,7 +577,7 @@ class DocumentBulkUploadController extends AbstractController
             return null;
         }
 
-        $date = new \DateTime();
+        $date = new DateTime();
         $date->setTimestamp($timestamp);
 
         $year = (int)$date->format('Y');
@@ -617,8 +617,8 @@ class DocumentBulkUploadController extends AbstractController
         $tagData = array_map(
             function (Tag $tag) {
                 return [
-                'id' => $tag->getId(),
-                'name' => $tag->getName(),
+                    'id' => $tag->getId(),
+                    'name' => $tag->getName(),
                 ];
             },
             $tags
@@ -648,9 +648,9 @@ class DocumentBulkUploadController extends AbstractController
         if ($existingTag) {
             return $this->json(
                 [
-                'id' => $existingTag->getId(),
-                'name' => $existingTag->getName(),
-                'existing' => true,
+                    'id' => $existingTag->getId(),
+                    'name' => $existingTag->getName(),
+                    'existing' => true,
                 ]
             );
         }
@@ -664,9 +664,9 @@ class DocumentBulkUploadController extends AbstractController
 
         return $this->json(
             [
-            'id' => $tag->getId(),
-            'name' => $tag->getName(),
-            'existing' => false,
+                'id' => $tag->getId(),
+                'name' => $tag->getName(),
+                'existing' => false,
             ],
             201
         );

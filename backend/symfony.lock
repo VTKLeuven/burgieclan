@@ -25,9 +25,6 @@
             "config/packages/dama_doctrine_test_bundle.yaml"
         ]
     },
-    "dflydev/dot-access-data": {
-        "version": "v3.0.1"
-    },
     "doctrine/collections": {
         "version": "1.6.8"
     },
@@ -147,12 +144,6 @@
     "laminas/laminas-code": {
         "version": "4.4.3"
     },
-    "league/commonmark": {
-        "version": "2.1.0"
-    },
-    "league/config": {
-        "version": "v1.1.1"
-    },
     "league/uri": {
         "version": "6.5.0"
     },
@@ -200,12 +191,6 @@
         "files": [
             "config/packages/nelmio_security.yaml"
         ]
-    },
-    "nette/schema": {
-        "version": "v1.2.2"
-    },
-    "nette/utils": {
-        "version": "v3.2.6"
     },
     "nikic/php-parser": {
         "version": "v4.13.2"
