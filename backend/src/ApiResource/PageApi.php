@@ -7,6 +7,8 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use App\Entity\Page;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
@@ -17,42 +19,42 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'Page',
     operations: [
         new Get(
-            openapiContext: [
-                'parameters' => [
-                    [
-                        'name' => 'lang',
-                        'in' => 'query',
-                        'required' => false,
-                        'schema' => [
+            openapi: new Operation(
+                parameters: [
+                    new Parameter(
+                        name: 'lang',
+                        in: 'query',
+                        required: false,
+                        schema: [
                             'type' => 'string',
                             'enum' => ['nl', 'en'],
                             'default' => 'nl'
                         ],
-                        'description' => 'The language in which to retrieve the page content'
-                    ]
+                        description: 'The language in which to retrieve the page content'
+                    )
                 ]
-            ],
+            ),
             security: 'is_granted("VIEW", object)', // Handled by the src/Security/Voter/PageVoter
             provider: PageApiProvider::class
         ),
         new GetCollection(
-            openapiContext: [
-                'summary' => 'Retrieves the collection of publicly available Page resources.',
-                'description' => 'Retrieves the collection of publicly available Page resources.',
-                'parameters' => [
-                    [
-                        'name' => 'lang',
-                        'in' => 'query',
-                        'required' => false,
-                        'schema' => [
+            openapi: new Operation(
+                summary: 'Retrieves the collection of publicly available Page resources.',
+                description: 'Retrieves the collection of publicly available Page resources.',
+                parameters: [
+                    new Parameter(
+                        name: 'lang',
+                        in: 'query',
+                        required: false,
+                        schema: [
                             'type' => 'string',
                             'enum' => ['nl', 'en'],
                             'default' => 'nl'
                         ],
-                        'description' => 'The language in which to retrieve the page content'
-                    ]
+                        description: 'The language in which to retrieve the page content'
+                    )
                 ]
-            ],
+            ),
             paginationEnabled: false,
             provider: PageApiProvider::class,
         )
