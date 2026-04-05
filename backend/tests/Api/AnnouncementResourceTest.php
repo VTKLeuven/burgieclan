@@ -20,9 +20,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -33,16 +33,16 @@ class AnnouncementResourceTest extends ApiTestCase
 
         $this->assertEqualsCanonicalizing(
             [
-            '@id',
-            '@type',
-            'title',
-            'content',
-            'creator',
-            'startTime',
-            'endTime',
-            'createdAt',
-            'updatedAt',
-            'priority',
+                '@id',
+                '@type',
+                'title',
+                'content',
+                'creator',
+                'startTime',
+                'endTime',
+                'createdAt',
+                'updatedAt',
+                'priority',
             ],
             array_keys($json->decoded()['hydra:member'][0])
         );
@@ -56,9 +56,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements/' . $announcement->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -70,22 +70,22 @@ class AnnouncementResourceTest extends ApiTestCase
     {
         $announcement1 = AnnouncementFactory::createOne(
             [
-            'title_nl' => 'testannouncement1',
-            'title_en' => 'testannouncement1_en',
+                'title_nl' => 'testannouncement1',
+                'title_en' => 'testannouncement1_en',
             ]
         );
 
         $announcement2 = AnnouncementFactory::createOne(
             [
-            'title_nl' => 'testannouncement2',
-            'title_en' => 'testannouncement2_en',
+                'title_nl' => 'testannouncement2',
+                'title_en' => 'testannouncement2_en',
             ]
         );
 
         $announcement3 = AnnouncementFactory::createOne(
             [
-            'title_nl' => 'testannouncement3',
-            'title_en' => 'testannouncement3_en',
+                'title_nl' => 'testannouncement3',
+                'title_en' => 'testannouncement3_en',
             ]
         );
 
@@ -95,9 +95,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements?title=testannouncement2',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -107,9 +107,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements?title=testannouncement',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -121,22 +121,22 @@ class AnnouncementResourceTest extends ApiTestCase
     {
         $announcement1 = AnnouncementFactory::createOne(
             [
-            'content_nl' => 'testannouncement1',
-            'content_en' => 'testannouncement1_en',
+                'content_nl' => 'testannouncement1',
+                'content_en' => 'testannouncement1_en',
             ]
         );
 
         $announcement2 = AnnouncementFactory::createOne(
             [
-            'content_nl' => 'testannouncement2',
-            'content_en' => 'testannouncement2_en',
+                'content_nl' => 'testannouncement2',
+                'content_en' => 'testannouncement2_en',
             ]
         );
 
         $announcement3 = AnnouncementFactory::createOne(
             [
-            'content_nl' => 'testannouncement3',
-            'content_en' => 'testannouncement3_en',
+                'content_nl' => 'testannouncement3',
+                'content_en' => 'testannouncement3_en',
             ]
         );
 
@@ -146,9 +146,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements?content=testannouncement2',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -158,9 +158,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements?content=testannouncement',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -173,21 +173,21 @@ class AnnouncementResourceTest extends ApiTestCase
         $startTime1 = (new DateTime());
         $announcement1 = AnnouncementFactory::createOne(
             [
-            'startTime' => $startTime1,
+                'startTime' => $startTime1,
             ]
         );
 
         $startTime2 = (new DateTime())->add(new DateInterval('P1D'));
         $announcement2 = AnnouncementFactory::createOne(
             [
-            'startTime' => $startTime2,
+                'startTime' => $startTime2,
             ]
         );
 
         $startTime3 = (new DateTime())->add(new DateInterval('P2D'));
         $announcement3 = AnnouncementFactory::createOne(
             [
-            'startTime' => $startTime3,
+                'startTime' => $startTime3,
             ]
         );
 
@@ -195,9 +195,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements?startTime[before]=' . $startTime2->format('Y-m-d H:i:s'),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -207,9 +207,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements?startTime[strictly_before]=' . $startTime2->format('Y-m-d H:i:s'),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -219,9 +219,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements?startTime[after]=' . $startTime2->format('Y-m-d H:i:s'),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -231,9 +231,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements?startTime[strictly_after]=' . $startTime2->format('Y-m-d H:i:s'),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -247,21 +247,21 @@ class AnnouncementResourceTest extends ApiTestCase
         $endTime1 = (new DateTime());
         $announcement1 = AnnouncementFactory::createOne(
             [
-            'endTime' => $endTime1,
+                'endTime' => $endTime1,
             ]
         );
 
         $endTime2 = (new DateTime())->add(new DateInterval('P1D'));
         $announcement2 = AnnouncementFactory::createOne(
             [
-            'endTime' => $endTime2,
+                'endTime' => $endTime2,
             ]
         );
 
         $endTime3 = (new DateTime())->add(new DateInterval('P2D'));
         $announcement3 = AnnouncementFactory::createOne(
             [
-            'endTime' => $endTime3,
+                'endTime' => $endTime3,
             ]
         );
 
@@ -269,9 +269,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements?endTime[before]=' . $endTime2->format('Y-m-d H:i:s'),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -281,9 +281,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements?endTime[strictly_before]=' . $endTime2->format('Y-m-d H:i:s'),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -293,9 +293,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements?endTime[after]=' . $endTime2->format('Y-m-d H:i:s'),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -305,9 +305,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements?endTime[strictly_after]=' . $endTime2->format('Y-m-d H:i:s'),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -320,10 +320,10 @@ class AnnouncementResourceTest extends ApiTestCase
     {
         $announcement = AnnouncementFactory::createOne(
             [
-            'title_nl' => 'Nederlandse titel',
-            'title_en' => 'English title',
-            'content_nl' => 'Nederlandse inhoud',
-            'content_en' => 'English content',
+                'title_nl' => 'Nederlandse titel',
+                'title_en' => 'English title',
+                'content_nl' => 'Nederlandse inhoud',
+                'content_en' => 'English content',
             ]
         );
 
@@ -332,9 +332,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements/' . $announcement->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -348,9 +348,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements/' . $announcement->getId() . '?lang=nl',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -363,9 +363,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements/' . $announcement->getId() . '?lang=en',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -378,19 +378,19 @@ class AnnouncementResourceTest extends ApiTestCase
     {
         $announcement1 = AnnouncementFactory::createOne(
             [
-            'title_nl' => 'Nederlandse titel 1',
-            'title_en' => 'English title 1',
-            'content_nl' => 'Nederlandse inhoud 1',
-            'content_en' => 'English content 1',
+                'title_nl' => 'Nederlandse titel 1',
+                'title_en' => 'English title 1',
+                'content_nl' => 'Nederlandse inhoud 1',
+                'content_en' => 'English content 1',
             ]
         );
 
         $announcement2 = AnnouncementFactory::createOne(
             [
-            'title_nl' => 'Nederlandse titel 2',
-            'title_en' => 'English title 2',
-            'content_nl' => 'Nederlandse inhoud 2',
-            'content_en' => 'English content 2',
+                'title_nl' => 'Nederlandse titel 2',
+                'title_en' => 'English title 2',
+                'content_nl' => 'Nederlandse inhoud 2',
+                'content_en' => 'English content 2',
             ]
         );
 
@@ -399,9 +399,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -417,9 +417,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements?lang=en',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -436,10 +436,10 @@ class AnnouncementResourceTest extends ApiTestCase
         // Create announcement with only Dutch content (English fields empty but not null)
         $announcement = AnnouncementFactory::createOne(
             [
-            'title_nl' => 'Nederlandse titel',
-            'title_en' => '',
-            'content_nl' => 'Nederlandse inhoud',
-            'content_en' => '',
+                'title_nl' => 'Nederlandse titel',
+                'title_en' => '',
+                'content_nl' => 'Nederlandse inhoud',
+                'content_en' => '',
             ]
         );
 
@@ -448,9 +448,9 @@ class AnnouncementResourceTest extends ApiTestCase
             ->get(
                 '/api/announcements/' . $announcement->getId() . '?lang=en',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
