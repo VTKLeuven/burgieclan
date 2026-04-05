@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     stateOptions: new Options(entityClass: User::class),
 )]
 #[ApiResource(
-    shortName: 'User favorites',
+    shortName: 'UserFavorites',
     operations: [
         new Get(
             uriTemplate: 'users/{id}/favorites',
