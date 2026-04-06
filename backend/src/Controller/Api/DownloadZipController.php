@@ -21,6 +21,9 @@ use ZipArchive;
 
 final class DownloadZipController extends AbstractController
 {
+    /** @var list<string> */
+    private array $zipBuildTempFiles = [];
+
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
         private readonly DocumentRepository $documentRepository,
@@ -144,21 +147,31 @@ final class DownloadZipController extends AbstractController
 
         $zip = new ZipArchive();
         if (!file_exists($fileName) && $zip->open($fileName, ZipArchive::CREATE) === true) {
-            $this->addProgramsToZip($zip, $programs);
-            $this->addModulesToZip($zip, $modules, '');
-            $this->addCoursesToZip($zip, $courses, '');
-            $this->addDocumentsToZip($zip, $documents, '');
+            $this->zipBuildTempFiles = [];
+            try {
+                $this->addProgramsToZip($zip, $programs);
+                $this->addModulesToZip($zip, $modules, '');
+                $this->addCoursesToZip($zip, $courses, '');
+                $this->addDocumentsToZip($zip, $documents, '');
 
-            // Generate and add HTML structure file
-            $htmlContent = $this->generateHtmlStructure($programs, $modules, $courses, $documents);
-            $result = $zip->addFromString('burgieclan-documents-index.html', $htmlContent);
+                // Generate and add HTML structure file
+                $htmlContent = $this->generateHtmlStructure($programs, $modules, $courses, $documents);
+                $result = $zip->addFromString('burgieclan-documents-index.html', $htmlContent);
 
-            if (!$result) {
-                // Log the error or take appropriate action if the HTML file couldn't be added
-                error_log('Failed to add HTML structure to ZIP file');
+                if (!$result) {
+                    // Log the error or take appropriate action if the HTML file couldn't be added
+                    error_log('Failed to add HTML structure to ZIP file');
+                }
+
+                $zip->close();
+            } finally {
+                foreach ($this->zipBuildTempFiles as $tmpPath) {
+                    if ($tmpPath !== '' && is_file($tmpPath)) {
+                        unlink($tmpPath);
+                    }
+                }
+                $this->zipBuildTempFiles = [];
             }
-
-            $zip->close();
         }
 
         return $fileName;
@@ -215,14 +228,31 @@ final class DownloadZipController extends AbstractController
 
             foreach ($categoryDocuments as $document) {
                 if ($document->getFileName()) {
-                    $filePath = $this->storage->resolvePath($document, 'file');
-                    if (file_exists($filePath)) {
-                        $originalFileName = $document->getFileName();
-                        $fileNameToUse = $this->getUniqueFileName($originalFileName, $usedFilenames[$category]);
-                        $usedFilenames[$category][] = $fileNameToUse;
-
-                        $zip->addFile($filePath, $categoryDir . '/' . $fileNameToUse);
+                    $originalFileName = $document->getFileName();
+                    $stream = $this->storage->resolveStream($document, 'file');
+                    if (!\is_resource($stream)) {
+                        continue;
                     }
+                    $tmpPath = tempnam(sys_get_temp_dir(), 'bc_zip_');
+                    if ($tmpPath === false) {
+                        fclose($stream);
+                        continue;
+                    }
+                    $out = fopen($tmpPath, 'wb');
+                    if ($out === false) {
+                        fclose($stream);
+                        unlink($tmpPath);
+                        continue;
+                    }
+                    stream_copy_to_stream($stream, $out);
+                    fclose($stream);
+                    fclose($out);
+
+                    $fileNameToUse = $this->getUniqueFileName($originalFileName, $usedFilenames[$category]);
+                    $usedFilenames[$category][] = $fileNameToUse;
+
+                    $this->zipBuildTempFiles[] = $tmpPath;
+                    $zip->addFile($tmpPath, $categoryDir . '/' . $fileNameToUse);
                 }
             }
         }
@@ -793,16 +823,12 @@ final class DownloadZipController extends AbstractController
         $html .= '<span class="metadata-value">' . $document->getUpdateDate()->format('Y-m-d') . '</span>';
         $html .= '</div>';
 
-        // Add file size if we can calculate it
-        if ($document->getFile()) {
-            $filePath = $this->storage->resolvePath($document, 'file');
-            if (file_exists($filePath) && is_readable($filePath)) {
-                $fileSize = filesize($filePath);
-                $html .= '<div class="metadata-pair">';
-                $html .= '<span class="metadata-label">Size:</span>';
-                $html .= '<span class="metadata-value">' . $this->formatFileSize($fileSize) . '</span>';
-                $html .= '</div>';
-            }
+        // Add file size from persisted metadata when available
+        if (null !== $document->getFileSize()) {
+            $html .= '<div class="metadata-pair">';
+            $html .= '<span class="metadata-label">Size:</span>';
+            $html .= '<span class="metadata-value">' . $this->formatFileSize($document->getFileSize()) . '</span>';
+            $html .= '</div>';
         }
 
         $html .= '</div></div>';

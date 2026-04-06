@@ -149,16 +149,9 @@ class DocumentApiProvider implements ProviderInterface
         if ($document->getFileName()) {
             $documentApi->filename = $document->getFileName();
 
-            try {
-                $filePath = $this->storage->resolvePath($document, 'file');
-                if ($filePath) {
-                    $mimeType = $this->mimeTypes->guessMimeType($filePath);
-                    $documentApi->mimetype = $mimeType ?: 'application/octet-stream';
-                }
-            } catch (\Exception $e) {
-                // If we can't determine the mime type, default to octet-stream
-                $documentApi->mimetype = 'application/octet-stream';
-            }
+            $extension = strtolower(pathinfo($document->getFileName(), \PATHINFO_EXTENSION));
+            $mimeTypes = '' !== $extension ? $this->mimeTypes->getMimeTypes($extension) : [];
+            $documentApi->mimetype = $mimeTypes[0] ?? 'application/octet-stream';
         }
 
         return $documentApi;
