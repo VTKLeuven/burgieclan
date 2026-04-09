@@ -15,22 +15,18 @@ use App\Entity\Document;
 use App\Entity\DocumentCategory;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\Mime\MimeTypesInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
-use Vich\UploaderBundle\Storage\StorageInterface;
 
 class DocumentApiProvider implements ProviderInterface
 {
-    private MimeTypes $mimeTypes;
-
     public function __construct(
         #[Autowire(service: ItemProvider::class)] private readonly ProviderInterface $itemProvider,
         #[Autowire(service: CollectionProvider::class)] private readonly ProviderInterface $collectionProvider,
         private readonly MicroMapperInterface $microMapper,
-        private readonly StorageInterface $storage,
+        private readonly MimeTypesInterface $mimeTypes,
         private readonly Security $security,
     ) {
-        $this->mimeTypes = new MimeTypes();
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
@@ -146,19 +142,12 @@ class DocumentApiProvider implements ProviderInterface
             $documentApi->creator = null; // Remove author in GET-requests if document is anonymous
         }
 
-        if ($document->getFileName()) {
-            $documentApi->filename = $document->getFileName();
-
-            try {
-                $filePath = $this->storage->resolvePath($document, 'file');
-                if ($filePath) {
-                    $mimeType = $this->mimeTypes->guessMimeType($filePath);
-                    $documentApi->mimetype = $mimeType ?: 'application/octet-stream';
-                }
-            } catch (\Exception $e) {
-                // If we can't determine the mime type, default to octet-stream
-                $documentApi->mimetype = 'application/octet-stream';
-            }
+        $fileName = $document->getFileName();
+        if ($fileName) {
+            $documentApi->filename = $fileName;
+            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $mimeTypes = $extension !== '' ? $this->mimeTypes->getMimeTypes($extension) : [];
+            $documentApi->mimetype = $mimeTypes[0] ?? 'application/octet-stream';
         }
 
         return $documentApi;

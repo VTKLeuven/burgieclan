@@ -65,3 +65,16 @@ services:
         class: App\EventListener\Api\JWTExpiredListener
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_expired, method: onJWTExpired }
+
+when@prod:
+    services:
+        app.s3.documents_client:
+            class: Aws\S3\S3Client
+            arguments:
+                - version: 'latest'
+                  region: '%env(S3_DOCUMENTS_REGION)%'
+                  endpoint: '%env(S3_DOCUMENTS_ENDPOINT)%'
+                  use_path_style_endpoint: true
+                  credentials:
+                      key: '%env(S3_DOCUMENTS_ACCESS_KEY)%'
+                      secret: '%env(S3_DOCUMENTS_SECRET_KEY)%'

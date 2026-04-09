@@ -1,0 +1,16 @@
+# Read the documentation at https://github.com/thephpleague/flysystem-bundle/blob/master/docs/1-getting-started.md
+flysystem:
+    storages:
+        documents.storage:
+            adapter: 'local'
+            options:
+                directory: '%kernel.project_dir%/data/documents'
+
+when@prod:
+    flysystem:
+        storages:
+            documents.storage:
+                adapter: 'aws'
+                options:
+                    client: 'app.s3.documents_client'
+                    bucket: '%env(S3_DOCUMENTS_BUCKET)%'
