@@ -4,22 +4,45 @@ import { getActiveJWT, logOut } from "@/actions/auth";
 import { headers } from 'next/headers';
 import { redirect } from "next/navigation";
 
+type ApiProblemShape = { message?: string; title?: string; detail?: string };
+
 /**
  * Encodes an API error response from the backend server into a structured serializable format for the frontend.
+ * Handles non-JSON bodies (e.g. Symfony HTML error pages on 500) without throwing.
  */
 const handleError = async (response: Response) => {
-    const errorData = await response.json();
+    const contentType = response.headers.get('content-type') ?? '';
+    let errorData: ApiProblemShape = {};
 
-    switch (response.status) {
-        case 401:
-            return { error: { message: errorData.message || errorData.title || 'Unauthorized. Please log in again.', detail: errorData.detail, status: 401 } };
-        case 404:
-            return { error: { message: errorData.message || errorData.title || 'Resource not found.', detail: errorData.detail, status: 404 } };
-        case 500:
-            return { error: { message: errorData.message || errorData.title || 'Internal Server Error. Please try again later.', detail: errorData.detail, status: 500 } };
-        default:
-            return { error: { message: errorData.message || errorData.title || 'Unexpected Error.', detail: errorData.detail, status: response.status || 500 } };
+    if (contentType.includes('json')) {
+        try {
+            errorData = (await response.json()) as ApiProblemShape;
+        } catch {
+            errorData = {};
+        }
+    } else {
+        const text = await response.text();
+        const snippet = text.slice(0, 400).replace(/\s+/g, ' ').trim();
+        errorData = {
+            detail: snippet ? `Non-JSON error body (${response.status}): ${snippet}` : `Non-JSON error response (${response.status})`,
+        };
     }
+
+    const message =
+        errorData.message ||
+        errorData.title ||
+        (response.status === 401 ? 'Unauthorized. Please log in again.' : null) ||
+        (response.status === 404 ? 'Resource not found.' : null) ||
+        (response.status === 500 ? 'Internal Server Error. Please try again later.' : null) ||
+        'Unexpected Error.';
+
+    return {
+        error: {
+            message,
+            detail: errorData.detail,
+            status: response.status || 500,
+        },
+    };
 };
 
 /**
@@ -42,6 +65,10 @@ export const ApiClient = async (method: string, endpoint: string, body?: unknown
         const jwt = await getActiveJWT();
 
         const requestHeaders = new Headers(customHeaders || {});
+        // Prefer JSON/JSON-LD error responses from API Platform instead of HTML exception pages
+        if (!requestHeaders.has('Accept')) {
+            requestHeaders.set('Accept', 'application/ld+json, application/json');
+        }
         // If body is FormData, don't set content-type (useful for file uploads)
         if (!(body instanceof FormData) && !customHeaders?.get('Content-Type')) {
             if (method === 'PATCH') {
