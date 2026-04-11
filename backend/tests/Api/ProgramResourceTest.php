@@ -3,14 +3,9 @@
 namespace App\Tests\Api;
 
 use App\Factory\ProgramFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 class ProgramResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testGetCollectionOfPrograms(): void
     {
         ProgramFactory::createMany(5);
@@ -18,9 +13,9 @@ class ProgramResourceTest extends ApiTestCase
             ->get(
                 '/api/programs',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -32,10 +27,10 @@ class ProgramResourceTest extends ApiTestCase
         $this->assertSame(
             array_keys($json->decoded()['hydra:member'][0]),
             [
-            '@id',
-            '@type',
-            'name',
-            'modules',
+                '@id',
+                '@type',
+                'name',
+                'modules',
             ]
         );
     }
@@ -48,9 +43,9 @@ class ProgramResourceTest extends ApiTestCase
             ->get(
                 '/api/programs/' . $program->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -62,19 +57,19 @@ class ProgramResourceTest extends ApiTestCase
     {
         $program1 = ProgramFactory::createOne(
             [
-            'name' => 'program1',
+                'name' => 'program1',
             ]
         );
 
         $program2 = ProgramFactory::createOne(
             [
-            'name' => 'program2',
+                'name' => 'program2',
             ]
         );
 
         $program3 = ProgramFactory::createOne(
             [
-            'name' => 'program3',
+                'name' => 'program3',
             ]
         );
 
@@ -84,9 +79,9 @@ class ProgramResourceTest extends ApiTestCase
             ->get(
                 '/api/programs?name=program2',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -96,9 +91,9 @@ class ProgramResourceTest extends ApiTestCase
             ->get(
                 '/api/programs?name=program',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)

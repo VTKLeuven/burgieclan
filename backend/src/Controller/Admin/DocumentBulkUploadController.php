@@ -40,7 +40,8 @@ class DocumentBulkUploadController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly RequestStack $requestStack,
-    ) {}
+    ) {
+    }
 
     #[AdminRoute('/bulk-upload', name: 'bulk_upload_index')]
     public function index(): Response
