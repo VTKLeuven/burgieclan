@@ -27,16 +27,13 @@
     <body id="{% block body_id %}{% endblock %}">
 
         {% block header %}
-            {% set _route = app.request.get('_route') %}
+            {% set _route = app.request.attributes.get('_route') %}
             <header>
                 <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
                     <div class="container">
                         <a class="navbar-brand" href="{{ path('admin') }}">
                             Burgieclan - Admin
                         </a>
-{#                        <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#appNavbar" aria-controls="appNavbar" aria-expanded="false" aria-label="Toggle navigation">#}
-{#                        <span class="navbar-toggler-icon"></span>#}
-{#                        </button>#}
                     </div>
                 </nav>
             </header>

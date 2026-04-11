@@ -263,17 +263,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Removes sensitive data from the user.
-     *
-     * {@inheritdoc}
-     */
-    #[\Deprecated]
-    public function eraseCredentials(): void
-    {
-        //  $this->plainPassword = null;
-    }
-
-    /**
      * @return array{int|null, string|null, string|null}
      */
     public function __serialize(): array

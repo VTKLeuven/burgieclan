@@ -105,7 +105,8 @@ class UserCrudController extends AbstractCrudController
         if ($plainPassword = $user->getPlainPassword()) {
             $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashedPassword);
-            $user->eraseCredentials();
+            // The plainPassword is a transient property and will be garbage collected after the request
+            $user->setPlainPassword('');
         }
     }
 
