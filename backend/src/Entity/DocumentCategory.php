@@ -6,13 +6,8 @@ use App\Repository\DocumentCategoryRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DocumentCategoryRepository::class)]
-class DocumentCategory
+class DocumentCategory extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     public static array $AVAILABLE_LANGUAGES = [
         'nl' => 'Dutch',
         'en' => 'English',
@@ -25,11 +20,6 @@ class DocumentCategory
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $name_en = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function __toString(): string
     {
