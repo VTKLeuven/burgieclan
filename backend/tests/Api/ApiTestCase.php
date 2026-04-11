@@ -36,8 +36,8 @@ abstract class ApiTestCase extends KernelTestCase
                 '/api/auth/login',
                 HttpOptions::json(
                     [
-                    'username' => $username,
-                    'password' => $password,
+                        'username' => $username,
+                        'password' => $password,
                     ]
                 )
             )

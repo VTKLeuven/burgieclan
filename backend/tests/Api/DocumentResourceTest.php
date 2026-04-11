@@ -8,29 +8,27 @@ use App\Factory\DocumentFactory;
 use App\Factory\TagFactory;
 use App\Factory\UserFactory;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+
+use function Zenstruck\Foundry\Persistence\refresh;
+use function Zenstruck\Foundry\Persistence\save;
 
 class DocumentResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testGetCollectionOfDocuments(): void
     {
         DocumentFactory::createMany(
             5,
             [
-            'anonymous' => false,
+                'anonymous' => false,
             ]
         );
         $json = $this->browser()
             ->get(
                 '/api/documents',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -41,21 +39,21 @@ class DocumentResourceTest extends ApiTestCase
         $this->assertSame(
             array_keys($json->decoded()['hydra:member'][0]),
             [
-            '@id',
-            '@type',
-            'name',
-            'course',
-            'category',
-            'year',
-            'under_review',
-            'anonymous',
-            'contentUrl',
-            'mimetype',
-            'filename',
-            'creator',
-            'createdAt',
-            'updatedAt',
-            'tags',
+                '@id',
+                '@type',
+                'name',
+                'course',
+                'category',
+                'year',
+                'under_review',
+                'anonymous',
+                'contentUrl',
+                'mimetype',
+                'filename',
+                'creator',
+                'createdAt',
+                'updatedAt',
+                'tags',
             ]
         );
     }
@@ -65,24 +63,25 @@ class DocumentResourceTest extends ApiTestCase
         DocumentFactory::createMany(
             5,
             [
-            'anonymous' => true,
+                'anonymous' => true,
             ]
         );
         $json = $this->browser()
             ->get(
                 '/api/documents',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
-            ->json();$this->assertSame(
-                array_keys($json->decoded()['hydra:member'][0]),
-                [
+            ->json();
+        $this->assertSame(
+            array_keys($json->decoded()['hydra:member'][0]),
+            [
                 '@id',
                 '@type',
                 'name',
@@ -97,8 +96,8 @@ class DocumentResourceTest extends ApiTestCase
                 'createdAt',
                 'updatedAt',
                 'tags',
-                ]
-            ); // Notice that creator is not included in the response.
+            ]
+        ); // Notice that creator is not included in the response.
     }
 
     public function testGetOneDocument(): void
@@ -113,9 +112,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/' . $document->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -135,9 +134,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/' . $document->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -150,19 +149,19 @@ class DocumentResourceTest extends ApiTestCase
     {
         $document1 = DocumentFactory::createOne(
             [
-            'name' => 'document1',
+                'name' => 'document1',
             ]
         );
 
         $document2 = DocumentFactory::createOne(
             [
-            'name' => 'document2',
+                'name' => 'document2',
             ]
         );
 
         $document3 = DocumentFactory::createOne(
             [
-            'name' => 'document3',
+                'name' => 'document3',
             ]
         );
 
@@ -172,9 +171,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?name=document2',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -183,9 +182,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?name=document',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -198,13 +197,13 @@ class DocumentResourceTest extends ApiTestCase
         DocumentFactory::createMany(
             3,
             [
-            'under_review' => true,
+                'under_review' => true,
             ]
         );
         DocumentFactory::createMany(
             5,
             [
-            'under_review' => false,
+                'under_review' => false,
             ]
         );
 
@@ -212,9 +211,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?under_review=true',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -223,9 +222,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?under_review=false',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -240,19 +239,19 @@ class DocumentResourceTest extends ApiTestCase
         DocumentFactory::createMany(
             1,
             [
-            'course' => $course1,
+                'course' => $course1,
             ]
         );
         DocumentFactory::createMany(
             2,
             [
-            'course' => $course2,
+                'course' => $course2,
             ]
         );
         DocumentFactory::createMany(
             5,
             [
-            'course' => CourseFactory::createOne(),
+                'course' => CourseFactory::createOne(),
             ]
         );
 
@@ -260,9 +259,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?course=/api/courses/' . $course1->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -270,11 +269,11 @@ class DocumentResourceTest extends ApiTestCase
             ->assertJsonMatches('length("hydra:member")', 1)
             ->get(
                 '/api/documents?course[]=/api/courses/' . $course1->getId() .
-                '&course[]=/api/courses/' . $course2->getId(),
+                    '&course[]=/api/courses/' . $course2->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -283,9 +282,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -300,19 +299,19 @@ class DocumentResourceTest extends ApiTestCase
         DocumentFactory::createMany(
             1,
             [
-            'category' => $category1,
+                'category' => $category1,
             ]
         );
         DocumentFactory::createMany(
             2,
             [
-            'category' => $category2,
+                'category' => $category2,
             ]
         );
         DocumentFactory::createMany(
             5,
             [
-            'category' => DocumentCategoryFactory::createOne(),
+                'category' => DocumentCategoryFactory::createOne(),
             ]
         );
 
@@ -320,9 +319,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?category=/api/document_categories/' . $category1->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -330,11 +329,11 @@ class DocumentResourceTest extends ApiTestCase
             ->assertJsonMatches('length("hydra:member")', 1)
             ->get(
                 '/api/documents?category[]=/api/document_categories/' . $category1->getId() .
-                '&category[]=/api/document_categories/' . $category2->getId(),
+                    '&category[]=/api/document_categories/' . $category2->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -343,9 +342,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -360,22 +359,22 @@ class DocumentResourceTest extends ApiTestCase
         DocumentFactory::createMany(
             1,
             [
-            'creator' => $user1,
-            'under_review' => false, // Only non-under-review documents are returned (except if the user is the creator)
+                'creator' => $user1,
+                'under_review' => false, // Only non-under-review documents are returned (except if the user is the creator)
             ]
         );
         DocumentFactory::createMany(
             2,
             [
-            'creator' => $user2,
-            'under_review' => false,
+                'creator' => $user2,
+                'under_review' => false,
             ]
         );
         DocumentFactory::createMany(
             5,
             [
-            'creator' => UserFactory::createOne(),
-            'under_review' => false,
+                'creator' => UserFactory::createOne(),
+                'under_review' => false,
             ]
         );
 
@@ -383,9 +382,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?creator=/api/users/' . $user1->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -393,11 +392,11 @@ class DocumentResourceTest extends ApiTestCase
             ->assertJsonMatches('length("hydra:member")', 1)
             ->get(
                 '/api/documents?creator[]=/api/users/' . $user1->getId() .
-                '&creator[]=/api/users/' . $user2->getId(),
+                    '&creator[]=/api/users/' . $user2->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -406,9 +405,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -421,19 +420,19 @@ class DocumentResourceTest extends ApiTestCase
         DocumentFactory::createMany(
             1,
             [
-            'year' => '2024 - 2025',
+                'year' => '2024 - 2025',
             ]
         );
         DocumentFactory::createMany(
             1,
             [
-            'year' => '2025 - 2026',
+                'year' => '2025 - 2026',
             ]
         );
         DocumentFactory::createMany(
             5,
             [
-            'year' => '2026 - 2027',
+                'year' => '2026 - 2027',
             ]
         );
 
@@ -441,9 +440,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?year=2024 - 2025',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -452,9 +451,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?year=24',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -463,9 +462,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?year=25',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -474,9 +473,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?year=26',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -499,30 +498,30 @@ class DocumentResourceTest extends ApiTestCase
             ->post(
                 '/api/documents',
                 [
-                'headers' => [
-                    'Content-Type' => 'multipart/form-data',
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Content-Type' => 'multipart/form-data',
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(400)
             ->post(
                 '/api/documents',
                 [
-                'headers' => [
-                    'Content-Type' => 'multipart/form-data',
-                    'Authorization' => 'Bearer ' . $this->token
-                ],
-                'body' => [
-                    'name' => 'Document name',
-                    'course' => '/api/courses/' . $course->getId(),
-                    'category' => '/api/document_categories/' . $category->getId(),
-                    'under_review' => true,
-                    'anonymous' => true,
-                ],
-                'files' => [
-                    'file' => $file,
-                ],
+                    'headers' => [
+                        'Content-Type' => 'multipart/form-data',
+                        'Authorization' => 'Bearer ' . $this->token
+                    ],
+                    'body' => [
+                        'name' => 'Document name',
+                        'course' => '/api/courses/' . $course->getId(),
+                        'category' => '/api/document_categories/' . $category->getId(),
+                        'under_review' => true,
+                        'anonymous' => true,
+                    ],
+                    'files' => [
+                        'file' => $file,
+                    ],
                 ]
             )
             ->assertStatus(201)
@@ -545,8 +544,8 @@ class DocumentResourceTest extends ApiTestCase
     {
         $document = DocumentFactory::createOne(
             [
-            'anonymous' => true,
-            'creator' => UserFactory::createOne(),
+                'anonymous' => true,
+                'creator' => UserFactory::createOne(),
             ]
         );
 
@@ -554,9 +553,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/' . $document->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -566,16 +565,17 @@ class DocumentResourceTest extends ApiTestCase
         $this->assertArrayNotHasKey('creator', $json->decoded());
 
         // Check that if the creator is set to non-anonymous later on, the creator is given in the GET-response.
+        refresh($document);
         $document->setAnonymous(false);
-        $document->_save();
+        save($document);
 
         $json = $this->browser()
             ->get(
                 '/api/documents/' . $document->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -604,15 +604,15 @@ class DocumentResourceTest extends ApiTestCase
         // Create document through normal upload process
         $document = DocumentFactory::new()->withoutPersisting()->create();
         $document->setFile($uploadedFile);
-        $document->_save();
+        save($document);
 
         $this->browser()
             ->get(
                 '/api/documents/' . $document->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -664,19 +664,19 @@ class DocumentResourceTest extends ApiTestCase
         // Create documents with actual files
         $pdfDocument = DocumentFactory::new()->withoutPersisting()->create();
         $pdfDocument->setFile($pdfFile);
-        $pdfDocument->_save();
+        save($pdfDocument);
 
         $txtDocument = DocumentFactory::new()->withoutPersisting()->create();
         $txtDocument->setFile($txtFile);
-        $pdfDocument->_save();
+        save($txtDocument);
 
         $json = $this->browser()
             ->get(
                 '/api/documents',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -728,7 +728,7 @@ class DocumentResourceTest extends ApiTestCase
     {
         $document = DocumentFactory::createOne(
             [
-            'anonymous' => false
+                'anonymous' => false
             ]
         );
 
@@ -736,9 +736,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/' . $document->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -748,16 +748,17 @@ class DocumentResourceTest extends ApiTestCase
         $this->assertArrayHasKey('creator', $json->decoded());
 
         // Check that if the creator is set to anonymous later on, no creator field is given on GET.
+        refresh($document);
         $document->setAnonymous(true);
-        $document->_save();
+        save($document);
 
         $json = $this->browser()
             ->get(
                 '/api/documents/' . $document->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -777,36 +778,36 @@ class DocumentResourceTest extends ApiTestCase
         // Create documents with different tag combinations
         DocumentFactory::createOne(
             [
-            'tags' => [$tagPython],
-            'under_review' => false,
+                'tags' => [$tagPython],
+                'under_review' => false,
             ]
         );
 
         DocumentFactory::createOne(
             [
-            'tags' => [$tagJavascript],
-            'under_review' => false,
+                'tags' => [$tagJavascript],
+                'under_review' => false,
             ]
         );
 
         DocumentFactory::createOne(
             [
-            'tags' => [$tagPHP],
-            'under_review' => false,
+                'tags' => [$tagPHP],
+                'under_review' => false,
             ]
         );
 
         DocumentFactory::createOne(
             [
-            'tags' => [$tagPython, $tagJavascript],
-            'under_review' => false,
+                'tags' => [$tagPython, $tagJavascript],
+                'under_review' => false,
             ]
         );
 
         DocumentFactory::createOne(
             [
-            'tags' => [$tagJavascript, $tagPHP, $tagPython],
-            'under_review' => false,
+                'tags' => [$tagJavascript, $tagPHP, $tagPython],
+                'under_review' => false,
             ]
         );
 
@@ -814,8 +815,8 @@ class DocumentResourceTest extends ApiTestCase
         DocumentFactory::createMany(
             3,
             [
-            'tags' => [],
-            'under_review' => false,
+                'tags' => [],
+                'under_review' => false,
             ]
         );
 
@@ -824,9 +825,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?tags.name=python',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -838,9 +839,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?tags.name=py',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -852,9 +853,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?tags.name[]=python&tags.name[]=javascript',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -866,9 +867,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents?tags=/api/tags/' . $tagPHP->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -879,11 +880,11 @@ class DocumentResourceTest extends ApiTestCase
         $this->browser()
             ->get(
                 '/api/documents?tags[]=/api/tags/' . $tagPython->getId() .
-                '&tags[]=/api/tags/' . $tagPHP->getId(),
+                    '&tags[]=/api/tags/' . $tagPHP->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -895,9 +896,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/documents',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -923,20 +924,20 @@ class DocumentResourceTest extends ApiTestCase
             ->post(
                 '/api/documents',
                 [
-                'headers' => [
-                    'Content-Type' => 'multipart/form-data',
-                    'Authorization' => 'Bearer ' . $this->token
-                ],
-                'body' => [
-                    'name' => 'Document with tags',
-                    'course' => '/api/courses/' . $course->getId(),
-                    'category' => '/api/document_categories/' . $category->getId(),
-                    'anonymous' => false,
-                    'tags' => ['/api/tags/' . $existingTag->getId()],
-                ],
-                'files' => [
-                    'file' => $file,
-                ],
+                    'headers' => [
+                        'Content-Type' => 'multipart/form-data',
+                        'Authorization' => 'Bearer ' . $this->token
+                    ],
+                    'body' => [
+                        'name' => 'Document with tags',
+                        'course' => '/api/courses/' . $course->getId(),
+                        'category' => '/api/document_categories/' . $category->getId(),
+                        'anonymous' => false,
+                        'tags' => ['/api/tags/' . $existingTag->getId()],
+                    ],
+                    'files' => [
+                        'file' => $file,
+                    ],
                 ]
             )
             ->assertStatus(201)
@@ -951,9 +952,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 $documentIRI,
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -973,9 +974,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 '/api/tags/' . $existingTag->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -1010,24 +1011,24 @@ class DocumentResourceTest extends ApiTestCase
             ->post(
                 '/api/documents',
                 [
-                'headers' => [
-                    'Content-Type' => 'multipart/form-data',
-                    'Authorization' => 'Bearer ' . $this->token
-                ],
-                'body' => [
-                    'name' => 'Document with multiple tags',
-                    'course' => '/api/courses/' . $course->getId(),
-                    'category' => '/api/document_categories/' . $category->getId(),
-                    'anonymous' => false,
-                    // Use array of tags
-                    'tags' => [
-                        '/api/tags/' . $tag1->getId(),
-                        '/api/tags/' . $tag2->getId()
+                    'headers' => [
+                        'Content-Type' => 'multipart/form-data',
+                        'Authorization' => 'Bearer ' . $this->token
                     ],
-                ],
-                'files' => [
-                    'file' => $file,
-                ],
+                    'body' => [
+                        'name' => 'Document with multiple tags',
+                        'course' => '/api/courses/' . $course->getId(),
+                        'category' => '/api/document_categories/' . $category->getId(),
+                        'anonymous' => false,
+                        // Use array of tags
+                        'tags' => [
+                            '/api/tags/' . $tag1->getId(),
+                            '/api/tags/' . $tag2->getId()
+                        ],
+                    ],
+                    'files' => [
+                        'file' => $file,
+                    ],
                 ]
             )
             ->assertStatus(201)
@@ -1042,9 +1043,9 @@ class DocumentResourceTest extends ApiTestCase
             ->get(
                 $documentIRI,
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)

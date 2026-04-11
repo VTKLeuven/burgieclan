@@ -104,7 +104,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserDocumentView::class)]
     private Collection $viewedDocuments;
 
-        /**
+    /**
      * @var Collection<int, DocumentVote>
      */
     #[ORM\OneToMany(
@@ -267,9 +267,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * {@inheritdoc}
      */
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
-         $this->plainPassword = null;
+        //  $this->plainPassword = null;
     }
 
     /**
