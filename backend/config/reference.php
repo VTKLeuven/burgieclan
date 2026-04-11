@@ -2222,6 +2222,8 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         traces_sampler?: scalar|null,
  *         profiles_sample_rate?: float, // The sampling factor to apply to profiles. A value of 0 will deny sending any profiles, and a value of 1 will send all profiles. Profiles are sampled in relation to traces_sample_rate
  *         enable_logs?: bool,
+ *         log_flush_threshold?: mixed, // Default: null
+ *         enable_metrics?: bool, // Default: true
  *         attach_stacktrace?: bool,
  *         attach_metric_code_locations?: bool,
  *         context_lines?: int,
@@ -2230,6 +2232,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         spotlight?: bool,
  *         spotlight_url?: scalar|null,
  *         release?: scalar|null, // Default: "%env(default::SENTRY_RELEASE)%"
+ *         org_id?: int,
  *         server_name?: scalar|null,
  *         ignore_exceptions?: list<scalar|null>,
  *         ignore_transactions?: list<scalar|null>,
@@ -2238,7 +2241,9 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         before_send_check_in?: scalar|null,
  *         before_send_metrics?: scalar|null,
  *         before_send_log?: scalar|null,
+ *         before_send_metric?: scalar|null,
  *         trace_propagation_targets?: mixed,
+ *         strict_trace_continuation?: bool,
  *         tags?: array<string, scalar|null>,
  *         error_types?: scalar|null,
  *         max_breadcrumbs?: int,
@@ -2256,18 +2261,20 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         http_ssl_verify_peer?: bool,
  *         http_compression?: bool,
  *         capture_silenced_errors?: bool,
- *         max_request_body_size?: "none"|"small"|"medium"|"always",
+ *         max_request_body_size?: "none"|"never"|"small"|"medium"|"always",
  *         class_serializers?: array<string, scalar|null>,
  *     },
  *     messenger?: bool|array{
  *         enabled?: bool, // Default: false
  *         capture_soft_fails?: bool, // Default: true
  *         isolate_breadcrumbs_by_message?: bool, // Default: false
+ *         isolate_context_by_message?: bool, // Default: false
  *     },
  *     tracing?: bool|array{
  *         enabled?: bool, // Default: true
  *         dbal?: bool|array{
  *             enabled?: bool, // Default: true
+ *             ignore_prepare_spans?: bool, // Default: false
  *             connections?: list<scalar|null>,
  *         },
  *         twig?: bool|array{
