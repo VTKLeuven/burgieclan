@@ -50,9 +50,9 @@
     "symfony/validator": "7.4",
     "symfony/webpack-encore-bundle": "2.4",
     "symfonycasts/micro-mapper": "0.3",
-    "twig/extra-bundle": "^3.3",
-    "twig/intl-extra": "^3.3",
-    "twig/markdown-extra": "^3.3",
+    "twig/extra-bundle": "3.24",
+    "twig/intl-extra": "3.24",
+    "twig/markdown-extra": "3.24",
     "vich/uploader-bundle": "2.9"
   },
   "require-dev": {
