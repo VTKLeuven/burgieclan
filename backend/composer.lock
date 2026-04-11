@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5a35d61f89ff75be0c4714d603a2ff60",
+    "content-hash": "606a49c79754e026f3f6d5b4236daa38",
     "packages": [
         {
             "name": "api-platform/doctrine-common",
@@ -2621,63 +2621,61 @@
         },
         {
             "name": "gesdinet/jwt-refresh-token-bundle",
-            "version": "v1.5.0",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/markitosgv/JWTRefreshTokenBundle.git",
-                "reference": "8706b0d8dcb26610358ba3328ec412315b55c3cd"
+                "reference": "453bf7338025984e51918f65fcc0ca50645a168c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/markitosgv/JWTRefreshTokenBundle/zipball/8706b0d8dcb26610358ba3328ec412315b55c3cd",
-                "reference": "8706b0d8dcb26610358ba3328ec412315b55c3cd",
+                "url": "https://api.github.com/repos/markitosgv/JWTRefreshTokenBundle/zipball/453bf7338025984e51918f65fcc0ca50645a168c",
+                "reference": "453bf7338025984e51918f65fcc0ca50645a168c",
                 "shasum": ""
             },
             "require": {
-                "doctrine/persistence": "^1.3.3|^2.0|^3.0|^4.0",
-                "lexik/jwt-authentication-bundle": "^2.0|^3.0",
-                "php": ">=7.4",
-                "symfony/config": "^5.4|^6.0|^7.0",
-                "symfony/console": "^5.4|^6.0|^7.0",
-                "symfony/dependency-injection": "^5.4|^6.0|^7.0",
-                "symfony/deprecation-contracts": "^2.1|^3.0",
-                "symfony/event-dispatcher": "^5.4|^6.0|^7.0",
-                "symfony/http-foundation": "^5.4|^6.0|^7.0",
-                "symfony/http-kernel": "^5.4|^6.0|^7.0",
-                "symfony/polyfill-php80": "^1.15",
-                "symfony/property-access": "^5.4|^6.0|^7.0",
-                "symfony/security-bundle": "^5.4|^6.0|^7.0",
-                "symfony/security-core": "^5.4|^6.0|^7.0",
-                "symfony/security-http": "^5.4|^6.0|^7.0"
+                "doctrine/persistence": "^3.1 || ^4.0",
+                "lexik/jwt-authentication-bundle": "^2.15 || ^3.0",
+                "php": ">=8.2 || ^8.3 || ^8.4",
+                "symfony/config": "^6.4 || ^7.0  || ^7.2 || ^8.0",
+                "symfony/console": "^6.4 || ^7.2 || ^8.0",
+                "symfony/dependency-injection": "^6.4 || ^7.0  || ^7.2 || ^8.0",
+                "symfony/deprecation-contracts": "^2.1 || ^3.0 || ^4.0",
+                "symfony/event-dispatcher": "^6.4 || ^7.0  || ^7.2 || ^8.0",
+                "symfony/http-foundation": "^6.4 || ^7.0  || ^7.2 || ^8.0",
+                "symfony/http-kernel": "^6.4 || ^7.0  || ^7.2 || ^8.0",
+                "symfony/property-access": "^6.4 || ^7.0  || ^7.2 || ^8.0",
+                "symfony/security-bundle": "^6.4 || ^7.0  || ^7.2 || ^8.0",
+                "symfony/security-core": "^6.4 || ^7.0  || ^7.2 || ^8.0",
+                "symfony/security-http": "^6.4 || ^7.2 || ^8.0"
             },
             "conflict": {
-                "doctrine/mongodb-odm": "<2.2",
-                "doctrine/orm": "<2.7"
+                "doctrine/mongodb-odm": "<2.7",
+                "doctrine/orm": "<2.20"
             },
             "require-dev": {
-                "doctrine/annotations": "^1.13|^2.0",
-                "doctrine/cache": "^1.11|^2.0",
-                "doctrine/mongodb-odm": "^2.2",
-                "doctrine/orm": "^2.7|^3.0",
-                "matthiasnoback/symfony-config-test": "^4.2|^5.0",
-                "matthiasnoback/symfony-dependency-injection-test": "^4.2|^5.0",
-                "phpunit/phpunit": "^9.5",
-                "symfony/cache": "^5.4|^6.0|^7.0",
-                "symfony/security-guard": "^5.4"
+                "doctrine/mongodb-odm": "^2.7",
+                "doctrine/orm": "^2.20 || ^3.0",
+                "ergebnis/composer-normalize": "*",
+                "matthiasnoback/symfony-config-test": "^5.1 || ^6.0",
+                "matthiasnoback/symfony-dependency-injection-test": "^5.1 || ^6.0",
+                "mongodb/mongodb": "^2.1",
+                "phpunit/phpunit": "^10.5 || ^12.2",
+                "rector/jack": "^0.5.0",
+                "rector/rector": "^2.2",
+                "symfony/cache": "^6.4 || ^7.2 || ^8.0",
+                "vimeo/psalm": "^7.0@beta"
             },
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.x-dev"
+                    "dev-master": "2.x-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "Gesdinet\\JWTRefreshTokenBundle\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
+                    "Gesdinet\\JWTRefreshTokenBundle\\": "src/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2695,9 +2693,9 @@
             ],
             "support": {
                 "issues": "https://github.com/markitosgv/JWTRefreshTokenBundle/issues",
-                "source": "https://github.com/markitosgv/JWTRefreshTokenBundle/tree/v1.5.0"
+                "source": "https://github.com/markitosgv/JWTRefreshTokenBundle/tree/v2.0.0"
             },
-            "time": "2025-06-24T13:08:37+00:00"
+            "time": "2025-12-29T23:20:41+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
