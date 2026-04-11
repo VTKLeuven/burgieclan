@@ -3,14 +3,9 @@
 namespace App\Tests\Api;
 
 use App\Factory\DocumentCategoryFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 class DocumentCategoryResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testGetCollectionOfDocumentCategories(): void
     {
         DocumentCategoryFactory::createMany(5);
@@ -18,9 +13,9 @@ class DocumentCategoryResourceTest extends ApiTestCase
             ->get(
                 '/api/document_categories',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -31,9 +26,9 @@ class DocumentCategoryResourceTest extends ApiTestCase
         $this->assertSame(
             array_keys($json->decoded()['hydra:member'][0]),
             [
-            '@id',
-            '@type',
-            'name',
+                '@id',
+                '@type',
+                'name',
             ]
         );
     }
@@ -46,9 +41,9 @@ class DocumentCategoryResourceTest extends ApiTestCase
             ->get(
                 '/api/document_categories/' . $category->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -59,19 +54,19 @@ class DocumentCategoryResourceTest extends ApiTestCase
     {
         $category1 = DocumentCategoryFactory::createOne(
             [
-            'name_nl' => 'category1',
+                'name_nl' => 'category1',
             ]
         );
 
         $category2 = DocumentCategoryFactory::createOne(
             [
-            'name_nl' => 'category2',
+                'name_nl' => 'category2',
             ]
         );
 
         $category3 = DocumentCategoryFactory::createOne(
             [
-            'name_nl' => 'category3',
+                'name_nl' => 'category3',
             ]
         );
 
@@ -81,9 +76,9 @@ class DocumentCategoryResourceTest extends ApiTestCase
             ->get(
                 '/api/document_categories?name=category2',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -92,9 +87,9 @@ class DocumentCategoryResourceTest extends ApiTestCase
             ->get(
                 '/api/document_categories?name=category',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -113,9 +108,9 @@ class DocumentCategoryResourceTest extends ApiTestCase
             ->get(
                 '/api/document_categories?name=dutch2',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -124,9 +119,9 @@ class DocumentCategoryResourceTest extends ApiTestCase
             ->get(
                 '/api/document_categories?name=dutch',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -145,9 +140,9 @@ class DocumentCategoryResourceTest extends ApiTestCase
             ->get(
                 '/api/document_categories?name=english2',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -156,9 +151,9 @@ class DocumentCategoryResourceTest extends ApiTestCase
             ->get(
                 '/api/document_categories?name=english',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -178,9 +173,9 @@ class DocumentCategoryResourceTest extends ApiTestCase
             ->get(
                 '/api/document_categories?name=mixnl',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -189,9 +184,9 @@ class DocumentCategoryResourceTest extends ApiTestCase
             ->get(
                 '/api/document_categories?name=mixen2',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -200,9 +195,9 @@ class DocumentCategoryResourceTest extends ApiTestCase
             ->get(
                 '/api/document_categories?name=mix',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()

@@ -3,14 +3,9 @@
 namespace App\Tests\Api;
 
 use App\Factory\QuickLinkFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 class QuickLinkResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testGetCollectionOfQuickLinks(): void
     {
         QuickLinkFactory::createMany(5);
@@ -18,9 +13,9 @@ class QuickLinkResourceTest extends ApiTestCase
             ->get(
                 '/api/quick_links',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -32,10 +27,10 @@ class QuickLinkResourceTest extends ApiTestCase
         $this->assertSame(
             array_keys($json->decoded()['hydra:member'][0]),
             [
-            '@id',
-            '@type',
-            'name',
-            'linkTo',
+                '@id',
+                '@type',
+                'name',
+                'linkTo',
             ]
         );
     }
@@ -48,9 +43,9 @@ class QuickLinkResourceTest extends ApiTestCase
             ->get(
                 '/api/quick_links/' . $quickLink->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -65,9 +60,9 @@ class QuickLinkResourceTest extends ApiTestCase
             ->get(
                 '/api/quick_links',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer invalid_token_here'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer invalid_token_here'
+                    ]
                 ]
             )
             ->assertStatus(401)

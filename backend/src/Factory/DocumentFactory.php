@@ -1,68 +1,23 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace App\Factory;
 
 use App\Entity\Document;
-use App\Repository\DocumentRepository;
-use Doctrine\ORM\EntityRepository;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<Document>
- *
- * @method        Document|Proxy                              create(array|callable $attributes = [])
- * @method static Document|Proxy                              createOne(array $attributes = [])
- * @method static Document|Proxy                              find(object|array|mixed $criteria)
- * @method static Document|Proxy                              findOrCreate(array $attributes)
- * @method static Document|Proxy                              first(string $sortedField = 'id')
- * @method static Document|Proxy                              last(string $sortedField = 'id')
- * @method static Document|Proxy                              random(array $attributes = [])
- * @method static Document|Proxy                              randomOrCreate(array $attributes = [])
- * @method static DocumentRepository|ProxyRepositoryDecorator repository()
- * @method static Document[]|Proxy[]                          all()
- * @method static Document[]|Proxy[]                          createMany(int $number, array|callable $attributes = [])
- * @method static Document[]|Proxy[]                          createSequence(iterable|callable $sequence)
- * @method static Document[]|Proxy[]                          findBy(array $attributes)
- * @method static Document[]|Proxy[]                          randomRange(int $min, int $max, array $attributes = [])
- * @method static Document[]|Proxy[]                          randomSet(int $number, array $attributes = [])
- *
- * @phpstan-method        Document&Proxy<Document> create(array|callable $attributes = [])
- * @phpstan-method static Document&Proxy<Document> createOne(array $attributes = [])
- * @phpstan-method static Document&Proxy<Document> find(object|array|mixed $criteria)
- * @phpstan-method static Document&Proxy<Document> findOrCreate(array $attributes)
- * @phpstan-method static Document&Proxy<Document> first(string $sortedField = 'id')
- * @phpstan-method static Document&Proxy<Document> last(string $sortedField = 'id')
- * @phpstan-method static Document&Proxy<Document> random(array $attributes = [])
- * @phpstan-method static Document&Proxy<Document> randomOrCreate(array $attributes = [])
- * @phpstan-method static ProxyRepositoryDecorator<Document, EntityRepository> repository()
- * @phpstan-method static list<Document&Proxy<Document>> all()
- * @phpstan-method static list<Document&Proxy<Document>> createMany(int $number, array|callable $attributes = [])
- * @phpstan-method static list<Document&Proxy<Document>> createSequence(iterable|callable $sequence)
- * @phpstan-method static list<Document&Proxy<Document>> findBy(array $attributes)
- * @phpstan-method static list<Document&Proxy<Document>> randomRange(int $min, int $max, array $attributes = [])
- * @phpstan-method static list<Document&Proxy<Document>> randomSet(int $number, array $attributes = [])
+ * @extends PersistentObjectFactory<Document>
  */
-final class DocumentFactory extends PersistentProxyObjectFactory
+final class DocumentFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
      */
     public function __construct()
     {
-        parent::__construct();
     }
 
+    #[\Override]
     public static function class(): string
     {
         return Document::class;
@@ -71,7 +26,8 @@ final class DocumentFactory extends PersistentProxyObjectFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      */
-    protected function defaults(): callable
+    #[\Override]
+    protected function defaults(): array|callable
     {
         return function () {
             $tagsNeeded = self::faker()->numberBetween(1, 3);
@@ -110,6 +66,7 @@ final class DocumentFactory extends PersistentProxyObjectFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
+    #[\Override]
     protected function initialize(): static
     {
         return $this

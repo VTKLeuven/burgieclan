@@ -6,14 +6,9 @@ use App\Factory\CourseFactory;
 use App\Factory\DocumentFactory;
 use App\Factory\UserDocumentViewFactory;
 use App\Factory\UserFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 class UserDocumentViewResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testGetRecentDocuments(): void
     {
         $user = UserFactory::createOne(['plainPassword' => 'password']);
@@ -22,23 +17,23 @@ class UserDocumentViewResourceTest extends ApiTestCase
         $course = CourseFactory::createOne();
         $document1 = DocumentFactory::createOne(
             [
-            'course' => $course,
+                'course' => $course,
             ]
         );
         $document2 = DocumentFactory::createOne();
 
         UserDocumentViewFactory::createOne(
             [
-            'user' => $user,
-            'document' => $document1,
-            'lastViewed' => new \DateTime('2024-02-01'),
+                'user' => $user,
+                'document' => $document1,
+                'lastViewed' => new \DateTime('2024-02-01'),
             ]
         );
         UserDocumentViewFactory::createOne(
             [
-            'user' => $user,
-            'document' => $document2,
-            'lastViewed' => new \DateTime('2024-01-02'),
+                'user' => $user,
+                'document' => $document2,
+                'lastViewed' => new \DateTime('2024-01-02'),
             ]
         );
 
@@ -47,9 +42,9 @@ class UserDocumentViewResourceTest extends ApiTestCase
             ->get(
                 '/api/document_views',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $userToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $userToken
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -74,22 +69,22 @@ class UserDocumentViewResourceTest extends ApiTestCase
             ->post(
                 '/api/document_views/batch',
                 [
-                'headers' => [
-                    'Content-Type' => 'application/ld+json',
-                    'Authorization' => 'Bearer ' . $userToken
-                ],
-                'json' => [
-                    'userDocumentViews' => [
-                        [
-                            'document' => '/api/documents/' . $document1->getId(),
-                            'lastViewed' => '2024-01-02T10:00:00+00:00'
-                        ],
-                        [
-                            'document' => '/api/documents/' . $document2->getId(),
-                            'lastViewed' => '2024-01-01T10:00:00+00:00'
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json',
+                        'Authorization' => 'Bearer ' . $userToken
+                    ],
+                    'json' => [
+                        'userDocumentViews' => [
+                            [
+                                'document' => '/api/documents/' . $document1->getId(),
+                                'lastViewed' => '2024-01-02T10:00:00+00:00'
+                            ],
+                            [
+                                'document' => '/api/documents/' . $document2->getId(),
+                                'lastViewed' => '2024-01-01T10:00:00+00:00'
+                            ]
                         ]
                     ]
-                ]
                 ]
             )
             ->assertStatus(204);
@@ -99,9 +94,9 @@ class UserDocumentViewResourceTest extends ApiTestCase
             ->get(
                 '/api/document_views',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $userToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $userToken
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -122,9 +117,9 @@ class UserDocumentViewResourceTest extends ApiTestCase
         // Create initial view
         UserDocumentViewFactory::createOne(
             [
-            'user' => $user,
-            'document' => $document,
-            'lastViewed' => new \DateTime('2024-01-01T10:00:00+00:00'),
+                'user' => $user,
+                'document' => $document,
+                'lastViewed' => new \DateTime('2024-01-01T10:00:00+00:00'),
             ]
         );
 
@@ -133,18 +128,18 @@ class UserDocumentViewResourceTest extends ApiTestCase
             ->post(
                 '/api/document_views/batch',
                 [
-                'headers' => [
-                    'Content-Type' => 'application/ld+json',
-                    'Authorization' => 'Bearer ' . $userToken
-                ],
-                'json' => [
-                    'userDocumentViews' => [
-                        [
-                            'document' => '/api/documents/' . $document->getId(),
-                            'lastViewed' => '2024-01-02T10:00:00+00:00'
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json',
+                        'Authorization' => 'Bearer ' . $userToken
+                    ],
+                    'json' => [
+                        'userDocumentViews' => [
+                            [
+                                'document' => '/api/documents/' . $document->getId(),
+                                'lastViewed' => '2024-01-02T10:00:00+00:00'
+                            ]
                         ]
                     ]
-                ]
                 ]
             )
             ->assertStatus(204);
@@ -154,9 +149,9 @@ class UserDocumentViewResourceTest extends ApiTestCase
             ->get(
                 '/api/document_views',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $userToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $userToken
+                    ]
                 ]
             )
             ->assertStatus(200)

@@ -5,14 +5,9 @@ namespace App\Tests\Api;
 use App\Factory\AnnouncementFactory;
 use DateInterval;
 use DateTime;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 class AnnouncementResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testGetCollectionOfAnnouncements(): void
     {
         AnnouncementFactory::createMany(5);

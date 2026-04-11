@@ -8,8 +8,8 @@ use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * Generic filter for searching across multiple fields (e.g. for multilingual fields).
@@ -61,7 +61,7 @@ final class MultiLangSearchFilter extends AbstractFilter
         foreach ($this->fieldMappings as $property => $fields) {
             $desc[$property] = [
                 'property' => $property,
-                'type' => Type::BUILTIN_TYPE_STRING,
+                'type' => TypeIdentifier::STRING->value,
                 'required' => false,
                 'swagger' => [
                     'description' => sprintf('Search by %s (matches any of: %s)', $property, implode(', ', $fields)),

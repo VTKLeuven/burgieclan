@@ -25,7 +25,8 @@ class AddDocumentViewToUserController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly IriConverterInterface $iriConverter,
         private readonly UserDocumentViewRepository $viewRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * @throws Exception
