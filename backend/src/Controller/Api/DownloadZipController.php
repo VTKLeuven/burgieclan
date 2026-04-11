@@ -785,13 +785,13 @@ final class DownloadZipController extends AbstractController
         // Create date
         $html .= '<div class="metadata-pair">';
         $html .= '<span class="metadata-label">Created:</span>';
-        $html .= '<span class="metadata-value">' . $document->getCreateDate()->format('Y-m-d') . '</span>';
+        $html .= '<span class="metadata-value">' . $document->getCreatedAt()->format('Y-m-d') . '</span>';
         $html .= '</div>';
 
         // Update date
         $html .= '<div class="metadata-pair">';
         $html .= '<span class="metadata-label">Updated:</span>';
-        $html .= '<span class="metadata-value">' . $document->getUpdateDate()->format('Y-m-d') . '</span>';
+        $html .= '<span class="metadata-value">' . $document->getUpdatedAt()->format('Y-m-d') . '</span>';
         $html .= '</div>';
 
         // Add file size if we can calculate it

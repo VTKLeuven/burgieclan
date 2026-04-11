@@ -64,8 +64,8 @@ class DocumentEntityToApiMapper implements MapperInterface
             MicroMapperInterface::MAX_DEPTH => 1,
             ]
         );
-        $to->createdAt = $from->getCreateDate()->format('Y-m-d H:i:s');
-        $to->updatedAt = $from->getUpdateDate()->format('Y-m-d H:i:s');
+        $to->createdAt = $from->getCreatedAt()->format('Y-m-d H:i:s');
+        $to->updatedAt = $from->getUpdatedAt()->format('Y-m-d H:i:s');
         $to->contentUrl = $this->storage->resolveUri($from, 'file');
         $to->tags = array_map(
             function (Tag $tag) {

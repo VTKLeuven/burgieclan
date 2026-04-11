@@ -48,8 +48,8 @@ class CourseCommentVoteEntityToApiMapper implements MapperInterface
             MicroMapperInterface::MAX_DEPTH => 0,
             ]
         );
-        $to->createdAt = $from->getCreateDate()->format('Y-m-d H:i:s');
-        $to->updatedAt = $from->getUpdateDate()->format('Y-m-d H:i:s');
+        $to->createdAt = $from->getCreatedAt()->format('Y-m-d H:i:s');
+        $to->updatedAt = $from->getUpdatedAt()->format('Y-m-d H:i:s');
 
         return $to;
     }

@@ -49,8 +49,8 @@ class AnnouncementEntityToApiMapper implements MapperInterface
 
         $to->startTime = $from->getStartTime()->format('Y-m-d H:i:s');
         $to->endTime = $from->getEndTime()->format('Y-m-d H:i:s');
-        $to->createdAt = DateTime::createFromInterface($from->getCreateDate())->format('Y-m-d H:i:s');
-        $to->updatedAt = DateTime::createFromInterface($from->getUpdateDate())->format('Y-m-d H:i:s');
+        $to->createdAt = DateTime::createFromInterface($from->getCreatedAt())->format('Y-m-d H:i:s');
+        $to->updatedAt = DateTime::createFromInterface($from->getUpdatedAt())->format('Y-m-d H:i:s');
 
         return $to;
     }
