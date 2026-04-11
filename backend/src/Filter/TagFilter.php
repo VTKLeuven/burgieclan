@@ -10,7 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 final class TagFilter extends AbstractFilter
 {
@@ -105,7 +105,7 @@ final class TagFilter extends AbstractFilter
         foreach ($this->properties as $property => $strategy) {
             $description[$property] = [
                 'property' => $property,
-                'type' => Type::string(),
+                'type' => TypeIdentifier::STRING->value,
                 'required' => false,
                 'description' => $property === 'tags.name' ?
                     'Filter by tag names (AND logic for multiple values)' :

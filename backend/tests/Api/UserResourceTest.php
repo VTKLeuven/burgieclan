@@ -85,7 +85,7 @@ class UserResourceTest extends ApiTestCase
         $module = ModuleFactory::createOne();
         $program = ProgramFactory::createOne();
         $document = DocumentFactory::createOne();
-        $user = UserFactory::CreateOne(
+        $user = UserFactory::createOne(
             [
                 'plainPassword' => 'password',
                 'favoriteCourses' => [$course],
@@ -161,7 +161,7 @@ class UserResourceTest extends ApiTestCase
         $module = ModuleFactory::createOne();
         $program = ProgramFactory::createOne();
         $document = DocumentFactory::createOne();
-        $user = UserFactory::CreateOne(['plainPassword' => 'password']);
+        $user = UserFactory::createOne(['plainPassword' => 'password']);
         $userToken = $this->getToken($user->getUsername(), 'password');
         $otherUser = UserFactory::createOne();
 
@@ -228,7 +228,7 @@ class UserResourceTest extends ApiTestCase
         $program2 = ProgramFactory::createOne();
         $document1 = DocumentFactory::createOne();
         $document2 = DocumentFactory::createOne();
-        $user = UserFactory::CreateOne(
+        $user = UserFactory::createOne(
             [
                 'plainPassword' => 'password',
                 'favoriteCourses' => [$course1, $course2],

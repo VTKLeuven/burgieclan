@@ -10,6 +10,7 @@ use App\Entity\Tag;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -114,6 +115,7 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->onlyOnIndex();
     }
 
+    #[AdminRoute('/approve', name: 'approve')]
     public function approve(
         AdminContext $adminContext,
         EntityManagerInterface $entityManagerInterface,
