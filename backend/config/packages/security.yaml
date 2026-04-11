@@ -30,6 +30,7 @@ security:
             jwt: ~
             refresh_jwt:
               check_path: /api/auth/token/refresh
+              invalidate_token_on_logout: true
             logout:
               path: api_logout
               # The LexikJWTAuthenticationBundle will handle JWT invalidation
