@@ -9,8 +9,8 @@ use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\TypeInfo\Type;
 
 final class TagFilter extends AbstractFilter
 {
@@ -68,8 +68,8 @@ final class TagFilter extends AbstractFilter
                     $this->logger->notice(
                         'Invalid IRI passed to tag filter',
                         [
-                        'iri' => $tagIri,
-                        'exception' => $e->getMessage()
+                            'iri' => $tagIri,
+                            'exception' => $e->getMessage()
                         ]
                     );
                     continue;
@@ -105,7 +105,7 @@ final class TagFilter extends AbstractFilter
         foreach ($this->properties as $property => $strategy) {
             $description[$property] = [
                 'property' => $property,
-                'type' => Type::BUILTIN_TYPE_ARRAY,
+                'type' => Type::string(),
                 'required' => false,
                 'description' => $property === 'tags.name' ?
                     'Filter by tag names (AND logic for multiple values)' :

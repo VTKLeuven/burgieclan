@@ -14,6 +14,7 @@ namespace App\Security\Voter;
 use App\ApiResource\AbstractCommentApi;
 use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -28,7 +29,6 @@ class AbstractCommentVoter extends Voter
     ) {
     }
 
-
     protected function supports(string $attribute, mixed $subject): bool
     {
         // replace with your own logic
@@ -36,7 +36,7 @@ class AbstractCommentVoter extends Voter
         return in_array($attribute, [self::EDIT, self::DELETE]) && $subject instanceof AbstractCommentApi;
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
         $user = $token->getUser();
         // if the user is unauthenticated, do not grant access
