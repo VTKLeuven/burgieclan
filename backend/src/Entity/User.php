@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'burgieclan_user')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUserInterface
 {
     // We can use constants for roles to find usages all over the application rather
     // than doing a full-text search on the "ROLE_" string.
@@ -23,11 +23,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     final public const ROLE_ADMIN = 'ROLE_ADMIN';
     final public const ROLE_MODERATOR = 'ROLE_MODERATOR';
     final public const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
-
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private ?int $id = null;
 
     #[ORM\Column(type: Types::STRING)]
     #[Assert\NotBlank]
@@ -147,11 +142,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->documentVotes = new ArrayCollection();
         $this->documentCommentVotes = new ArrayCollection();
         $this->courseCommentVotes = new ArrayCollection();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function setFullName(string $fullName): void
