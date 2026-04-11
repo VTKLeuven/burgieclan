@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -21,22 +21,22 @@ abstract class BaseEntity
     protected ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    protected DateTime $createdAt;
+    protected DateTimeImmutable $createdAt;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    protected DateTime $updatedAt;
+    protected DateTimeImmutable $updatedAt;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getCreatedAt(): DateTime
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): DateTime
+    public function getUpdatedAt(): DateTimeImmutable
     {
         return $this->updatedAt;
     }
@@ -44,14 +44,14 @@ abstract class BaseEntity
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
-        $this->createdAt = $this->createdAt ?? new DateTime("now");
+        $this->createdAt = $this->createdAt ?? new DateTimeImmutable("now");
         $this->updatedAt = $this->createdAt;
     }
 
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
-        $this->updatedAt = new DateTime("now");
+        $this->updatedAt = new DateTimeImmutable("now");
     }
 
     public function __toString(): string

@@ -97,7 +97,7 @@ class DocumentRepository extends ServiceEntityRepository
 
         /** @var Document[] $result */
         $result = $queryBuilder
-            ->orderBy('d.updateDate', 'DESC')
+            ->orderBy('d.updatedAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();

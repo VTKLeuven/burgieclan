@@ -51,9 +51,9 @@ class CourseCommentCrudController extends AbstractCrudController
             ->autocomplete();
         yield AssociationField::new('category')
             ->autocomplete();
-        yield DateTimeField::new('createDate')
+        yield DateTimeField::new('createdAt')
             ->hideOnForm();
-        yield DateTimeField::new('updateDate')
+        yield DateTimeField::new('updatedAt')
             ->hideOnForm();
     }
 
@@ -65,7 +65,7 @@ class CourseCommentCrudController extends AbstractCrudController
             ->add('content')
             ->add(EntityContainsFilter::new('creator', User::class))
             ->add('anonymous')
-            ->add('createDate')
-            ->add('updateDate');
+            ->add('createdAt')
+            ->add('updatedAt');
     }
 }
