@@ -25,11 +25,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: Course::class),
 )]
-class CourseApi
+class CourseApi extends BaseEntityApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     #[Groups(['course:get', 'program:get', 'module:get', 'search', 'user', 'document:get', 'user:document_views'])]

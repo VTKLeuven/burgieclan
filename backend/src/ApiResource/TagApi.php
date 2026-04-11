@@ -29,11 +29,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 #[ApiFilter(TagDocumentCategoryFilter::class)]
 #[ApiFilter(TagDocumentCourseFilter::class)]
-class TagApi
+class TagApi extends BaseEntityApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[Groups(['search', 'user', 'document:get', 'document:create'])]
     public ?string $name = null;
 

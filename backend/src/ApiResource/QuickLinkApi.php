@@ -55,11 +55,8 @@ use App\State\EntityClassDtoStateProvider;
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: QuickLink::class),
 )]
-class QuickLinkApi
+class QuickLinkApi extends BaseEntityApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     public ?string $name = null;
 
     public ?string $linkTo = null;
