@@ -10,11 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: DocumentCommentRepository::class)]
 class DocumentComment extends AbstractComment implements VotableInterface
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Document $document;
@@ -39,11 +34,6 @@ class DocumentComment extends AbstractComment implements VotableInterface
     public function __toString(): string
     {
         return sprintf('%s (%s)', $this->getContent(), $this->getDocument()->getName());
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getDocument(): Document

@@ -11,11 +11,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: 'announcement')]
 class Announcement extends Node
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private ?int $id = null;
-
     #[ORM\Column(type: Types::BOOLEAN)]
     private bool $priority;
 
@@ -45,11 +40,6 @@ class Announcement extends Node
     ];
 
     public static string $DEFAULT_LANGUAGE = 'nl';
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getStartTime(): DateTime
     {

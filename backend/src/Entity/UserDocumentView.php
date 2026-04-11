@@ -10,13 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: UserDocumentViewRepository::class)]
 #[ORM\Index(columns: ['last_viewed'])]
 #[ORM\UniqueConstraint(columns: ['user_id', 'document_id'])]
-class UserDocumentView
+class UserDocumentView extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\ManyToOne(inversedBy: 'viewedDocuments')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private User $user;
@@ -33,11 +28,6 @@ class UserDocumentView
         $this->user = $user;
         $this->document = $document;
         $this->lastViewed = $lastViewed;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
     }
 
     public function getUser(): User

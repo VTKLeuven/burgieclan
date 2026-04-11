@@ -17,17 +17,12 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 #[ORM\Entity(repositoryClass: CourseRepository::class)]
 #[ORM\Table(name: 'course')]
-class Course
+class Course extends BaseEntity
 {
     final public const SEMESTERS = [
         'Semester 1' => 'Semester 1',
         'Semester 2' => 'Semester 2',
     ];
-
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
 
     #[ORM\Column(type: Types::STRING, length: 255)]
     #[Assert\NotBlank]
@@ -96,11 +91,6 @@ class Course
     public function __toString(): string
     {
         return sprintf('%s (%s)', $this->getName(), $this->getCode());
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getName(): string

@@ -8,13 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentCategoryRepository::class)]
-class CommentCategory
+class CommentCategory extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     public static array $AVAILABLE_LANGUAGES = [
         'nl' => 'Dutch',
         'en' => 'English',
@@ -39,11 +34,6 @@ class CommentCategory
     public function __toString(): string
     {
         return sprintf('%s (%s)', $this->getNameNl(), $this->getNameEn());
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getName(string $lang): ?string

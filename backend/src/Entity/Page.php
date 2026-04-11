@@ -7,13 +7,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PageRepository::class)]
-class Page
+class Page extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(length: 255, unique: true)]
     private string $urlKey;
 
@@ -48,11 +43,6 @@ class Page
     public function __construct(?string $urlKey = null)
     {
         $this->urlKey = self::createUrlKey($urlKey);
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getUrlKey(): ?string
