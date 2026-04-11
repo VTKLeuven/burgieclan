@@ -13,7 +13,7 @@
     "symfony/polyfill-php81": "*"
   },
   "require": {
-    "php": ">=8.4",
+    "php": "8.4",
     "ext-iconv": "*",
     "ext-zip": "*",
     "api-platform/doctrine-orm": "^4",
