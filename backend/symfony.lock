@@ -153,9 +153,6 @@
             "config/packages/lexik_jwt_authentication.yaml"
         ]
     },
-    "masterminds/html5": {
-        "version": "2.7.5"
-    },
     "monolog/monolog": {
         "version": "2.3.5"
     },
