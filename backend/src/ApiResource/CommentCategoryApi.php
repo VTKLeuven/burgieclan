@@ -24,11 +24,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: CommentCategory::class),
 )]
-class CommentCategoryApi
+class CommentCategoryApi extends BaseEntityApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[Assert\NotBlank]
     #[ApiFilter(
         MultiLangSearchFilter::class,

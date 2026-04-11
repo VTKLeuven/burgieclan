@@ -27,11 +27,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     stateOptions: new Options(entityClass: Program::class),
 )]
 #[ApiFilter(OrderFilter::class)]
-class ProgramApi
+class ProgramApi extends BaseEntityApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     #[Groups(['program:get', 'search', 'user'])]

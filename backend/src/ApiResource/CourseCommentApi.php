@@ -21,14 +21,14 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Get(),
         new GetCollection(),
         new Patch(
-        // This redirects the security check to all voters to see if one accepts CourseCommentApi objects
-        // This is handled by the src/Security/Voter/AbstractCommentVoter
+            // This redirects the security check to all voters to see if one accepts CourseCommentApi objects
+            // This is handled by the src/Security/Voter/AbstractCommentVoter
             security: 'is_granted("EDIT", object)'
         ),
         new Post(),
         new Delete(
-        // This redirects the security check to all voters to see if one accepts CourseCommentApi objects
-        // This is handled by the src/Security/Voter/AbstractCommentVoter
+            // This redirects the security check to all voters to see if one accepts CourseCommentApi objects
+            // This is handled by the src/Security/Voter/AbstractCommentVoter
             security: 'is_granted("DELETE", object)'
         ),
     ],
@@ -38,9 +38,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 class CourseCommentApi extends AbstractCommentApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[Groups(['course:get'])]
     public ?CourseApi $course;
 

@@ -124,11 +124,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     stateOptions: new Options(entityClass: Document::class)
 )]
 #[ApiFilter(OrderFilter::class)]
-class DocumentApi
+class DocumentApi extends NodeApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     #[Groups(['search', 'user', 'document:get', 'document:create', 'user:document_views'])]
@@ -183,14 +180,6 @@ class DocumentApi
     )]
     #[Groups(['search', 'document:get'])]
     public ?UserApi $creator;
-
-    #[ApiProperty(writable: false)]
-    #[Groups(['search', 'document:get'])]
-    public string $createdAt;
-
-    #[ApiProperty(writable: false)]
-    #[Groups(['search', 'document:get'])]
-    public string $updatedAt;
 
     /**
      * @var TagApi[]
