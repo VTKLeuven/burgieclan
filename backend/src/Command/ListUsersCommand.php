@@ -20,8 +20,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 
 /**
  * A console command that lists all the existing users.
@@ -64,8 +62,6 @@ final class ListUsersCommand extends Command
                 results to display with the <comment>--max-results</comment> option:
 
                   <info>php %command.full_name%</info> <comment>--max-results=2000</comment>
-
-                  <info>php %command.full_name%</info> <comment>--send-to=fabien@symfony.com</comment>
                 HELP
             )
             // commands can optionally define arguments and/or options (mandatory and optional)
@@ -76,12 +72,6 @@ final class ListUsersCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Limits the number of users listed',
                 50
-            )
-            ->addOption(
-                'send-to',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'If set, the result is sent to the given email address'
             );
     }
 
@@ -113,8 +103,7 @@ final class ListUsersCommand extends Command
         // In your console commands you should always use the regular output type,
         // which outputs contents directly in the console window. However, this
         // command uses the BufferedOutput type instead, to be able to get the output
-        // contents before displaying them. This is needed because the command allows
-        // to send the list of users via email with the '--send-to' option
+        // contents before displaying them.
         $bufferedOutput = new BufferedOutput();
         $io = new SymfonyStyle($input, $bufferedOutput);
         $io->table(

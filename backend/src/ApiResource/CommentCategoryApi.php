@@ -15,7 +15,7 @@ use App\State\EntityClassDtoStateProvider;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    shortName: 'Comment Category',
+    shortName: 'CommentCategory',
     operations: [
         new Get(),
         new GetCollection(),

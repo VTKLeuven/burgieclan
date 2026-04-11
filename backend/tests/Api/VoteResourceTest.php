@@ -10,14 +10,9 @@ use App\Factory\DocumentCommentVoteFactory;
 use App\Factory\DocumentFactory;
 use App\Factory\DocumentVoteFactory;
 use App\Factory\UserFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 class VoteResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testGetDocumentVoteSummary(): void
     {
         $document = DocumentFactory::createOne();
@@ -27,7 +22,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $this->token]
+                    'headers' => ['Authorization' => 'Bearer ' . $this->token]
                 ]
             )
             ->assertStatus(200)
@@ -48,25 +43,25 @@ class VoteResourceTest extends ApiTestCase
         // Create votes directly through the entities (simulating existing votes)
         $vote1 = DocumentVoteFactory::createOne(
             [
-            'creator' => $user1,
-            'document' => $document,
-            'voteType' => AbstractVote::UPVOTE,
+                'creator' => $user1,
+                'document' => $document,
+                'voteType' => AbstractVote::UPVOTE,
             ]
         );
 
         $vote2 = DocumentVoteFactory::createOne(
             [
-            'creator' => $user2,
-            'document' => $document,
-            'voteType' => AbstractVote::UPVOTE,
+                'creator' => $user2,
+                'document' => $document,
+                'voteType' => AbstractVote::UPVOTE,
             ]
         );
 
         $vote3 = DocumentVoteFactory::createOne(
             [
-            'creator' => $user3,
-            'document' => $document,
-            'voteType' => AbstractVote::DOWNVOTE,
+                'creator' => $user3,
+                'document' => $document,
+                'voteType' => AbstractVote::DOWNVOTE,
             ]
         );
 
@@ -75,7 +70,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $user1Token]
+                    'headers' => ['Authorization' => 'Bearer ' . $user1Token]
                 ]
             )
             ->assertStatus(200)
@@ -89,7 +84,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $user2Token]
+                    'headers' => ['Authorization' => 'Bearer ' . $user2Token]
                 ]
             )
             ->assertStatus(200)
@@ -103,7 +98,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $user3Token]
+                    'headers' => ['Authorization' => 'Bearer ' . $user3Token]
                 ]
             )
             ->assertStatus(200)
@@ -122,7 +117,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/document-comments/' . $documentComment->getId() . '/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $this->token]
+                    'headers' => ['Authorization' => 'Bearer ' . $this->token]
                 ]
             )
             ->assertStatus(200)
@@ -141,25 +136,25 @@ class VoteResourceTest extends ApiTestCase
 
         $vote1 = DocumentCommentVoteFactory::createOne(
             [
-            'creator' => $user1,
-            'documentComment' => $documentComment,
-            'voteType' => AbstractVote::UPVOTE,
+                'creator' => $user1,
+                'documentComment' => $documentComment,
+                'voteType' => AbstractVote::UPVOTE,
             ]
         );
 
         $vote2 = DocumentCommentVoteFactory::createOne(
             [
-            'creator' => $user2,
-            'documentComment' => $documentComment,
-            'voteType' => AbstractVote::UPVOTE,
+                'creator' => $user2,
+                'documentComment' => $documentComment,
+                'voteType' => AbstractVote::UPVOTE,
             ]
         );
 
         $vote3 = DocumentCommentVoteFactory::createOne(
             [
-            'creator' => $user3,
-            'documentComment' => $documentComment,
-            'voteType' => AbstractVote::DOWNVOTE,
+                'creator' => $user3,
+                'documentComment' => $documentComment,
+                'voteType' => AbstractVote::DOWNVOTE,
             ]
         );
 
@@ -167,7 +162,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/document-comments/' . $documentComment->getId() . '/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $user1Token]
+                    'headers' => ['Authorization' => 'Bearer ' . $user1Token]
                 ]
             )
             ->assertStatus(200)
@@ -181,7 +176,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/document-comments/' . $documentComment->getId() . '/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $user2Token]
+                    'headers' => ['Authorization' => 'Bearer ' . $user2Token]
                 ]
             )
             ->assertStatus(200)
@@ -195,7 +190,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/document-comments/' . $documentComment->getId() . '/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $user3Token]
+                    'headers' => ['Authorization' => 'Bearer ' . $user3Token]
                 ]
             )
             ->assertStatus(200)
@@ -214,7 +209,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/course-comments/' . $courseComment->getId() . '/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $this->token]
+                    'headers' => ['Authorization' => 'Bearer ' . $this->token]
                 ]
             )
             ->assertStatus(200)
@@ -233,25 +228,25 @@ class VoteResourceTest extends ApiTestCase
 
         $vote1 = CourseCommentVoteFactory::createOne(
             [
-            'creator' => $user1,
-            'courseComment' => $courseComment,
-            'voteType' => AbstractVote::UPVOTE,
+                'creator' => $user1,
+                'courseComment' => $courseComment,
+                'voteType' => AbstractVote::UPVOTE,
             ]
         );
 
         $vote2 = CourseCommentVoteFactory::createOne(
             [
-            'creator' => $user2,
-            'courseComment' => $courseComment,
-            'voteType' => AbstractVote::UPVOTE,
+                'creator' => $user2,
+                'courseComment' => $courseComment,
+                'voteType' => AbstractVote::UPVOTE,
             ]
         );
 
         $vote3 = CourseCommentVoteFactory::createOne(
             [
-            'creator' => $user3,
-            'courseComment' => $courseComment,
-            'voteType' => AbstractVote::DOWNVOTE,
+                'creator' => $user3,
+                'courseComment' => $courseComment,
+                'voteType' => AbstractVote::DOWNVOTE,
             ]
         );
 
@@ -259,7 +254,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/course-comments/' . $courseComment->getId() . '/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $user1Token]
+                    'headers' => ['Authorization' => 'Bearer ' . $user1Token]
                 ]
             )
             ->assertStatus(200)
@@ -273,7 +268,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/course-comments/' . $courseComment->getId() . '/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $user2Token]
+                    'headers' => ['Authorization' => 'Bearer ' . $user2Token]
                 ]
             )
             ->assertStatus(200)
@@ -287,7 +282,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/course-comments/' . $courseComment->getId() . '/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $user3Token]
+                    'headers' => ['Authorization' => 'Bearer ' . $user3Token]
                 ]
             )
             ->assertStatus(200)
@@ -304,7 +299,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/99999/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $this->token]
+                    'headers' => ['Authorization' => 'Bearer ' . $this->token]
                 ]
             )
             ->assertStatus(404);
@@ -313,7 +308,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/document-comments/99999/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $this->token]
+                    'headers' => ['Authorization' => 'Bearer ' . $this->token]
                 ]
             )
             ->assertStatus(404);
@@ -322,7 +317,7 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/course-comments/99999/votes',
                 [
-                'headers' => ['Authorization' => 'Bearer ' . $this->token]
+                    'headers' => ['Authorization' => 'Bearer ' . $this->token]
                 ]
             )
             ->assertStatus(404);
@@ -339,11 +334,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'json' => ['voteType' => 1],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => 1],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(201)
@@ -356,11 +351,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'json' => ['voteType' => 1],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => 1],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -372,11 +367,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'json' => ['voteType' => -1],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => -1],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -394,11 +389,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/document-comments/' . $documentComment->getId() . '/votes',
                 [
-                'json' => ['voteType' => 1],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => 1],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(201)
@@ -417,11 +412,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/course-comments/' . $courseComment->getId() . '/votes',
                 [
-                'json' => ['voteType' => -1],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => -1],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(201)
@@ -441,11 +436,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'json' => ['voteType' => 2],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => 2],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(400);
@@ -455,11 +450,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'json' => [],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => [],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(400);
@@ -474,11 +469,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/documents/99999/votes',
                 [
-                'json' => ['voteType' => 1],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => 1],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(404);
@@ -487,11 +482,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/document-comments/99999/votes',
                 [
-                'json' => ['voteType' => 1],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => 1],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(404);
@@ -500,11 +495,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/course-comments/99999/votes',
                 [
-                'json' => ['voteType' => 1],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => 1],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(404);
@@ -520,10 +515,10 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'json' => ['voteType' => 1],
-                'headers' => [
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => 1],
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(401);
@@ -532,10 +527,10 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/document-comments/' . $documentComment->getId() . '/votes',
                 [
-                'json' => ['voteType' => 1],
-                'headers' => [
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => 1],
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(401);
@@ -544,10 +539,10 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/course-comments/' . $courseComment->getId() . '/votes',
                 [
-                'json' => ['voteType' => 1],
-                'headers' => [
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => 1],
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(401);
@@ -564,11 +559,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'json' => ['voteType' => 1],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => 1],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(201);
@@ -578,10 +573,10 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -594,10 +589,10 @@ class VoteResourceTest extends ApiTestCase
             ->delete(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(204);
@@ -607,10 +602,10 @@ class VoteResourceTest extends ApiTestCase
             ->delete(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(404);
@@ -627,11 +622,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/document-comments/' . $documentComment->getId() . '/votes',
                 [
-                'json' => ['voteType' => 1],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => 1],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(201);
@@ -641,10 +636,10 @@ class VoteResourceTest extends ApiTestCase
             ->delete(
                 '/api/document-comments/' . $documentComment->getId() . '/votes',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(204);
@@ -661,11 +656,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/course-comments/' . $courseComment->getId() . '/votes',
                 [
-                'json' => ['voteType' => 1],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => 1],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(201);
@@ -675,10 +670,10 @@ class VoteResourceTest extends ApiTestCase
             ->delete(
                 '/api/course-comments/' . $courseComment->getId() . '/votes',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(204);
@@ -693,10 +688,10 @@ class VoteResourceTest extends ApiTestCase
             ->delete(
                 '/api/documents/99999/votes',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(404);
@@ -705,10 +700,10 @@ class VoteResourceTest extends ApiTestCase
             ->delete(
                 '/api/document-comments/99999/votes',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(404);
@@ -717,10 +712,10 @@ class VoteResourceTest extends ApiTestCase
             ->delete(
                 '/api/course-comments/99999/votes',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(404);
@@ -756,10 +751,10 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -770,11 +765,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'json' => ['voteType' => 1],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => 1],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(201);
@@ -784,10 +779,10 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -800,11 +795,11 @@ class VoteResourceTest extends ApiTestCase
             ->post(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'json' => ['voteType' => -1],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'json' => ['voteType' => -1],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(200);
@@ -814,10 +809,10 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -830,10 +825,10 @@ class VoteResourceTest extends ApiTestCase
             ->delete(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(204);
@@ -843,10 +838,10 @@ class VoteResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/' . $document->getId() . '/votes',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/ld+json'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/ld+json'
+                    ]
                 ]
             )
             ->assertStatus(200)

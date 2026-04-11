@@ -5,7 +5,7 @@ namespace App\Mapper;
 use App\ApiResource\AnnouncementApi;
 use App\ApiResource\UserApi;
 use App\Entity\Announcement;
-use Nette\Utils\DateTime;
+use DateTime;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -43,7 +43,7 @@ class AnnouncementEntityToApiMapper implements MapperInterface
             $from->getCreator(),
             UserApi::class,
             [
-            MicroMapperInterface::MAX_DEPTH => 0,
+                MicroMapperInterface::MAX_DEPTH => 0,
             ]
         );
 

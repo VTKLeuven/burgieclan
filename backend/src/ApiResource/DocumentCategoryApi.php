@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    shortName: 'Document Category',
+    shortName: 'DocumentCategory',
     operations: [
         new Get(),
         new GetCollection(),

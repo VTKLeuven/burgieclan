@@ -6,14 +6,9 @@ use App\Factory\DocumentCommentFactory;
 use App\Factory\DocumentFactory;
 use App\Factory\UserFactory;
 use Zenstruck\Browser\HttpOptions;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 class DocumentCommentResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testGetCollectionOfDocumentComments(): void
     {
         DocumentCommentFactory::createMany(5);
@@ -21,9 +16,9 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/document_comments',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -33,14 +28,14 @@ class DocumentCommentResourceTest extends ApiTestCase
 
         $this->assertEqualsCanonicalizing(
             [
-            '@id',
-            '@type',
-            'content',
-            'anonymous',
-            'document',
-            'creator',
-            'createdAt',
-            'updatedAt',
+                '@id',
+                '@type',
+                'content',
+                'anonymous',
+                'document',
+                'creator',
+                'createdAt',
+                'updatedAt',
             ],
             array_keys($json->decoded()['hydra:member'][0])
         );
@@ -54,9 +49,9 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/document_comments/' . $comment->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -67,19 +62,19 @@ class DocumentCommentResourceTest extends ApiTestCase
     {
         $comment1 = DocumentCommentFactory::createOne(
             [
-            'content' => 'comment1',
+                'content' => 'comment1',
             ]
         );
 
         $comment2 = DocumentCommentFactory::createOne(
             [
-            'content' => 'comment2',
+                'content' => 'comment2',
             ]
         );
 
         $comment3 = DocumentCommentFactory::createOne(
             [
-            'content' => 'comment3',
+                'content' => 'comment3',
             ]
         );
 
@@ -89,9 +84,9 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/document_comments?content=comment2',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -100,9 +95,9 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/document_comments?content=comment',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -115,13 +110,13 @@ class DocumentCommentResourceTest extends ApiTestCase
         DocumentCommentFactory::createMany(
             3,
             [
-            'anonymous' => true,
+                'anonymous' => true,
             ]
         );
         DocumentCommentFactory::createMany(
             5,
             [
-            'anonymous' => false,
+                'anonymous' => false,
             ]
         );
 
@@ -129,9 +124,9 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/document_comments?anonymous=true',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -140,9 +135,9 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/document_comments?anonymous=false',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -157,19 +152,19 @@ class DocumentCommentResourceTest extends ApiTestCase
         DocumentCommentFactory::createMany(
             1,
             [
-            'document' => $document1,
+                'document' => $document1,
             ]
         );
         DocumentCommentFactory::createMany(
             2,
             [
-            'document' => $document2,
+                'document' => $document2,
             ]
         );
         DocumentCommentFactory::createMany(
             5,
             [
-            'document' => DocumentFactory::createOne(),
+                'document' => DocumentFactory::createOne(),
             ]
         );
 
@@ -177,9 +172,9 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/document_comments?document=/api/documents/' . $document1->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -187,11 +182,11 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->assertJsonMatches('length("hydra:member")', 1)
             ->get(
                 '/api/document_comments?document[]=/api/documents/' . $document1->getId() .
-                '&document[]=/api/documents/' . $document2->getId(),
+                    '&document[]=/api/documents/' . $document2->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -200,9 +195,9 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/document_comments',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -217,19 +212,19 @@ class DocumentCommentResourceTest extends ApiTestCase
         DocumentCommentFactory::createMany(
             1,
             [
-            'creator' => $user1,
+                'creator' => $user1,
             ]
         );
         DocumentCommentFactory::createMany(
             2,
             [
-            'creator' => $user2,
+                'creator' => $user2,
             ]
         );
         DocumentCommentFactory::createMany(
             5,
             [
-            'creator' => UserFactory::createOne(),
+                'creator' => UserFactory::createOne(),
             ]
         );
 
@@ -237,9 +232,9 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/document_comments?creator=/api/users/' . $user1->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -247,11 +242,11 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->assertJsonMatches('length("hydra:member")', 1)
             ->get(
                 '/api/document_comments?creator[]=/api/users/' . $user1->getId() .
-                '&creator[]=/api/users/' . $user2->getId(),
+                    '&creator[]=/api/users/' . $user2->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -260,9 +255,9 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/document_comments',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -279,11 +274,11 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->post(
                 '/api/document_comments',
                 [
-                'json' => [],
-                'headers' => [
-                    'Content-Type' => 'application/ld+json',
-                    'Authorization' => 'Bearer ' . $this->token
-                ],
+                    'json' => [],
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json',
+                        'Authorization' => 'Bearer ' . $this->token
+                    ],
                 ]
             )
             ->assertStatus(422)
@@ -315,7 +310,8 @@ class DocumentCommentResourceTest extends ApiTestCase
         $otherUser = UserFactory::createOne(
             [
                 'username' => 'other user',
-            'plainPassword' => 'password']
+                'plainPassword' => 'password'
+            ]
         );
 
         $creatorTokenResponse = $this->browser()
@@ -323,8 +319,8 @@ class DocumentCommentResourceTest extends ApiTestCase
                 '/api/auth/login',
                 HttpOptions::json(
                     [
-                    'username' => $creator->getUsername(),
-                    'password' => 'password',
+                        'username' => $creator->getUsername(),
+                        'password' => 'password',
                     ]
                 )
             )
@@ -337,8 +333,8 @@ class DocumentCommentResourceTest extends ApiTestCase
                 '/api/auth/login',
                 HttpOptions::json(
                     [
-                    'username' => $otherUser->getUsername(),
-                    'password' => 'password',
+                        'username' => $otherUser->getUsername(),
+                        'password' => 'password',
                     ]
                 )
             )
@@ -348,7 +344,7 @@ class DocumentCommentResourceTest extends ApiTestCase
 
         $comment = DocumentCommentFactory::createOne(
             [
-            'creator' => $creator,
+                'creator' => $creator,
             ]
         );
 
@@ -356,13 +352,13 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->patch(
                 '/api/document_comments/' . $comment->getId(),
                 [
-                'json' => [
-                    'content' => 'Some new content',
-                ],
-                'headers' => [
-                    'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' => 'Bearer ' . $creatorToken
-                ]
+                    'json' => [
+                        'content' => 'Some new content',
+                    ],
+                    'headers' => [
+                        'Content-Type' => 'application/merge-patch+json',
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -372,13 +368,13 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->patch(
                 '/api/document_comments/' . $comment->getId(),
                 [
-                'json' => [
-                    'content' => 'Some new content',
-                ],
-                'headers' => [
-                    'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' => 'Bearer ' . $otherToken
-                ]
+                    'json' => [
+                        'content' => 'Some new content',
+                    ],
+                    'headers' => [
+                        'Content-Type' => 'application/merge-patch+json',
+                        'Authorization' => 'Bearer ' . $otherToken
+                    ]
                 ]
             )
             ->assertStatus(403);
@@ -395,7 +391,8 @@ class DocumentCommentResourceTest extends ApiTestCase
         $otherUser = UserFactory::createOne(
             [
                 'username' => 'other user',
-            'plainPassword' => 'password']
+                'plainPassword' => 'password'
+            ]
         );
 
         $creatorTokenResponse = $this->browser()
@@ -403,8 +400,8 @@ class DocumentCommentResourceTest extends ApiTestCase
                 '/api/auth/login',
                 HttpOptions::json(
                     [
-                    'username' => $creator->getUsername(),
-                    'password' => 'password',
+                        'username' => $creator->getUsername(),
+                        'password' => 'password',
                     ]
                 )
             )
@@ -417,8 +414,8 @@ class DocumentCommentResourceTest extends ApiTestCase
                 '/api/auth/login',
                 HttpOptions::json(
                     [
-                    'username' => $otherUser->getUsername(),
-                    'password' => 'password',
+                        'username' => $otherUser->getUsername(),
+                        'password' => 'password',
                     ]
                 )
             )
@@ -437,9 +434,9 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/document_comments/' . $commentId,
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $creatorToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
                 ]
             )
             ->assertStatus(200);
@@ -448,9 +445,9 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->delete(
                 '/api/document_comments/' . $commentId,
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $otherToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $otherToken
+                    ]
                 ]
             )
             ->assertStatus(403);
@@ -459,9 +456,9 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->delete(
                 '/api/document_comments/' . $commentId,
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $creatorToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
                 ]
             )
             ->assertStatus(204);
@@ -470,9 +467,9 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/document_comments/' . $commentId,
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $creatorToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
                 ]
             )
             ->assertStatus(404);

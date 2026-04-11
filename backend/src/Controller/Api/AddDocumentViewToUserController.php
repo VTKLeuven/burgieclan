@@ -7,6 +7,7 @@ use App\ApiResource\DocumentApi;
 use App\Entity\Document;
 use App\Entity\User;
 use App\Repository\UserDocumentViewRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -49,14 +50,14 @@ class AddDocumentViewToUserController extends AbstractController
                 $documentApi,
                 Document::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
 
             $this->viewRepository->recordView(
                 $user,
                 $document,
-                new \DateTime($view['lastViewed']),
+                new DateTime($view['lastViewed']),
                 false
             );
         }

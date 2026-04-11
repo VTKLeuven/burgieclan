@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\UserDocumentViewRepository;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;

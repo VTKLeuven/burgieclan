@@ -9,6 +9,7 @@ use App\Entity\Module;
 use App\Entity\Program;
 use App\Repository\DocumentRepository;
 use DateTime;
+use DateTimeZone;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -57,7 +58,7 @@ final class DownloadZipController extends AbstractController
                 $entity,
                 $class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             ),
             $entities
@@ -514,7 +515,7 @@ final class DownloadZipController extends AbstractController
 <body>
     <div class="container">
         <h1>Burgieclan Documents Archive</h1>
-        <p class="timestamp">Generated on ' . (new DateTime('now', new \DateTimeZone('Europe/Brussels')))->format('d/m/Y \a\t H:i') . '</p>';
+        <p class="timestamp">Generated on ' . (new DateTime('now', new DateTimeZone('Europe/Brussels')))->format('d/m/Y \a\t H:i') . '</p>';
 
         // Add counters for summary
         $totalDocuments = 0; // Start with 0 and count all documents
@@ -953,7 +954,7 @@ final class DownloadZipController extends AbstractController
     private function generateDescriptiveFilename(array $programs, array $modules, array $courses, array $documents): string
     {
         // Create the timestamp part
-        $timestamp = (new DateTime('now', new \DateTimeZone('Europe/Brussels')))->format('Y-m-d');
+        $timestamp = (new DateTime('now', new DateTimeZone('Europe/Brussels')))->format('Y-m-d');
 
         // Default base name
         $baseName = 'documents';
@@ -1029,7 +1030,7 @@ final class DownloadZipController extends AbstractController
                 $length = $fileSize;
                 $request = Request::createFromGlobals();
 
-            // Handle range requests
+                // Handle range requests
                 if ($request->headers->has('Range')) {
                     $range = $request->headers->get('Range');
                     if (preg_match('/bytes=(\d+)-(\d+)?/', $range, $matches)) {

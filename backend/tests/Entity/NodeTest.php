@@ -21,7 +21,7 @@ class NodeTest extends KernelTestCase
 
     public function testConstructNode()
     {
-        $creator = $this->createMock(User::class);
+        $creator = $this->createStub(User::class);
         $beforedate = new DateTime();
         $node = $this->createNodeInstance($creator);
         $afterdate = new DateTime();
@@ -31,7 +31,7 @@ class NodeTest extends KernelTestCase
 
     public function testSetUpdate()
     {
-        $creator = $this->createMock(User::class);
+        $creator = $this->createStub(User::class);
         $node = $this->createNodeInstance($creator);
 
         $beforedate = new DateTime();
@@ -44,12 +44,12 @@ class NodeTest extends KernelTestCase
 
     public function testSetUser()
     {
-        $creator = $this->createMock(User::class);
+        $creator = $this->createStub(User::class);
         $node = $this->createNodeInstance($creator);
 
         $this->assertSame($creator, $node->getCreator());
 
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $node->setCreator($user);
         $this->assertSame($user, $node->getCreator());
     }

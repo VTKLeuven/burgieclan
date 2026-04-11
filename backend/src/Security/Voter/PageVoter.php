@@ -4,6 +4,7 @@ namespace App\Security\Voter;
 
 use App\ApiResource\PageApi;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -16,7 +17,7 @@ class PageVoter extends Voter
         return in_array($attribute, [self::VIEW]) && ($subject instanceof PageApi);
     }
 
-    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
         if ($subject instanceof PageApi) {
             // if page is public available, unauthenticated users can access page

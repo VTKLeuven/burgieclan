@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Document;
 use App\Entity\User;
 use App\Entity\UserDocumentView;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -39,7 +40,7 @@ class UserDocumentViewRepository extends ServiceEntityRepository
     public function recordView(
         User $user,
         Document $document,
-        \DateTimeInterface $viewedAt,
+        DateTimeInterface $viewedAt,
         bool $flush = true
     ): UserDocumentView {
         $view = $this->findOneBy(['user' => $user, 'document' => $document]);
@@ -58,7 +59,7 @@ class UserDocumentViewRepository extends ServiceEntityRepository
         return $view;
     }
 
-    public function clearOldViews(\DateTimeInterface $before): int
+    public function clearOldViews(DateTimeInterface $before): int
     {
         return $this->createQueryBuilder('v')
             ->delete()

@@ -4,30 +4,25 @@ namespace App\Tests\Api;
 
 use App\Factory\ModuleFactory;
 use App\Factory\ProgramFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 class ModuleResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testGetCollectionOfModules(): void
     {
         ModuleFactory::createMany(
             5,
             [
-            'program' => ProgramFactory::createOne(),
-            'modules' => [], // Ensure no nested modules
+                'program' => ProgramFactory::createOne(),
+                'modules' => [], // Ensure no nested modules
             ]
         );
         $json = $this->browser()
             ->get(
                 '/api/modules',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -39,12 +34,12 @@ class ModuleResourceTest extends ApiTestCase
         $this->assertSame(
             array_keys($json->decoded()['hydra:member'][0]),
             [
-            '@id',
-            '@type',
-            'name',
-            'courses',
-            'modules',
-            'program',
+                '@id',
+                '@type',
+                'name',
+                'courses',
+                'modules',
+                'program',
             ]
         );
     }
@@ -54,17 +49,17 @@ class ModuleResourceTest extends ApiTestCase
         ModuleFactory::createMany(
             5,
             [
-            'program' => null,
-            'modules' => [], // Ensure no nested modules
+                'program' => null,
+                'modules' => [], // Ensure no nested modules
             ]
         );
         $json = $this->browser()
             ->get(
                 '/api/modules',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -76,11 +71,11 @@ class ModuleResourceTest extends ApiTestCase
         $this->assertSame(
             array_keys($json->decoded()['hydra:member'][0]),
             [
-            '@id',
-            '@type',
-            'name',
-            'courses',
-            'modules',
+                '@id',
+                '@type',
+                'name',
+                'courses',
+                'modules',
             ]
         );
     }
@@ -91,16 +86,16 @@ class ModuleResourceTest extends ApiTestCase
         ModuleFactory::createMany(
             3,
             [
-            'modules' => ModuleFactory::new(['modules' => []])->many(2),
+                'modules' => ModuleFactory::new(['modules' => []])->many(2),
             ]
         );
         $json = $this->browser()
             ->get(
                 '/api/modules',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -123,7 +118,7 @@ class ModuleResourceTest extends ApiTestCase
         $submodules = ModuleFactory::createMany(2);
         $module = ModuleFactory::createOne(
             [
-            'modules' => $submodules,
+                'modules' => $submodules,
             ]
         );
 
@@ -131,9 +126,9 @@ class ModuleResourceTest extends ApiTestCase
             ->get(
                 '/api/modules/' . $module->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -156,9 +151,9 @@ class ModuleResourceTest extends ApiTestCase
             ->get(
                 '/api/modules/' . $module->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -170,19 +165,19 @@ class ModuleResourceTest extends ApiTestCase
     {
         $module1 = ModuleFactory::createOne(
             [
-            'name' => 'testmodule1',
+                'name' => 'testmodule1',
             ]
         );
 
         $module2 = ModuleFactory::createOne(
             [
-            'name' => 'testmodule2',
+                'name' => 'testmodule2',
             ]
         );
 
         $module3 = ModuleFactory::createOne(
             [
-            'name' => 'testmodule3',
+                'name' => 'testmodule3',
             ]
         );
 
@@ -192,9 +187,9 @@ class ModuleResourceTest extends ApiTestCase
             ->get(
                 '/api/modules?name=module2',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -204,9 +199,9 @@ class ModuleResourceTest extends ApiTestCase
             ->get(
                 '/api/modules?name=testmodule',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
