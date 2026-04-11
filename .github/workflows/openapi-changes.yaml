@@ -1,0 +1,230 @@
+name: "OpenAPI Spec Changes"
+
+on:
+  pull_request:
+    paths:
+      - 'backend/src/**'
+      - 'backend/config/**'
+      - '.github/workflows/openapi-changes.yaml'
+
+jobs:
+  openapi-diff:
+    name: Check OpenAPI spec changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: backend/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          composer install
+
+      - name: Generate OpenAPI spec for PR branch
+        run: |
+          cd backend
+          php bin/console api:openapi:export > /tmp/openapi-pr.json
+
+      - name: Checkout base branch
+        run: git checkout origin/${{ github.base_ref }}
+
+      - name: Install dependencies for base branch
+        run: |
+          cd backend
+          composer install
+
+      - name: Generate OpenAPI spec for base branch
+        run: |
+          cd backend
+          php bin/console api:openapi:export > /tmp/openapi-base.json
+
+      - name: Compare OpenAPI specs
+        id: diff
+        run: |
+          set +e
+
+          diff -u /tmp/openapi-base.json /tmp/openapi-pr.json > /tmp/openapi.diff
+          DIFF_EXIT=$?
+
+          # Check if there are changes
+          if [ "$DIFF_EXIT" -eq 0 ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload OpenAPI specs as artifacts
+        if: steps.diff.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-specs
+          path: |
+            /tmp/openapi-base.json
+            /tmp/openapi-pr.json
+          retention-days: 7
+
+      - name: Create or update PR comment with OpenAPI summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const basePath = '/tmp/openapi-base.json';
+            const prPath = '/tmp/openapi-pr.json';
+            const marker = '<!-- openapi-spec-changes-comment -->';
+            
+            try {
+              const baseSpec = JSON.parse(fs.readFileSync(basePath, 'utf8'));
+              const prSpec = JSON.parse(fs.readFileSync(prPath, 'utf8'));
+              
+              // Collect changes
+              const changes = [];
+              
+              // Helper to extract method+path
+              const getMethods = (pathObj) => {
+                const httpMethods = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'];
+                return httpMethods.filter(m => pathObj[m]);
+              };
+              
+              // Check path changes
+              const basePaths = Object.keys(baseSpec.paths || {});
+              const prPaths = Object.keys(prSpec.paths || {});
+              
+              const newPaths = prPaths.filter(p => !basePaths.includes(p));
+              const removedPaths = basePaths.filter(p => !prPaths.includes(p));
+              const modifiedPaths = basePaths.filter(p => prPaths.includes(p) && 
+                JSON.stringify(baseSpec.paths[p]) !== JSON.stringify(prSpec.paths[p]));
+              
+              if (newPaths.length > 0) {
+                const endpoints = newPaths.flatMap(p => {
+                  const methods = getMethods(prSpec.paths[p]);
+                  return methods.map(m => `  - \`${m.toUpperCase()} ${p}\``);
+                }).join('\n');
+                changes.push(`🟢 **New Endpoints** (${newPaths.length}):\n${endpoints}`);
+              }
+              
+              if (removedPaths.length > 0) {
+                const endpoints = removedPaths.flatMap(p => {
+                  const methods = getMethods(baseSpec.paths[p]);
+                  return methods.map(m => `  - \`${m.toUpperCase()} ${p}\``);
+                }).join('\n');
+                changes.push(`🔴 **Removed Endpoints** (${removedPaths.length}):\n${endpoints}`);
+              }
+              
+              if (modifiedPaths.length > 0) {
+                const endpoints = modifiedPaths.map(p => {
+                  const baseMethods = getMethods(baseSpec.paths[p]);
+                  const prMethods = getMethods(prSpec.paths[p]);
+                  
+                  const added = prMethods.filter(m => !baseMethods.includes(m));
+                  const removed = baseMethods.filter(m => !prMethods.includes(m));
+                  const modified = baseMethods.filter(m => prMethods.includes(m) && 
+                    JSON.stringify(baseSpec.paths[p][m]) !== JSON.stringify(prSpec.paths[p][m]));
+                  
+                  let result = `${p}`;
+                  if (added.length > 0) result += ` [+${added.map(m => m.toUpperCase()).join(',')}]`;
+                  if (removed.length > 0) result += ` [-${removed.map(m => m.toUpperCase()).join(',')}]`;
+                  if (modified.length > 0) result += ` [~${modified.map(m => m.toUpperCase()).join(',')}]`;
+                  
+                  return `  - \`${result}\``;
+                }).join('\n');
+                changes.push(`🟡 **Modified Endpoints** (${modifiedPaths.length}):\n${endpoints}`);
+              }
+              
+              // Check schema changes
+              const baseSchemas = Object.keys(baseSpec.components?.schemas || {});
+              const prSchemas = Object.keys(prSpec.components?.schemas || {});
+              
+              const newSchemas = prSchemas.filter(s => !baseSchemas.includes(s));
+              const removedSchemas = baseSchemas.filter(s => !prSchemas.includes(s));
+              const modifiedSchemas = baseSchemas.filter(s => prSchemas.includes(s) && 
+                JSON.stringify(baseSpec.components.schemas[s]) !== JSON.stringify(prSpec.components.schemas[s]));
+              
+              if (newSchemas.length > 0) {
+                changes.push(`🟢 **New Schemas** (${newSchemas.length}):\n${newSchemas.map(s => `  - \`${s}\``).join('\n')}`);
+              }
+              
+              if (removedSchemas.length > 0) {
+                changes.push(`🔴 **Removed Schemas** (${removedSchemas.length}):\n${removedSchemas.map(s => `  - \`${s}\``).join('\n')}`);
+              }
+              
+              if (modifiedSchemas.length > 0) {
+                changes.push(`🟡 **Modified Schemas** (${modifiedSchemas.length}):\n${modifiedSchemas.map(s => `  - \`${s}\``).join('\n')}`);
+              }
+              
+              const hasChanges = changes.length > 0;
+              const body = hasChanges
+                ? `${marker}\n## 📋 OpenAPI Spec Changes\n\n${changes.join('\n\n')}\n\n_[Check artifacts for full specs comparison](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})_`
+                : `${marker}\n✅ No changes to OpenAPI spec detected.`;
+
+              const { data: comments } = await github.rest.issues.listComments({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100
+              });
+
+              const existing = comments.find(c => c.body && c.body.includes(marker));
+
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: existing.id,
+                  body
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body
+                });
+              }
+            } catch (error) {
+              console.error('Error:', error);
+              const body = `${marker}\n⚠️ Failed to generate OpenAPI diff. Check workflow logs.`;
+
+              const { data: comments } = await github.rest.issues.listComments({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100
+              });
+
+              const existing = comments.find(c => c.body && c.body.includes(marker));
+
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: existing.id,
+                  body
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body
+                });
+              }
+            }
