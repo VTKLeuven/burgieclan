@@ -148,23 +148,21 @@ class DocumentBulkUploadController extends AbstractController
                         new All(
                             [
                                 new FileConstraint(
-                                    [
-                                        'maxSize' => '200M',
-                                        'mimeTypes' => [
-                                            'application/pdf',
-                                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                                            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                                            'application/msword',
-                                            'text/plain',
-                                            'image/jpeg',
-                                            'image/png',
-                                            'video/mp4',
-                                            'application/zip',
-                                            'text/x-matlab',
-                                            'text/x-python'
-                                        ],
-                                    ]
+                                    maxSize: '200M',
+                                    mimeTypes: [
+                                        'application/pdf',
+                                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                                        'application/msword',
+                                        'text/plain',
+                                        'image/jpeg',
+                                        'image/png',
+                                        'video/mp4',
+                                        'application/zip',
+                                        'text/x-matlab',
+                                        'text/x-python'
+                                    ],
                                 ),
                             ]
                         ),
