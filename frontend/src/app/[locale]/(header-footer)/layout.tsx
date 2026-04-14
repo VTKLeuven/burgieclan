@@ -1,4 +1,3 @@
-import Footer from "@/components/footer/Footer";
 import Header from "@/components/header/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import React from "react";
@@ -15,7 +14,6 @@ export default function HeaderLayout({ children }: Readonly<{ children: React.Re
                     </div>
                 </main>
             </div>
-            <Footer />
         </div>
     );
 }

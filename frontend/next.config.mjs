@@ -1,7 +1,15 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { withSentryConfig } from '@sentry/nextjs';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // Pin Turbopack root when multiple lockfiles exist (e.g. ~/package-lock.json).
+    turbopack: {
+        root: __dirname,
+    },
     output: 'standalone',
     reactStrictMode: false,
     images: {

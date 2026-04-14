@@ -41,21 +41,21 @@
     "react-pdf": "^10.2.0",
     "sharp": "^0.34.5",
     "tailwind-merge": "^3.4.0",
+    "@tailwindcss/postcss": "^4.1.17",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^4.1.17",
     "tailwindcss-animate": "^1.0.7",
     "timeago.js": "^4.0.2",
     "type-fest": "^5.2.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^24",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "eslint": "^9",
     "eslint-config-next": "^16.0.3",
     "eslint-config-prettier": "^10.1.8",
-    "postcss": "^8.4.38",
-    "tailwindcss": "^4.1.17",
     "typescript": "^5"
   }
 }

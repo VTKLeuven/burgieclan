@@ -30,13 +30,13 @@ export default function Header() {
     return (
         <header className="bg-white">
             <nav aria-label="Global"
-                 className="mx-auto flex items-center justify-between border-b border-gray-900/10 p-6 lg:px-8">
+                 className="mx-auto flex items-center justify-between border-b border-gray-900/10 px-4 py-2 lg:px-6">
 
                 {/* Logo and search */}
-                <div className="flex gap-x-8 items-center justify-start sm:justify-center pr-8">
-                    <Link href={`/${i18n.language}`} className="-m-1.5 p-1.5 shrink-0">
+                <div className="flex gap-x-6 items-center justify-start sm:justify-center pr-4">
+                    <Link href={`/${i18n.language}`} className="-m-1 p-1 shrink-0">
                         <span className="sr-only">Burgieclan</span>
-                        <Logo width={50} height={50} />
+                        <Logo width={36} height={36} />
                     </Link>
                     {isAuthenticated && <Search />}
                 </div>
