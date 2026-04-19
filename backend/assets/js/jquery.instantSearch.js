@@ -64,7 +64,7 @@
 
         var self = this;
         var data = this.$form.serializeArray();
-        data['l'] = this.limit;
+        data['l'] = this.options.limit;
 
         $.getJSON(this.$form.attr('action'), data, function (items) {
             self.show(items);
