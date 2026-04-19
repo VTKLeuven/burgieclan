@@ -2,6 +2,13 @@
 @use "sass:color";
 @use "variables" as *;
 
+// Pick the Lato fonts individually to avoid importing the entire font family.
+$lato-font-path: '~lato-font/fonts';
+@import '~lato-font/scss/public-api';
+
+@include lato-include-font('normal');
+@include lato-include-font('bold');
+
 :root {
   --bs-primary: #{$vtk-blue};
   --bs-primary-rgb: #{color.channel($vtk-blue, "red", $space: rgb)},
