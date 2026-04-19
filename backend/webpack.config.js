@@ -69,7 +69,6 @@ Encore
     // uncomment if you're having problems with a jQuery plugin
     .autoProvidejQuery()
     .autoProvideVariables({
-        "window.Bloodhound": require.resolve('bloodhound-js'),
         "jQuery.tagsinput": "bootstrap-tagsinput"
     })
     ;
