@@ -2,7 +2,6 @@ import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/css/v4-shims.css';
 import 'bootswatch/dist/flatly/bootstrap.min.css';
 import 'highlight.js/styles/github-dark-dimmed.css';
-import 'lato-font/css/lato-font.css';
 import './bootstrap.js';
 import './styles/app.scss';
 
