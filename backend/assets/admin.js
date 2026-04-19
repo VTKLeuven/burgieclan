@@ -1,25 +1,33 @@
-import Bloodhound from "bloodhound-js";
+import { Modal } from 'bootstrap';
 import 'bootstrap-tagsinput';
 import './styles/admin.scss';
+
+function buildLocalTagMatcher(tags) {
+    return function findMatches(query, syncResults) {
+        if (!query) {
+            syncResults(tags);
+            return;
+        }
+
+        const normalizedQuery = query.toLowerCase();
+        const matches = tags.filter((tag) => tag.toLowerCase().includes(normalizedQuery));
+        syncResults(matches);
+    };
+}
 
 $(function () {
     // Bootstrap-tagsinput initialization
     // https://bootstrap-tagsinput.github.io/bootstrap-tagsinput/examples/
     var $input = $('input[data-toggle="tagsinput"]');
     if ($input.length) {
-        var source = new Bloodhound({
-            local: $input.data('tags'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            datumTokenizer: Bloodhound.tokenizers.whitespace
-        });
-        source.initialize();
+        var tags = $input.data('tags') || [];
 
         $input.tagsinput({
             trimValue: true,
             focusClass: 'focus',
             typeaheadjs: {
                 name: 'tags',
-                source: source.ttAdapter()
+                source: buildLocalTagMatcher(tags)
             }
         });
     }
@@ -40,7 +48,8 @@ $(document).on('submit', 'form[data-confirmation]', function (event) {
                 $confirm.data('result', 'yes');
                 $form.find('input[type="submit"]').attr('disabled', 'disabled');
                 $form.trigger('submit');
-            })
-            .modal('show');
+            });
+
+        Modal.getOrCreateInstance($confirm[0]).show();
     }
 });
