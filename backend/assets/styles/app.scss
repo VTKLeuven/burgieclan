@@ -1,29 +1,21 @@
-@import "variables";
-
-@import "~bootstrap/scss/bootstrap";
-
-@import "~bootswatch/dist/flatly/bootswatch";
-@import "~@fortawesome/fontawesome-free/css/all.css";
-@import "~@fortawesome/fontawesome-free/css/v4-shims.css";
-@import "~highlight.js/styles/github-dark-dimmed.css";
-
-// pick the Lato fonts individually to avoid importing the entire font family
-@import '~lato-font/scss/public-api';
-
-@include lato-include-font('normal');
-@include lato-include-font('bold');
+@use "sass:map";
+@use "variables" as *;
 
 /* Basic styles
    ------------------------------------------------------------------------- */
-h1, .h1 {
+h1,
+.h1 {
   font-size: $font-heading;
 }
 
-h3, .h3 {
+h3,
+.h3 {
   font-size: $font-subtitle;
 }
 
-p, ul, ol {
+p,
+ul,
+ol {
   font-size: $font-default;
   margin-bottom: 1.5em
 }
@@ -42,7 +34,8 @@ code {
   font-size: 90%;
 }
 
-.text-danger, .text-danger:hover {
+.text-danger,
+.text-danger:hover {
   color: $red
 }
 
@@ -109,6 +102,7 @@ header {
     .navbar-brand {
       padding: 0;
     }
+
     .navbar-toggler {
       padding: 0 $navbar-toggler-padding-x;
     }
@@ -124,7 +118,7 @@ header {
   background: #2c3e50;
 
   .modal-dialog {
-    @media (min-width: map-get($grid-breakpoints, 'md')) {
+    @media (min-width: map.get($grid-breakpoints, md)) {
       max-width: 800px;
       width: 96%;
     }
@@ -139,7 +133,10 @@ header {
     border-bottom: 0;
     color: var(--white);
 
-    .close { color: var(--white); opacity: 1; }
+    .close {
+      color: var(--white);
+      opacity: 1;
+    }
   }
 
   .modal-body {
@@ -149,7 +146,7 @@ header {
       list-style: none;
       padding: 0;
 
-      @media (min-width: map-get($grid-breakpoints, 'md')) {
+      @media (min-width: map.get($grid-breakpoints, md)) {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         grid-gap: 10px 20px;
@@ -160,7 +157,7 @@ header {
         margin-bottom: 10px;
         position: relative;
 
-        @media (min-width: map-get($grid-breakpoints, 'md')) {
+        @media (min-width: map.get($grid-breakpoints, md)) {
           margin: 0;
         }
 
@@ -203,7 +200,8 @@ header {
           }
         }
 
-        &.active a, &:hover.active a {
+        &.active a,
+        &:hover.active a {
           background: #18bc9c;
           color: #fff;
           outline: none;
@@ -225,7 +223,8 @@ header {
   min-height: 600px
 }
 
-.body-container #main h1, .body-container #main h2 {
+.body-container #main h1,
+.body-container #main h2 {
   margin-top: 0
 }
 
@@ -237,7 +236,7 @@ header {
   font-size: 15px
 }
 
-#sidebar p + p {
+#sidebar p+p {
   margin: 1.5em 0 0
 }
 
@@ -269,20 +268,35 @@ footer #footer-resources i {
     border-bottom: 0;
     padding: 1rem 1rem 0;
 
-    h3 { font-size: 18px; margin-top: 0; }
+    h3 {
+      font-size: 18px;
+      margin-top: 0;
+    }
   }
 
   .nav-tabs {
     border-bottom-color: #95a5a6;
     margin-bottom: 15px;
 
-    .nav-link { font-size: 16px; }
-    .nav-link.active { border-color: #95a5a6 #95a5a6 #fff; }
-    .nav-link:not(.active):hover { border-color: transparent; text-decoration: underline; }
+    .nav-link {
+      font-size: 16px;
+    }
+
+    .nav-link.active {
+      border-color: #95a5a6 #95a5a6 #fff;
+    }
+
+    .nav-link:not(.active):hover {
+      border-color: transparent;
+      text-decoration: underline;
+    }
   }
 
   .tab-content {
-    .file-link { font-size: 16px; margin: 0 0 10px 5px; }
+    .file-link {
+      font-size: 16px;
+      margin: 0 0 10px 5px;
+    }
   }
 
   pre {
@@ -340,7 +354,7 @@ footer #footer-resources i {
   margin-bottom: 0
 }
 
-.form-group.has-error .help-block li + li {
+.form-group.has-error .help-block li+li {
   margin-top: 0.5em;
 }
 
