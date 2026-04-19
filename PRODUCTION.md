@@ -99,7 +99,7 @@ Images are hosted on GitHub Container Registry (GHCR) at `ghcr.io/vtkleuven/burg
 
 ### Frontend Image
 
-**Base**: `node:20-alpine`
+**Base**: `node:24-alpine`
 
 **Architecture**: Multi-stage build producing Next.js standalone server
 
