@@ -1,5 +1,27 @@
 @use "sass:map";
+@use "sass:color";
 @use "variables" as *;
+
+:root {
+  --bs-primary: #{$vtk-blue};
+  --bs-primary-rgb: #{color.channel($vtk-blue, "red", $space: rgb)},
+  #{color.channel($vtk-blue, "green", $space: rgb)},
+  #{color.channel($vtk-blue, "blue", $space: rgb)};
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+  --bs-btn-hover-bg: #{color.scale($vtk-blue, $lightness: -8%)};
+  --bs-btn-hover-border-color: #{color.scale($vtk-blue, $lightness: -10%)};
+  --bs-btn-focus-shadow-rgb: #{color.channel($vtk-blue, "red", $space: rgb)},
+  #{color.channel($vtk-blue, "green", $space: rgb)},
+  #{color.channel($vtk-blue, "blue", $space: rgb)};
+  --bs-btn-active-bg: #{color.scale($vtk-blue, $lightness: -12%)};
+  --bs-btn-active-border-color: #{color.scale($vtk-blue, $lightness: -14%)};
+  --bs-btn-disabled-bg: var(--bs-primary);
+  --bs-btn-disabled-border-color: var(--bs-primary);
+}
 
 /* Basic styles
    ------------------------------------------------------------------------- */
