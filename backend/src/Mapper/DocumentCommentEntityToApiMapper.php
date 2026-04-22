@@ -8,11 +8,10 @@ use App\ApiResource\UserApi;
 use App\Entity\DocumentComment;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfonycasts\MicroMapper\AsMapper;
-use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 #[AsMapper(from: DocumentComment::class, to: DocumentCommentApi::class)]
-class DocumentCommentEntityToApiMapper implements MapperInterface
+class DocumentCommentEntityToApiMapper extends BaseEntityToApiMapper
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
@@ -25,7 +24,7 @@ class DocumentCommentEntityToApiMapper implements MapperInterface
         assert($from instanceof DocumentComment);
 
         $dto = new DocumentCommentApi();
-        $dto->id = $from->getId();
+        $this->mapBaseFields($from, $dto);
 
         return $dto;
     }
@@ -41,7 +40,7 @@ class DocumentCommentEntityToApiMapper implements MapperInterface
             $from->getDocument(),
             DocumentApi::class,
             [
-            MicroMapperInterface::MAX_DEPTH => 0,
+                MicroMapperInterface::MAX_DEPTH => 0,
             ]
         );
 
@@ -54,13 +53,10 @@ class DocumentCommentEntityToApiMapper implements MapperInterface
                 $from->getCreator(),
                 UserApi::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 1,
+                    MicroMapperInterface::MAX_DEPTH => 1,
                 ]
             );
         }
-        $to->createdAt = $from->getCreatedAt()->format('Y-m-d H:i:s');
-        $to->updatedAt = $from->getUpdatedAt()->format('Y-m-d H:i:s');
-
         return $to;
     }
 }

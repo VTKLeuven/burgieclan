@@ -5,7 +5,6 @@ namespace App\ApiResource;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -27,14 +26,14 @@ use Symfony\Component\Serializer\Attribute\Groups;
             normalizationContext: ['groups' => ['document_comment:get']]
         ),
         new Patch(
-        // This redirects the security check to all voters to see if one accepts CourseCommentApi objects
-        // This is handled by the src/Security/Voter/AbstractCommentVoter
+            // This redirects the security check to all voters to see if one accepts CourseCommentApi objects
+            // This is handled by the src/Security/Voter/AbstractCommentVoter
             security: 'is_granted("EDIT", object)'
         ),
         new Post(normalizationContext: ['groups' => ['document_comment:get']]),
         new Delete(
-        // This redirects the security check to all voters to see if one accepts CourseCommentApi objects
-        // This is handled by the src/Security/Voter/AbstractCommentVoter
+            // This redirects the security check to all voters to see if one accepts CourseCommentApi objects
+            // This is handled by the src/Security/Voter/AbstractCommentVoter
             security: 'is_granted("DELETE", object)'
         ),
     ],
@@ -44,9 +43,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 class DocumentCommentApi extends AbstractCommentApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Groups(['document_comment:get'])]
     public ?DocumentApi $document;

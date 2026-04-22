@@ -6,11 +6,10 @@ use App\ApiResource\DocumentApi;
 use App\ApiResource\UserDocumentViewApi;
 use App\Entity\UserDocumentView;
 use Symfonycasts\MicroMapper\AsMapper;
-use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 #[AsMapper(from: UserDocumentView::class, to: UserDocumentViewApi::class)]
-class UserDocumentViewEntityToApiMapper implements MapperInterface
+class UserDocumentViewEntityToApiMapper extends BaseEntityToApiMapper
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
@@ -22,7 +21,7 @@ class UserDocumentViewEntityToApiMapper implements MapperInterface
         assert($from instanceof UserDocumentView);
 
         $dto = new UserDocumentViewApi();
-        $dto->id = $from->getId();
+        $this->mapBaseFields($from, $dto);
 
         return $dto;
     }
@@ -36,8 +35,8 @@ class UserDocumentViewEntityToApiMapper implements MapperInterface
             $from->getDocument(),
             DocumentApi::class,
             [
-            // Depth: document (0), course (1), course props (2)
-            MicroMapperInterface::MAX_DEPTH => 2,
+                // Depth: document (0), course (1), course props (2)
+                MicroMapperInterface::MAX_DEPTH => 2,
             ]
         );
         $to->lastViewed = $from->getLastViewedAt();

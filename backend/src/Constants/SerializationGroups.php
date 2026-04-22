@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Constants;
+
+/**
+ * Serialization group constants used throughout the API.
+ * These groups are used by the Symfony serializer to control which fields
+ * are included in API responses and requests.
+ */
+final class SerializationGroups
+{
+    // Get operations
+    public const ANNOUNCEMENT_GET = 'announcement:get';
+    public const COURSE_GET = 'course:get';
+    public const COURSE_COMMENT_GET = 'course_comment:get';
+    public const DOCUMENT_GET = 'document:get';
+    public const DOCUMENT_CATEGORY_GET = 'document_category:get';
+    public const DOCUMENT_COMMENT_GET = 'document_comment:get';
+    public const MODULE_GET = 'module:get';
+    public const PAGE_GET = 'page:get';
+    public const PROGRAM_GET = 'program:get';
+    public const TAG_GET = 'tag:get';
+    public const USER_GET = 'user:get';
+    public const USER_DOCUMENT_VIEW_GET = 'user_document_view:get';
+
+    // Create/Write operations
+    public const DOCUMENT_CREATE = 'document:create';
+
+    // User-related groups
+    public const USER = 'user';
+    public const USER_FAVORITES = 'user:favorites';
+    public const USER_DOCUMENT_VIEWS = 'user:document_views';
+    public const USER_DOCUMENT_VIEWS_BATCH = 'user:document_views:batch';
+
+    // Vote-related groups
+    public const VOTE_READ = 'vote:read';
+    public const VOTE_WRITE = 'vote:write';
+
+    // Search and common
+    public const SEARCH = 'search';
+
+    /**
+     * All groups used in GET/Read operations.
+     * These are the groups that should include BaseEntity fields.
+     */
+    public const ALL_READ_GROUPS = [
+        self::ANNOUNCEMENT_GET,
+        self::COURSE_GET,
+        self::COURSE_COMMENT_GET,
+        self::DOCUMENT_GET,
+        self::DOCUMENT_CREATE,
+        self::DOCUMENT_CATEGORY_GET,
+        self::DOCUMENT_COMMENT_GET,
+        self::MODULE_GET,
+        self::PAGE_GET,
+        self::PROGRAM_GET,
+        self::TAG_GET,
+        self::USER_GET,
+        self::USER_FAVORITES,
+        self::USER_DOCUMENT_VIEW_GET,
+        self::USER_DOCUMENT_VIEWS,
+        self::USER_DOCUMENT_VIEWS_BATCH,
+        self::VOTE_READ,
+        self::SEARCH,
+        self::USER,
+    ];
+}

@@ -4,7 +4,6 @@ namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -29,11 +28,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 #[ApiFilter(TagDocumentCategoryFilter::class)]
 #[ApiFilter(TagDocumentCourseFilter::class)]
-class TagApi
+class TagApi extends BaseEntityApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[Groups(['search', 'user', 'document:get', 'document:create'])]
     public ?string $name = null;
 

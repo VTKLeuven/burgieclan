@@ -23,11 +23,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     stateOptions: new Options(entityClass: UserDocumentView::class)
 )]
-class UserDocumentViewApi
+class UserDocumentViewApi extends BaseEntityApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[Assert\NotNull]
     #[ApiProperty(writable: true)]
     #[Groups(['user:document_views', 'user:document_views:batch'])]

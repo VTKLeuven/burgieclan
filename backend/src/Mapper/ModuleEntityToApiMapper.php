@@ -8,11 +8,10 @@ use App\ApiResource\ProgramApi;
 use App\Entity\Course;
 use App\Entity\Module;
 use Symfonycasts\MicroMapper\AsMapper;
-use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 #[AsMapper(from: Module::class, to: ModuleApi::class)]
-class ModuleEntityToApiMapper implements MapperInterface
+class ModuleEntityToApiMapper extends BaseEntityToApiMapper
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
@@ -24,7 +23,7 @@ class ModuleEntityToApiMapper implements MapperInterface
         assert($from instanceof Module);
 
         $dto = new ModuleApi();
-        $dto->id = $from->getId();
+        $this->mapBaseFields($from, $dto);
 
         return $dto;
     }
@@ -41,7 +40,7 @@ class ModuleEntityToApiMapper implements MapperInterface
                     $course,
                     CourseApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 1,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },
@@ -53,7 +52,7 @@ class ModuleEntityToApiMapper implements MapperInterface
                     $module,
                     ModuleApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 1,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },
@@ -65,7 +64,7 @@ class ModuleEntityToApiMapper implements MapperInterface
                 $from->getProgram(),
                 ProgramApi::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
         }
