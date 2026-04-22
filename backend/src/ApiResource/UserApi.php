@@ -51,12 +51,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: User::class),
 )]
-class UserApi
+class UserApi extends BaseEntityApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    #[Groups('user')]
-    public ?int $id = null;
-
     #[Assert\NotBlank]
     #[ApiProperty(writable: false)]
     #[Groups(['user', 'course:get', 'document:get', 'document_comment:get'])]

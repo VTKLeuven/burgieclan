@@ -3,7 +3,6 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -55,11 +54,8 @@ use App\State\EntityClassDtoStateProvider;
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: QuickLink::class),
 )]
-class QuickLinkApi
+class QuickLinkApi extends BaseEntityApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     public ?string $name = null;
 
     public ?string $linkTo = null;

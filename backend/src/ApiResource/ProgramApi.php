@@ -6,7 +6,6 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -27,11 +26,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     stateOptions: new Options(entityClass: Program::class),
 )]
 #[ApiFilter(OrderFilter::class)]
-class ProgramApi
+class ProgramApi extends BaseEntityApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     #[Groups(['program:get', 'search', 'user'])]

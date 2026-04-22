@@ -7,18 +7,10 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-abstract class NodeApi
+abstract class NodeApi extends BaseEntityApi
 {
     #[ApiProperty(writable: false)]
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Groups(['course:get', 'document_comment:get'])]
     public ?UserApi $creator;
-
-    #[ApiProperty(writable: false)]
-    #[Groups(['course:get', 'document_comment:get'])]
-    public string $createdAt;
-
-    #[ApiProperty(writable: false)]
-    #[Groups(['course:get', 'document_comment:get'])]
-    public string $updatedAt;
 }

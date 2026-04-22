@@ -5,17 +5,16 @@ namespace App\Mapper;
 use App\ApiResource\CommentCategoryApi;
 use App\Entity\CommentCategory;
 use Symfonycasts\MicroMapper\AsMapper;
-use Symfonycasts\MicroMapper\MapperInterface;
 
 #[AsMapper(from: CommentCategory::class, to: CommentCategoryApi::class)]
-class CommentCategoryEntityToApiMapper implements MapperInterface
+class CommentCategoryEntityToApiMapper extends BaseEntityToApiMapper
 {
     public function load(object $from, string $toClass, array $context): object
     {
         assert($from instanceof CommentCategory);
 
         $dto = new CommentCategoryApi();
-        $dto->id = $from->getId();
+        $this->mapBaseFields($from, $dto);
 
         return $dto;
     }

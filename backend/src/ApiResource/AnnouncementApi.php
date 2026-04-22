@@ -60,11 +60,8 @@ use App\State\EntityClassDtoStateProvider;
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: Announcement::class),
 )]
-class AnnouncementApi
+class AnnouncementApi extends NodeApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[ApiFilter(
         MultiLangSearchFilter::class,
         properties: [
@@ -88,12 +85,6 @@ class AnnouncementApi
 
     #[ApiFilter(DateFilter::class)]
     public string $endTime;
-
-    #[ApiProperty(writable: false)]
-    public string $createdAt;
-
-    #[ApiProperty(writable: false)]
-    public string $updatedAt;
 
     #[ApiProperty(writable: false)]
     public bool $priority;

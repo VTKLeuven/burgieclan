@@ -7,11 +7,10 @@ use App\ApiResource\TagApi;
 use App\Entity\Document;
 use App\Entity\Tag;
 use Symfonycasts\MicroMapper\AsMapper;
-use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 #[AsMapper(from: Tag::class, to: TagApi::class)]
-class TagEntityToApiMapper implements MapperInterface
+class TagEntityToApiMapper extends BaseEntityToApiMapper
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
@@ -23,7 +22,7 @@ class TagEntityToApiMapper implements MapperInterface
         assert($from instanceof Tag);
 
         $dto = new TagApi();
-        $dto->id = $from->getId();
+        $this->mapBaseFields($from, $dto);
 
         return $dto;
     }
@@ -40,7 +39,7 @@ class TagEntityToApiMapper implements MapperInterface
                     $document,
                     DocumentApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 0,
+                        MicroMapperInterface::MAX_DEPTH => 0,
                     ]
                 );
             },

@@ -63,7 +63,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: Page::class),
 )]
-class PageApi
+class PageApi extends BaseEntityApi
 {
     #[ApiProperty(readable: true, writable: false, identifier: true)]
     #[Assert\NotBlank]
