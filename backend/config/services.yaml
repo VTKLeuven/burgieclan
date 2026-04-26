@@ -25,6 +25,7 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
             - '../src/DataFixtures/'
+            - '../src/Factory/'
 
     App\Doctrine\Extension\DocumentUnderReviewExtension:
         tags:
@@ -76,6 +77,9 @@ when@dev:
         App\DataFixtures\:
             resource: '../src/DataFixtures/'
 
+        App\Factory\:
+            resource: '../src/Factory/'
+
 when@test:
     services:
         _defaults:
@@ -84,3 +88,6 @@ when@test:
 
         App\DataFixtures\:
             resource: '../src/DataFixtures/'
+
+        App\Factory\:
+            resource: '../src/Factory/'
