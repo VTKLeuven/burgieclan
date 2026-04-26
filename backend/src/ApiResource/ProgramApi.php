@@ -34,9 +34,9 @@ class ProgramApi extends BaseEntityApi
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     #[Groups(
         [
-        SerializationGroups::PROGRAM_GET,
-        SerializationGroups::SEARCH,
-        SerializationGroups::USER
+            SerializationGroups::PROGRAM_GET,
+            SerializationGroups::SEARCH,
+            SerializationGroups::USER
         ]
     )]
     public ?string $name = null;

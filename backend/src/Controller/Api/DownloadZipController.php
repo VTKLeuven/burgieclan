@@ -27,8 +27,7 @@ final class DownloadZipController extends AbstractController
         private readonly DocumentRepository $documentRepository,
         private readonly StorageInterface $storage,
         private readonly KernelInterface $kernel,
-    ) {
-    }
+    ) {}
 
     public function __invoke(ZipApi $zipApi): Response
     {

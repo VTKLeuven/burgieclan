@@ -22,8 +22,7 @@ class UserApiToEntityMapper implements MapperInterface
         private readonly UserRepository $repository,
         private readonly MicroMapperInterface $microMapper,
         private readonly PropertyAccessorInterface $propertyAccessor,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Exception
@@ -54,7 +53,7 @@ class UserApiToEntityMapper implements MapperInterface
                 $course,
                 Course::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
         }
@@ -66,7 +65,7 @@ class UserApiToEntityMapper implements MapperInterface
                 $module,
                 Module::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
         }
@@ -78,7 +77,7 @@ class UserApiToEntityMapper implements MapperInterface
                 $program,
                 Program::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
         }
@@ -90,7 +89,7 @@ class UserApiToEntityMapper implements MapperInterface
                 $document,
                 Document::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
         }

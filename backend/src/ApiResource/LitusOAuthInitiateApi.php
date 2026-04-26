@@ -22,12 +22,12 @@ use App\Controller\Api\LitusOAuthInitiateController;
                         content: null,
                         headers: new \ArrayObject(
                             [
-                            'Location' => [
-                                'description' => 'OAuth provider authorization URL',
-                                'schema' => [
-                                    'type' => 'string'
+                                'Location' => [
+                                    'description' => 'OAuth provider authorization URL',
+                                    'schema' => [
+                                        'type' => 'string'
+                                    ]
                                 ]
-                            ]
                             ]
                         )
                     )

@@ -2,9 +2,6 @@
 
 namespace App\Entity;
 
-use DateTime;
-use DateTimeImmutable;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\MappedSuperclass]

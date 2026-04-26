@@ -14,8 +14,7 @@ class CommentCategoryApiToEntityMapper implements MapperInterface
 {
     public function __construct(
         private readonly CommentCategoryRepository $repository,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Exception

@@ -32,10 +32,10 @@ class ModuleApi extends BaseEntityApi
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     #[Groups(
         [
-        SerializationGroups::MODULE_GET,
-        SerializationGroups::PROGRAM_GET,
-        SerializationGroups::SEARCH,
-        SerializationGroups::USER
+            SerializationGroups::MODULE_GET,
+            SerializationGroups::PROGRAM_GET,
+            SerializationGroups::SEARCH,
+            SerializationGroups::USER
         ]
     )]
     public ?string $name = null;
@@ -54,9 +54,9 @@ class ModuleApi extends BaseEntityApi
 
     #[Groups(
         [
-        SerializationGroups::MODULE_GET,
-        SerializationGroups::PROGRAM_GET,
-        SerializationGroups::SEARCH,
+            SerializationGroups::MODULE_GET,
+            SerializationGroups::PROGRAM_GET,
+            SerializationGroups::SEARCH,
         ]
     )]
     public ProgramApi $program;

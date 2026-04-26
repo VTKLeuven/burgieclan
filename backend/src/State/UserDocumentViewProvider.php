@@ -3,14 +3,14 @@
 namespace App\State;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
-use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\UserDocumentViewApi;
 use App\Entity\User;
 use App\Repository\UserDocumentViewRepository;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfonycasts\MicroMapper\MicroMapperInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 /**
  * Custom provider for PageApi because it uses urlKey as identifier, while Page uses id as identifier
@@ -21,8 +21,7 @@ class UserDocumentViewProvider implements ProviderInterface
         private readonly Security $security,
         private readonly UserDocumentViewRepository $viewRepository,
         private readonly MicroMapperInterface $microMapper,
-    ) {
-    }
+    ) {}
 
     public function provide(
         Operation $operation,
@@ -44,8 +43,8 @@ class UserDocumentViewProvider implements ProviderInterface
                         $view,
                         UserDocumentViewApi::class,
                         [
-                        // Depth: document (0), document props (1), course (2), course props (3)
-                        MicroMapperInterface::MAX_DEPTH => 3,
+                            // Depth: document (0), document props (1), course (2), course props (3)
+                            MicroMapperInterface::MAX_DEPTH => 3,
                         ]
                     );
                 },

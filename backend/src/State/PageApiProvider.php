@@ -3,8 +3,8 @@
 namespace App\State;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
-use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\PageApi;
 use App\Entity\Page;
 use App\Repository\PageRepository;
@@ -21,8 +21,7 @@ class PageApiProvider implements ProviderInterface
         private readonly PageRepository $pageRepository,
         private readonly MicroMapperInterface $microMapper,
         private readonly RequestStack $requestStack,
-    ) {
-    }
+    ) {}
 
     /*
      * Retrieves a page by unique urlKey and returns the converted PageApi object

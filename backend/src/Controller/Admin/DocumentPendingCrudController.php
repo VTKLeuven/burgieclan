@@ -106,8 +106,8 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->setFormType(VichFileType::class)
             ->setFormTypeOptions(
                 [
-                'download_label' => true,
-                'allow_delete' => false,
+                    'download_label' => true,
+                    'allow_delete' => false,
                 ]
             )
             ->hideOnIndex();

@@ -18,8 +18,7 @@ class TagApiToEntityMapper implements MapperInterface
     public function __construct(
         private readonly TagRepository $repository,
         private readonly MicroMapperInterface $microMapper,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Exception
@@ -63,7 +62,7 @@ class TagApiToEntityMapper implements MapperInterface
                 $document,
                 Document::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
             $to->addDocument($documentEntity);

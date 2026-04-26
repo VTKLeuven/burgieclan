@@ -58,10 +58,10 @@ class UserApi extends BaseEntityApi
     #[ApiProperty(writable: false)]
     #[Groups(
         [
-        SerializationGroups::USER,
-        SerializationGroups::COURSE_GET,
-        SerializationGroups::DOCUMENT_GET,
-        SerializationGroups::DOCUMENT_COMMENT_GET
+            SerializationGroups::USER,
+            SerializationGroups::COURSE_GET,
+            SerializationGroups::DOCUMENT_GET,
+            SerializationGroups::DOCUMENT_COMMENT_GET
         ]
     )]
     public ?string $fullName = null;

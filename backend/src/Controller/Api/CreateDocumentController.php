@@ -23,8 +23,7 @@ class CreateDocumentController extends AbstractController
         private readonly IriConverterInterface $iriConverter,
         private readonly MicroMapperInterface $microMapper,
         private readonly StorageInterface $storage,
-    ) {
-    }
+    ) {}
 
     public function __invoke(Request $request): DocumentApi
     {
@@ -36,13 +35,13 @@ class CreateDocumentController extends AbstractController
         /** @var CourseApi $course */
         $course = $this->iriConverter->getResourceFromIri(
             $request->request->get('course') ??
-            throw new BadRequestHttpException('"course" is required')
+                throw new BadRequestHttpException('"course" is required')
         );
         $dto->course = $course;
         /** @var DocumentCategoryApi $category */
         $category = $this->iriConverter->getResourceFromIri(
             $request->request->get('category') ??
-            throw new BadRequestHttpException('"category" is required')
+                throw new BadRequestHttpException('"category" is required')
         );
         $dto->category = $category;
 

@@ -20,8 +20,7 @@ class CourseApiToEntityMapper implements MapperInterface
         private readonly CourseRepository $repository,
         private readonly MicroMapperInterface $microMapper,
         private readonly PropertyAccessorInterface $propertyAccessor,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Exception
@@ -56,7 +55,7 @@ class CourseApiToEntityMapper implements MapperInterface
                 $course,
                 Course::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
         }
@@ -68,7 +67,7 @@ class CourseApiToEntityMapper implements MapperInterface
                 $course,
                 Course::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
         }
@@ -80,7 +79,7 @@ class CourseApiToEntityMapper implements MapperInterface
                 $course,
                 Course::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
         }
@@ -92,7 +91,7 @@ class CourseApiToEntityMapper implements MapperInterface
                 $module,
                 Module::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
         }
@@ -104,7 +103,7 @@ class CourseApiToEntityMapper implements MapperInterface
                 $comment,
                 CourseComment::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
         }

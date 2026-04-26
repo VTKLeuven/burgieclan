@@ -32,7 +32,7 @@ class CommentCategoryApi extends BaseEntityApi
     #[ApiFilter(
         MultiLangSearchFilter::class,
         properties: [
-        'name' => ['name_nl', 'name_en'],
+            'name' => ['name_nl', 'name_en'],
         ]
     )]
     #[Groups([SerializationGroups::COMMENT_CATEGORY_GET])]
@@ -41,7 +41,7 @@ class CommentCategoryApi extends BaseEntityApi
     #[ApiFilter(
         MultiLangSearchFilter::class,
         properties: [
-        'description' => ['description_nl', 'description_en'],
+            'description' => ['description_nl', 'description_en'],
         ]
     )]
     #[Groups([SerializationGroups::COMMENT_CATEGORY_GET])]

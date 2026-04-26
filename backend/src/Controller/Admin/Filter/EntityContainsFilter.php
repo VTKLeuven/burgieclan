@@ -25,19 +25,19 @@ class EntityContainsFilter implements FilterInterface
             ->setFormType(EntityFilterType::class)
             ->setFormTypeOptions(
                 [
-                'value_type_options' => [
-                    'class' => $entityClass,
-                    'multiple' => true,
-                ],
-                'comparison_type_options' => [
-                    'choices' => [
-                        'Contains Any' => 'CONTAINS_ANY',
-                        'Contains All' => 'CONTAINS_ALL',
-                        'Is Same' => 'IN',
-                        'Is Not Same' => 'NOT IN',
+                    'value_type_options' => [
+                        'class' => $entityClass,
+                        'multiple' => true,
                     ],
-                ],
-                'translation_domain' => 'EasyAdminBundle',
+                    'comparison_type_options' => [
+                        'choices' => [
+                            'Contains Any' => 'CONTAINS_ANY',
+                            'Contains All' => 'CONTAINS_ALL',
+                            'Is Same' => 'IN',
+                            'Is Not Same' => 'NOT IN',
+                        ],
+                    ],
+                    'translation_domain' => 'EasyAdminBundle',
                 ]
             );
     }
