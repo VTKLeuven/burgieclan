@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
+use App\Constants\SerializationGroups;
 use App\Controller\Api\CreateVoteController;
 use App\Controller\Api\DeleteVoteController;
 use App\Entity\DocumentCommentVote;
@@ -60,8 +61,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
             )
         ),
     ],
-    normalizationContext: ['groups' => ['vote:read']],
-    denormalizationContext: ['groups' => ['vote:write']],
+    normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::VOTE_READ]],
+    denormalizationContext: ['groups' => [SerializationGroups::VOTE_WRITE]],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: DocumentCommentVote::class),
@@ -69,6 +70,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 class DocumentCommentVoteApi extends AbstractVoteApi
 {
     #[ApiProperty(writable: false)]
-    #[Groups(['vote:read'])]
+    #[Groups([SerializationGroups::VOTE_READ])]
     public ?DocumentCommentApi $documentComment = null;
 }

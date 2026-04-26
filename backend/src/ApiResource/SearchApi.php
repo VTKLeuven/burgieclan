@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
+use App\Constants\SerializationGroups;
 use App\Controller\Api\SearchController;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -29,7 +30,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
                     )
                 ]
             ),
-            normalizationContext: ['groups' => ['search']],
+            normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::SEARCH]],
             read: false,
         )
     ],
@@ -39,24 +40,24 @@ class SearchApi
     /**
      * @var CourseApi[]
      */
-    #[Groups('search')]
+    #[Groups(SerializationGroups::SEARCH)]
     public array $courses = [];
 
     /**
      * @var ModuleApi[]
      */
-    #[Groups('search')]
+    #[Groups(SerializationGroups::SEARCH)]
     public array $modules = [];
 
     /**
      * @var ProgramApi[]
      */
-    #[Groups('search')]
+    #[Groups(SerializationGroups::SEARCH)]
     public array $programs = [];
 
     /**
      * @var DocumentApi[]
      */
-    #[Groups('search')]
+    #[Groups(SerializationGroups::SEARCH)]
     public array $documents = [];
 }

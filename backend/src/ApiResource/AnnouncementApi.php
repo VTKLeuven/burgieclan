@@ -11,10 +11,12 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
+use App\Constants\SerializationGroups;
 use App\Entity\Announcement;
 use App\Filter\MultiLangSearchFilter;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     shortName: 'Announcement',
@@ -34,7 +36,8 @@ use App\State\EntityClassDtoStateProvider;
                         description: 'The language in which to retrieve the announcement content'
                     )
                 ]
-            )
+            ),
+            normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::ANNOUNCEMENT_GET]],
         ),
         new GetCollection(
             openapi: new Operation(
@@ -53,7 +56,8 @@ use App\State\EntityClassDtoStateProvider;
                         description: 'The language in which to retrieve the announcement content'
                     )
                 ]
-            )
+            ),
+            normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::ANNOUNCEMENT_GET]],
         ),
     ],
     provider: EntityClassDtoStateProvider::class,
@@ -68,6 +72,7 @@ class AnnouncementApi extends NodeApi
             'title' => ['title_nl', 'title_en'],
         ]
     )]
+    #[Groups([SerializationGroups::ANNOUNCEMENT_GET])]
     public ?string $title = null;
 
     #[ApiFilter(
@@ -76,16 +81,21 @@ class AnnouncementApi extends NodeApi
             'content' => ['content_nl', 'content_en'],
         ]
     )]
+    #[Groups([SerializationGroups::ANNOUNCEMENT_GET])]
     public ?string $content = null;
 
+    #[Groups([SerializationGroups::ANNOUNCEMENT_GET])]
     public ?UserApi $creator;
 
     #[ApiFilter(DateFilter::class)]
+    #[Groups([SerializationGroups::ANNOUNCEMENT_GET])]
     public string $startTime;
 
     #[ApiFilter(DateFilter::class)]
+    #[Groups([SerializationGroups::ANNOUNCEMENT_GET])]
     public string $endTime;
 
     #[ApiProperty(writable: false)]
+    #[Groups([SerializationGroups::ANNOUNCEMENT_GET])]
     public bool $priority;
 }
