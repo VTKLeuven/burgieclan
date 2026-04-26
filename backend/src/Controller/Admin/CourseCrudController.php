@@ -32,8 +32,8 @@ class CourseCrudController extends AbstractCrudController
         yield ChoiceField::new('language')
             ->setChoices(
                 [
-                'Dutch' => 'nl',
-                'English' => 'en',
+                    'Dutch' => 'nl',
+                    'English' => 'en',
                 ]
             );
         yield AssociationField::new('modules')

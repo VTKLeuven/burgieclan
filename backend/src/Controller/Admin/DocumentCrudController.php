@@ -39,9 +39,9 @@ class DocumentCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield TextField::new('name');
-        yield DateTimeField::new('createDate')
+        yield DateTimeField::new('createdAt')
             ->hideOnForm();
-        yield DateTimeField::new('updateDate')
+        yield DateTimeField::new('updatedAt')
             ->hideOnForm();
         yield AssociationField::new('course')
             ->autocomplete();
@@ -70,8 +70,8 @@ class DocumentCrudController extends AbstractCrudController
             ->setFormType(VichFileType::class)
             ->setFormTypeOptions(
                 [
-                'download_label' => true,
-                'allow_delete' => false,
+                    'download_label' => true,
+                    'allow_delete' => false,
                 ]
             )
             ->hideOnIndex();
@@ -86,7 +86,7 @@ class DocumentCrudController extends AbstractCrudController
             ->add('year')
             ->add(EntityContainsFilter::new('course', Course::class))
             ->add(EntityContainsFilter::new('category', DocumentCategory::class))
-            ->add(EntityContainsFilter::new('tags', Tag ::class))
+            ->add(EntityContainsFilter::new('tags', Tag::class))
             ->add('under_review')
             ->add('anonymous');
     }

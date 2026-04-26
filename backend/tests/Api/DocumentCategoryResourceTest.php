@@ -23,13 +23,15 @@ class DocumentCategoryResourceTest extends ApiTestCase
             ->assertJsonMatches('length("hydra:member")', 5)
             ->json();
 
-        $this->assertSame(
-            array_keys($json->decoded()['hydra:member'][0]),
+        $this->assertEqualsCanonicalizing(
             [
                 '@id',
                 '@type',
                 'name',
-            ]
+                'createdAt',
+                'updatedAt',
+            ],
+            array_keys($json->decoded()['hydra:member'][0])
         );
     }
 

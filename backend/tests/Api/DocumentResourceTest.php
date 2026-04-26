@@ -36,8 +36,7 @@ class DocumentResourceTest extends ApiTestCase
             ->assertJsonMatches('length("hydra:member")', 5)
             ->json();
 
-        $this->assertSame(
-            array_keys($json->decoded()['hydra:member'][0]),
+        $this->assertEqualsCanonicalizing(
             [
                 '@id',
                 '@type',
@@ -54,7 +53,8 @@ class DocumentResourceTest extends ApiTestCase
                 'createdAt',
                 'updatedAt',
                 'tags',
-            ]
+            ],
+            array_keys($json->decoded()['hydra:member'][0])
         );
     }
 
@@ -79,8 +79,7 @@ class DocumentResourceTest extends ApiTestCase
             ->assertJsonMatches('"hydra:totalItems"', 5)
             ->assertJsonMatches('length("hydra:member")', 5)
             ->json();
-        $this->assertSame(
-            array_keys($json->decoded()['hydra:member'][0]),
+        $this->assertEqualsCanonicalizing(
             [
                 '@id',
                 '@type',
@@ -96,7 +95,8 @@ class DocumentResourceTest extends ApiTestCase
                 'createdAt',
                 'updatedAt',
                 'tags',
-            ]
+            ],
+            array_keys($json->decoded()['hydra:member'][0])
         ); // Notice that creator is not included in the response.
     }
 
@@ -983,7 +983,13 @@ class DocumentResourceTest extends ApiTestCase
             ->assertJson()
             ->json()->decoded();
 
-        $this->assertContains($documentIRI, $tagResponse['documents']);
+        $documentIRIsinTag = array_map(
+            function ($doc) {
+                return $doc['@id'];
+            },
+            $tagResponse['documents']
+        );
+        $this->assertContains($documentIRI, $documentIRIsinTag);
 
         // Clean up the file
         $contentUrl = $json['contentUrl'];

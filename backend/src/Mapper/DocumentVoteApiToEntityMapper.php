@@ -20,8 +20,7 @@ class DocumentVoteApiToEntityMapper implements MapperInterface
         private readonly DocumentVoteRepository $repository,
         private readonly Security $security,
         private readonly MicroMapperInterface $microMapper,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Exception
@@ -52,7 +51,7 @@ class DocumentVoteApiToEntityMapper implements MapperInterface
                 $from->document,
                 Document::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             )
         );

@@ -6,13 +6,8 @@ use App\Repository\QuickLinkRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: QuickLinkRepository::class)]
-class QuickLink
+class QuickLink extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     public static string $DEFAULT_LANGUAGE = 'nl';
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -23,11 +18,6 @@ class QuickLink
 
     #[ORM\Column(length: 255)]
     private string $linkTo;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getName(string $lang): ?string
     {

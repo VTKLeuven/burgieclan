@@ -4,10 +4,10 @@ namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use App\Constants\SerializationGroups;
 use App\Entity\DocumentCategory;
 use App\Filter\MultiLangSearchFilter;
 use App\State\EntityClassDtoStateProcessor;
@@ -21,22 +21,23 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(),
         new GetCollection(),
     ],
+    normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::DOCUMENT_CATEGORY_GET]],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: DocumentCategory::class),
 )]
-class DocumentCategoryApi
+class DocumentCategoryApi extends BaseEntityApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[Assert\NotBlank]
     #[ApiFilter(
         MultiLangSearchFilter::class,
         properties: [
-        'name' => ['name_nl',
-        'name_en']]
+            'name' => [
+                'name_nl',
+                'name_en'
+            ]
+        ]
     )]
-    #[Groups(['document:get'])]
+    #[Groups([SerializationGroups::DOCUMENT_CATEGORY_GET, SerializationGroups::DOCUMENT_GET])]
     public ?string $name = null;
 }

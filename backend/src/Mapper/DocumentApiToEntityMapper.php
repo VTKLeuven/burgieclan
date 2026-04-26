@@ -21,8 +21,7 @@ class DocumentApiToEntityMapper implements MapperInterface
         private readonly DocumentRepository $repository,
         private readonly Security $security,
         private readonly MicroMapperInterface $microMapper,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Exception
@@ -50,7 +49,7 @@ class DocumentApiToEntityMapper implements MapperInterface
                 $from->course,
                 Course::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             )
         );
@@ -59,7 +58,7 @@ class DocumentApiToEntityMapper implements MapperInterface
                 $from->category,
                 DocumentCategory::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             )
         );
@@ -72,7 +71,7 @@ class DocumentApiToEntityMapper implements MapperInterface
                 $tag,
                 Tag::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
             $to->addTag($tagEntity);

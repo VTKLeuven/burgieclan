@@ -39,8 +39,7 @@ final class Paginator
     public function __construct(
         private readonly DoctrineQueryBuilder $queryBuilder,
         private readonly int $pageSize = self::PAGE_SIZE
-    ) {
-    }
+    ) {}
 
     public function paginate(int $page = 1): self
     {

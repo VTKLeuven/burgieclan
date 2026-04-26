@@ -29,8 +29,7 @@ class CreateVoteController extends AbstractController
         private readonly Security $security,
         private readonly SerializerInterface $serializer,
         private readonly MicroMapperInterface $microMapper,
-    ) {
-    }
+    ) {}
 
     public function __invoke(Request $request): JsonResponse
     {

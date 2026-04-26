@@ -31,7 +31,7 @@ class CommentCategoryCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnDetail();
-        yield Textfield::new('name_nl')
+        yield TextField::new('name_nl')
             ->setRequired(true)
             ->setLabel('Name (NL)');
         yield TextEditorField::new('description_nl')
@@ -40,7 +40,7 @@ class CommentCategoryCrudController extends AbstractCrudController
 
         yield FormField::addFieldset('English Content')->setIcon('fa fa-language')
             ->collapsible();
-        yield Textfield::new('name_en')
+        yield TextField::new('name_en')
             ->setLabel('Name (EN)');
         yield TextEditorField::new('description_en')
             ->setLabel('Description (EN)')

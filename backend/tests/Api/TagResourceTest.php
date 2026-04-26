@@ -27,14 +27,16 @@ class TagResourceTest extends ApiTestCase
             ->assertJsonMatches('length("hydra:member")', 5)
             ->json();
 
-        $this->assertSame(
-            array_keys($json->decoded()['hydra:member'][0]),
+        $this->assertEqualsCanonicalizing(
             [
                 '@id',
                 '@type',
                 'name',
                 'documents',
-            ]
+                'createdAt',
+                'updatedAt',
+            ],
+            array_keys($json->decoded()['hydra:member'][0])
         );
     }
 
@@ -307,8 +309,12 @@ class TagResourceTest extends ApiTestCase
             ->assertJsonMatches('length("documents")', 2)
             ->json()->decoded();
 
-        $this->assertContains('/api/documents/' . $document1->getId(), $response['documents']);
-        $this->assertContains('/api/documents/' . $document2->getId(), $response['documents']);
+        $documentIRIsInResponse = array_map(
+            fn($doc) => $doc['@id'],
+            $response['documents']
+        );
+        $this->assertContains('/api/documents/' . $document1->getId(), $documentIRIsInResponse);
+        $this->assertContains('/api/documents/' . $document2->getId(), $documentIRIsInResponse);
 
         // Verify the relationship from the document side (optional)
         $response = $this->browser()

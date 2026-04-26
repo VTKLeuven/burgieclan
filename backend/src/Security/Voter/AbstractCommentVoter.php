@@ -26,8 +26,7 @@ class AbstractCommentVoter extends Voter
 
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
-    ) {
-    }
+    ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -57,7 +56,7 @@ class AbstractCommentVoter extends Voter
                     $subject->creator,
                     User::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 0,
+                        MicroMapperInterface::MAX_DEPTH => 0,
                     ]
                 );
 
@@ -75,7 +74,7 @@ class AbstractCommentVoter extends Voter
                     $subject->creator,
                     User::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 0,
+                        MicroMapperInterface::MAX_DEPTH => 0,
                     ]
                 );
 

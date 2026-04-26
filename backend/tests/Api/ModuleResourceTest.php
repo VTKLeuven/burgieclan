@@ -31,8 +31,7 @@ class ModuleResourceTest extends ApiTestCase
             ->assertJsonMatches('length("hydra:member")', 5)
             ->json();
 
-        $this->assertSame(
-            array_keys($json->decoded()['hydra:member'][0]),
+        $this->assertEqualsCanonicalizing(
             [
                 '@id',
                 '@type',
@@ -40,7 +39,10 @@ class ModuleResourceTest extends ApiTestCase
                 'courses',
                 'modules',
                 'program',
-            ]
+                'createdAt',
+                'updatedAt',
+            ],
+            array_keys($json->decoded()['hydra:member'][0])
         );
     }
 
@@ -68,15 +70,17 @@ class ModuleResourceTest extends ApiTestCase
             ->assertJsonMatches('length("hydra:member")', 5)
             ->json();
 
-        $this->assertSame(
-            array_keys($json->decoded()['hydra:member'][0]),
+        $this->assertEqualsCanonicalizing(
             [
                 '@id',
                 '@type',
                 'name',
                 'courses',
                 'modules',
-            ]
+                'createdAt',
+                'updatedAt',
+            ],
+            array_keys($json->decoded()['hydra:member'][0])
         );
     }
 
@@ -107,8 +111,11 @@ class ModuleResourceTest extends ApiTestCase
         $parents = array_filter($json->decoded()['hydra:member'], fn($m) => isset($m['modules']) && count($m['modules']) === 2);
         $this->assertCount(3, $parents);
         foreach ($parents as $module) {
+            $this->assertArrayHasKey('modules', $module);
+            $this->assertCount(2, $module['modules']);
             foreach ($module['modules'] as $submodule) {
-                $this->assertIsString($submodule); // Should be IRI string
+                $this->assertArrayHasKey('@id', $submodule);
+                $this->assertArrayHasKey('name', $submodule);
             }
         }
     }

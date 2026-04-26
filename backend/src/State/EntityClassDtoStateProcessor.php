@@ -17,8 +17,7 @@ class EntityClassDtoStateProcessor implements ProcessorInterface
         #[Autowire(service: PersistProcessor::class)] private readonly ProcessorInterface $persistProcessor,
         #[Autowire(service: RemoveProcessor::class)] private readonly ProcessorInterface $removeProcessor,
         private readonly MicroMapperInterface $microMapper
-    ) {
-    }
+    ) {}
 
     /**
      * @param mixed $data

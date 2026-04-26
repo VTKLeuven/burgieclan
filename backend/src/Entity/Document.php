@@ -14,11 +14,6 @@ use Vich\UploaderBundle\Mapping\Attribute as Vich;
 #[ORM\Entity(repositoryClass: DocumentRepository::class)]
 class Document extends Node implements VotableInterface
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(length: 255)]
     private string $name;
 
@@ -70,11 +65,6 @@ class Document extends Node implements VotableInterface
         parent::__construct($creator);
         $this->tags = new ArrayCollection();
         $this->votes = new ArrayCollection();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getName(): string
@@ -171,7 +161,7 @@ class Document extends Node implements VotableInterface
         if (null !== $file) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
-            $this->setUpdateDate();
+            $this->onPreUpdate();
         }
     }
 

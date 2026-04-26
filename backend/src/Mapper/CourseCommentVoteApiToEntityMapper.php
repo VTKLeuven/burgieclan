@@ -20,8 +20,7 @@ class CourseCommentVoteApiToEntityMapper implements MapperInterface
         private readonly CourseCommentVoteRepository $repository,
         private readonly Security $security,
         private readonly MicroMapperInterface $microMapper,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Exception
@@ -52,7 +51,7 @@ class CourseCommentVoteApiToEntityMapper implements MapperInterface
                 $from->courseComment,
                 CourseComment::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             )
         );

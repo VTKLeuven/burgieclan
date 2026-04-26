@@ -10,25 +10,23 @@ use App\ApiResource\UserApi;
 use App\Entity\Document;
 use App\Entity\Tag;
 use Symfonycasts\MicroMapper\AsMapper;
-use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 use Vich\UploaderBundle\Storage\StorageInterface;
 
 #[AsMapper(from: Document::class, to: DocumentApi::class)]
-class DocumentEntityToApiMapper implements MapperInterface
+class DocumentEntityToApiMapper extends BaseEntityToApiMapper
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
         private readonly StorageInterface $storage,
-    ) {
-    }
+    ) {}
 
     public function load(object $from, string $toClass, array $context): object
     {
         assert($from instanceof Document);
 
         $dto = new DocumentApi();
-        $dto->id = $from->getId();
+        $this->mapBaseFields($from, $dto);
 
         return $dto;
     }
@@ -43,15 +41,15 @@ class DocumentEntityToApiMapper implements MapperInterface
             $from->getCourse(),
             CourseApi::class,
             [
-            MicroMapperInterface::MAX_DEPTH => 2,
+                MicroMapperInterface::MAX_DEPTH => 2,
             ]
         );
         $to->category = $this->microMapper->map(
             $from->getCategory(),
             DocumentCategoryApi::class,
             [
-            MicroMapperInterface::MAX_DEPTH => 2,
-            'lang' => isset($context['lang']) ? $context['lang'] : null,
+                MicroMapperInterface::MAX_DEPTH => 2,
+                'lang' => isset($context['lang']) ? $context['lang'] : null,
             ]
         );
         $to->year = $from->getYear();
@@ -61,11 +59,9 @@ class DocumentEntityToApiMapper implements MapperInterface
             $from->getCreator(),
             UserApi::class,
             [
-            MicroMapperInterface::MAX_DEPTH => 1,
+                MicroMapperInterface::MAX_DEPTH => 1,
             ]
         );
-        $to->createdAt = $from->getCreateDate()->format('Y-m-d H:i:s');
-        $to->updatedAt = $from->getUpdateDate()->format('Y-m-d H:i:s');
         $to->contentUrl = $this->storage->resolveUri($from, 'file');
         $to->tags = array_map(
             function (Tag $tag) {
@@ -73,7 +69,7 @@ class DocumentEntityToApiMapper implements MapperInterface
                     $tag,
                     TagApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 1,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },

@@ -6,10 +6,10 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use App\Constants\SerializationGroups;
 use App\Entity\Program;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
@@ -20,26 +20,30 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'Program',
     operations: [
         new Get(),
-        new GetCollection(normalizationContext: ['groups' => ['program:get']]),
+        new GetCollection(),
     ],
+    normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::PROGRAM_GET]],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: Program::class),
 )]
 #[ApiFilter(OrderFilter::class)]
-class ProgramApi
+class ProgramApi extends BaseEntityApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups(['program:get', 'search', 'user'])]
+    #[Groups(
+        [
+            SerializationGroups::PROGRAM_GET,
+            SerializationGroups::SEARCH,
+            SerializationGroups::USER
+        ]
+    )]
     public ?string $name = null;
 
     /**
      * @var ModuleApi[]
      */
-    #[Groups(['program:get'])]
+    #[Groups([SerializationGroups::PROGRAM_GET])]
     public array $modules = [];
 }

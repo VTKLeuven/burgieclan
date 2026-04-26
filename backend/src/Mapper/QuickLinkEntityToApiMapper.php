@@ -5,17 +5,16 @@ namespace App\Mapper;
 use App\ApiResource\QuickLinkApi;
 use App\Entity\QuickLink;
 use Symfonycasts\MicroMapper\AsMapper;
-use Symfonycasts\MicroMapper\MapperInterface;
 
 #[AsMapper(from: QuickLink::class, to: QuickLinkApi::class)]
-class QuickLinkEntityToApiMapper implements MapperInterface
+class QuickLinkEntityToApiMapper extends BaseEntityToApiMapper
 {
     public function load(object $from, string $toClass, array $context): object
     {
         assert($from instanceof QuickLink);
 
         $dto = new QuickLinkApi();
-        $dto->id = $from->getId();
+        $this->mapBaseFields($from, $dto);
 
         return $dto;
     }

@@ -9,23 +9,21 @@ use App\Entity\Course;
 use App\Entity\CourseComment;
 use App\Entity\Module;
 use Symfonycasts\MicroMapper\AsMapper;
-use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 #[AsMapper(from: Course::class, to: CourseApi::class)]
-class CourseEntityToApiMapper implements MapperInterface
+class CourseEntityToApiMapper extends BaseEntityToApiMapper
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
-    ) {
-    }
+    ) {}
 
     public function load(object $from, string $toClass, array $context): object
     {
         assert($from instanceof Course);
 
         $dto = new CourseApi();
-        $dto->id = $from->getId();
+        $this->mapBaseFields($from, $dto);
 
         return $dto;
     }
@@ -47,7 +45,7 @@ class CourseEntityToApiMapper implements MapperInterface
                     $course,
                     CourseApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 0,
+                        MicroMapperInterface::MAX_DEPTH => 0,
                     ]
                 );
             },
@@ -59,7 +57,7 @@ class CourseEntityToApiMapper implements MapperInterface
                     $course,
                     CourseApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 0,
+                        MicroMapperInterface::MAX_DEPTH => 0,
                     ]
                 );
             },
@@ -72,7 +70,7 @@ class CourseEntityToApiMapper implements MapperInterface
                     $course,
                     CourseApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 0,
+                        MicroMapperInterface::MAX_DEPTH => 0,
                     ]
                 );
             },
@@ -85,7 +83,7 @@ class CourseEntityToApiMapper implements MapperInterface
                     $module,
                     ModuleApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 0,
+                        MicroMapperInterface::MAX_DEPTH => 0,
                     ]
                 );
             },
@@ -98,7 +96,7 @@ class CourseEntityToApiMapper implements MapperInterface
                     $comment,
                     CourseCommentApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 2,
+                        MicroMapperInterface::MAX_DEPTH => 2,
                     ]
                 );
             },

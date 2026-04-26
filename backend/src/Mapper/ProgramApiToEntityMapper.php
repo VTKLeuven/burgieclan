@@ -14,8 +14,7 @@ class ProgramApiToEntityMapper implements MapperInterface
 {
     public function __construct(
         private readonly ProgramRepository $repository,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Exception

@@ -30,8 +30,7 @@ class AddFavoriteToUserController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly SerializerInterface $serializer,
         private readonly IriConverterInterface $iriConverter,
-    ) {
-    }
+    ) {}
 
     public function __invoke(UserApi $userApi, Request $request)
     {
@@ -55,7 +54,7 @@ class AddFavoriteToUserController extends AbstractController
                 $courseApi,
                 Course::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
 
@@ -69,7 +68,7 @@ class AddFavoriteToUserController extends AbstractController
                 $moduleApi,
                 Module::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
             $user->addFavoriteModule($module);
@@ -81,7 +80,7 @@ class AddFavoriteToUserController extends AbstractController
                 $programApi,
                 Program::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
             $user->addFavoriteProgram($program);
@@ -93,7 +92,7 @@ class AddFavoriteToUserController extends AbstractController
                 $documentApi,
                 Document::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             );
             $user->addFavoriteDocument($document);
@@ -105,7 +104,7 @@ class AddFavoriteToUserController extends AbstractController
             $user,
             UserApi::class,
             [
-            MicroMapperInterface::MAX_DEPTH => 1,
+                MicroMapperInterface::MAX_DEPTH => 1,
             ]
         );
         $serializedUserApi = $this->serializer->serialize(

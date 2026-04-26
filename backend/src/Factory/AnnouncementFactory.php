@@ -15,9 +15,7 @@ final class AnnouncementFactory extends PersistentObjectFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
      */
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     #[\Override]
     public static function class(): string
@@ -31,8 +29,8 @@ final class AnnouncementFactory extends PersistentObjectFactory
     #[\Override]
     protected function defaults(): array|callable
     {
-        $createDate = new DateTimeImmutable();
-        $startTime = $createDate->add(new DateInterval('P' . self::faker()->numberBetween(1, 10) . 'D'));
+        $createdAt = new DateTimeImmutable();
+        $startTime = $createdAt->add(new DateInterval('P' . self::faker()->numberBetween(1, 10) . 'D'));
         $endTime = $startTime->add(new DateInterval('P' . self::faker()->numberBetween(1, 10) . 'D'));
         return [
             'title_nl' => self::faker()->word(),
