@@ -13,23 +13,21 @@ use App\Entity\Module;
 use App\Entity\Program;
 use App\Entity\User;
 use Symfonycasts\MicroMapper\AsMapper;
-use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 #[AsMapper(from: User::class, to: UserApi::class)]
-class UserEntityToApiMapper implements MapperInterface
+class UserEntityToApiMapper extends BaseEntityToApiMapper
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
-    ) {
-    }
+    ) {}
 
     public function load(object $from, string $toClass, array $context): object
     {
         assert($from instanceof User);
 
         $dto = new UserApi();
-        $dto->id = $from->getId();
+        $this->mapBaseFields($from, $dto);
 
         return $dto;
     }
@@ -48,7 +46,7 @@ class UserEntityToApiMapper implements MapperInterface
                     $course,
                     CourseApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 1,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },
@@ -60,7 +58,7 @@ class UserEntityToApiMapper implements MapperInterface
                     $module,
                     ModuleApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 1,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },
@@ -72,7 +70,7 @@ class UserEntityToApiMapper implements MapperInterface
                     $program,
                     ProgramApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 1,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },
@@ -84,7 +82,7 @@ class UserEntityToApiMapper implements MapperInterface
                     $document,
                     DocumentApi::class,
                     [
-                    MicroMapperInterface::MAX_DEPTH => 1,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },

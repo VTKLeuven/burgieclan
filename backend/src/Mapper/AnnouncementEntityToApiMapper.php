@@ -5,25 +5,22 @@ namespace App\Mapper;
 use App\ApiResource\AnnouncementApi;
 use App\ApiResource\UserApi;
 use App\Entity\Announcement;
-use DateTime;
 use Symfonycasts\MicroMapper\AsMapper;
-use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 #[AsMapper(from: Announcement::class, to: AnnouncementApi::class)]
-class AnnouncementEntityToApiMapper implements MapperInterface
+class AnnouncementEntityToApiMapper extends BaseEntityToApiMapper
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
-    ) {
-    }
+    ) {}
 
     public function load(object $from, string $toClass, array $context): object
     {
         assert($from instanceof Announcement);
 
         $dto = new AnnouncementApi();
-        $dto->id = $from->getId();
+        $this->mapBaseFields($from, $dto);
 
         return $dto;
     }
@@ -49,8 +46,6 @@ class AnnouncementEntityToApiMapper implements MapperInterface
 
         $to->startTime = $from->getStartTime()->format('Y-m-d H:i:s');
         $to->endTime = $from->getEndTime()->format('Y-m-d H:i:s');
-        $to->createdAt = DateTime::createFromInterface($from->getCreateDate())->format('Y-m-d H:i:s');
-        $to->updatedAt = DateTime::createFromInterface($from->getUpdateDate())->format('Y-m-d H:i:s');
 
         return $to;
     }

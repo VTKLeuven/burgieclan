@@ -54,7 +54,7 @@ class DocumentRepository extends ServiceEntityRepository
             $this->logger->warning(
                 'Error counting pending documents',
                 [
-                'error' => $e->getMessage()
+                    'error' => $e->getMessage()
                 ]
             );
             return 0;
@@ -97,7 +97,7 @@ class DocumentRepository extends ServiceEntityRepository
 
         /** @var Document[] $result */
         $result = $queryBuilder
-            ->orderBy('d.updateDate', 'DESC')
+            ->orderBy('d.updatedAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();

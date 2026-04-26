@@ -6,6 +6,7 @@ use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use App\Constants\SerializationGroups;
 use App\Entity\UserDocumentView;
 use App\State\UserDocumentViewProvider;
 use DateTimeInterface;
@@ -17,25 +18,22 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(
             uriTemplate: 'document_views',
-            normalizationContext: ['groups' => ['user:document_views']],
+            normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::USER_DOCUMENT_VIEWS]],
             provider: UserDocumentViewProvider::class,
         ),
     ],
     stateOptions: new Options(entityClass: UserDocumentView::class)
 )]
-class UserDocumentViewApi
+class UserDocumentViewApi extends BaseEntityApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[Assert\NotNull]
     #[ApiProperty(writable: true)]
-    #[Groups(['user:document_views', 'user:document_views:batch'])]
+    #[Groups([SerializationGroups::USER_DOCUMENT_VIEWS, SerializationGroups::USER_DOCUMENT_VIEWS_BATCH])]
     public DocumentApi $document;
 
     #[Assert\NotNull]
     #[Assert\Type(DateTimeInterface::class)]
     #[ApiProperty(writable: true)]
-    #[Groups(['user:document_views', 'user:document_views:batch'])]
+    #[Groups([SerializationGroups::USER_DOCUMENT_VIEWS, SerializationGroups::USER_DOCUMENT_VIEWS_BATCH])]
     public DateTimeInterface $lastViewed;
 }

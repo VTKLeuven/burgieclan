@@ -2,9 +2,7 @@
 
 namespace App\Tests\Api;
 
-use App\Entity\Page;
 use App\Factory\PageFactory;
-use Zenstruck\Foundry\Proxy;
 
 class PageResourceTest extends ApiTestCase
 {

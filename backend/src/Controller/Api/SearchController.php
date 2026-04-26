@@ -27,8 +27,7 @@ class SearchController extends AbstractController
         private readonly ProgramRepository $programRepository,
         private readonly DocumentRepository $documentRepository,
         private readonly MicroMapperInterface $microMapper,
-    ) {
-    }
+    ) {}
 
     public function __invoke(Request $request)
     {

@@ -33,17 +33,17 @@ use ArrayObject;
                 requestBody: new RequestBody(
                     content: new ArrayObject(
                         [
-                        'application/json' => [
-                            'schema' => [
-                                'type' => 'object',
-                                'properties' => [
-                                    'refresh_token' => [
-                                        'type' => 'string',
-                                        'description' => 'The refresh token to invalidate'
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'refresh_token' => [
+                                            'type' => 'string',
+                                            'description' => 'The refresh token to invalidate'
+                                        ]
                                     ]
                                 ]
                             ]
-                        ]
                         ]
                     )
                 )

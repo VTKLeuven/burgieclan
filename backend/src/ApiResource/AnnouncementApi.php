@@ -11,10 +11,12 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
+use App\Constants\SerializationGroups;
 use App\Entity\Announcement;
 use App\Filter\MultiLangSearchFilter;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     shortName: 'Announcement',
@@ -34,7 +36,8 @@ use App\State\EntityClassDtoStateProvider;
                         description: 'The language in which to retrieve the announcement content'
                     )
                 ]
-            )
+            ),
+            normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::ANNOUNCEMENT_GET]],
         ),
         new GetCollection(
             openapi: new Operation(
@@ -53,24 +56,23 @@ use App\State\EntityClassDtoStateProvider;
                         description: 'The language in which to retrieve the announcement content'
                     )
                 ]
-            )
+            ),
+            normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::ANNOUNCEMENT_GET]],
         ),
     ],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: Announcement::class),
 )]
-class AnnouncementApi
+class AnnouncementApi extends NodeApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
     #[ApiFilter(
         MultiLangSearchFilter::class,
         properties: [
             'title' => ['title_nl', 'title_en'],
         ]
     )]
+    #[Groups([SerializationGroups::ANNOUNCEMENT_GET])]
     public ?string $title = null;
 
     #[ApiFilter(
@@ -79,22 +81,18 @@ class AnnouncementApi
             'content' => ['content_nl', 'content_en'],
         ]
     )]
+    #[Groups([SerializationGroups::ANNOUNCEMENT_GET])]
     public ?string $content = null;
 
-    public ?UserApi $creator;
-
     #[ApiFilter(DateFilter::class)]
+    #[Groups([SerializationGroups::ANNOUNCEMENT_GET])]
     public string $startTime;
 
     #[ApiFilter(DateFilter::class)]
+    #[Groups([SerializationGroups::ANNOUNCEMENT_GET])]
     public string $endTime;
 
     #[ApiProperty(writable: false)]
-    public string $createdAt;
-
-    #[ApiProperty(writable: false)]
-    public string $updatedAt;
-
-    #[ApiProperty(writable: false)]
+    #[Groups([SerializationGroups::ANNOUNCEMENT_GET])]
     public bool $priority;
 }

@@ -23,19 +23,19 @@ class ArrayContainsFilter implements FilterInterface
             ->setFormType(ChoiceFilterType::class)
             ->setFormTypeOptions(
                 [
-                'value_type_options' => [
-                    'choices' => $choices,
-                    'multiple' => true,
-                ],
-                'comparison_type_options' => [
-                    'choices' => [
-                        'Contains Any' => 'CONTAINS_ANY',
-                        'Contains All' => 'CONTAINS_ALL',
-                        'Is Same' => 'IN',
-                        'Is Not Same' => 'NOT IN',
+                    'value_type_options' => [
+                        'choices' => $choices,
+                        'multiple' => true,
                     ],
-                ],
-                'translation_domain' => 'EasyAdminBundle',
+                    'comparison_type_options' => [
+                        'choices' => [
+                            'Contains Any' => 'CONTAINS_ANY',
+                            'Contains All' => 'CONTAINS_ALL',
+                            'Is Same' => 'IN',
+                            'Is Not Same' => 'NOT IN',
+                        ],
+                    ],
+                    'translation_domain' => 'EasyAdminBundle',
                 ]
             );
     }

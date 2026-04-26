@@ -91,13 +91,13 @@ final class DeleteUserCommand extends Command
         $this->io->title('Delete User Command Interactive Wizard');
         $this->io->text(
             [
-            'If you prefer to not use this interactive wizard, provide the',
-            'arguments required by this command as follows:',
-            '',
-            ' $ php bin/console app:delete-user username',
-            '',
-            'Now we\'ll ask you for the value of all the missing command arguments.',
-            '',
+                'If you prefer to not use this interactive wizard, provide the',
+                'arguments required by this command as follows:',
+                '',
+                ' $ php bin/console app:delete-user username',
+                '',
+                'Now we\'ll ask you for the value of all the missing command arguments.',
+                '',
             ]
         );
 
@@ -142,9 +142,11 @@ final class DeleteUserCommand extends Command
         // See https://symfony.com/doc/current/logging.html
         $this->logger->info(
             'User "{username}" (ID: {id}, email: {email}) was successfully deleted.',
-            ['username' => $userUsername,
+            [
+                'username' => $userUsername,
                 'id' => $userId,
-                'email' => $userEmail]
+                'email' => $userEmail
+            ]
         );
 
         return Command::SUCCESS;

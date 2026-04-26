@@ -14,8 +14,7 @@ class DocumentCategoryApiToEntityMapper implements MapperInterface
 {
     public function __construct(
         private readonly DocumentCategoryRepository $repository,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Exception

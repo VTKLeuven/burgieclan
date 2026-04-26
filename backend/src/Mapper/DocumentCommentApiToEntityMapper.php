@@ -20,8 +20,7 @@ class DocumentCommentApiToEntityMapper implements MapperInterface
         private readonly DocumentCommentRepository $repository,
         private readonly Security $security,
         private readonly MicroMapperInterface $microMapper,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Exception
@@ -53,7 +52,7 @@ class DocumentCommentApiToEntityMapper implements MapperInterface
                 $from->document,
                 Document::class,
                 [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                    MicroMapperInterface::MAX_DEPTH => 0,
                 ]
             )
         );

@@ -22,8 +22,7 @@ class LitusAuthenticator extends OAuth2Authenticator implements AuthenticationEn
         private readonly ClientRegistry $clientRegistry,
         private readonly RouterInterface $router,
         private readonly UserRepository $userRepository
-    ) {
-    }
+    ) {}
 
     public function start(Request $request, ?AuthenticationException $authException = null): RedirectResponse
     {
@@ -43,7 +42,7 @@ class LitusAuthenticator extends OAuth2Authenticator implements AuthenticationEn
             new UserBadge(
                 $accessToken->getToken(),
                 function () use ($accessToken, $client) {
-                /** @var LitusResourceOwner $litusUser */
+                    /** @var LitusResourceOwner $litusUser */
                     $litusUser = $client->fetchUserFromToken($accessToken);
 
                     return $this->userRepository->createUserfromLitusUser($litusUser, $accessToken);

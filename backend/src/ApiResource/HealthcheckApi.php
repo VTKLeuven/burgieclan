@@ -6,8 +6,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Response;
-use ArrayObject;
 use App\Controller\Api\HealthcheckController;
+use ArrayObject;
 
 #[ApiResource(
     shortName: 'Healthcheck',
@@ -24,14 +24,14 @@ use App\Controller\Api\HealthcheckController;
                         description: 'Service is healthy',
                         content: new ArrayObject(
                             [
-                            'application/json' => [
-                                'example' => [
-                                    'status' => 'ok',
-                                    'timestamp' => '2025-11-08T12:00:00+00:00',
-                                    'service' => 'burgieclan-api',
-                                    'database' => 'connected'
+                                'application/json' => [
+                                    'example' => [
+                                        'status' => 'ok',
+                                        'timestamp' => '2025-11-08T12:00:00+00:00',
+                                        'service' => 'burgieclan-api',
+                                        'database' => 'connected'
+                                    ]
                                 ]
-                            ]
                             ]
                         )
                     ),
@@ -39,15 +39,15 @@ use App\Controller\Api\HealthcheckController;
                         description: 'Service is unhealthy',
                         content: new ArrayObject(
                             [
-                            'application/json' => [
-                                'example' => [
-                                    'status' => 'error',
-                                    'timestamp' => '2025-11-08T12:00:00+00:00',
-                                    'service' => 'burgieclan-api',
-                                    'database' => 'disconnected',
-                                    'error' => 'Database connection failed'
+                                'application/json' => [
+                                    'example' => [
+                                        'status' => 'error',
+                                        'timestamp' => '2025-11-08T12:00:00+00:00',
+                                        'service' => 'burgieclan-api',
+                                        'database' => 'disconnected',
+                                        'error' => 'Database connection failed'
+                                    ]
                                 ]
-                            ]
                             ]
                         )
                     )

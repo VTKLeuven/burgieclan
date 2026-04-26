@@ -10,11 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: CourseCommentRepository::class)]
 class CourseComment extends AbstractComment implements VotableInterface
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\ManyToOne(inversedBy: 'courseComments')]
     #[ORM\JoinColumn(nullable: false)]
     private Course $course;
@@ -43,11 +38,6 @@ class CourseComment extends AbstractComment implements VotableInterface
     public function __toString(): string
     {
         return sprintf('%s (%s)', $this->getContent(), $this->getCourse()->getName());
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getCourse(): Course

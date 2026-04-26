@@ -74,9 +74,9 @@ class DocumentPendingCrudController extends DocumentCrudController
     public function configureFields(string $pageName): iterable
     {
         yield TextField::new('name');
-        yield DateTimeField::new('createDate')
+        yield DateTimeField::new('createdAt')
             ->hideOnForm();
-        yield DateTimeField::new('updateDate')
+        yield DateTimeField::new('updatedAt')
             ->hideOnForm();
         yield AssociationField::new('category')
             ->autocomplete();
@@ -106,8 +106,8 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->setFormType(VichFileType::class)
             ->setFormTypeOptions(
                 [
-                'download_label' => true,
-                'allow_delete' => false,
+                    'download_label' => true,
+                    'allow_delete' => false,
                 ]
             )
             ->hideOnIndex();

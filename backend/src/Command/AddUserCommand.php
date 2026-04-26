@@ -121,12 +121,12 @@ final class AddUserCommand extends Command
         $this->io->title('Add User Command Interactive Wizard');
         $this->io->text(
             [
-            'If you prefer to not use this interactive wizard, provide the',
-            'arguments required by this command as follows:',
-            '',
-            ' $ php bin/console app:add-user username password email@example.com',
-            '',
-            'Now we\'ll ask you for the value of all the missing command arguments.',
+                'If you prefer to not use this interactive wizard, provide the',
+                'arguments required by this command as follows:',
+                '',
+                ' $ php bin/console app:add-user username password email@example.com',
+                '',
+                'Now we\'ll ask you for the value of all the missing command arguments.',
             ]
         );
 
@@ -216,7 +216,7 @@ final class AddUserCommand extends Command
             sprintf(
                 '%s was successfully created: %s (%s)',
                 $isAdmin ?
-                'Administrator user' : 'User',
+                    'Administrator user' : 'User',
                 $user->getUsername(),
                 $user->getEmail()
             )

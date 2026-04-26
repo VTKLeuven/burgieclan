@@ -47,7 +47,7 @@ class CourseCommentVoteRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('v')
             ->andWhere('v.courseComment = :courseComment')
             ->setParameter('courseComment', $courseComment)
-            ->orderBy('v.createDate', 'DESC')
+            ->orderBy('v.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
     }
@@ -91,7 +91,7 @@ class CourseCommentVoteRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('v')
             ->andWhere('v.creator = :user')
             ->setParameter('user', $user)
-            ->orderBy('v.createDate', 'DESC')
+            ->orderBy('v.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
     }

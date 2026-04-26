@@ -3,15 +3,16 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
+use App\Constants\SerializationGroups;
 use App\Entity\QuickLink;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     shortName: 'QuickLink',
@@ -51,16 +52,16 @@ use App\State\EntityClassDtoStateProvider;
             )
         ),
     ],
+    normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::QUICKLINK_GET]],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: QuickLink::class),
 )]
-class QuickLinkApi
+class QuickLinkApi extends BaseEntityApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
-    public ?int $id = null;
-
+    #[Groups([SerializationGroups::QUICKLINK_GET])]
     public ?string $name = null;
 
+    #[Groups([SerializationGroups::QUICKLINK_GET])]
     public ?string $linkTo = null;
 }

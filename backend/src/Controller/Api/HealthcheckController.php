@@ -12,8 +12,7 @@ class HealthcheckController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-    ) {
-    }
+    ) {}
 
     public function __invoke(): JsonResponse
     {
@@ -24,21 +23,21 @@ class HealthcheckController extends AbstractController
 
             return new JsonResponse(
                 [
-                'status' => 'ok',
-                'timestamp' => date('c'),
-                'service' => 'burgieclan-api',
-                'database' => 'connected'
+                    'status' => 'ok',
+                    'timestamp' => date('c'),
+                    'service' => 'burgieclan-api',
+                    'database' => 'connected'
                 ],
                 Response::HTTP_OK
             );
         } catch (Exception $e) {
             return new JsonResponse(
                 [
-                'status' => 'error',
-                'timestamp' => date('c'),
-                'service' => 'burgieclan-api',
-                'database' => 'disconnected',
-                'error' => $e->getMessage()
+                    'status' => 'error',
+                    'timestamp' => date('c'),
+                    'service' => 'burgieclan-api',
+                    'database' => 'disconnected',
+                    'error' => $e->getMessage()
                 ],
                 Response::HTTP_SERVICE_UNAVAILABLE
             );

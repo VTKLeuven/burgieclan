@@ -9,10 +9,12 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
+use App\Constants\SerializationGroups;
 use App\Entity\Page;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
 use App\State\PageApiProvider;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -59,23 +61,32 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: PageApiProvider::class,
         )
     ],
+    normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::PAGE_GET]],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: Page::class),
 )]
-class PageApi
+class PageApi extends BaseEntityApi
 {
+    // Override BaseEntityApi: urlKey is the identifier here, not id
+    #[ApiProperty(readable: false, writable: false, identifier: false)]
+    public ?int $id = null;
+
     #[ApiProperty(readable: true, writable: false, identifier: true)]
     #[Assert\NotBlank]
     #[Assert\Length(max: 255)]
+    #[Groups([SerializationGroups::PAGE_GET])]
     public ?string $urlKey = null;
 
     #[Assert\NotBlank]
     #[Assert\Length(max: 255)]
+    #[Groups([SerializationGroups::PAGE_GET])]
     public ?string $name = null;
 
     #[Assert\NotBlank]
+    #[Groups([SerializationGroups::PAGE_GET])]
     public ?string $content = null;
 
+    #[Groups([SerializationGroups::PAGE_GET])]
     public bool $publicAvailable = false;
 }

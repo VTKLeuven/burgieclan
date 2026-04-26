@@ -5,16 +5,18 @@ namespace App\Mapper;
 use App\ApiResource\PageApi;
 use App\Entity\Page;
 use Symfonycasts\MicroMapper\AsMapper;
-use Symfonycasts\MicroMapper\MapperInterface;
 
 #[AsMapper(from: Page::class, to: PageApi::class)]
-class PageEntityToApiMapper implements MapperInterface
+class PageEntityToApiMapper extends BaseEntityToApiMapper
 {
     public function load(object $from, string $toClass, array $context): object
     {
         assert($from instanceof Page);
 
-        return new PageApi();
+        $dto = new PageApi();
+        $this->mapBaseFields($from, $dto);
+
+        return $dto;
     }
 
     public function populate(object $from, object $to, array $context): object

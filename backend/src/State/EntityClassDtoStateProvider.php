@@ -2,10 +2,10 @@
 
 namespace App\State;
 
-use ApiPlatform\Doctrine\Orm\State\ItemProvider;
-use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Doctrine\Orm\Paginator;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
+use ApiPlatform\Doctrine\Orm\State\ItemProvider;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
@@ -21,8 +21,7 @@ class EntityClassDtoStateProvider implements ProviderInterface
         #[Autowire(service: ItemProvider::class)] private readonly ProviderInterface $itemProvider,
         private readonly MicroMapperInterface $microMapper,
         private readonly RequestStack $requestStack,
-    ) {
-    }
+    ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
@@ -30,8 +29,8 @@ class EntityClassDtoStateProvider implements ProviderInterface
         if ($operation instanceof CollectionOperationInterface) {
             $request = $this->requestStack->getCurrentRequest();
             $disablePagination = $request && $request->query->has('pagination') &&
-                                ($request->query->get('pagination') === 'false'
-                                || $request->query->get('pagination') === '0');
+                ($request->query->get('pagination') === 'false'
+                    || $request->query->get('pagination') === '0');
 
             $entities = $this->collectionProvider->provide($operation, $uriVariables, $context);
 

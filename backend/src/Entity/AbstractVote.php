@@ -9,22 +9,12 @@ abstract class AbstractVote extends Node
     public const UPVOTE = 1;
     public const DOWNVOTE = -1;
 
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    protected ?int $id = null;
-
     #[ORM\Column]
     protected ?int $voteType = null;
 
     public function __construct(User $creator)
     {
         parent::__construct($creator);
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getVoteType(): ?int

@@ -22,13 +22,13 @@ use App\Controller\Api\LitusOAuthCallbackController;
                         content: null,
                         headers: new \ArrayObject(
                             [
-                            'Location' => [
-                                'description' => 'Frontend callback URL with JWT tokens and redirect parameters',
-                                'schema' => [
-                                    'type' => 'string',
-                                    'example' => 'http://localhost:3000/auth/callback?token=jwt&refresh_token=refresh'
+                                'Location' => [
+                                    'description' => 'Frontend callback URL with JWT tokens and redirect parameters',
+                                    'schema' => [
+                                        'type' => 'string',
+                                        'example' => 'http://localhost:3000/auth/callback?token=jwt&refresh_token=refresh'
+                                    ]
                                 ]
-                            ]
                             ]
                         )
                     ),
@@ -37,13 +37,13 @@ use App\Controller\Api\LitusOAuthCallbackController;
                         content: null,
                         headers: new \ArrayObject(
                             [
-                            'Location' => [
-                                'description' => 'Frontend callback URL with error parameter',
-                                'schema' => [
-                                    'type' => 'string',
-                                    'example' => 'http://localhost:3000/auth/callback?error=Invalid%20OAuth%20state'
+                                'Location' => [
+                                    'description' => 'Frontend callback URL with error parameter',
+                                    'schema' => [
+                                        'type' => 'string',
+                                        'example' => 'http://localhost:3000/auth/callback?error=Invalid%20OAuth%20state'
+                                    ]
                                 ]
-                            ]
                             ]
                         )
                     )

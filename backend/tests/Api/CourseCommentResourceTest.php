@@ -245,6 +245,7 @@ class CourseCommentResourceTest extends ApiTestCase
                         'category' => '/api/comment_categories/' . $category->getId(),
                     ],
                     'headers' => [
+                        'Content-Type' => 'application/ld+json',
                         'Authorization' => 'Bearer ' . $this->token
                     ]
                 ]

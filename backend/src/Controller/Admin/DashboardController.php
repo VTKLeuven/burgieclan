@@ -16,9 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
-    public function __construct(private readonly DocumentRepository $documentRepository)
-    {
-    }
+    public function __construct(private readonly DocumentRepository $documentRepository) {}
 
     public function index(): Response
     {
