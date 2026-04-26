@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Constants\SerializationGroups;
 use App\Entity\CourseComment;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
@@ -31,15 +32,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
             security: 'is_granted("DELETE", object)'
         ),
     ],
+    normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::COURSE_COMMENT_GET]],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: CourseComment::class),
 )]
 class CourseCommentApi extends AbstractCommentApi
 {
-    #[Groups(['course:get'])]
+    #[Groups([SerializationGroups::COURSE_COMMENT_GET, SerializationGroups::COURSE_GET])]
     public ?CourseApi $course;
 
-    #[Groups(['course:get'])]
+    #[Groups([SerializationGroups::COURSE_COMMENT_GET, SerializationGroups::COURSE_GET])]
     public ?CommentCategoryApi $category;
 }

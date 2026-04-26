@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use App\Constants\SerializationGroups;
 use App\Entity\Tag;
 use App\Filter\TagDocumentCategoryFilter;
 use App\Filter\TagDocumentCourseFilter;
@@ -22,6 +23,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new GetCollection(),
         new Post(),
     ],
+    normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::TAG_GET]],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: Tag::class),
@@ -30,12 +32,28 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiFilter(TagDocumentCourseFilter::class)]
 class TagApi extends BaseEntityApi
 {
-    #[Groups(['search', 'user', 'document:get', 'document:create'])]
+    #[Groups(
+        [
+        SerializationGroups::TAG_GET,
+        SerializationGroups::SEARCH,
+        SerializationGroups::USER,
+        SerializationGroups::DOCUMENT_GET,
+        SerializationGroups::DOCUMENT_CREATE
+        ]
+    )]
     public ?string $name = null;
 
     /**
      * @var DocumentApi[]
      */
-    #[Groups(['search', 'user', 'document:get', 'document:create'])]
+    #[Groups(
+        [
+        SerializationGroups::TAG_GET,
+        SerializationGroups::SEARCH,
+        SerializationGroups::USER,
+        SerializationGroups::DOCUMENT_GET,
+        SerializationGroups::DOCUMENT_CREATE
+        ]
+    )]
     public array $documents = [];
 }

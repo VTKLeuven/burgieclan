@@ -24,7 +24,10 @@ class CommentCategoryResourceTest extends ApiTestCase
             ->assertJsonMatches('length("hydra:member")', 5)
             ->json();
 
-        $this->assertSame(array_keys($json->decoded()['hydra:member'][0]), ['@id', '@type', 'name', 'description',]);
+        $this->assertEqualsCanonicalizing(
+            ['@id', '@type', 'name', 'description', 'createdAt', 'updatedAt'],
+            array_keys($json->decoded()['hydra:member'][0])
+        );
     }
 
     public function testGetOneCommentCategory(): void

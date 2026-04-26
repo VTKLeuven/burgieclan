@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
+use App\Constants\SerializationGroups;
 use App\Controller\Api\CreateDocumentController;
 use App\Entity\Document;
 use App\Filter\TagFilter;
@@ -28,7 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'Document',
     operations: [
         new Get(
-            normalizationContext: ['groups' => ['document:get']],
+            normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::DOCUMENT_GET]],
             provider: DocumentApiProvider::class
         ),
         new GetCollection(
@@ -50,7 +51,7 @@ use Symfony\Component\Validator\Constraints as Assert;
                     )
                 ]
             ),
-            normalizationContext: ['groups' => ['document:get']],
+            normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::DOCUMENT_GET]],
             provider: DocumentApiProvider::class
         ),
         new Post(
@@ -112,7 +113,8 @@ use Symfony\Component\Validator\Constraints as Assert;
                     )
                 )
             ),
-            validationContext: ['groups' => ['document:create']],
+            validationContext: ['groups' => [SerializationGroups::DOCUMENT_CREATE]],
+            normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::DOCUMENT_CREATE]],
             read: false,
             deserialize: false,
             validate: false,
@@ -128,47 +130,70 @@ class DocumentApi extends NodeApi
 {
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups(['search', 'user', 'document:get', 'document:create', 'user:document_views'])]
+    #[Groups(
+        [
+        SerializationGroups::SEARCH,
+        SerializationGroups::USER,
+        SerializationGroups::DOCUMENT_GET,
+        SerializationGroups::DOCUMENT_CREATE,
+        SerializationGroups::USER_DOCUMENT_VIEWS
+        ]
+    )]
     public ?string $name = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
-    #[Groups(['search', 'user', 'document:get', 'document:create', 'user:document_views'])]
+    #[Groups(
+        [
+        SerializationGroups::SEARCH,
+        SerializationGroups::USER,
+        SerializationGroups::DOCUMENT_GET,
+        SerializationGroups::DOCUMENT_CREATE,
+        SerializationGroups::USER_DOCUMENT_VIEWS
+        ]
+    )]
     public ?CourseApi $course;
 
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
-    #[Groups(['search', 'user', 'document:get', 'document:create'])]
+    #[Groups(
+        [
+        SerializationGroups::SEARCH,
+        SerializationGroups::USER,
+        SerializationGroups::DOCUMENT_GET,
+        SerializationGroups::DOCUMENT_CREATE
+        ]
+    )]
     public ?DocumentCategoryApi $category = null;
 
     #[Assert\Length(5)]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
-    #[Groups(['document:get', 'document:create'])]
+    #[Groups([SerializationGroups::DOCUMENT_GET, SerializationGroups::DOCUMENT_CREATE])]
     public ?string $year = null;
 
     #[ApiProperty(writable: false)]
     #[ApiFilter(BooleanFilter::class)]
-    #[Groups(['search', 'document:get'])]
+    #[Groups([SerializationGroups::SEARCH, SerializationGroups::DOCUMENT_GET])]
     public bool $under_review = true;
 
     #[ApiFilter(BooleanFilter::class)]
-    #[Groups(['document:get'])]
+    #[Groups([SerializationGroups::DOCUMENT_GET])]
     public bool $anonymous = false;
 
-    #[Groups(['document:get'])]
+    #[Groups([SerializationGroups::DOCUMENT_GET])]
     public ?string $contentUrl = null;
 
     #[ApiProperty(writable: false)]
-    #[Groups(['document:get'])]
+    #[Groups([SerializationGroups::DOCUMENT_GET])]
     public ?string $mimetype = null;
 
     #[ApiProperty(writable: false)]
-    #[Groups(['document:get'])]
+    #[Groups([SerializationGroups::DOCUMENT_GET])]
     public ?string $filename = null;
 
     #[ApiProperty(writable: false)]
-    #[Groups(['document:get'])]
+    #[Groups([SerializationGroups::DOCUMENT_GET])]
     public ?int $fileSize = null;
 
-    #[Assert\NotNull(groups: ['document:create'])]
+    #[Assert\NotNull(groups: [SerializationGroups::DOCUMENT_CREATE])]
     #[ApiProperty(readable: false)]
     public ?File $file = null;
 
@@ -178,13 +203,20 @@ class DocumentApi extends NodeApi
         strategy: 'exact',
         properties: ['creator' => 'exact', 'creator.fullName' => 'ipartial']
     )]
-    #[Groups(['search', 'document:get'])]
+    #[Groups([SerializationGroups::SEARCH, SerializationGroups::DOCUMENT_GET])]
     public ?UserApi $creator;
 
     /**
      * @var TagApi[]
      */
     #[ApiFilter(TagFilter::class, properties: ['tags' => true, 'tags.name' => true])]
-    #[Groups(['search', 'user', 'document:get', 'document:create'])]
+    #[Groups(
+        [
+        SerializationGroups::SEARCH,
+        SerializationGroups::USER,
+        SerializationGroups::DOCUMENT_GET,
+        SerializationGroups::DOCUMENT_CREATE
+        ]
+    )]
     public array $tags = [];
 }

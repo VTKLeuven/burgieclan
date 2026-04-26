@@ -26,8 +26,7 @@ class CourseResourceTest extends ApiTestCase
             ->assertJsonMatches('length("hydra:member")', 5)
             ->json();
 
-        $this->assertSame(
-            array_keys($json->decoded()['hydra:member'][0]),
+        $this->assertEqualsCanonicalizing(
             [
                 '@id',
                 '@type',
@@ -42,7 +41,10 @@ class CourseResourceTest extends ApiTestCase
                 'newCourses',
                 'modules',
                 'courseComments',
-            ]
+                'createdAt',
+                'updatedAt',
+            ],
+            array_keys($json->decoded()['hydra:member'][0])
         );
     }
 

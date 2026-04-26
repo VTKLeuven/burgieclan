@@ -2,11 +2,10 @@
 
 namespace App\ApiResource;
 
-use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
+use App\Constants\SerializationGroups;
 use App\Controller\Api\AddDocumentViewToUserController;
-use App\Entity\UserDocumentView;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
@@ -15,7 +14,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Post(
             uriTemplate: 'document_views/batch',
             controller: AddDocumentViewToUserController::class,
-            denormalizationContext: ['groups' => ['user:document_views:batch']],
+            denormalizationContext: ['groups' => [SerializationGroups::USER_DOCUMENT_VIEWS_BATCH]],
         ),
     ],
 )]
@@ -24,6 +23,6 @@ class ListUserDocumentViewApi
     /**
      * @var UserDocumentViewApi[]
      */
-    #[Groups('user:document_views:batch')]
+    #[Groups([SerializationGroups::USER_DOCUMENT_VIEWS_BATCH])]
     public array $userDocumentViews = [];
 }
