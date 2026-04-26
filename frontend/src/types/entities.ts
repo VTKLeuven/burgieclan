@@ -1,12 +1,12 @@
 import { VoteDirection } from "@/components/ui/buttons/VoteButton";
 interface BaseEntity {
     id: number;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 interface NodeEntity extends BaseEntity {
-    creator?: User,
-    createdAt?: Date;
-    updatedAt?: Date;
+    creator?: User;
 }
 
 export interface Course extends BaseEntity {
