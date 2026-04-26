@@ -2,48 +2,21 @@
   "entrypoints": {
     "app": {
       "js": [
-        "/build/runtime.a1abe9fc.js",
-        "/build/848.6184fd2c.js",
-        "/build/655.0294d708.js",
-        "/build/553.58ed09b3.js",
-        "/build/app.e95d32f7.js"
+        "/build/runtime.ad3a625c.js",
+        "/build/792.07cfd2db.js",
+        "/build/app.952e0166.js"
       ],
       "css": [
-        "/build/553.89647e14.css",
-        "/build/app.36334270.css"
-      ]
-    },
-    "admin": {
-      "js": [
-        "/build/runtime.a1abe9fc.js",
-        "/build/848.6184fd2c.js",
-        "/build/985.49cc8a21.js",
-        "/build/admin.ae6b6add.js"
-      ],
-      "css": [
-        "/build/admin.0cb1ac85.css"
-      ]
-    },
-    "search": {
-      "js": [
-        "/build/runtime.a1abe9fc.js",
-        "/build/848.6184fd2c.js",
-        "/build/655.0294d708.js",
-        "/build/search.45fe2177.js"
+        "/build/792.94c63b37.css",
+        "/build/app.7eb98903.css"
       ]
     }
   },
   "integrity": {
-    "/build/runtime.a1abe9fc.js": "sha384-cwjBS9KV9buaUrs6S+X8dL9ir4RF+EAqU2Z8b4LZzkudLp//o8p71dYDsu5/geip",
-    "/build/848.6184fd2c.js": "sha384-5BOuZQu8HxvcFpxkB0/KrQmzM76vE99+R92j6jEc7C+p/5NeSZPCiShyTu3UMVgb",
-    "/build/655.0294d708.js": "sha384-25xdSdH+RXbUy6jPs+e3yu8LQEOJxtzrxWACEeit3JSUlmBb46BJJi2BTUfmFlc8",
-    "/build/553.58ed09b3.js": "sha384-W9mGBkIU7WfdRWrA7TrXPfvVl6O1w+u9ZxSMdPeWnFsGTacosBkgtKn2iSgj/0GD",
-    "/build/app.e95d32f7.js": "sha384-2byRjTZdryhvfATliYKklVOaiArqyFpXLe+xDTNCpR+/U+B0+46Thcoc3RSY2lkx",
-    "/build/553.89647e14.css": "sha384-B8s2S6kZ3srom387hNq7VicKCJGYdncbgou4bvapZc068ODzQx2xKLLH76jS/edU",
-    "/build/app.36334270.css": "sha384-bRg3EqYFv6ndKaiiElarOLqE/P5wLM/TMytVFv4fbkhUdHuCCoQdVx7loy9CWS4k",
-    "/build/985.49cc8a21.js": "sha384-u+OSOxtWlDd+RUmBmByQo0xcyM2peVhQ2Ygl0+XJgVBKfDnI8eiyC7mPNn4bV4ro",
-    "/build/admin.ae6b6add.js": "sha384-3MdkV1tsIDx2RWzqUgFm3NOmAW/aOIVtgTf730SaAHPd/SdtrXfS0qqwt0IpuDLj",
-    "/build/admin.0cb1ac85.css": "sha384-Cj+8mLhRnFPc77lx4qAVcXiweEMKw05wipBlACMHVEv3uPoc6ZxbfGneCpq514Ex",
-    "/build/search.45fe2177.js": "sha384-bB/fXHNWeHXZbw+FMnYQvDobPoOA81DeqeTg01wVDvYeWyOrXPTuglqLMeljMltF"
+    "/build/runtime.ad3a625c.js": "sha384-h12jg0vmrhrwAC5Cy5v2pCyVVPWDiGL75SUdWhe7AiokA2f4ii1wEK+/Ntf9DMnJ",
+    "/build/792.07cfd2db.js": "sha384-A53xnnGKjs7tUpDfq3UwF8Wg8mFung9Xu3S8yvUjqG4vyLipfaqgsa4qYyS41N3B",
+    "/build/app.952e0166.js": "sha384-86iDL3FY8OSZL9Wsd5rQ+bVg1SdORxSYoszGqE6BiiOUkRWATbv7ExBoQJQPyR5F",
+    "/build/792.94c63b37.css": "sha384-dvf/f49FagUW33x2itBeDoNQAQTft+rUTHktcIy41LEedzkD3heDEEAS9koBomMb",
+    "/build/app.7eb98903.css": "sha384-986/EFJ4dsj454Wr9Vh0M1vwBGwp/+ZpZxvT+1BxUwhYagjXuzb/omKXUOSxuKsZ"
   }
 }
