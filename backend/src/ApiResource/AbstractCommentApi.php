@@ -15,9 +15,9 @@ abstract class AbstractCommentApi extends NodeApi
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     #[Groups(
         [
-        SerializationGroups::COURSE_GET,
-        SerializationGroups::DOCUMENT_COMMENT_GET,
-        SerializationGroups::COURSE_COMMENT_GET
+            SerializationGroups::COURSE_GET,
+            SerializationGroups::DOCUMENT_COMMENT_GET,
+            SerializationGroups::COURSE_COMMENT_GET
         ]
     )]
     public ?string $content = null;
@@ -25,9 +25,9 @@ abstract class AbstractCommentApi extends NodeApi
     #[ApiFilter(BooleanFilter::class)]
     #[Groups(
         [
-        SerializationGroups::COURSE_GET,
-        SerializationGroups::DOCUMENT_COMMENT_GET,
-        SerializationGroups::COURSE_COMMENT_GET
+            SerializationGroups::COURSE_GET,
+            SerializationGroups::DOCUMENT_COMMENT_GET,
+            SerializationGroups::COURSE_COMMENT_GET
         ]
     )]
     public bool $anonymous = false;

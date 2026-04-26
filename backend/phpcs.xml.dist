@@ -8,7 +8,10 @@
     <arg name="colors"/>
     <arg name="extensions" value="php"/>
 
-    <rule ref="PSR12"/>
+    <rule ref="PSR12">
+        <exclude name="Squiz.WhiteSpace.ScopeClosingBrace"/>
+        <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
+    </rule>
 
     <!-- Do not allow unreachable code. -->
     <rule ref="Squiz.PHP.NonExecutableCode"/>

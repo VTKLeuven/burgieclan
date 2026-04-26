@@ -54,7 +54,7 @@ class DocumentRepository extends ServiceEntityRepository
             $this->logger->warning(
                 'Error counting pending documents',
                 [
-                'error' => $e->getMessage()
+                    'error' => $e->getMessage()
                 ]
             );
             return 0;

@@ -12,8 +12,7 @@ class LitusOAuthInitiateController extends AbstractController
 {
     public function __construct(
         private readonly ClientRegistry $clientRegistry
-    ) {
-    }
+    ) {}
 
 
     public function __invoke(Request $request): RedirectResponse

@@ -132,11 +132,11 @@ class DocumentApi extends NodeApi
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     #[Groups(
         [
-        SerializationGroups::SEARCH,
-        SerializationGroups::USER,
-        SerializationGroups::DOCUMENT_GET,
-        SerializationGroups::DOCUMENT_CREATE,
-        SerializationGroups::USER_DOCUMENT_VIEWS
+            SerializationGroups::SEARCH,
+            SerializationGroups::USER,
+            SerializationGroups::DOCUMENT_GET,
+            SerializationGroups::DOCUMENT_CREATE,
+            SerializationGroups::USER_DOCUMENT_VIEWS
         ]
     )]
     public ?string $name = null;
@@ -144,11 +144,11 @@ class DocumentApi extends NodeApi
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Groups(
         [
-        SerializationGroups::SEARCH,
-        SerializationGroups::USER,
-        SerializationGroups::DOCUMENT_GET,
-        SerializationGroups::DOCUMENT_CREATE,
-        SerializationGroups::USER_DOCUMENT_VIEWS
+            SerializationGroups::SEARCH,
+            SerializationGroups::USER,
+            SerializationGroups::DOCUMENT_GET,
+            SerializationGroups::DOCUMENT_CREATE,
+            SerializationGroups::USER_DOCUMENT_VIEWS
         ]
     )]
     public ?CourseApi $course;
@@ -156,10 +156,10 @@ class DocumentApi extends NodeApi
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Groups(
         [
-        SerializationGroups::SEARCH,
-        SerializationGroups::USER,
-        SerializationGroups::DOCUMENT_GET,
-        SerializationGroups::DOCUMENT_CREATE
+            SerializationGroups::SEARCH,
+            SerializationGroups::USER,
+            SerializationGroups::DOCUMENT_GET,
+            SerializationGroups::DOCUMENT_CREATE
         ]
     )]
     public ?DocumentCategoryApi $category = null;
@@ -212,10 +212,10 @@ class DocumentApi extends NodeApi
     #[ApiFilter(TagFilter::class, properties: ['tags' => true, 'tags.name' => true])]
     #[Groups(
         [
-        SerializationGroups::SEARCH,
-        SerializationGroups::USER,
-        SerializationGroups::DOCUMENT_GET,
-        SerializationGroups::DOCUMENT_CREATE
+            SerializationGroups::SEARCH,
+            SerializationGroups::USER,
+            SerializationGroups::DOCUMENT_GET,
+            SerializationGroups::DOCUMENT_CREATE
         ]
     )]
     public array $tags = [];

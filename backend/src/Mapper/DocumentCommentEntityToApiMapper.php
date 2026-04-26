@@ -16,8 +16,7 @@ class DocumentCommentEntityToApiMapper extends BaseEntityToApiMapper
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
         private readonly Security $security,
-    ) {
-    }
+    ) {}
 
     public function load(object $from, string $toClass, array $context): object
     {

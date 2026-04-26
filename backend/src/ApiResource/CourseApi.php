@@ -31,13 +31,13 @@ class CourseApi extends BaseEntityApi
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     #[Groups(
         [
-        SerializationGroups::COURSE_GET,
-        SerializationGroups::PROGRAM_GET,
-        SerializationGroups::MODULE_GET,
-        SerializationGroups::SEARCH,
-        SerializationGroups::USER,
-        SerializationGroups::DOCUMENT_GET,
-        SerializationGroups::USER_DOCUMENT_VIEWS
+            SerializationGroups::COURSE_GET,
+            SerializationGroups::PROGRAM_GET,
+            SerializationGroups::MODULE_GET,
+            SerializationGroups::SEARCH,
+            SerializationGroups::USER,
+            SerializationGroups::DOCUMENT_GET,
+            SerializationGroups::USER_DOCUMENT_VIEWS
         ]
     )]
     public ?string $name = null;
@@ -47,12 +47,12 @@ class CourseApi extends BaseEntityApi
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
     #[Groups(
         [
-        SerializationGroups::COURSE_GET,
-        SerializationGroups::PROGRAM_GET,
-        SerializationGroups::MODULE_GET,
-        SerializationGroups::SEARCH,
-        SerializationGroups::USER,
-        SerializationGroups::DOCUMENT_GET
+            SerializationGroups::COURSE_GET,
+            SerializationGroups::PROGRAM_GET,
+            SerializationGroups::MODULE_GET,
+            SerializationGroups::SEARCH,
+            SerializationGroups::USER,
+            SerializationGroups::DOCUMENT_GET
         ]
     )]
     public ?string $code = null;
@@ -64,20 +64,20 @@ class CourseApi extends BaseEntityApi
 
     #[Groups(
         [
-        SerializationGroups::COURSE_GET,
-        SerializationGroups::PROGRAM_GET,
-        SerializationGroups::MODULE_GET,
-        SerializationGroups::SEARCH
+            SerializationGroups::COURSE_GET,
+            SerializationGroups::PROGRAM_GET,
+            SerializationGroups::MODULE_GET,
+            SerializationGroups::SEARCH
         ]
     )]
     public array $professors = [];
 
     #[Groups(
         [
-        SerializationGroups::COURSE_GET,
-        SerializationGroups::PROGRAM_GET,
-        SerializationGroups::MODULE_GET,
-        SerializationGroups::SEARCH
+            SerializationGroups::COURSE_GET,
+            SerializationGroups::PROGRAM_GET,
+            SerializationGroups::MODULE_GET,
+            SerializationGroups::SEARCH
         ]
     )]
     public array $semesters = [];
@@ -85,10 +85,10 @@ class CourseApi extends BaseEntityApi
     #[Assert\Positive]
     #[Groups(
         [
-        SerializationGroups::COURSE_GET,
-        SerializationGroups::PROGRAM_GET,
-        SerializationGroups::MODULE_GET,
-        SerializationGroups::SEARCH
+            SerializationGroups::COURSE_GET,
+            SerializationGroups::PROGRAM_GET,
+            SerializationGroups::MODULE_GET,
+            SerializationGroups::SEARCH
         ]
     )]
     public ?int $credits = null;

@@ -49,8 +49,8 @@ class DocumentCommentCrudController extends AbstractCrudController
         yield AssociationField::new('document')
             ->autocomplete()
             ->setCrudController(DocumentCrudController::class);
-            // Explicit reference needed because there are multiple crudcontrollers for Document
-            // See https://symfonycasts.com/screencast/easyadminbundle/multiple-crud#autocomplete-and-multiple-crud-controllers
+        // Explicit reference needed because there are multiple crudcontrollers for Document
+        // See https://symfonycasts.com/screencast/easyadminbundle/multiple-crud#autocomplete-and-multiple-crud-controllers
         yield DateTimeField::new('createdAt')
             ->hideOnForm();
         yield DateTimeField::new('updatedAt')

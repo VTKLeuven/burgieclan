@@ -979,7 +979,6 @@ class DocumentResourceTest extends ApiTestCase
                     ]
                 ]
             )
-            ->dump()
             ->assertStatus(200)
             ->assertJson()
             ->json()->decoded();

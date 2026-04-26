@@ -50,7 +50,7 @@ TEMP_FILE=$(mktemp)
 echo "$STAGED_FILES" > "$TEMP_FILE"
 
 # Run phpcs on staged files
-PHPCS_OUTPUT=$(cd "$GIT_ROOT" && cat "$TEMP_FILE" | xargs "$PHPCS" --runtime-set ignore_warnings_on_exit 1 2>&1)
+PHPCS_OUTPUT=$(cd "$GIT_ROOT" && cat "$TEMP_FILE" | xargs "$PHPCS" --standard="$BACKEND_DIR/phpcs.xml.dist" --runtime-set ignore_warnings_on_exit 1 2>&1)
 PHPCS_EXIT_CODE=$?
 
 # Clean up temp file

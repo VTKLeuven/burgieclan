@@ -310,7 +310,7 @@ class TagResourceTest extends ApiTestCase
             ->json()->decoded();
 
         $documentIRIsInResponse = array_map(
-            fn ($doc) => $doc['@id'],
+            fn($doc) => $doc['@id'],
             $response['documents']
         );
         $this->assertContains('/api/documents/' . $document1->getId(), $documentIRIsInResponse);

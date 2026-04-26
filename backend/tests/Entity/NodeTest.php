@@ -2,7 +2,6 @@
 
 namespace App\Tests\Entity;
 
-use App\Entity\BaseEntity;
 use App\Entity\Node;
 use App\Entity\User;
 use DateTime;

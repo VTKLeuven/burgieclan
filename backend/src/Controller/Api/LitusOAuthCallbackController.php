@@ -26,8 +26,7 @@ class LitusOAuthCallbackController extends AbstractController
         private readonly UserRepository $userRepository,
         private readonly ClientRegistry $clientRegistry,
         private readonly LoggerInterface $logger
-    ) {
-    }
+    ) {}
 
     public function __invoke(Request $request): RedirectResponse
     {

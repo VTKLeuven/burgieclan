@@ -84,9 +84,6 @@ class AnnouncementApi extends NodeApi
     #[Groups([SerializationGroups::ANNOUNCEMENT_GET])]
     public ?string $content = null;
 
-    #[Groups([SerializationGroups::ANNOUNCEMENT_GET])]
-    public ?UserApi $creator;
-
     #[ApiFilter(DateFilter::class)]
     #[Groups([SerializationGroups::ANNOUNCEMENT_GET])]
     public string $startTime;

@@ -14,10 +14,10 @@ abstract class NodeApi extends BaseEntityApi
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Groups(
         [
-        SerializationGroups::COURSE_GET,
-        SerializationGroups::DOCUMENT_COMMENT_GET,
-        SerializationGroups::COURSE_COMMENT_GET,
-        SerializationGroups::ANNOUNCEMENT_GET
+            SerializationGroups::COURSE_GET,
+            SerializationGroups::DOCUMENT_COMMENT_GET,
+            SerializationGroups::COURSE_COMMENT_GET,
+            SerializationGroups::ANNOUNCEMENT_GET
         ]
     )]
     public ?UserApi $creator;

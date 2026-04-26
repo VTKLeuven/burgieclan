@@ -14,8 +14,7 @@ class ModuleApiToEntityMapper implements MapperInterface
 {
     public function __construct(
         private readonly ModuleRepository $repository,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Exception

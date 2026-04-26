@@ -28,11 +28,11 @@ class PageCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield Textfield::new('urlKey')
+        yield TextField::new('urlKey')
             ->setHelp('The URL key is used to generate the URL of the page.');
         yield BooleanField::new('publicAvailable')
             ->renderAsSwitch(false);
-        yield Textfield::new('name_nl')
+        yield TextField::new('name_nl')
             ->setRequired(true)
             ->setLabel('Name (NL)');
         yield TextEditorField::new('content_nl')
@@ -42,7 +42,7 @@ class PageCrudController extends AbstractCrudController
         yield FormField::addFieldset('English Content')->setIcon('fa fa-language')
             ->collapsible()
             ->renderCollapsed();
-        yield Textfield::new('name_en')
+        yield TextField::new('name_en')
             ->setLabel('Name (EN)');
         yield TextEditorField::new('content_en')
             ->setLabel('Content (EN)')
