@@ -18,7 +18,7 @@ use App\State\EntityClassDtoStateProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
-    shortName: 'Document Comment',
+    shortName: 'DocumentComment',
     operations: [
         new Get(
             normalizationContext: ['groups' => ['document_comment:get']]

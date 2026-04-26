@@ -7,29 +7,24 @@ use App\Factory\CourseCommentFactory;
 use App\Factory\CourseFactory;
 use App\Factory\UserFactory;
 use Zenstruck\Browser\HttpOptions;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 class CourseCommentResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testGetCollectionOfCourseComments(): void
     {
         CourseCommentFactory::createMany(
             5,
             [
-            'anonymous' => false
+                'anonymous' => false
             ]
         );
         $json = $this->browser()
             ->get(
                 '/api/course_comments',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -40,15 +35,15 @@ class CourseCommentResourceTest extends ApiTestCase
 
         $this->assertEqualsCanonicalizing(
             [
-            '@id',
-            '@type',
-            'content',
-            'anonymous',
-            'course',
-            'category',
-            'creator',
-            'createdAt',
-            'updatedAt',
+                '@id',
+                '@type',
+                'content',
+                'anonymous',
+                'course',
+                'category',
+                'creator',
+                'createdAt',
+                'updatedAt',
             ],
             array_keys($json->decoded()['hydra:member'][0])
         );
@@ -62,9 +57,9 @@ class CourseCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/course_comments/' . $comment->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -76,19 +71,19 @@ class CourseCommentResourceTest extends ApiTestCase
     {
         $comment1 = CourseCommentFactory::createOne(
             [
-            'content' => 'comment1',
+                'content' => 'comment1',
             ]
         );
 
         $comment2 = CourseCommentFactory::createOne(
             [
-            'content' => 'comment2',
+                'content' => 'comment2',
             ]
         );
 
         $comment3 = CourseCommentFactory::createOne(
             [
-            'content' => 'comment3',
+                'content' => 'comment3',
             ]
         );
 
@@ -98,9 +93,9 @@ class CourseCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/course_comments?content=comment2',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -110,9 +105,9 @@ class CourseCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/course_comments?content=comment',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -125,13 +120,13 @@ class CourseCommentResourceTest extends ApiTestCase
         CourseCommentFactory::createMany(
             3,
             [
-            'anonymous' => true,
+                'anonymous' => true,
             ]
         );
         CourseCommentFactory::createMany(
             5,
             [
-            'anonymous' => false,
+                'anonymous' => false,
             ]
         );
 
@@ -139,9 +134,9 @@ class CourseCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/course_comments?anonymous=true',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -151,9 +146,9 @@ class CourseCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/course_comments?anonymous=false',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -169,19 +164,19 @@ class CourseCommentResourceTest extends ApiTestCase
         CourseCommentFactory::createMany(
             1,
             [
-            'creator' => $user1,
+                'creator' => $user1,
             ]
         );
         CourseCommentFactory::createMany(
             2,
             [
-            'creator' => $user2,
+                'creator' => $user2,
             ]
         );
         CourseCommentFactory::createMany(
             5,
             [
-            'creator' => UserFactory::createOne(),
+                'creator' => UserFactory::createOne(),
             ]
         );
 
@@ -189,9 +184,9 @@ class CourseCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/course_comments?creator=/api/users/' . $user1->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -199,11 +194,11 @@ class CourseCommentResourceTest extends ApiTestCase
             ->assertJsonMatches('length("hydra:member")', 1)
             ->get(
                 '/api/course_comments?creator[]=/api/users/' . $user1->getId() .
-                '&creator[]=/api/users/' . $user2->getId(),
+                    '&creator[]=/api/users/' . $user2->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -212,9 +207,9 @@ class CourseCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/course_comments',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -232,26 +227,26 @@ class CourseCommentResourceTest extends ApiTestCase
             ->post(
                 '/api/course_comments',
                 [
-                'json' => [],
-                'headers' => [
-                    'Content-Type' => 'application/ld+json',
-                    'Authorization' => 'Bearer ' . $this->getToken($user->getUsername(), 'password')
-                ],
+                    'json' => [],
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json',
+                        'Authorization' => 'Bearer ' . $this->getToken($user->getUsername(), 'password')
+                    ],
                 ]
             )
             ->assertStatus(422)
             ->post(
                 '/api/course_comments',
                 [
-                'json' => [
-                    'content' => 'The content of this comment',
-                    'anonymous' => true,
-                    'course' => '/api/courses/' . $course->getId(),
-                    'category' => '/api/comment_categories/' . $category->getId(),
-                ],
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'json' => [
+                        'content' => 'The content of this comment',
+                        'anonymous' => true,
+                        'course' => '/api/courses/' . $course->getId(),
+                        'category' => '/api/comment_categories/' . $category->getId(),
+                    ],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(201)
@@ -269,7 +264,8 @@ class CourseCommentResourceTest extends ApiTestCase
         $otherUser = UserFactory::createOne(
             [
                 'username' => 'other user',
-            'plainPassword' => 'password']
+                'plainPassword' => 'password'
+            ]
         );
 
         $creatorTokenResponse = $this->browser()
@@ -277,8 +273,8 @@ class CourseCommentResourceTest extends ApiTestCase
                 '/api/auth/login',
                 HttpOptions::json(
                     [
-                    'username' => $creator->getUsername(),
-                    'password' => 'password',
+                        'username' => $creator->getUsername(),
+                        'password' => 'password',
                     ]
                 )
             )
@@ -291,8 +287,8 @@ class CourseCommentResourceTest extends ApiTestCase
                 '/api/auth/login',
                 HttpOptions::json(
                     [
-                    'username' => $otherUser->getUsername(),
-                    'password' => 'password',
+                        'username' => $otherUser->getUsername(),
+                        'password' => 'password',
                     ]
                 )
             )
@@ -302,7 +298,7 @@ class CourseCommentResourceTest extends ApiTestCase
 
         $comment = CourseCommentFactory::createOne(
             [
-            'creator' => $creator,
+                'creator' => $creator,
             ]
         );
 
@@ -310,13 +306,13 @@ class CourseCommentResourceTest extends ApiTestCase
             ->patch(
                 '/api/course_comments/' . $comment->getId(),
                 [
-                'json' => [
-                    'content' => 'Some new content',
-                ],
-                'headers' => [
-                    'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' => 'Bearer ' . $creatorToken
-                ]
+                    'json' => [
+                        'content' => 'Some new content',
+                    ],
+                    'headers' => [
+                        'Content-Type' => 'application/merge-patch+json',
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -326,13 +322,13 @@ class CourseCommentResourceTest extends ApiTestCase
             ->patch(
                 '/api/course_comments/' . $comment->getId(),
                 [
-                'json' => [
-                    'content' => 'Some new content',
-                ],
-                'headers' => [
-                    'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' => 'Bearer ' . $otherToken
-                ]
+                    'json' => [
+                        'content' => 'Some new content',
+                    ],
+                    'headers' => [
+                        'Content-Type' => 'application/merge-patch+json',
+                        'Authorization' => 'Bearer ' . $otherToken
+                    ]
                 ]
             )
             ->assertStatus(403);
@@ -349,7 +345,8 @@ class CourseCommentResourceTest extends ApiTestCase
         $otherUser = UserFactory::createOne(
             [
                 'username' => 'other user',
-            'plainPassword' => 'password']
+                'plainPassword' => 'password'
+            ]
         );
 
         $creatorTokenResponse = $this->browser()
@@ -357,8 +354,8 @@ class CourseCommentResourceTest extends ApiTestCase
                 '/api/auth/login',
                 HttpOptions::json(
                     [
-                    'username' => $creator->getUsername(),
-                    'password' => 'password',
+                        'username' => $creator->getUsername(),
+                        'password' => 'password',
                     ]
                 )
             )
@@ -371,8 +368,8 @@ class CourseCommentResourceTest extends ApiTestCase
                 '/api/auth/login',
                 HttpOptions::json(
                     [
-                    'username' => $otherUser->getUsername(),
-                    'password' => 'password',
+                        'username' => $otherUser->getUsername(),
+                        'password' => 'password',
                     ]
                 )
             )
@@ -382,7 +379,7 @@ class CourseCommentResourceTest extends ApiTestCase
 
         $comment = CourseCommentFactory::createOne(
             [
-            'creator' => $creator,
+                'creator' => $creator,
             ]
         );
         $commentId = $comment->getId();
@@ -391,9 +388,9 @@ class CourseCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/course_comments/' . $commentId,
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $creatorToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
                 ]
             )
             ->assertStatus(200);
@@ -402,9 +399,9 @@ class CourseCommentResourceTest extends ApiTestCase
             ->delete(
                 '/api/course_comments/' . $commentId,
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $otherToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $otherToken
+                    ]
                 ]
             )
             ->assertStatus(403);
@@ -413,9 +410,9 @@ class CourseCommentResourceTest extends ApiTestCase
             ->delete(
                 '/api/course_comments/' . $commentId,
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $creatorToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
                 ]
             )
             ->assertStatus(204);
@@ -424,9 +421,9 @@ class CourseCommentResourceTest extends ApiTestCase
             ->get(
                 '/api/course_comments/' . $commentId,
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $creatorToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
                 ]
             )
             ->assertStatus(404);

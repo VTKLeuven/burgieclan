@@ -1,34 +1,24 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace App\Factory;
 
 use App\Entity\AbstractVote;
 use App\Entity\CourseCommentVote;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<CourseCommentVote>
+ * @extends PersistentObjectFactory<CourseCommentVote>
  */
-final class CourseCommentVoteFactory extends PersistentProxyObjectFactory
+final class CourseCommentVoteFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
-     *
-     * @todo inject services if required
      */
     public function __construct()
     {
     }
 
+    #[\Override]
     public static function class(): string
     {
         return CourseCommentVote::class;
@@ -36,10 +26,9 @@ final class CourseCommentVoteFactory extends PersistentProxyObjectFactory
 
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
-     *
-     * @todo add your default values here
      */
-    protected function defaults(): array
+    #[\Override]
+    protected function defaults(): array|callable
     {
         return [
             'courseComment' => CourseCommentFactory::randomOrCreate(),
@@ -90,6 +79,7 @@ final class CourseCommentVoteFactory extends PersistentProxyObjectFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
+    #[\Override]
     protected function initialize(): static
     {
         return $this

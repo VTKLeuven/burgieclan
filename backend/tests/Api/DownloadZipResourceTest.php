@@ -6,14 +6,9 @@ use App\Factory\CourseFactory;
 use App\Factory\DocumentFactory;
 use App\Factory\ModuleFactory;
 use App\Factory\ProgramFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 class DownloadZipResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testDownloadZipFileSuccessfully()
     {
         $program = ProgramFactory::createOne();
@@ -25,16 +20,16 @@ class DownloadZipResourceTest extends ApiTestCase
             ->post(
                 '/api/zip',
                 [
-                'headers' => [
-                    'Content-Type' => 'application/ld+json',
-                    'Authorization' => 'Bearer ' . $this->token
-                ],
-                'json' => [
-                    'programs' => ['/api/programs/' . $program->getId()],
-                    'modules' => ['/api/modules/' . $module->getId()],
-                    'courses' => ['/api/courses/' . $course->getId()],
-                    'documents' => ['/api/documents/' . $document->getId()],
-                ],
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json',
+                        'Authorization' => 'Bearer ' . $this->token
+                    ],
+                    'json' => [
+                        'programs' => ['/api/programs/' . $program->getId()],
+                        'modules' => ['/api/modules/' . $module->getId()],
+                        'courses' => ['/api/courses/' . $course->getId()],
+                        'documents' => ['/api/documents/' . $document->getId()],
+                    ],
                 ]
             )
             ->assertStatus(200)
@@ -47,16 +42,16 @@ class DownloadZipResourceTest extends ApiTestCase
             ->post(
                 '/api/zip',
                 [
-                'headers' => [
-                    'Content-Type' => 'application/ld+json',
-                    'Authorization' => 'Bearer ' . $this->token
-                ],
-                'json' => [
-                    'programs' => [],
-                    'modules' => [],
-                    'courses' => [],
-                    'documents' => [],
-                ],
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json',
+                        'Authorization' => 'Bearer ' . $this->token
+                    ],
+                    'json' => [
+                        'programs' => [],
+                        'modules' => [],
+                        'courses' => [],
+                        'documents' => [],
+                    ],
                 ]
             )
             ->assertStatus(204);
@@ -68,16 +63,16 @@ class DownloadZipResourceTest extends ApiTestCase
             ->post(
                 '/api/zip',
                 [
-                'headers' => [
-                    'Content-Type' => 'application/ld+json',
-                    'Authorization' => 'Bearer ' . $this->token
-                ],
-                'json' => [
-                    'programs' => 'invalid',
-                    'modules' => 'invalid',
-                    'courses' => 'invalid',
-                    'documents' => 'invalid',
-                ],
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json',
+                        'Authorization' => 'Bearer ' . $this->token
+                    ],
+                    'json' => [
+                        'programs' => 'invalid',
+                        'modules' => 'invalid',
+                        'courses' => 'invalid',
+                        'documents' => 'invalid',
+                    ],
                 ]
             )
             ->assertStatus(400);

@@ -4,6 +4,8 @@ namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use App\Controller\Api\SearchController;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -13,18 +15,20 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Get(
             uriTemplate: 'search',
             controller: SearchController::class,
-            openapiContext: [
-                'parameters' => [
-                    [
-                        'name'        => 'searchText',
-                        'in'          => 'query',
-                        'description' => 'Searchtext',
-                        'required'    => false,
-                        'type'        => 'string',
-                        'default'     => '',
-                    ],
-                ],
-            ],
+            openapi: new Operation(
+                parameters: [
+                    new Parameter(
+                        name: 'searchText',
+                        in: 'query',
+                        required: false,
+                        description: 'Searchtext',
+                        schema: [
+                            'type' => 'string',
+                            'default' => '',
+                        ],
+                    )
+                ]
+            ),
             normalizationContext: ['groups' => ['search']],
             read: false,
         )

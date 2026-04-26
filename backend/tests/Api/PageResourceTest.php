@@ -5,14 +5,9 @@ namespace App\Tests\Api;
 use App\Entity\Page;
 use App\Factory\PageFactory;
 use Zenstruck\Foundry\Proxy;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 class PageResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testGetOnePagePublicAvailable(): void
     {
         $page = PageFactory::createOne(['publicAvailable' => true]);
@@ -47,9 +42,9 @@ class PageResourceTest extends ApiTestCase
             ->get(
                 '/api/pages/' . $page->getUrlKey(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
