@@ -6,14 +6,9 @@ use App\Factory\CourseFactory;
 use App\Factory\DocumentCategoryFactory;
 use App\Factory\DocumentFactory;
 use App\Factory\TagFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 class TagResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testGetCollectionOfTags(): void
     {
         TagFactory::createMany(5);
@@ -21,9 +16,9 @@ class TagResourceTest extends ApiTestCase
             ->get(
                 '/api/tags',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -35,10 +30,10 @@ class TagResourceTest extends ApiTestCase
         $this->assertSame(
             array_keys($json->decoded()['hydra:member'][0]),
             [
-            '@id',
-            '@type',
-            'name',
-            'documents',
+                '@id',
+                '@type',
+                'name',
+                'documents',
             ]
         );
     }
@@ -51,9 +46,9 @@ class TagResourceTest extends ApiTestCase
             ->get(
                 '/api/tags/' . $tag->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -78,33 +73,33 @@ class TagResourceTest extends ApiTestCase
         // Create documents with different combinations of courses and categories
         $document1 = DocumentFactory::createOne(
             [
-            'course' => $course1,
-            'category' => $category1,
-            'tags' => [$tag1, $tag2],
+                'course' => $course1,
+                'category' => $category1,
+                'tags' => [$tag1, $tag2],
             ]
         );
 
         $document2 = DocumentFactory::createOne(
             [
-            'course' => $course1,
-            'category' => $category2,
-            'tags' => [$tag2],
+                'course' => $course1,
+                'category' => $category2,
+                'tags' => [$tag2],
             ]
         );
 
         $document3 = DocumentFactory::createOne(
             [
-            'course' => $course2,
-            'category' => $category1,
-            'tags' => [$tag2],
+                'course' => $course2,
+                'category' => $category1,
+                'tags' => [$tag2],
             ]
         );
 
         $document4 = DocumentFactory::createOne(
             [
-            'course' => $course2,
-            'category' => $category2,
-            'tags' => [$tag3],
+                'course' => $course2,
+                'category' => $category2,
+                'tags' => [$tag3],
             ]
         );
 
@@ -113,9 +108,9 @@ class TagResourceTest extends ApiTestCase
             ->get(
                 '/api/tags?course=/api/courses/' . $course1->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -128,9 +123,9 @@ class TagResourceTest extends ApiTestCase
             ->get(
                 '/api/tags?category=/api/document_categories/' . $category1->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -143,9 +138,9 @@ class TagResourceTest extends ApiTestCase
             ->get(
                 '/api/tags?course=/api/courses/' . $course2->getId() . '&category=/api/document_categories/' . $category2->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -159,9 +154,9 @@ class TagResourceTest extends ApiTestCase
             ->get(
                 '/api/tags?course=/api/courses/999',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -173,9 +168,9 @@ class TagResourceTest extends ApiTestCase
             ->get(
                 '/api/tags',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -191,9 +186,9 @@ class TagResourceTest extends ApiTestCase
             ->get(
                 '/api/tags',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer invalid_token_here'
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer invalid_token_here'
+                    ]
                 ]
             )
             ->assertStatus(401)
@@ -212,11 +207,11 @@ class TagResourceTest extends ApiTestCase
             ->post(
                 '/api/tags',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token,
-                    'Content-Type' => 'application/ld+json'
-                ],
-                'json' => $tagData
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token,
+                        'Content-Type' => 'application/ld+json'
+                    ],
+                    'json' => $tagData
                 ]
             )
             ->assertStatus(201)
@@ -233,9 +228,9 @@ class TagResourceTest extends ApiTestCase
             ->get(
                 $tagIRI,
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -247,13 +242,13 @@ class TagResourceTest extends ApiTestCase
             ->post(
                 '/api/tags',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token,
-                    'Content-Type' => 'application/ld+json'
-                ],
-                'json' => [
-                    'name' => $tagData['name'],
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token,
+                        'Content-Type' => 'application/ld+json'
+                    ],
+                    'json' => [
+                        'name' => $tagData['name'],
+                    ]
                 ]
             )
             ->assertStatus(201)
@@ -281,11 +276,11 @@ class TagResourceTest extends ApiTestCase
             ->post(
                 '/api/tags',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token,
-                    'Content-Type' => 'application/ld+json'
-                ],
-                'json' => $tagData
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token,
+                        'Content-Type' => 'application/ld+json'
+                    ],
+                    'json' => $tagData
                 ]
             )
             ->assertStatus(201)
@@ -301,9 +296,9 @@ class TagResourceTest extends ApiTestCase
             ->get(
                 $tagIRI,
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -320,9 +315,9 @@ class TagResourceTest extends ApiTestCase
             ->get(
                 '/api/documents/' . $document1->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -343,10 +338,10 @@ class TagResourceTest extends ApiTestCase
             ->post(
                 '/api/tags',
                 [
-                'headers' => [
-                    'Content-Type' => 'application/ld+json'
-                ],
-                'json' => $tagData
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json'
+                    ],
+                    'json' => $tagData
                 ]
             )
             ->assertStatus(401);
@@ -363,11 +358,11 @@ class TagResourceTest extends ApiTestCase
             ->post(
                 '/api/tags',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token,
-                    'Content-Type' => 'application/ld+json'
-                ],
-                'json' => $tagData
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token,
+                        'Content-Type' => 'application/ld+json'
+                    ],
+                    'json' => $tagData
                 ]
             )
             ->assertStatus(422) // Unprocessable Entity

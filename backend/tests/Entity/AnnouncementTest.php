@@ -11,7 +11,7 @@ class AnnouncementTest extends KernelTestCase
 {
     public function testSetTitleNl(): void
     {
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $announcement = new Announcement($user);
         $announcement->setTitleNl("Dutch Announcement");
 
@@ -20,7 +20,7 @@ class AnnouncementTest extends KernelTestCase
 
     public function testSetTitleEn(): void
     {
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $announcement = new Announcement($user);
         $announcement->setTitleEn("English Announcement");
 
@@ -29,7 +29,7 @@ class AnnouncementTest extends KernelTestCase
 
     public function testSetContentNl(): void
     {
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $announcement = new Announcement($user);
         $announcement->setContentNl("Dutch announcement content");
 
@@ -38,7 +38,7 @@ class AnnouncementTest extends KernelTestCase
 
     public function testSetContentEn(): void
     {
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $announcement = new Announcement($user);
         $announcement->setContentEn("English announcement content");
 
@@ -47,7 +47,7 @@ class AnnouncementTest extends KernelTestCase
 
     public function testSetStartTime(): void
     {
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $announcement = new Announcement($user);
         $starttime = new DateTime();
         $announcement->setStartTime($starttime);
@@ -57,7 +57,7 @@ class AnnouncementTest extends KernelTestCase
 
     public function testSetEndTime(): void
     {
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $announcement = new Announcement($user);
         $endtime = new DateTime();
         $announcement->setEndTime($endtime);
@@ -67,7 +67,7 @@ class AnnouncementTest extends KernelTestCase
 
     public function testSetPriority(): void
     {
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $announcement = new Announcement($user);
         $announcement->setPriority(true);
 

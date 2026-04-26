@@ -1,0 +1,8 @@
+{
+    "phpstan.binPath": "backend/vendor/bin/phpstan",
+    "phpunit.phpunit": "${workspaceFolder}/backend/vendor/bin/phpunit",
+    "phpunit.args": [
+        "--configuration",
+        "${workspaceFolder}/backend/phpunit.xml.dist"
+    ]
+}

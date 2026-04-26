@@ -17,7 +17,6 @@ use App\Controller\Api\CreateDocumentController;
 use App\Entity\Document;
 use App\Filter\TagFilter;
 use App\State\DocumentApiProvider;
-use App\State\DocumentProcessor;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
 use ArrayObject;
@@ -61,54 +60,54 @@ use Symfony\Component\Validator\Constraints as Assert;
                 requestBody: new Model\RequestBody(
                     content: new ArrayObject(
                         [
-                        'multipart/form-data' => [
-                            'schema' => [
-                                'type' => 'object',
-                                'properties' => [
-                                    'name' => [
-                                        'type' => 'string',
-                                        'example' => "document name"
-                                    ],
-                                    'course' => [
-                                        'type' => 'string',
-                                        'format' => "iri-reference",
-                                        'example' => "/api/courses/1"
-                                    ],
-                                    "category" => [
-                                        "type" => "string",
-                                        "format" => "iri-reference",
-                                        "example" => "/api/document_categories/1"
-                                    ],
-                                    "year" => [
-                                        "type" => "string",
-                                        "example" => "2024 - 2025"
-                                    ],
-                                    'file' => [
-                                        'type' => 'string',
-                                        'format' => 'binary'
-                                    ],
-                                    'anonymous' => [
-                                        'type' => 'boolean',
-                                        'example' => false
-                                    ],
-                                    'tags[]' => [
-                                        'type' => 'array',
-                                        'items' => [
+                            'multipart/form-data' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'name' => [
                                             'type' => 'string',
-                                            'format' => 'iri-reference',
+                                            'example' => "document name"
                                         ],
-                                        'example' => ['/api/tags/1', '/api/tags/2'],
-                                    ],
-                                ]
-                            ],
-                            'encoding' => [
-                                'tags[]' => [
-                                    'style' => 'form',
-                                    'explode' => true,
-                                    'allowReserved' => true
+                                        'course' => [
+                                            'type' => 'string',
+                                            'format' => "iri-reference",
+                                            'example' => "/api/courses/1"
+                                        ],
+                                        "category" => [
+                                            "type" => "string",
+                                            "format" => "iri-reference",
+                                            "example" => "/api/document_categories/1"
+                                        ],
+                                        "year" => [
+                                            "type" => "string",
+                                            "example" => "2024 - 2025"
+                                        ],
+                                        'file' => [
+                                            'type' => 'string',
+                                            'format' => 'binary'
+                                        ],
+                                        'anonymous' => [
+                                            'type' => 'boolean',
+                                            'example' => false
+                                        ],
+                                        'tags[]' => [
+                                            'type' => 'array',
+                                            'items' => [
+                                                'type' => 'string',
+                                                'format' => 'iri-reference',
+                                            ],
+                                            'example' => ['/api/tags/1', '/api/tags/2'],
+                                        ],
+                                    ]
+                                ],
+                                'encoding' => [
+                                    'tags[]' => [
+                                        'style' => 'form',
+                                        'explode' => true,
+                                        'allowReserved' => true
+                                    ]
                                 ]
                             ]
-                        ]
                         ]
                     )
                 )
@@ -117,7 +116,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             read: false,
             deserialize: false,
             validate: false,
-        )],
+        )
+    ],
     outputFormats: ['jsonld' => ['application/ld+json']],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,

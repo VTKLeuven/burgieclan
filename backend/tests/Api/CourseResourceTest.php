@@ -3,14 +3,9 @@
 namespace App\Tests\Api;
 
 use App\Factory\CourseFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 class CourseResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testGetCollectionOfCourses(): void
     {
         CourseFactory::createMany(5);
@@ -20,9 +15,9 @@ class CourseResourceTest extends ApiTestCase
             ->get(
                 '/api/courses',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -34,19 +29,19 @@ class CourseResourceTest extends ApiTestCase
         $this->assertSame(
             array_keys($json->decoded()['hydra:member'][0]),
             [
-            '@id',
-            '@type',
-            'name',
-            'code',
-            'language',
-            'professors',
-            'semesters',
-            'credits',
-            'identicalCourses',
-            'oldCourses',
-            'newCourses',
-            'modules',
-            'courseComments',
+                '@id',
+                '@type',
+                'name',
+                'code',
+                'language',
+                'professors',
+                'semesters',
+                'credits',
+                'identicalCourses',
+                'oldCourses',
+                'newCourses',
+                'modules',
+                'courseComments',
             ]
         );
     }
@@ -59,9 +54,9 @@ class CourseResourceTest extends ApiTestCase
             ->get(
                 '/api/courses/' . $course->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -73,19 +68,19 @@ class CourseResourceTest extends ApiTestCase
     {
         $course1 = CourseFactory::createOne(
             [
-            'name' => 'Course1',
+                'name' => 'Course1',
             ]
         );
 
         $course2 = CourseFactory::createOne(
             [
-            'name' => 'Course2',
+                'name' => 'Course2',
             ]
         );
 
         $course3 = CourseFactory::createOne(
             [
-            'name' => 'Course3',
+                'name' => 'Course3',
             ]
         );
 
@@ -95,9 +90,9 @@ class CourseResourceTest extends ApiTestCase
             ->get(
                 '/api/courses?name=course2',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -107,9 +102,9 @@ class CourseResourceTest extends ApiTestCase
             ->get(
                 '/api/courses?name=course',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertJson()
@@ -121,19 +116,19 @@ class CourseResourceTest extends ApiTestCase
     {
         $course1 = CourseFactory::createOne(
             [
-            'code' => 'code1',
+                'code' => 'code1',
             ]
         );
 
         $course2 = CourseFactory::createOne(
             [
-            'code' => 'code2',
+                'code' => 'code2',
             ]
         );
 
         $course3 = CourseFactory::createOne(
             [
-            'code' => 'code3',
+                'code' => 'code3',
             ]
         );
 
@@ -143,9 +138,9 @@ class CourseResourceTest extends ApiTestCase
             ->get(
                 '/api/courses?code=code2',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -155,9 +150,9 @@ class CourseResourceTest extends ApiTestCase
             ->get(
                 '/api/courses?code=code',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
                 ]
             )
             ->assertStatus(200)

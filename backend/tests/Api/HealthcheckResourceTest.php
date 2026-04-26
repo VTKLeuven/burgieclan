@@ -2,14 +2,8 @@
 
 namespace App\Tests\Api;
 
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
-
 class HealthcheckResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testHealthcheckReturns200(): void
     {
         $json = $this->browser()

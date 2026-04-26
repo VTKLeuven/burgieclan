@@ -16,7 +16,7 @@ use App\State\EntityClassDtoStateProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
-    shortName: 'Course Comment',
+    shortName: 'CourseComment',
     operations: [
         new Get(),
         new GetCollection(),

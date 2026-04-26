@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    shortName: 'User document view',
+    shortName: 'UserDocumentView',
     operations: [
         new GetCollection(
             uriTemplate: 'document_views',
@@ -34,7 +34,7 @@ class UserDocumentViewApi
     public DocumentApi $document;
 
     #[Assert\NotNull]
-    #[Assert\Type(\DateTimeInterface::class)]
+    #[Assert\Type(DateTimeInterface::class)]
     #[ApiProperty(writable: true)]
     #[Groups(['user:document_views', 'user:document_views:batch'])]
     public DateTimeInterface $lastViewed;

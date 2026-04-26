@@ -2,24 +2,16 @@
 
 namespace App\Tests\Api;
 
-use App\Factory\CourseCommentFactory;
-use App\Factory\CourseCommentVoteFactory;
 use App\Factory\CourseFactory;
-use App\Factory\DocumentCommentFactory;
-use App\Factory\DocumentCommentVoteFactory;
 use App\Factory\DocumentFactory;
-use App\Factory\DocumentVoteFactory;
 use App\Factory\ModuleFactory;
 use App\Factory\ProgramFactory;
 use App\Factory\UserFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+
+use function Zenstruck\Foundry\Persistence\refresh;
 
 class UserResourceTest extends ApiTestCase
 {
-    use ResetDatabase;
-    use Factories;
-
     public function testGetOneUser(): void
     {
         $currentUser = UserFactory::createOne(
@@ -35,9 +27,9 @@ class UserResourceTest extends ApiTestCase
             ->get(
                 '/api/users/' . $currentUser->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $currentUserToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $currentUserToken
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -47,17 +39,17 @@ class UserResourceTest extends ApiTestCase
 
         $this->assertEqualsCanonicalizing(
             [
-            '@context',
-            '@id',
-            '@type',
-            'fullName',
-            'username',
-            'email',
-            'favoriteCourses',
-            'favoriteDocuments',
-            'favoriteModules',
-            'favoritePrograms',
-            'defaultAnonymous',
+                '@context',
+                '@id',
+                '@type',
+                'fullName',
+                'username',
+                'email',
+                'favoriteCourses',
+                'favoriteDocuments',
+                'favoriteModules',
+                'favoritePrograms',
+                'defaultAnonymous',
             ],
             array_keys($json->decoded())
         );
@@ -66,9 +58,9 @@ class UserResourceTest extends ApiTestCase
             ->get(
                 '/api/users/' . $otherUser->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $currentUserToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $currentUserToken
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -78,10 +70,10 @@ class UserResourceTest extends ApiTestCase
 
         $this->assertEqualsCanonicalizing(
             [
-            '@context',
-            '@id',
-            '@type',
-            'fullName',
+                '@context',
+                '@id',
+                '@type',
+                'fullName',
             ],
             array_keys($json->decoded())
         );
@@ -93,13 +85,13 @@ class UserResourceTest extends ApiTestCase
         $module = ModuleFactory::createOne();
         $program = ProgramFactory::createOne();
         $document = DocumentFactory::createOne();
-        $user = UserFactory::CreateOne(
+        $user = UserFactory::createOne(
             [
-            'plainPassword' => 'password',
-            'favoriteCourses' => [$course],
-            'favoriteModules' => [$module],
-            'favoritePrograms' => [$program],
-            'favoriteDocuments' => [$document],
+                'plainPassword' => 'password',
+                'favoriteCourses' => [$course],
+                'favoriteModules' => [$module],
+                'favoritePrograms' => [$program],
+                'favoriteDocuments' => [$document],
             ]
         );
         $userToken = $this->getToken($user->getUsername(), 'password');
@@ -115,9 +107,9 @@ class UserResourceTest extends ApiTestCase
             ->get(
                 '/api/users/' . $user->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $userToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $userToken
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -134,9 +126,9 @@ class UserResourceTest extends ApiTestCase
             ->get(
                 '/api/users/' . $user->getId() . '/favorites',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $userToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $userToken
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -155,9 +147,9 @@ class UserResourceTest extends ApiTestCase
             ->get(
                 '/api/users/' . $otherUser->getId() . '/favorites',
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $userToken
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $userToken
+                    ]
                 ]
             )
             ->assertStatus(403);
@@ -169,7 +161,7 @@ class UserResourceTest extends ApiTestCase
         $module = ModuleFactory::createOne();
         $program = ProgramFactory::createOne();
         $document = DocumentFactory::createOne();
-        $user = UserFactory::CreateOne(['plainPassword' => 'password']);
+        $user = UserFactory::createOne(['plainPassword' => 'password']);
         $userToken = $this->getToken($user->getUsername(), 'password');
         $otherUser = UserFactory::createOne();
 
@@ -182,16 +174,16 @@ class UserResourceTest extends ApiTestCase
             ->patch(
                 '/api/users/' . $user->getId() . '/favorites/add',
                 [
-                'headers' => [
-                    'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' => 'Bearer ' . $userToken
-                ],
-                'json' => [
-                    'favoriteCourses' => ['/api/courses/' . $course->getId()],
-                    'favoriteModules' => ['/api/modules/' . $module->getId()],
-                    'favoritePrograms' => ['/api/programs/' . $program->getId()],
-                    'favoriteDocuments' => ['/api/documents/' . $document->getId()],
-                ]
+                    'headers' => [
+                        'Content-Type' => 'application/merge-patch+json',
+                        'Authorization' => 'Bearer ' . $userToken
+                    ],
+                    'json' => [
+                        'favoriteCourses' => ['/api/courses/' . $course->getId()],
+                        'favoriteModules' => ['/api/modules/' . $module->getId()],
+                        'favoritePrograms' => ['/api/programs/' . $program->getId()],
+                        'favoriteDocuments' => ['/api/documents/' . $document->getId()],
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -201,6 +193,7 @@ class UserResourceTest extends ApiTestCase
             ->assertJsonMatches('favoritePrograms[0]', '/api/programs/' . $program->getId())
             ->assertJsonMatches('favoriteDocuments[0]', '/api/documents/' . $document->getId());
 
+        refresh($user);
         self::assertEquals(1, count($user->getFavoriteCourses()));
         self::assertEquals(1, count($user->getFavoriteModules()));
         self::assertEquals(1, count($user->getFavoritePrograms()));
@@ -210,16 +203,16 @@ class UserResourceTest extends ApiTestCase
             ->patch(
                 '/api/users/' . $otherUser->getId() . '/favorites/add',
                 [
-                'headers' => [
-                    'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' => 'Bearer ' . $userToken
-                ],
-                'json' => [
-                    'favoriteCourses' => ['/api/courses/' . $course->getId()],
-                    'favoriteModules' => ['/api/modules/' . $module->getId()],
-                    'favoritePrograms' => ['/api/programs/' . $program->getId()],
-                    'favoriteDocuments' => ['/api/documents/' . $document->getId()],
-                ]
+                    'headers' => [
+                        'Content-Type' => 'application/merge-patch+json',
+                        'Authorization' => 'Bearer ' . $userToken
+                    ],
+                    'json' => [
+                        'favoriteCourses' => ['/api/courses/' . $course->getId()],
+                        'favoriteModules' => ['/api/modules/' . $module->getId()],
+                        'favoritePrograms' => ['/api/programs/' . $program->getId()],
+                        'favoriteDocuments' => ['/api/documents/' . $document->getId()],
+                    ]
                 ]
             )
             ->assertStatus(403);
@@ -235,13 +228,13 @@ class UserResourceTest extends ApiTestCase
         $program2 = ProgramFactory::createOne();
         $document1 = DocumentFactory::createOne();
         $document2 = DocumentFactory::createOne();
-        $user = UserFactory::CreateOne(
+        $user = UserFactory::createOne(
             [
-            'plainPassword' => 'password',
-            'favoriteCourses' => [$course1, $course2],
-            'favoriteModules' => [$module1, $module2],
-            'favoritePrograms' => [$program1, $program2],
-            'favoriteDocuments' => [$document1, $document2],
+                'plainPassword' => 'password',
+                'favoriteCourses' => [$course1, $course2],
+                'favoriteModules' => [$module1, $module2],
+                'favoritePrograms' => [$program1, $program2],
+                'favoriteDocuments' => [$document1, $document2],
             ]
         );
         $userToken = $this->getToken($user->getUsername(), 'password');
@@ -257,16 +250,16 @@ class UserResourceTest extends ApiTestCase
             ->patch(
                 '/api/users/' . $user->getId() . '/favorites/remove',
                 [
-                'headers' => [
-                    'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' => 'Bearer ' . $userToken
-                ],
-                'json' => [
-                    'favoriteCourses' => ['/api/courses/' . $course2->getId()],
-                    'favoriteModules' => ['/api/modules/' . $module2->getId()],
-                    'favoritePrograms' => ['/api/programs/' . $program2->getId()],
-                    'favoriteDocuments' => ['/api/documents/' . $document2->getId()],
-                ]
+                    'headers' => [
+                        'Content-Type' => 'application/merge-patch+json',
+                        'Authorization' => 'Bearer ' . $userToken
+                    ],
+                    'json' => [
+                        'favoriteCourses' => ['/api/courses/' . $course2->getId()],
+                        'favoriteModules' => ['/api/modules/' . $module2->getId()],
+                        'favoritePrograms' => ['/api/programs/' . $program2->getId()],
+                        'favoriteDocuments' => ['/api/documents/' . $document2->getId()],
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -280,6 +273,7 @@ class UserResourceTest extends ApiTestCase
             ->assertJsonMatches('favoritePrograms[0]', '/api/programs/' . $program1->getId())
             ->assertJsonMatches('favoriteDocuments[0]', '/api/documents/' . $document1->getId());
 
+        refresh($user);
         self::assertEquals(1, count($user->getFavoriteCourses()));
         self::assertEquals(1, count($user->getFavoriteModules()));
         self::assertEquals(1, count($user->getFavoritePrograms()));
@@ -289,16 +283,16 @@ class UserResourceTest extends ApiTestCase
             ->patch(
                 '/api/users/' . $otherUser->getId() . '/favorites/remove',
                 [
-                'headers' => [
-                    'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' => 'Bearer ' . $userToken
-                ],
-                'json' => [
-                    'favoriteCourses' => ['/api/courses/' . $course2->getId()],
-                    'favoriteModules' => ['/api/modules/' . $module2->getId()],
-                    'favoritePrograms' => ['/api/programs/' . $program2->getId()],
-                    'favoriteDocuments' => ['/api/documents/' . $document2->getId()],
-                ]
+                    'headers' => [
+                        'Content-Type' => 'application/merge-patch+json',
+                        'Authorization' => 'Bearer ' . $userToken
+                    ],
+                    'json' => [
+                        'favoriteCourses' => ['/api/courses/' . $course2->getId()],
+                        'favoriteModules' => ['/api/modules/' . $module2->getId()],
+                        'favoritePrograms' => ['/api/programs/' . $program2->getId()],
+                        'favoriteDocuments' => ['/api/documents/' . $document2->getId()],
+                    ]
                 ]
             )
             ->assertStatus(403);
@@ -308,9 +302,9 @@ class UserResourceTest extends ApiTestCase
     {
         $user = UserFactory::createOne(
             [
-            'username' => 'anonuser',
-            'plainPassword' => 'password',
-            'defaultAnonymous' => true
+                'username' => 'anonuser',
+                'plainPassword' => 'password',
+                'defaultAnonymous' => true
             ]
         );
         $token = $this->getToken('anonuser', 'password');
@@ -319,9 +313,9 @@ class UserResourceTest extends ApiTestCase
             ->get(
                 '/api/users/' . $user->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -330,9 +324,9 @@ class UserResourceTest extends ApiTestCase
 
         $user2 = UserFactory::createOne(
             [
-            'username' => 'nonanonuser',
-            'plainPassword' => 'password',
-            'defaultAnonymous' => false
+                'username' => 'nonanonuser',
+                'plainPassword' => 'password',
+                'defaultAnonymous' => false
             ]
         );
         $token2 = $this->getToken('nonanonuser', 'password');
@@ -340,9 +334,9 @@ class UserResourceTest extends ApiTestCase
             ->get(
                 '/api/users/' . $user2->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token2
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token2
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -354,9 +348,9 @@ class UserResourceTest extends ApiTestCase
     {
         $user = UserFactory::createOne(
             [
-            'username' => 'patchanon',
-            'plainPassword' => 'password',
-            'defaultAnonymous' => false
+                'username' => 'patchanon',
+                'plainPassword' => 'password',
+                'defaultAnonymous' => false
             ]
         );
         $token = $this->getToken('patchanon', 'password');
@@ -366,9 +360,9 @@ class UserResourceTest extends ApiTestCase
             ->get(
                 '/api/users/' . $user->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -380,13 +374,13 @@ class UserResourceTest extends ApiTestCase
             ->patch(
                 '/api/users/' . $user->getId(),
                 [
-                'headers' => [
-                    'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' => 'Bearer ' . $token
-                ],
-                'json' => [
-                    'defaultAnonymous' => true
-                ]
+                    'headers' => [
+                        'Content-Type' => 'application/merge-patch+json',
+                        'Authorization' => 'Bearer ' . $token
+                    ],
+                    'json' => [
+                        'defaultAnonymous' => true
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -397,9 +391,9 @@ class UserResourceTest extends ApiTestCase
             ->get(
                 '/api/users/' . $user->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -410,13 +404,13 @@ class UserResourceTest extends ApiTestCase
             ->patch(
                 '/api/users/' . $user->getId(),
                 [
-                'headers' => [
-                    'Content-Type' => 'application/merge-patch+json',
-                    'Authorization' => 'Bearer ' . $token
-                ],
-                'json' => [
-                    'defaultAnonymous' => false
-                ]
+                    'headers' => [
+                        'Content-Type' => 'application/merge-patch+json',
+                        'Authorization' => 'Bearer ' . $token
+                    ],
+                    'json' => [
+                        'defaultAnonymous' => false
+                    ]
                 ]
             )
             ->assertStatus(200)
@@ -427,9 +421,9 @@ class UserResourceTest extends ApiTestCase
             ->get(
                 '/api/users/' . $user->getId(),
                 [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token
-                ]
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token
+                    ]
                 ]
             )
             ->assertStatus(200)
