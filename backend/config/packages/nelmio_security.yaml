@@ -29,6 +29,9 @@ nelmio_security:
             script-src:
                 - 'self'
                 - 'unsafe-inline'
+            font-src:
+                - 'self'
+                - 'https://fonts.gstatic.com'
             img-src: [ 'self', 'data:', 'https://www.gravatar.com' ]
 
     # Permissions Policy - control access to browser features
