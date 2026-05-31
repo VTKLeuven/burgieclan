@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "698dbbfc72a056d06aebbf81ca8245bf",
+    "content-hash": "ddf7b0ec987745ebf811cb579bb1c1b6",
     "packages": [
         {
             "name": "api-platform/doctrine-common",
@@ -10805,16 +10805,16 @@
         },
         {
             "name": "vich/uploader-bundle",
-            "version": "v2.9.0",
+            "version": "v2.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dustin10/VichUploaderBundle.git",
-                "reference": "deb1d70a46f3d4250801e8fa40bd52ffa3494d70"
+                "reference": "4b88b23cb859a121413df4a831d960a46d6fe27f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dustin10/VichUploaderBundle/zipball/deb1d70a46f3d4250801e8fa40bd52ffa3494d70",
-                "reference": "deb1d70a46f3d4250801e8fa40bd52ffa3494d70",
+                "url": "https://api.github.com/repos/dustin10/VichUploaderBundle/zipball/4b88b23cb859a121413df4a831d960a46d6fe27f",
+                "reference": "4b88b23cb859a121413df4a831d960a46d6fe27f",
                 "shasum": ""
             },
             "require": {
@@ -10907,9 +10907,9 @@
             ],
             "support": {
                 "issues": "https://github.com/dustin10/VichUploaderBundle/issues",
-                "source": "https://github.com/dustin10/VichUploaderBundle/tree/v2.9.0"
+                "source": "https://github.com/dustin10/VichUploaderBundle/tree/v2.9.2"
             },
-            "time": "2025-12-07T13:46:23+00:00"
+            "time": "2026-03-12T08:18:50+00:00"
         },
         {
             "name": "webmozart/assert",
