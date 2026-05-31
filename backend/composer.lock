@@ -14152,16 +14152,16 @@
         },
         {
             "name": "zenstruck/browser",
-            "version": "v1.10.0",
+            "version": "v1.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zenstruck/browser.git",
-                "reference": "e1d29a78114b17450f5bc1e3d0b0fd2d5451e482"
+                "reference": "c9097f8f4d5faace4be0335e42952d1168fb316f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zenstruck/browser/zipball/e1d29a78114b17450f5bc1e3d0b0fd2d5451e482",
-                "reference": "e1d29a78114b17450f5bc1e3d0b0fd2d5451e482",
+                "url": "https://api.github.com/repos/zenstruck/browser/zipball/c9097f8f4d5faace4be0335e42952d1168fb316f",
+                "reference": "c9097f8f4d5faace4be0335e42952d1168fb316f",
                 "shasum": ""
             },
             "require": {
@@ -14215,7 +14215,7 @@
             ],
             "support": {
                 "issues": "https://github.com/zenstruck/browser/issues",
-                "source": "https://github.com/zenstruck/browser/tree/v1.10.0"
+                "source": "https://github.com/zenstruck/browser/tree/v1.10.1"
             },
             "funding": [
                 {
@@ -14227,7 +14227,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-01-08T15:40:26+00:00"
+            "time": "2026-05-28T15:54:04+00:00"
         },
         {
             "name": "zenstruck/callback",
