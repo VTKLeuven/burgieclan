@@ -2516,16 +2516,16 @@
         },
         {
             "name": "easycorp/easyadmin-bundle",
-            "version": "v5.0.4",
+            "version": "v5.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EasyCorp/EasyAdminBundle.git",
-                "reference": "d56826d50887eea7a65afa2bd3157aed6c87e0ea"
+                "reference": "e22ef0fddc532ab7847c887de428fbd7f6f118d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/d56826d50887eea7a65afa2bd3157aed6c87e0ea",
-                "reference": "d56826d50887eea7a65afa2bd3157aed6c87e0ea",
+                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/e22ef0fddc532ab7847c887de428fbd7f6f118d5",
+                "reference": "e22ef0fddc532ab7847c887de428fbd7f6f118d5",
                 "shasum": ""
             },
             "require": {
@@ -2553,7 +2553,7 @@
                 "symfony/twig-bridge": "^6.4.32|^7.1.9|^7.2|^8.0",
                 "symfony/twig-bundle": "^6.4.32|^7.0|^8.0",
                 "symfony/uid": "^6.4.32|^7.0|^8.0",
-                "symfony/ux-twig-component": "^2.32",
+                "symfony/ux-twig-component": "^2.32|^3.0",
                 "symfony/validator": "^6.4.33|^7.0|^8.0",
                 "twig/extra-bundle": "^3.23",
                 "twig/html-extra": "^3.23",
@@ -2562,6 +2562,7 @@
             "require-dev": {
                 "dama/doctrine-test-bundle": "^8.2",
                 "doctrine/doctrine-fixtures-bundle": "^3.4|3.5.x-dev|^4.0",
+                "league/flysystem": "^3.10",
                 "moneyphp/money": "^4.8",
                 "phpstan/extension-installer": "^1.4",
                 "phpstan/phpstan": "^2.0",
@@ -2610,7 +2611,7 @@
             ],
             "support": {
                 "issues": "https://github.com/EasyCorp/EasyAdminBundle/issues",
-                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v5.0.4"
+                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v5.0.11"
             },
             "funding": [
                 {
@@ -2618,7 +2619,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-04-01T18:44:07+00:00"
+            "time": "2026-05-28T19:03:47+00:00"
         },
         {
             "name": "gesdinet/jwt-refresh-token-bundle",
