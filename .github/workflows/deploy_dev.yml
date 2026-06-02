@@ -10,6 +10,13 @@ concurrency:
   group: deploy-dev-${{ github.ref }}
   cancel-in-progress: false
 
+# GITHUB_TOKEN scope minted for the whole reusable-workflow chain.
+# Nested reusable workflows can only restrict these, never elevate them,
+# so packages: write must be granted here for the image push to succeed.
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   deploy:
     name: Deploy

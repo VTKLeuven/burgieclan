@@ -17,10 +17,20 @@ on:
       SSH_PRIVATE_KEY:
         required: true
 
+# Least-privilege default: the deploy job only needs packages: read to log in
+# and pull from ghcr.io. The build jobs elevate to packages: write per-job so
+# the nested reusable workflows can push images.
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   build_backend:
     name: Build Backend
     uses: ./.github/workflows/build-backend.yaml
+    permissions:
+      contents: read
+      packages: write
     with:
       environment: ${{ inputs.environment }}
       url: ${{ inputs.url }}
@@ -28,6 +38,9 @@ jobs:
   build_frontend:
     name: Build Frontend
     uses: ./.github/workflows/build-frontend.yaml
+    permissions:
+      contents: read
+      packages: write
     with:
       environment: ${{ inputs.environment }}
       url: ${{ inputs.url }}
