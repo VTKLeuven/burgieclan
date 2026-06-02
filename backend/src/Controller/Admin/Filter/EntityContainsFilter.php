@@ -91,7 +91,7 @@ class EntityContainsFilter implements FilterInterface
 
         if ($associationType === 'toMany') {
             // ManyToMany or OneToMany: MEMBER OF logic
-            if ($comparison === 'CONTAINS_ANY' && $values) {
+            if ($comparison === 'CONTAINS_ANY') {
                 $orX = $queryBuilder->expr()->orX();
                 foreach ($values as $i => $v) {
                     $param = $parameterName . '_contains_' . $i;
@@ -99,7 +99,7 @@ class EntityContainsFilter implements FilterInterface
                     $queryBuilder->setParameter($param, $v);
                 }
                 $queryBuilder->andWhere($orX);
-            } elseif ($comparison === 'CONTAINS_ALL' && $values) {
+            } elseif ($comparison === 'CONTAINS_ALL') {
                 foreach ($values as $i => $v) {
                     $param = $parameterName . '_containsall_' . $i;
                     $queryBuilder->andWhere(":$param MEMBER OF $rootAlias.$property");
