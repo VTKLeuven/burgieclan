@@ -11,7 +11,7 @@
         "core-js": "3.49.0",
         "highlight.js": "11.11.1",
         "imports-loader": "5.0.0",
-        "jquery": "3.7.1",
+        "jquery": "4.0.0",
         "lato-font": "3.0.0",
         "moment": "2.30.1",
         "moment-timezone": "0.6.2",
