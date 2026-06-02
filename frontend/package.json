@@ -26,7 +26,7 @@
     "cookie": "^1.0.2",
     "file-type": "^21.3.4",
     "fuse.js": "^7.1.0",
-    "i18next": "^25.6.3",
+    "i18next": "^26.0.0",
     "i18next-resources-to-backend": "^1.2.1",
     "katex": "^0.16.11",
     "lucide-react": "^1.0.0",
