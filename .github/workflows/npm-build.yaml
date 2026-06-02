@@ -48,7 +48,3 @@ jobs:
         run: |
           cd frontend
           npm run build
-
-      - name: Block merge if build fails
-        if: failure()
-        run: exit 1

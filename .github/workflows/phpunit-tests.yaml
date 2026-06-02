@@ -60,7 +60,3 @@ jobs:
         run: |
           cd backend
           vendor/bin/phpunit tests
-
-      - name: Block merge if tests fail
-        if: failure() # This step runs only if the previous steps failed
-        run: exit 1 # Exits with a non-zero status to block the merge if tests fail
