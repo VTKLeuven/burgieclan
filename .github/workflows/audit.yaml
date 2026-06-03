@@ -12,6 +12,10 @@ jobs:
   npm-audit:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: frontend
+
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -22,11 +26,14 @@ jobs:
           node-version: "24"
 
       - name: Run security audit
-        working-directory: frontend
         run: npm audit --audit-level high
 
   composer-audit:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
 
     steps:
       - name: Checkout code
@@ -38,5 +45,4 @@ jobs:
           php-version: "8.4"
 
       - name: Run security audit
-        working-directory: backend
         run: composer audit --locked

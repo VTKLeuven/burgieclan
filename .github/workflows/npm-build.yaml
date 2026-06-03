@@ -12,6 +12,10 @@ jobs:
   npm-build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: frontend
+
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -35,16 +39,10 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
 
       - name: Install dependencies
-        run: |
-          cd frontend
-          npm install
+        run: npm install
 
       - name: Run linter
-        run: |
-          cd frontend
-          npm run lint
+        run: npm run lint
 
       - name: Run build
-        run: |
-          cd frontend
-          npm run build
+        run: npm run build

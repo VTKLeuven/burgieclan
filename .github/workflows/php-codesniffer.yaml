@@ -12,6 +12,10 @@ jobs:
   php-codesniffer:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: backend
+
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -30,14 +34,10 @@ jobs:
           php-version: "8.4"
 
       - name: Install dependencies
-        run: |
-          cd backend
-          composer install
+        run: composer install
 
       - name: Run PHP Code Sniffer
-        run: |
-          cd backend
-          vendor/bin/phpcs --runtime-set ignore_warnings_on_exit 1
+        run: vendor/bin/phpcs --runtime-set ignore_warnings_on_exit 1
 
       - name: Print local fix instructions
         if: failure()

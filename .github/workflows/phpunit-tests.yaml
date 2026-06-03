@@ -12,6 +12,10 @@ jobs:
   php-unit:
     runs-on: ubuntu-latest # The job runs on the latest version of Ubuntu
 
+    defaults:
+      run:
+        working-directory: backend
+
     services:
       db:
         image: postgres:18@sha256:8ff36f3c66371cba71d20ceedccfc3de9669a68737607888c4ef0af93abe8e39
@@ -46,17 +50,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd backend
           composer install
           php bin/console lexik:jwt:generate-keypair
 
       - name: Backend - Create database
         run: |
-          cd backend
           bin/console doctrine:database:create --if-not-exists --env=test
           bin/console doctrine:schema:create --env=test
 
       - name: Run PHPUnit tests
-        run: |
-          cd backend
-          vendor/bin/phpunit tests
+        run: vendor/bin/phpunit tests
