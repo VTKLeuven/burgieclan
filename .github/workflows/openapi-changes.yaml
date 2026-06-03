@@ -47,6 +47,9 @@ jobs:
       - name: Checkout base branch
         run: git checkout origin/${{ github.base_ref }}
 
+      - name: Clear stale cache from PR branch
+        run: rm -rf backend/var/cache/*
+
       - name: Install dependencies for base branch
         run: |
           cd backend
