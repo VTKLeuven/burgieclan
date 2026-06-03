@@ -1,3 +1,7 @@
+# syntax=docker/dockerfile:1
+# ^ Selects the BuildKit Dockerfile frontend so `RUN --mount=type=secret` (used below for
+#   the Sentry auth token) works consistently across Docker installs / CI runners.
+
 # Stage 1: Dependencies
 FROM node:24-alpine@sha256:2bdb65ed1dab192432bc31c95f94155ca5ad7fc1392fb7eb7526ab682fa5bf14 AS base
 
@@ -15,18 +19,19 @@ RUN npm ci --no-audit
 FROM base AS builder
 WORKDIR /app
 
-# Accept Sentry auth token as secret for build-time use
-# This is used to upload source maps to Sentry during build
-# Note: Using ARG is acceptable here since the token is only needed during build
-# and is not persisted in the final image layers
-ARG SENTRY_AUTH_TOKEN
-
-# Accept Next.js public environment variables as build args
-# These are embedded at build time, not runtime
+# Next.js public env vars: inlined into the bundle at BUILD time, so they must be set here
+# (a runtime value is ignored). NEXT_PUBLIC_SENTRY_DSN missing => client Sentry disabled.
 ARG NEXT_PUBLIC_FRONTEND_URL
 ARG NEXT_PUBLIC_BACKEND_URL
+ARG NEXT_PUBLIC_SENTRY_DSN
+ARG NEXT_PUBLIC_SENTRY_ENVIRONMENT
 ENV NEXT_PUBLIC_FRONTEND_URL=$NEXT_PUBLIC_FRONTEND_URL
 ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
+ENV NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN
+ENV NEXT_PUBLIC_SENTRY_ENVIRONMENT=$NEXT_PUBLIC_SENTRY_ENVIRONMENT
+
+ARG SENTRY_RELEASE
+ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
@@ -37,8 +42,15 @@ COPY . .
 # Set environment variables for build
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build the application
-RUN npm run build
+# Build the application.
+# SENTRY_AUTH_TOKEN (used by the Sentry Next.js plugin to upload source maps) is a real
+# secret, so it's provided via a BuildKit secret mount rather than ARG/ENV. This keeps it
+# out of image layers AND out of the registry build cache (cache-to mode=max). The token
+# is exposed only as an env var for the duration of this single RUN; if absent (e.g. local
+# builds), the Sentry plugin simply skips the upload.
+RUN --mount=type=secret,id=sentry_auth_token \
+    export SENTRY_AUTH_TOKEN="$(cat /run/secrets/sentry_auth_token 2>/dev/null || true)" && \
+    npm run build
 
 # Stage 3: Runner
 FROM base AS runner

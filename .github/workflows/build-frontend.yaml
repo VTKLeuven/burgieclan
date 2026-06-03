@@ -66,6 +66,15 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/${{ steps.repo_name.outputs.lowercase }}/frontend:buildcache
           cache-to: type=registry,ref=ghcr.io/${{ steps.repo_name.outputs.lowercase }}/frontend:buildcache,mode=max
           build-args: |
-            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
             NEXT_PUBLIC_FRONTEND_URL=${{ inputs.url }}
             NEXT_PUBLIC_BACKEND_URL=${{ inputs.url }}
+            NEXT_PUBLIC_SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+            # Sentry release: git tag on production releases, commit SHA on dev deploys.
+            # The Next.js plugin tags events and uploads source maps under it. Environment
+            # is the deploy stage (dev/production); NEXT_PUBLIC_ so it's inlined client-side.
+            SENTRY_RELEASE=${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
+            NEXT_PUBLIC_SENTRY_ENVIRONMENT=${{ inputs.environment }}
+          # Secret (source-map upload) passed via BuildKit secret mount, not a build-arg,
+          # so it never lands in image layers or the registry build cache.
+          secrets: |
+            sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}

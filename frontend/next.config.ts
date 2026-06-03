@@ -1,7 +1,9 @@
 import { withSentryConfig } from '@sentry/nextjs';
+import type { NextConfig } from 'next';
+// Single source of truth for the upload size limit (see src/utils/constants/upload.ts).
+import { FILE_SIZE_MB } from './src/utils/constants/upload';
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
     output: 'standalone',
     reactStrictMode: false,
     images: {
@@ -22,7 +24,8 @@ const nextConfig = {
     },
     experimental: {
         serverActions: {
-            bodySizeLimit: `${parseInt(process.env.NEXT_PUBLIC_MAX_FILE_SIZE_MB ?? '10') + 5}mb`,
+            // +5 MB headroom over the file limit for multipart/form-data overhead.
+            bodySizeLimit: `${FILE_SIZE_MB + 5}mb`,
         },
     },
 };
@@ -33,6 +36,10 @@ export default withSentryConfig(nextConfig, {
 
     org: "vtko-vzw",
     project: "burgieclan",
+
+    release: {
+        name: process.env.SENTRY_RELEASE || undefined,
+    },
 
     // Pass the auth token
     authToken: process.env.SENTRY_AUTH_TOKEN,

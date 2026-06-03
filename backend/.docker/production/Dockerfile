@@ -35,8 +35,6 @@ WORKDIR /app
 # These folders are defined as volumes to ensure they use external persistence
 # (as configured in docker-compose) rather than being part of the image layers.
 # This is crucial for runtime data and external configuration mounts.
-# Logs and Cache. Persisted via the 'backend_var' named volume in Compose.
-VOLUME /app/var/
 # Application data/uploads. Mounted from the host via ${DATA_DIR} in Compose.
 VOLUME /app/data
 # Sensitive JWT keys. Mounted from the host via ${JWT_DIR} in Compose.
@@ -98,11 +96,15 @@ ARG FRONTEND_URL
 ARG APP_ENV=prod
 ARG COMMIT_HASH
 ARG VERSION
+ARG SENTRY_RELEASE
+ARG SENTRY_ENVIRONMENT
 
 ENV APP_ENV=$APP_ENV
 ENV FRONTEND_URL=$FRONTEND_URL
 ENV COMMIT_HASH=$COMMIT_HASH
 ENV VERSION=$VERSION
+ENV SENTRY_RELEASE=$SENTRY_RELEASE
+ENV SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT
 ENV JWT_PUBLIC_KEY=/app/config/jwt/public.pem
 ENV JWT_SECRET_KEY=/app/config/jwt/private.pem
 
