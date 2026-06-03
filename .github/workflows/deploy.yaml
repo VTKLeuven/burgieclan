@@ -16,6 +16,10 @@ on:
         required: true
       SSH_PRIVATE_KEY:
         required: true
+      SENTRY_AUTH_TOKEN:
+        required: true
+      SENTRY_DSN:
+        required: true
 
 # Least-privilege default: the deploy job only needs packages: read to log in
 # and pull from ghcr.io. The build jobs elevate to packages: write per-job so
@@ -44,6 +48,9 @@ jobs:
     with:
       environment: ${{ inputs.environment }}
       url: ${{ inputs.url }}
+    secrets:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
   deploy:
     name: Deploy
