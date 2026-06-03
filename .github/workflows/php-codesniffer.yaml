@@ -42,5 +42,8 @@ jobs:
       - name: Print local fix instructions
         if: failure()
         run: |
-          echo "To fix PHP CodeSniffer errors locally, run:"
-          echo "  vendor/bin/phpcbf"
+          echo "### PHP CodeSniffer failed :x:" >> "$GITHUB_STEP_SUMMARY"
+          echo "To fix the errors locally, run:" >> "$GITHUB_STEP_SUMMARY"
+          echo '```bash' >> "$GITHUB_STEP_SUMMARY"
+          echo "vendor/bin/phpcbf" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
