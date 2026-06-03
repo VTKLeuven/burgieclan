@@ -1,12 +1,15 @@
-name: Security Audit
+name: Security
 
 on:
   push:
     branches:
       - main
   pull_request:
-    branches:
-      - "**"
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: security-audit-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   npm-audit:
