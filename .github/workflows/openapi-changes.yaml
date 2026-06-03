@@ -14,7 +14,11 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    
+
+    defaults:
+      run:
+        working-directory: backend
+
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -35,30 +39,22 @@ jobs:
           php-version: "8.4"
 
       - name: Install dependencies
-        run: |
-          cd backend
-          composer install
+        run: composer install
 
       - name: Generate OpenAPI spec for PR branch
-        run: |
-          cd backend
-          php bin/console api:openapi:export > /tmp/openapi-pr.json
+        run: php bin/console api:openapi:export > /tmp/openapi-pr.json
 
       - name: Checkout base branch
         run: git checkout origin/${{ github.base_ref }}
 
       - name: Clear stale cache from PR branch
-        run: rm -rf backend/var/cache/*
+        run: rm -rf var/cache/*
 
       - name: Install dependencies for base branch
-        run: |
-          cd backend
-          composer install
+        run: composer install
 
       - name: Generate OpenAPI spec for base branch
-        run: |
-          cd backend
-          php bin/console api:openapi:export > /tmp/openapi-base.json
+        run: php bin/console api:openapi:export > /tmp/openapi-base.json
 
       - name: Compare OpenAPI specs
         id: diff
