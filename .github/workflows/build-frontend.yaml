@@ -9,6 +9,11 @@ on:
       url:
         type: string
         required: true
+    secrets:
+      SENTRY_AUTH_TOKEN:
+        required: true
+      SENTRY_DSN:
+        required: true
 jobs:
   build_and_push:
     name: Build and push frontend image
