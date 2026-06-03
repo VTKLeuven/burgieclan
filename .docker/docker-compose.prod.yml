@@ -81,9 +81,6 @@ services:
       - ${DATA_DIR:?DATA_DIR is required}:/app/data
       # JWT directory - where JWT keys are stored
       - ${JWT_DIR:?JWT_DIR is required}:/app/config/jwt
-      # Var directory for cache and logs
-      # Using named volume for better performance
-      - backend_var:/app/var
 
     # Health check to ensure backend is ready before frontend starts
     healthcheck:
@@ -121,15 +118,6 @@ services:
     # Port mapping - only expose internally to nginx
     expose:
       - "3000"
-
-    # Environment variables
-    environment:
-      # File upload configuration
-      NEXT_PUBLIC_MAX_FILE_SIZE_MB: "200"
-      NEXT_PUBLIC_ALLOWED_MIME_TYPES: "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.spreadsheet,application/vnd.oasis.opendocument.presentation,image/jpeg,image/jpg,image/png,image/svg+xml,image/gif,application/zip,text/csv,text/plain,text/markdown,text/x-matlab,text/x-python,video/mp4"
-
-      # Sentry configuration
-      NEXT_PUBLIC_SENTRY_DSN: ${SENTRY_DSN:-}
 
     depends_on:
       backend:
@@ -188,7 +176,3 @@ services:
         max-size: "50m" # Rotate when file reaches 50MB
         max-file: "5" # Keep 5 rotated files (250MB total per service)
         compress: "true" # Compress rotated logs to save space
-
-volumes:
-  backend_var:
-    driver: local
