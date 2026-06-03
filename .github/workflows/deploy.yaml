@@ -146,3 +146,31 @@ jobs:
             echo "Cleaning up old images..."
             docker image prune -a -f
           EOF
+
+  sentry_release:
+    name: Sentry Release
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    environment:
+      name: ${{ inputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          # Full history so Sentry can associate commits with the release.
+          fetch-depth: 0
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@ff07929a6537bac57790c3451cf4d364aca38528 # v3.7.0
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: vtko-vzw
+          SENTRY_PROJECT: burgieclan
+        with:
+          release: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
+          environment: ${{ inputs.environment }}
+          set_commits: auto
+          # Don't fail the deploy if commit association hits a missing ref (force-push/
+          # rebase) or finds no new commits (e.g. first release / re-deploy).
+          ignore_missing: true
+          ignore_empty: true

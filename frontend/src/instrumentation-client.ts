@@ -8,7 +8,9 @@ import { captureConsoleIntegration, captureRouterTransitionStart, init, replayIn
 init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
-  environment: "frontend-" + process.env.NODE_ENV,
+  environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT || "development",
+
+  initialScope: { tags: { component: "frontend" } },
 
   // Add optional integrations for additional features
   integrations: [

@@ -71,3 +71,8 @@ jobs:
             COMMIT_HASH=${{ github.sha }}
             VERSION=${{ (github.ref_type == 'tag' && github.ref_name) || '' }}
             # VERSION is only set for tag releases, empty string for branch deployments
+            # Sentry release: git tag on production releases, commit SHA on dev deploys.
+            # Environment is the deploy stage (dev/production) so dev-server and prod-server
+            # errors are distinguishable.
+            SENTRY_RELEASE=${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
+            SENTRY_ENVIRONMENT=${{ inputs.environment }}

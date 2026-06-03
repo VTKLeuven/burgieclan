@@ -7,14 +7,17 @@ when@prod:
         tracing:
             enabled: false
 
-        # If you are using Monolog, you also need this additional configuration to log the errors correctly:
-        # https://docs.sentry.io/platforms/php/guides/symfony/#monolog-integration
-        register_error_listener: false
+        # Capture unhandled exceptions as Sentry issues. The Monolog handler below
+        # feeds Sentry Logs (a separate product), so the two are complementary.
+        register_error_listener: true
+        # Left off to avoid reporting PHP deprecations as issues.
         register_error_handler: false
 
         options:
-            # Set custom Sentry environment
-            environment: "backend-%kernel.environment%"
+            environment: "%env(default::SENTRY_ENVIRONMENT)%"
+            release: "%env(default::SENTRY_RELEASE)%"
+            tags:
+                component: backend
             # Required for LogsHandler (Sentry Logs API)
             enable_logs: true
             # Ignore 404 errors
