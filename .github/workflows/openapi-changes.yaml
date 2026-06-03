@@ -82,6 +82,7 @@ jobs:
           retention-days: 7
 
       - name: Create or update PR comment with OpenAPI summary
+        if: ${{ !cancelled() }}
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
           script: |
@@ -170,9 +171,6 @@ jobs:
               }
               
               const hasChanges = changes.length > 0;
-              const body = hasChanges
-                ? `${marker}\n## 📋 OpenAPI Spec Changes\n\n${changes.join('\n\n')}\n\n_[Check artifacts for full specs comparison](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})_`
-                : `${marker}\n✅ No changes to OpenAPI spec detected.`;
 
               const { data: comments } = await github.rest.issues.listComments({
                 issue_number: context.issue.number,
@@ -182,6 +180,20 @@ jobs:
               });
 
               const existing = comments.find(c => c.body && c.body.includes(marker));
+
+              // No changes: remove any stale comment from a previous run, but don't post a new one.
+              if (!hasChanges) {
+                if (existing) {
+                  await github.rest.issues.deleteComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    comment_id: existing.id
+                  });
+                }
+                return;
+              }
+
+              const body = `${marker}\n## 📋 OpenAPI Spec Changes\n\n${changes.join('\n\n')}\n\n_[Check artifacts for full specs comparison](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})_`;
 
               if (existing) {
                 await github.rest.issues.updateComment({
