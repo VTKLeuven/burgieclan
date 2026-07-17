@@ -48,9 +48,9 @@ jobs:
     with:
       environment: ${{ inputs.environment }}
       url: ${{ inputs.url }}
-    secrets:
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+    # Inherit so the Sentry secrets resolve from the environment declared in
+    # build-frontend.yaml's job, not from this (environment-less) caller job.
+    secrets: inherit
 
   deploy:
     name: Deploy
@@ -68,6 +68,13 @@ jobs:
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          # Fail fast with a clear error if the secret arrived empty or mangled
+          # (e.g. environment secrets not reaching this workflow) instead of a
+          # generic "Permission denied" at connect time.
+          ssh-keygen -y -f ~/.ssh/id_rsa > /dev/null || { echo "❌ SSH_PRIVATE_KEY is empty or not a valid private key"; exit 1; }
+          # Log the key fingerprint (safe: no private material) so a failed
+          # deploy can be checked against the key the server actually expects.
+          ssh-keygen -lf ~/.ssh/id_rsa
           ssh-keyscan -H "$SSH_HOST" > ~/.ssh/known_hosts
 
       - name: Pull and deploy containers
@@ -76,12 +83,19 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
           ssh "$SSH_USER@$SSH_HOST" << 'EOF'
+            # Abort on the first failing command instead of continuing with a
+            # broken deploy (e.g. a failed image pull followed by `down` would
+            # otherwise take the site offline and still report success).
+            set -e
+
             # Variables
             DEPLOY_DIR="${{ vars.DEPLOY_DIR }}"
-            
-            # Set IMAGE_TAG based on environment
+
+            # Set IMAGE_TAG based on environment. Must match a tag pushed by the
+            # build workflows: they tag images with the environment name
+            # (plus `latest` and a sha tag for production).
             if [ "${{ inputs.environment }}" = "production" ]; then
-              IMAGE_TAG="prod"
+              IMAGE_TAG="production"
             else
               IMAGE_TAG="dev"
             fi
@@ -130,8 +144,10 @@ jobs:
             # Start new containers with latest images
             docker compose -f $COMPOSE_FILE up -d --force-recreate --wait --wait-timeout 30
             
-            # Verify all services are healthy
-            if docker compose -f $COMPOSE_FILE ps --format json | jq -s -e 'all(.Health // "" | IN("healthy", ""))' > /dev/null; then
+            # Verify all services are healthy. The jq predicate is vacuously
+            # true for an empty list, so explicitly require at least one
+            # running container.
+            if [ -n "$(docker compose -f $COMPOSE_FILE ps -q)" ] && docker compose -f $COMPOSE_FILE ps --format json | jq -s -e 'all(.Health // "" | IN("healthy", ""))' > /dev/null; then
               echo "✅ All containers healthy"
               docker compose -f $COMPOSE_FILE ps
             else

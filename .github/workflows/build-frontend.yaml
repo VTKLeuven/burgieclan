@@ -57,7 +57,7 @@ jobs:
             # Tag with environment
             type=raw,value=${{ inputs.environment }}
             # Tag with commit SHA
-            type=sha,prefix={{branch}}-
+            type=sha,prefix=sha-
 
       - name: Build and push Docker image
         id: build
