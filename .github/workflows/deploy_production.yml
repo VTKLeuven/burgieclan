@@ -24,9 +24,9 @@ jobs:
     with:
       environment: production
       url: https://burgieclan-new.vtk.be
-    secrets:
-      SSH_USER: ${{ secrets.SSH_USER }}
-      SSH_HOST: ${{ secrets.SSH_HOST }}
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+    # secrets: inherit is required here: the secrets live on the GitHub
+    # environments, and environment secrets only resolve inside the called
+    # workflow's jobs (which declare `environment:`). Explicit
+    # `SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}` mappings evaluate in
+    # this caller job, which has no environment, and silently pass empty strings.
+    secrets: inherit

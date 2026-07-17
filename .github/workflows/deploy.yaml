@@ -48,9 +48,9 @@ jobs:
     with:
       environment: ${{ inputs.environment }}
       url: ${{ inputs.url }}
-    secrets:
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+    # Inherit so the Sentry secrets resolve from the environment declared in
+    # build-frontend.yaml's job, not from this (environment-less) caller job.
+    secrets: inherit
 
   deploy:
     name: Deploy
@@ -68,6 +68,10 @@ jobs:
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          # Fail fast with a clear error if the secret arrived empty or mangled
+          # (e.g. environment secrets not reaching this workflow) instead of a
+          # generic "Permission denied" at connect time.
+          ssh-keygen -y -f ~/.ssh/id_rsa > /dev/null || { echo "❌ SSH_PRIVATE_KEY is empty or not a valid private key"; exit 1; }
           ssh-keyscan -H "$SSH_HOST" > ~/.ssh/known_hosts
 
       - name: Pull and deploy containers
