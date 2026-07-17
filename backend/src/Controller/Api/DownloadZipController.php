@@ -215,13 +215,13 @@ final class DownloadZipController extends AbstractController
 
             foreach ($categoryDocuments as $document) {
                 if ($document->getFileName()) {
-                    $filePath = $this->storage->resolvePath($document, 'file');
-                    if (file_exists($filePath)) {
+                    $fileStream = $this->storage->resolveStream($document, 'file');
+                    if ($fileStream !== null) {
                         $originalFileName = $document->getFileName();
                         $fileNameToUse = $this->getUniqueFileName($originalFileName, $usedFilenames[$category]);
                         $usedFilenames[$category][] = $fileNameToUse;
 
-                        $zip->addFile($filePath, $categoryDir . '/' . $fileNameToUse);
+                        $zip->addFromString($categoryDir . '/' . $fileNameToUse, stream_get_contents($fileStream));
                     }
                 }
             }
@@ -793,16 +793,13 @@ final class DownloadZipController extends AbstractController
         $html .= '<span class="metadata-value">' . $document->getUpdatedAt()->format('Y-m-d') . '</span>';
         $html .= '</div>';
 
-        // Add file size if we can calculate it
-        if ($document->getFile()) {
-            $filePath = $this->storage->resolvePath($document, 'file');
-            if (file_exists($filePath) && is_readable($filePath)) {
-                $fileSize = filesize($filePath);
-                $html .= '<div class="metadata-pair">';
-                $html .= '<span class="metadata-label">Size:</span>';
-                $html .= '<span class="metadata-value">' . $this->formatFileSize($fileSize) . '</span>';
-                $html .= '</div>';
-            }
+        // Add file size from entity metadata (works with both local and S3 storage)
+        $fileSize = $document->getFileSize();
+        if ($fileSize) {
+            $html .= '<div class="metadata-pair">';
+            $html .= '<span class="metadata-label">Size:</span>';
+            $html .= '<span class="metadata-value">' . $this->formatFileSize($fileSize) . '</span>';
+            $html .= '</div>';
         }
 
         $html .= '</div></div>';
