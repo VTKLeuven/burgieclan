@@ -72,6 +72,9 @@ jobs:
           # (e.g. environment secrets not reaching this workflow) instead of a
           # generic "Permission denied" at connect time.
           ssh-keygen -y -f ~/.ssh/id_rsa > /dev/null || { echo "❌ SSH_PRIVATE_KEY is empty or not a valid private key"; exit 1; }
+          # Log the key fingerprint (safe: no private material) so a failed
+          # deploy can be checked against the key the server actually expects.
+          ssh-keygen -lf ~/.ssh/id_rsa
           ssh-keyscan -H "$SSH_HOST" > ~/.ssh/known_hosts
 
       - name: Pull and deploy containers

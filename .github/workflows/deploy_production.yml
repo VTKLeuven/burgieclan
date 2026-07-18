@@ -4,6 +4,9 @@ on:
   release:
     types:
       - published
+  # Manual trigger for testing the production deploy pipeline without
+  # publishing a release (e.g. `gh workflow run deploy_production.yml`).
+  workflow_dispatch:
 
 # Ensure only one deployment runs at a time
 concurrency:
