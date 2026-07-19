@@ -1,12 +1,49 @@
+'use client'
+
 import { captureException } from '@sentry/nextjs';
-import { TFunction } from 'i18next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export default function ProfessorDiv({ unumber, index, t }: { unumber: string, index: number, t: TFunction }) {
-    const { i18n } = useTranslation();
+interface ProfessorDivProps {
+    unumber: string;
+    /** Index in the list — 0 means coordinator. */
+    index: number;
+    /** Pixel size of the avatar circle (default 48). */
+    size?: number;
+    /** Whether to link the avatar to the wieiswie profile page (default true). */
+    linkToProfile?: boolean;
+}
+
+function getInitials(name: string): string {
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+}
+
+// Fallback avatars stay on the navy scale rather than introducing a rainbow
+// of accent colours; only the tone varies per person.
+function getAvatarColor(name: string): string {
+    const tones = [
+        'bg-vtk-navy text-vtk-paper',
+        'bg-vtk-ink text-vtk-paper',
+        'bg-vtk-blue-light text-vtk-paper',
+        'bg-vtk-yellow text-vtk-ink',
+    ];
+    const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return tones[hash % tones.length];
+}
+
+export default function ProfessorDiv({
+    unumber,
+    index,
+    size = 48,
+    linkToProfile = true,
+}: ProfessorDivProps) {
+    const { i18n, t } = useTranslation();
     const locale = i18n.language || 'en';
 
     const sanitizedUnumber = unumber.replace(/\D/g, '').padStart(7, '0').slice(-7);
@@ -41,62 +78,65 @@ export default function ProfessorDiv({ unumber, index, t }: { unumber: string, i
         loadProfessorName();
     }, [sanitizedUnumber]);
 
-    const handleError = () => {
-        setImageError(true);
-    };
-
-    // Get initials for fallback
-    const getInitials = (name: string) => {
-        const parts = name.split(' ');
-        if (parts.length >= 2) {
-            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-        }
-        return name.slice(0, 2).toUpperCase();
-    };
-
-    // Fallback avatars stay on the navy scale rather than introducing a rainbow
-    // of accent colours; only the tone varies per person.
-    const getAvatarColor = (name: string) => {
-        const tones = [
-            'bg-vtk-navy text-vtk-paper',
-            'bg-vtk-ink text-vtk-paper',
-            'bg-vtk-blue-light text-vtk-paper',
-            'bg-vtk-yellow text-vtk-ink',
-        ];
-        const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        return tones[hash % tones.length];
-    };
-
     const roleText = index === 0 ? t('course-page.coordinator') : t('course-page.professor');
+    const borderClass = size < 36 ? 'border border-white' : 'border-2 border-white';
+
+    const avatarContent = !imageError ? (
+        <div
+            className={`rounded-full overflow-hidden bg-vtk-paper-2 ${borderClass} shadow-xs
+                ${linkToProfile ? 'hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer' : ''}
+                relative z-10 group-hover:z-20`}
+            style={{ width: size, height: size }}
+        >
+            <Image
+                src={imgSrc}
+                onError={() => setImageError(true)}
+                className="w-full h-full object-cover"
+                alt={professorName}
+                width={size}
+                height={size}
+            />
+        </div>
+    ) : (
+        <div
+            className={`relative z-10 flex items-center justify-center rounded-full ${borderClass} font-semibold shadow-xs
+                ${linkToProfile ? 'cursor-pointer transition-all duration-200 hover:scale-110 hover:shadow-md' : ''}
+                group-hover:z-20 ${getAvatarColor(professorName)}`}
+            style={{ width: size, height: size, fontSize: size * 0.28 }}
+        >
+            {getInitials(professorName)}
+        </div>
+    );
+
+    const tooltip = (
+        <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-vtk-ink text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none">
+            <div className="font-medium">{professorName}</div>
+            <div className="text-vtk-on-dark-muted">{roleText}</div>
+            {/* Arrow pointing up */}
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-2 border-transparent border-b-vtk-ink"></div>
+        </div>
+    );
+
+    const inner = (
+        <>
+            {avatarContent}
+            {tooltip}
+        </>
+    );
+
+    if (linkToProfile) {
+        return (
+            <div className="relative group">
+                <Link href={`https://www.kuleuven.be/wieiswie/${locale}/person/0${sanitizedUnumber}`}>
+                    {inner}
+                </Link>
+            </div>
+        );
+    }
 
     return (
         <div className="relative group">
-            <Link href={`https://www.kuleuven.be/wieiswie/${locale}/person/0${sanitizedUnumber}`}>
-                {!imageError ? (
-                    <div className="w-12 h-12 rounded-full overflow-hidden bg-vtk-paper-2 border-2 border-white shadow-xs hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer relative z-10 group-hover:z-20">
-                        <Image
-                            src={imgSrc}
-                            onError={handleError}
-                            className="w-full h-full object-cover"
-                            alt={professorName}
-                            width={48}
-                            height={48}
-                        />
-                    </div>
-                ) : (
-                    <div className={`relative z-10 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-white text-sm font-semibold shadow-xs transition-all duration-200 hover:scale-110 hover:shadow-md group-hover:z-20 ${getAvatarColor(professorName)}`}>
-                        {getInitials(professorName)}
-                    </div>
-                )}
-            </Link>
-
-            {/* Tooltip on hover - appears below */}
-            <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-vtk-ink text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none">
-                <div className="font-medium">{professorName}</div>
-                <div className="text-vtk-on-dark-muted">{roleText}</div>
-                {/* Arrow pointing up */}
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-2 border-transparent border-b-vtk-ink"></div>
-            </div>
+            {inner}
         </div>
     );
-};
+}
