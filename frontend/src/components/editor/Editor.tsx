@@ -83,7 +83,7 @@ const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
     }
 
     return (
-        <div className="tiptap flex justify-between p-2 items-center border-b border-gray-900/10">
+        <div className="tiptap flex justify-between p-2 items-center border-b border-vtk-ink/10">
             <div>
                 <button
                     onClick={() => editor?.chain().focus().toggleBold().run()}
@@ -94,7 +94,7 @@ const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .toggleBold()
                             .run()
                     }
-                    className={`${editor.isActive('bold') ? 'isActive' : 'hover:bg-gray-100'}`}
+                    className={`${editor.isActive('bold') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
                     <Bold className="icon" />
                 </button>
@@ -107,7 +107,7 @@ const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .toggleItalic()
                             .run()
                     }
-                    className={`${editor.isActive('italic') ? 'isActive' : 'hover:bg-gray-100'}`}
+                    className={`${editor.isActive('italic') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
                     <Italic className="icon" />
                 </button>
@@ -120,7 +120,7 @@ const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .toggleStrike()
                             .run()
                     }
-                    className={`${editor.isActive('strike') ? 'isActive' : 'hover:bg-gray-100'}`}
+                    className={`${editor.isActive('strike') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
                     <Strikethrough className="icon" />
                 </button>
@@ -133,31 +133,31 @@ const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .toggleCode()
                             .run()
                     }
-                    className={`${editor.isActive('code') ? 'isActive' : 'hover:bg-gray-100'}`}
+                    className={`${editor.isActive('code') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
                     <CodeIcon className="icon" />
                 </button>
                 <button
                     onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
-                    className={`${editor.isActive('heading', { level: 1 }) ? 'isActive' : 'hover:bg-gray-100'}`}
+                    className={`${editor.isActive('heading', { level: 1 }) ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
                     <Heading1 className="icon" />
                 </button>
                 <button
                     onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
-                    className={`${editor.isActive('heading', { level: 2 }) ? 'isActive' : 'hover:bg-gray-100'}`}
+                    className={`${editor.isActive('heading', { level: 2 }) ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
                     <Heading2 className="icon" />
                 </button>
                 <button
                     onClick={() => editor?.chain().focus().toggleBulletList().run()}
-                    className={`${editor.isActive('bulletList') ? 'isActive' : 'hover:bg-gray-100'}`}
+                    className={`${editor.isActive('bulletList') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
                     <List className="icon" />
                 </button>
                 <button
                     onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-                    className={`${editor.isActive('orderedList') ? 'isActive' : 'hover:bg-gray-100'}`}
+                    className={`${editor.isActive('orderedList') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
                     <ListOrdered className="icon" />
                 </button>
@@ -261,7 +261,7 @@ const Editor = ({ className = '', onEditorReady }: EditorProps) => {    // Creat
     }, [editor, onEditorReady]);
 
     return (
-        <div className={`editor-container border border-gray-900/10 rounded-md h-fit ${className}`}>
+        <div className={`editor-container border border-vtk-ink/10 rounded-md h-fit ${className}`}>
             <Toolbar editor={editor} />
             <EditorContent editor={editor} />
         </div>

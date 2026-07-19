@@ -19,23 +19,25 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
     };
 
     return (
-        <div className="mt-6 border rounded-lg shadow-xs">
-            <button onClick={toggleCollapse} className="w-full text-left focus:outline-hidden">
-                <div className="flex justify-between items-center px-4 py-1 bg-gray-100 rounded-t-lg">
-                    {header}
-                    <ChevronDown
-                        className={`text-vtk-blue-500 transform transition-transform duration-400 ${isCollapsed ? 'rotate-0' : '-rotate-180'
-                            }`}
-                        aria-hidden="true"
-                    />
-                </div>
-            </button>
-            <div
-                className={`transition-all duration-300 ease-in-out origin-top ${isCollapsed ? 'scale-y-0 h-0' : 'scale-y-100 h-auto'
-                    }`}
+        <div className="vtk-panel overflow-hidden">
+            <button
+                onClick={toggleCollapse}
+                className="flex w-full items-center justify-between gap-3 px-5 py-3.5 text-left transition-colors hover:bg-vtk-paper"
+                aria-expanded={!isCollapsed}
             >
-                {children}
-            </div>
+                {header}
+                <ChevronDown
+                    size={16}
+                    className={`shrink-0 text-vtk-muted transition-transform duration-300 ${isCollapsed ? 'rotate-0' : '-rotate-180'
+                        }`}
+                    aria-hidden="true"
+                />
+            </button>
+            {!isCollapsed && (
+                <div className="border-t border-vtk-line">
+                    {children}
+                </div>
+            )}
         </div>
     );
 };

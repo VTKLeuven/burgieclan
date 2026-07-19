@@ -3,6 +3,10 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { i18nConfig } from "../../../i18nConfig";
 
+/**
+ * Subtle NL / EN toggle for the navy header: light text, the active locale in
+ * solid white. Mirrors `.vtk-site-header .lang-toggle` in vtk-website-new.
+ */
 const LanguageSwitcher = () => {
     const { i18n } = useTranslation();
     const pathname = usePathname();
@@ -31,37 +35,23 @@ const LanguageSwitcher = () => {
     };
 
     return (
-        <div className="relative flex items-center bg-gray-100 rounded-full p-0.5 h-6">
-            {/* Background slider */}
-            <div
-                className={`absolute h-5 w-9 bg-amber-600 rounded-full transition-all duration-300 ease-in-out ${
-                    currentLocale === 'nl' ? 'left-0.5' : 'left-[48%]'
-                }`}
-            />
-
-            {/* Buttons */}
-            <button
-                onClick={() => !isTransitioning && switchLanguage('nl')}
-                className={`relative z-10 flex-1 flex items-center justify-center rounded-full transition-all duration-300 ${
-                    currentLocale === 'nl'
-                        ? 'text-white'
-                        : 'text-gray-600 hover:text-gray-900'
-                }`}
-                disabled={isTransitioning}
-            >
-                <span className="px-2 text-sm font-medium">NL</span>
-            </button>
-            <button
-                onClick={() => !isTransitioning && switchLanguage('en')}
-                className={`relative z-10 flex-1 flex items-center justify-center rounded-full transition-all duration-300 ${
-                    currentLocale === 'en'
-                        ? 'text-white'
-                        : 'text-gray-600 hover:text-gray-900'
-                }`}
-                disabled={isTransitioning}
-            >
-                <span className="px-2 text-sm font-medium">EN</span>
-            </button>
+        <div className="flex items-center gap-0.5 text-[13px] text-vtk-paper/75">
+            {i18nConfig.locales.map((locale, index) => (
+                <span key={locale} className="flex items-center">
+                    {index > 0 && <span className="text-vtk-paper/40">/</span>}
+                    <button
+                        onClick={() => !isTransitioning && switchLanguage(locale)}
+                        aria-pressed={currentLocale === locale}
+                        disabled={isTransitioning}
+                        className={`p-1 uppercase transition-colors ${currentLocale === locale
+                            ? 'font-semibold text-white'
+                            : 'hover:text-white'
+                            }`}
+                    >
+                        {locale}
+                    </button>
+                </span>
+            ))}
         </div>
     );
 };

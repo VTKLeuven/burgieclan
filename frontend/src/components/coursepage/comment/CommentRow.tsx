@@ -85,7 +85,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
     };
 
     return (
-        <div className="py-2 px-3 leading-tight flex flex-col sm:flex-row overflow-visible relative items-center transition-colors border-b border-gray-200 hover:bg-gray-50 hover:shadow-xs group/comment">
+        <div className="py-2 px-3 leading-tight flex flex-col sm:flex-row overflow-visible relative items-center transition-colors border-b border-vtk-line hover:bg-vtk-paper hover:shadow-xs group/comment">
             {/* Profile Picture - Left side (desktop only) */}
             <div className="hidden sm:flex items-center mr-2 overflow-visible">
                 <CommentUserIcon anonymous={comment.anonymous ?? true} creatorName={comment.creator?.fullName} />
@@ -99,7 +99,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
                             ref={editTextareaRef}
                             value={editContent}
                             onChange={handleEditContentChange}
-                            className="w-full p-2 text-sm border border-gray-300 rounded-md resize-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 placeholder-gray-450"
+                            className="w-full p-2 text-sm border border-vtk-line rounded-md resize-none focus:ring-1 focus:ring-vtk-ink focus:border-vtk-line-2 placeholder-vtk-muted"
                             rows={Math.min(10, editContent.split('\n').length)}
                             required
                             disabled={editIsSubmitting}
@@ -109,7 +109,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
                             <button
                                 type="button"
                                 onClick={handleCancelEdit}
-                                className="text-xs px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                                className="text-xs px-3 py-1 bg-vtk-paper-2 text-vtk-body rounded hover:bg-vtk-paper-2 transition-colors"
                                 disabled={editIsSubmitting}
                             >
                                 {t('course-page.comments.dialog.button.cancel')}
@@ -123,14 +123,14 @@ const CommentRow: React.FC<CommentRowProps> = ({
                                     checked={editAnonymous}
                                     onChange={(e) => setEditAnonymous(e.target.checked)}
                                     disabled={editIsSubmitting}
-                                    labelClassName="text-xs text-gray-600 hover:text-gray-800 transition-colors"
+                                    labelClassName="text-xs text-vtk-body hover:text-vtk-ink transition-colors"
                                 />
                             </div>
 
                             <button
                                 type="submit"
                                 disabled={editIsSubmitting || !editContent.trim()}
-                                className="text-xs px-3 py-1 bg-amber-600 text-white rounded hover:bg-amber-700 disabled:opacity-50 transition-colors inline-flex items-center"
+                                className="text-xs px-3 py-1 bg-vtk-ink text-white rounded hover:bg-vtk-navy disabled:opacity-50 transition-colors inline-flex items-center"
                             >
                                 {editIsSubmitting ? (
                                     <>
@@ -148,7 +148,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
                     </form>
                 ) : (
                     <>
-                        <p className="text-sm min-h-[1.4rem] text-gray-700 whitespace-pre-line">{comment.content}</p>
+                        <p className="text-sm min-h-[1.4rem] text-vtk-body whitespace-pre-line">{comment.content}</p>
                         <div className="hidden sm:flex items-center w-auto">
                             <CommentActions onEdit={handleEditClick} onDelete={handleDeleteComment} show={isOwnComment && !isEditing} />
                         </div>

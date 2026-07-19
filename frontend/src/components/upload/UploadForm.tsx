@@ -108,7 +108,7 @@ export default function UploadForm({
         <form id="upload-form" onSubmit={handleSubmit(onSubmit)} className="pt-6 space-y-6">
             {error && (
                 <div className="mb-4">
-                    <Text className="text-red-600">{error}</Text>
+                    <Text className="vtk-error-text">{error}</Text>
                 </div>
             )}
 
@@ -162,7 +162,7 @@ export default function UploadForm({
                 </div>
 
                 <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium text-gray-900">
+                    <label className="block text-sm font-medium text-vtk-ink">
                         {t('upload.form.tags.label')}
                     </label>
                     <UploadTagFilter

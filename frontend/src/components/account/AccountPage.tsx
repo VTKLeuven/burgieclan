@@ -69,46 +69,57 @@ export default function AccountPage() {
     }
 
     return (
-        <div className="bg-white p-6 md:p-10 mx-auto max-w-7xl">
-            <div className="flex items-center space-x-4 mt-3">
-                <h1 className="md:text-5xl text-4xl mb-4 text-wireframe-primary-blue">
-                    {t('account.greeting', { name: user.fullName })}
-                </h1>
+        <div className="vtk-shell pb-16">
+            <div className="vtk-page-head">
+                <div>
+                    <div className="vtk-page-kicker">{t('account.account')}</div>
+                    <h1 className="vtk-page-title">
+                        {t('account.greeting', { name: user.fullName })}
+                    </h1>
+                    <p
+                        className="vtk-page-subtitle [&_p]:m-0"
+                        dangerouslySetInnerHTML={{ __html: t('account.welcome_text') }}
+                    />
+                </div>
+                <div className="vtk-page-meta hidden sm:block">
+                    <b>{favoriteCourses.length}</b> courses<br />
+                    <b>{favoriteDocuments.length}</b> documents
+                </div>
             </div>
-            <p className="pt-3 md:pt-0 text-lg mb-5" dangerouslySetInnerHTML={{ __html: t('account.welcome_text') }} />
 
-            <DocumentList />
+            <div className="mt-7 grid gap-4">
+                <DocumentList />
 
-            <FavoriteList
-                title={t('account.favorite.courses')}
-                items={mapCoursesToItems(favoriteCourses)}
-                emptyMessage={t('account.favorite.no_courses')}
-            />
-            <FavoriteList
-                title={t('account.favorite.modules')}
-                items={mapModulesToItems(favoriteModules)}
-                emptyMessage={t('account.favorite.no_modules')}
-            />
-            <FavoriteList
-                title={t('account.favorite.programs')}
-                items={mapProgramsToItems(favoritePrograms)}
-                emptyMessage={t('account.favorite.no_programs')}
-            />
-            <FavoriteList
-                title={t('account.favorite.documents')}
-                items={mapDocumentsToItems(favoriteDocuments)}
-                emptyMessage={t('account.favorite.no_documents')}
-            />
+                <div className="grid gap-4 lg:grid-cols-2">
+                    <FavoriteList
+                        title={t('account.favorite.courses')}
+                        items={mapCoursesToItems(favoriteCourses)}
+                        emptyMessage={t('account.favorite.no_courses')}
+                    />
+                    <FavoriteList
+                        title={t('account.favorite.modules')}
+                        items={mapModulesToItems(favoriteModules)}
+                        emptyMessage={t('account.favorite.no_modules')}
+                    />
+                    <FavoriteList
+                        title={t('account.favorite.programs')}
+                        items={mapProgramsToItems(favoritePrograms)}
+                        emptyMessage={t('account.favorite.no_programs')}
+                    />
+                    <FavoriteList
+                        title={t('account.favorite.documents')}
+                        items={mapDocumentsToItems(favoriteDocuments)}
+                        emptyMessage={t('account.favorite.no_documents')}
+                    />
+                </div>
 
-            <AnonymousSetting />
+                <AnonymousSetting />
 
-            <div className="mt-6">
-                <button
-                    onClick={handleLogout}
-                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 active:bg-red-700 transition duration-150 ease-in-out"
-                >
-                    {t('logout')}
-                </button>
+                <div className="flex justify-end border-t border-vtk-line pt-5">
+                    <button onClick={handleLogout} className="vtk-button vtk-button-danger">
+                        {t('logout')}
+                    </button>
+                </div>
             </div>
         </div>
     );

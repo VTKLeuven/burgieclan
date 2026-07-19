@@ -282,7 +282,8 @@
             "submitting": "Submitting...",
             "anonymous": "Anonymous",
             "success": "Comment added successfully",
-            "error": "Failed to add comment"
+            "error": "Failed to add comment",
+            "title": "Comments"
         },
         "under-review-warning": "This document is currently under review, so it is only visible to you."
     },
@@ -323,5 +324,12 @@
             "katex_end": " the underlying LaTeX interpreter."
         },
         "info_button": "Info"
+    },
+    "footer": {
+        "navigate": "Navigate",
+        "support": "Support",
+        "community": "Community",
+        "tagline": "Share your notes.\nPass your exams.",
+        "about": "About Burgieclan"
     }
 }

@@ -79,15 +79,15 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     let fillColor = "";
 
     if (colorScheme === 'gray') {
-        baseClasses += " hover:bg-gray-200";
-        favoriteClasses = "text-gray-400 hover:text-gray-600";
-        fillColor = isFavorite ? "fill-gray-400" : "";
+        baseClasses += " hover:bg-vtk-paper-2";
+        favoriteClasses = "text-vtk-muted hover:text-vtk-body";
+        fillColor = isFavorite ? "fill-vtk-muted" : "";
     } else {
-        baseClasses += " hover:bg-gray-100";
+        baseClasses += " hover:bg-vtk-paper-2";
         favoriteClasses = isFavorite
-            ? "text-yellow-500 hover:text-yellow-600"
-            : "text-gray-400 hover:text-yellow-500";
-        fillColor = isFavorite ? "fill-yellow-500" : "";
+            ? "text-vtk-yellow hover:text-vtk-yellow-dark"
+            : "text-vtk-muted hover:text-vtk-yellow";
+        fillColor = isFavorite ? "fill-vtk-yellow" : "";
     }
 
     return (

@@ -13,24 +13,25 @@ interface DocumentCategoryPageProps {
 
 export default function DocumentCategoryPage({ category, course }: DocumentCategoryPageProps) {
     return (
-        <>
-            <div className="w-full h-full">
-                <div className="bg-wireframe-lightest-gray relative p-10 pt-5 md:pt-10">
-                    {/* Breadcrumb */}
-                    <div className="mb-4">
+        <div className="vtk-shell pb-16">
+            <div className="vtk-page-head">
+                <div>
+                    <div className="vtk-page-kicker">
                         <DynamicBreadcrumb course={course} category={category} />
                     </div>
-
-                    <div className="flex items-center space-x-2 mt-3">
-                        <FileText className="h-8 w-8 text-wireframe-primary-blue" />
-                        <h1 className="md:text-4xl text-3xl mb-4 text-wireframe-primary-blue">{category.name} {course.name}</h1>
+                    <div className="flex items-start gap-3">
+                        <FileText className="mt-1.5 h-6 w-6 shrink-0 text-vtk-muted" />
+                        <h1 className="vtk-page-title">{category.name}</h1>
                     </div>
+                    <p className="vtk-page-subtitle">{course.name}</p>
                 </div>
+            </div>
 
+            <div className="mt-7 grid gap-6">
                 <FavoriteDocuments category={category} course={course} />
 
                 <DocumentList category={category} course={course} />
             </div>
-        </>
+        </div>
     )
 }

@@ -99,9 +99,11 @@ export default function VoteButton({
     const spacing = size === 'small' ? 'space-x-1' : 'space-x-1.5';
 
     return (
-        <span className={`inline-flex items-center border rounded-2xl 
+        // Both directions read on the navy scale; the active state is an ink
+        // fill rather than a second accent colour.
+        <span className={`inline-flex items-center rounded-full border border-vtk-line-2 bg-vtk-surface
             ${padding} ${spacing}
-            ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+            ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
             ${className}`}
         >
             <ArrowBigUpIcon
@@ -110,16 +112,12 @@ export default function VoteButton({
                 onMouseEnter={() => setIsUpvoteHovered(true)}
                 onMouseLeave={() => setIsUpvoteHovered(false)}
                 onClick={() => handleVote(VoteDirection.UP)}
-                className={`
-                    ${disabled ? '' : 'hover:text-amber-600'}
-                    ${voteState === VoteDirection.UP ? 'text-amber-600 fill-amber-600' : 'text-gray-500'}
+                className={`transition-colors
+                    ${disabled ? '' : 'hover:text-vtk-ink'}
+                    ${voteState === VoteDirection.UP ? 'fill-vtk-ink text-vtk-ink' : 'text-vtk-muted'}
                 `}
             />
-            <div className={`${textSize} min-w-4 text-center ${voteState === VoteDirection.UP
-                ? 'text-amber-600'
-                : voteState === VoteDirection.DOWN
-                    ? 'text-blue-500'
-                    : ''
+            <div className={`${textSize} min-w-4 text-center tabular-nums ${voteState === VoteDirection.NONE ? 'text-vtk-body' : 'font-semibold text-vtk-ink'
                 }`}>
                 {voteCount}
             </div>
@@ -129,9 +127,9 @@ export default function VoteButton({
                 onMouseEnter={() => setIsDownvoteHovered(true)}
                 onMouseLeave={() => setIsDownvoteHovered(false)}
                 onClick={() => handleVote(VoteDirection.DOWN)}
-                className={`
-                    ${disabled ? '' : 'hover:text-blue-500'}
-                    ${voteState === VoteDirection.DOWN ? 'text-blue-500 fill-blue-500' : 'text-gray-500'}
+                className={`transition-colors
+                    ${disabled ? '' : 'hover:text-vtk-ink'}
+                    ${voteState === VoteDirection.DOWN ? 'fill-vtk-ink text-vtk-ink' : 'text-vtk-muted'}
                 `}
             />
         </span>

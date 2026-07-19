@@ -106,12 +106,28 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
     const allSelected = documents.length > 0 && selectedDocuments.length === documents.length;
 
     return (
-        <div className="mt-3 rounded-lg">
-            <div className="flex justify-between items-center mb-4">
-                <h3>{t('course-page.documents.header')}</h3>
+        <div>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-vtk-line pb-3.5">
+                <h2 className="m-0 text-xl font-semibold tracking-tight text-vtk-ink">
+                    {t('course-page.documents.header')}
+                </h2>
 
-                <div className="flex items-center space-x-2">
-                    <CreateDocumentButton initialData={{ course, category }} />
+                <div className="flex flex-wrap items-center gap-2">
+                    {selectedDocuments.length > 0 && (
+                        <div className="mr-1 flex items-center gap-2">
+                            <span className="text-sm text-vtk-body">
+                                {t('course-page.documents.selected', { amount: selectedDocuments.length })}
+                            </span>
+                            <DownloadButton documents={selectedDocuments} size={15} showText={true} className="vtk-button-sm" />
+                            <button
+                                onClick={handleClearSelection}
+                                className="vtk-icon-button h-8 w-8"
+                                title={t('course-page.documents.clear-selection')}
+                            >
+                                <X size={14} />
+                            </button>
+                        </div>
+                    )}
 
                     <DocumentFilter
                         filters={filters}
@@ -126,50 +142,29 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                         onSortChange={handleSortChange}
                     />
 
-                    {selectedDocuments.length > 0 && (
-                        <div className="flex items-center space-x-2 ml-4">
-                            <span className="text-sm text-gray-700">
-                                {t('course-page.documents.selected', { amount: selectedDocuments.length })}
-                            </span>
-                            <DownloadButton
-                                documents={selectedDocuments}
-                                size={16}
-                                showText={true}
-                                className="px-3 py-2 bg-vtk-blue-400 hover:bg-vtk-blue-600 text-white hover:text-gray-300 text-sm"
-                            />
-                            <button
-                                onClick={handleClearSelection}
-                                className="p-2 text-gray-600 hover:text-gray-800 rounded-md"
-                                title={t('course-page.documents.clear-selection')}
-                            >
-                                <X size={16} />
-                            </button>
-                        </div>
-                    )}
+                    <CreateDocumentButton initialData={{ course, category }} size={16} />
                 </div>
             </div>
 
-            <div className="rounded-lg shadow-xs">
+            <div className="vtk-panel overflow-hidden">
                 {loading ? (
-                    <div className="flex justify-center items-center h-full py-12">
-                        <LoaderCircle className="animate-spin text-vtk-blue-500" size={48} />
+                    <div className="flex items-center justify-center py-14">
+                        <LoaderCircle className="animate-spin text-vtk-muted" size={28} />
                     </div>
                 ) : documents.length === 0 ? (
-                    <p className='p-4'>{t('course-page.documents.no-documents')}</p>
+                    <p className="vtk-empty m-0">{t('course-page.documents.no-documents')}</p>
                 ) : (
-                    <div>
-                        {documents.length > 0 && (
-                            <div className="mb-2 flex items-center">
-                                <Checkbox
-                                    label={allSelected ? t('course-page.documents.deselect-all') : t('course-page.documents.select-all')}
-                                    checked={allSelected}
-                                    onChange={handleSelectAll}
-                                    className="text-sm pl-3"
-                                />
-                            </div>
-                        )}
+                    <>
+                        <div className="flex items-center border-b border-vtk-line bg-vtk-paper-2 px-4 py-2.5">
+                            <Checkbox
+                                label={allSelected ? t('course-page.documents.deselect-all') : t('course-page.documents.select-all')}
+                                checked={allSelected}
+                                onChange={handleSelectAll}
+                                className="my-0 text-xs font-semibold uppercase tracking-[0.08em] text-vtk-muted"
+                            />
+                        </div>
 
-                        <div className="flex flex-col space-y-2">
+                        <div className="vtk-rows">
                             {documents.map((document) => (
                                 <DocumentListItem
                                     key={document.id}
@@ -179,8 +174,11 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                                 />
                             ))}
                         </div>
-                        <Pagination totalAmount={totalItems} currentPage={page} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} />
-                    </div>
+
+                        <div className="border-t border-vtk-line px-4 py-3">
+                            <Pagination totalAmount={totalItems} currentPage={page} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} />
+                        </div>
+                    </>
                 )}
             </div>
         </div>

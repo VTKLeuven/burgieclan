@@ -5,14 +5,14 @@ import React from "react";
 
 export default function HeaderLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
-        <div className="flex h-full flex-col min-h-full">
+        // The page scrolls as one document so the navy header can stay sticky;
+        // the sidebar sticks under it rather than owning its own scroll pane.
+        <div className="flex min-h-full flex-col bg-vtk-paper">
             <Header />
-            <div className="grow flex flex-1 overflow-hidden">
+            <div className="flex flex-1 items-start">
                 <Sidebar />
-                <main className="flex-1 flex justify-center px-4 overflow-y-auto">
-                    <div className="w-full max-w-6xl">
-                        {children}
-                    </div>
+                <main className="min-w-0 flex-1">
+                    {children}
                 </main>
             </div>
             <Footer />

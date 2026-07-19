@@ -25,8 +25,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     ({ id, name, type, placeholder, autoComplete, readOnly, passive, onClick, value, onChange, required, onFocus, onKeyDown, 'aria-label': ariaLabel, icon: Icon, borderless, ...props }, ref) => (
         <div className="relative">
             {Icon && (
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <Icon size={18} className="text-gray-400" />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <Icon size={16} className="text-vtk-muted" />
                 </div>
             )}
             <input
@@ -45,7 +45,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 onKeyDown={onKeyDown}
                 aria-label={ariaLabel}
                 {...props}
-                className={`block w-full max-h-8 rounded-md border-0 py-2 ${Icon ? 'pl-8 pr-4' : 'px-3'} text-gray-900 ${borderless ? '' : 'shadow-xs ring-1 ring-inset ring-gray-300'} placeholder:text-gray-400 sm:text-sm sm:leading-6 ${borderless ? 'focus:outline-hidden' : passive ? 'focus:outline-hidden focus:ring-1 focus:ring-gray-300' : 'focus:ring-2 focus:ring-inset focus:ring-amber-600'}`}
+                className={`vtk-input block ${Icon ? 'pl-9' : ''} ${borderless ? 'border-0 bg-transparent focus:shadow-none' : ''} ${passive ? 'cursor-pointer' : ''}`}
             />
         </div>
     )

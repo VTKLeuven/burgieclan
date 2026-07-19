@@ -15,9 +15,9 @@ const CommentUserIcon: React.FC<CommentUserIconProps> = ({ anonymous, creatorNam
     <Tooltip content={anonymous || !creatorName ? t('course-page.comments.anonymous') : creatorName}>
       <div className="relative group overflow-visible">
         {anonymous || !creatorName ? (
-          <UserX className="h-4 w-4 text-gray-500 rounded-full" />
+          <UserX className="h-4 w-4 text-vtk-muted rounded-full" />
         ) : (
-          <CircleUserRound className="h-4 w-4 text-gray-500 rounded-full" />
+          <CircleUserRound className="h-4 w-4 text-vtk-muted rounded-full" />
         )}
       </div>
     </Tooltip>

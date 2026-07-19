@@ -54,7 +54,7 @@ const UploadDialog = ({
                 {t('upload.dialog.title')}
             </DialogTitle>
             <DialogBody>
-                <Text className={'text-justify'}>
+                <Text className="max-w-[62ch] text-vtk-body">
                     {t('upload.dialog.description')}
                 </Text>
 

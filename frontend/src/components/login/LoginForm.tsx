@@ -102,59 +102,60 @@ export default function LoginForm() {
     }
 
     return (
-        <>
-            <div className="min-h-screen px-6 py-10 lg:px-8">
-                <div className="flex flex-col items-center justify-center mt-[10vh]">
-                    <div className="w-full max-w-sm">
-                        <Link href="/">
-                            <span className="sr-only">Burgieclan</span>
-                            <Logo width={100} height={100} />
-                        </Link>
-                        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-vtk-blue-500">
-                            {t('sign_in')}
-                        </h2>
-                    </div>
+        // Single white panel on the cool paper ground, mirroring `.vtk-auth`.
+        <div className="flex flex-1 items-center justify-center bg-vtk-paper px-5 py-12 sm:px-9 sm:py-20">
+            <div className="w-full max-w-[430px] rounded-[18px] border border-vtk-line bg-vtk-surface p-7 shadow-[0_18px_50px_rgba(10,15,31,0.06)] sm:p-10">
+                <Link href="/" className="inline-block">
+                    <span className="sr-only">Burgieclan</span>
+                    <Logo width={56} height={56} />
+                </Link>
 
-                    {/* Handles OAuth login via Litus */}
+                <p className="mt-6 text-[13px] text-vtk-muted">Burgieclan</p>
+                <h1 className="m-0 mt-2.5 text-[clamp(30px,4vw,42px)] font-semibold leading-none tracking-[-0.03em] text-vtk-ink">
+                    {t('sign_in')}
+                </h1>
+
+                {/* Handles OAuth login via Litus */}
+                <div className="mt-7">
                     <LitusOAuthButton loginHandler={handleOAuthLogin} />
-
-                    <div
-                        className="mt-4 w-full max-w-sm font-semibold text-center text-sm leading-6 text-vtk-blue-500 hover:text-vtk-blue-400 cursor-pointer flex items-center justify-center"
-                        onClick={toggleCollapse}>
-                        <p>{t('or_log_in_manually')}</p>
-                        <ChevronDown
-                            className={`mt-0.5 h-4 w-4 transform transition-transform duration-200 ${isOpen ? 'rotate-0' : '-rotate-90'
-                                }`}
-                            aria-hidden="true"
-                        />
-                    </div>
                 </div>
-                <div
-                    className={`flex flex-col items-center justify-center ${isOpen ? 'h-3/7 pb-2' : 'h-0'} overflow-hidden`}>
-                    <form onSubmit={handleCredentialsLogin} className="w-full max-w-sm mt-10">
-                        <div>
-                            <label htmlFor="username">
-                                <p className="mt-2 text-sm font-medium">{t('username')}</p>
+
+                <button
+                    type="button"
+                    className="mt-3.5 flex w-full items-center justify-center gap-1 text-sm font-medium text-vtk-muted transition-colors hover:text-vtk-ink"
+                    onClick={toggleCollapse}
+                    aria-expanded={isOpen}
+                >
+                    {t('or_log_in_manually')}
+                    <ChevronDown
+                        className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-0' : '-rotate-90'}`}
+                        aria-hidden="true"
+                    />
+                </button>
+
+                {isOpen && (
+                    <form onSubmit={handleCredentialsLogin} className="mt-6 flex flex-col gap-4.5 border-t border-vtk-line pt-6">
+                        <div className="vtk-field">
+                            <label htmlFor="username" className="vtk-field-label uppercase tracking-[0.08em]">
+                                {t('username')}
                             </label>
-                            <div className="mt-2">
-                                <Input
-                                    id="username"
-                                    name="username"
-                                    type="text"
-                                    placeholder=""
-                                    autoComplete={t('username')}
-                                    required
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                />
-                            </div>
+                            <Input
+                                id="username"
+                                name="username"
+                                type="text"
+                                placeholder=""
+                                autoComplete="username"
+                                required
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
                         </div>
 
-                        <div>
-                            <label htmlFor="password">
-                                <p className="mt-2 text-sm font-medium">{t('password')}</p>
+                        <div className="vtk-field">
+                            <label htmlFor="password" className="vtk-field-label uppercase tracking-[0.08em]">
+                                {t('password')}
                             </label>
-                            <div className="mt-2 relative">
+                            <div className="relative">
                                 <Input
                                     id="password"
                                     name="password"
@@ -167,34 +168,33 @@ export default function LoginForm() {
                                 />
                                 <button
                                     type="button"
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-vtk-blue-500"
+                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-vtk-muted transition-colors hover:text-vtk-ink"
                                     onClick={() => setShowPassword(!showPassword)}
+                                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                                 >
                                     {showPassword ? (
-                                        <EyeOff className="h-5 w-5" aria-hidden="true" />
+                                        <EyeOff className="h-4 w-4" aria-hidden="true" />
                                     ) : (
-                                        <Eye className="h-5 w-5" aria-hidden="true" />
+                                        <Eye className="h-4 w-4" aria-hidden="true" />
                                     )}
                                 </button>
                             </div>
                         </div>
 
                         {credentialsError && (
-                            <p className="mt-4 text-sm text-red-600">{credentialsError}</p>
+                            <p className="vtk-error-text m-0">{credentialsError}</p>
                         )}
 
-                        <div className="mt-5 w-full max-w-sm">
-                            <button
-                                type="submit"
-                                className="primary-button flex w-full items-center justify-center gap-2"
-                                disabled={loading}
-                            >
-                                {loading ? <LoaderCircle className="animate-spin" /> : t('login')}
-                            </button>
-                        </div>
+                        <button
+                            type="submit"
+                            className="vtk-button vtk-button-primary w-full"
+                            disabled={loading}
+                        >
+                            {loading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : t('login')}
+                        </button>
                     </form>
-                </div>
+                )}
             </div>
-        </>
+        </div>
     )
 }

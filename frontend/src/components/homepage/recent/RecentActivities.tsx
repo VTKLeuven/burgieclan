@@ -33,13 +33,13 @@ export const RecentActivities = () => {
         }
 
         if (error || documentViews.length === 0) {
-            return <div className="p-10 text-center text-gray-400">
+            return <div className="vtk-empty py-10">
                 {t('home.no_recent_activities')}
             </div>
         }
 
         return (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-vtk-line">
                 {documentViews.map(documentView => (
                     <Activity
                         key={documentView.id}
@@ -54,9 +54,11 @@ export const RecentActivities = () => {
     };
 
     return (
-        <div className="rounded-lg border border-gray-200 h-full">
-            <div className="px-4 pt-2">
-                <h3 className="text-xl text-gray-900">{t('home.recent_activities')}</h3>
+        <div className="vtk-panel overflow-hidden">
+            <div className="border-b border-vtk-line px-5 py-3.5">
+                <h2 className="m-0 text-base font-semibold tracking-tight text-vtk-ink">
+                    {t('home.recent_activities')}
+                </h2>
             </div>
             {renderContent()}
         </div>

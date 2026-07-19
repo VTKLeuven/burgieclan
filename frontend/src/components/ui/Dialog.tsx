@@ -44,7 +44,7 @@ export function Dialog({ isOpen, onClose, size = 'lg', className, children }: Di
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 backdrop-blur-xs bg-gray-500 bg-opacity-75" />
+                    <div className="fixed inset-0 bg-vtk-ink/40 backdrop-blur-xs" />
                 </Transition.Child>
 
                 <div className="fixed inset-0 z-10 overflow-y-auto">
@@ -62,7 +62,7 @@ export function Dialog({ isOpen, onClose, size = 'lg', className, children }: Di
                                 className={clsx(
                                     className,
                                     sizes[size],
-                                    "relative transform overflow-hidden rounded-3xl bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:p-6 w-full"
+                                    "relative w-full transform overflow-hidden rounded-[22px] border border-vtk-line bg-vtk-surface px-4 pb-4 pt-5 text-left shadow-[0_24px_70px_rgba(10,15,31,0.2)] transition-all sm:my-8 sm:p-6"
                                 )}
                             >
                                 <DialogCloseButton onClose={onClose} />
@@ -127,10 +127,10 @@ export function DialogCloseButton({ onClose }: DialogCloseButtonProps) {
         <button
             type="button"
             onClick={onClose}
-            className="absolute top-4 right-4 p-1.5 text-gray-700 justify-center items-center flex"
+            className="vtk-icon-button absolute right-4 top-4 h-8 w-8"
         >
             <span className="sr-only">{t('dialog.close')}</span>
-            <X aria-hidden="true" className="h-6 w-6" />
+            <X aria-hidden="true" className="h-4 w-4" />
         </button>
     )
 }
