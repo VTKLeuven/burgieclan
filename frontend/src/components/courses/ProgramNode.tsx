@@ -51,33 +51,31 @@ const ProgramNode = ({
   const matchingItems = searchQuery ? countMatchesInProgram(program, searchQuery) : 0;
 
   return (
-    <div className="program-node mb-2">
+    <div className="program-node">
+      {/* A search hit is marked with a yellow accent rail, not a fill. */}
       <div
-        className={`flex items-center py-2 px-3 border border-gray-200 rounded-md cursor-pointer 
-          hover:bg-blue-50 ${programMatches ? 'ring-1 ring-yellow-300' : ''
+        className={`flex cursor-pointer items-center gap-2.5 rounded-[18px] border border-vtk-line bg-vtk-surface px-4 py-3 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper ${programMatches ? 'shadow-[inset_3px_0_0_var(--yellow)]' : ''
           }`}
         onClick={() => setExpanded(!expanded)}
       >
-        <div className="transition-transform duration-200" style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
-          <ChevronRight size={16} />
-        </div>
-        <span className="ml-2 text-base font-medium">{program.name}</span>
+        <ChevronRight
+          size={16}
+          className="shrink-0 text-vtk-muted transition-transform duration-200"
+          style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+        />
+        <span className="min-w-0 flex-1 truncate text-[15px] font-medium text-vtk-ink">{program.name}</span>
 
-        {/* Show badge with match count if matches exist */}
+        {/* Match count when a search is active */}
         {autoExpand && matchingItems > 0 && (
-          <div className="ml-auto bg-yellow-300 text-wireframe-primary-blue text-xs px-2 py-0.5 rounded-full min-w-6 h-6 flex items-center justify-center mr-2">
-            {matchingItems}
-          </div>
+          <span className="vtk-badge vtk-badge-accent shrink-0">{matchingItems}</span>
         )}
 
-        <div className="ml-auto flex items-center">
-          <DownloadButton programs={[program]} className='px-4 py-0.5' />
-        </div>
+        <DownloadButton programs={[program]} />
       </div>
 
       <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
         {program.modules && program.modules.length > 0 ? (
-          <div className="pl-4 mt-1 border-l-2 border-gray-200 space-y-1">
+          <div className="ml-5 mt-1.5 space-y-1 border-l border-vtk-line pl-4">
             {program.modules.map(module => (
               <ModuleNode
                 key={module.id}
@@ -90,8 +88,8 @@ const ProgramNode = ({
             ))}
           </div>
         ) : (
-          <div className="pl-4 mt-1 border-l-2 border-gray-200 py-1">
-            <div className="text-gray-500 text-sm italic">
+          <div className="ml-5 mt-1.5 border-l border-vtk-line py-1.5 pl-4">
+            <div className="text-sm text-vtk-muted">
               {t('curriculum-navigator.no-modules-in-program')}
             </div>
           </div>

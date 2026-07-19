@@ -47,8 +47,8 @@ export const FormField = <TFieldValues extends FieldValues = FieldValues>({
         return (
             <div>
                 <div className="flex items-center justify-between">
-                    <label className="block text-sm font-medium text-gray-900">{label}</label>
-                    {error && <p className="text-red-500 text-xs">{error?.message}</p>}
+                    <label className="block text-sm font-medium text-vtk-ink">{label}</label>
+                    {error && <p className="vtk-error-text text-xs">{error?.message}</p>}
                 </div>
                 <div className="mt-2">
                     <Input
@@ -66,8 +66,8 @@ export const FormField = <TFieldValues extends FieldValues = FieldValues>({
     return (
         <div>
             <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-gray-900">{label}</label>
-                {error && <p className="text-red-500 text-xs">{error?.message}</p>}
+                <label className="block text-sm font-medium text-vtk-ink">{label}</label>
+                {error && <p className="vtk-error-text text-xs">{error?.message}</p>}
             </div>
             <div className="mt-2">
                 <Controller

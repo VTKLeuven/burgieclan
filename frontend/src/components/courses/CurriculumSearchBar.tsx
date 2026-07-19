@@ -50,8 +50,8 @@ export default function CurriculumSearchBar({ onSearch, clearSearch }: SearchPro
     };
 
     return (
-        <div className="mb-6">
-            <div className="flex items-center mb-2">
+        <div>
+            <div className="flex items-center gap-2">
                 <div className="relative grow">
                     <Input
                         type="text"
@@ -64,34 +64,34 @@ export default function CurriculumSearchBar({ onSearch, clearSearch }: SearchPro
                     {(query || showFilters || semester || minCredits || maxCredits || showOnlyFavorites) && (
                         <button
                             onClick={handleClear}
-                            className="absolute inset-y-0 right-12 flex items-center pr-3"
+                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-vtk-muted transition-colors hover:text-vtk-ink"
                             title={t('curriculum-navigator.clear-search')}
                         >
-                            <X size={18} className="text-gray-400 hover:text-gray-600" />
+                            <X size={16} />
                         </button>
                     )}
                 </div>
                 <button
                     onClick={() => setShowFilters(!showFilters)}
-                    className={`ml-2 p-2 rounded-lg border ${showFilters ? 'bg-gray-100 border-wireframe-primary-blue' : 'border-gray-300'}`}
+                    className={`vtk-icon-button h-[42px] w-[42px] ${showFilters ? 'border-vtk-ink bg-vtk-paper-2' : ''}`}
                     title={t('curriculum-navigator.advanced-filters')}
                 >
-                    <Filter size={20} className={showFilters ? 'text-wireframe-primary-blue' : 'text-gray-600'} />
+                    <Filter size={16} />
                 </button>
                 <button
                     onClick={handleSearch}
-                    className="ml-2 py-2 px-4 bg-wireframe-primary-blue text-white rounded-lg hover:bg-blue-700"
+                    className="vtk-button vtk-button-primary h-[42px]"
                 >
                     {t('curriculum-navigator.search-submit')}
                 </button>
             </div>
 
             {showFilters && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('curriculum-navigator.semester')}</label>
+                <div className="vtk-panel vtk-panel-muted mt-2.5 grid grid-cols-1 gap-4 p-4 md:grid-cols-3">
+                    <div className="vtk-field">
+                        <label className="vtk-field-label">{t('curriculum-navigator.semester')}</label>
                         <select
-                            className="w-full p-2 border border-gray-300 rounded-md"
+                            className="vtk-select"
                             value={semester || ''}
                             onChange={(e) => setSemester(e.target.value ? parseInt(e.target.value) : null)}
                             onKeyDown={handleKeyDown}
@@ -101,42 +101,40 @@ export default function CurriculumSearchBar({ onSearch, clearSearch }: SearchPro
                             <option value="2">2</option>
                         </select>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('curriculum-navigator.credits')}</label>
-                        <div className="flex space-x-2">
+                    <div className="vtk-field">
+                        <label className="vtk-field-label">{t('curriculum-navigator.credits')}</label>
+                        <div className="flex items-center gap-2">
                             <input
                                 type="number"
                                 min="0"
                                 placeholder="Min"
-                                className="w-full p-2 border border-gray-300 rounded-md"
+                                className="vtk-input"
                                 value={minCredits}
                                 onChange={(e) => setMinCredits(e.target.value)}
                                 onKeyDown={handleKeyDown}
                             />
-                            <span className="self-center">-</span>
+                            <span className="text-vtk-muted">-</span>
                             <input
                                 type="number"
                                 min="0"
                                 placeholder="Max"
-                                className="w-full p-2 border border-gray-300 rounded-md"
+                                className="vtk-input"
                                 value={maxCredits}
                                 onChange={(e) => setMaxCredits(e.target.value)}
                                 onKeyDown={handleKeyDown}
                             />
                         </div>
                     </div>
-                    <div>
-                        <label className="flex items-center space-x-2 mt-6">
+                    <div className="flex items-end">
+                        <label className="flex cursor-pointer items-center gap-2 pb-2.5 text-sm text-vtk-body">
                             <input
                                 type="checkbox"
                                 checked={showOnlyFavorites}
                                 onChange={() => setShowOnlyFavorites(!showOnlyFavorites)}
-                                className="rounded text-wireframe-primary-blue"
+                                className="h-4 w-4 accent-vtk-ink"
                                 onKeyDown={handleKeyDown}
                             />
-                            <span className="text-sm font-medium text-gray-700">
-                                {t('curriculum-navigator.show-only-favorites')}
-                            </span>
+                            {t('curriculum-navigator.show-only-favorites')}
                         </label>
                     </div>
                 </div>

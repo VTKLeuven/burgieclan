@@ -83,14 +83,14 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
     <div className="relative" ref={filterRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center px-3 py-2 text-sm border rounded-md hover:bg-gray-50 focus:outline-hidden ${hasActiveFilters ? 'bg-vtk-blue-50 border-vtk-blue-200' : ''
+        className={`vtk-button vtk-button-sm h-[34px] ${hasActiveFilters ? 'border-vtk-ink bg-vtk-paper-2' : ''
           }`}
         aria-expanded={isOpen}
       >
-        <Filter size={16} className={`mr-1 ${hasActiveFilters ? 'text-vtk-blue-600' : ''}`} />
+        <Filter size={16} className={`mr-1 ${hasActiveFilters ? 'text-vtk-ink' : ''}`} />
         <span>{t('document.filter')}</span>
         {hasActiveFilters && (
-          <span className="ml-1 px-1.5 py-0.5 text-xs bg-vtk-blue-500 text-white rounded-full">
+          <span className="vtk-badge vtk-badge-accent min-h-5 px-1.5 py-0">
             {Object.values(filters).filter(v =>
               v !== undefined && v !== '' && (Array.isArray(v) ? v.length > 0 : v)
             ).length}
@@ -99,13 +99,13 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 z-10 mt-1 w-80 bg-white rounded-md shadow-lg border p-4">
+        <div className="absolute right-0 z-10 mt-1.5 w-80 rounded-[18px] border border-vtk-line bg-vtk-surface p-4 shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-sm font-medium">{t('document.filters')}</h3>
             {hasActiveFilters && (
               <button
                 onClick={handleClearFilters}
-                className="text-xs text-gray-500 hover:text-gray-700 flex items-center"
+                className="text-xs text-vtk-muted hover:text-vtk-body flex items-center"
               >
                 <X size={12} className="mr-1" />
                 {t('document.clear-filters')}
@@ -115,7 +115,7 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="name" className="vtk-field-label mb-1.5 block">
                 {t('document.name')}
               </label>
               <Input
@@ -129,7 +129,7 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
             </div>
 
             <div>
-              <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="year" className="vtk-field-label mb-1.5 block">
                 {t('document.year')}
               </label>
               <Input
@@ -143,9 +143,9 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="vtk-field-label mb-1.5 block">
                 {t('document.tags')}
-                <span className="text-xs text-gray-500 ml-1">
+                <span className="text-xs text-vtk-muted ml-1">
                   ({t('document.match-all-tags')})
                 </span>
               </label>
@@ -159,7 +159,7 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
             </div>
 
             <div>
-              <label htmlFor="creator" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="creator" className="vtk-field-label mb-1.5 block">
                 {t('document.creator')}
               </label>
               <Input
@@ -176,13 +176,13 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
           <div className="mt-4 flex justify-end">
             <button
               onClick={() => setIsOpen(false)}
-              className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md mr-2"
+              className="vtk-button vtk-button-sm vtk-button-ghost mr-2"
             >
               {t('document.cancel')}
             </button>
             <button
               onClick={applyFilters}
-              className="px-3 py-2 text-sm bg-vtk-blue-500 text-white hover:bg-vtk-blue-600 rounded-md"
+              className="vtk-button vtk-button-sm vtk-button-primary"
             >
               {t('document.apply')}
             </button>

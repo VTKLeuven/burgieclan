@@ -1,9 +1,13 @@
 @reference "../../app/globals.css";
 
 .footerText {
-    @apply text-xs leading-5 text-gray-500
+    @apply text-xs leading-5 text-vtk-on-dark-muted
+}
+
+.footerNavLink {
+    @apply text-sm text-vtk-paper/80 no-underline transition-colors hover:text-white
 }
 
 .footerLink {
-    @apply text-xs font-semibold underline leading-5 text-gray-500
+    @apply text-xs font-medium leading-5 text-vtk-paper/80 underline underline-offset-4 transition-colors hover:text-white
 }

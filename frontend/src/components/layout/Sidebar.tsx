@@ -1,6 +1,5 @@
 'use client';
 
-import Loading from "@/app/[locale]/loading";
 import ItemList from '@/components/layout/ItemList';
 import CreateDocumentButton from '@/components/ui/CreateDocumentButton';
 import { useUser } from "@/components/UserContext";
@@ -29,6 +28,10 @@ const mapDocumentsToItems = (documents: Document[]) => {
   }));
 };
 
+/**
+ * Favourites rail. Sticks under the navy header instead of owning a scroll
+ * pane, so the page still scrolls as one document.
+ */
 const NavigationSidebar = () => {
   const { user, loading } = useUser();
   const { t, i18n } = useTranslation();
@@ -38,7 +41,7 @@ const NavigationSidebar = () => {
     documents: false
   });
 
-  if (!user) {
+  if (!user || loading) {
     return null;
   }
 
@@ -49,86 +52,99 @@ const NavigationSidebar = () => {
     }));
   };
 
-  if (loading) {
-    return <Loading />;
-  }
+  const sectionButton =
+    'flex w-full items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-sm font-semibold text-vtk-ink transition-colors hover:bg-vtk-paper-2';
 
   return (
-    <aside className="h-full shrink-0">
-      <div className={`relative transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} h-full bg-white border-r border-gray-200 flex flex-col`}>
-        {/* Collapse Toggle Button */}
+    <aside className="sticky top-[72px] hidden shrink-0 self-start md:block">
+      <div
+        className={`relative flex h-[calc(100vh-72px)] flex-col border-r border-vtk-line bg-vtk-paper transition-[width] duration-300 ${isCollapsed ? 'w-16' : 'w-64'
+          }`}
+      >
+        {/* Collapse toggle */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-4 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-100 z-10"
+          className="absolute -right-3.5 top-5 z-10 grid h-7 w-7 place-items-center rounded-full border border-vtk-line-2 bg-vtk-surface text-vtk-body shadow-sm transition hover:border-vtk-ink hover:text-vtk-ink"
           aria-label={'toggle'}
         >
-          {isCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
+          {isCollapsed ? <PanelLeft size={14} /> : <PanelLeftClose size={14} />}
         </button>
 
-        {/* Top Navigation */}
-        <div className="p-4 shrink-0">
-          <Link href={`/${i18n.language}`} className="flex items-center space-x-2 text-gray-700 hover:bg-gray-100 rounded p-1 transition-all duration-200 hover:scale-[1.01]">
-            <button onClick={() => setIsCollapsed(false)}>
-              <Home size={20} />
-            </button>
+        <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3">
+          {/* Home */}
+          <Link
+            href={`/${i18n.language}`}
+            className="flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-semibold text-vtk-ink transition-colors hover:bg-vtk-paper-2"
+          >
+            <Home size={18} className="shrink-0" />
             {!isCollapsed && <span>{t('sidebar.home')}</span>}
           </Link>
-        </div>
-        <nav className="flex-1 overflow-y-hidden overflow-x-hidden pl-4 flex flex-col">
-          <div className="border-t border-gray-300 mb-2"></div>
+
+          <div className="my-1 border-t border-vtk-line" />
+
+          {/* Favourite courses */}
           <button
-            className="flex items-center justify-between w-full p-1 text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0 shrink-0"
+            className={sectionButton}
             onClick={() => {
               toggleSection('courses');
               setIsCollapsed(false);
             }}
             aria-label={t('sidebar.toggle_courses')}
           >
-            <div className="flex items-center space-x-2">
-              <FolderClosed size={20} />
+            <span className="flex items-center gap-2.5">
+              <FolderClosed size={18} className="shrink-0" />
               {!isCollapsed && <span>{t('sidebar.my_courses')}</span>}
-            </div>
-            {!isCollapsed && <ChevronDown size={16} className={`transform transition-transform duration-200 ${expandedSections.courses ? 'rotate-0' : '-rotate-90'}`} />}
-          </button>
-          {/* Favorite Courses List */}
-          {!isCollapsed && expandedSections.courses && (
-            <div className="flex-1 min-h-0">
-              <ItemList
-                items={mapCoursesToItems(user!.favoriteCourses!)}
-                emptyMessage={t('account.favorite.no_courses')}
-              />
-            </div>
-          )}
-          <div className="border-t border-gray-300 my-2 shrink-0"></div>
-          <div className="flex-1 min-h-0">
-            <button
-              className="flex items-center justify-between w-full p-1 text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-[1.01] rounded p-0 shrink-0"
-              onClick={() => {
-                toggleSection('documents');
-                setIsCollapsed(false);
-              }}
-              aria-label={t('sidebar.toggle_documents')}
-            >
-              <div className="flex items-center space-x-2">
-                <File size={20} />
-                {!isCollapsed && <span>{t('sidebar.my_favorite_documents')}</span>}
-              </div>
-              {!isCollapsed && <ChevronDown size={16} className={`transform transition-transform duration-200 ${expandedSections.documents ? 'rotate-0' : '-rotate-90'}`} />}
-            </button>
-            {/* Favorite Documents List */}
-            {!isCollapsed && expandedSections.documents && (
-              <ItemList
-                items={mapDocumentsToItems(user.favoriteDocuments || [])}
-                emptyMessage={t('account.favorite.no_documents')}
+            </span>
+            {!isCollapsed && (
+              <ChevronDown
+                size={15}
+                className={`shrink-0 text-vtk-muted transition-transform duration-200 ${expandedSections.courses ? 'rotate-0' : '-rotate-90'
+                  }`}
               />
             )}
-          </div>
-        </nav>
+          </button>
+          {!isCollapsed && expandedSections.courses && (
+            <ItemList
+              items={mapCoursesToItems(user.favoriteCourses ?? [])}
+              emptyMessage={t('account.favorite.no_courses')}
+            />
+          )}
 
-        {/* Add Document Button */}
-        {!isCollapsed && (
-          <CreateDocumentButton className='mx-2 my-2 transition duration-150 ease-in-out' />
-        )}
+          <div className="my-1 border-t border-vtk-line" />
+
+          {/* Favourite documents */}
+          <button
+            className={sectionButton}
+            onClick={() => {
+              toggleSection('documents');
+              setIsCollapsed(false);
+            }}
+            aria-label={t('sidebar.toggle_documents')}
+          >
+            <span className="flex items-center gap-2.5">
+              <File size={18} className="shrink-0" />
+              {!isCollapsed && <span>{t('sidebar.my_favorite_documents')}</span>}
+            </span>
+            {!isCollapsed && (
+              <ChevronDown
+                size={15}
+                className={`shrink-0 text-vtk-muted transition-transform duration-200 ${expandedSections.documents ? 'rotate-0' : '-rotate-90'
+                  }`}
+              />
+            )}
+          </button>
+          {!isCollapsed && expandedSections.documents && (
+            <ItemList
+              items={mapDocumentsToItems(user.favoriteDocuments ?? [])}
+              emptyMessage={t('account.favorite.no_documents')}
+            />
+          )}
+        </div>
+
+        {/* Create document */}
+        <div className="shrink-0 border-t border-vtk-line p-3">
+          <CreateDocumentButton className="w-full" showText={!isCollapsed} size={17} />
+        </div>
       </div>
     </aside>
   );

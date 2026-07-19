@@ -45,17 +45,17 @@ export default function AnonymousSetting() {
     }, [error, showToast, t]);
 
     return (
-        <div className="mt-6 bg-gray-50 rounded-lg p-3">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h3 className="text-base font-medium text-wireframe-primary-blue">
+        <div className="vtk-panel p-5">
+            <div className="flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                    <h2 className="m-0 text-base font-semibold tracking-tight text-vtk-ink">
                         {t('account.anonymous_setting.title')}
-                    </h3>
-                    <p className="text-sm text-gray-600 mt-1">
+                    </h2>
+                    <p className="m-0 mt-1 text-sm leading-relaxed text-vtk-body">
                         {t('account.anonymous_setting.description')}
                     </p>
                 </div>
-                <div className="flex items-center space-x-2 ml-4">
+                <div className="flex shrink-0 items-center gap-2">
                     <Switch
                         id="anonymous-mode"
                         checked={user?.defaultAnonymous}

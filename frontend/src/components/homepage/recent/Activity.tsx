@@ -26,22 +26,20 @@ export const Activity: React.FC<ActivityProps> = ({
     link
 }) => {
     return (
-        <Link className="flex items-start space-x-4 p-2 pl-3 hover:bg-gray-50" href={link}>
-            <div className="shrink-0">
-                <Clock className="mt-0.5 h-5 w-5 text-gray-500" />
-                <p className="text-xs text-gray-400 mt-0.5 text-center">
-                    {/* Convert timestamp to minimal relative time format (e.g., "2h", "3d") */}
-                    {format(timestamp, 'minimal')}
-                </p>
-            </div>
-            <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900">
+        <Link className="flex items-center gap-3.5 px-5 py-2.5 transition-colors hover:bg-vtk-paper-2" href={link}>
+            <Clock aria-hidden="true" className="h-4 w-4 shrink-0 text-vtk-muted" />
+            <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium leading-snug text-vtk-ink">
                     {documentName}
                 </p>
-                <p className="text-sm font-normal text-gray-500">
+                <p className="truncate text-[13px] leading-snug text-vtk-muted">
                     {courseName}
                 </p>
             </div>
+            {/* Compact relative time (e.g. "2h", "3d") right-aligned as a spec value. */}
+            <span className="shrink-0 text-xs tabular-nums text-vtk-muted">
+                {format(timestamp, 'minimal')}
+            </span>
         </Link>
     )
 }

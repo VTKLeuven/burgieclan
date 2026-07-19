@@ -23,7 +23,7 @@ const CommentActions: React.FC<CommentActionsProps> = ({ onEdit, onDelete, show,
         <button
           type="button"
           onClick={onEdit}
-          className="text-gray-500 bg-amber-100 hover:text-amber-600 hover:bg-amber-200 rounded transition-colors opacity-0 group-hover/comment:opacity-100 flex items-center justify-center px-2 py-0.5 w-full"
+          className="text-vtk-muted bg-vtk-paper-2 hover:text-vtk-ink hover:bg-vtk-paper-2 rounded transition-colors opacity-0 group-hover/comment:opacity-100 flex items-center justify-center px-2 py-0.5 w-full"
         >
           <Pencil size={14} />
         </button>
@@ -33,7 +33,7 @@ const CommentActions: React.FC<CommentActionsProps> = ({ onEdit, onDelete, show,
         <button
           type="button"
           onClick={onDelete}
-          className="text-red-700 bg-red-100 hover:bg-red-200 rounded transition-colors opacity-0 group-hover/comment:opacity-100 flex items-center justify-center px-2 py-0.5 w-full"
+          className="vtk-badge vtk-badge-danger transition-colors opacity-0 group-hover/comment:opacity-100 flex items-center justify-center px-2 py-0.5 w-full"
         >
           <Trash2 size={14} />
         </button>

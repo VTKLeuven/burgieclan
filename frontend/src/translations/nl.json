@@ -283,7 +283,8 @@
             "submitting": "Opmerking indienen...",
             "anonymous": "Anoniem",
             "success": "Opmerking succesvol toegevoegd",
-            "error": "Opmerking toevoegen mislukt"
+            "error": "Opmerking toevoegen mislukt",
+            "title": "Opmerkingen"
         },
         "under-review-warning": "Dit document is momenteel in behandeling, dus het is alleen zichtbaar voor jou."
     },
@@ -324,5 +325,12 @@
             "katex_end": " de onderliggende LaTeX-interpreter."
         },
         "info_button": "Info"
+    },
+    "footer": {
+        "navigate": "Navigeren",
+        "support": "Ondersteuning",
+        "community": "Community",
+        "tagline": "Deel je samenvattingen.\nSlaag voor je examens.",
+        "about": "Over Burgieclan"
     }
 }

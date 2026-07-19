@@ -34,7 +34,7 @@ interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>
  * <Checkbox
  *   label="Accept terms"
  *   className="justify-end"
- *   labelClassName="text-xs text-gray-600 hover:text-gray-800 transition-colors"
+ *   labelClassName="text-xs text-vtk-body hover:text-vtk-ink transition-colors"
  *   required
  * />
  */
@@ -55,12 +55,12 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
                 id={id}
                 type="checkbox"
                 ref={ref}
-                className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded cursor-pointer"
+                className="h-4 w-4 cursor-pointer rounded accent-vtk-ink"
                 {...props}
             />
             <label
                 htmlFor={id}
-                className={`ml-2 block cursor-pointer ${labelClassName || 'text-sm font-medium text-gray-900'}`}
+                className={`ml-2 block cursor-pointer ${labelClassName || 'text-sm font-medium text-vtk-ink'}`}
             >
                 {label}
             </label>
@@ -77,7 +77,7 @@ Checkbox.displayName = 'Checkbox';
  * - Compatible with React Hook Form through ref forwarding
  * - Supports all standard HTML checkbox attributes
  * - Customizable appearance through className prop
- * - Tailwind styling with amber accent color
+ * - Tailwind styling with the ink accent colour
  * - Clickable label toggling the checkbox state
  *
  * Accessibility Improvements:
@@ -87,8 +87,8 @@ Checkbox.displayName = 'Checkbox';
  *
  * Styling Classes:
  * - Container: flex items-center
- * - Checkbox: h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded
- * - Default Label: ml-2 block text-sm font-medium text-gray-900 cursor-pointer
+ * - Checkbox: h-4 w-4 rounded accent-vtk-ink
+ * - Default Label: ml-2 block text-sm font-medium text-vtk-ink cursor-pointer
  * - Custom Label: Use labelClassName to override the default label styling
  *
  * Usage with React Hook Form:

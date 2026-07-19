@@ -17,7 +17,7 @@ import { convertToDocument } from "@/utils/convertToEntity";
 import { formatFileSize } from "@/utils/fileSize";
 import { Calendar, ChartPie, CircleUser, File, Package } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function DocumentPreview({ id }: { id: string }) {
@@ -28,6 +28,7 @@ export default function DocumentPreview({ id }: { id: string }) {
 
     // Used to scale pdf width to fit its parent container
     const [containerWidth, setContainerWidth] = useState<number>(0);
+    const previewRef = useRef<HTMLDivElement>(null);
 
     const { user } = useUser();
     const { request, loading, error } = useApi();
@@ -59,17 +60,18 @@ export default function DocumentPreview({ id }: { id: string }) {
         }
     }, [document?.name]);
 
-    // Update container width on mount and window resize, necessary to resize PDFViewer
+    // Track the preview panel's own width (not the window's) so the PDF scales
+    // to the column it actually sits in.
     useEffect(() => {
-        const updateWidth = () => {
-            const width = window.innerWidth;
-            setContainerWidth(width > 768 ? Math.min(width * 0.9, MAXWIDTH) : width - 32);
-        };
+        const el = previewRef.current;
+        if (!el) return;
 
-        updateWidth();
-        window.addEventListener('resize', updateWidth);
-        return () => window.removeEventListener('resize', updateWidth);
-    }, []);
+        const observer = new ResizeObserver(([entry]) => {
+            setContainerWidth(Math.min(entry.contentRect.width, MAXWIDTH));
+        });
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [document]);
 
     if (loading) return <LoadingPage />;
 
@@ -78,59 +80,52 @@ export default function DocumentPreview({ id }: { id: string }) {
     }
 
     return (document &&
-        <div className="p-8 flex-auto text-sm w-full">
-            {/* Breadcrumb */}
-            <div className="mb-2">
-                <DynamicBreadcrumb
-                    course={document.course}
-                    category={document.category}
-                    document={document}
-                />
-            </div>
-
-            {/* Filename */}
-            <span className="inline-flex items-center space-x-4">
-                <File />
-                <h3>{document.name}</h3>
-            </span>
-
-            {/* Description */}
-            <div className="flex flex-row justify-between py-5">
-                <div className="flex space-x-8">
-                    {document.createdAt && <DocumentInfoField icon={Calendar} value={document.createdAt?.toLocaleDateString()} />}
-                    <DocumentInfoField
-                        icon={Package}
-                        value={document.fileSize ? formatFileSize(document.fileSize) : ""}
-                    />
-                    {document.year && <DocumentInfoField icon={ChartPie} value={document.year} />}
-                </div>
+        <div className="vtk-shell pb-16">
+            {/* Editorial page head: breadcrumb kicker, filename as the display
+                title, and the file facts as a right-aligned spec block. */}
+            <div className="vtk-page-head">
                 <div>
-                    <DocumentInfoField
-                        icon={CircleUser}
-                        value={document.anonymous ? t("document.anonymous") : document.creator?.fullName || ""}
-                    />
+                    <div className="vtk-page-kicker">
+                        <DynamicBreadcrumb
+                            course={document.course}
+                            category={document.category}
+                            document={document}
+                        />
+                    </div>
+                    <div className="flex items-start gap-3">
+                        <File className="mt-1.5 h-6 w-6 shrink-0 text-vtk-muted" />
+                        <h1 className="vtk-page-title">{document.name}</h1>
+                    </div>
+
+                    <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+                        {document.createdAt && <DocumentInfoField icon={Calendar} value={document.createdAt?.toLocaleDateString()} />}
+                        {document.fileSize && <DocumentInfoField icon={Package} value={formatFileSize(document.fileSize)} />}
+                        {document.year && <DocumentInfoField icon={ChartPie} value={document.year} />}
+                        <DocumentInfoField
+                            icon={CircleUser}
+                            value={document.anonymous ? t("document.anonymous") : document.creator?.fullName || ""}
+                        />
+                    </div>
                 </div>
             </div>
-
-            {/* Horizontal divider */}
-            <div className="w-full border-t border-vtk-blue-600 pb-5" />
 
             {/* Under review box */}
             {document.underReview && (
-                <UnderReviewBox />
+                <div className="mt-6">
+                    <UnderReviewBox />
+                </div>
             )}
 
             {/* Document preview & comment section */}
-            <div className="flex flex-row space-x-4 w-full justify-center">
-                <div style={{ width: containerWidth }} className="py-5">
-                    <div className="flex flex-row h-8 justify-between place-items-center">
+            <div className="mt-7 grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
+                <div className="vtk-panel overflow-hidden">
+                    <div className="flex items-center justify-between gap-3 border-b border-vtk-line px-4 py-3">
                         <VoteButton
                             type="document"
                             objectId={Number(id)}
                             disabled={!user}
-                            className="border-gray-500"
                         />
-                        <div className="flex space-x-2">
+                        <div className="flex items-center gap-2">
                             <DownloadSingleDocumentButton
                                 document={document}
                                 fileSize={document.fileSize ? formatFileSize(document.fileSize) : "Unknown size"}
@@ -139,19 +134,23 @@ export default function DocumentPreview({ id }: { id: string }) {
                             <FavoriteButton
                                 itemId={Number(id)}
                                 itemType="document"
+                                size={18}
                             />
                         </div>
                     </div>
 
                     {/*TODO: expand preview to other file types*/}
-                    {(document && document.mimetype == "application/pdf" && document.contentUrl) ? (
-                        <PDFViewer file={document.contentUrl} width={containerWidth} />
-                    ) : (
-                        <div className="w-full h-96 flex items-center justify-center">
-                            <p>{t('document.no-preview', { filename: document.filename })}</p>
-                        </div>
-                    )}
+                    <div ref={previewRef} className="flex justify-center overflow-x-auto bg-vtk-paper-2 p-4">
+                        {(document && document.mimetype == "application/pdf" && document.contentUrl) ? (
+                            <PDFViewer file={document.contentUrl} width={containerWidth} />
+                        ) : (
+                            <div className="vtk-empty flex h-96 w-full items-center justify-center">
+                                {t('document.no-preview', { filename: document.filename })}
+                            </div>
+                        )}
+                    </div>
                 </div>
+
                 <DocumentCommentSection documentId={document.id} file={document.contentUrl} />
             </div>
         </div>

@@ -37,7 +37,7 @@ const DocumentList: React.FC = () => {
             <div className="rounded-lg shadow-xs">
                 {loading ?
                     <div className="flex justify-center items-center h-full">
-                        <LoaderCircle className="animate-spin text-vtk-blue-500" size={48} />
+                        <LoaderCircle className="animate-spin text-vtk-navy" size={48} />
                     </div>
                     : documents.length === 0 ? (
                         <p className='p-4'>{t('account.documents.no_uploads')}</p>
@@ -58,15 +58,15 @@ const DocumentList: React.FC = () => {
                                                     <Badge text={t('document.approved')} color="green" />
                                                 )}
                                             </div>
-                                            <p className="text-gray-700 truncate max-w-[75%]">{document.course!.name}</p>
-                                            <p className="text-gray-700 truncate max-w-[65%]">{document.category!.name}</p>
+                                            <p className="text-vtk-body truncate max-w-[75%]">{document.course!.name}</p>
+                                            <p className="text-vtk-body truncate max-w-[65%]">{document.category!.name}</p>
                                             <div className="flex justify-between items-end mt-2">
                                                 <VoteButton
                                                     type="document"
                                                     objectId={document.id}
                                                     size="small"
                                                 />
-                                                <p className="text-gray-500 text-xs">{new Date(document.createdAt!).toLocaleString('en-GB', {
+                                                <p className="text-vtk-muted text-xs">{new Date(document.createdAt!).toLocaleString('en-GB', {
                                                     day: '2-digit',
                                                     month: '2-digit',
                                                     year: 'numeric',

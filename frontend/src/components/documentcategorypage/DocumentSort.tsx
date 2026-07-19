@@ -70,7 +70,7 @@ const DocumentSort: React.FC<DocumentSortProps> = ({ currentSort, onSortChange }
                 <div className="relative">
                     <button
                         onClick={() => setIsOpen(!isOpen)}
-                        className={`${buttonStyle} rounded-l-md hover:bg-gray-50`}
+                        className={`${buttonStyle} rounded-l-md hover:bg-vtk-paper`}
                         aria-haspopup="true"
                         aria-expanded={isOpen}
                     >
@@ -79,14 +79,14 @@ const DocumentSort: React.FC<DocumentSortProps> = ({ currentSort, onSortChange }
                     </button>
 
                     {isOpen && (
-                        <div className="absolute right-0 z-10 mt-1 w-48 bg-white rounded-md shadow-lg">
+                        <div className="absolute right-0 z-10 mt-1.5 w-48 overflow-hidden rounded-[14px] border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
                             <div className="py-1">
                                 {sortableFields.map((field) => (
                                     <button
                                         key={field.value}
                                         onClick={() => handleFieldChange(field.value)}
-                                        className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                                            currentSort.field === field.value ? 'bg-gray-50 text-vtk-blue-600' : 'text-gray-700'
+                                        className={`block w-full text-left px-4 py-2 text-sm hover:bg-vtk-paper-2 ${
+                                            currentSort.field === field.value ? 'bg-vtk-paper text-vtk-ink' : 'text-vtk-body'
                                         }`}
                                     >
                                         {field.label}
@@ -99,7 +99,7 @@ const DocumentSort: React.FC<DocumentSortProps> = ({ currentSort, onSortChange }
 
                 <button
                     onClick={toggleDirection}
-                    className={`${buttonStyle} border-l-0 rounded-r-md hover:bg-gray-50`}
+                    className={`${buttonStyle} border-l-0 rounded-r-md hover:bg-vtk-paper`}
                     title={currentSort.direction === 'asc' ? t('document.sort-ascending') : t('document.sort-descending')}
                 >
                     {currentSort.direction === 'asc' ? (

@@ -75,46 +75,45 @@ export default function AnnouncementSlideShow() {
     }
 
     return (
-        <div className="relative">
-            <div className="p-2 pl-4 rounded-lg border border-gray-200 h-full bg-wireframe-lightest-gray">
-                <Announcement {...announcements[currentIndex]} />
+        <div className="mt-6">
+            <div className="vtk-panel vtk-panel-muted flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:px-5">
+                <div className="min-w-0 flex-1">
+                    <Announcement {...announcements[currentIndex]} />
+                </div>
 
-                {/* Navigation controls - only show if multiple announcements */}
+                {/* Navigation controls, only when there is more than one notice. */}
                 {announcements.length > 1 && (
-                    <>
-                        {/* Left arrow button */}
+                    <div className="flex shrink-0 items-center justify-end gap-1.5">
                         <button
                             onClick={handlePrevious}
-                            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/2 bg-white hover:bg-gray-100 border border-gray-300 rounded-full p-1.5 shadow-xs transition-colors duration-200 z-10"
+                            className="grid h-7 w-7 place-items-center rounded-full border border-vtk-line-2 bg-vtk-surface text-vtk-body transition-colors hover:border-vtk-ink hover:text-vtk-ink"
                             aria-label="Previous announcement"
                         >
-                            <ChevronLeft className="w-4 h-4 text-gray-600" />
+                            <ChevronLeft className="h-3.5 w-3.5" />
                         </button>
 
-                        {/* Right arrow button */}
-                        <button
-                            onClick={handleNext}
-                            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 bg-white hover:bg-gray-100 border border-gray-300 rounded-full p-1.5 shadow-xs transition-colors duration-200 z-10"
-                            aria-label="Next announcement"
-                        >
-                            <ChevronRight className="w-4 h-4 text-gray-600" />
-                        </button>
-
-                        {/* Dot indicators - repositioned to bottom center */}
-                        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                        <div className="flex gap-1.5 px-1">
                             {announcements.map((_, index) => (
                                 <button
                                     key={index}
-                                    className={`w-3 h-3 rounded-full transition-colors duration-200 ${index === currentIndex
-                                        ? 'bg-gray-800 hover:bg-gray-700'
-                                        : 'bg-gray-400 hover:bg-gray-500'
+                                    className={`h-1.5 w-1.5 rounded-full transition-colors duration-200 ${index === currentIndex
+                                        ? 'bg-vtk-ink'
+                                        : 'bg-vtk-line-2 hover:bg-vtk-muted'
                                         }`}
                                     onClick={() => handleDotClick(index)}
                                     aria-label={`Go to announcement ${index + 1}`}
                                 />
                             ))}
                         </div>
-                    </>
+
+                        <button
+                            onClick={handleNext}
+                            className="grid h-7 w-7 place-items-center rounded-full border border-vtk-line-2 bg-vtk-surface text-vtk-body transition-colors hover:border-vtk-ink hover:text-vtk-ink"
+                            aria-label="Next announcement"
+                        >
+                            <ChevronRight className="h-3.5 w-3.5" />
+                        </button>
+                    </div>
                 )}
             </div>
         </div>

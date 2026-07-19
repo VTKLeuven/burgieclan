@@ -199,23 +199,19 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
     return (
         <div className="mt-2" ref={containerRef}>
             <div
-                className="block w-full rounded-md border-0 py-1.5 px-3
-                text-gray-900 shadow-xs ring-1 ring-inset
-                ring-gray-300 placeholder:text-gray-400
-                focus:ring-2 focus:ring-inset focus:ring-amber-600
-                sm:text-sm sm:leading-6 items-center flex flex-wrap gap-1"
+                className="flex min-h-[42px] w-full flex-wrap items-center gap-1 rounded-xl border border-vtk-line-2 bg-vtk-paper px-3 py-1.5 text-sm text-vtk-ink focus-within:border-vtk-ink focus-within:shadow-[0_0_0_3px_rgba(14,26,54,0.08)]"
                 onClick={handleContainerClick}
             >
                 {/* Display selected tags by ID */}
                 {selectedTags.map(tag => (
                     <div
                         key={`id-${tag.id}`}
-                        className="tag-chip inline-flex items-center h-6 bg-gray-100 text-gray-800 rounded-md text-xs px-2 mr-2"
+                        className="tag-chip h-6 inline-flex items-center rounded-full bg-vtk-paper-2 text-vtk-ink text-xs mr-2 px-2"
                     >
                         <span className="text-xs">{tag.name}</span>
                         <button
                             type="button"
-                            className="ml-1.5 text-gray-600 hover:text-gray-800 flex items-center justify-center"
+                            className="ml-1.5 text-vtk-body hover:text-vtk-ink flex items-center justify-center"
                             onClick={() => tag.id && removeExistingTag(tag.id)}
                         >
                             <X size={12} />
@@ -227,12 +223,12 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
                 {selectedTagQueries.map(query => (
                     <div
                         key={`query-${query}`}
-                        className="tag-chip inline-flex items-center h-5 bg-gray-100 text-gray-800 rounded-md text-xs px-2 my-auto mr-2"
+                        className="tag-chip h-5 inline-flex items-center rounded-full bg-vtk-paper-2 text-vtk-ink text-xs my-auto mr-2 px-2"
                     >
                         <span className="text-xs">&quot;{query}&quot;</span>
                         <button
                             type="button"
-                            className="ml-1.5 text-gray-600 hover:text-gray-800 flex items-center justify-center"
+                            className="ml-1.5 text-vtk-body hover:text-vtk-ink flex items-center justify-center"
                             onClick={() => removeCustomTagQuery(query)}
                         >
                             <X size={12} />
@@ -261,14 +257,14 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
 
             {/* Tag suggestions dropdown - only show if user has typed something and not loading */}
             {showSuggestions && tagInput.trim() !== '' && !tagsLoading && (
-                <ul className="absolute z-20 w-full bg-white mt-1 border rounded-md shadow-md max-h-60 overflow-y-auto">
+                <ul className="absolute z-20 mt-1.5 max-h-60 w-full overflow-y-auto rounded-[14px] border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
                     <>
                         {/* Existing tag suggestions */}
                         {filteredTags.map((tag, index) => (
                             <li
                                 key={tag.id}
-                                className={`px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer ${
-                                    selectedSuggestionIndex === index ? 'bg-gray-100' : ''
+                                className={`px-3 py-2 text-sm hover:bg-vtk-paper-2 cursor-pointer ${
+                                    selectedSuggestionIndex === index ? 'bg-vtk-paper-2' : ''
                                 }`}
                                 onClick={() => addExistingTag(tag)}
                             >
@@ -279,8 +275,8 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
                         {/* Create new tag option - only show if input doesn't exactly match an existing tag */}
                         {tagInput.trim() !== '' && !hasExactMatch && (
                             <li
-                                className={`px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer border-t flex items-center text-vtk-blue-500 ${
-                                    selectedSuggestionIndex === filteredTags.length ? 'bg-gray-100' : ''
+                                className={`px-3 py-2 text-sm hover:bg-vtk-paper-2 cursor-pointer border-t flex items-center text-vtk-navy ${
+                                    selectedSuggestionIndex === filteredTags.length ? 'bg-vtk-paper-2' : ''
                                 }`}
                                 onClick={() => addCustomTagQuery(tagInput)}
                             >
@@ -291,7 +287,7 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
 
                         {/* No results message */}
                         {filteredTags.length === 0 && hasExactMatch && (
-                            <li className="px-3 py-2 text-sm text-gray-500">
+                            <li className="px-3 py-2 text-sm text-vtk-muted">
                                 {t('upload.form.tags.no-results')}
                             </li>
                         )}

@@ -12,7 +12,7 @@ export default function FoldableSection({
     title,
     defaultOpen,
     children,
-    headerClassName = "bg-gray-100 text-xs font-semibold text-gray-900" // Default styling
+    headerClassName = "bg-vtk-paper-2 text-xs font-semibold text-vtk-ink" // Default styling
 }: FoldableSectionProps) {
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -37,7 +37,7 @@ export default function FoldableSection({
                 className={`transition-all duration-200 ease-in-out overflow-hidden ${isOpen ? 'opacity-100' : 'max-h-0 opacity-0'
                     }`}
             >
-                <div className="content text-sm text-gray-800">
+                <div className="content text-sm text-vtk-ink">
                     {children}
                 </div>
             </div>
