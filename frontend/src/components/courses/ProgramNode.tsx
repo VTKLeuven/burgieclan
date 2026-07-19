@@ -73,7 +73,7 @@ const ProgramNode = ({
         <DownloadButton programs={[program]} />
       </div>
 
-      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+      <div className={`transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100 overflow-visible' : 'max-h-0 opacity-0 overflow-hidden'}`}>
         {program.modules && program.modules.length > 0 ? (
           <div className="ml-5 mt-1.5 space-y-1 border-l border-vtk-line pl-4">
             {program.modules.map(module => (
