@@ -20,23 +20,23 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage }) => {
     const displayedItems = items.slice(0, itemsPerList);
 
     return (
-        <div className="overflow-y-auto h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <div className="pl-2">
             {items && items.length > 0 ? (
-                <ul className="space-y-0 list-none p-0">
+                <ul className="m-0 list-none space-y-0 p-0">
                     {displayedItems.map((item, index) => (
                         <li
                             key={index}
-                            className="group rounded-sm hover:bg-gray-100 transition-colors duration-100"
+                            className="group rounded-lg transition-colors duration-100 hover:bg-vtk-paper-2"
                         >
-                            <div className="flex items-center py-1.5 px-2 w-full">
+                            <div className="flex w-full items-center px-2 py-1.5">
                                 <Link
                                     href={item.redirectUrl}
                                     className="flex-1 min-w-0"
                                 >
                                     <div className="flex items-center overflow-hidden">
-                                        <span className="truncate text-gray-700 text-sm font-normal">
+                                        <span className="truncate text-vtk-body text-sm font-normal">
                                             {item.name}
-                                            {item.code && <span className="text-gray-400 ml-1 text-xs">({item.code})</span>}
+                                            {item.code && <span className="text-vtk-muted ml-1 text-xs">({item.code})</span>}
                                         </span>
                                     </div>
                                 </Link>
@@ -54,17 +54,15 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage }) => {
                     ))}
                 </ul>
             ) : (
-                <p className="text-sm text-gray-500">{emptyMessage}</p>
+                <p className="px-2 py-1 text-[13px] leading-snug text-vtk-muted">{emptyMessage}</p>
             )}
             {items.length > itemsPerList && (
-                <div className="flex justify-center mt-3">
-                    <Link
-                        href="/account"
-                        className="py-1 px-2 rounded text-gray-600 text-sm hover:bg-gray-100 transition-colors duration-100"
-                    >
-                        View All
-                    </Link>
-                </div>
+                <Link
+                    href="/account"
+                    className="mt-1 block rounded-lg px-2 py-1 text-[13px] text-vtk-muted transition-colors duration-100 hover:bg-vtk-paper-2 hover:text-vtk-ink"
+                >
+                    View All
+                </Link>
             )}
         </div>
     );

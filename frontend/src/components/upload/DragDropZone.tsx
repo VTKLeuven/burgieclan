@@ -81,10 +81,11 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
     return (
         <div
             className={cn(
-                "h-full w-full flex flex-col items-center justify-center p-6",
-                "border-2 border-dashed rounded-lg",
-                isDragging ? "border-amber-600 bg-amber-50" : "border-gray-300",
-                "transition-colors duration-200 cursor-pointer",
+                "flex h-full w-full cursor-pointer flex-col items-center justify-center p-6 text-center",
+                "rounded-[18px] border border-dashed transition-colors duration-200",
+                isDragging
+                    ? "border-vtk-ink bg-vtk-paper-2"
+                    : "border-vtk-line-2 bg-vtk-surface hover:border-vtk-ink/40 hover:bg-vtk-paper",
                 className
             )}
             onClick={handleClick}
@@ -102,14 +103,14 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
             />
             <FileText
                 className={cn(
-                    "w-16 h-16 mb-4",
-                    isDragging ? "text-amber-600" : "text-gray-400", "transition-colors duration-200"
+                    "mb-3.5 h-9 w-9 transition-colors duration-200",
+                    isDragging ? "text-vtk-ink" : "text-vtk-muted"
                 )}
             />
-            <p className="text-lg font-semibold text-gray-900 mb-1">
+            <p className="m-0 text-[15px] font-semibold tracking-tight text-vtk-ink">
                 {t('upload.drag_drop_title')}
             </p>
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="m-0 mt-1.5 text-[13px] text-vtk-muted">
                 {t('upload.supported_formats', { size: FILE_SIZE_MB })}
             </p>
         </div>

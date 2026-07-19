@@ -136,20 +136,20 @@ const TagFilter: React.FC<TagFilterProps> = ({
   return (
     <div className="relative" ref={containerRef}>
       <div
-        className="flex flex-wrap items-center w-full bg-white min-h-[38px] cursor-text ring-1 ring-inset ring-gray-300 rounded-md px-2 focus-within:ring-2 focus-within:ring-inset focus-within:ring-amber-600"
+        className="flex min-h-[42px] w-full cursor-text flex-wrap items-center rounded-xl border border-vtk-line-2 bg-vtk-paper px-2 focus-within:border-vtk-ink focus-within:shadow-[0_0_0_3px_rgba(14,26,54,0.08)]"
         onClick={handleContainerClick}
       >
         {/* Display selected tags by ID */}
         {selectedTags.map(tag => (
           <div 
             key={`id-${tag.id}`} 
-            className="tag-chip flex items-center bg-gray-100 text-gray-800 rounded-md px-2 py-1 m-1 text-xs"
+            className="tag-chip m-1 flex items-center rounded-full bg-vtk-paper-2 px-2 py-1 text-xs text-vtk-ink"
             title={t('document.filter-by-tag-id')}
           >
             <span>{tag.name}</span>
             <button 
               type="button" 
-              className="ml-1 text-gray-600 hover:text-gray-800"
+              className="ml-1 text-vtk-body hover:text-vtk-ink"
               onClick={() => tag.id && removeExistingTag(tag.id)}
             >
               <X size={12} />
@@ -161,13 +161,13 @@ const TagFilter: React.FC<TagFilterProps> = ({
         {selectedTagQueries.map(query => (
           <div 
             key={`query-${query}`} 
-            className="tag-chip flex items-center bg-gray-100 text-gray-800 rounded-md px-2 py-1 m-1 text-xs"
+            className="tag-chip m-1 flex items-center rounded-full bg-vtk-paper-2 px-2 py-1 text-xs text-vtk-ink"
             title={t('document.filter-by-tag-name')}
           >
             <span>&quot;{query}&quot;</span>
             <button 
               type="button" 
-              className="ml-1 text-gray-600 hover:text-gray-800"
+              className="ml-1 text-vtk-body hover:text-vtk-ink"
               onClick={() => removeCustomTagQuery(query)}
             >
               <X size={12} />
@@ -192,14 +192,14 @@ const TagFilter: React.FC<TagFilterProps> = ({
       {showSuggestions && (
         <>
           {tagsLoading || filteredTags.length > 0 ? (
-            <ul className="absolute z-20 w-full bg-white mt-1 border rounded-md shadow-md max-h-60 overflow-y-auto">
+            <ul className="absolute z-20 mt-1.5 max-h-60 w-full overflow-y-auto rounded-[14px] border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
               {tagsLoading ? (
-                <li className="px-3 py-2 text-sm text-gray-500">{t('common.loading')}</li>
+                <li className="px-3 py-2 text-sm text-vtk-muted">{t('common.loading')}</li>
               ) : (
                 filteredTags.map(tag => (
                   <li 
                     key={tag.id} 
-                    className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                    className="px-3 py-2 text-sm hover:bg-vtk-paper-2 cursor-pointer"
                     onClick={() => addExistingTag(tag)}
                   >
                     {tag.name}

@@ -115,18 +115,18 @@ export const UploadField: React.FC<FileUploadProps> = ({
     return (
         <div>
             <div className="flex items-center justify-between">
-                <label htmlFor="file-upload" className="block text-sm font-medium text-gray-900">
+                <label htmlFor="file-upload" className="block text-sm font-medium text-vtk-ink">
                     {t('upload.field.label')}
                 </label>
-                {error && <p className="text-red-500 text-xs">{`${error?.message}`}</p>}
+                {error && <p className="vtk-error-text text-xs">{`${error?.message}`}</p>}
             </div>
 
             {!filePreview ? (
                 <div
                     className={cn(
                         "mt-2 flex justify-center rounded-lg border ",
-                        "border-dashed border-gray-900/25 px-6 py-3 h-16",
-                        isDragging ? "border-amber-600 bg-amber-50" : "border-gray-300",
+                        "border-dashed border-vtk-ink/25 px-6 py-3 h-16",
+                        isDragging ? "border-vtk-ink bg-vtk-paper-2" : "border-vtk-line",
                         "transition-colors duration-100",
                         className
                     )}
@@ -135,10 +135,10 @@ export const UploadField: React.FC<FileUploadProps> = ({
                     onDragLeave={handleDragLeave}
                 >
                     <div className="text-center">
-                        <div className="flex text-sm leading-6 text-gray-600">
+                        <div className="flex text-sm leading-6 text-vtk-body">
                             <label
                                 htmlFor="file-upload"
-                                className="relative cursor-pointer rounded-md bg-white font-semibold text-amber-600 focus-within:outline-hidden focus-within:ring-2 focus-within:ring-amber-600 focus-within:ring-offset-2 hover:text-amber-500"
+                                className="relative cursor-pointer rounded-md bg-white font-semibold text-vtk-ink focus-within:outline-hidden focus-within:ring-2 focus-within:ring-vtk-ink focus-within:ring-offset-2 hover:text-vtk-navy"
                             >
                                 <p className={'text-sm'}>{t('upload.field.upload_button')}</p>
                                 <input
@@ -151,27 +151,27 @@ export const UploadField: React.FC<FileUploadProps> = ({
                             </label>
                             <p className="pl-1 sm:block hidden text-sm">{t('upload.field.drag_drop_text')}</p>
                         </div>
-                        <p className="text-xs leading-5 text-gray-400">
+                        <p className="text-xs leading-5 text-vtk-muted">
                             {t('upload.supported_formats', { size: FILE_SIZE_MB })}
                         </p>
                     </div>
                 </div>
             ) : (
-                <div className="mt-2 overflow-hidden rounded-lg bg-gray-100 h-16">
+                <div className="mt-2 overflow-hidden rounded-lg bg-vtk-paper-2 h-16">
                     <div className="p-4 flex items-center">
                         <span className="mr-3 min-h-8 min-w-8">
                             {filePreview.icon}
                         </span>
                         <div className="grow overflow-hidden whitespace-nowrap max-w-full">
                             <p className="text-sm">{filePreview.name}</p>
-                            <p className="text-xs text-gray-400">{filePreview.size}</p>
+                            <p className="text-xs text-vtk-muted">{filePreview.size}</p>
                         </div>
                         <button
                             type="button"
                             onClick={handleRemoveFile}
                             className="min-h-5 min-w-5"
                         >
-                            <X className="h-5 w-5 text-gray-400 hover:text-gray-600" aria-hidden="true" />
+                            <X className="h-5 w-5 text-vtk-muted hover:text-vtk-body" aria-hidden="true" />
                         </button>
                     </div>
                 </div>

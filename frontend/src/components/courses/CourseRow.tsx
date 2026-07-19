@@ -139,17 +139,17 @@ export const CourseRow = memo(({
         name: course.name,
         code: course.code,
         credits: (
-            <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">
+            <span className="vtk-badge vtk-badge-muted">
                 {course.credits}
             </span>
         ),
         semesters: <SemesterIndicator semesters={course.semesters} size={16} />,
-        star: <Star className='text-vtk-yellow-500' fill={isFavorite ? "currentColor" : "none"} size={16} />,
-        professor: <UserRound className="text-wireframe-primary-blue" size={16} />
+        star: <Star className='text-vtk-yellow' fill={isFavorite ? "currentColor" : "none"} size={16} />,
+        professor: <UserRound className="text-vtk-navy" size={16} />
     };
 
     return (
-        <div className={`grid grid-cols-12 py-2 px-3 border-b leading-tight hover:bg-gray-50 rounded-md ${highlightMatch ? 'ring-1 ring-yellow-300' : ''
+        <div className={`grid grid-cols-12 py-2 px-3 border-b leading-tight hover:bg-vtk-paper rounded-md ${highlightMatch ? 'ring-1 ring-vtk-yellow' : ''
             } ${marginClass}`}>
             <div className="col-span-5 flex items-center">
                 <div
@@ -164,19 +164,19 @@ export const CourseRow = memo(({
                         {content.name}
                     </div>
                 ) : (
-                    <Link href={`/course/${course.id}`} className="hover:text-wireframe-primary-blue hover:underline text-sm text-gray-700">
+                    <Link href={`/course/${course.id}`} className="hover:text-vtk-navy hover:underline text-sm text-vtk-body">
                         {content.name}
                     </Link>
                 )}
             </div>
-            <div className="col-span-1 flex items-center text-sm font-mono text-gray-600">{content.code}</div>
+            <div className="col-span-1 flex items-center text-sm font-mono text-vtk-body">{content.code}</div>
             <div className="col-span-1 flex items-center justify-center">{content.credits}</div>
             <div className="col-span-2 flex justify-center items-center">
                 {content.semesters}
             </div>
             <div className="col-span-2 flex justify-center items-center relative">
                 <div
-                    className={`p-1 ${!loading && 'hover:bg-gray-100 cursor-pointer'} rounded-full`}
+                    className={`p-1 ${!loading && 'hover:bg-vtk-paper-2 cursor-pointer'} rounded-full`}
                     onMouseEnter={!loading && course ? handleProfessorHover : undefined}
                     onMouseLeave={!loading && course ? () => setShowTooltip(false) : undefined}
                 >
@@ -196,7 +196,7 @@ export const CourseRow = memo(({
 CourseRow.displayName = "CourseRow";
 
 const ProfessorTooltip = ({ professorNames }: { professorNames: string[] }) => (
-    <div className="absolute bottom-full mb-2 bg-white rounded-md border border-vtk-blue-500 p-1 z-10 whitespace-nowrap text-sm">
+    <div className="absolute bottom-full mb-2 bg-white rounded-md border border-vtk-navy p-1 z-10 whitespace-nowrap text-sm">
         <ul className="list-none">
             {professorNames.map((professor, index) => (
                 <li key={index}>{professor}</li>

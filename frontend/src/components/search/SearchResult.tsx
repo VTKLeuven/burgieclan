@@ -11,11 +11,11 @@ type SearchResultProps = {
 export default function SearchResult({ mainResult, extraInfo, redirect }: SearchResultProps) {
     return <ComboboxOption
         value={{ redirect }}
-        className="cursor-default select-none px-4 py-2 data-focus:bg-amber-600 data-focus:text-white"
+        className="cursor-default select-none px-4 py-2 data-focus:bg-vtk-ink data-focus:text-white"
     >
         {({ focus }) => (<div className="flex justify-between">
             <span className="truncate">{mainResult}</span>
-            <span className={clsx('ml-2', focus && 'text-white', !focus && 'text-gray-500')}>
+            <span className={clsx('ml-2', focus && 'text-white', !focus && 'text-vtk-muted')}>
                 {extraInfo}
             </span>
         </div>

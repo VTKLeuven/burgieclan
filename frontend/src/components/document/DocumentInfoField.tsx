@@ -13,12 +13,14 @@ export default function DocumentInfoField({ icon: Icon, value, className }: {
     className?: string;
 }) {
     return (
-        <span className={`inline-flex items-center space-x-2 ${className}`}>
+        <span className={`inline-flex items-center gap-2 text-sm text-vtk-body ${className ?? ''}`}>
             <Icon
-                size={18}
-                strokeWidth="1.5"
+                size={15}
+                strokeWidth="1.75"
+                className="shrink-0 text-vtk-muted"
+                aria-hidden="true"
             />
-            <div>{value}</div>
+            {value}
         </span>
     );
 };

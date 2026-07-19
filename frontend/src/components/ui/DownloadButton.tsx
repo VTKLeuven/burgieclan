@@ -44,10 +44,14 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
     if (!hasContent) return null;
 
     return (
+        // Repeated row action, so the compact form is an icon button; the
+        // labelled form stays a normal pill button.
         <button
             onClick={handleDownload}
             disabled={loading}
-            className={`primary-button ${className}`}
+            title={showText ? undefined : t('download.download')}
+            aria-label={showText ? undefined : t('download.download')}
+            className={`${showText ? 'vtk-button' : 'vtk-icon-button'} ${className}`}
         >
             {loading ? (
                 <LoaderCircle size={size} className="animate-spin" />
@@ -55,9 +59,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
                 <Download size={size} />
             )}
             {showText && (
-                <span className="ml-1.5 text-sm">
-                    {loading ? t('download.downloading') : t('download.download')}
-                </span>
+                <span>{loading ? t('download.downloading') : t('download.download')}</span>
             )}
         </button>
     );

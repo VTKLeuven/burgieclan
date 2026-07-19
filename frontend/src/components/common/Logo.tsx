@@ -3,13 +3,14 @@ import React from "react";
 
 export default function Logo({ width, height }: { width: number; height: number }) {
     return (
+        // Navy VTK mark for light surfaces; the header/footer use the white
+        // variant directly since they sit on the navy band.
         <Image
-            // TODO: Replace with the actual logo
-            src="/images/logos/seafile-logo.png"
+            src="/images/logos/vtk-logo-blue.png"
             alt="Burgieclan Logo"
             width={width}
             height={height}
-            className="mx-auto"
+            className="h-auto w-auto object-contain"
         />
     )
 }

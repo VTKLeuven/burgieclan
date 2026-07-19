@@ -47,14 +47,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
         ? filteredOptions.slice(0, visibleOptions)
         : filteredOptions;
 
-    const inputClassName = `
-    block w-full rounded-md border-0 py-1.5 px-3
-    text-gray-900 shadow-xs ring-1 ring-inset
-    ring-gray-300 placeholder:text-gray-400
-    focus:ring-2 focus:ring-inset focus:ring-amber-600
-    sm:text-sm sm:leading-6 appearance-none
-    ${disabled ? 'bg-gray-50 text-gray-500' : ''}
-  `;
+    const inputClassName = `vtk-input block appearance-none pr-9 ${disabled ? 'text-vtk-muted' : ''}`;
 
     return (
         <div>
@@ -71,18 +64,17 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
                                 autoComplete="off"
                             />
                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                <ChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                <ChevronDown className="h-5 w-5 text-vtk-muted" aria-hidden="true" />
                             </div>
                         </Combobox.Button>
                         {open && (
-                            <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-hidden sm:text-sm">
+                            <Combobox.Options className="absolute z-10 mt-1.5 max-h-60 w-full overflow-auto text-base focus:outline-hidden sm:text-sm rounded-[14px] border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
                                 {limitedOptions.map((option) => (
                                     <Combobox.Option
                                         key={option.id}
                                         value={option}
                                         className={({ active }) =>
-                                            `block w-full rounded-md px-4 py-2 ${
-                                                active ? 'bg-amber-600 text-white' : 'text-gray-900 hover:bg-gray-100'
+                                            `block w-full cursor-pointer px-4 py-2 text-sm ${active ? 'bg-vtk-ink text-vtk-paper' : 'text-vtk-ink hover:bg-vtk-paper-2'
                                             }`
                                         }
                                     >
@@ -90,7 +82,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
                                     </Combobox.Option>
                                 ))}
                                 {limitedOptions.length === 0 && query !== '' && (
-                                    <div className="px-4 py-2 text-sm text-gray-500">
+                                    <div className="px-4 py-2 text-sm text-vtk-muted">
                                         {t('form.combo.no_results')}
                                     </div>
                                 )}

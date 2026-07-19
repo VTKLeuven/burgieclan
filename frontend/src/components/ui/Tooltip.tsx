@@ -30,7 +30,7 @@ const TooltipPortal: React.FC<{
 
   return createPortal(
     <div
-      className={`fixed bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 whitespace-nowrap shadow-lg pointer-events-none transform -translate-x-1/2 transition-opacity ${className || ''}`}
+      className={`fixed bg-white border border-vtk-line rounded px-2 py-1 text-xs text-vtk-body whitespace-nowrap shadow-lg pointer-events-none transform -translate-x-1/2 transition-opacity ${className || ''}`}
       style={{ top: position.top, left: position.left, zIndex: 10000 }}
     >
       {content}

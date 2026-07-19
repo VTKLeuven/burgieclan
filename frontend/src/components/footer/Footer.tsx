@@ -1,6 +1,7 @@
 'use client'
 
 import styles from "./styles.module.css";
+import Image from 'next/image'
 import Link from 'next/link'
 import { getCurrentYear } from "@/utils/date";
 import { useTranslation } from "react-i18next";
@@ -68,37 +69,88 @@ export default function Footer() {
     const { t } = useTranslation();
 
     return (
-        <footer aria-labelledby="footer-heading" className="bg-white">
-            <div className="mx-auto border-t border-gray-900/10 px-6 py-6 lg:px-8">
-                <div className="md:flex md:items-center md:justify-between">
+        // Dark navy band on every page: the closing bookend to the navy header,
+        // so the site opens and closes dark. Mirrors `.vtk-site-footer`.
+        <footer aria-labelledby="footer-heading" className="mt-auto border-t border-white/10 bg-vtk-navy text-vtk-paper antialiased">
+            <h2 id="footer-heading" className="sr-only">Footer</h2>
+            <div className="mx-auto max-w-(--max) px-5 pb-8 pt-12 sm:px-9">
+                <div className="grid gap-9 md:grid-cols-2 lg:grid-cols-[1.6fr_repeat(3,minmax(0,1fr))]">
 
-                    {/* Social Links Section */}
-                    <div className="flex space-x-6 md:order-3  md:mt-0">
-                        {navigation.map((item) => (
-                            <Link key={item.name} href={item.href} className="text-gray-400 hover:text-gray-500">
-                                <span className="sr-only">{item.name}</span>
-                                <item.icon aria-hidden="true" className="h-6 w-6" />
-                            </Link>
-                        ))}
-                    </div>
-
-                    {/* Contribution / Issue Reporting Section */}
-                    <div className="mt-2 flex space-x-4 md:order-2  md:mt-0">
-                        <Link href="/support" prefetch={true} className={styles.footerLink}>
-                            {t('report_issue')}
-                        </Link>
-                        <p className={styles.footerText}>{" or "}</p>
-                        <Link href="https://github.com/VTKLeuven/burgieclan" className={styles.footerLink}>
-                            {t('contribute_github')}<span><SquareArrowOutUpRight className="h-3 w-3 inline-block ml-0.5 mb-1 text-gray-500" aria-hidden="true" /></span>
-                        </Link>
-                    </div>
-
-                    {/* Copyright Section */}
+                    {/* Brand */}
                     <div>
-                        <p className="mt-2 text-xs leading-5 text-gray-500 md:order-1 md:mt-0">
-                            &copy; {currentYear} Vlaamse Technische Kring vzw
+                        <Image
+                            src="/images/logos/vtk-logo-white.png"
+                            alt=""
+                            width={140}
+                            height={38}
+                            className="mb-4 h-[34px] w-auto max-w-[150px] object-contain object-left"
+                        />
+                        <p className="max-w-[24ch] whitespace-pre-line text-[22px] font-bold leading-[1.12] tracking-tight text-vtk-paper">
+                            {t('footer.tagline')}
                         </p>
+                        <p className="mt-3.5 max-w-[36ch] text-[13px] leading-relaxed text-vtk-on-dark-muted">
+                            Kasteelpark Arenberg 6{'\n'}3001 Heverlee, België
+                        </p>
+
+                        <div className="mt-5 flex space-x-4">
+                            {navigation.map((item) => (
+                                <Link
+                                    key={item.name}
+                                    href={item.href}
+                                    className="text-vtk-paper/70 transition-colors hover:text-white"
+                                >
+                                    <span className="sr-only">{item.name}</span>
+                                    <item.icon aria-hidden="true" className="h-5 w-5" />
+                                </Link>
+                            ))}
+                        </div>
                     </div>
+
+                    {/* Link columns */}
+                    <div>
+                        <h3 className="mb-3.5 text-xs font-semibold uppercase tracking-[0.1em] text-vtk-on-dark-muted">
+                            {t('footer.navigate')}
+                        </h3>
+                        <ul className="m-0 flex list-none flex-col gap-2 p-0">
+                            <li><Link href="/courses" className={styles.footerNavLink}>{t('courses')}</Link></li>
+                            <li><Link href="/account" className={styles.footerNavLink}>{t('account.account')}</Link></li>
+                            <li><Link href="#" className={styles.footerNavLink}>{t('FAQ')}</Link></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 className="mb-3.5 text-xs font-semibold uppercase tracking-[0.1em] text-vtk-on-dark-muted">
+                            {t('footer.support')}
+                        </h3>
+                        <ul className="m-0 flex list-none flex-col gap-2 p-0">
+                            <li>
+                                <Link href="/support" prefetch={true} className={styles.footerNavLink}>
+                                    {t('report_issue')}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="https://github.com/VTKLeuven/burgieclan" className={styles.footerNavLink}>
+                                    {t('contribute_github')}
+                                    <SquareArrowOutUpRight className="ml-1 inline-block h-3 w-3 align-baseline" aria-hidden="true" />
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 className="mb-3.5 text-xs font-semibold uppercase tracking-[0.1em] text-vtk-on-dark-muted">
+                            {t('footer.community')}
+                        </h3>
+                        <ul className="m-0 flex list-none flex-col gap-2 p-0">
+                            <li><Link href="https://vtk.be" className={styles.footerNavLink}>vtk.be</Link></li>
+                            <li><Link href="https://vtk.be/account/" className={styles.footerNavLink}>{t('header.my_vtk')}</Link></li>
+                        </ul>
+                    </div>
+                </div>
+
+                {/* Bottom bar */}
+                <div className="mt-9 flex flex-col justify-between gap-4 border-t border-white/12 pt-4.5 text-xs text-vtk-on-dark-muted sm:flex-row">
+                    <p className="m-0">&copy; {currentYear} Vlaamse Technische Kring vzw</p>
                 </div>
             </div>
         </footer>

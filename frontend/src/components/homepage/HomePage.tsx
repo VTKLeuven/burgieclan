@@ -2,7 +2,6 @@
 
 import AnnouncementSlideShow from '@/components/announcement/AnnouncementSlideShow';
 import { QuickLinks } from '@/components/homepage/QuickLinks';
-import { Text } from '@/components/ui/Text';
 import { DragDropZone } from '@/components/upload/DragDropZone';
 import UploadDialog from '@/components/upload/UploadDialog';
 import { useUploadFlow } from '@/hooks/useUploadFlow';
@@ -20,42 +19,27 @@ export default function HomePage() {
     const { t } = useTranslation();
 
     return (
-        <main className="flex-1 flex flex-col">
-            <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 md:px-8 py-4">
-                <AnnouncementSlideShow />
+        <main className="vtk-shell pb-16">
+            <AnnouncementSlideShow />
 
-                {/* Header */}
-                <div className="mb-8">
-                    <h2 className="text-black">{t('home.title')}</h2>
-                    <Text className="text-wireframe-darkest-gray max-w-4xl text-justify">
-                        {t('home.description')}
-                    </Text>
+            {/* Editorial page head: kicker, large tight title, rule underneath. */}
+            <div className="vtk-page-head">
+                <div>
+                    <div className="vtk-page-kicker">Burgieclan</div>
+                    <h1 className="vtk-page-title">{t('home.title')}</h1>
+                    <p className="vtk-page-subtitle">{t('home.description')}</p>
                 </div>
+            </div>
 
-                {/* Grid Layout */}
-                <div className="grid grid-rows-2 gap-4 flex-1">
-                    {/* Top Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Recent activities */}
-                        <RecentActivities />
-                        {/* Dropbox */}
-                        <DragDropZone onFileDrop={handleFileDrop} className="h-full" />
-                    </div>
+            {/* Recent activity carries the page; upload and navigation sit
+                beside it as a narrower utility column. */}
+            <div className="mt-7 grid items-start gap-4 lg:grid-cols-[1.7fr_1fr]">
+                <RecentActivities />
 
-                    {/* Bottom Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-[30%_1fr] gap-4">
-                        {/* News */}
-                        <div className="rounded-lg border border-gray-200 h-full">
-                            <div className="p-4">
-                                <h3 className="text-xl text-gray-900">{t('home.news')}</h3>
-                            </div>
-                        </div>
-                        {/* Navigate */}
-                        <div className="rounded-lg border border-gray-200 h-full">
-                            <div className="p-4">
-                                <QuickLinks />
-                            </div>
-                        </div>
+                <div className="grid gap-4">
+                    <DragDropZone onFileDrop={handleFileDrop} className="min-h-64" />
+                    <div className="vtk-panel p-6">
+                        <QuickLinks />
                     </div>
                 </div>
             </div>

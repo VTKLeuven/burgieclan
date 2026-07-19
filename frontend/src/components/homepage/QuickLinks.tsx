@@ -31,7 +31,7 @@ export function QuickLinks() {
     if (loading) {
         return (
             <div className="flex justify-center items-center py-8">
-                <div className="animate-spin h-6 w-6 border-2 border-gray-500 rounded-full border-t-transparent"></div>
+                <div className="animate-spin h-6 w-6 border-2 border-vtk-line-2 rounded-full border-t-transparent"></div>
             </div>
         );
     }
@@ -42,22 +42,23 @@ export function QuickLinks() {
 
     return (
         <div>
-            <h3 className="text-xl text-gray-900 mb-4">{t('home.navigate_to')}</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+            <h2 className="m-0 mb-4 text-base font-semibold tracking-tight text-vtk-ink">
+                {t('home.navigate_to')}
+            </h2>
+            <div className="grid grid-cols-1 gap-x-4 gap-y-0.5">
                 {links.length > 0 ? (
                     links.map((link) => (
-                        <div key={link.id}>
-                            <Link
-                                href={link.linkTo}
-                                className="flex items-center text-gray-700 hover:text-primary hover:underline transition-colors"
-                            >
-                                <ChevronRight className="mr-2 shrink-0 text-amber-600" />
-                                <span>{link.name ?? link.linkTo}</span>
-                            </Link>
-                        </div>
+                        <Link
+                            key={link.id}
+                            href={link.linkTo}
+                            className="group -mx-2 flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-vtk-body transition-colors hover:bg-vtk-paper-2 hover:text-vtk-ink"
+                        >
+                            <ChevronRight className="h-4 w-4 shrink-0 text-vtk-muted transition-transform group-hover:translate-x-0.5 group-hover:text-vtk-ink" />
+                            <span className="truncate">{link.name ?? link.linkTo}</span>
+                        </Link>
                     ))
                 ) : (
-                    <div className="col-span-2 text-center py-4 text-gray-500">
+                    <div className="vtk-empty">
                         {t('home.no_quick_links')}
                     </div>
                 )}

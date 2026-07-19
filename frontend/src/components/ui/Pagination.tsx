@@ -15,67 +15,53 @@ export default function Pagination({ totalAmount, currentPage, itemsPerPage, onP
     const currentEnd = Math.min(currentPage * itemsPerPage, totalAmount);
     const totalPages = Math.ceil(totalAmount / itemsPerPage);
     return (
-        <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-            <div className="flex flex-1 items-center justify-between sm:hidden">
+        // Pill controls on paper; the active page is an ink fill, never a
+        // third accent colour.
+        <div className="flex items-center justify-between gap-3">
+            <p className="m-0 hidden text-sm text-vtk-muted sm:block">
+                {t('pagination.showing', { start: currentStart, end: currentEnd, total: totalAmount })}
+            </p>
+            <p className="m-0 text-sm text-vtk-muted sm:hidden">
+                <span className="font-medium text-vtk-ink">{currentPage}</span>
+                <span className="mx-0.5">/</span>
+                <span className="font-medium text-vtk-ink">{totalPages}</span>
+            </p>
+
+            <nav aria-label="Pagination" className="flex items-center gap-1">
                 <button
                     onClick={() => onPageChange(currentPage - 1)}
-                    className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    disabled={currentPage === 1}>
-                    {t('pagination.previous')}
+                    className="vtk-icon-button h-8 w-8"
+                    disabled={currentPage === 1}
+                >
+                    <span className="sr-only">{t('pagination.previous')}</span>
+                    <ChevronLeft aria-hidden="true" className="h-4 w-4" />
                 </button>
-                <div>
-                    <p className="text-sm text-gray-700">
-                        <span className="font-medium">{currentPage}</span>/
-                        <span className="font-medium">{totalPages}</span>
-                    </p>
+
+                <div className="hidden items-center gap-1 sm:flex">
+                    {Array.from({ length: totalPages }, (_, index) => (
+                        <button
+                            key={index + 1}
+                            onClick={() => onPageChange(index + 1)}
+                            aria-current={currentPage === index + 1 ? 'page' : undefined}
+                            className={`h-8 min-w-8 rounded-full px-2.5 text-sm font-semibold transition-colors ${currentPage === index + 1
+                                ? 'bg-vtk-ink text-vtk-paper'
+                                : 'text-vtk-body hover:bg-vtk-paper-2 hover:text-vtk-ink'
+                                }`}
+                        >
+                            {index + 1}
+                        </button>
+                    ))}
                 </div>
+
                 <button
                     onClick={() => onPageChange(currentPage + 1)}
-                    className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    disabled={currentPage === totalPages}>
-                    {t('pagination.next')}
+                    className="vtk-icon-button h-8 w-8"
+                    disabled={currentPage === totalPages}
+                >
+                    <span className="sr-only">{t('pagination.next')}</span>
+                    <ChevronRight aria-hidden="true" className="h-4 w-4" />
                 </button>
-            </div>
-            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                <div>
-                    <p className="text-sm text-gray-700">
-                        {t('pagination.showing', { start: currentStart, end: currentEnd, total: totalAmount })}
-                    </p>
-                </div>
-                <div>
-                    <nav aria-label="Pagination" className="isolate inline-flex -space-x-px rounded-md shadow-xs">
-                        <button
-                            onClick={() => onPageChange(currentPage - 1)}
-                            className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                            disabled={currentPage === 1}
-                        >
-                            <span className="sr-only">{t('pagination.previous')}</span>
-                            <ChevronLeft aria-hidden="true" className="size-5" />
-                        </button>
-                        {Array.from({ length: totalPages }, (_, index) => (
-                            <button
-                                key={index + 1}
-                                onClick={() => onPageChange(index + 1)}
-                                aria-current={currentPage === index + 1 ? 'page' : undefined}
-                                className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${currentPage === index + 1
-                                    ? 'z-10 bg-indigo-600 text-white focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
-                                    : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                                    }`}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
-                        <button
-                            onClick={() => onPageChange(currentPage + 1)}
-                            className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                            disabled={currentPage === totalPages}
-                        >
-                            <span className="sr-only">{t('pagination.next')}</span>
-                            <ChevronRight aria-hidden="true" className="size-5" />
-                        </button>
-                    </nav>
-                </div>
-            </div>
+            </nav>
         </div>
     );
 }

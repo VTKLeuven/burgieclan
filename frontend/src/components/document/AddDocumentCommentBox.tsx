@@ -20,7 +20,7 @@ export default function AddDocumentCommentBox({ documentId, file, content, onCom
     return (
         <div className="border rounded-lg max-w-sm p-2 min-h-20">
             <button
-                className="flex flex-row justify-between pb-2 text-gray-600"
+                className="flex flex-row justify-between pb-2 text-vtk-body"
                 onClick={() => setIsModalOpen(true)}>
                 <span className="text-left">{t("document.comments.add")}</span>
             </button>

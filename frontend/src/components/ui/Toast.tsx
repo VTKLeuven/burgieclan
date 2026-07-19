@@ -20,18 +20,19 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 // Toast Message Component
 const ToastMessage = ({ message, type }: { message: string; type: ToastType }) => {
+    // Semantic tones matching `.vtk-basic-badge-success` / `-danger`.
     const styles = {
         success: {
-            bg: 'bg-green-50',
-            border: 'border-green-200',
-            text: 'text-green-700',
-            icon: 'text-green-400'
+            bg: 'bg-[#eef8ea]',
+            border: 'border-[#b8dec1]',
+            text: 'text-[#2f6f33]',
+            icon: 'text-[#2f6f33]'
         },
         error: {
-            bg: 'bg-red-50',
-            border: 'border-red-200',
-            text: 'text-red-700',
-            icon: 'text-red-400'
+            bg: 'bg-[#fff0ed]',
+            border: 'border-[#f0c6bd]',
+            text: 'text-[#9d2f1f]',
+            icon: 'text-[#9d2f1f]'
         }
     }[type];
 
@@ -49,7 +50,7 @@ const ToastMessage = ({ message, type }: { message: string; type: ToastType }) =
             leaveTo="opacity-0"
         >
             <div
-                className={`inline-flex items-center ${styles.bg} border ${styles.border} rounded-lg shadow-lg px-4 py-2`}
+                className={`inline-flex items-center ${styles.bg} border ${styles.border} rounded-2xl px-4 py-2.5 shadow-[0_18px_42px_rgba(10,15,31,0.12)]`}
                 role="alert"
             >
                 <Icon className={`h-5 w-5 ${styles.icon}`} aria-hidden="true" />

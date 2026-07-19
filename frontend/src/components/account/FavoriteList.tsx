@@ -27,37 +27,36 @@ const FavoriteList: React.FC<FavoriteListProps> = ({
     return (
         <CollapsibleSection
             header={
-                <h3 className="text-xl font-semibold">
-                    {title} <span className="text-sm">({items.length})</span>
-                </h3>
+                <h2 className="m-0 flex items-baseline gap-2 text-base font-semibold tracking-tight text-vtk-ink">
+                    {title}
+                    <span className="text-[13px] font-normal text-vtk-muted">({items.length})</span>
+                </h2>
             }
         >
-            <div className='p-4'>
-                {items && items.length > 0 ? (
-                    <ul className="space-y-4 list-none">
-                        {items.map((item, index) => (
-                            <li key={index} className="bg-gray-200 px-4 py-2 rounded-md shadow-xs flex justify-between items-center">
-                                <Link href={item.redirectUrl} className="hover:underline flex-1">
-                                    {item.name} {item.code && <span className="text-sm text-gray-500">[{item.code}]</span>}
-                                </Link>
-                                <FavoriteButton
-                                    itemId={item.id}
-                                    itemType={item.type}
-                                    className="ml-2"
-                                    size={20}
-                                    onToggle={(isFavorite) => {
-                                        if (!isFavorite && onRemoveItem) {
-                                            onRemoveItem(index);
-                                        }
-                                    }}
-                                />
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>{emptyMessage}</p>
-                )}
-            </div>
+            {items && items.length > 0 ? (
+                <ul className="vtk-rows m-0 list-none p-0">
+                    {items.map((item, index) => (
+                        <li key={index} className="vtk-row vtk-row-click px-5">
+                            <Link href={item.redirectUrl} className="min-w-0 flex-1 truncate text-sm text-vtk-body hover:text-vtk-ink">
+                                {item.name}
+                                {item.code && <span className="ml-1.5 text-[13px] text-vtk-muted">[{item.code}]</span>}
+                            </Link>
+                            <FavoriteButton
+                                itemId={item.id}
+                                itemType={item.type}
+                                size={16}
+                                onToggle={(isFavorite) => {
+                                    if (!isFavorite && onRemoveItem) {
+                                        onRemoveItem(index);
+                                    }
+                                }}
+                            />
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <p className="vtk-empty m-0">{emptyMessage}</p>
+            )}
         </CollapsibleSection>
     );
 };
