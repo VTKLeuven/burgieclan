@@ -97,28 +97,26 @@ const ModuleNode = ({
     return (
         <div className="module-node mb-1">
             <div
-                className={`flex items-center py-2 px-3 border border-vtk-line bg-vtk-paper rounded-md cursor-pointer hover:bg-vtk-paper-2 ${moduleMatches ? 'ring-1 ring-vtk-yellow' : ''
+                className={`flex cursor-pointer items-center gap-2.5 py-2 px-3 border border-vtk-line bg-vtk-paper rounded-md hover:bg-vtk-paper-2 ${moduleMatches ? 'ring-1 ring-vtk-yellow' : ''
                     }`}
                 onClick={() => setExpanded(!expanded)}
             >
-                <div className="transition-transform duration-200" style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
-                    <ChevronRight size={16} />
-                </div>
-                <span className="ml-2 text-sm font-medium">{module.name}</span>
+                <ChevronRight
+                    size={16}
+                    className="shrink-0 transition-transform duration-200"
+                    style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+                />
+                <span className="min-w-0 flex-1 truncate text-sm font-medium">{module.name}</span>
 
                 {/* Show badge with match count if matches exist */}
                 {searchFilters && searchQuery && totalMatches > 0 && (
-                    <div className="ml-auto bg-vtk-paper-2 text-vtk-ink text-xs px-2 py-0.5 rounded-full min-w-6 h-6 flex items-center justify-center mr-2">
-                        {totalMatches}
-                    </div>
+                    <span className="vtk-badge vtk-badge-accent shrink-0">{totalMatches}</span>
                 )}
 
-                <div className="ml-auto flex items-center">
-                    <DownloadButton modules={[module]} className='px-4 py-0.5' />
-                </div>
+                <DownloadButton modules={[module]} />
             </div>
 
-            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div className={`transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100 overflow-visible' : 'max-h-0 opacity-0 overflow-hidden'}`}>
                 <div className="pl-4 mt-1 space-y-1">
                     {/* Render submodules recursively */}
                     {module.modules?.map(submodule => (

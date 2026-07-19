@@ -1,3 +1,4 @@
+import ProfessorDiv from '@/components/coursepage/ProfessorDiv';
 import DownloadButton from '@/components/ui/DownloadButton';
 import SemesterIndicator from "@/components/ui/SemesterIndicator";
 import { useUser } from '@/components/UserContext';
@@ -6,7 +7,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import type { Course } from '@/types/entities';
 import { convertToCourse } from "@/utils/convertToEntity";
 import { captureException } from '@sentry/nextjs';
-import { Star, UserRound } from "lucide-react";
+import { Star } from "lucide-react";
 import Link from "next/link";
 import { memo, useCallback, useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
@@ -31,9 +32,7 @@ export const CourseRow = memo(({
     const [loading, setLoading] = useState<boolean>(false);
     const { request } = useApi();
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
-    const [showTooltip, setShowTooltip] = useState<boolean>(false);
-    const [professorNames, setProfessorNames] = useState<string[]>([]);
-    const [professorsLoaded, setProfessorsLoaded] = useState<boolean>(false);
+    const [showProfessors, setShowProfessors] = useState<boolean>(false);
 
     // Fetch complete course data if we only have the ID and parent is visible
     useEffect(() => {
@@ -86,44 +85,6 @@ export const CourseRow = memo(({
         await updateFavorite(initialCourse.id, "course", newFavoriteState);
     }, [user, initialCourse.id, updateFavorite]);
 
-    const fetchProfessorNames = useCallback(async () => {
-        if (!course?.professors?.length || professorsLoaded) return;
-
-        try {
-            setProfessorsLoaded(true);
-            const professors = course.professors ?? [];
-            const namePromises = professors.map(async unumber => {
-                if (!unumber) return "";
-
-                const sanitizedUnumber = unumber.replace(/\D/g, '');
-                if (!sanitizedUnumber) return "";
-
-                try {
-                    const response = await fetch(`https://dataservice.kuleuven.be/employee/_doc/0${sanitizedUnumber}`);
-                    if (!response.ok) return "";
-
-                    const data = await response.json();
-                    return data?._source?.firstName && data?._source?.surname
-                        ? `${data._source.firstName[0]}. ${data._source.surname}`
-                        : "";
-                } catch {
-                    return "";
-                }
-            });
-
-            const names = await Promise.all(namePromises);
-            setProfessorNames(names.filter(name => name));
-        } catch {
-            setProfessorNames([]);
-        }
-    }, [course?.professors, professorsLoaded]);
-
-    // Only load professor data when the tooltip is hovered
-    const handleProfessorHover = useCallback(() => {
-        setShowTooltip(true);
-        fetchProfessorNames();
-    }, [fetchProfessorNames]);
-
     // Add margin-top classes conditionally based on whether this is the first row
     const marginClass = isFirstRow ? '' : 'mt-0';
 
@@ -134,7 +95,7 @@ export const CourseRow = memo(({
         credits: <Skeleton />,
         semesters: <Skeleton circle width={16} height={16} />,
         star: <Skeleton circle width={16} height={16} />,
-        professor: <Skeleton circle width={16} height={16} />
+        professor: <Skeleton circle width={28} height={28} />
     } : {
         name: course.name,
         code: course.code,
@@ -145,7 +106,19 @@ export const CourseRow = memo(({
         ),
         semesters: <SemesterIndicator semesters={course.semesters} size={16} />,
         star: <Star className='text-vtk-yellow' fill={isFavorite ? "currentColor" : "none"} size={16} />,
-        professor: <UserRound className="text-vtk-navy" size={16} />
+        professor: (
+            <div className="flex -space-x-1.5">
+                {showProfessors && course.professors?.map((unumber, index) => (
+                    <ProfessorDiv
+                        key={unumber}
+                        unumber={unumber}
+                        index={index}
+                        size={28}
+                        linkToProfile={false}
+                    />
+                ))}
+            </div>
+        )
     };
 
     return (
@@ -174,17 +147,10 @@ export const CourseRow = memo(({
             <div className="col-span-2 flex justify-center items-center">
                 {content.semesters}
             </div>
-            <div className="col-span-2 flex justify-center items-center relative">
-                <div
-                    className={`p-1 ${!loading && 'hover:bg-vtk-paper-2 cursor-pointer'} rounded-full`}
-                    onMouseEnter={!loading && course ? handleProfessorHover : undefined}
-                    onMouseLeave={!loading && course ? () => setShowTooltip(false) : undefined}
-                >
-                    {content.professor}
-                    {showTooltip && professorNames.length > 0 && (
-                        <ProfessorTooltip professorNames={professorNames} />
-                    )}
-                </div>
+            <div className="col-span-2 flex justify-center items-center relative hover:z-50"
+                onMouseEnter={!loading && course ? () => setShowProfessors(true) : undefined}
+            >
+                {content.professor}
             </div>
             <div className="col-span-1 flex justify-end items-center">
                 {!loading && course && <DownloadButton courses={[course]} size={16} />}
@@ -194,13 +160,3 @@ export const CourseRow = memo(({
 });
 
 CourseRow.displayName = "CourseRow";
-
-const ProfessorTooltip = ({ professorNames }: { professorNames: string[] }) => (
-    <div className="absolute bottom-full mb-2 bg-white rounded-md border border-vtk-navy p-1 z-10 whitespace-nowrap text-sm">
-        <ul className="list-none">
-            {professorNames.map((professor, index) => (
-                <li key={index}>{professor}</li>
-            ))}
-        </ul>
-    </div>
-);

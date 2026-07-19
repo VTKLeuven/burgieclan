@@ -128,7 +128,7 @@ export default function CoursePage() {
                             <div className="vtk-label mb-2.5">{t('course-page.teachers')}</div>
                             <div className="flex justify-end -space-x-3">
                                 {course.professors.map((p, index) => (
-                                    <ProfessorDiv key={index} unumber={p} index={index} t={t} />
+                                    <ProfessorDiv key={index} unumber={p} index={index} />
                                 ))}
                             </div>
                         </div>
