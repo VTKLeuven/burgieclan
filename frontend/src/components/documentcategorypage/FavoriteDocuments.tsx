@@ -95,7 +95,7 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
                 {favoriteDocuments.length > 3 && (
                     <Link
                         href="/account"
-                        className="flex items-center text-sm text-vtk-blue-500 hover:text-vtk-blue-700"
+                        className="flex items-center text-sm text-vtk-navy hover:text-vtk-ink"
                     >
                         {t('course-page.documents.favorites-see-all')}
                         <ChevronRight className="h-4 w-4 ml-1" />
@@ -107,23 +107,23 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
                 {favoriteDocuments.slice(0, 4).map((document) => (
                     <div
                         key={document.id}
-                        className="relative bg-white rounded-lg border border-gray-200 p-3"
+                        className="vtk-panel relative p-4"
                     >
                         <Link
                             href={`/document/${document.id}`}
                             className="block"
                         >
                             <div className="flex items-center gap-2">
-                                <h4 className="font-medium text-gray-900 truncate">{document.name}</h4>
+                                <h4 className="font-medium text-vtk-ink truncate">{document.name}</h4>
                                 {document.underReview && (
                                     <Badge text={t('document.under_review')} color="yellow" />
                                 )}
                             </div>
-                            <p className="text-xs text-gray-500 truncate">
+                            <p className="text-xs text-vtk-muted truncate">
                                 {extractFilename(document.contentUrl)}
                             </p>
 
-                            <div className="text-xs text-gray-500 flex justify-between mt-1">
+                            <div className="text-xs text-vtk-muted flex justify-between mt-1">
                                 <p className="whitespace-nowrap">
                                     {document.updatedAt && new Date(document.updatedAt).toLocaleString('en-GB', {
                                         day: '2-digit',
@@ -142,7 +142,7 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
                             </div>
                         </Link>
 
-                        <div className="flex justify-between pt-3 border-t border-gray-100">
+                        <div className="flex justify-between pt-3 border-t border-vtk-line">
                             <FavoriteButton
                                 itemId={document.id}
                                 itemType="document"
@@ -158,7 +158,7 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
 
                             <DownloadButton 
                                 documents={[document]} 
-                                className="p-1 bg-vtk-blue-400 hover:bg-vtk-blue-600 text-white hover:text-gray-300 rounded-md flex items-center justify-center"
+                                className="vtk-icon-button h-8 w-8"
                                 size={16}
                             />
                         </div>

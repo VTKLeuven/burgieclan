@@ -54,20 +54,17 @@ export default function ProfessorDiv({ unumber, index, t }: { unumber: string, i
         return name.slice(0, 2).toUpperCase();
     };
 
-    // Generate a consistent color based on the name
+    // Fallback avatars stay on the navy scale rather than introducing a rainbow
+    // of accent colours; only the tone varies per person.
     const getAvatarColor = (name: string) => {
-        const colors = [
-            'bg-blue-500',
-            'bg-green-500', 
-            'bg-purple-500',
-            'bg-pink-500',
-            'bg-indigo-500',
-            'bg-yellow-500',
-            'bg-red-500',
-            'bg-teal-500'
+        const tones = [
+            'bg-vtk-navy text-vtk-paper',
+            'bg-vtk-ink text-vtk-paper',
+            'bg-vtk-blue-light text-vtk-paper',
+            'bg-vtk-yellow text-vtk-ink',
         ];
         const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        return colors[hash % colors.length];
+        return tones[hash % tones.length];
     };
 
     const roleText = index === 0 ? t('course-page.coordinator') : t('course-page.professor');
@@ -76,7 +73,7 @@ export default function ProfessorDiv({ unumber, index, t }: { unumber: string, i
         <div className="relative group">
             <Link href={`https://www.kuleuven.be/wieiswie/${locale}/person/0${sanitizedUnumber}`}>
                 {!imageError ? (
-                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 border-2 border-white shadow-xs hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer relative z-10 group-hover:z-20">
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-vtk-paper-2 border-2 border-white shadow-xs hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer relative z-10 group-hover:z-20">
                         <Image
                             src={imgSrc}
                             onError={handleError}
@@ -87,18 +84,18 @@ export default function ProfessorDiv({ unumber, index, t }: { unumber: string, i
                         />
                     </div>
                 ) : (
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-medium border-2 border-white shadow-xs hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer relative z-10 group-hover:z-20 ${getAvatarColor(professorName)}`}>
+                    <div className={`relative z-10 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-white text-sm font-semibold shadow-xs transition-all duration-200 hover:scale-110 hover:shadow-md group-hover:z-20 ${getAvatarColor(professorName)}`}>
                         {getInitials(professorName)}
                     </div>
                 )}
             </Link>
 
             {/* Tooltip on hover - appears below */}
-            <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none">
+            <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-vtk-ink text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none">
                 <div className="font-medium">{professorName}</div>
-                <div className="text-gray-300">{roleText}</div>
+                <div className="text-vtk-on-dark-muted">{roleText}</div>
                 {/* Arrow pointing up */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 border-2 border-transparent border-b-gray-900"></div>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-2 border-transparent border-b-vtk-ink"></div>
             </div>
         </div>
     );

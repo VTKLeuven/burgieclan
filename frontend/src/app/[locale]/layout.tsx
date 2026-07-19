@@ -42,10 +42,10 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
         locale={locale}
         resources={resources}>
         <html lang={locale} className={`${inter.className} h-full`}>
-          <body className="flex min-h-full">
+          <body className="flex min-h-full flex-col">
             {/* ToastProvider uses client-side hooks (useState, useContext) so must be placed inside body tags */}
             <ToastProvider>
-              <div className="w-full">
+              <div className="flex min-h-full w-full flex-1 flex-col">
                 {children}
                 <CookieBanner />
               </div>

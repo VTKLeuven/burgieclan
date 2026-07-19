@@ -94,13 +94,13 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
         >
             <DialogBackdrop
                 transition
-                className="fixed inset-0 backdrop-blur-xs bg-gray-500 bg-opacity-25 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-leave:duration-200 data-enter:ease-out data-leave:ease-in"
+                className="fixed inset-0 bg-vtk-ink/40 backdrop-blur-xs transition-opacity data-closed:opacity-0 data-enter:duration-300 data-leave:duration-200 data-enter:ease-out data-leave:ease-in"
             />
 
             <div className="fixed inset-0 z-10 w-screen overflow-y-auto p-4 sm:p-6 md:p-20">
                 <DialogPanel
                     transition
-                    className="mx-auto max-w-xl transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all data-closed:scale-95 data-closed:opacity-0 data-enter:duration-300 data-leave:duration-200 data-enter:ease-out data-leave:ease-in"
+                    className="mx-auto max-w-xl transform overflow-hidden rounded-[22px] border border-vtk-line bg-vtk-surface shadow-[0_24px_70px_rgba(10,15,31,0.2)] transition-all data-closed:scale-95 data-closed:opacity-0 data-enter:duration-300 data-leave:duration-200 data-enter:ease-out data-leave:ease-in"
                 >
                     <Combobox
                         onChange={(param: { redirect: Location | string } | null) => {
@@ -114,12 +114,12 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                         <div>
                             <div className="relative">
                                 <SearchIcon
-                                    className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-gray-400"
+                                    className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-vtk-muted"
                                     aria-hidden="true"
                                 />
                                 <ComboboxInput
                                     autoFocus
-                                    className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
+                                    className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-vtk-ink placeholder:text-vtk-muted focus:ring-0 sm:text-sm"
                                     placeholder={t('search.placeholder')}
                                     onChange={(event) => setQuery(event.target.value)}
                                     onBlur={() => setQuery('')}
@@ -128,7 +128,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
 
                             {loading && (
                                 <div className="flex justify-center py-12">
-                                    <svg className="animate-spin h-8 w-8 text-gray-900" xmlns="http://www.w3.org/2000/svg"
+                                    <svg className="animate-spin h-8 w-8 text-vtk-ink" xmlns="http://www.w3.org/2000/svg"
                                         fill="none" viewBox="0 0 24 24">
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                             strokeWidth="4"></circle>
@@ -140,32 +140,32 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
 
                             {/* Show redirecting state */}
                             {isRedirecting && (
-                                <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
-                                    <svg className="mx-auto animate-spin h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                <div className="border-t border-vtk-line px-6 py-14 text-center text-sm sm:px-14">
+                                    <svg className="mx-auto animate-spin h-6 w-6 text-vtk-muted" xmlns="http://www.w3.org/2000/svg"
                                         fill="none" viewBox="0 0 24 24">
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                             strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor"
                                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                                     </svg>
-                                    <p className="mt-4 font-semibold text-gray-900">{t('redirecting')}</p>
-                                    <p className="mt-2 text-gray-500">{t('session_expired')}</p>
+                                    <p className="mt-4 font-semibold text-vtk-ink">{t('redirecting')}</p>
+                                    <p className="mt-2 text-vtk-muted">{t('session_expired')}</p>
                                 </div>
                             )}
 
                             {error && !isRedirecting && (
-                                <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
-                                    <Frown className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
-                                    <p className="mt-4 font-semibold text-gray-900">{t('unexpected')}</p>
-                                    <p className="mt-2 text-gray-500">{error.message}</p>
+                                <div className="border-t border-vtk-line px-6 py-14 text-center text-sm sm:px-14">
+                                    <Frown className="mx-auto h-6 w-6 text-vtk-muted" aria-hidden="true" />
+                                    <p className="mt-4 font-semibold text-vtk-ink">{t('unexpected')}</p>
+                                    <p className="mt-2 text-vtk-muted">{error.message}</p>
                                 </div>
                             )}
 
                             {!error && !isRedirecting && query.length <= 2 && (
-                                <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
-                                    <Globe className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
-                                    <p className="mt-4 font-semibold text-gray-900">{t('search.info')}</p>
-                                    <p className="mt-2 text-gray-500">{t('search.info_sub')}</p>
+                                <div className="border-t border-vtk-line px-6 py-14 text-center text-sm sm:px-14">
+                                    <Globe className="mx-auto h-6 w-6 text-vtk-muted" aria-hidden="true" />
+                                    <p className="mt-4 font-semibold text-vtk-ink">{t('search.info')}</p>
+                                    <p className="mt-2 text-vtk-muted">{t('search.info_sub')}</p>
                                 </div>
                             )}
 
@@ -180,7 +180,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                             <FoldableSection key={'courses'} title={t('courses')} defaultOpen={true}>
                                                 <li className="list-none">
                                                     <ul
-                                                        className="mt-2 text-sm text-gray-800 pl-0"
+                                                        className="mt-2 text-sm text-vtk-ink pl-0"
                                                     >
                                                         {items.courses.map((course) => (
                                                             <CourseSearchResult key={course.id} course={course} />
@@ -193,7 +193,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                             <FoldableSection key={'modules'} title={t('modules')} defaultOpen={true}>
                                                 <li className="list-none">
                                                     <ul
-                                                        className="mt-2 text-sm text-gray-800 pl-0"
+                                                        className="mt-2 text-sm text-vtk-ink pl-0"
                                                     >
                                                         {items.modules.map((module) => (
                                                             <ModuleSearchResult key={module.id} module={module} />
@@ -206,7 +206,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                             <FoldableSection key={'programs'} title={t('programs')} defaultOpen={true}>
                                                 <li className="list-none">
                                                     <ul
-                                                        className="mt-2 text-sm text-gray-800 pl-0"
+                                                        className="mt-2 text-sm text-vtk-ink pl-0"
                                                     >
                                                         {items.programs.map((program) => (
                                                             <ProgramSearchResult key={program.id} program={program} />
@@ -219,7 +219,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                             <FoldableSection key={'documents'} title={t('documents')} defaultOpen={true}>
                                                 <li className="list-none">
                                                     <ul
-                                                        className="mt-2 text-sm text-gray-800 pl-0"
+                                                        className="mt-2 text-sm text-vtk-ink pl-0"
                                                     >
                                                         {items.documents.map((document) => (
                                                             <DocumentSearchResult key={document.id} document={document} />
@@ -233,10 +233,10 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                             )}
 
                             {!error && !loading && !isRedirecting && query.length > 2 && Object.values(items).every(value => Array.isArray(value) && value.length === 0) && (
-                                <div className="border-t border-gray-100 px-6 py-14 text-center text-sm sm:px-14">
-                                    <Frown className="mx-auto h-6 w-6 text-gray-400" aria-hidden="true" />
-                                    <p className="mt-4 font-semibold text-gray-900">{t('search.no_results')}</p>
-                                    <p className="mt-2 text-gray-500">{t('search.no_results_sub')}</p>
+                                <div className="border-t border-vtk-line px-6 py-14 text-center text-sm sm:px-14">
+                                    <Frown className="mx-auto h-6 w-6 text-vtk-muted" aria-hidden="true" />
+                                    <p className="mt-4 font-semibold text-vtk-ink">{t('search.no_results')}</p>
+                                    <p className="mt-2 text-vtk-muted">{t('search.no_results_sub')}</p>
                                 </div>
                             )}
                         </div>

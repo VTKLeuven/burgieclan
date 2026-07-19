@@ -118,98 +118,95 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
     };
 
     return (
-        <div className="mb-2 relative z-10">
-            {/* Category Header - Program-style */}
+        <div className="relative z-10">
+            {/* Category header, matching the curriculum program rows */}
             <div
-                className="flex items-center py-2 px-3 border border-gray-200 rounded-md cursor-pointer hover:bg-blue-50 relative z-20"
+                className="relative z-20 flex cursor-pointer items-center gap-2.5 rounded-[18px] border border-vtk-line bg-vtk-surface px-4 py-3 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper"
                 onClick={() => setExpanded(!expanded)}
             >
-                <div className="flex items-center flex-1">
-                    <div className="transition-transform duration-200" style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
-                        <ChevronRight size={16} />
-                    </div>
-                    <span className="ml-2 text-base font-medium">{category.name}</span>
-                </div>
+                <ChevronRight
+                    size={16}
+                    className="shrink-0 text-vtk-muted transition-transform duration-200"
+                    style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+                />
+                <span className="min-w-0 flex-1 truncate text-[15px] font-medium text-vtk-ink">{category.name}</span>
 
                 {/* Add comment button */}
                 {onCommentAdded && (
                     <Tooltip content={t('course-page.comments.add-new')}>
                         <button
                             onClick={handleAddButtonClick}
-                            className="ml-3 text-gray-500 hover:text-amber-600 hover:bg-amber-100 rounded transition-colors p-1"
+                            className="vtk-icon-button h-8 w-8"
+                            aria-label={t('course-page.comments.add-new')}
                         >
-                            <MessageSquarePlus size={20} />
+                            <MessageSquarePlus size={15} />
                         </button>
                     </Tooltip>
                 )}
 
-                {/* Comment count badge */}
-                <div className="ml-3 bg-blue-100 text-blue-800 px-2 rounded-full min-w-6 h-6 flex items-center justify-center text-xs">
-                    {comments.length}
-                </div>
+                {/* Comment count */}
+                <span className="vtk-badge vtk-badge-muted shrink-0">{comments.length}</span>
             </div>
 
             {/* Collapsible Content */}
             <div className={`overflow-visible transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                <div className="pl-4 mt-1 space-y-1">
+                <div className="ml-5 mt-1.5 space-y-1.5 border-l border-vtk-line pl-4">
                     {/* Category description */}
                     {category.description && (
-                        <div className="py-2 px-3 bg-gray-50 border border-gray-200 rounded-md flex items-start">
-                            <Info className="h-4 w-4 mr-2 text-gray-500 mt-0.5 shrink-0" />
-                            <p className="text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: category.description }} />
+                        <div className="flex items-start gap-2.5 rounded-2xl border border-vtk-line bg-vtk-paper-2 px-4 py-3">
+                            <Info className="mt-0.5 h-4 w-4 shrink-0 text-vtk-muted" />
+                            <p className="m-0 text-sm leading-relaxed text-vtk-body" dangerouslySetInnerHTML={{ __html: category.description }} />
                         </div>
                     )}
 
                     {/* Add comment form */}
                     {showAddForm && (
-                        <div className="mb-3 p-3 bg-gray-100 border border-gray-400 rounded-md">
-                            <form onSubmit={handleAddComment} className="space-y-2">
+                        <div className="rounded-2xl border border-vtk-line bg-vtk-surface p-4">
+                            <form onSubmit={handleAddComment} className="space-y-3">
                                 <textarea
                                     ref={textareaRef}
                                     value={formContent}
                                     onChange={(e) => setFormContent(e.target.value)}
                                     placeholder={t('course-page.comments.dialog.description')}
-                                    className="w-full p-2 text-sm border border-gray-300 rounded-md resize-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 placeholder-gray-450"
+                                    className="vtk-textarea min-h-20"
                                     rows={2}
                                     required
                                     disabled={isSubmitting}
                                 />
 
-                                <div className="flex items-center justify-end gap-3">
+                                <div className="flex flex-wrap items-center justify-end gap-3">
+                                    {/* Anonymous checkbox */}
+                                    <Checkbox
+                                        id="anonymous-comment"
+                                        label={t('course-page.comments.dialog.anonymous')}
+                                        checked={formAnonymous}
+                                        onChange={(e) => setFormAnonymous(e.target.checked)}
+                                        disabled={isSubmitting}
+                                        labelClassName="text-xs text-vtk-body hover:text-vtk-ink transition-colors"
+                                    />
+
                                     <button
                                         type="button"
                                         onClick={handleCancelAdd}
-                                        className="text-xs px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                                        className="vtk-button vtk-button-sm vtk-button-ghost"
                                         disabled={isSubmitting}
                                     >
                                         {t('course-page.comments.dialog.button.cancel')}
                                     </button>
 
-                                    {/* Anonymous checkbox */}
-                                    <div className="flex items-center justify-end">
-                                        <Checkbox
-                                            id="anonymous-comment"
-                                            label={t('course-page.comments.dialog.anonymous')}
-                                            checked={formAnonymous}
-                                            onChange={(e) => setFormAnonymous(e.target.checked)}
-                                            disabled={isSubmitting}
-                                            labelClassName="text-xs text-gray-600 hover:text-gray-800 transition-colors"
-                                        />
-                                    </div>
-
                                     <button
                                         type="submit"
                                         disabled={isSubmitting || !formContent.trim()}
-                                        className="text-xs px-3 py-1 bg-amber-600 text-white rounded hover:bg-amber-700 disabled:opacity-50 transition-colors inline-flex items-center"
+                                        className="vtk-button vtk-button-sm vtk-button-primary"
                                     >
                                         {isSubmitting ? (
                                             <>
-                                                <span className="spinner mr-1" />
+                                                <span className="spinner" />
                                                 {t('course-page.comments.dialog.button.submitting')}
                                             </>
                                         ) : (
                                             <>
-                                                <Send className="mr-1 w-3 h-3" />
+                                                <Send className="h-3 w-3" />
                                                 {t('course-page.comments.dialog.button.submit')}
                                             </>
                                         )}
@@ -220,11 +217,11 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
                     )}
 
                     {comments.length === 0 ? (
-                        <div className="py-2 px-3 border border-gray-200 rounded-md">
-                            <p className="text-sm text-gray-500 italic">{t('course-page.comments.no-comments')}</p>
+                        <div className="vtk-panel vtk-empty py-3.5">
+                            {t('course-page.comments.no-comments')}
                         </div>
                     ) : (
-                        <div className="border border-gray-200 rounded-md overflow-visible relative">
+                        <div className="vtk-panel vtk-rows relative overflow-visible">
                             {sortedComments.map((comment) => (
                                 <CommentRow
                                     key={comment.id}

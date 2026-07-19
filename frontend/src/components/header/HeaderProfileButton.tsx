@@ -37,12 +37,12 @@ export default function HeaderProfileButton() {
 
     return (
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-            <DropdownMenuTrigger>
-                <CircleUserRound className="" size={28} strokeWidth={1.5} />
+            <DropdownMenuTrigger className="grid h-[38px] w-[38px] place-items-center rounded-full border border-vtk-paper/35 bg-white/12 text-vtk-paper transition hover:border-vtk-paper hover:bg-white/22">
+                <CircleUserRound size={20} strokeWidth={1.75} />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <DropdownMenuLabel className="pt-1.5 pb-1">{user?.fullName}</DropdownMenuLabel>
-                <DropdownMenuLabel className="text-gray-600 pt-0 pb-1.5 text-xs">{user?.username}</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-vtk-body pt-0 pb-1.5 text-xs">{user?.username}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleMenuItemClick}>
                     <Link className="font-normal text-sm" href="/account">{t('account.account')}</Link>
@@ -56,7 +56,7 @@ export default function HeaderProfileButton() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                     <button
-                        className="text-sm w-full text-left text-red-600 hover:text-red-800 font-medium"
+                        className="w-full text-left text-sm font-medium text-[#b42318] transition-colors hover:text-[#8a1a12]"
                         onClick={async () => onClickLogout()}
                     >
                         {t('logout')}

@@ -85,24 +85,27 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
     }
 
     return (
-        <div className="relative">
-            <div className="flex justify-between items-center mb-3">
-                <h2>{t('course-page.comments.title')}</h2>
+        <div>
+            <div className="border-b border-vtk-line pb-3.5">
+                <h2 className="m-0 text-xl font-semibold tracking-tight text-vtk-ink">
+                    {t('course-page.comments.title')}
+                </h2>
+                <p className="m-0 mt-1.5 max-w-[70ch] text-sm leading-relaxed text-vtk-muted">
+                    {t('course-page.comments.description')}
+                </p>
             </div>
 
-            <p className="text-wireframe-mid-gray italic mb-4">
-                {t('course-page.comments.description')}
-            </p>
-
-            {allCategories.map((category) => (
+            <div className="mt-5 grid gap-2.5">
+                {allCategories.map((category) => (
                 <CourseCommentList
                     key={category.id}
                     category={category}
                     comments={getCommentsByCategory(category.id)}
                     courseId={courseId}
                     onCommentAdded={handleCommentAdded}
-                />
-            ))}
+                    />
+                ))}
+            </div>
         </div>
     );
 };

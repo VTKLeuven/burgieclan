@@ -35,9 +35,13 @@ export default function DocumentCommentSection({ documentId, file }: DocumentCom
     }, []);
 
     return (
-        <>
-            <div className="space-y-4 py-2.5">
-                <div className="h-8"></div>
+        <div className="vtk-panel p-5">
+            <h2 className="m-0 mb-4 text-base font-semibold tracking-tight text-vtk-ink">
+                {t('document.comments.title')}
+                <span className="ml-2 text-[13px] font-normal text-vtk-muted">({comments.length})</span>
+            </h2>
+
+            <div className="space-y-3">
                 {/*Allow users to add comments*/}
                 <AddDocumentCommentBox
                     documentId={documentId}
@@ -55,6 +59,6 @@ export default function DocumentCommentSection({ documentId, file }: DocumentCom
                     />
                 ))}
             </div>
-        </>
+        </div>
     );
 }

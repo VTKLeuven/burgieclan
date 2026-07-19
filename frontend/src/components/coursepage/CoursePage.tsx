@@ -73,80 +73,75 @@ export default function CoursePage() {
 
     return (course &&
         <>
-            <div className="w-full h-full">
-                <div className="bg-gray-100 border-b border-gray-200 px-6 py-4">
-                    {/* Breadcrumb */}
-                    <div className="mb-4">
-                        <DynamicBreadcrumb course={course} />
-                    </div>
-
-                    {/* Main Content Grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Left Column - Course Info */}
-                        <div className="lg:col-span-2">
-                            {/* Course Title & Code */}
-                            <div className="flex items-center gap-3 mb-2">
-                                <FavoriteButton
-                                    itemId={course.id}
-                                    itemType="course"
-                                    size={24}
-                                    onToggle={() => {
-                                        refreshUser();
-                                    }}
-                                />
-                                <h1 className="text-3xl font-semibold text-gray-900">{course.name}</h1>
-                                <span className="text-xl font-mono text-gray-600 pl-3 mt-2">
-                                    {course.code}
-                                </span>
-                            </div>
-
-                            {/* Course Metadata */}
-                            <div className="flex items-center gap-6 text-sm text-gray-600">
-                                <div className="flex items-center gap-2">
-                                    <ChartPie size={16} className="text-gray-400" />
-                                    <span>{course.credits} {t('credits')}</span>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                    <SemesterIndicator semesters={course.semesters} size={16} />
-                                    <span>
-                                        {Array.isArray(course.semesters)
-                                            ? (course.semesters.includes("Semester 1") && course.semesters.includes("Semester 2"))
-                                                ? t('Year course')
-                                                : course.semesters.join(", ")
-                                            : course.semesters}
-                                    </span>
-                                </div>
-
-                                <Link
-                                    href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`}
-                                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline"
-                                >
-                                    <LinkIcon size={16} />
-                                    <span>ECTS</span>
-                                </Link>
-                            </div>
+            <div className="vtk-shell pb-16">
+                {/* Editorial page head: breadcrumb kicker, display title, and
+                    the course facts as a right-aligned spec block. */}
+                <div className="vtk-page-head">
+                    <div>
+                        <div className="vtk-page-kicker">
+                            <DynamicBreadcrumb course={course} />
                         </div>
 
-                        {/* Right Column - Professors */}
-                        <div className="lg:col-span-1">
-                            <h3 className="text-lg font-medium text-gray-900 mt-4 mb-1">{t('course-page.teachers')}</h3>
-                            <div className="flex -space-x-3">
-                                {course?.professors?.map((p, index) => (
+                        <div className="flex items-start gap-3">
+                            <FavoriteButton
+                                itemId={course.id}
+                                itemType="course"
+                                size={20}
+                                className="mt-2"
+                                onToggle={() => {
+                                    refreshUser();
+                                }}
+                            />
+                            <h1 className="vtk-page-title">{course.name}</h1>
+                        </div>
+
+                        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-vtk-body">
+                            <span className="vtk-badge vtk-badge-muted font-mono">{course.code}</span>
+
+                            <span className="flex items-center gap-2">
+                                <ChartPie size={15} className="text-vtk-muted" />
+                                {course.credits} {t('credits')}
+                            </span>
+
+                            <span className="flex items-center gap-2">
+                                <SemesterIndicator semesters={course.semesters} size={15} />
+                                {Array.isArray(course.semesters)
+                                    ? (course.semesters.includes("Semester 1") && course.semesters.includes("Semester 2"))
+                                        ? t('Year course')
+                                        : course.semesters.join(", ")
+                                    : course.semesters}
+                            </span>
+
+                            <Link
+                                href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`}
+                                className="vtk-link flex items-center gap-1.5"
+                            >
+                                <LinkIcon size={14} />
+                                ECTS
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* Teachers */}
+                    {course?.professors && course.professors.length > 0 && (
+                        <div className="text-right">
+                            <div className="vtk-label mb-2.5">{t('course-page.teachers')}</div>
+                            <div className="flex justify-end -space-x-3">
+                                {course.professors.map((p, index) => (
                                     <ProfessorDiv key={index} unumber={p} index={index} t={t} />
                                 ))}
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
-                {/* Documents Section */}
-                <div className="px-6 py-8">
+                {/* Documents */}
+                <div className="mt-8">
                     <DocumentSections courseId={course.id} />
                 </div>
 
-                {/* Comments Section */}
-                <div className="px-6 py-8 border-t border-gray-100">
+                {/* Comments */}
+                <div className="mt-10 border-t border-vtk-line pt-8">
                     <CommentCategories
                         comments={course.courseComments ?? []}
                         courseId={course.id}

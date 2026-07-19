@@ -115,25 +115,34 @@ export default function CurriculumNavigator() {
   );
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="vtk-shell pb-16">
 
-      {/* Breadcrumb */}
-      <div className="mb-4">
-        <DynamicBreadcrumb />
+      {/* Editorial page head: breadcrumb as kicker, then the display title. */}
+      <div className="vtk-page-head">
+        <div>
+          <div className="vtk-page-kicker">
+            <DynamicBreadcrumb />
+          </div>
+          <h1 className="vtk-page-title">Curriculum Navigator</h1>
+        </div>
+        <div className="vtk-page-meta hidden sm:block">
+          <b>{totalEntities.programs}</b> programs<br />
+          <b>{totalEntities.courses}</b> courses
+        </div>
       </div>
 
-      <h1 className="text-3xl font-bold mb-8 text-wireframe-primary-blue">Curriculum Navigator</h1>
-
-      <CurriculumSearchBar onSearch={handleSearch} clearSearch={clearSearch} />
+      <div className="mt-7">
+        <CurriculumSearchBar onSearch={handleSearch} clearSearch={clearSearch} />
+      </div>
 
       {error && (
-        <div className="py-4 text-center border rounded-md">
+        <div className="vtk-panel vtk-empty mt-5">
           {t('unexpected')}
         </div>
       )}
 
       {!error && (programs.length > 0 ? (
-        <div className="curriculum-tree">
+        <div className="curriculum-tree mt-5 grid gap-2.5">
           {programs.map((program) => (
             <ProgramNode
               key={program.id}
@@ -145,7 +154,7 @@ export default function CurriculumNavigator() {
           ))}
         </div>
       ) : (
-        <div className="py-4 text-center border rounded-md">
+        <div className="vtk-panel vtk-empty mt-5">
           {hasActiveSearch
             ? t('curriculum-navigator.no-search-results')
             : t('curriculum-navigator.no-programs')}
@@ -154,7 +163,7 @@ export default function CurriculumNavigator() {
 
       {/* Debug info for development */}
       {process.env.NODE_ENV === 'development' && searchAnalytics && (
-        <div className="mt-8 p-4 bg-gray-100 rounded-md text-xs">
+        <div className="mt-8 p-4 bg-vtk-paper-2 rounded-md text-xs">
           <h4 className="font-bold mb-2">Debug: Search Analytics</h4>
 
           <div className="mb-4">

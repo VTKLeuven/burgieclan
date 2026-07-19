@@ -97,7 +97,7 @@ const ModuleNode = ({
     return (
         <div className="module-node mb-1">
             <div
-                className={`flex items-center py-2 px-3 border border-gray-200 bg-gray-50 rounded-md cursor-pointer hover:bg-gray-100 ${moduleMatches ? 'ring-1 ring-yellow-300' : ''
+                className={`flex items-center py-2 px-3 border border-vtk-line bg-vtk-paper rounded-md cursor-pointer hover:bg-vtk-paper-2 ${moduleMatches ? 'ring-1 ring-vtk-yellow' : ''
                     }`}
                 onClick={() => setExpanded(!expanded)}
             >
@@ -108,7 +108,7 @@ const ModuleNode = ({
 
                 {/* Show badge with match count if matches exist */}
                 {searchFilters && searchQuery && totalMatches > 0 && (
-                    <div className="ml-auto bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full min-w-6 h-6 flex items-center justify-center mr-2">
+                    <div className="ml-auto bg-vtk-paper-2 text-vtk-ink text-xs px-2 py-0.5 rounded-full min-w-6 h-6 flex items-center justify-center mr-2">
                         {totalMatches}
                     </div>
                 )}
@@ -134,7 +134,7 @@ const ModuleNode = ({
 
                     {/* Render courses */}
                     {module.courses && module.courses.length > 0 && (
-                        <div className="border border-gray-200 rounded-md mt-1">
+                        <div className="border border-vtk-line rounded-md mt-1">
                             <CourseTableHeader />
                             {module.courses.map((course, index) => (
                                 <CourseRow
@@ -152,7 +152,7 @@ const ModuleNode = ({
                     {(!module.modules || module.modules.length === 0) &&
                         (!module.courses || module.courses.length === 0) && (
                             <div className="py-3 px-2">
-                                <div className="text-gray-500 text-sm italic">
+                                <div className="text-vtk-muted text-sm italic">
                                     {t('curriculum-navigator.no-courses-in-module')}
                                 </div>
                             </div>

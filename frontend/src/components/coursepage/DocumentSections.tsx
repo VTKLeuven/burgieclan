@@ -37,25 +37,19 @@ export default function DocumentSections({ courseId }: { courseId: number }) {
 
     return (
         <>
-            <div className="flex items-center gap-2">
-                <h2 className="mr-2">{t('course-page.files')}</h2>
-                <div className="ml-auto flex items-center gap-2">
-                    <div className="relative group">
-                        <CreateDocumentButton 
-                        initialData={{ course: { id: courseId } }} 
-                        size={20}
-                        className="h-10" />
-                    </div>
-                    <div className="relative group">
-                        <DownloadButton
-                            courses={[{ id: courseId }]}
-                            size={20}
-                            className="inline-flex items-center justify-center w-10 h-10 p-0 primary-button"
-                        />
-                    </div>
+            <div className="flex items-center justify-between gap-3 border-b border-vtk-line pb-3.5">
+                <h2 className="m-0 text-xl font-semibold tracking-tight text-vtk-ink">
+                    {t('course-page.files')}
+                </h2>
+                <div className="flex items-center gap-2">
+                    <CreateDocumentButton
+                        initialData={{ course: { id: courseId } }}
+                        size={16}
+                    />
+                    <DownloadButton courses={[{ id: courseId }]} size={16} />
                 </div>
             </div>
-            <div className="flex flex-wrap gap-6 md:mt-5">
+            <div className="vtk-card-grid mt-5">
                 {documentCategories.map((category) => (
                     <DocumentCategoryPage
                         key={category.id}

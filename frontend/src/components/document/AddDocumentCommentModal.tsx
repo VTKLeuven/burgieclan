@@ -88,7 +88,7 @@ export default function AddDocumentCommentModal({ documentId, file, isModalOpen,
                     />
                 </div>
             }
-            <div className="border-t border-gray-200 mt-2">
+            <div className="border-t border-vtk-line mt-2">
                 <Editor
                     onEditorReady={handleEditorReady}
                 />

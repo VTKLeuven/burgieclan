@@ -78,7 +78,7 @@ export default function PDFViewer({ file, width }: { file: PDFFile, width: numbe
                 <div className="flex justify-center my-8">
                     <button
                         onClick={loadMorePages}
-                        className="white-button border border-vtk-blue-600 hover:bg-vtk-blue-600 hover:text-white"
+                        className="white-button border border-vtk-ink hover:bg-vtk-ink hover:text-white"
                     >
                         {t('document.load-more', { displayedPages, numPages })}
                     </button>

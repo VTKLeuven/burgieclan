@@ -32,7 +32,7 @@ const formatFullDateTime = (date?: Date): string => {
 };
 
 const CommentMetadata: React.FC<CommentMetadataProps> = ({ comment }) => (
-  <div className="flex flex-col items-end space-y-1 text-xs text-gray-500">
+  <div className="flex flex-col items-end space-y-1 text-xs text-vtk-muted">
     <Tooltip content={formatFullDateTime(comment.createdAt)}>
       <div className="flex items-center">
         <Calendar className="h-3 w-3 mr-1" />

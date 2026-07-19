@@ -36,7 +36,7 @@ export default function DownloadSingleDocumentButton({document, fileSize, disabl
                 inline-flex items-center px-3 py-1 border rounded-2xl
                 transition-all duration-300 ease-in-out
                 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                border-gray-500 relative
+                border-vtk-line-2 relative
                 ${isDownloading ? 'w-18' : `${isHovered ? 'w-24' : 'w-12'}`}
             `}
             onMouseEnter={() => setIsHovered(true)}
@@ -49,7 +49,7 @@ export default function DownloadSingleDocumentButton({document, fileSize, disabl
                 size={20}
                 strokeWidth={isHovered && (!isDownloading) ? '2.5' : '1.5'}
                 className={`
-                    transition-all duration-300 text-gray-500
+                    transition-all duration-300 text-vtk-muted
                     ${isHovered ? '-translate-x-1' : ''}
                     ${isDownloading ? 'opacity-0 duration-0' : 'opacity-100 duration-300'}
                 `}
@@ -61,7 +61,7 @@ export default function DownloadSingleDocumentButton({document, fileSize, disabl
                     right-3
                     text-sm
                     font-semibold
-                    text-gray-500
+                    text-vtk-muted
                     transition-opacity
                     ${isDownloading ? 'opacity-100 duration-300' : `${isHovered ? 'opacity-100 duration-300' : 'opacity-0 duration-0'}`}
                 `}

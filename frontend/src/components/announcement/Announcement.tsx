@@ -5,18 +5,23 @@ export default function Announcement(props: Announcement) {
     const { priority, title, content, createdAt } = props;
 
     return (
-        <div className="flex mt-2 mb-2">
-            <div className="flex items-center justify-end mr-2">
-                {!priority && <Bell size={28} className="text-wireframe-content" />}
-                {priority && <AlertTriangle size={28} className="text-wireframe-content" />}
+        <div className="flex items-start gap-4">
+            {/* Yellow pin marks the notice; priority swaps the glyph, not the colour. */}
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-vtk-yellow text-vtk-ink">
+                {priority
+                    ? <AlertTriangle size={16} aria-hidden="true" />
+                    : <Bell size={16} aria-hidden="true" />}
+            </span>
+            <div className="min-w-0 flex-1">
+                <h2 className="m-0 text-[15px] font-semibold tracking-tight text-vtk-ink">{title}</h2>
+                <div
+                    className="mt-1 text-sm leading-relaxed text-vtk-body [&_p]:m-0 [&_p]:text-sm [&_p]:leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: content || '' }}
+                />
             </div>
-            <div className="pl-3 flex flex-col justify-center">
-                <h3 className="text-xl text-wireframe-content m-0">{title}</h3>
-                <div className="text-wireframe-content" dangerouslySetInnerHTML={{ __html: content || '' }} />
-            </div>
-            <div className="flex items-center justify-end ml-auto mr-4">
-                <span className="text-wireframe-content text-s">{createdAt?.toLocaleString()}</span>
-            </div>
+            <span className="hidden shrink-0 text-xs uppercase tracking-[0.08em] text-vtk-muted sm:block">
+                {createdAt?.toLocaleDateString()}
+            </span>
         </div>
     );
 }
