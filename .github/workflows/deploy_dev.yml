@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  # Manual trigger for testing the dev deploy pipeline without pushing.
+  workflow_dispatch:
 
 # Ensure only one deployment runs at a time
 concurrency:
