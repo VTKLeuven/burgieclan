@@ -7,6 +7,7 @@ import {
     type DocumentCategory,
     type DocumentComment,
     type DocumentView,
+    type FaqItem,
     type Module,
     type Page,
     type Program,
@@ -257,6 +258,19 @@ export function convertToVoteSummary(voteSummary: unknown): VoteSummary {
         downvotes: data && typeof data.downvotes === 'number' ? data.downvotes : 0,
         sum: data && typeof data.sum === 'number' ? data.sum : 0,
         currentUserVote: data && typeof data.currentUserVote !== 'undefined' ? data.currentUserVote as VoteSummary['currentUserVote'] : 0
+    };
+}
+
+export function convertToFaqItem(faqItem: unknown): FaqItem {
+    if (typeof faqItem === 'string' || typeof faqItem === 'number') {
+        return { id: parseId(faqItem) };
+    }
+    const data = toRecord(faqItem, 'FaqItem');
+    return {
+        id: parseId(data['@id']),
+        question: typeof data.question === 'string' ? data.question : undefined,
+        answer: typeof data.answer === 'string' ? data.answer : undefined,
+        position: typeof data.position === 'number' ? data.position : undefined,
     };
 }
 
