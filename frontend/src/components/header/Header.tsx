@@ -27,7 +27,7 @@ export default function Header() {
 
     const navigation = [
         { name: t('courses'), href: '/courses' },
-        { name: t('FAQ'), href: '#' },
+        { name: t('FAQ'), href: '/faq' },
         { name: t('overview'), href: '#' },
     ];
 

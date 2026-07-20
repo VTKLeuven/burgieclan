@@ -331,5 +331,13 @@
         "community": "Community",
         "tagline": "Share your notes.\nPass your exams.",
         "about": "About Burgieclan"
+    },
+    "faq": {
+        "title": "Frequently Asked Questions",
+        "description": "Find answers to the most common questions about Burgieclan. Can't find what you're looking for? Feel free to reach out to us!",
+        "no_items": "No FAQ items available yet.",
+        "ask_title": "Have a question?",
+        "ask_description": "If you can't find the answer to your question, don't hesitate to reach out to us via email. We'll be happy to help!",
+        "ask_button": "Send us an email"
     }
 }

@@ -332,5 +332,13 @@
         "community": "Community",
         "tagline": "Deel je samenvattingen.\nSlaag voor je examens.",
         "about": "Over Burgieclan"
+    },
+    "faq": {
+        "title": "Veelgestelde vragen",
+        "description": "Vind antwoorden op de meest gestelde vragen over Burgieclan. Staat je vraag er niet bij? Neem dan gerust contact met ons op!",
+        "no_items": "Er zijn nog geen veelgestelde vragen beschikbaar.",
+        "ask_title": "Heb je een vraag?",
+        "ask_description": "Als je het antwoord op je vraag niet kunt vinden, aarzel dan niet om ons een e-mail te sturen. We helpen je graag!",
+        "ask_button": "Stuur ons een e-mail"
     }
 }

@@ -114,7 +114,7 @@ export default function Footer() {
                         <ul className="m-0 flex list-none flex-col gap-2 p-0">
                             <li><Link href="/courses" className={styles.footerNavLink}>{t('courses')}</Link></li>
                             <li><Link href="/account" className={styles.footerNavLink}>{t('account.account')}</Link></li>
-                            <li><Link href="#" className={styles.footerNavLink}>{t('FAQ')}</Link></li>
+                            <li><Link href="/faq" className={styles.footerNavLink}>{t('FAQ')}</Link></li>
                         </ul>
                     </div>
 

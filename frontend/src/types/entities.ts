@@ -120,3 +120,9 @@ export interface VoteSummary {
     sum: number;
     currentUserVote: VoteDirection;
 }
+
+export interface FaqItem extends BaseEntity {
+    question?: string;
+    answer?: string;
+    position?: number;
+}

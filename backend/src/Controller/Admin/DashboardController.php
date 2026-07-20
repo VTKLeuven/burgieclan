@@ -89,6 +89,8 @@ class DashboardController extends AbstractDashboardController
             ->setPermission(User::ROLE_ADMIN);
         yield MenuItem::linkTo(QuickLinkCrudController::class, 'Quick Links', 'fa-solid fa-link')
             ->setPermission(User::ROLE_ADMIN);
+        yield MenuItem::linkTo(FaqItemCrudController::class, 'FAQ Items', 'fa-solid fa-circle-question')
+            ->setPermission(User::ROLE_ADMIN);
 
         yield MenuItem::section('Frontend');
         yield MenuItem::linkToUrl('Home', 'fa fa-window-maximize', '/');
