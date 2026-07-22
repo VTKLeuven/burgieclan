@@ -39,7 +39,7 @@
     "react-i18next": "^17.0.0",
     "react-loading-skeleton": "^3.5.0",
     "react-pdf": "^10.2.0",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "timeago.js": "^4.0.2",
