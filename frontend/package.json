@@ -39,7 +39,7 @@
     "react-i18next": "^17.0.0",
     "react-loading-skeleton": "^3.5.0",
     "react-pdf": "^10.2.0",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.3",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "timeago.js": "^4.0.2",
@@ -54,8 +54,12 @@
     "eslint": "9.39.4",
     "eslint-config-next": "16.2.6",
     "eslint-config-prettier": "10.1.8",
-    "postcss": "8.5.15",
+    "postcss": "^8.5.23",
     "tailwindcss": "4.3.0",
     "typescript": "6.0.3"
+  },
+  "overrides": {
+    "postcss": "^8.5.23",
+    "sharp": "$sharp"
   }
 }
