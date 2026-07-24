@@ -33,7 +33,6 @@ final class DownloadController extends AbstractController
                 null,
                 false
             );
-            $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
             return $response;
         } catch (NoFileFoundException $e) {
             // Vich signals missing file via its own exception in some code paths

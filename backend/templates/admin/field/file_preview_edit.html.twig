@@ -1,0 +1,122 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+
+{# PDF preview panel for the edit/detail page — renders below the file field #}
+
+{% set filename = field.value %}
+{% set entityId = entity.primaryKeyValue %}
+
+{% if filename and filename|lower ends with '.pdf' %}
+    {% set previewUrl = path('admin_document_preview', {filename: filename}) %}
+
+    <div class="mb-3">
+        <div id="pdf-edit-preview-{{ entityId }}"
+             class="border rounded overflow-hidden"
+             data-pdf-url="{{ previewUrl }}"
+             data-entity-id="{{ entityId }}">
+
+            {# Navigation bar #}
+            <div class="d-flex align-items-center justify-content-center gap-3 py-2 bg-white"
+                 style="border-bottom: 1px solid var(--bs-border-color, #dee2e6);">
+                <button type="button" class="btn btn-sm btn-outline-secondary pdf-prev-btn" disabled>
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <span class="small fw-medium pdf-page-info"
+                      style="color: var(--bs-secondary-color, #6c757d); min-width: 100px; text-align: center;">
+                    Loading...
+                </span>
+                <button type="button" class="btn btn-sm btn-outline-secondary pdf-next-btn" disabled>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+
+            {# PDF canvas container #}
+            <div class="pdf-pages-container"
+                 style="overflow: auto; max-height: 70vh; padding: 16px; background: #edf0f2; display: flex; justify-content: center;">
+                <div class="text-center py-4 text-muted pdf-loading">
+                    <i class="fa-solid fa-spinner fa-spin me-2"></i>Loading PDF...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script nonce="{{ csp_nonce('script') }}">
+    (function() {
+        var container = document.getElementById('pdf-edit-preview-{{ entityId }}');
+        if (!container || container.dataset.loaded === 'true') return;
+        container.dataset.loaded = 'true';
+
+        var pdfUrl = container.dataset.pdfUrl;
+        var pagesContainer = container.querySelector('.pdf-pages-container');
+        var loadingEl = container.querySelector('.pdf-loading');
+        var pageInfo = container.querySelector('.pdf-page-info');
+        var prevBtn = container.querySelector('.pdf-prev-btn');
+        var nextBtn = container.querySelector('.pdf-next-btn');
+
+        import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.9.155/pdf.min.mjs').then(function(pdfjsMod) {
+            pdfjsMod.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.9.155/pdf.worker.min.mjs';
+
+            pdfjsMod.getDocument(pdfUrl).promise.then(function(pdf) {
+                if (loadingEl) loadingEl.remove();
+
+                var totalPages = pdf.numPages;
+                var currentPage = 1;
+
+                function showPage(num) {
+                    currentPage = num;
+                    pageInfo.textContent = 'Page ' + num + ' of ' + totalPages;
+                    prevBtn.disabled = (num <= 1);
+                    nextBtn.disabled = (num >= totalPages);
+
+                    // Remove old canvas
+                    var oldCanvas = pagesContainer.querySelector('canvas');
+                    if (oldCanvas) oldCanvas.remove();
+
+                    requestAnimationFrame(function() {
+                        var availableWidth = pagesContainer.clientWidth - 32;
+                        if (availableWidth < 100) availableWidth = 800;
+
+                        pdf.getPage(num).then(function(page) {
+                            var defaultViewport = page.getViewport({ scale: 1 });
+                            var scale = availableWidth / defaultViewport.width;
+                            var viewport = page.getViewport({ scale: scale });
+
+                            var canvas = document.createElement('canvas');
+                            canvas.style.display = 'block';
+                            canvas.style.maxWidth = '100%';
+                            canvas.style.height = 'auto';
+                            canvas.style.background = '#fff';
+                            canvas.style.boxShadow = '0 1px 4px rgba(0,0,0,0.12)';
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            pagesContainer.appendChild(canvas);
+                            page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport });
+                        });
+                    });
+                }
+
+                prevBtn.addEventListener('click', function() {
+                    if (currentPage > 1) showPage(currentPage - 1);
+                });
+                nextBtn.addEventListener('click', function() {
+                    if (currentPage < totalPages) showPage(currentPage + 1);
+                });
+
+                showPage(1);
+            }).catch(function(err) {
+                if (loadingEl) loadingEl.remove();
+                pageInfo.textContent = 'Failed to load';
+                pageInfo.classList.add('text-danger');
+                var errDiv = document.createElement('div');
+                errDiv.className = 'text-center py-4 text-danger';
+                errDiv.textContent = 'Error: ' + err.message;
+                pagesContainer.appendChild(errDiv);
+            });
+        });
+    })();
+    </script>
+{% else %}
+    <span class="text-muted small">{{ filename ? 'No preview available (not a PDF)' : 'No file uploaded' }}</span>
+{% endif %}
