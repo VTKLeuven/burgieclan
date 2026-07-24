@@ -1,4 +1,4 @@
-FROM php:8.4-apache@sha256:04385e3b0f31eee82d711fcb1228cd61c3d4460db8230a54c169869966dc878c
+FROM php:8.4-apache@sha256:ea61837b6dee7f5981cced9fdf6a7773c4ef695bc3237fb9da59d223df638ec2
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -26,7 +26,7 @@ RUN docker-php-ext-install \
 RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/memory-limit.ini
 
 # Get latest Composer
-COPY --from=composer:latest@sha256:1b73755de4f19775ba6087fd5313664493e06fab72b6fc27dc2044e87bb7c4c3 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:latest@sha256:5946476338742b200bb9ff88f8be56275ddae4b3949c72305cb0dbf10cfcb760 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app/backend
 
