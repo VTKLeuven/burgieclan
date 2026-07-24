@@ -15,14 +15,15 @@ import { useApi } from "@/hooks/useApi";
 import type { Document } from "@/types/entities";
 import { convertToDocument } from "@/utils/convertToEntity";
 import { formatFileSize } from "@/utils/fileSize";
-import { Calendar, ChartPie, CircleUser, File, Package } from "lucide-react";
+import { Calendar, ChartPie, CircleUser, ExternalLink, File, Package } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+// Lazy-load PDFViewer so pdfjs-dist never runs on the server (no DOMMatrix in Node)
+const PDFViewer = dynamic(() => import("@/components/document/pdf/PDFViewer"), { ssr: false });
+
 export default function DocumentPreview({ id }: { id: string }) {
-    // Lazy load PDFViewer component
-    const PDFViewer = dynamic(() => import("@/components/document/pdf/PDFViewer"), { ssr: false });
 
     const [document, setDocument] = useState<Document | null>(null);
 
@@ -128,9 +129,20 @@ export default function DocumentPreview({ id }: { id: string }) {
                         <div className="flex items-center gap-2">
                             <DownloadSingleDocumentButton
                                 document={document}
-                                fileSize={document.fileSize ? formatFileSize(document.fileSize) : "Unknown size"}
+                                fileSize={document.fileSize ? formatFileSize(document.fileSize) : undefined}
                                 disabled={!user}
                             />
+                            {document.mimetype === "application/pdf" && document.contentUrl && (
+                                <a
+                                    href={`${document.contentUrl}?inline=1`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="vtk-btn vtk-btn-ghost p-2"
+                                    title={t('document.open-in-browser')}
+                                >
+                                    <ExternalLink className="h-[18px] w-[18px]" />
+                                </a>
+                            )}
                             <FavoriteButton
                                 itemId={Number(id)}
                                 itemType="document"

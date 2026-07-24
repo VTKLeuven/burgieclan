@@ -1,4 +1,6 @@
-import PDFViewer from "@/components/document/pdf/PDFViewer";
+import dynamic from "next/dynamic";
+
+const PDFViewer = dynamic(() => import("@/components/document/pdf/PDFViewer"), { ssr: false });
 import Editor from "@/components/editor/Editor";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Dialog, DialogActions } from "@/components/ui/Dialog";
