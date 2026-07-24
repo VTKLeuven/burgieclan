@@ -9,5 +9,17 @@
   "labels": ["dependencies"],
   "prConcurrentLimit": 4,
   "minimumReleaseAge": "3 days",
-  "osvVulnerabilityAlerts": true
+  "osvVulnerabilityAlerts": true,
+  "packageRules": [
+    {
+      "description": "Automerge patch/minor updates, digest bumps, and lockfile maintenance when CI passes. Major bumps still require manual review.",
+      "matchUpdateTypes": ["patch", "minor", "pin", "digest", "lockFileMaintenance"],
+      "automerge": true
+    },
+    {
+      "description": "Backend stack is standardized on PHP 8.4. Do not bump Docker images or Composer platform to PHP 8.5/8.6.",
+      "matchPackageNames": ["php"],
+      "allowedVersions": "~8.4"
+    }
+  ]
 }
