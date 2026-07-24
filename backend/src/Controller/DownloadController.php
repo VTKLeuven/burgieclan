@@ -26,13 +26,15 @@ final class DownloadController extends AbstractController
         }
 
         try {
-            return $downloadHandler->downloadObject(
+            $response = $downloadHandler->downloadObject(
                 $document,
                 'file',
                 null,
                 null,
                 false
             );
+            $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+            return $response;
         } catch (NoFileFoundException $e) {
             // Vich signals missing file via its own exception in some code paths
             return new Response('File not found', Response::HTTP_NOT_FOUND);

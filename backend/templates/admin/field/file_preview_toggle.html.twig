@@ -6,35 +6,77 @@
 {% set entityId = entity.primaryKeyValue %}
 
 {% if filename %}
-    <div class="d-inline-flex flex-column align-items-start gap-1">
-        <div class="d-flex align-items-center gap-2">
-            <span class="fw-medium text-break">{{ filename }}</span>
-
-            {% if filename|lower ends with '.pdf' %}
-                <button type="button"
-                        class="btn btn-xs btn-outline-primary d-inline-flex align-items-center gap-1 py-0 px-2"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#preview-collapse-{{ entityId }}"
-                        aria-expanded="false"
-                        aria-controls="preview-collapse-{{ entityId }}"
-                        title="Toggle Inline PDF Preview">
-                    <i class="fa-solid fa-chevron-down"></i>
-                    <span class="small">Preview</span>
-                </button>
-            {% endif %}
-        </div>
+    <div class="d-inline-flex align-items-center gap-2">
+        <span class="fw-medium text-break">{{ filename }}</span>
 
         {% if filename|lower ends with '.pdf' %}
-            <div class="collapse mt-2 w-100" id="preview-collapse-{{ entityId }}" style="min-width: 550px;">
-                <div class="card card-body p-1 shadow-sm bg-light">
-                    <iframe src="{{ path('document_download', {filename: filename}) }}"
-                            style="width: 100%; height: 500px; border: none; border-radius: 4px;"
-                            loading="lazy">
-                    </iframe>
-                </div>
-            </div>
+            <button type="button"
+                    class="btn btn-xs btn-outline-primary d-inline-flex align-items-center gap-1 py-0 px-2 toggle-pdf-btn"
+                    onclick="toggleFullRowPreview('{{ entityId }}', '{{ path('document_download', {filename: filename}) }}', event)"
+                    title="Toggle Full Row PDF Preview">
+                <i class="fa-solid fa-chevron-down" id="chevron-{{ entityId }}"></i>
+                <span class="small">Preview</span>
+            </button>
         {% endif %}
     </div>
 {% else %}
     <span class="text-muted small">No file</span>
 {% endif %}
+
+<script>
+if (typeof window.toggleFullRowPreview === 'undefined') {
+    window.toggleFullRowPreview = function(entityId, pdfUrl, evt) {
+        let btn = null;
+        if (evt) {
+            btn = evt.currentTarget;
+        }
+        let tr = btn ? btn.closest('tr') : document.getElementById('preview-row-' + entityId)?.previousElementSibling;
+        const chevron = document.getElementById('chevron-' + entityId);
+
+        let existingRow = document.getElementById('preview-row-' + entityId);
+        if (existingRow) {
+            if (existingRow.style.display === 'none') {
+                existingRow.style.display = 'table-row';
+                if (chevron) {
+                    chevron.classList.remove('fa-chevron-down');
+                    chevron.classList.add('fa-chevron-up');
+                }
+            } else {
+                existingRow.style.display = 'none';
+                if (chevron) {
+                    chevron.classList.remove('fa-chevron-up');
+                    chevron.classList.add('fa-chevron-down');
+                }
+            }
+            return;
+        }
+
+        if (!tr) return;
+
+        const colCount = tr.children.length;
+        const newRow = document.createElement('tr');
+        newRow.id = 'preview-row-' + entityId;
+        newRow.className = 'bg-light';
+        newRow.innerHTML = `
+            <td colspan="${colCount}" class="p-3">
+                <div class="card shadow-sm border">
+                    <div class="card-header d-flex justify-content-between align-items-center py-2 bg-white">
+                        <span class="small fw-bold text-secondary">
+                            <i class="fa-solid fa-file-pdf text-danger me-1"></i> Document Preview
+                        </span>
+                        <button type="button" class="btn-close btn-sm" onclick="toggleFullRowPreview('${entityId}', '${pdfUrl}')"></button>
+                    </div>
+                    <div class="card-body p-0">
+                        <iframe src="${pdfUrl}" style="width: 100%; height: 600px; border: none;" loading="lazy"></iframe>
+                    </div>
+                </div>
+            </td>
+        `;
+        tr.parentNode.insertBefore(newRow, tr.nextSibling);
+        if (chevron) {
+            chevron.classList.remove('fa-chevron-down');
+            chevron.classList.add('fa-chevron-up');
+        }
+    };
+}
+</script>
