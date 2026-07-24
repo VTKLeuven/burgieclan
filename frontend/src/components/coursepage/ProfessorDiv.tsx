@@ -95,6 +95,7 @@ export default function ProfessorDiv({
                 alt={professorName}
                 width={size}
                 height={size}
+                unoptimized
             />
         </div>
     ) : (
