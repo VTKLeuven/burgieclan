@@ -26,7 +26,7 @@ RUN docker-php-ext-install \
 RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/memory-limit.ini
 
 # Get latest Composer
-COPY --from=composer:latest@sha256:1b73755de4f19775ba6087fd5313664493e06fab72b6fc27dc2044e87bb7c4c3 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:latest@sha256:5946476338742b200bb9ff88f8be56275ddae4b3949c72305cb0dbf10cfcb760 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app/backend
 
