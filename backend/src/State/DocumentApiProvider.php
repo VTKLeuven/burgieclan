@@ -147,18 +147,28 @@ class DocumentApiProvider implements ProviderInterface
         }
 
         if ($document->getFileName()) {
-            $documentApi->filename = $document->getFileName();
+            $filename = $document->getFileName();
+            $documentApi->filename = $filename;
 
+            $mimeType = null;
             try {
                 $filePath = $this->storage->resolvePath($document, 'file');
-                if ($filePath) {
+                if ($filePath && file_exists($filePath)) {
                     $mimeType = $this->mimeTypes->guessMimeType($filePath);
-                    $documentApi->mimetype = $mimeType ?: 'application/octet-stream';
                 }
-            } catch (\Exception $e) {
-                // If we can't determine the mime type, default to octet-stream
-                $documentApi->mimetype = 'application/octet-stream';
+            } catch (\Throwable $e) {
+                // If path resolution or guessMimeType fails (e.g. remote Flysystem storage), fallback below
             }
+
+            if (!$mimeType || $mimeType === 'application/octet-stream') {
+                $ext = pathinfo($filename, PATHINFO_EXTENSION);
+                if ($ext) {
+                    $guessedTypes = $this->mimeTypes->getMimeTypes($ext);
+                    $mimeType = $guessedTypes[0] ?? null;
+                }
+            }
+
+            $documentApi->mimetype = $mimeType ?: 'application/octet-stream';
         }
 
         return $documentApi;
