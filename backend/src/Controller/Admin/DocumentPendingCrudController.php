@@ -68,7 +68,8 @@ class DocumentPendingCrudController extends DocumentCrudController
     {
         return parent::configureCrud($crud)
             ->setPageTitle(Crud::PAGE_INDEX, 'Pending Documents')
-            ->showEntityActionsInlined();
+            ->showEntityActionsInlined()
+            ->overrideTemplate('crud/edit', 'admin/document_pending_edit.html.twig');
     }
 
     public function configureFields(string $pageName): iterable
