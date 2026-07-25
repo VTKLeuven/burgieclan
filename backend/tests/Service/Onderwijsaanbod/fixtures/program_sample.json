@@ -3,21 +3,13 @@
     {
       "programId": "999",
       "programLanguageSet": [
-        {
-          "programLangu": "NL",
-          "programTitleSet": [
-            { "programLangu": "NL", "description": "Testopleiding" }
-          ]
-        }
+        { "programLangu": "NL", "programTitleSet": [ { "programLangu": "NL", "description": "Testopleiding" } ] }
       ],
       "moduleGroupSet": [
         {
           "moduleGroupId": "g1",
           "parentType": "programme",
           "parentId": "999",
-          "level": "1",
-          "stageStart": "1",
-          "stageEnd": "3",
           "moduleGroupLanguageSet": [
             { "moduleGroupLangu": "NL", "moduleGroupTitleSet": [ { "description": "Basis" } ] }
           ]
@@ -26,25 +18,16 @@
           "moduleGroupId": "g2",
           "parentType": "modulegroup",
           "parentId": "g1",
-          "level": "2",
           "moduleGroupLanguageSet": [
             { "moduleGroupLangu": "NL", "moduleGroupTitleSet": [ { "description": "Wiskunde" } ] }
           ],
           "moduleSet": [
             {
-              "moduleId": "m1",
-              "short": "W0001A",
-              "credits": "6",
-              "mandatory": "True",
-              "originalLangu": "NL",
-              "stageStart": "1",
-              "stageEnd": "1",
+              "moduleId": "m1", "short": "W0001A", "credits": "6", "mandatory": "True",
+              "originalLangu": "NL", "stageStart": "1",
               "moduleLanguageSet": [
-                {
-                  "moduleLangu": "NL",
-                  "moduleTitleSet": [ { "description": "Analyse" } ],
-                  "moduleSessionPatternSet": [ { "offerPeriod": "1" } ]
-                }
+                { "moduleLangu": "NL", "moduleTitleSet": [ { "description": "Analyse" } ],
+                  "moduleSessionPatternSet": [ { "offerPeriod": "1" } ] }
               ]
             }
           ]
@@ -53,25 +36,16 @@
           "moduleGroupId": "g3",
           "parentType": "modulegroup",
           "parentId": "g1",
-          "level": "2",
           "moduleGroupLanguageSet": [
             { "moduleGroupLangu": "NL", "moduleGroupTitleSet": [ { "description": "Verplichte opleidingsonderdelen" } ] }
           ],
           "moduleSet": [
             {
-              "moduleId": "m2",
-              "short": "V0001A",
-              "credits": "3",
-              "mandatory": "False",
-              "originalLangu": "EN",
-              "stageStart": "1",
-              "stageEnd": "1",
+              "moduleId": "m2", "short": "V0001A", "credits": "3", "mandatory": "False",
+              "originalLangu": "EN", "stageStart": "1",
               "moduleLanguageSet": [
-                {
-                  "moduleLangu": "EN",
-                  "moduleTitleSet": [ { "description": "Ethics" } ],
-                  "moduleSessionPatternSet": [ { "offerPeriod": "2" } ]
-                }
+                { "moduleLangu": "EN", "moduleTitleSet": [ { "description": "Ethics" } ],
+                  "moduleSessionPatternSet": [ { "offerPeriod": "2" } ] }
               ]
             }
           ]
@@ -80,25 +54,42 @@
           "moduleGroupId": "g4",
           "parentType": "modulegroup",
           "parentId": "g3",
-          "level": "3",
           "moduleGroupLanguageSet": [
             { "moduleGroupLangu": "NL", "moduleGroupTitleSet": [ { "description": "Verdieping" } ] }
           ],
           "moduleSet": [
             {
-              "moduleId": "m3",
-              "short": "S0001A",
-              "credits": "4",
-              "mandatory": "True",
-              "originalLangu": "NL",
-              "stageStart": "2",
-              "stageEnd": "2",
+              "moduleId": "m3", "short": "S0001A", "credits": "4", "mandatory": "True",
+              "originalLangu": "NL", "stageStart": "2",
               "moduleLanguageSet": [
-                {
-                  "moduleLangu": "NL",
-                  "moduleTitleSet": [ { "description": "Verdiepingsvak" } ],
-                  "moduleSessionPatternSet": [ { "offerPeriod": "1" } ]
-                }
+                { "moduleLangu": "NL", "moduleTitleSet": [ { "description": "Verdiepingsvak" } ],
+                  "moduleSessionPatternSet": [ { "offerPeriod": "1" } ] }
+              ]
+            }
+          ]
+        },
+        {
+          "moduleGroupId": "g5",
+          "parentType": "programme",
+          "parentId": "999",
+          "moduleGroupLanguageSet": [
+            { "moduleGroupLangu": "NL", "moduleGroupTitleSet": [ { "description": "Keuze" } ] }
+          ]
+        },
+        {
+          "moduleGroupId": "g6",
+          "parentType": "modulegroup",
+          "parentId": "g5",
+          "moduleGroupLanguageSet": [
+            { "moduleGroupLangu": "NL", "moduleGroupTitleSet": [ { "description": "Keuzepakket" } ] }
+          ],
+          "moduleSet": [
+            {
+              "moduleId": "m4", "short": "K0001A", "credits": "5", "mandatory": "True",
+              "originalLangu": "NL", "stageStart": "3",
+              "moduleLanguageSet": [
+                { "moduleLangu": "NL", "moduleTitleSet": [ { "description": "Keuzevak X" } ],
+                  "moduleSessionPatternSet": [ { "offerPeriod": "2" } ] }
               ]
             }
           ]
