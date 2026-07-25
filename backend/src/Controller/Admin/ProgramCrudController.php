@@ -30,7 +30,13 @@ class ProgramCrudController extends AbstractCrudController
             ->linkToRoute('admin_onderwijsaanbod_import')
             ->createAsGlobalAction();
 
-        return $actions->add(Crud::PAGE_INDEX, $import);
+        $viewTree = Action::new('viewTree', 'Structure', 'fa fa-sitemap')
+            ->linkToRoute('admin_program_tree', fn (Program $program) => ['id' => $program->getId()]);
+
+        return $actions
+            ->add(Crud::PAGE_INDEX, $import)
+            ->add(Crud::PAGE_INDEX, $viewTree)
+            ->add(Crud::PAGE_DETAIL, $viewTree);
     }
 
     public function configureFields(string $pageName): iterable
