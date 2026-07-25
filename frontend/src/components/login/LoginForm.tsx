@@ -33,7 +33,28 @@ export default function LoginForm() {
     const { showToast } = useToast();
     const { request, loading, error: apiError } = useApi<LoginResponse>();
 
-    const redirectTo = searchParams.get('redirectTo') || '/';
+    const getSafeRedirect = (raw: string | null): string => {
+        if (!raw) return '/';
+        let path = decodeURIComponent(raw);
+        if (path.startsWith('http://') || path.startsWith('https://')) {
+            try {
+                const url = new URL(path);
+                path = url.pathname + url.search + url.hash;
+            } catch {
+                return '/';
+            }
+        }
+        if (!path.startsWith('/')) {
+            path = '/' + path;
+        }
+        const cleanPathname = path.split('?')[0].split('#')[0];
+        if (cleanPathname.endsWith('/login') || cleanPathname.includes('/auth/callback')) {
+            return '/';
+        }
+        return path;
+    };
+
+    const redirectTo = getSafeRedirect(searchParams.get('redirectTo'));
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
