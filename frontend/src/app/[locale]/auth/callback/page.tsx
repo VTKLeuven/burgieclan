@@ -8,6 +8,34 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+function getSafeRedirectTarget(rawRedirect: string | null): string {
+    if (!rawRedirect) return '/';
+
+    let target = decodeURIComponent(rawRedirect);
+
+    // If it's a full URL (e.g. https://dev.burgieclan.vtk.be/en/login), extract path
+    if (target.startsWith('http://') || target.startsWith('https://')) {
+        try {
+            const url = new URL(target);
+            target = url.pathname + url.search + url.hash;
+        } catch {
+            return '/';
+        }
+    }
+
+    if (!target.startsWith('/')) {
+        target = '/' + target;
+    }
+
+    // Do not redirect back to login or callback routes after login!
+    const cleanPathname = target.split('?')[0].split('#')[0];
+    if (cleanPathname.endsWith('/login') || cleanPathname.includes('/auth/callback')) {
+        return '/';
+    }
+
+    return target;
+}
+
 export default function AuthCallbackPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -20,7 +48,7 @@ export default function AuthCallbackPage() {
             const refreshToken = searchParams.get('refresh_token');
             const refreshTokenExpiration = searchParams.get('refresh_token_expiration');
             const error = searchParams.get('error');
-            const redirectTo = searchParams.get('redirect_to') || '/';
+            const targetPath = getSafeRedirectTarget(searchParams.get('redirect_to'));
 
             if (error) {
                 captureException(
@@ -42,7 +70,7 @@ export default function AuthCallbackPage() {
                     await storeTokensInCookies(token, refreshToken || undefined, expiration);
 
                     showToast(t('login_success'), 'success');
-                    router.push(decodeURIComponent(redirectTo));
+                    router.push(targetPath);
                 } catch (err) {
                     captureException(
                         err instanceof Error ? err : new Error(String(err)),

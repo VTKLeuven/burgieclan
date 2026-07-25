@@ -528,11 +528,15 @@ class DocumentResourceTest extends ApiTestCase
             ->assertJsonMatches('name', 'Document name')
             ->json();
 
-        $contentUrl = $json->decoded()['contentUrl'];
-        $array = explode('/', $contentUrl);
-        $filename = end($array);
-        // Delete saved file to clean up.
-        unlink(__DIR__ . '/../../data/documents/' . $filename);
+        $contentUrl = $json->decoded()['contentUrl'] ?? null;
+        if ($contentUrl) {
+            $array = explode('/', $contentUrl);
+            $filename = end($array);
+            $target = __DIR__ . '/../../data/documents/' . $filename;
+            if (is_file($target)) {
+                unlink($target);
+            }
+        }
     }
 
     /**
@@ -992,10 +996,15 @@ class DocumentResourceTest extends ApiTestCase
         $this->assertContains($documentIRI, $documentIRIsinTag);
 
         // Clean up the file
-        $contentUrl = $json['contentUrl'];
-        $array = explode('/', $contentUrl);
-        $filename = end($array);
-        unlink(__DIR__ . '/../../data/documents/' . $filename);
+        $contentUrl = $json['contentUrl'] ?? null;
+        if ($contentUrl) {
+            $array = explode('/', $contentUrl);
+            $filename = end($array);
+            $target = __DIR__ . '/../../data/documents/' . $filename;
+            if (is_file($target)) {
+                unlink($target);
+            }
+        }
     }
 
     public function testCreateDocumentWithMultipleTags(): void
@@ -1069,9 +1078,14 @@ class DocumentResourceTest extends ApiTestCase
         $this->assertContains('/api/tags/' . $tag2->getId(), $tagIRIs);
 
         // Clean up the file
-        $contentUrl = $json['contentUrl'];
-        $array = explode('/', $contentUrl);
-        $filename = end($array);
-        unlink(__DIR__ . '/../../data/documents/' . $filename);
+        $contentUrl = $json['contentUrl'] ?? null;
+        if ($contentUrl) {
+            $array = explode('/', $contentUrl);
+            $filename = end($array);
+            $target = __DIR__ . '/../../data/documents/' . $filename;
+            if (is_file($target)) {
+                unlink($target);
+            }
+        }
     }
 }

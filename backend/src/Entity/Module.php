@@ -8,10 +8,20 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ModuleRepository::class)]
+#[ORM\Index(name: 'idx_module_kul_id', columns: ['kul_id'])]
 class Module extends BaseEntity
 {
     #[ORM\Column(length: 255)]
     private string $name;
+
+    /**
+     * KU Leuven onderwijsaanbod identifier used to match this module when (re-)importing.
+     * In "named" grouping this is the KU Leuven moduleGroupId; in "stage" grouping it is a
+     * synthetic key like "stage:<programId>:<n>". Null for manually created modules, which
+     * the importer never touches.
+     */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $kulId = null;
 
     /**
      * @var Collection<int, Course>
@@ -48,6 +58,18 @@ class Module extends BaseEntity
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getKulId(): ?string
+    {
+        return $this->kulId;
+    }
+
+    public function setKulId(?string $kulId): self
+    {
+        $this->kulId = $kulId;
 
         return $this;
     }

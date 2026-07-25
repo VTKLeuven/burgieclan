@@ -8,6 +8,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\ColorScheme;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +28,9 @@ class DashboardController extends AbstractDashboardController
     {
         // admin-assets is not proxied to the frontend, so it is accessible
         return Dashboard::new()
-            ->setTitle('<img src="/admin-assets/images/logo.png" alt="Icon" style="height: 20px; margin-right: 10px;"> Burgieclan');
+            ->setTitle('<img src="/admin-assets/images/logo.png" alt="Icon" style="height: 20px; margin-right: 10px;"> Burgieclan')
+            // Follow the OS preference by default; users can switch light/dark from the user menu.
+            ->setDefaultColorScheme(ColorScheme::AUTO);
         //TODO add Burgieclan logo here
     }
 
