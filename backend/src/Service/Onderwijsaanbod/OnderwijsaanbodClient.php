@@ -47,7 +47,7 @@ class OnderwijsaanbodClient
         }
 
         // Sanitize special Lucene syntax characters while preserving natural full-text search
-        $sanitizedQuery = preg_replace('/[+\-&&||!()\[\]{}^"~*?:\\\\]/', ' ', $cleanQuery);
+        $sanitizedQuery = preg_replace('/[+\-&|!(){}\[\]^"~*?:\\\\]/', ' ', $cleanQuery);
         $sanitizedQuery = preg_replace('/\s+/', ' ', trim((string) $sanitizedQuery));
         if ($sanitizedQuery === '') {
             return [];

@@ -53,6 +53,7 @@ class ProgramTreeMapper
         ) ?? $programId;
 
         $roots = $this->buildNamedTree($programSet, $language);
+        $roots = $this->unwrapRedundantProgramRoots($roots, $name);
 
         if ($semesterKeys !== []) {
             $roots = array_map(fn (ModuleData $m): ModuleData => $this->applySemesterize($m, $programId, $semesterKeys), $roots);
@@ -400,5 +401,61 @@ class ProgramTreeMapper
             }
         }
         $module->addCourse($course);
+    }
+
+    /**
+     * Always unwrap top-level wrapper root modules so that the actual structural submodules
+     * (e.g. "Gemeenschappelijk deel", "Opties", stage folders) appear directly at the root level of the program.
+     *
+     * @param list<ModuleData> $roots
+     * @return list<ModuleData>
+     */
+    private function unwrapRedundantProgramRoots(array $roots, string $programName): array
+    {
+        $cleanProgramName = $this->normalizeNameForComparison($programName);
+
+        $changed = true;
+        while ($changed) {
+            $changed = false;
+
+            // 1. Always unwrap a single top-level root wrapper module if it has children and no own courses
+            if (count($roots) === 1 && $roots[0]->children !== [] && $roots[0]->courses === []) {
+                $roots = $roots[0]->children;
+                $changed = true;
+                continue;
+            }
+
+            // 2. Unwrap any root module whose name matches/resembles the program name
+            $newRoots = [];
+            foreach ($roots as $root) {
+                $cleanRootName = $this->normalizeNameForComparison($root->name);
+
+                $isMatch = $cleanRootName !== '' && $cleanProgramName !== '' && (
+                    $cleanRootName === $cleanProgramName
+                    || (str_starts_with($cleanProgramName, $cleanRootName)
+                        && mb_strlen($cleanRootName) >= mb_strlen($cleanProgramName) * 0.8)
+                    || (str_starts_with($cleanRootName, $cleanProgramName)
+                        && mb_strlen($cleanProgramName) >= mb_strlen($cleanRootName) * 0.8)
+                );
+
+                if ($isMatch && $root->courses === [] && $root->children !== []) {
+                    foreach ($root->children as $child) {
+                        $newRoots[] = $child;
+                    }
+                    $changed = true;
+                } else {
+                    $newRoots[] = $root;
+                }
+            }
+            $roots = $newRoots;
+        }
+
+        return $roots;
+    }
+
+    private function normalizeNameForComparison(string $name): string
+    {
+        $clean = preg_replace('/\s*\([^)]*\)\s*$/u', '', $name) ?? $name;
+        return mb_strtolower(trim($clean));
     }
 }

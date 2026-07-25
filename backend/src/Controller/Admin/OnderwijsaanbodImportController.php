@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Program;
 use App\Entity\User;
 use App\Repository\CourseRepository;
 use App\Repository\ModuleRepository;
@@ -11,6 +12,7 @@ use App\Service\Onderwijsaanbod\Dto\ProgramData;
 use App\Service\Onderwijsaanbod\OnderwijsaanbodClient;
 use App\Service\Onderwijsaanbod\OnderwijsaanbodImporter;
 use App\Service\Onderwijsaanbod\ProgramTreeMapper;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,7 +30,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted(User::ROLE_ADMIN)]
 class OnderwijsaanbodImportController extends AbstractController
 {
-    private const DEFAULT_FLATTEN = 'Verplichte opleidingsonderdelen, Compulsory courses';
+    /** @var string Comma-separated default flatten names for the template form. */
+    private const DEFAULT_FLATTEN_DISPLAY = 'Verplichte opleidingsonderdelen, Compulsory courses';
 
     public function __construct(
         private readonly OnderwijsaanbodClient $client,
@@ -37,6 +40,7 @@ class OnderwijsaanbodImportController extends AbstractController
         private readonly ProgramRepository $programRepository,
         private readonly ModuleRepository $moduleRepository,
         private readonly CourseRepository $courseRepository,
+        private readonly EntityManagerInterface $entityManager,
     ) {}
 
     #[AdminRoute('/onderwijsaanbod/import', name: 'onderwijsaanbod_import')]
@@ -50,7 +54,7 @@ class OnderwijsaanbodImportController extends AbstractController
             [
             'query' => $query,
             'searchResults' => $searchResults,
-            'defaultFlatten' => self::DEFAULT_FLATTEN,
+            'defaultFlatten' => self::DEFAULT_FLATTEN_DISPLAY,
             ]
         );
     }
@@ -106,6 +110,10 @@ class OnderwijsaanbodImportController extends AbstractController
 
         $result = $this->importer->import($programData, $options['enrich'], dryRun: false);
         $program = $this->programRepository->findOneByKulId($programData->kulId);
+        if ($program !== null) {
+            $program->setImportSettings($options);
+            $this->entityManager->flush();
+        }
 
         $this->addFlash(
             'success',
@@ -139,27 +147,48 @@ class OnderwijsaanbodImportController extends AbstractController
      */
     private function readOptions(Request $request): array
     {
-        $lang = (string) $request->request->get('lang', 'nl') === 'en' ? 'en' : 'nl';
+        $programId = trim((string) $request->request->get('programId', ''));
+        $existingProgram = $programId !== '' ? $this->programRepository->findOneByKulId($programId) : null;
+        $saved = $existingProgram?->getResolvedImportSettings();
 
-        // "configured" marks a submission from the preview (where empty selections are meaningful).
-        // On the first hop from the search form it is absent, so we seed the default flatten list.
+        // Language: explicit request parameter takes precedence over saved settings
+        $langParam = $request->request->get('lang');
+        if ($langParam !== null) {
+            /** @var 'nl'|'en' $lang */
+            $lang = (string) $langParam === 'en' ? 'en' : 'nl';
+        } else {
+            /** @var 'nl'|'en' $lang */
+            $lang = $saved['lang'] ?? 'nl';
+        }
+
+        // Flatten/semester/merge: use explicit form values when the form was configured,
+        // otherwise fall back to saved settings (which include defaults)
         if ($request->request->getBoolean('configured')) {
             $flatten = $request->request->all('flatten');
             $semester = $request->request->all('semester');
             $merge = $request->request->getBoolean('merge');
         } else {
-            $flatten = array_map('trim', explode(',', self::DEFAULT_FLATTEN));
-            $semester = [];
-            $merge = true;
+            /** @var list<string> $flatten */
+            $flatten = $saved['flatten'] ?? Program::DEFAULT_FLATTEN;
+            /** @var list<string> $semester */
+            $semester = $saved['semester'] ?? [];
+            $merge = (bool) ($saved['merge'] ?? true);
+        }
+
+        // Enrich: explicit request parameter takes precedence over saved settings
+        if ($request->request->has('enrich')) {
+            $enrich = $request->request->getBoolean('enrich');
+        } else {
+            $enrich = (bool) ($saved['enrich'] ?? true);
         }
 
         return [
-            'programId' => trim((string) $request->request->get('programId', '')),
+            'programId' => $programId,
             'lang' => $lang,
             'flatten' => array_values(array_filter(array_map('strval', $flatten))),
             'semester' => array_values(array_filter(array_map('strval', $semester))),
             'merge' => $merge,
-            'enrich' => $request->request->getBoolean('enrich', true),
+            'enrich' => $enrich,
         ];
     }
 

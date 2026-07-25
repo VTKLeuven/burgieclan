@@ -18,8 +18,16 @@
         <div class="d-flex gap-2">
             {% if program.kulId %}
                 <form method="post" action="{{ path('admin_program_tree_sync', {id: program.id}) }}" class="d-inline">
-                    <button type="submit" class="btn btn-sm btn-secondary">
-                        <i class="fa-solid fa-rotate me-1"></i> Sync from KU Leuven
+                    <input type="hidden" name="_token" value="{{ csrf_token('program_sync') }}">
+                    <button type="submit" class="btn btn-sm btn-primary" title="Re-sync using saved import options">
+                        <i class="fa-solid fa-rotate me-1"></i> Quick Sync
+                    </button>
+                </form>
+                <form method="post" action="{{ path('admin_onderwijsaanbod_import_preview') }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('onderwijsaanbod_import') }}">
+                    <input type="hidden" name="programId" value="{{ program.kulId }}">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Preview and adjust flatten/semester/language options before syncing">
+                        <i class="fa-solid fa-sliders me-1"></i> Sync & Adjust Settings
                     </button>
                 </form>
             {% endif %}
