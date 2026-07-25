@@ -19,12 +19,11 @@ export interface DownloadOptions {
 const useDownloadContent = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const { showToast } = useToast();
     const { t } = useTranslation();
     const router = useRouter();
 
-    // Handle download status notifications
+    // Handle download error notifications
     useEffect(() => {
         if (error) {
             captureException(
@@ -35,12 +34,7 @@ const useDownloadContent = () => {
             );
             showToast(t('download.download-error', { error }), 'error');
         }
-
-        if (isSuccess) {
-            showToast(t('download.download-success'), 'success');
-            setIsSuccess(false);
-        }
-    }, [error, isSuccess, showToast, t]);
+    }, [error, showToast, t]);
 
     /**
      * Check if a response indicates JWT expiration and redirect to login if needed
@@ -118,7 +112,7 @@ const useDownloadContent = () => {
             window.URL.revokeObjectURL(url);
             window.document.body.removeChild(link);
 
-            setIsSuccess(true);
+            showToast(t('download.download-success'), 'success');
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message);
@@ -214,7 +208,7 @@ const useDownloadContent = () => {
             window.URL.revokeObjectURL(url);
             window.document.body.removeChild(link);
 
-            setIsSuccess(true);
+            showToast(t('download.download-success'), 'success');
 
         } catch (err) {
             if (err instanceof Error) {

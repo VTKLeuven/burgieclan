@@ -68,7 +68,8 @@ class DocumentPendingCrudController extends DocumentCrudController
     {
         return parent::configureCrud($crud)
             ->setPageTitle(Crud::PAGE_INDEX, 'Pending Documents')
-            ->showEntityActionsInlined();
+            ->showEntityActionsInlined()
+            ->overrideTemplate('crud/edit', 'admin/document_pending_edit.html.twig');
     }
 
     public function configureFields(string $pageName): iterable
@@ -111,7 +112,8 @@ class DocumentPendingCrudController extends DocumentCrudController
                 ]
             )
             ->hideOnIndex();
-        yield TextField::new('file_name')
+        yield TextField::new('file_name', 'File & Preview')
+            ->setTemplatePath('admin/field/file_preview_toggle.html.twig')
             ->onlyOnIndex();
     }
 

@@ -1,0 +1,220 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+
+{% set filename = field.value %}
+{% set entityId = entity.primaryKeyValue %}
+{% if filename %}
+    <div class="d-inline-flex align-items-center gap-2">
+        <span class="fw-medium text-break">{{ filename }}</span>
+
+        {% if filename|lower ends with '.pdf' %}
+            <button type="button"
+                    class="btn btn-xs btn-outline-primary d-inline-flex align-items-center gap-1 py-0 px-2 toggle-pdf-btn"
+                    data-entity-id="{{ entityId }}"
+                    data-pdf-url="{{ path('admin_document_preview', {filename: filename}) }}"
+                    title="Toggle Full Row PDF Preview">
+                <i class="fa-solid fa-chevron-down" id="chevron-{{ entityId }}"></i>
+                <span class="small">Preview</span>
+            </button>
+        {% endif %}
+    </div>
+{% else %}
+    <span class="text-muted small">No file</span>
+{% endif %}
+
+<script nonce="{{ csp_nonce('script') }}">
+if (typeof window.pdfPreviewListenerAdded === 'undefined') {
+    window.pdfPreviewListenerAdded = true;
+
+    function renderPdfPage(pdf, pageNum, container) {
+        // Defer with setTimeout so the newly inserted table row has been laid out
+        setTimeout(function() {
+            var availableWidth = container.clientWidth - 32;
+            if (availableWidth < 100) availableWidth = 800; // fallback
+
+            pdf.getPage(pageNum).then(function(page) {
+                var defaultViewport = page.getViewport({ scale: 1 });
+                var scale = availableWidth / defaultViewport.width;
+                var viewport = page.getViewport({ scale: scale });
+
+                var canvas = document.createElement('canvas');
+                canvas.style.display = 'block';
+                canvas.style.margin = '0 auto';
+                canvas.style.background = '#fff';
+                canvas.style.boxShadow = '0 1px 4px rgba(0,0,0,0.12)';
+                var ctx = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                container.appendChild(canvas);
+
+                page.render({ canvasContext: ctx, viewport: viewport });
+            });
+        }, 50);
+    }
+
+    function loadPdf(pdfUrl, container, entityId) {
+        var loading = document.createElement('div');
+        loading.className = 'text-center py-4 text-muted';
+        loading.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Loading PDF...';
+        container.appendChild(loading);
+
+        import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.9.155/pdf.min.mjs').then(function(pdfjsMod) {
+            var pdfjsLib = pdfjsMod;
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.9.155/pdf.worker.min.mjs';
+
+            pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
+                container.removeChild(loading);
+
+                var totalPages = pdf.numPages;
+                var currentPage = 1;
+
+                // Navigation bar — matches EasyAdmin's muted toolbar style
+                var navBar = document.createElement('div');
+                navBar.className = 'd-flex align-items-center justify-content-center gap-3 py-2';
+                navBar.style.borderBottom = '1px solid var(--bs-border-color, #dee2e6)';
+
+                var prevBtn = document.createElement('button');
+                prevBtn.type = 'button';
+                prevBtn.className = 'btn btn-sm btn-outline-secondary';
+                prevBtn.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+
+                var pageInfo = document.createElement('span');
+                pageInfo.className = 'small fw-medium';
+                pageInfo.style.color = 'var(--bs-secondary-color, #6c757d)';
+                pageInfo.style.minWidth = '100px';
+                pageInfo.style.textAlign = 'center';
+
+                var nextBtn = document.createElement('button');
+                nextBtn.type = 'button';
+                nextBtn.className = 'btn btn-sm btn-outline-secondary';
+                nextBtn.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+
+                navBar.appendChild(prevBtn);
+                navBar.appendChild(pageInfo);
+                navBar.appendChild(nextBtn);
+                container.appendChild(navBar);
+
+                // PDF page container
+                var pagesContainer = document.createElement('div');
+                pagesContainer.style.overflow = 'auto';
+                pagesContainer.style.maxHeight = '70vh';
+                pagesContainer.style.padding = '16px';
+                pagesContainer.style.background = '#edf0f2';
+                pagesContainer.style.textAlign = 'center';
+                container.appendChild(pagesContainer);
+
+                function showPage(num) {
+                    currentPage = num;
+                    pageInfo.textContent = 'Page ' + num + ' of ' + totalPages;
+                    prevBtn.disabled = (num <= 1);
+                    nextBtn.disabled = (num >= totalPages);
+                    pagesContainer.innerHTML = '';
+                    renderPdfPage(pdf, num, pagesContainer);
+                }
+
+                prevBtn.addEventListener('click', function() {
+                    if (currentPage > 1) showPage(currentPage - 1);
+                });
+                nextBtn.addEventListener('click', function() {
+                    if (currentPage < totalPages) showPage(currentPage + 1);
+                });
+
+                showPage(1);
+            }).catch(function(err) {
+                container.removeChild(loading);
+                var errDiv = document.createElement('div');
+                errDiv.className = 'text-center py-4 text-danger';
+                errDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-2"></i>Failed to load PDF: ' + err.message;
+                container.appendChild(errDiv);
+            });
+        });
+    }
+
+    document.addEventListener('click', function(evt) {
+        var btn = evt.target.closest('.toggle-pdf-btn');
+        if (!btn) return;
+
+        evt.preventDefault();
+        var entityId = btn.getAttribute('data-entity-id');
+        var pdfUrl = btn.getAttribute('data-pdf-url');
+        var tr = btn.closest('tr');
+        var chevron = document.getElementById('chevron-' + entityId);
+
+        var existingRow = document.getElementById('preview-row-' + entityId);
+        if (existingRow) {
+            if (existingRow.style.display === 'none') {
+                existingRow.style.display = 'table-row';
+                if (chevron) {
+                    chevron.classList.remove('fa-chevron-down');
+                    chevron.classList.add('fa-chevron-up');
+                }
+            } else {
+                existingRow.style.display = 'none';
+                if (chevron) {
+                    chevron.classList.remove('fa-chevron-up');
+                    chevron.classList.add('fa-chevron-down');
+                }
+            }
+            return;
+        }
+
+        if (!tr) return;
+
+        var colCount = tr.children.length;
+        var newRow = document.createElement('tr');
+        newRow.id = 'preview-row-' + entityId;
+
+        var td = document.createElement('td');
+        td.colSpan = colCount;
+        td.style.padding = '0';
+        td.style.background = 'var(--bs-body-bg, #fff)';
+
+        // Minimal wrapper — no card, just a clean bordered container
+        var wrapper = document.createElement('div');
+        wrapper.style.borderTop = '1px solid var(--bs-border-color, #dee2e6)';
+        wrapper.style.borderBottom = '1px solid var(--bs-border-color, #dee2e6)';
+
+        // Header with title and close button
+        var header = document.createElement('div');
+        header.className = 'd-flex justify-content-between align-items-center px-3 py-2';
+        header.style.borderBottom = '1px solid var(--bs-border-color, #dee2e6)';
+
+        var titleSpan = document.createElement('span');
+        titleSpan.className = 'small fw-semibold';
+        titleSpan.style.color = 'var(--bs-secondary-color, #6c757d)';
+        titleSpan.innerHTML = '<i class="fa-solid fa-file-pdf text-danger me-1"></i> Preview';
+
+        var closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'btn-close btn-sm';
+        closeBtn.setAttribute('aria-label', 'Close');
+        closeBtn.addEventListener('click', function() {
+            newRow.style.display = 'none';
+            if (chevron) {
+                chevron.classList.remove('fa-chevron-up');
+                chevron.classList.add('fa-chevron-down');
+            }
+        });
+
+        header.appendChild(titleSpan);
+        header.appendChild(closeBtn);
+
+        var body = document.createElement('div');
+
+        wrapper.appendChild(header);
+        wrapper.appendChild(body);
+        td.appendChild(wrapper);
+        newRow.appendChild(td);
+
+        tr.parentNode.insertBefore(newRow, tr.nextSibling);
+        if (chevron) {
+            chevron.classList.remove('fa-chevron-down');
+            chevron.classList.add('fa-chevron-up');
+        }
+
+        loadPdf(pdfUrl, body, entityId);
+    });
+}
+</script>

@@ -38,12 +38,7 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
         }
     }, [showAddForm]);
 
-    // Initialize anonymous state from user preference when form is shown
-    useEffect(() => {
-        if (showAddForm && user?.defaultAnonymous !== undefined) {
-            setFormAnonymous(user.defaultAnonymous);
-        }
-    }, [showAddForm, user]);
+
 
     // Sort comments by most recent update/creation date
     const sortedComments = useMemo(() => {
@@ -109,6 +104,7 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
 
     const handleAddButtonClick = (e: React.MouseEvent) => {
         e.stopPropagation();
+        setFormAnonymous(user?.defaultAnonymous ?? false);
         setShowAddForm(true);
         setExpanded(true);
     };
