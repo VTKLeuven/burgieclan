@@ -1,0 +1,108 @@
+{#
+    Override EasyAdmin's Vich file/image widgets to remove inline onchange
+    handlers that are blocked by CSP nonce policies.
+
+    Instead of an inline `onchange` attribute (which CSP blocks when nonces are
+    present), we render the file input without the handler and attach the
+    equivalent logic via an inline <script> tag that carries the CSP nonce.
+#}
+
+{% block vich_file_widget %}
+    {% set formTypeOptions = ea_vars.field.formTypeOptions|default('') %}
+    <div class="ea-vich-file">
+        {% if download_uri|default('') is not empty %}
+            <a class="ea-vich-file-name" href="{{ asset_helper is same as(true) ? asset(download_uri) : download_uri }}">
+                {{ download_label_translation_domain is same as(false) ? download_label : download_label|trans({}, download_label_translation_domain) }}
+            </a>
+        {% endif %}
+
+        <div class="ea-vich-file-actions">
+            {# the container element is needed to allow customizing the <input type="file" /> #}
+            <div class="btn btn-secondary input-file-container">
+                <twig:ea:Icon name="internal:upload" /> {{ 'action.choose_file'|trans({}, 'EasyAdminBundle') }}
+                {# Render WITHOUT the inline onchange handler #}
+                {{ form_widget(form.file, {vich: true}) }}
+            </div>
+
+            {% if form.delete is defined %}
+                {{ form_row(form.delete) }}
+            {% endif %}
+        </div>
+        <div class="small" id="{{ form.file.vars.id }}_new_file_name"></div>
+    </div>
+
+    {# CSP-safe: attach change listener via nonce'd script #}
+    <script nonce="{{ csp_nonce('script') }}">
+        (function() {
+            var fileInput = document.getElementById('{{ form.file.vars.id }}');
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    var newFile = this.files[0];
+                    if (!newFile) return;
+                    var fileSizeInMegabytes = newFile.size > 1024 * 1024;
+                    var fileSize = fileSizeInMegabytes ? newFile.size / (1024 * 1024) : newFile.size / 1024;
+                    var nameEl = document.getElementById('{{ form.file.vars.id }}_new_file_name');
+                    if (nameEl) {
+                        nameEl.innerText = newFile.name + ' (' + fileSize.toFixed(2) + ' ' + (fileSizeInMegabytes ? 'MB' : 'KB') + ')';
+                    }
+                });
+            }
+        })();
+    </script>
+{% endblock %}
+
+{% block vich_image_widget %}
+    {% set formTypeOptions = ea_vars.field.formTypeOptions|default('') %}
+    <div class="ea-vich-image">
+        {% if image_uri|default('') is not empty %}
+            {% if download_uri|default('') is empty %}
+                <div class="ea-lightbox-thumbnail">
+                    <img style="cursor: initial" src="{{ asset_helper is same as(true) ? asset(image_uri) : image_uri }}">
+                </div>
+            {% else %}
+                {% set _lightbox_id = 'ea-lightbox-' ~ id %}
+
+                <a href="#" class="ea-lightbox-thumbnail" data-ea-lightbox-content-selector="#{{ _lightbox_id }}">
+                    <img src="{{ asset_helper is same as(true) ? asset(image_uri) : image_uri }}">
+                </a>
+
+                <div id="{{ _lightbox_id }}" class="ea-lightbox">
+                    <img src="{{ asset_helper is same as(true) ? asset(download_uri) : download_uri }}">
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <div class="ea-vich-image-actions">
+            {# the container element is needed to allow customizing the <input type="file" /> #}
+            <div class="btn btn-secondary input-file-container">
+                <twig:ea:Icon name="internal:upload" /> {{ 'action.choose_file'|trans({}, 'EasyAdminBundle') }}
+                {# Render WITHOUT the inline onchange handler #}
+                {{ form_widget(form.file, {vich: true}) }}
+            </div>
+
+            {% if form.delete is defined %}
+                {{ form_row(form.delete) }}
+            {% endif %}
+        </div>
+        <div class="small" id="{{ form.file.vars.id }}_new_file_name"></div>
+    </div>
+
+    {# CSP-safe: attach change listener via nonce'd script #}
+    <script nonce="{{ csp_nonce('script') }}">
+        (function() {
+            var fileInput = document.getElementById('{{ form.file.vars.id }}');
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    var newFile = this.files[0];
+                    if (!newFile) return;
+                    var fileSizeInMegabytes = newFile.size > 1024 * 1024;
+                    var fileSize = fileSizeInMegabytes ? newFile.size / (1024 * 1024) : newFile.size / 1024;
+                    var nameEl = document.getElementById('{{ form.file.vars.id }}_new_file_name');
+                    if (nameEl) {
+                        nameEl.innerText = newFile.name + ' (' + fileSize.toFixed(2) + ' ' + (fileSizeInMegabytes ? 'MB' : 'KB') + ')';
+                    }
+                });
+            }
+        })();
+    </script>
+{% endblock %}
