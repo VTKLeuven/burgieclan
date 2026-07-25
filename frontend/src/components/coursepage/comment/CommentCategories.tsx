@@ -3,7 +3,7 @@ import CourseCommentList from '@/components/coursepage/comment/CourseCommentList
 import { HydraCollection, useApi } from '@/hooks/useApi';
 import { CommentCategory, CourseComment } from '@/types/entities';
 import { convertToCommentCategory } from '@/utils/convertToEntity';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type CommentCategoriesProps = {
