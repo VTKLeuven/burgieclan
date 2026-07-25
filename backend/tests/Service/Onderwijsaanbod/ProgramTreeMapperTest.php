@@ -3,7 +3,6 @@
 namespace App\Tests\Service\Onderwijsaanbod;
 
 use App\Service\Onderwijsaanbod\Dto\ModuleData;
-use App\Service\Onderwijsaanbod\GroupingMode;
 use App\Service\Onderwijsaanbod\ProgramTreeMapper;
 use PHPUnit\Framework\TestCase;
 
@@ -24,106 +23,97 @@ class ProgramTreeMapperTest extends TestCase
 
     public function testUnknownProgramIdReturnsNull(): void
     {
-        self::assertNull($this->mapper->map($this->source, 'does-not-exist', GroupingMode::Named));
+        self::assertNull($this->mapper->map($this->source, 'does-not-exist'));
     }
 
-    public function testNamedModeBuildsNestedTreeAndParsesCourseFields(): void
+    public function testNamedTreeBuildsFullStructureAndParsesCourseFields(): void
     {
-        $program = $this->mapper->map($this->source, '999', GroupingMode::Named, [], 'nl');
+        // Merge off so the raw KU Leuven structure is preserved.
+        $program = $this->mapper->map($this->source, '999', 'nl', [], [], false);
 
         self::assertNotNull($program);
         self::assertSame('999', $program->kulId);
         self::assertSame('Testopleiding', $program->name);
 
-        // Single root "Basis" with two children: "Wiskunde" and "Verplichte..." (not flattened here).
-        self::assertCount(1, $program->modules);
-        $root = $program->modules[0];
-        self::assertSame('Basis', $root->name);
-        self::assertSame('g1', $root->kulId);
+        $rootNames = array_map(static fn (ModuleData $m): string => $m->name, $program->modules);
+        self::assertSame(['Basis', 'Keuze'], $rootNames);
 
-        $childNames = array_map(static fn (ModuleData $m): string => $m->name, $root->children);
-        self::assertContains('Wiskunde', $childNames);
-        self::assertContains('Verplichte opleidingsonderdelen', $childNames);
-
-        $wiskunde = $this->childByName($root, 'Wiskunde');
-        self::assertCount(1, $wiskunde->courses);
+        $basis = $program->modules[0];
+        $wiskunde = $this->childByName($basis, 'Wiskunde');
         $course = $wiskunde->courses[0];
         self::assertSame('W0001A', $course->code);
         self::assertSame('Analyse', $course->name);
         self::assertSame('nl', $course->language);
         self::assertSame(6, $course->credits);
         self::assertSame(['Semester 1'], $course->semesters);
+        self::assertSame(1, $course->stage);
         self::assertTrue($course->mandatory);
     }
 
     public function testFlattenHoistsCoursesToParentAndReparentsChildren(): void
     {
-        $program = $this->mapper->map(
-            $this->source,
-            '999',
-            GroupingMode::Named,
-            ['Verplichte opleidingsonderdelen'],
-            'nl',
-        );
+        $program = $this->mapper->map($this->source, '999', 'nl', ['Verplichte opleidingsonderdelen'], [], false);
 
         self::assertNotNull($program);
-        $root = $program->modules[0];
+        $basis = $program->modules[0];
 
-        // "Verplichte opleidingsonderdelen" must no longer be a module...
-        $childNames = array_map(static fn (ModuleData $m): string => $m->name, $root->children);
+        $childNames = array_map(static fn (ModuleData $m): string => $m->name, $basis->children);
         self::assertNotContains('Verplichte opleidingsonderdelen', $childNames);
 
-        // ...its course is hoisted onto the parent (root)...
-        $rootCourseCodes = array_map(static fn ($c): string => $c->code, $root->courses);
-        self::assertContains('V0001A', $rootCourseCodes);
-
-        // ...and its real subgroup "Verdieping" is re-parented up to the root.
+        // Its course is hoisted to the parent...
+        self::assertContains('V0001A', array_map(static fn ($c): string => $c->code, $basis->courses));
+        // ...and its real subgroup is re-parented up.
         self::assertContains('Verdieping', $childNames);
-        $verdieping = $this->childByName($root, 'Verdieping');
-        self::assertSame('S0001A', $verdieping->courses[0]->code);
     }
 
     public function testEnglishFallbackTitleWhenRequestedLanguageMissing(): void
     {
-        $program = $this->mapper->map(
-            $this->source,
-            '999',
-            GroupingMode::Named,
-            ['Verplichte opleidingsonderdelen'],
-            'nl'
-        );
+        $program = $this->mapper->map($this->source, '999', 'nl', ['Verplichte opleidingsonderdelen'], [], false);
         self::assertNotNull($program);
-        $root = $program->modules[0];
+        $basis = $program->modules[0];
+
         $ethics = null;
-        foreach ($root->courses as $c) {
+        foreach ($basis->courses as $c) {
             if ($c->code === 'V0001A') {
                 $ethics = $c;
             }
         }
         self::assertNotNull($ethics);
-        // Only an English title exists for this course; it should fall back rather than show the code.
         self::assertSame('Ethics', $ethics->name);
         self::assertSame('en', $ethics->language);
         self::assertSame(['Semester 2'], $ethics->semesters);
         self::assertFalse($ethics->mandatory);
     }
 
-    public function testStageModeGroupsByStartingStage(): void
+    public function testMergeCollapsesSingleChildFolder(): void
     {
-        $program = $this->mapper->map($this->source, '999', GroupingMode::Stage, [], 'nl');
+        // "Keuze" has a single child "Keuzepakket" and no own courses, so it collapses to the child.
+        $program = $this->mapper->map($this->source, '999', 'nl', [], [], true);
 
         self::assertNotNull($program);
-        $names = array_map(static fn (ModuleData $m): string => $m->name, $program->modules);
-        self::assertSame(['Fase 1', 'Fase 2'], $names);
+        $rootNames = array_map(static fn (ModuleData $m): string => $m->name, $program->modules);
+        self::assertContains('Keuzepakket', $rootNames);
+        self::assertNotContains('Keuze', $rootNames);
+    }
 
-        $fase1 = $program->modules[0];
-        $fase1Codes = array_map(static fn ($c): string => $c->code, $fase1->courses);
-        sort($fase1Codes);
-        self::assertSame(['V0001A', 'W0001A'], $fase1Codes);
-        self::assertSame('stage:999:1', $fase1->kulId);
+    public function testSemesterizeRegroupsSubtreeByDegreeWideSemester(): void
+    {
+        // Regroup the "Basis" block by semester; stages 1 and 2 must yield Semester 1, 2 and 3.
+        $program = $this->mapper->map($this->source, '999', 'nl', [], ['Basis'], false);
 
-        $fase2 = $program->modules[1];
-        self::assertSame(['S0001A'], array_map(static fn ($c): string => $c->code, $fase2->courses));
+        self::assertNotNull($program);
+        $basis = $program->modules[0];
+        self::assertSame('Basis', $basis->name);
+
+        $semesterNames = array_map(static fn (ModuleData $m): string => $m->name, $basis->children);
+        self::assertSame(['Semester 1', 'Semester 2', 'Semester 3'], $semesterNames);
+
+        // W0001A: stage 1, sem 1 -> Semester 1; V0001A: stage 1, sem 2 -> Semester 2; S0001A: stage 2 -> Semester 3.
+        self::assertSame('W0001A', $basis->children[0]->courses[0]->code);
+        self::assertSame('V0001A', $basis->children[1]->courses[0]->code);
+        self::assertSame('S0001A', $basis->children[2]->courses[0]->code);
+        // Named subgroups are gone; the block now holds only semester folders.
+        self::assertSame([], $basis->courses);
     }
 
     private function childByName(ModuleData $parent, string $name): ModuleData

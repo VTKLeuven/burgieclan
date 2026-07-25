@@ -16,6 +16,8 @@ final class CourseData
      * @param int|null      $credits     ECTS credits.
      * @param list<string>  $semesters   Subset of Course::SEMESTERS values.
      * @param bool          $mandatory   Whether the course is mandatory within its group.
+     * @param int|null      $stage       Study stage / year (1..n) this course sits in; used to derive
+     *                                   the degree-wide semester number when semester-grouping.
      * @param list<string>  $professors  Professor display names (filled during enrichment).
      * @param list<string>  $identicalCourseCodes  ECTS codes of identical courses (filled during enrichment).
      * @param string|null   $kulModuleId KU Leuven internal moduleId, kept for enrichment lookups.
@@ -27,6 +29,7 @@ final class CourseData
         public readonly ?int $credits,
         public readonly array $semesters = [],
         public readonly bool $mandatory = true,
+        public readonly ?int $stage = null,
         public array $professors = [],
         public array $identicalCourseCodes = [],
         public readonly ?string $kulModuleId = null,

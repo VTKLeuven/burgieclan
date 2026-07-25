@@ -6,6 +6,9 @@ use App\Controller\Admin\Filter\EntityContainsFilter;
 use App\Entity\Module;
 use App\Entity\Program;
 use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -21,10 +24,20 @@ class ProgramCrudController extends AbstractCrudController
         return Program::class;
     }
 
+    public function configureActions(Actions $actions): Actions
+    {
+        $import = Action::new('importOnderwijsaanbod', 'Import from KU Leuven', 'fa fa-download')
+            ->linkToRoute('admin_onderwijsaanbod_import')
+            ->createAsGlobalAction();
+
+        return $actions->add(Crud::PAGE_INDEX, $import);
+    }
+
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnDetail();
         yield TextField::new('name');
+        yield TextField::new('kulId', 'KU Leuven id')->onlyOnDetail();
         yield AssociationField::new('modules');
     }
 

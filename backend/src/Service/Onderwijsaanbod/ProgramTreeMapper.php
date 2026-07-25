@@ -10,6 +10,15 @@ use App\Service\Onderwijsaanbod\Dto\ProgramData;
  * Pure transformation of a raw KU Leuven programme document into an in-memory ProgramData tree.
  * Holds no database or HTTP state, so it is fully unit-testable against saved API fixtures.
  *
+ * The KU Leuven "named" module-group tree is always the base structure. On top of it a few
+ * composable transforms can be applied, each selecting groups by their moduleGroupId or by their
+ * (case-insensitive) name so both the CLI (names) and the admin wizard (ids) can drive them:
+ *
+ *   - semesterize: replace a group's whole subtree with degree-wide "Semester N" folders, e.g. the
+ *     common-core block regrouped by semester while the specialisation tracks keep their form.
+ *   - flatten:     drop a group's own folder; its courses attach to the parent, its children move up.
+ *   - merge:       collapse any module that has a single child module and no own courses.
+ *
  * KU Leuven terminology note: in this API a "module" (with an ectsCode) is what we call a Course,
  * a "moduleGroup" is what we call a Module, and a "program" is our Program.
  */
@@ -18,16 +27,18 @@ class ProgramTreeMapper
     /**
      * @param array<string, mixed> $programSource the `_source` of a programme document
      * @param string               $programId     which bundled programme version to map
-     * @param list<string>         $flattenNames  module-group names whose folder is skipped
-     *                                            (courses attach to the parent); named mode only
      * @param 'nl'|'en'            $language       language for program/module/course titles
+     * @param list<string>         $flattenKeys   moduleGroupIds or names whose folder is skipped
+     * @param list<string>         $semesterKeys  moduleGroupIds or names to regroup by semester
+     * @param bool                 $mergeSingleChild collapse single-child, course-less modules
      */
     public function map(
         array $programSource,
         string $programId,
-        GroupingMode $mode,
-        array $flattenNames = [],
         string $language = 'nl',
+        array $flattenKeys = [],
+        array $semesterKeys = [],
+        bool $mergeSingleChild = true,
     ): ?ProgramData {
         $programSet = $this->findProgramSet($programSource, $programId);
         if ($programSet === null) {
@@ -41,25 +52,30 @@ class ProgramTreeMapper
             $language,
         ) ?? $programId;
 
-        $modules = $mode === GroupingMode::Named
-            ? $this->buildNamedTree($programSet, $programId, $flattenNames, $language)
-            : $this->buildStageTree($programSet, $programId, $language);
+        $roots = $this->buildNamedTree($programSet, $language);
 
-        return new ProgramData($programId, $name, $modules);
+        if ($semesterKeys !== []) {
+            $roots = array_map(fn (ModuleData $m): ModuleData => $this->applySemesterize($m, $programId, $semesterKeys), $roots);
+        }
+        if ($flattenKeys !== []) {
+            $roots = array_map(fn (ModuleData $m): ModuleData => $this->applyFlatten($m, $flattenKeys), $roots);
+        }
+        if ($mergeSingleChild) {
+            $roots = array_map(fn (ModuleData $m): ModuleData => $this->mergeSingleChild($m), $roots);
+        }
+
+        return new ProgramData($programId, $name, $roots);
     }
 
     /**
-     * Named grouping: mirror the moduleGroupSet tree, honouring flatten names.
+     * Build the full KU Leuven named module-group tree (no transforms yet).
      *
      * @param array<string, mixed> $programSet
-     * @param list<string>         $flattenNames
      *
      * @return list<ModuleData>
      */
-    private function buildNamedTree(array $programSet, string $programId, array $flattenNames, string $language): array
+    private function buildNamedTree(array $programSet, string $language): array
     {
-        $flatten = array_map(static fn (string $n): string => mb_strtolower(trim($n)), $flattenNames);
-
         /** @var array<string, array<string, mixed>> $groups indexed by moduleGroupId */
         $groups = [];
         foreach ($programSet['moduleGroupSet'] ?? [] as $group) {
@@ -69,80 +85,31 @@ class ProgramTreeMapper
             }
         }
 
-        $nameOf = fn (array $group): string => $this->localized(
-            $group['moduleGroupLanguageSet'] ?? [],
-            'moduleGroupLangu',
-            'moduleGroupTitleSet',
-            $language,
-        ) ?? '';
-
-        // A group is flattened only if it actually has a non-flattened ancestor to hoist into;
-        // the top of the tree can never be flattened away (courses need a Module to live in).
-        $isFlattened = function (string $id) use ($groups, $nameOf, $flatten): bool {
-            $group = $groups[$id] ?? null;
-            if ($group === null) {
-                return false;
-            }
-            if (!in_array(mb_strtolower(trim($nameOf($group))), $flatten, true)) {
-                return false;
-            }
-            $parentType = (string) ($group['parentType'] ?? '');
-            $parentId = (string) ($group['parentId'] ?? '');
-
-            return $parentType === 'modulegroup' && isset($groups[$parentId]);
-        };
-
-        // Nearest ancestor-or-self group id that is NOT flattened (null => attach at program root).
-        $effectiveHost = function (string $id) use (&$effectiveHost, $groups, $isFlattened): ?string {
-            if (!$isFlattened($id)) {
-                return $id;
-            }
-            $group = $groups[$id];
-            $parentId = (string) ($group['parentId'] ?? '');
-
-            return isset($groups[$parentId]) ? $effectiveHost($parentId) : null;
-        };
-
-        // Create a ModuleData for every non-flattened group.
         /** @var array<string, ModuleData> $modulesById */
         $modulesById = [];
         foreach ($groups as $id => $group) {
-            if (!$isFlattened($id)) {
-                $modulesById[$id] = new ModuleData($id, $nameOf($group));
+            $name = $this->localized(
+                $group['moduleGroupLanguageSet'] ?? [],
+                'moduleGroupLangu',
+                'moduleGroupTitleSet',
+                $language,
+            ) ?? '';
+            $module = new ModuleData($id, $name);
+            foreach ($this->coursesOf($group, $language) as $course) {
+                $this->addCourseOnce($module, $course);
             }
+            $modulesById[$id] = $module;
         }
 
         /** @var list<ModuleData> $roots */
         $roots = [];
-        // Wire up the module hierarchy.
         foreach ($groups as $id => $group) {
-            if ($isFlattened($id)) {
-                continue;
-            }
             $parentType = (string) ($group['parentType'] ?? '');
             $parentId = (string) ($group['parentId'] ?? '');
-            $host = $parentType === 'modulegroup' ? $effectiveHost($parentId) : null;
-            if ($host !== null && isset($modulesById[$host])) {
-                $modulesById[$host]->addChild($modulesById[$id]);
+            if ($parentType === 'modulegroup' && isset($modulesById[$parentId])) {
+                $modulesById[$parentId]->addChild($modulesById[$id]);
             } else {
                 $roots[] = $modulesById[$id];
-            }
-        }
-
-        // Attach courses to the module of their nearest non-flattened ancestor-or-self.
-        foreach ($groups as $id => $group) {
-            $host = $effectiveHost($id);
-            $target = $host !== null ? ($modulesById[$host] ?? null) : null;
-            if ($target === null) {
-                // Flattened all the way to the program root: keep the group as its own module
-                // rather than dropping its courses (courses cannot hang directly off a Program).
-                $target = $modulesById[$id] ??= new ModuleData($id, $nameOf($group));
-                if (!in_array($target, $roots, true)) {
-                    $roots[] = $target;
-                }
-            }
-            foreach ($this->coursesOf($group, $language) as $course) {
-                $this->addCourseOnce($target, $course);
             }
         }
 
@@ -150,41 +117,149 @@ class ProgramTreeMapper
     }
 
     /**
-     * Stage grouping: one top-level module per study stage ("Fase 1"...), courses placed by
-     * their starting stage. Flatten names do not apply here.
+     * Replace the subtree of any module matching $keys with degree-wide "Semester N" folders,
+     * recursing into non-matching modules so a nested common-core block is caught too.
      *
-     * @param array<string, mixed> $programSet
-     *
-     * @return list<ModuleData>
+     * @param list<string> $keys
      */
-    private function buildStageTree(array $programSet, string $programId, string $language): array
+    private function applySemesterize(ModuleData $module, string $programId, array $keys): ModuleData
     {
-        /** @var array<int, ModuleData> $stages */
-        $stages = [];
+        if ($this->matches($module, $keys)) {
+            return $this->toSemesterModule($module, $programId);
+        }
 
-        foreach ($programSet['moduleGroupSet'] ?? [] as $group) {
-            foreach ($group['moduleSet'] ?? [] as $module) {
-                $course = $this->toCourse($module, $language);
-                if ($course === null) {
-                    continue;
+        $children = array_map(fn (ModuleData $c): ModuleData => $this->applySemesterize($c, $programId, $keys), $module->children);
+
+        return new ModuleData($module->kulId, $module->name, $children, $module->courses);
+    }
+
+    /**
+     * Turn a module into one keeping its name but whose children are "Semester N" folders holding
+     * every course from its former subtree. The semester number spans the whole degree
+     * ((stage - 1) * 2 + within-year semester), so a 3-year bachelor yields Semester 1..6.
+     */
+    private function toSemesterModule(ModuleData $module, string $programId): ModuleData
+    {
+        /** @var array<int, ModuleData> $bySemester keyed by degree-wide semester (0 = unknown) */
+        $bySemester = [];
+        foreach ($this->collectCourses($module) as $course) {
+            foreach ($this->semesterNumbers($course) as $number) {
+                if (!isset($bySemester[$number])) {
+                    $label = $number > 0 ? sprintf('Semester %d', $number) : 'Overige vakken';
+                    $bySemester[$number] = new ModuleData(sprintf('sem:%s:%s:%d', $programId, $module->kulId, $number), $label);
                 }
-                $stage = isset($module['stageStart']) && is_numeric($module['stageStart'])
-                    ? (int) $module['stageStart']
-                    : null;
-                if ($stage === null || $stage < 1) {
-                    continue;
-                }
-                if (!isset($stages[$stage])) {
-                    $label = $language === 'en' ? sprintf('Phase %d', $stage) : sprintf('Fase %d', $stage);
-                    $stages[$stage] = new ModuleData(sprintf('stage:%s:%d', $programId, $stage), $label);
-                }
-                $this->addCourseOnce($stages[$stage], $course);
+                $this->addCourseOnce($bySemester[$number], $course);
             }
         }
 
-        ksort($stages);
+        ksort($bySemester);
+        // Show the "unknown" bucket (key 0) last rather than first.
+        if (isset($bySemester[0])) {
+            $unknown = $bySemester[0];
+            unset($bySemester[0]);
+            $bySemester[] = $unknown;
+        }
 
-        return array_values($stages);
+        return new ModuleData($module->kulId, $module->name, array_values($bySemester));
+    }
+
+    /**
+     * Degree-wide semester numbers a course belongs to (usually one; two for a year-long course).
+     * Returns [0] when neither stage nor semester is known.
+     *
+     * @return list<int>
+     */
+    private function semesterNumbers(CourseData $course): array
+    {
+        $base = $course->stage !== null ? ($course->stage - 1) * 2 : null;
+        $numbers = [];
+        foreach ($course->semesters as $semester) {
+            $within = $semester === 'Semester 2' ? 2 : 1;
+            $numbers[] = $base !== null ? $base + $within : $within;
+        }
+        if ($numbers === []) {
+            // No within-year semester known: fall back to the first semester of the stage, else unknown.
+            $numbers[] = $base !== null ? $base + 1 : 0;
+        }
+
+        return array_values(array_unique($numbers));
+    }
+
+    /**
+     * Dissolve any descendant module matching $keys: its courses join this module and its children
+     * move up. Roots are never dissolved (courses cannot hang directly off a Program).
+     *
+     * @param list<string> $keys
+     */
+    private function applyFlatten(ModuleData $module, array $keys): ModuleData
+    {
+        $result = new ModuleData($module->kulId, $module->name, [], $module->courses);
+        foreach ($module->children as $child) {
+            $processed = $this->applyFlatten($child, $keys);
+            if ($this->matches($processed, $keys)) {
+                foreach ($processed->courses as $course) {
+                    $this->addCourseOnce($result, $course);
+                }
+                foreach ($processed->children as $grandChild) {
+                    $result->addChild($grandChild);
+                }
+            } else {
+                $result->addChild($processed);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Collapse a module that has exactly one child module and no own courses into that child,
+     * removing the redundant wrapper. Applied depth-first.
+     */
+    private function mergeSingleChild(ModuleData $module): ModuleData
+    {
+        $children = array_map(fn (ModuleData $c): ModuleData => $this->mergeSingleChild($c), $module->children);
+
+        if (count($children) === 1 && $module->courses === []) {
+            return $children[0];
+        }
+
+        return new ModuleData($module->kulId, $module->name, $children, $module->courses);
+    }
+
+    /**
+     * @param list<string> $keys moduleGroupIds or (case-insensitive) group names
+     */
+    private function matches(ModuleData $module, array $keys): bool
+    {
+        foreach ($keys as $key) {
+            if ($module->kulId === $key || mb_strtolower(trim($module->name)) === mb_strtolower(trim($key))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * All courses in a module and its descendants (de-duplicated by code, preserving order).
+     *
+     * @return list<CourseData>
+     */
+    private function collectCourses(ModuleData $module): array
+    {
+        /** @var array<string, CourseData> $byCode */
+        $byCode = [];
+        $walk = static function (ModuleData $m) use (&$walk, &$byCode): void {
+            foreach ($m->courses as $course) {
+                $byCode[$course->code] ??= $course;
+            }
+            foreach ($m->children as $child) {
+                $walk($child);
+            }
+        };
+        $walk($module);
+
+        return array_values($byCode);
     }
 
     /**
@@ -235,6 +310,7 @@ class ProgramTreeMapper
             credits: $credits,
             semesters: $this->semestersOf($module),
             mandatory: filter_var($module['mandatory'] ?? true, FILTER_VALIDATE_BOOL),
+            stage: isset($module['stageStart']) && is_numeric($module['stageStart']) ? (int) $module['stageStart'] : null,
             kulModuleId: isset($module['moduleId']) ? (string) $module['moduleId'] : null,
         );
     }
