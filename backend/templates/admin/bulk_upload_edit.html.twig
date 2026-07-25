@@ -675,13 +675,13 @@ Review and Edit Document Metadata
                 <div class="d-flex gap-2 mt-3 justify-content-end">
                     <twig:ea:Button htmlElement="a" href="{{ path('admin_bulk_upload_create_all') }}" variant="success"
                         icon="fa fa-circle-check"
-                        htmlAttributes="{{ {onclick: 'return confirm(\'Create ' ~ documents|length ~ ' document(s)?\')' } }}">
+                        htmlAttributes="{{ {id: 'createAllBtn'} }}">
                         Create All Documents ({{ documents|length }})
                     </twig:ea:Button>
 
                     <twig:ea:Button htmlElement="a" href="{{ path('admin_bulk_upload_cancel') }}" variant="default"
                         icon="fa fa-xmark"
-                        htmlAttributes="{{ {onclick: 'return confirm(\'Are you sure you want to cancel? All uploaded files will be removed.\')' } }}">
+                        htmlAttributes="{{ {id: 'cancelBtn'} }}">
                         Cancel
                     </twig:ea:Button>
                 </div>
@@ -1230,6 +1230,24 @@ Review and Edit Document Metadata
                 });
             }
         });
+        // Confirm dialogs for Create All and Cancel buttons (CSP-safe, no inline onclick)
+        var createAllBtn = document.getElementById('createAllBtn');
+        if (createAllBtn) {
+            createAllBtn.addEventListener('click', function(e) {
+                if (!confirm('Create {{ documents|length }} document(s)?')) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        var cancelBtn = document.getElementById('cancelBtn');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function(e) {
+                if (!confirm('Are you sure you want to cancel? All uploaded files will be removed.')) {
+                    e.preventDefault();
+                }
+            });
+        }
     });
 </script>
 {% endblock %}
