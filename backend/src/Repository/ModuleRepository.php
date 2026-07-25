@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Module;
+use App\Entity\Program;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -39,6 +40,16 @@ class ModuleRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * Find a previously imported module within a program by its KU Leuven import key
+     * (moduleGroupId or a synthetic "stage:<programId>:<n>" key). Matching is scoped to the
+     * program so the same synthetic stage keys can never collide across programs.
+     */
+    public function findOneByKulIdAndProgram(string $kulId, Program $program): ?Module
+    {
+        return $this->findOneBy(['kulId' => $kulId, 'program' => $program]);
     }
 
     /**

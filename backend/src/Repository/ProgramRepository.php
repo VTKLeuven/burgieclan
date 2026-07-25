@@ -42,6 +42,14 @@ class ProgramRepository extends ServiceEntityRepository
     }
 
     /**
+     * Find a program previously imported from the KU Leuven onderwijsaanbod by its programId.
+     */
+    public function findOneByKulId(string $kulId): ?Program
+    {
+        return $this->findOneBy(['kulId' => $kulId]);
+    }
+
+    /**
      * @return Program[]
      */
     public function findBySearchQuery(string $query, int $limit = 20): array
