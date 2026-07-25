@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '@/components/UserContext';
@@ -27,31 +27,27 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     const { user } = useUser();
     const { updateFavorite } = useFavorites(user);
 
-    const [isFavorite, setIsFavorite] = useState(false);
-
-    // Synchronize with user data when it changes
-    useEffect(() => {
-        if (user) {
-            // Determine favorite status from user context
-            let isItemFavorite = false;
-
-            if (itemType === 'document' && user.favoriteDocuments) {
-                isItemFavorite = user.favoriteDocuments.some(doc => doc.id === itemId);
-            } else if (itemType === 'course' && user.favoriteCourses) {
-                isItemFavorite = user.favoriteCourses.some(course => course.id === itemId);
-            } else if (itemType === 'module' && user.favoriteModules) {
-                isItemFavorite = user.favoriteModules.some(module => module.id === itemId);
-            } else if (itemType === 'program' && user.favoritePrograms) {
-                isItemFavorite = user.favoritePrograms.some(program => program.id === itemId);
-            }
-
-            // Only update if different from current state
-            if (isItemFavorite !== isFavorite) {
-                setIsFavorite(isItemFavorite);
-            }
+    // Derived favorite status from user context (no state sync effect)
+    const derivedFavorite = useMemo(() => {
+        if (!user) return false;
+        if (itemType === 'document' && user.favoriteDocuments) {
+            return !!user.favoriteDocuments.some(doc => doc.id === itemId);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        if (itemType === 'course' && user.favoriteCourses) {
+            return !!user.favoriteCourses.some(course => course.id === itemId);
+        }
+        if (itemType === 'module' && user.favoriteModules) {
+            return !!user.favoriteModules.some(module => module.id === itemId);
+        }
+        if (itemType === 'program' && user.favoritePrograms) {
+            return !!user.favoritePrograms.some(program => program.id === itemId);
+        }
+        return false;
     }, [user, itemId, itemType]);
+
+    // Optional optimistic state for immediate UI feedback on toggle
+    const [optimisticFavorite, setOptimisticFavorite] = useState<boolean | null>(null);
+    const isFavorite = optimisticFavorite ?? derivedFavorite;
 
     const handleToggleFavorite = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -60,13 +56,13 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
         if (user) {
             const newFavoriteState = !isFavorite;
 
-            // Update internal state first for immediate UI feedback
-            setIsFavorite(newFavoriteState);
+            // Optimistically update UI
+            setOptimisticFavorite(newFavoriteState);
 
-            // Call the API to update favorites
+            // Persist change via API
             updateFavorite(itemId, itemType, newFavoriteState);
 
-            // Notify parent component if callback provided
+            // Propagate if parent cares
             if (onToggleFavorite) {
                 onToggleFavorite(newFavoriteState);
             }

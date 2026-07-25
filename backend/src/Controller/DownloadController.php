@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\DocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Vich\UploaderBundle\Exception\NoFileFoundException;
@@ -15,6 +16,7 @@ final class DownloadController extends AbstractController
     #[Route('/{filename}', name: 'document_download', methods: ['GET'])]
     public function __invoke(
         string $filename,
+        Request $request,
         DocumentRepository $documentRepository,
         DownloadHandler $downloadHandler
     ): Response {
@@ -26,13 +28,23 @@ final class DownloadController extends AbstractController
         }
 
         try {
-            return $downloadHandler->downloadObject(
+            $response = $downloadHandler->downloadObject(
                 $document,
                 'file',
                 null,
                 null,
                 false
             );
+
+            // When ?inline=1 is set, serve for in-browser viewing instead of download
+            if ($request->query->get('inline')) {
+                $response->headers->set('Content-Disposition', 'inline');
+                if (str_ends_with(strtolower($filename), '.pdf')) {
+                    $response->headers->set('Content-Type', 'application/pdf');
+                }
+            }
+
+            return $response;
         } catch (NoFileFoundException $e) {
             // Vich signals missing file via its own exception in some code paths
             return new Response('File not found', Response::HTTP_NOT_FOUND);

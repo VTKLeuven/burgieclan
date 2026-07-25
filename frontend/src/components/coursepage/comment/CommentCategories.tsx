@@ -3,7 +3,7 @@ import CourseCommentList from '@/components/coursepage/comment/CourseCommentList
 import { HydraCollection, useApi } from '@/hooks/useApi';
 import { CommentCategory, CourseComment } from '@/types/entities';
 import { convertToCommentCategory } from '@/utils/convertToEntity';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type CommentCategoriesProps = {
@@ -14,14 +14,11 @@ type CommentCategoriesProps = {
 
 const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCategoriesProps) => {
     const [allCategories, setAllCategories] = useState<CommentCategory[]>([]);
-    const [localComments, setLocalComments] = useState<CourseComment[]>(comments);
+
     const { t, i18n } = useTranslation();
     const { request, loading } = useApi<HydraCollection<unknown>>();
 
-    // Sync local comments with props
-    useEffect(() => {
-        setLocalComments(comments);
-    }, [comments]);
+
 
     // Fetch all categories from backend
     useEffect(() => {
@@ -41,7 +38,7 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
     // Group comments by category - memoized to prevent unnecessary recalculations
     const commentsByCategory = useMemo(() => {
         const grouped: { [key: number]: CourseComment[] } = {};
-        localComments.forEach(comment => {
+        comments.forEach(comment => {
             if (comment.commentCategory) {
                 const categoryId = comment.commentCategory.id;
                 if (!grouped[categoryId]) {
@@ -51,22 +48,18 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
             }
         });
         return grouped;
-    }, [localComments]);
+    }, [comments]);
 
     const getCommentsByCategory = useCallback((categoryId: number) => {
         return commentsByCategory[categoryId] || [];
     }, [commentsByCategory]);
 
     const handleCommentAdded = useCallback((newComment: CourseComment) => {
-        setLocalComments(prevComments => {
-            const updatedComments = [...prevComments, newComment];
-            // Notify parent component of the update
-            if (onCommentsUpdate) {
-                onCommentsUpdate(updatedComments);
-            }
-            return updatedComments;
-        });
-    }, [onCommentsUpdate]);
+        const updatedComments = [...comments, newComment];
+        if (onCommentsUpdate) {
+            onCommentsUpdate(updatedComments);
+        }
+    }, [comments, onCommentsUpdate]);
 
     if (loading) {
         return (
