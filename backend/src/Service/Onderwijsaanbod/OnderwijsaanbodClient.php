@@ -39,21 +39,61 @@ class OnderwijsaanbodClient
      *
      * @return list<array{programId: string, title: string, qualificationId: ?string}>
      */
-    public function searchPrograms(string $query, int $size = 20): array
+    public function searchPrograms(string $query, int $size = 30): array
     {
+        $cleanQuery = trim($query);
+        if ($cleanQuery === '') {
+            return [];
+        }
+
+        // Sanitize special Lucene syntax characters while preserving natural full-text search
+        $sanitizedQuery = preg_replace('/[+\-&&||!()\[\]{}^"~*?:\\\\]/', ' ', $cleanQuery);
+        $sanitizedQuery = preg_replace('/\s+/', ' ', trim((string) $sanitizedQuery));
+        if ($sanitizedQuery === '') {
+            return [];
+        }
+
+        $terms = array_values(array_filter(explode(' ', mb_strtolower($sanitizedQuery))));
+
         $response = $this->search(
             $this->programIndex,
             [
-            'size' => $size,
-            'query' => ['query_string' => ['query' => $query]],
-            '_source' => [
-                'qualificationId',
-                'inProgramguide',
-                'programSet.programId',
-                'programSet.inProgramGuide',
-                'programSet.programLanguageSet.programLangu',
-                'programSet.programLanguageSet.programTitleSet.description',
-            ],
+                'size' => max(50, $size * 2),
+                'query' => [
+                    'bool' => [
+                        'should' => [
+                            [
+                                'query_string' => [
+                                    'query' => $sanitizedQuery,
+                                    'fields' => [
+                                        'programSet.programLanguageSet.programTitleSet.description^20',
+                                        'qualificationLanguageSet.qualificationTitleSet.description^20',
+                                        'programSet.programId^50',
+                                    ],
+                                    'default_operator' => 'AND',
+                                ],
+                            ],
+                            [
+                                'query_string' => [
+                                    'query' => $sanitizedQuery,
+                                    'fields' => [
+                                        'programSet.programLanguageSet.programTitleSet.description^5',
+                                        'qualificationLanguageSet.qualificationTitleSet.description^5',
+                                    ],
+                                    'default_operator' => 'OR',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                '_source' => [
+                    'qualificationId',
+                    'inProgramguide',
+                    'programSet.programId',
+                    'programSet.inProgramGuide',
+                    'programSet.programLanguageSet.programLangu',
+                    'programSet.programLanguageSet.programTitleSet.description',
+                ],
             ]
         );
 
@@ -67,16 +107,75 @@ class OnderwijsaanbodClient
                 if ($programId === null || isset($seen[$programId])) {
                     continue;
                 }
+
+                if (isset($programSet['inProgramGuide']) && strtolower((string) $programSet['inProgramGuide']) === 'false') {
+                    continue;
+                }
+
+                $title = $this->extractProgramTitle($programSet);
                 $seen[$programId] = true;
+
                 $results[] = [
                     'programId' => $programId,
-                    'title' => $this->extractProgramTitle($programSet),
+                    'title' => $title,
                     'qualificationId' => $qualificationId,
                 ];
             }
         }
 
-        return $results;
+        // Rank results: prioritize direct matches, short titles, and demote prep/shortened programs if query doesn't ask for them
+        $qLower = mb_strtolower($cleanQuery);
+        usort(
+            $results,
+            static function (array $a, array $b) use ($terms, $qLower): int {
+                $titleA = mb_strtolower($a['title']);
+                $titleB = mb_strtolower($b['title']);
+
+                $scoreA = 0;
+                $scoreB = 0;
+
+                foreach ($terms as $term) {
+                    if (str_contains($titleA, $term)) {
+                        $scoreA += 10;
+                    }
+                    if (str_contains($titleB, $term)) {
+                        $scoreB += 10;
+                    }
+                }
+
+                if (str_contains($titleA, $qLower)) {
+                    $scoreA += 50;
+                }
+                if (str_contains($titleB, $qLower)) {
+                    $scoreB += 50;
+                }
+
+                if (str_starts_with($titleA, $qLower)) {
+                    $scoreA += 100;
+                }
+                if (str_starts_with($titleB, $qLower)) {
+                    $scoreB += 100;
+                }
+
+                foreach (['verkort', 'voorbereidingsprogramma', 'schakel', 'educatief', 'postgraduaat'] as $modifier) {
+                    if (!str_contains($qLower, $modifier)) {
+                        if (str_contains($titleA, $modifier)) {
+                            $scoreA -= 30;
+                        }
+                        if (str_contains($titleB, $modifier)) {
+                            $scoreB -= 30;
+                        }
+                    }
+                }
+
+                $scoreA -= (int) (mb_strlen($a['title']) / 10);
+                $scoreB -= (int) (mb_strlen($b['title']) / 10);
+
+                return $scoreB <=> $scoreA;
+            }
+        );
+
+        return array_slice($results, 0, $size);
     }
 
     /**
