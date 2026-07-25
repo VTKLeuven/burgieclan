@@ -116,6 +116,73 @@ class ProgramTreeMapperTest extends TestCase
         self::assertSame([], $basis->courses);
     }
 
+    public function testUnwrapRedundantProgramRootModule(): void
+    {
+        $mockSource = [
+            'programSet' => [
+                [
+                    'programId' => '1001',
+                    'programLanguageSet' => [
+                        [
+                            'programLangu' => 'NL',
+                            'programTitleSet' => [
+                                ['description' => 'Bachelor in de ingenieurswetenschappen (Leuven)'],
+                            ],
+                        ],
+                    ],
+                    'moduleGroupSet' => [
+                        [
+                            'moduleGroupId' => 'G1',
+                            'parentType' => 'program',
+                            'parentId' => '1001',
+                            'moduleGroupLanguageSet' => [
+                                [
+                                    'moduleGroupLangu' => 'NL',
+                                    'moduleGroupTitleSet' => [
+                                        ['description' => 'Bachelor in de ingenieurswetenschappen'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'moduleGroupId' => 'G2',
+                            'parentType' => 'modulegroup',
+                            'parentId' => 'G1',
+                            'moduleGroupLanguageSet' => [
+                                [
+                                    'moduleGroupLangu' => 'NL',
+                                    'moduleGroupTitleSet' => [
+                                        ['description' => 'Gemeenschappelijk deel'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'moduleGroupId' => 'G3',
+                            'parentType' => 'modulegroup',
+                            'parentId' => 'G1',
+                            'moduleGroupLanguageSet' => [
+                                [
+                                    'moduleGroupLangu' => 'NL',
+                                    'moduleGroupTitleSet' => [
+                                        ['description' => 'Opties'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $program = $this->mapper->map($mockSource, '1001', 'nl', [], [], false);
+        self::assertNotNull($program);
+
+        // The redundant root module "Bachelor in de ingenieurswetenschappen" should be unwrapped!
+        $rootNames = array_map(static fn (ModuleData $m): string => $m->name, $program->modules);
+        self::assertSame(['Gemeenschappelijk deel', 'Opties'], $rootNames);
+    }
+
     private function childByName(ModuleData $parent, string $name): ModuleData
     {
         foreach ($parent->children as $child) {

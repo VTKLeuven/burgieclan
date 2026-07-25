@@ -19,6 +19,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Admin controller for the program tree structure editor.
+ *
+ * Manages the module/course hierarchy of a program: adding, moving, renaming, and removing
+ * modules and courses. Also handles one-click re-sync from KU Leuven using saved import settings.
+ */
 #[IsGranted(User::ROLE_ADMIN)]
 class ProgramTreeAdminController extends AbstractController
 {
@@ -235,6 +241,17 @@ class ProgramTreeAdminController extends AbstractController
         /** @var array<string> $items */
         $items = $request->request->all('items');
         $removedCount = 0;
+        $warnings = [];
+
+        // Collect all module IDs being removed in this bulk request
+        /** @var array<int, bool> $modulesBeingRemoved */
+        $modulesBeingRemoved = [];
+        foreach ($items as $item) {
+            $parts = explode(':', $item);
+            if (count($parts) >= 3 && $parts[0] === 'module') {
+                $modulesBeingRemoved[(int) $parts[1]] = true;
+            }
+        }
 
         foreach ($items as $item) {
             $parts = explode(':', $item);
@@ -264,6 +281,8 @@ class ProgramTreeAdminController extends AbstractController
                             $parentModule->removeModule($module);
                         }
                     }
+
+                    $this->removeModuleRecursively($module, $modulesBeingRemoved, $warnings, $program);
                     $removedCount++;
                 }
             }
@@ -272,8 +291,61 @@ class ProgramTreeAdminController extends AbstractController
         $this->entityManager->flush();
 
         $this->addFlash('success', sprintf('Removed %d item(s) from program.', $removedCount));
+        foreach (array_unique($warnings) as $warning) {
+            $this->addFlash('warning', $warning);
+        }
 
         return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
+    }
+
+    /**
+     * Safely remove a module and its submodules recursively. If a submodule has another
+     * parent module or belongs to another program not being deleted, it is unlinked instead.
+     *
+     * @param array<int, bool> $modulesBeingRemoved set of module IDs being removed in this bulk request
+     * @param list<string>     $warnings            out-parameter to collect warning messages
+     */
+    private function removeModuleRecursively(
+        Module $module,
+        array $modulesBeingRemoved,
+        array &$warnings,
+        Program $currentProgram
+    ): void {
+        // Check for external parents BEFORE recursing into children to avoid
+        // deleting grandchildren of a module that should only be unlinked.
+        $allParents = $this->moduleRepository->findParentModules($module);
+        $externalParents = array_filter(
+            $allParents,
+            static fn (Module $p): bool => !isset($modulesBeingRemoved[$p->getId()]) && $p->getId() !== $module->getId()
+        );
+
+        $hasExternalProgram = $module->getProgram() !== null && $module->getProgram()->getId() !== $currentProgram->getId();
+
+        if (count($externalParents) > 0 || $hasExternalProgram) {
+            $parentNames = array_map(static fn (Module $p): string => $p->getName(), $externalParents);
+            $prog = $module->getProgram();
+            if ($prog !== null && $prog->getId() !== $currentProgram->getId()) {
+                $parentNames[] = 'Program: ' . $prog->getName();
+            }
+
+            $warnings[] = sprintf(
+                'Module "%s" (ID %d) was unlinked instead of deleted from the database because it is also used in: %s.',
+                $module->getName(),
+                $module->getId(),
+                implode(', ', $parentNames)
+            );
+
+            return;
+        }
+
+        // Safe to recurse — this module will be deleted, so process its children first
+        foreach (array_values($module->getModules()->toArray()) as $childModule) {
+            $this->removeModuleRecursively($childModule, $modulesBeingRemoved, $warnings, $currentProgram);
+        }
+
+        $module->getCourses()->clear();
+        $module->getModules()->clear();
+        $this->entityManager->remove($module);
     }
 
     #[AdminRoute('/program/{id}/tree/rename-module', name: 'program_tree_rename_module', options: ['methods' => ['POST']])]
@@ -305,8 +377,14 @@ class ProgramTreeAdminController extends AbstractController
     }
 
     #[AdminRoute('/program/{id}/tree/sync-onderwijsaanbod', name: 'program_tree_sync', options: ['methods' => ['POST']])]
-    public function syncOnderwijsaanbod(int $id): Response
+    public function syncOnderwijsaanbod(int $id, Request $request): Response
     {
+        if (!$this->isCsrfTokenValid('program_sync', (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Invalid CSRF token, sync aborted.');
+
+            return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
+        }
+
         $program = $this->programRepository->find($id);
         if (!$program || !$program->getKulId()) {
             $this->addFlash('danger', 'Program not found or lacks a KU Leuven programId.');
@@ -322,14 +400,23 @@ class ProgramTreeAdminController extends AbstractController
             return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
         }
 
-        $programData = $this->mapper->map($source, $kulId, 'nl');
+        $settings = $program->getResolvedImportSettings();
+
+        $programData = $this->mapper->map(
+            $source,
+            $kulId,
+            $settings['lang'],
+            $settings['flatten'],
+            $settings['semester'],
+            $settings['merge'],
+        );
         if ($programData === null) {
             $this->addFlash('danger', 'Failed to map program data.');
 
             return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
         }
 
-        $result = $this->importer->import($programData, enrich: true, dryRun: false);
+        $result = $this->importer->import($programData, enrich: $settings['enrich'], dryRun: false);
 
         $this->addFlash(
             'success',

@@ -53,6 +53,24 @@ class ModuleRepository extends ServiceEntityRepository
     }
 
     /**
+     * Find all parent modules that contain the given module in their $modules collection.
+     *
+     * @return Module[]
+     */
+    public function findParentModules(Module $module): array
+    {
+        /** @var Module[] $result */
+        $result = $this->createQueryBuilder('m')
+            ->innerJoin('m.modules', 'child')
+            ->where('child.id = :childId')
+            ->setParameter('childId', $module->getId())
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+    }
+
+    /**
      * @return Module[]
      */
     public function findBySearchQuery(string $query, int $limit = 20): array
