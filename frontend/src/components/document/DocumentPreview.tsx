@@ -153,13 +153,18 @@ export default function DocumentPreview({ id }: { id: string }) {
 
                     {/*TODO: expand preview to other file types*/}
                     <div ref={previewRef} className="flex justify-center overflow-x-auto bg-vtk-paper-2 p-4">
-                        {(document && document.mimetype == "application/pdf" && document.contentUrl) ? (
-                            <PDFViewer file={document.contentUrl} width={containerWidth} />
-                        ) : (
-                            <div className="vtk-empty flex h-96 w-full items-center justify-center">
-                                {t('document.no-preview', { filename: document.filename })}
-                            </div>
-                        )}
+                        {(() => {
+                            const isPdf = document.mimetype === "application/pdf" ||
+                                document.filename?.toLowerCase().endsWith('.pdf') ||
+                                document.contentUrl?.toLowerCase().endsWith('.pdf');
+                            return (document.contentUrl && isPdf) ? (
+                                <PDFViewer file={document.contentUrl} width={containerWidth} />
+                            ) : (
+                                <div className="vtk-empty flex h-96 w-full items-center justify-center">
+                                    {t('document.no-preview', { filename: document.filename })}
+                                </div>
+                            );
+                        })()}
                     </div>
                 </div>
 
