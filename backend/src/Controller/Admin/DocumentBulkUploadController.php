@@ -21,7 +21,6 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -30,6 +29,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\File as FileConstraint;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Vich\UploaderBundle\FileAbstraction\ReplacingFile;
 
 #[IsGranted(User::ROLE_MODERATOR)]
 class DocumentBulkUploadController extends AbstractController
@@ -505,9 +505,8 @@ class DocumentBulkUploadController extends AbstractController
                         if (!(isset($tempPath) && is_string($tempPath) && file_exists($tempPath))) {
                             throw new \RuntimeException('Temporary file not found: ' . (is_string($tempPath) ? $tempPath : ''));
                         }
-                        $file = new File($tempPath);
+                        $file = new ReplacingFile($tempPath);
                         $document->setFile($file);
-                        $document->setFileName(is_string($docMeta['originalName']) ? $docMeta['originalName'] : '');
 
                         $this->entityManager->persist($document);
                         $createdCount++;
