@@ -186,23 +186,33 @@ class OnderwijsaanbodImporter
     }
 
     /**
+     * Extract professor KU Leuven u-numbers (e.g. "u0179816") from an OPO document source.
+     *
      * @param array<string, mixed> $source
      *
      * @return list<string>
      */
     private function extractProfessors(array $source): array
     {
-        $names = [];
+        $uNumbers = [];
         foreach ($source['moduleInstructorSet'] ?? [] as $instructor) {
-            $first = trim((string) ($instructor['firstName'] ?? ''));
-            $family = trim((string) ($instructor['familyName'] ?? ''));
-            $name = trim($first . ' ' . $family);
-            if ($name !== '' && !in_array($name, $names, true)) {
-                $names[] = $name;
+            $uNumber = null;
+            if (!empty($instructor['uid'])) {
+                $uNumber = strtolower(trim((string) $instructor['uid']));
+            } elseif (!empty($instructor['masterEmployeeNr'])) {
+                $num = trim((string) $instructor['masterEmployeeNr']);
+                $uNumber = 'u' . str_pad($num, 7, '0', STR_PAD_LEFT);
+            } elseif (!empty($instructor['objectIdCentralPerson'])) {
+                $num = trim((string) $instructor['objectIdCentralPerson']);
+                $uNumber = 'u' . str_pad($num, 7, '0', STR_PAD_LEFT);
+            }
+
+            if ($uNumber !== null && $uNumber !== '' && !in_array($uNumber, $uNumbers, true)) {
+                $uNumbers[] = $uNumber;
             }
         }
 
-        return $names;
+        return $uNumbers;
     }
 
     /**
