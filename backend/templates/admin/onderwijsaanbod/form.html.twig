@@ -1,0 +1,71 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}Import from KU Leuven onderwijsaanbod{% endblock %}
+
+{% block main %}
+    <p class="text-muted">
+        Search for a KU Leuven programme, then choose how it should be structured on the next
+        screen before anything is written.
+    </p>
+
+            {# Step 1: search #}
+            <form method="get" action="{{ path('admin_onderwijsaanbod_import') }}" class="mb-4">
+                <div class="d-flex" style="gap: .5rem;">
+                    <input type="text" name="q" value="{{ query }}" class="form-control"
+                           placeholder="e.g. burgerlijk ingenieur informatica" autofocus>
+                    <button type="submit" class="btn btn-secondary">Search</button>
+                </div>
+            </form>
+
+            {# Step 2: options + programme choice #}
+            <form method="post" action="{{ path('admin_onderwijsaanbod_import_preview') }}">
+                {% if searchResults is not empty %}
+                    <div class="form-group">
+                        <label class="form-label">Programme</label>
+                        <table class="table datagrid">
+                            <tbody>
+                                {% for r in searchResults %}
+                                    <tr>
+                                        <td style="width: 1%;">
+                                            <input type="radio" name="programId" value="{{ r.programId }}"
+                                                   {{ loop.first ? 'checked' : '' }}>
+                                        </td>
+                                        <td style="width: 1%;"><code>{{ r.programId }}</code></td>
+                                        <td>{{ r.title }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="form-group">
+                        <label class="form-label" for="programId">KU Leuven programId</label>
+                        <input type="text" id="programId" name="programId" class="form-control"
+                               placeholder="e.g. 55036830">
+                        {% if query is not empty %}
+                            <small class="form-text text-muted">No results for “{{ query }}”. Enter a programId directly.</small>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label class="form-label" for="lang">Title language</label>
+                        <select id="lang" name="lang" class="form-select">
+                            <option value="nl" selected>Nederlands</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label class="form-label d-block">Enrichment</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="enrich" name="enrich" value="1" checked>
+                            <label class="form-check-label" for="enrich">Fetch professors &amp; identical courses</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Preview import</button>
+            </form>
+{% endblock %}

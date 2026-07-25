@@ -1,0 +1,516 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block title %}Manage Structure — {{ program.name }}{% endblock %}
+
+{% block content_header %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="m-0">{{ program.name }}</h1>
+            <div class="text-muted small mt-1">
+                {% if program.kulId %}
+                    <span class="badge badge-secondary me-2"><i class="fa-solid fa-university me-1"></i> KU Leuven ID: {{ program.kulId }}</span>
+                {% else %}
+                    <span class="badge badge-secondary me-2">Custom Program</span>
+                {% endif %}
+                <span><i class="fa-solid fa-folder-open me-1"></i> {{ program.modules|length }} root module(s)</span>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            {% if program.kulId %}
+                <form method="post" action="{{ path('admin_program_tree_sync', {id: program.id}) }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('program_sync') }}">
+                    <button type="submit" class="btn btn-sm btn-primary" title="Re-sync using saved import options">
+                        <i class="fa-solid fa-rotate me-1"></i> Quick Sync
+                    </button>
+                </form>
+                <form method="post" action="{{ path('admin_onderwijsaanbod_import_preview') }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('onderwijsaanbod_import') }}">
+                    <input type="hidden" name="programId" value="{{ program.kulId }}">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Preview and adjust flatten/semester/language options before syncing">
+                        <i class="fa-solid fa-sliders me-1"></i> Sync & Adjust Settings
+                    </button>
+                </form>
+            {% endif %}
+            <a href="{{ path('admin', {crudAction: 'index', crudControllerFqcn: 'App\\Controller\\Admin\\ProgramCrudController'}) }}" class="btn btn-sm btn-secondary">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Programs
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% macro renderModule(module, parentId, level) %}
+    {% import _self as selfMacro %}
+    <li class="tree-module-item mb-2" data-module-id="{{ module.id }}">
+        <div class="card shadow-sm border-left-primary">
+            <div class="card-header py-2 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <input type="checkbox" class="tree-checkbox module-checkbox me-2" data-type="module" data-id="{{ module.id }}" data-parent-id="{{ parentId }}">
+                    <span class="toggle-collapse cursor-pointer text-primary me-1" data-target="#module-collapse-{{ module.id }}">
+                        <i class="fa-solid fa-chevron-right toggle-icon"></i>
+                    </span>
+                    <strong>{{ module.name }}</strong>
+                    {% if module.kulId %}
+                        <span class="badge badge-secondary border ms-1">{{ module.kulId }}</span>
+                    {% endif %}
+                </div>
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 add-submodule-btn" data-module-id="{{ module.id }}" data-module-name="{{ module.name }}" title="Add Submodule">
+                        <i class="fa-solid fa-folder-plus text-success me-1"></i> Submodule
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 attach-courses-btn" data-module-id="{{ module.id }}" data-module-name="{{ module.name }}" title="Add Courses">
+                        <i class="fa-solid fa-plus text-primary me-1"></i> Courses
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 rename-module-btn" data-module-id="{{ module.id }}" data-module-name="{{ module.name }}" title="Rename Module">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="collapse card-body p-2" id="module-collapse-{{ module.id }}">
+                {# Render courses attached to this module #}
+                {% if module.courses is not empty %}
+                    <div class="table-responsive mb-2">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30px;"></th>
+                                    <th>Code</th>
+                                    <th>Course Name</th>
+                                    <th>Credits</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for course in module.courses %}
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="tree-checkbox course-checkbox" data-type="course" data-id="{{ course.id }}" data-parent-id="{{ module.id }}">
+                                        </td>
+                                        <td><code>{{ course.code }}</code></td>
+                                        <td>{{ course.name }}</td>
+                                        <td><span class="badge badge-secondary">{{ course.credits ?? '–' }} ECTS</span></td>
+                                        <td>
+                                            <a href="{{ ea_url().setController('App\\Controller\\Admin\\CourseCrudController').setAction('edit').setEntityId(course.id) }}" class="btn btn-sm btn-outline-primary py-0 px-1 border-0 me-1" title="Edit course">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                            <form method="post" action="{{ path('admin_program_tree_bulk_remove', {id: module.program.id ?? 0}) }}" class="d-inline">
+                                                <input type="hidden" name="items[]" value="course:{{ course.id }}:{{ module.id }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1 border-0" title="Remove course from module">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {# Render child submodules recursively #}
+                {% if module.modules is not empty %}
+                    <ul class="list-unstyled ps-3 mb-0 border-start">
+                        {% for subModule in module.modules %}
+                            {{ selfMacro.renderModule(subModule, module.id, level + 1) }}
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {% if module.courses is empty and module.modules is empty %}
+                    <div class="text-muted small italic p-2 rounded border">
+                        <i class="fa-solid fa-circle-info me-1"></i> Empty module (no courses or submodules).
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </li>
+{% endmacro %}
+
+{% import _self as treeMacro %}
+
+{% block main %}
+    {# Sticky Bulk Action Bar #}
+    <div id="bulk-action-bar" class="card mb-3 sticky-top shadow-sm border-primary d-none" style="top: 15px; z-index: 1020;">
+        <div class="card-body py-2 px-3 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <input type="checkbox" id="master-select-all" class="me-2">
+                <span id="bulk-selection-count" class="fw-bold">0 items selected</span>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-primary btn-sm" id="trigger-bulk-move-btn">
+                    <i class="fa-solid fa-folder-tree me-1"></i> Move Selected...
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" id="trigger-bulk-remove-btn">
+                    <i class="fa-solid fa-trash-can me-1"></i> Remove Selected
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {# Main Program Tree Card #}
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <input type="checkbox" id="select-all-tree" class="me-2" title="Select All Items">
+                <h5 class="m-0 fw-bold"><i class="fa-solid fa-sitemap text-primary me-1"></i> Program Tree</h5>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" id="add-root-module-btn">
+                <i class="fa-solid fa-plus me-1"></i> Add Root Module
+            </button>
+        </div>
+        <div class="card-body">
+            {% if program.modules is not empty %}
+                <ul class="list-unstyled mb-0" id="program-tree-root">
+                    {% for rootModule in program.modules %}
+                        {{ treeMacro.renderModule(rootModule, 'root', 0) }}
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="fa-solid fa-folder-open fa-3x mb-3 text-muted"></i>
+                    <p class="mb-2">This program currently has no modules.</p>
+                    <button type="button" class="btn btn-primary btn-sm" id="add-first-module-btn">
+                        <i class="fa-solid fa-plus me-1"></i> Add First Module
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Modal: Move Items #}
+    <div class="modal fade" id="moveModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="post" action="{{ path('admin_program_tree_bulk_move', {id: program.id}) }}" id="bulk-move-form">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fa-solid fa-folder-tree text-primary me-2"></i> Move Selected Items</h5>
+                        <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Select destination module for the checked items:</p>
+                        <div class="mb-3">
+                            <label for="destination_module_id" class="form-label">Destination Module</label>
+                            <select name="destination_module_id" id="destination_module_id" class="form-select" required>
+                                <option value="">-- Choose Module --</option>
+                                {% macro renderModuleOptions(module, prefix) %}
+                                    <option value="{{ module.id }}">{{ prefix }}{{ module.name }}</option>
+                                    {% for sub in module.modules %}
+                                        {{ _self.renderModuleOptions(sub, prefix ~ '— ') }}
+                                    {% endfor %}
+                                {% endmacro %}
+                                {% for m in program.modules %}
+                                    {{ _self.renderModuleOptions(m, '') }}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div id="move-hidden-inputs"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check me-1"></i> Move Items</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {# Modal: Add Courses #}
+    <div class="modal fade" id="addCoursesModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <form method="post" action="{{ path('admin_program_tree_attach_courses', {id: program.id}) }}">
+                    <input type="hidden" name="target_module_id" id="attach-target-module-id">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fa-solid fa-plus text-primary me-2"></i> Add Courses to <span id="attach-module-title"></span></h5>
+                        <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <input type="text" id="course-search-filter" class="form-control" placeholder="Filter courses by name or code...">
+                        </div>
+                        <div style="max-height: 350px; overflow-y: auto;" class="border rounded p-2">
+                            {% for c in allCourses %}
+                                <div class="form-check course-item-row py-1 border-bottom">
+                                    <input type="checkbox" name="course_ids[]" value="{{ c.id }}" class="form-check-input" id="course-opt-{{ c.id }}">
+                                    <label class="form-check-label d-block cursor-pointer" for="course-opt-{{ c.id }}">
+                                        <code>{{ c.code }}</code> <strong>{{ c.name }}</strong>
+                                        <span class="badge badge-secondary float-end">{{ c.credits ?? '–' }} ECTS</span>
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check me-1"></i> Attach Courses</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {# Modal: Add Module #}
+    <div class="modal fade" id="addModuleModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="post" action="{{ path('admin_program_tree_add_module', {id: program.id}) }}">
+                    <input type="hidden" name="parent_module_id" id="add-module-parent-id">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fa-solid fa-folder-plus text-success me-2"></i> Add New Module</h5>
+                        <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="module-name-input" class="form-label">Module Name</label>
+                            <input type="text" name="name" id="module-name-input" class="form-control" placeholder="e.g. Fase 1 / Bachelor" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check me-1"></i> Create Module</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {# Modal: Rename Module #}
+    <div class="modal fade" id="renameModuleModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="post" action="{{ path('admin_program_tree_rename_module', {id: program.id}) }}">
+                    <input type="hidden" name="module_id" id="rename-module-id">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fa-solid fa-pen-to-square text-primary me-2"></i> Rename Module</h5>
+                        <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="rename-module-name-input" class="form-label">New Name</label>
+                            <input type="text" name="name" id="rename-module-name-input" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check me-1"></i> Save Name</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {# Hidden Bulk Remove Form #}
+    <form method="post" action="{{ path('admin_program_tree_bulk_remove', {id: program.id}) }}" id="bulk-remove-form">
+        <div id="remove-hidden-inputs"></div>
+    </form>
+
+    <script nonce="{{ csp_nonce('script') }}">
+        document.addEventListener('DOMContentLoaded', function () {
+            const bulkActionBar = document.getElementById('bulk-action-bar');
+            const bulkSelectionCount = document.getElementById('bulk-selection-count');
+            const masterSelectAll = document.getElementById('master-select-all');
+            const selectAllTree = document.getElementById('select-all-tree');
+
+            // Toggle collapses
+            document.querySelectorAll('.toggle-collapse').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const targetId = btn.getAttribute('data-target');
+                    const target = document.querySelector(targetId);
+                    const icon = btn.querySelector('.toggle-icon');
+                    if (target) {
+                        if (target.classList.contains('show')) {
+                            target.classList.remove('show');
+                            icon.classList.remove('fa-chevron-down');
+                            icon.classList.add('fa-chevron-right');
+                        } else {
+                            target.classList.add('show');
+                            icon.classList.remove('fa-chevron-right');
+                            icon.classList.add('fa-chevron-down');
+                        }
+                    }
+                });
+            });
+
+            // Update bulk action bar state
+            function updateSelectionState() {
+                const checked = document.querySelectorAll('.tree-checkbox:checked');
+                if (checked.length > 0) {
+                    bulkActionBar.classList.remove('d-none');
+                    bulkSelectionCount.textContent = checked.length + ' item(s) selected';
+                } else {
+                    bulkActionBar.classList.add('d-none');
+                }
+            }
+
+            document.querySelectorAll('.tree-checkbox').forEach(function (cb) {
+                cb.addEventListener('change', updateSelectionState);
+            });
+
+            function showModal(id) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    const inst = bootstrap.Modal.getOrCreateInstance(el);
+                    inst.show();
+                } else {
+                    el.classList.add('show');
+                    el.style.display = 'block';
+                    document.body.classList.add('modal-open');
+                    if (!document.getElementById('custom-backdrop')) {
+                        const backdrop = document.createElement('div');
+                        backdrop.id = 'custom-backdrop';
+                        backdrop.className = 'modal-backdrop fade show';
+                        document.body.appendChild(backdrop);
+                    }
+                }
+            }
+
+            function hideModal(id) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    const inst = bootstrap.Modal.getInstance(el);
+                    if (inst) inst.hide();
+                }
+                el.classList.remove('show');
+                el.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                const backdrop = document.getElementById('custom-backdrop');
+                if (backdrop) backdrop.remove();
+            }
+
+            document.querySelectorAll('[data-dismiss="modal"], [data-bs-dismiss="modal"]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const modal = btn.closest('.modal');
+                    if (modal) {
+                        hideModal(modal.id);
+                    }
+                });
+            });
+
+            // Master select all
+            function toggleSelectAll(state) {
+                document.querySelectorAll('.tree-checkbox').forEach(function (cb) {
+                    cb.checked = state;
+                });
+                updateSelectionState();
+            }
+
+            if (masterSelectAll) {
+                masterSelectAll.addEventListener('change', function () {
+                    toggleSelectAll(masterSelectAll.checked);
+                    if (selectAllTree) selectAllTree.checked = masterSelectAll.checked;
+                });
+            }
+
+            if (selectAllTree) {
+                selectAllTree.addEventListener('change', function () {
+                    toggleSelectAll(selectAllTree.checked);
+                    if (masterSelectAll) masterSelectAll.checked = selectAllTree.checked;
+                });
+            }
+
+            // Add Root Module button
+            const addRootBtn = document.getElementById('add-root-module-btn');
+            const addFirstBtn = document.getElementById('add-first-module-btn');
+
+            function openAddModuleModal(parentId, parentName) {
+                document.getElementById('add-module-parent-id').value = parentId || '';
+                document.getElementById('module-name-input').value = '';
+                showModal('addModuleModal');
+            }
+
+            if (addRootBtn) {
+                addRootBtn.addEventListener('click', function () { openAddModuleModal('', ''); });
+            }
+            if (addFirstBtn) {
+                addFirstBtn.addEventListener('click', function () { openAddModuleModal('', ''); });
+            }
+
+            // Submodule add buttons
+            document.querySelectorAll('.add-submodule-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const mId = btn.getAttribute('data-module-id');
+                    const mName = btn.getAttribute('data-module-name');
+                    openAddModuleModal(mId, mName);
+                });
+            });
+
+            // Attach courses buttons
+            document.querySelectorAll('.attach-courses-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const mId = btn.getAttribute('data-module-id');
+                    const mName = btn.getAttribute('data-module-name');
+                    document.getElementById('attach-target-module-id').value = mId;
+                    document.getElementById('attach-module-title').textContent = mName;
+                    showModal('addCoursesModal');
+                });
+            });
+
+            // Rename buttons
+            document.querySelectorAll('.rename-module-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const mId = btn.getAttribute('data-module-id');
+                    const mName = btn.getAttribute('data-module-name');
+                    document.getElementById('rename-module-id').value = mId;
+                    document.getElementById('rename-module-name-input').value = mName;
+                    showModal('renameModuleModal');
+                });
+            });
+
+            // Filter courses in modal
+            const courseSearchFilter = document.getElementById('course-search-filter');
+            if (courseSearchFilter) {
+                courseSearchFilter.addEventListener('input', function () {
+                    const q = courseSearchFilter.value.toLowerCase();
+                    document.querySelectorAll('.course-item-row').forEach(function (row) {
+                        const txt = row.textContent.toLowerCase();
+                        row.style.display = txt.includes(q) ? '' : 'none';
+                    });
+                });
+            }
+
+            // Bulk Move trigger
+            const triggerBulkMove = document.getElementById('trigger-bulk-move-btn');
+            if (triggerBulkMove) {
+                triggerBulkMove.addEventListener('click', function () {
+                    const container = document.getElementById('move-hidden-inputs');
+                    container.innerHTML = '';
+                    document.querySelectorAll('.tree-checkbox:checked').forEach(function (cb) {
+                        const type = cb.getAttribute('data-type');
+                        const id = cb.getAttribute('data-id');
+                        const parentId = cb.getAttribute('data-parent-id') || 'root';
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'items[]';
+                        input.value = type + ':' + id + ':' + parentId;
+                        container.appendChild(input);
+                    });
+                    showModal('moveModal');
+                });
+            }
+
+            // Bulk Remove trigger
+            const triggerBulkRemove = document.getElementById('trigger-bulk-remove-btn');
+            if (triggerBulkRemove) {
+                triggerBulkRemove.addEventListener('click', function () {
+                    if (!confirm('Are you sure you want to remove the selected item(s) from this program structure?')) {
+                        return;
+                    }
+                    const container = document.getElementById('remove-hidden-inputs');
+                    container.innerHTML = '';
+                    document.querySelectorAll('.tree-checkbox:checked').forEach(function (cb) {
+                        const type = cb.getAttribute('data-type');
+                        const id = cb.getAttribute('data-id');
+                        const parentId = cb.getAttribute('data-parent-id') || 'root';
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'items[]';
+                        input.value = type + ':' + id + ':' + parentId;
+                        container.appendChild(input);
+                    });
+                    document.getElementById('bulk-remove-form').submit();
+                });
+            }
+        });
+    </script>
+{% endblock %}

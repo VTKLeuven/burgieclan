@@ -106,11 +106,20 @@ async function redirectToLogin(frontendBaseUrl: string) {
 
     logOut(); // Clear any existing session (e.g., cookies, to prevent infinite redirect loop)
 
-    // Only set the redirectTo query parameter if the referer URL is not the login page
-    const redirectTo = refererUrl && !refererUrl.startsWith(loginUrl)
-        ? `?redirectTo=${encodeURIComponent(refererUrl)}`
-        : "";
+    let targetPath = "";
+    if (refererUrl) {
+        try {
+            const parsedReferer = new URL(refererUrl);
+            const path = parsedReferer.pathname + parsedReferer.search + parsedReferer.hash;
+            if (!path.endsWith('/login') && !path.includes('/auth/callback')) {
+                targetPath = path;
+            }
+        } catch {
+            // Invalid referer URL, ignore
+        }
+    }
 
+    const redirectTo = targetPath ? `?redirectTo=${encodeURIComponent(targetPath)}` : "";
     const finalLoginUrl = `${loginUrl}${redirectTo}`;
     redirect(finalLoginUrl);
 }
