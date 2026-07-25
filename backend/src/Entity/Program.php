@@ -8,10 +8,18 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProgramRepository::class)]
+#[ORM\UniqueConstraint(name: 'uniq_program_kul_id', columns: ['kul_id'])]
 class Program extends BaseEntity
 {
     #[ORM\Column(length: 255)]
     private string $name;
+
+    /**
+     * KU Leuven onderwijsaanbod identifier (programId), used to match this program
+     * when (re-)importing from the KU Leuven data services. Null for manually created programs.
+     */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $kulId = null;
 
     /**
      * @var Collection<int, Module>
@@ -37,6 +45,18 @@ class Program extends BaseEntity
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getKulId(): ?string
+    {
+        return $this->kulId;
+    }
+
+    public function setKulId(?string $kulId): self
+    {
+        $this->kulId = $kulId;
 
         return $this;
     }
