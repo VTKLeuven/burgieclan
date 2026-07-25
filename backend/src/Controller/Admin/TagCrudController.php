@@ -23,11 +23,11 @@ class TagCrudController extends AbstractCrudController
         yield TextField::new('name');
 
         if (in_array($pageName, [Crud::PAGE_INDEX, Crud::PAGE_DETAIL])) {
-            // Regular display for index and detail pages
+            // Index and detail pages – simple association display
             yield AssociationField::new('documents')
                 ->setLabel('Documents');
         } else {
-            // For edit/new forms, customize the dropdown display
+            // Edit/New forms – custom label showing document name, course name, and category name (Dutch)
             yield AssociationField::new('documents')
                 ->setLabel('Documents')
                 ->setFormTypeOption(
@@ -37,11 +37,11 @@ class TagCrudController extends AbstractCrudController
                             '%s (%s, %s)',
                             $document->getName(),
                             $document->getCourse()->getName(),
-                            $document->getCategory()->getName()
+                            $document->getCategory()->getName('nl')
                         );
                     }
                 )
-                ->setFormTypeOption('by_reference', false); // This is crucial for ManyToMany
+                ->setFormTypeOption('by_reference', false); // crucial for ManyToMany
         }
     }
 
