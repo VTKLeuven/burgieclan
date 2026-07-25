@@ -34,7 +34,10 @@ class DashboardController extends AbstractDashboardController
     public function configureCrud(): Crud
     {
         return Crud::new()
-            ->setDateTimeFormat('medium', 'short');
+            ->setDateTimeFormat('medium', 'short')
+            // Override EasyAdmin's Vich file/image widgets to use CSP-safe
+            // nonce'd script tags instead of inline onchange handlers.
+            ->addFormTheme('form/easyadmin_vich_csp.html.twig');
     }
 
     public function configureUserMenu(UserInterface $user): UserMenu
