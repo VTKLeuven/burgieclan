@@ -183,6 +183,50 @@ class ProgramTreeMapperTest extends TestCase
         self::assertSame(['Gemeenschappelijk deel', 'Opties'], $rootNames);
     }
 
+    public function testYearCourseIsMarkedInBothSemesters(): void
+    {
+        // offerPeriod "3" is a "jaarvak" (year-long course): it must land in both semesters.
+        $mockSource = [
+            'programSet' => [
+                [
+                    'programId' => '2002',
+                    'programLanguageSet' => [
+                        ['programLangu' => 'NL', 'programTitleSet' => [['description' => 'Testopleiding']]],
+                    ],
+                    'moduleGroupSet' => [
+                        [
+                            'moduleGroupId' => 'G1',
+                            'parentType' => 'programme',
+                            'parentId' => '2002',
+                            'moduleGroupLanguageSet' => [
+                                ['moduleGroupLangu' => 'NL', 'moduleGroupTitleSet' => [['description' => 'Basis']]],
+                            ],
+                            'moduleSet' => [
+                                [
+                                    'moduleId' => 'm1', 'short' => 'J0001A', 'credits' => '6',
+                                    'originalLangu' => 'NL', 'stageStart' => '1',
+                                    'moduleLanguageSet' => [
+                                        [
+                                            'moduleLangu' => 'NL',
+                                            'moduleTitleSet' => [['description' => 'Jaarvak']],
+                                            'moduleSessionPatternSet' => [['offerPeriod' => '3']],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $program = $this->mapper->map($mockSource, '2002', 'nl');
+        self::assertNotNull($program);
+        $course = $program->modules[0]->courses[0];
+        self::assertSame('J0001A', $course->code);
+        self::assertSame(['Semester 1', 'Semester 2'], $course->semesters);
+    }
+
     private function childByName(ModuleData $parent, string $name): ModuleData
     {
         foreach ($parent->children as $child) {

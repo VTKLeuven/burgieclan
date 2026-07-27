@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ModuleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ModuleRepository::class)]
@@ -24,6 +25,14 @@ class Module extends BaseEntity
     private ?string $kulId = null;
 
     /**
+     * Sort order of this module among its siblings (the children of one parent module, or the
+     * top-level modules of a program). Lower comes first; ties break on name. Editable from the
+     * program structure tree editor so admins can arrange modules in a meaningful order.
+     */
+    #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
+    private int $position = 0;
+
+    /**
      * @var Collection<int, Course>
      */
     #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'modules')]
@@ -37,6 +46,7 @@ class Module extends BaseEntity
      * @var Collection<int, Module>
      */
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'modules')]
+    #[ORM\OrderBy(['position' => 'ASC', 'name' => 'ASC'])]
     private Collection $modules;
 
     public function __construct()
@@ -70,6 +80,18 @@ class Module extends BaseEntity
     public function setKulId(?string $kulId): self
     {
         $this->kulId = $kulId;
+
+        return $this;
+    }
+
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): self
+    {
+        $this->position = $position;
 
         return $this;
     }

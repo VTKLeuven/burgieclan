@@ -32,7 +32,6 @@ export const CourseRow = memo(({
     const [loading, setLoading] = useState<boolean>(false);
     const { request } = useApi();
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
-    const [showProfessors, setShowProfessors] = useState<boolean>(false);
 
     // Fetch complete course data if we only have the ID and parent is visible
     useEffect(() => {
@@ -108,7 +107,7 @@ export const CourseRow = memo(({
         star: <Star className='text-vtk-yellow' fill={isFavorite ? "currentColor" : "none"} size={16} />,
         professor: (
             <div className="flex -space-x-1.5">
-                {showProfessors && course.professors?.map((unumber, index) => (
+                {course.professors?.map((unumber, index) => (
                     <ProfessorDiv
                         key={unumber}
                         unumber={unumber}
@@ -147,9 +146,7 @@ export const CourseRow = memo(({
             <div className="col-span-2 flex justify-center items-center">
                 {content.semesters}
             </div>
-            <div className="col-span-2 flex justify-center items-center relative hover:z-50"
-                onMouseEnter={!loading && course ? () => setShowProfessors(true) : undefined}
-            >
+            <div className="col-span-2 flex justify-center items-center relative hover:z-50">
                 {content.professor}
             </div>
             <div className="col-span-1 flex justify-end items-center">

@@ -38,7 +38,7 @@
     </div>
 {% endblock %}
 
-{% macro renderModule(module, parentId, level) %}
+{% macro renderModule(module, parentId, level, programId) %}
     {% import _self as selfMacro %}
     <li class="tree-module-item mb-2" data-module-id="{{ module.id }}">
         <div class="card shadow-sm border-left-primary">
@@ -53,7 +53,26 @@
                         <span class="badge badge-secondary border ms-1">{{ module.kulId }}</span>
                     {% endif %}
                 </div>
-                <div class="btn-group btn-group-sm">
+                <div class="d-flex align-items-center gap-1">
+                    <div class="btn-group btn-group-sm me-1" role="group" aria-label="Reorder module">
+                        <form method="post" action="{{ path('admin_program_tree_reorder_module', {id: programId}) }}" class="d-inline">
+                            <input type="hidden" name="module_id" value="{{ module.id }}">
+                            <input type="hidden" name="parent_id" value="{{ parentId }}">
+                            <input type="hidden" name="direction" value="up">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary py-0 px-2" title="Move module up">
+                                <i class="fa-solid fa-arrow-up"></i>
+                            </button>
+                        </form>
+                        <form method="post" action="{{ path('admin_program_tree_reorder_module', {id: programId}) }}" class="d-inline">
+                            <input type="hidden" name="module_id" value="{{ module.id }}">
+                            <input type="hidden" name="parent_id" value="{{ parentId }}">
+                            <input type="hidden" name="direction" value="down">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary py-0 px-2" title="Move module down">
+                                <i class="fa-solid fa-arrow-down"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="btn-group btn-group-sm">
                     <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 add-submodule-btn" data-module-id="{{ module.id }}" data-module-name="{{ module.name }}" title="Add Submodule">
                         <i class="fa-solid fa-folder-plus text-success me-1"></i> Submodule
                     </button>
@@ -63,6 +82,7 @@
                     <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 rename-module-btn" data-module-id="{{ module.id }}" data-module-name="{{ module.name }}" title="Rename Module">
                         <i class="fa-solid fa-pen-to-square"></i>
                     </button>
+                    </div>
                 </div>
             </div>
             <div class="collapse card-body p-2" id="module-collapse-{{ module.id }}">
@@ -92,7 +112,7 @@
                                             <a href="{{ ea_url().setController('App\\Controller\\Admin\\CourseCrudController').setAction('edit').setEntityId(course.id) }}" class="btn btn-sm btn-outline-primary py-0 px-1 border-0 me-1" title="Edit course">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </a>
-                                            <form method="post" action="{{ path('admin_program_tree_bulk_remove', {id: module.program.id ?? 0}) }}" class="d-inline">
+                                            <form method="post" action="{{ path('admin_program_tree_bulk_remove', {id: programId}) }}" class="d-inline">
                                                 <input type="hidden" name="items[]" value="course:{{ course.id }}:{{ module.id }}">
                                                 <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1 border-0" title="Remove course from module">
                                                     <i class="fa-solid fa-trash-can"></i>
@@ -110,7 +130,7 @@
                 {% if module.modules is not empty %}
                     <ul class="list-unstyled ps-3 mb-0 border-start">
                         {% for subModule in module.modules %}
-                            {{ selfMacro.renderModule(subModule, module.id, level + 1) }}
+                            {{ selfMacro.renderModule(subModule, module.id, level + 1, programId) }}
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -161,7 +181,7 @@
             {% if program.modules is not empty %}
                 <ul class="list-unstyled mb-0" id="program-tree-root">
                     {% for rootModule in program.modules %}
-                        {{ treeMacro.renderModule(rootModule, 'root', 0) }}
+                        {{ treeMacro.renderModule(rootModule, 'root', 0, program.id) }}
                     {% endfor %}
                 </ul>
             {% else %}

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\Filter\CaseInsensitiveTextFilter;
 use App\Controller\Admin\Filter\EntityContainsFilter;
 use App\Entity\Course;
 use App\Entity\Module;
@@ -33,7 +34,7 @@ class ModuleCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
-            ->add('name')
+            ->add(CaseInsensitiveTextFilter::new('name'))
             ->add('program')
             ->add(EntityContainsFilter::new('modules', Module::class))
             ->add(EntityContainsFilter::new('courses', Course::class));
