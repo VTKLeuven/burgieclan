@@ -329,16 +329,24 @@ class ProgramTreeMapper
         foreach ($module['moduleLanguageSet'] ?? [] as $lang) {
             foreach ($lang['moduleSessionPatternSet'] ?? [] as $pattern) {
                 $period = (string) ($pattern['offerPeriod'] ?? '');
-                $semester = match ($period) {
-                    '1' => 'Semester 1',
-                    '2' => 'Semester 2',
-                    default => null,
+                // offerPeriod 3 = "jaarvak" (year-long course): it runs across both semesters,
+                // so it must be marked in Semester 1 AND Semester 2 (both pie halves filled).
+                $mapped = match ($period) {
+                    '1' => ['Semester 1'],
+                    '2' => ['Semester 2'],
+                    '3' => ['Semester 1', 'Semester 2'],
+                    default => [],
                 };
-                if ($semester !== null && !in_array($semester, $semesters, true)) {
-                    $semesters[] = $semester;
+                foreach ($mapped as $semester) {
+                    if (!in_array($semester, $semesters, true)) {
+                        $semesters[] = $semester;
+                    }
                 }
             }
         }
+
+        // Keep the canonical order (Semester 1 before Semester 2) regardless of pattern order.
+        sort($semesters);
 
         return $semesters;
     }

@@ -398,14 +398,38 @@ class DocumentBulkUploadController extends AbstractController
             }
         }
 
-        // Also handle individual row updates
+        // Also handle individual per-row edits (document name, year, course, category, tags).
+        $documentsMetadata = $this->applyRowEdits($request, $documentsMetadata);
+
+        $session->set(self::SESSION_KEY, $documentsMetadata);
+
+        return $this->redirectToRoute('admin_bulk_upload_edit_metadata');
+    }
+
+    /**
+     * Merge the per-row inline edits from the metadata table into the session metadata.
+     *
+     * The edit table posts arrays keyed by row index (name[i], year[i], course[i], category[i],
+     * tags[i][]). Any field present in the request overrides what is stored in the session so that
+     * inline changes — most notably the document name — are actually persisted before the documents
+     * are created.
+     *
+     * @param array<int|string, mixed> $documentsMetadata
+     *
+     * @return array<int|string, mixed>
+     */
+    private function applyRowEdits(Request $request, array $documentsMetadata): array
+    {
         $names = $request->request->all('name');
         $years = $request->request->all('year');
         $courses = $request->request->all('course');
         $categories = $request->request->all('category');
+        $tags = $request->request->all('tags');
 
         foreach ($documentsMetadata as $index => &$doc) {
-            assert(is_array($doc));
+            if (!is_array($doc)) {
+                continue;
+            }
             if (isset($names[$index])) {
                 $doc['name'] = $names[$index];
             }
@@ -418,11 +442,12 @@ class DocumentBulkUploadController extends AbstractController
             if (isset($categories[$index])) {
                 $doc['category'] = $categories[$index];
             }
+            if (isset($tags[$index]) && is_array($tags[$index])) {
+                $doc['tags'] = $tags[$index];
+            }
         }
 
-        $session->set(self::SESSION_KEY, $documentsMetadata);
-
-        return $this->redirectToRoute('admin_bulk_upload_edit_metadata');
+        return $documentsMetadata;
     }
 
     #[AdminRoute('/bulk-upload/cancel', name: 'bulk_upload_cancel')]
@@ -445,7 +470,7 @@ class DocumentBulkUploadController extends AbstractController
     }
 
     #[AdminRoute('/bulk-upload/create-all', name: 'bulk_upload_create_all')]
-    public function createAll(): Response
+    public function createAll(Request $request): Response
     {
         $session = $this->requestStack->getSession();
         $documentsMetadata = $session->get(self::SESSION_KEY, []);
@@ -455,6 +480,11 @@ class DocumentBulkUploadController extends AbstractController
             $this->addFlash('warning', 'No documents to create.');
             return $this->redirectToRoute('admin_bulk_upload_index');
         }
+
+        // The "Create All" button submits the metadata table, so fold any last-minute inline edits
+        // (e.g. a corrected document name) into the session before the documents are created.
+        $documentsMetadata = $this->applyRowEdits($request, $documentsMetadata);
+        $session->set(self::SESSION_KEY, $documentsMetadata);
 
         $user = $this->getUser();
         assert($user instanceof User);

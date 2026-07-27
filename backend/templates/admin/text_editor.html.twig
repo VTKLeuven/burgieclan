@@ -6,7 +6,7 @@ dangerouslySetInnerHTML) while stripping unsafe markup #}
 {# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
 {# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
 {% if ea().crud.currentAction == 'detail' %}
-{{ field.formattedValue|sanitize_html }}
+{{ (field.formattedValue ?? '')|sanitize_html }}
 {% else %}
 {% set html_id = 'ea-text-editor-' ~ field.uniqueId %}
 <a href="#" data-bs-toggle="modal" data-bs-target="#{{ html_id }}">
@@ -23,7 +23,7 @@ dangerouslySetInnerHTML) while stripping unsafe markup #}
                     aria-label="{{ 'action.close'|trans([], domain: 'EasyAdminBundle') }}" />
             </div>
             <div class="modal-body">
-                {{ field.formattedValue|sanitize_html }}
+                {{ (field.formattedValue ?? '')|sanitize_html }}
             </div>
         </div>
     </div>

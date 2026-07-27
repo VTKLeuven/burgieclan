@@ -673,11 +673,13 @@ Review and Edit Document Metadata
                 </div>
 
                 <div class="d-flex gap-2 mt-3 justify-content-end">
-                    <twig:ea:Button htmlElement="a" href="{{ path('admin_bulk_upload_create_all') }}" variant="success"
-                        icon="fa fa-circle-check"
-                        htmlAttributes="{{ {id: 'createAllBtn'} }}">
+                    {# Submit the metadata table (not a plain link) so inline edits such as a
+                       corrected document name are posted and saved before the documents are created. #}
+                    <button type="submit" formaction="{{ path('admin_bulk_upload_create_all') }}" formmethod="post"
+                        class="btn btn-success" id="createAllBtn">
+                        <twig:ea:Icon name="fa fa-circle-check" class="me-1" />
                         Create All Documents ({{ documents|length }})
-                    </twig:ea:Button>
+                    </button>
 
                     <twig:ea:Button htmlElement="a" href="{{ path('admin_bulk_upload_cancel') }}" variant="default"
                         icon="fa fa-xmark"
