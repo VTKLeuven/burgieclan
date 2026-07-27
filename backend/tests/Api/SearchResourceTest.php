@@ -201,4 +201,39 @@ class SearchResourceTest extends ApiTestCase
         $this->assertSame(0, count($programs));
         $this->assertSame(0, count($documents));
     }
+
+    public function testSearchIsCaseInsensitive(): void
+    {
+        // Regression: on PostgreSQL a plain LIKE is case-sensitive, so a lowercase query used to
+        // miss differently-cased names. Searching "zzq..." (lowercase) must find "ZZQ..." (mixed).
+        $program = ProgramFactory::createOne(['name' => 'ZZQUniqueProgramName']);
+        $course = CourseFactory::createOne(['name' => 'ZZQUniqueCourseName', 'code' => 'ZZQ99X']);
+
+        $decoded_json = $this->browser()
+            ->get(
+                '/api/search?searchText=zzquniqueprogram',
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->assertJson()
+            ->json()
+            ->decoded();
+
+        $this->assertSame(1, count($decoded_json['programs']));
+        $this->assertSame('/api/programs/' . $program->getId(), $decoded_json['programs'][0]['@id']);
+
+        // A lowercase query matching the (uppercase) course code must also hit case-insensitively.
+        $decoded_json = $this->browser()
+            ->get(
+                '/api/search?searchText=zzq99x',
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->assertJson()
+            ->json()
+            ->decoded();
+
+        $this->assertSame(1, count($decoded_json['courses']));
+        $this->assertSame('/api/courses/' . $course->getId(), $decoded_json['courses'][0]['@id']);
+    }
 }

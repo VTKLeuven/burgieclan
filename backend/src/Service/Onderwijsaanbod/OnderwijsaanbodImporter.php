@@ -188,31 +188,62 @@ class OnderwijsaanbodImporter
     /**
      * Extract professor KU Leuven u-numbers (e.g. "u0179816") from an OPO document source.
      *
+     * The module-level `moduleInstructorSet` only carries the course coordinator. The other
+     * teachers (co-lecturers, tutors) that the KU Leuven website also lists live in the per-activity
+     * `activitySet[].activityInstructorSet[]`, so we merge both sets — otherwise most courses would
+     * import a single professor even when several teach them. The coordinator is kept first;
+     * remaining teachers follow in activity order, de-duplicated.
+     *
      * @param array<string, mixed> $source
      *
      * @return list<string>
      */
     private function extractProfessors(array $source): array
     {
-        $uNumbers = [];
-        foreach ($source['moduleInstructorSet'] ?? [] as $instructor) {
-            $uNumber = null;
-            if (!empty($instructor['uid'])) {
-                $uNumber = strtolower(trim((string) $instructor['uid']));
-            } elseif (!empty($instructor['masterEmployeeNr'])) {
-                $num = trim((string) $instructor['masterEmployeeNr']);
-                $uNumber = 'u' . str_pad($num, 7, '0', STR_PAD_LEFT);
-            } elseif (!empty($instructor['objectIdCentralPerson'])) {
-                $num = trim((string) $instructor['objectIdCentralPerson']);
-                $uNumber = 'u' . str_pad($num, 7, '0', STR_PAD_LEFT);
-            }
+        /** @var list<array<string, mixed>> $instructorSets */
+        $instructorSets = [$source['moduleInstructorSet'] ?? []];
+        foreach ($source['activitySet'] ?? [] as $activity) {
+            $instructorSets[] = $activity['activityInstructorSet'] ?? [];
+        }
 
-            if ($uNumber !== null && $uNumber !== '' && !in_array($uNumber, $uNumbers, true)) {
-                $uNumbers[] = $uNumber;
+        $uNumbers = [];
+        foreach ($instructorSets as $instructors) {
+            foreach ($instructors as $instructor) {
+                $uNumber = $this->instructorUNumber($instructor);
+                if ($uNumber !== null && !in_array($uNumber, $uNumbers, true)) {
+                    $uNumbers[] = $uNumber;
+                }
             }
         }
 
         return $uNumbers;
+    }
+
+    /**
+     * Resolve a single instructor record to a KU Leuven u-number, or null when it is unusable.
+     *
+     * KU Leuven pads instructor lists with an all-nines sentinel (objectIdCentralPerson "99999999",
+     * family name "N") for anonymous/placeholder teachers; importing it would yield a bogus
+     * "u99999999", so any all-nines identifier is rejected.
+     *
+     * @param array<string, mixed> $instructor
+     */
+    private function instructorUNumber(array $instructor): ?string
+    {
+        $uNumber = null;
+        if (!empty($instructor['uid'])) {
+            $uNumber = strtolower(trim((string) $instructor['uid']));
+        } elseif (!empty($instructor['masterEmployeeNr'])) {
+            $uNumber = 'u' . str_pad(trim((string) $instructor['masterEmployeeNr']), 7, '0', STR_PAD_LEFT);
+        } elseif (!empty($instructor['objectIdCentralPerson'])) {
+            $uNumber = 'u' . str_pad(trim((string) $instructor['objectIdCentralPerson']), 7, '0', STR_PAD_LEFT);
+        }
+
+        if ($uNumber === null || $uNumber === '' || preg_match('/^u9+$/', $uNumber) === 1) {
+            return null;
+        }
+
+        return $uNumber;
     }
 
     /**

@@ -22,6 +22,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[IsGranted(User::ROLE_SUPER_ADMIN)]
 class UserCrudController extends AbstractCrudController
@@ -45,10 +46,22 @@ class UserCrudController extends AbstractCrudController
 
         // Show password field on new and edit pages
         if (in_array($pageName, [Crud::PAGE_NEW, Crud::PAGE_EDIT])) {
-            yield TextField::new('plainPassword')
+            $passwordField = TextField::new('plainPassword')
                 ->setFormType(PasswordType::class)
                 ->setRequired($pageName === Crud::PAGE_NEW)
                 ->setLabel($pageName === Crud::PAGE_NEW ? 'Password' : 'New Password (leave empty to keep current)');
+
+            // On the "new" page a password is mandatory. setRequired() only adds the client-side
+            // "required" attribute; without a server-side constraint an empty submit (e.g. via
+            // "Create and add another") slipped through to persistEntity() and threw an uncaught
+            // exception → 500. A NotBlank constraint turns that into a normal validation error.
+            if ($pageName === Crud::PAGE_NEW) {
+                $passwordField->setFormTypeOption('constraints', [
+                    new NotBlank(message: 'Password is required for new users.'),
+                ]);
+            }
+
+            yield $passwordField;
         }
 
         yield ChoiceField::new('roles')

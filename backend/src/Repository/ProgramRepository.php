@@ -64,8 +64,8 @@ class ProgramRepository extends ServiceEntityRepository
 
         foreach ($searchTerms as $key => $term) {
             $queryBuilder
-                ->orWhere('p.name LIKE :t_' . $key)
-                ->setParameter('t_' . $key, '%' . $term . '%');
+                ->orWhere('LOWER(p.name) LIKE :t_' . $key)
+                ->setParameter('t_' . $key, '%' . mb_strtolower((string) $term) . '%');
         }
 
         /** @var Program[] $result */

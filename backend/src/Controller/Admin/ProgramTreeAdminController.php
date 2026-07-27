@@ -348,6 +348,75 @@ class ProgramTreeAdminController extends AbstractController
         $this->entityManager->remove($module);
     }
 
+    #[AdminRoute('/program/{id}/tree/reorder-module', name: 'program_tree_reorder_module', options: ['methods' => ['POST']])]
+    public function reorderModule(int $id, Request $request): Response
+    {
+        $program = $this->programRepository->find($id);
+        if (!$program) {
+            $this->addFlash('danger', 'Program not found.');
+
+            return $this->redirectToRoute(
+                'admin',
+                ['crudAction' => 'index', 'crudControllerFqcn' => ProgramCrudController::class]
+            );
+        }
+
+        $moduleId = (int) $request->request->get('module_id');
+        $parentId = (string) $request->request->get('parent_id');
+        $direction = (string) $request->request->get('direction');
+
+        $module = $this->moduleRepository->find($moduleId);
+        if (!$module) {
+            $this->addFlash('danger', 'Module not found.');
+
+            return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
+        }
+
+        // Siblings are the children of the same parent (or the program's top-level modules). They
+        // already arrive ordered by (position, name) thanks to the association's OrderBy.
+        if ($parentId === 'root') {
+            $siblings = array_values($program->getModules()->toArray());
+        } else {
+            $parent = $this->moduleRepository->find((int) $parentId);
+            if (!$parent) {
+                $this->addFlash('danger', 'Parent module not found.');
+
+                return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
+            }
+            $siblings = array_values($parent->getModules()->toArray());
+        }
+
+        $index = null;
+        foreach ($siblings as $i => $sibling) {
+            if ($sibling->getId() === $module->getId()) {
+                $index = $i;
+                break;
+            }
+        }
+
+        $swapWith = $direction === 'up' ? ($index ?? 0) - 1 : ($index ?? 0) + 1;
+        if ($index === null || $swapWith < 0 || $swapWith >= count($siblings)) {
+            // Already at the edge (or not found): nothing to do.
+            return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
+        }
+
+        // Normalise the whole sibling set to spaced-out positions matching their current order, then
+        // swap the two neighbours. Normalising first guarantees deterministic ordering even when the
+        // modules still share the default position of 0 (in which case they were name-ordered).
+        foreach ($siblings as $i => $sibling) {
+            $sibling->setPosition(($i + 1) * 10);
+        }
+        $current = $siblings[$index];
+        $neighbour = $siblings[$swapWith];
+        $currentPosition = $current->getPosition();
+        $current->setPosition($neighbour->getPosition());
+        $neighbour->setPosition($currentPosition);
+
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
+    }
+
     #[AdminRoute('/program/{id}/tree/rename-module', name: 'program_tree_rename_module', options: ['methods' => ['POST']])]
     public function renameModule(int $id, Request $request): Response
     {
