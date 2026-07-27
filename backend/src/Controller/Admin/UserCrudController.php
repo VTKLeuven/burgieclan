@@ -56,9 +56,12 @@ class UserCrudController extends AbstractCrudController
             // "Create and add another") slipped through to persistEntity() and threw an uncaught
             // exception → 500. A NotBlank constraint turns that into a normal validation error.
             if ($pageName === Crud::PAGE_NEW) {
-                $passwordField->setFormTypeOption('constraints', [
+                $passwordField->setFormTypeOption(
+                    'constraints',
+                    [
                     new NotBlank(message: 'Password is required for new users.'),
-                ]);
+                    ]
+                );
             }
 
             yield $passwordField;
