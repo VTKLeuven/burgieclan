@@ -37,6 +37,7 @@ class Program extends BaseEntity
      * @var Collection<int, Module>
      */
     #[ORM\OneToMany(mappedBy: 'program', targetEntity: Module::class)]
+    #[ORM\OrderBy(['position' => 'ASC', 'name' => 'ASC'])]
     private Collection $modules;
 
     public function __construct()
