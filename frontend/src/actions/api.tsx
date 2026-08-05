@@ -8,7 +8,16 @@ import { redirect } from "next/navigation";
  * Encodes an API error response from the backend server into a structured serializable format for the frontend.
  */
 const handleError = async (response: Response) => {
-    const errorData = await response.json();
+    // Not every error reaches us as JSON: nginx serves an HTML page for 413/502, and PHP
+    // emits a plain-text warning when a request body exceeds post_max_size. Parsing those
+    // as JSON throws, which used to collapse the real status into a generic 500 and hide
+    // the cause from the user entirely.
+    let errorData: { message?: string; title?: string; detail?: string } = {};
+    try {
+        errorData = await response.json();
+    } catch {
+        errorData = { detail: `${response.status} ${response.statusText}`.trim() };
+    }
 
     switch (response.status) {
         case 401:
