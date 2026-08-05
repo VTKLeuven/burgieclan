@@ -114,9 +114,13 @@ class FluxusProvider extends AbstractProvider
     /**
      * The default scopes used by this provider.
      *
-     * Study programme and year are split into separate scopes on the VTK side on
-     * purpose, so an application that only needs the programme cannot also read the
-     * student number. We request both study scopes but not `vtk:student_number`.
+     * Study programme, year and student number are split into separate scopes on
+     * the VTK side on purpose. We ask for all three: `vtk:student_number` carries
+     * the r-number that new accounts are named after.
+     *
+     * That last one is the only sensitive scope here: it gets its own checkbox on
+     * VTK's consent screen, so a member can grant everything else and refuse this
+     * one. Nothing may depend on it arriving; see UserRepository::generateUsername().
      *
      * `entitlements` is what unlocks the `permissions` claim on UserInfo, which is
      * where our moderator/admin roles come from. Note that a token carrying that
@@ -133,6 +137,7 @@ class FluxusProvider extends AbstractProvider
             'entitlements',
             'vtk:study_programme',
             'vtk:study_year',
+            'vtk:student_number',
         ];
     }
 

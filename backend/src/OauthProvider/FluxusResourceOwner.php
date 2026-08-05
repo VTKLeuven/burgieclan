@@ -75,6 +75,28 @@ class FluxusResourceOwner implements ResourceOwnerInterface
     }
 
     /**
+     * The KU Leuven student number, e.g. `r0812345`.
+     *
+     * Null more often than you would expect. It rides on `vtk:student_number`, a
+     * scope VTK marks sensitive: the member sees it on the consent screen as its
+     * own checkbox and can refuse it while granting the rest. On top of that,
+     * members who never signed in through KU Leuven have no r-number on file at
+     * all. Anything using this needs a fallback.
+     *
+     * @return string|null
+     */
+    public function getStudentNumber(): ?string
+    {
+        $studentNumber = $this->getValueByKey($this->response, 'vtk:student_number');
+
+        if (!is_string($studentNumber) || '' === trim($studentNumber)) {
+            return null;
+        }
+
+        return trim($studentNumber);
+    }
+
+    /**
      * @return string|null
      */
     public function getPicture(): ?string

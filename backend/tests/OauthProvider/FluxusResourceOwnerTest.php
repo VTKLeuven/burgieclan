@@ -41,11 +41,22 @@ class FluxusResourceOwnerTest extends TestCase
             [
             'vtk:study_programmes' => ['COMPUTER_SCIENCE', 'ARTIFICIAL_INTELLIGENCE'],
             'vtk:study_years' => ['MASTER_1'],
+            'vtk:student_number' => 'r0812345',
             ]
         );
 
         $this->assertSame(['COMPUTER_SCIENCE', 'ARTIFICIAL_INTELLIGENCE'], $owner->getStudyProgrammes());
         $this->assertSame(['MASTER_1'], $owner->getStudyYears());
+        $this->assertSame('r0812345', $owner->getStudentNumber());
+    }
+
+    public function testStudentNumberIsNullWhenRefusedOrUnknown(): void
+    {
+        // The scope is sensitive and unticked by default, so an account created
+        // without it must still get a username.
+        $this->assertNull((new FluxusResourceOwner(['sub' => 'user-123']))->getStudentNumber());
+        $this->assertNull((new FluxusResourceOwner(['vtk:student_number' => '   ']))->getStudentNumber());
+        $this->assertNull((new FluxusResourceOwner(['vtk:student_number' => 12345]))->getStudentNumber());
     }
 
     public function testDiscardsNonStringEntries(): void

@@ -79,7 +79,7 @@ class UserRepository extends ServiceEntityRepository
                 $user = new User();
                 $user->setFluxusSub($sub);
                 $user->setEmail($email);
-                $user->setUsername($this->generateUsername($email));
+                $user->setUsername($this->generateUsername($fluxusUser, $email));
                 $user->setFullName($fluxusUser->getFullName() ?? $email);
                 // No local password: this account signs in through VTK. The password
                 // login stays available for accounts that were given one on purpose.
@@ -101,12 +101,18 @@ class UserRepository extends ServiceEntityRepository
 
     /**
      * VTK issues no username, but the column is unique and NOT NULL, so derive one
-     * from the local part of the university address and add a numeric suffix on a
-     * collision. Only used when creating an account; existing usernames never change.
+     * and add a numeric suffix on a collision. Only used when creating an account;
+     * existing usernames never change.
+     *
+     * The r-number first: it is the identifier members recognise, and it is stable
+     * where the local part of an address is not. It is not guaranteed to arrive
+     * though — `vtk:student_number` is a sensitive scope the member can refuse on
+     * VTK's consent screen, and not every member has one on file — so the address
+     * stays as the fallback rather than the login failing over a refused scope.
      */
-    private function generateUsername(string $email): string
+    private function generateUsername(FluxusResourceOwner $fluxusUser, string $email): string
     {
-        $base = strstr($email, '@', true) ?: $email;
+        $base = $fluxusUser->getStudentNumber() ?? (strstr($email, '@', true) ?: $email);
         // The column allows 50 characters and at least 2; leave room for a suffix.
         $base = substr(preg_replace('/[^a-zA-Z0-9._-]/', '', $base) ?? '', 0, 40);
 
