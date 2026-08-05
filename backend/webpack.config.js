@@ -64,8 +64,13 @@ Encore
     // requires WebpackEncoreBundle 1.4 or higher
     .enableIntegrityHashes(Encore.isProduction())
 
-    // uncomment if you're having problems with a jQuery plugin
-    .autoProvidejQuery()
+    // No .autoProvidejQuery(): nothing here uses jQuery, and providing it breaks
+    // Bootstrap 5. The plugin rewrites every `window.jQuery` reference to the
+    // jquery module, including the one in Bootstrap's getjQuery(). jQuery 4 is
+    // ESM, so that hands Bootstrap a module namespace object instead of the
+    // jQuery function: `$.fn` is undefined and defineJQueryPlugin() dies on
+    // "Cannot read properties of undefined (reading 'alert')", taking the whole
+    // entry chunk (and with it Stimulus) down with it.
     ;
 
 module.exports = Encore.getWebpackConfig();
