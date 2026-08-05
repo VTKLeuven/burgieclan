@@ -31,12 +31,17 @@ nelmio_security:
                 - 'self'
                 - 'unsafe-inline'
                 - 'https://cdnjs.cloudflare.com'
+            style-src:
+                - 'self'
+                - 'unsafe-inline'
+                - 'https://fonts.googleapis.com'
             worker-src:
                 - 'self'
                 - 'blob:'
             font-src:
                 - 'self'
                 - 'https://fonts.gstatic.com'
+                - 'https://fonts.googleapis.com'
             img-src: [ 'self', 'data:', 'https://www.gravatar.com' ]
 
     # Permissions Policy - control access to browser features
