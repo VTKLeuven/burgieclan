@@ -70,6 +70,7 @@ export default function AuthCallbackPage() {
                     await storeTokensInCookies(token, refreshToken || undefined, expiration);
 
                     showToast(t('login_success'), 'success');
+                    router.refresh();
                     router.push(targetPath);
                 } catch (err) {
                     captureException(
