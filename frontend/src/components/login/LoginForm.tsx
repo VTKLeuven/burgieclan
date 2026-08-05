@@ -2,7 +2,7 @@
 
 import { storeTokensInCookies } from "@/actions/auth";
 import Logo from "@/components/common/Logo";
-import LitusOAuthButton from "@/components/login/LitusOAuthButton";
+import FluxusOAuthButton from "@/components/login/FluxusOAuthButton";
 import Input from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
 import { useUser } from "@/components/UserContext";
@@ -136,9 +136,9 @@ export default function LoginForm() {
                     {t('sign_in')}
                 </h1>
 
-                {/* Handles OAuth login via Litus */}
+                {/* Handles OAuth login via the VTK authorization server */}
                 <div className="mt-7">
-                    <LitusOAuthButton loginHandler={handleOAuthLogin} />
+                    <FluxusOAuthButton loginHandler={handleOAuthLogin} />
                 </div>
 
                 <button

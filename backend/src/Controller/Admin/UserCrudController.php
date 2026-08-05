@@ -67,11 +67,29 @@ class UserCrudController extends AbstractCrudController
             yield $passwordField;
         }
 
-        yield ChoiceField::new('roles')
+        // Local overrides only. These can add to what VTK grants but never take it
+        // away; see User::getRoles() for the effective set.
+        yield ChoiceField::new('roles', 'Roles (local)')
             ->setChoices(array_combine(User::getAvailableRoles(), User::getAvailableRoles()))
             ->allowMultipleChoices()
             ->renderExpanded()
-            ->renderAsBadges();
+            ->renderAsBadges()
+            ->setHelp(
+                'Assigned here, in Burgieclan. Granted on top of the roles that come from VTK, ' .
+                'and never removed by a resync.'
+            );
+
+        // Read-only: this is written by FluxusRoleSynchronizer on login. Without it an
+        // admin cannot see why someone is a moderator.
+        yield ChoiceField::new('ssoRoles', 'Roles (from VTK)')
+            ->setChoices(array_combine(User::getAvailableRoles(), User::getAvailableRoles()))
+            ->allowMultipleChoices()
+            ->renderAsBadges()
+            ->setDisabled()
+            ->setHelp(
+                'Derived from the permissions VTK reports at login. Change these in the ' .
+                'VTK admin under Rollen, not here.'
+            );
         yield AssociationField::new('favoritePrograms')
             ->setFormTypeOptions(['by_reference' => false])
             ->autocomplete()

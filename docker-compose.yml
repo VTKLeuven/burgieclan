@@ -29,9 +29,19 @@ services:
       - db
     environment:
       DATABASE_URL: "postgresql://burgieclan_db_user:burgieclan_db_pass@db:5432/burgieclan_db?serverVersion=18&charset=utf8"
-      LITUS_API_KEY: ${LITUS_API_KEY:?LITUS_API_KEY is required}
+      # The VTK website hosts VTK, the authorization server. Locally it runs on 3000,
+      # which is why the frontend below moved to 3002.
+      FLUXUS_SSO_ISSUER: ${FLUXUS_SSO_ISSUER:-http://localhost:3000/api/auth/better}
+      FLUXUS_SSO_CLIENT_ID: ${FLUXUS_SSO_CLIENT_ID:?FLUXUS_SSO_CLIENT_ID is required}
+      FLUXUS_SSO_CLIENT_SECRET: ${FLUXUS_SSO_CLIENT_SECRET:?FLUXUS_SSO_CLIENT_SECRET is required}
+      FRONTEND_URL: "http://localhost:3002"
     networks:
       - burgieclan-network
+    # The backend exchanges the code and fetches userinfo server to server, so
+    # `localhost` has to reach the host machine (where the VTK site runs), not the
+    # container itself.
+    extra_hosts:
+      - "localhost:host-gateway"
 
   frontend:
     container_name: burgieclan-frontend
@@ -43,10 +53,12 @@ services:
       - frontend-node-modules:/app/frontend/node_modules
       - frontend-next:/app/frontend/.next:delegated
     ports:
-      - "3000:3000"
+      # 3000 on the host belongs to the VTK website in local development; that is
+      # where BETTER_AUTH_URL points and what its trusted origins allow.
+      - "3002:3000"
     environment:
       - NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
-      - NEXT_PUBLIC_FRONTEND_URL=http://localhost:3000
+      - NEXT_PUBLIC_FRONTEND_URL=http://localhost:3002
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
     depends_on:

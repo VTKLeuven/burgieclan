@@ -1,11 +1,11 @@
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
 
-interface LitusOAuthButtonProps {
+interface FluxusOAuthButtonProps {
     loginHandler: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 
-const LitusOAuthButton = ({ loginHandler }: LitusOAuthButtonProps) => {
+const FluxusOAuthButton = ({ loginHandler }: FluxusOAuthButtonProps) => {
     const { t } = useTranslation();
     return (
         <button
@@ -25,4 +25,4 @@ const LitusOAuthButton = ({ loginHandler }: LitusOAuthButtonProps) => {
     )
 }
 
-export default LitusOAuthButton;
+export default FluxusOAuthButton;
