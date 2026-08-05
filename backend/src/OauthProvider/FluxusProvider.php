@@ -2,7 +2,7 @@
 
 namespace App\OauthProvider;
 
-use App\OauthProvider\Exception\LitusIdentityProviderException;
+use App\OauthProvider\Exception\FluxusIdentityProviderException;
 use InvalidArgumentException;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
@@ -10,36 +10,30 @@ use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use Psr\Http\Message\ResponseInterface;
 
-class LitusProvider extends AbstractProvider
+/**
+ * Fluxus, the OAuth2/OIDC provider of the VTK website, which acts as the
+ * authorization server for all VTK applications. Replaces Litus on the old site.
+ *
+ * The three endpoints all live under one issuer base path (`/api/auth/better`), so
+ * they are derived from a single `issuer` option instead of being configured one by
+ * one. Discovery is available at `<issuer>/.well-known/openid-configuration`.
+ */
+class FluxusProvider extends AbstractProvider
 {
     use BearerAuthorizationTrait;
 
     /**
-     * Authorize url
+     * Base URL of the authorization server, e.g. https://vtk.be/api/auth/better
      *
      * @var string
      */
-    public string $urlAuthorize;
-
-    /**
-     * Access token url
-     * @var string
-     */
-    public string $urlAccessToken;
-
-    /**
-     * Resource owner details
-     * @var string
-     */
-    public string $urlResourceOwnerDetails;
+    public string $issuer;
 
     public function __construct(array $options = [], array $collaborators = [])
     {
         $this->assertRequiredOptions($options);
 
-        $this->urlAuthorize = $options['urlAuthorize'];
-        $this->urlAccessToken = $options['urlAccessToken'];
-        $this->urlResourceOwnerDetails = $options['urlResourceOwnerDetails'];
+        $this->issuer = rtrim($options['issuer'], '/');
 
         parent::__construct($options, $collaborators);
     }
@@ -70,9 +64,7 @@ class LitusProvider extends AbstractProvider
     protected function getRequiredOptions(): array
     {
         return [
-            'urlAuthorize',
-            'urlAccessToken',
-            'urlResourceOwnerDetails',
+            'issuer',
         ];
     }
 
@@ -83,7 +75,7 @@ class LitusProvider extends AbstractProvider
      */
     public function getBaseAuthorizationUrl(): string
     {
-        return $this->urlAuthorize;
+        return $this->issuer . '/oauth2/authorize';
     }
 
     /**
@@ -94,7 +86,7 @@ class LitusProvider extends AbstractProvider
      */
     public function getBaseAccessTokenUrl(array $params): string
     {
-        return $this->urlAccessToken;
+        return $this->issuer . '/oauth2/token';
     }
 
     /**
@@ -105,7 +97,7 @@ class LitusProvider extends AbstractProvider
      */
     public function getResourceOwnerDetailsUrl(AccessToken $token): string
     {
-        return $this->urlResourceOwnerDetails;
+        return $this->issuer . '/oauth2/userinfo';
     }
 
     /**
@@ -120,17 +112,38 @@ class LitusProvider extends AbstractProvider
     }
 
     /**
-     * Get the default scopes used by this provider.
+     * The default scopes used by this provider.
      *
-     * This should not be a complete list of all scopes, but the minimum
-     * required for the provider user interface!
+     * Study programme and year are split into separate scopes on the VTK side on
+     * purpose, so an application that only needs the programme cannot also read the
+     * student number. We request both study scopes but not `vtk:student_number`.
+     *
+     * `entitlements` is what unlocks the `permissions` claim on UserInfo, which is
+     * where our moderator/admin roles come from. Note that a token carrying that
+     * scope expires after ten minutes by design.
      *
      * @return array
      */
     protected function getDefaultScopes(): array
     {
-        // Currently not implemented in Litus
-        return [];
+        return [
+            'openid',
+            'profile',
+            'email',
+            'entitlements',
+            'vtk:study_programme',
+            'vtk:study_year',
+        ];
+    }
+
+    /**
+     * PKCE is mandatory for every client on the VTK authorization server.
+     *
+     * @return string|null
+     */
+    protected function getPkceMethod(): ?string
+    {
+        return static::PKCE_METHOD_S256;
     }
 
     /**
@@ -145,7 +158,7 @@ class LitusProvider extends AbstractProvider
     protected function checkResponse(ResponseInterface $response, $data): void
     {
         if ($response->getStatusCode() >= 400) {
-            throw LitusIdentityProviderException::clientException($response, $data);
+            throw FluxusIdentityProviderException::clientException($response, $data);
         }
     }
 
@@ -154,11 +167,11 @@ class LitusProvider extends AbstractProvider
      *
      * @param  array $response
      * @param  AccessToken $token
-     * @return LitusResourceOwner
+     * @return FluxusResourceOwner
      */
-    protected function createResourceOwner(array $response, AccessToken $token): LitusResourceOwner
+    protected function createResourceOwner(array $response, AccessToken $token): FluxusResourceOwner
     {
-        return new LitusResourceOwner($response);
+        return new FluxusResourceOwner($response);
     }
 
     protected function getAuthorizationHeaders($token = null): array

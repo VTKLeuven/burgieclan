@@ -384,8 +384,9 @@ These variables **must** be set in the `.env` file. The application will fail to
 | `POSTGRES_DATA_DIR` | PostgreSQL data directory path | `/opt/burgieclan/postgres` |
 | `DATA_DIR` | Application data directory | `/opt/burgieclan/data` |
 | `JWT_DIR` | JWT keys directory | `/opt/burgieclan/jwt` |
-| `LITUS_API_KEY` | Litus OAuth API key | From Litus configuration |
-| `LITUS_SECRET` | Litus OAuth secret | From Litus configuration |
+| `FLUXUS_SSO_ISSUER` | VTK authorization server base URL | `https://vtk.be/api/auth/better` |
+| `FLUXUS_SSO_CLIENT_ID` | Fluxus OAuth client id | From `/admin/sso` on the VTK website |
+| `FLUXUS_SSO_CLIENT_SECRET` | Fluxus OAuth client secret | Shown once when the client is created |
 | `S3_ENDPOINT` | Hetzner Object Storage endpoint | `https://nbg1.your-objectstorage.com` |
 | `S3_BUCKET` | Object storage bucket name | `burgieclan-vtk` |
 | `S3_ACCESS_KEY` | Object storage access key | From Hetzner Object Storage credentials |

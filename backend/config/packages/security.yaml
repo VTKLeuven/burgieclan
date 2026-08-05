@@ -47,7 +47,7 @@ security:
             provider: database_users
 
             custom_authenticators:
-                - App\Security\LitusAuthenticator
+                - App\Security\FluxusAuthenticator
 
             # This allows the user to login by submitting a username and password
             # Reference: https://symfony.com/doc/current/security/form_login_setup.html
