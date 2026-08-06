@@ -2671,16 +2671,16 @@
         },
         {
             "name": "easycorp/easyadmin-bundle",
-            "version": "v5.3.0",
+            "version": "v5.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EasyCorp/EasyAdminBundle.git",
-                "reference": "730f0e0a36623acf85b5c12f0cca913f96eab9e7"
+                "reference": "e17d67530c1324509a4646ab96f2f34a1cf070c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/730f0e0a36623acf85b5c12f0cca913f96eab9e7",
-                "reference": "730f0e0a36623acf85b5c12f0cca913f96eab9e7",
+                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/e17d67530c1324509a4646ab96f2f34a1cf070c6",
+                "reference": "e17d67530c1324509a4646ab96f2f34a1cf070c6",
                 "shasum": ""
             },
             "require": {
@@ -2769,7 +2769,7 @@
             ],
             "support": {
                 "issues": "https://github.com/EasyCorp/EasyAdminBundle/issues",
-                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v5.3.0"
+                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v5.4.1"
             },
             "funding": [
                 {
@@ -2777,7 +2777,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-21T19:19:06+00:00"
+            "time": "2026-07-30T19:20:52+00:00"
         },
         {
             "name": "gesdinet/jwt-refresh-token-bundle",
