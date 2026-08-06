@@ -12,9 +12,32 @@
     {% if filename and filename|lower ends with '.pdf' %}
         {% set previewUrl = path('admin_document_preview', {filename: filename}) %}
 
+        {# Styles live here rather than in style="" attributes: EasyAdmin puts a nonce on
+           style-src (its _css_assets.html.twig calls csp_nonce('style')), and a nonce makes
+           the browser ignore the 'unsafe-inline' in nelmio_security.yaml — so attribute
+           styles are dropped on every admin page. A nonced <style> element is allowed,
+           same as the <script nonce> below. Colors use EasyAdmin's own variables so they
+           follow dark mode; the Bootstrap --bs-* ones these replaced did not. #}
+        <style nonce="{{ csp_nonce('style') }}">
+            .pdf-preview-title { color: var(--text-color-light); }
+            .pdf-preview-nav { border-bottom: 1px solid var(--border-color); }
+            .pdf-page-info {
+                color: var(--text-color-light);
+                min-width: 100px;
+                text-align: center;
+            }
+            .pdf-pages-container {
+                overflow: auto;
+                max-height: 70vh;
+                padding: 16px;
+                background: var(--body-bg);
+                text-align: center;
+            }
+        </style>
+
         <div class="card mb-4 shadow-sm">
             <div class="card-header d-flex align-items-center justify-content-between py-2 bg-white">
-                <span class="small fw-semibold" style="color: var(--bs-secondary-color, #6c757d);">
+                <span class="small fw-semibold pdf-preview-title">
                     <i class="fa-solid fa-file-pdf text-danger me-1"></i> Document Preview
                 </span>
                 <button type="button" class="btn btn-sm btn-outline-secondary" id="toggle-edit-preview">
@@ -24,13 +47,11 @@
             </div>
             <div id="pdf-edit-preview-container" data-pdf-url="{{ previewUrl }}">
                 {# Navigation bar #}
-                <div class="d-flex align-items-center justify-content-center gap-3 py-2"
-                     style="border-bottom: 1px solid var(--bs-border-color, #dee2e6);">
+                <div class="d-flex align-items-center justify-content-center gap-3 py-2 pdf-preview-nav">
                     <button type="button" class="btn btn-sm btn-outline-secondary pdf-prev-btn" disabled>
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
-                    <span class="small fw-medium pdf-page-info"
-                          style="color: var(--bs-secondary-color, #6c757d); min-width: 100px; text-align: center;">
+                    <span class="small fw-medium pdf-page-info">
                         Loading...
                     </span>
                     <button type="button" class="btn btn-sm btn-outline-secondary pdf-next-btn" disabled>
@@ -39,8 +60,7 @@
                 </div>
 
                 {# PDF canvas container #}
-                <div class="pdf-pages-container"
-                     style="overflow: auto; max-height: 70vh; padding: 16px; background: #edf0f2; text-align: center;">
+                <div class="pdf-pages-container">
                     <div class="text-center py-4 text-muted pdf-loading">
                         <i class="fa-solid fa-spinner fa-spin me-2"></i>Loading PDF...
                     </div>
