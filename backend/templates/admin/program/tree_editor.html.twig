@@ -94,7 +94,7 @@
                         <table class="table table-sm table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th style="width: 30px;"></th>
+                                    <th class="bc-col-30"></th>
                                     <th>Code</th>
                                     <th>Course Name</th>
                                     <th>Credits</th>
@@ -152,7 +152,7 @@
 
 {% block main %}
     {# Sticky Bulk Action Bar #}
-    <div id="bulk-action-bar" class="card mb-3 sticky-top shadow-sm border-primary d-none" style="top: 15px; z-index: 1020;">
+    <div id="bulk-action-bar" class="card mb-3 sticky-top shadow-sm border-primary d-none bc-bulk-action-bar">
         <div class="card-body py-2 px-3 d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-3">
                 <input type="checkbox" id="master-select-all" class="me-2">
@@ -252,7 +252,7 @@
                         <div class="mb-3">
                             <input type="text" id="course-search-filter" class="form-control" placeholder="Filter courses by name or code...">
                         </div>
-                        <div style="max-height: 350px; overflow-y: auto;" class="border rounded p-2">
+                        <div class="border rounded p-2 bc-scroll-350">
                             {% for c in allCourses %}
                                 <div class="form-check course-item-row py-1 border-bottom">
                                     <input type="checkbox" name="course_ids[]" value="{{ c.id }}" class="form-check-input" id="course-opt-{{ c.id }}">

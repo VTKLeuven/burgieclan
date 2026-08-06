@@ -54,7 +54,7 @@
                 <input type="hidden" name="lang" value="{{ options.lang }}">
                 <input type="hidden" name="enrich" value="{{ options.enrich ? '1' : '0' }}">
 
-                <div style="max-height: 360px; overflow-y: auto;">
+                <div class="bc-scroll-360">
                     <table class="table datagrid">
                         <thead>
                             <tr>
@@ -66,7 +66,7 @@
                         <tbody>
                             {% for g in groups %}
                                 <tr>
-                                    <td style="padding-left: {{ 0.75 + g.depth * 1.5 }}rem;">{{ g.name }}</td>
+                                    <td class="bc-tree-cell" data-depth="{{ min(g.depth, 9) }}">{{ g.name }}</td>
                                     <td class="text-center">
                                         <input type="checkbox" name="flatten[]" value="{{ g.kulId }}"
                                                {{ (g.kulId in options.flatten or g.name in options.flatten) ? 'checked' : '' }}>

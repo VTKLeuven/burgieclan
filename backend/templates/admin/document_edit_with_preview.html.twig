@@ -13,41 +13,16 @@
     {% set isPdf = is_previewable_pdf(filename) %}
     {% set isImage = is_previewable_image(filename) %}
 
+    {# The bc-preview-* classes are in public/admin-assets/css/admin.css, shared with the
+       index row toggle. Not style="" attributes: EasyAdmin nonces style-src, and a nonce
+       makes the browser ignore the 'unsafe-inline' in nelmio_security.yaml, so inline
+       style attributes are blocked on every admin page. #}
     {% if is_previewable(filename) %}
         {% set previewUrl = path('admin_document_preview', {filename: filename}) %}
 
-        {# Styles live here rather than in style="" attributes: EasyAdmin puts a nonce on
-           style-src (its _css_assets.html.twig calls csp_nonce('style')), and a nonce makes
-           the browser ignore the 'unsafe-inline' in nelmio_security.yaml — so attribute
-           styles are dropped on every admin page. A nonced <style> element is allowed,
-           same as the <script nonce> below. Colors use EasyAdmin's own variables so they
-           follow dark mode; the Bootstrap --bs-* ones these replaced did not. #}
-        <style nonce="{{ csp_nonce('style') }}">
-            .pdf-preview-title { color: var(--text-color-light); }
-            .pdf-preview-nav { border-bottom: 1px solid var(--border-color); }
-            /* Replaces Bootstrap's bg-white, which stays white in dark mode. */
-            .pdf-preview-header { background: var(--content-bg); }
-            .pdf-page-info {
-                color: var(--text-color-light);
-                min-width: 100px;
-                text-align: center;
-            }
-            /* Deliberately a shade off the panel behind it, so white PDF pages read as
-               pages. --gray-* are fixed palette tokens rather than theme-aware ones, so
-               the dark variant has to be spelled out. */
-            .pdf-pages-container {
-                overflow: auto;
-                max-height: 70vh;
-                padding: 16px;
-                background: var(--gray-200);
-                text-align: center;
-            }
-            .ea-dark-scheme .pdf-pages-container { background: var(--gray-950); }
-        </style>
-
         <div class="card mb-4 shadow-sm">
-            <div class="card-header d-flex align-items-center justify-content-between py-2 pdf-preview-header">
-                <span class="small fw-semibold pdf-preview-title">
+            <div class="card-header d-flex align-items-center justify-content-between py-2 bc-preview-panel-header">
+                <span class="small fw-semibold bc-preview-title">
                     {% if isImage %}
                         <i class="fa-solid fa-file-image text-primary me-1"></i> Document Preview
                     {% else %}
@@ -70,16 +45,16 @@
             </div>
             <div id="pdf-edit-preview-container" data-pdf-url="{{ previewUrl }}">
                 {% if isImage %}
-                    <div class="pdf-pages-container text-center py-3">
-                        <img src="{{ previewUrl }}" class="img-fluid rounded shadow-sm" style="max-height: 65vh; margin: 0 auto; display: block;" alt="Document Preview">
+                    <div class="bc-preview-scroll text-center py-3">
+                        <img src="{{ previewUrl }}" class="img-fluid rounded shadow-sm bc-preview-image" alt="Document Preview">
                     </div>
                 {% else %}
                     {# Navigation bar #}
-                    <div class="d-flex align-items-center justify-content-center gap-3 py-2 pdf-preview-nav">
+                    <div class="d-flex align-items-center justify-content-center gap-3 py-2 bc-preview-navbar">
                         <button type="button" class="btn btn-sm btn-outline-secondary pdf-prev-btn" disabled>
                             <i class="fa-solid fa-chevron-left"></i>
                         </button>
-                        <span class="small fw-medium pdf-page-info">
+                        <span class="small fw-medium bc-preview-pageinfo">
                             Loading...
                         </span>
                         <button type="button" class="btn btn-sm btn-outline-secondary pdf-next-btn" disabled>
@@ -88,7 +63,7 @@
                     </div>
 
                     {# PDF canvas container #}
-                    <div class="pdf-pages-container">
+                    <div class="bc-preview-scroll">
                         <div class="text-center py-4 text-muted pdf-loading">
                             <i class="fa-solid fa-spinner fa-spin me-2"></i>Loading PDF...
                         </div>
@@ -121,9 +96,9 @@
 
             {% if isPdf %}
             var pdfUrl = container.dataset.pdfUrl;
-            var pagesContainer = container.querySelector('.pdf-pages-container');
+            var pagesContainer = container.querySelector('.bc-preview-scroll');
             var loadingEl = container.querySelector('.pdf-loading');
-            var pageInfo = container.querySelector('.pdf-page-info');
+            var pageInfo = container.querySelector('.bc-preview-pageinfo');
             var prevBtn = container.querySelector('.pdf-prev-btn');
             var nextBtn = container.querySelector('.pdf-next-btn');
 

@@ -57,7 +57,7 @@
         {% if image_uri|default('') is not empty %}
             {% if download_uri|default('') is empty %}
                 <div class="ea-lightbox-thumbnail">
-                    <img style="cursor: initial" src="{{ asset_helper is same as(true) ? asset(image_uri) : image_uri }}">
+                    <img class="bc-vich-thumbnail" src="{{ asset_helper is same as(true) ? asset(image_uri) : image_uri }}">
                 </div>
             {% else %}
                 {% set _lightbox_id = 'ea-lightbox-' ~ id %}
