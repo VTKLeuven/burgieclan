@@ -7,14 +7,14 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\Response;
-use App\Controller\Api\LitusOAuthInitiateController;
+use App\Controller\Api\FluxusOAuthInitiateController;
 
 #[ApiResource(
-    shortName: 'Litus OAuth',
+    shortName: 'Fluxus OAuth',
     operations: [
         new Get(
             uriTemplate: '/auth/oauth/initiate',
-            controller: LitusOAuthInitiateController::class,
+            controller: FluxusOAuthInitiateController::class,
             openapi: new Operation(
                 responses: [
                     '302' => new Response(
@@ -32,8 +32,8 @@ use App\Controller\Api\LitusOAuthInitiateController;
                         )
                     )
                 ],
-                summary: 'Initiate OAuth flow with Litus',
-                description: 'Redirects user to Litus OAuth provider for authentication',
+                summary: 'Initiate OAuth flow with Fluxus',
+                description: 'Redirects user to the VTK authorization server for authentication',
                 parameters: [
                     new Parameter(
                         name: 'redirect_to',
@@ -56,6 +56,6 @@ use App\Controller\Api\LitusOAuthInitiateController;
         ),
     ]
 )]
-class LitusOAuthInitiateApi
+class FluxusOAuthInitiateApi
 {
 }

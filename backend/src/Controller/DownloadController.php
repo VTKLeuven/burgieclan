@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Constants\PreviewableFile;
 use App\Repository\DocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,8 +40,11 @@ final class DownloadController extends AbstractController
             // When ?inline=1 is set, serve for in-browser viewing instead of download
             if ($request->query->get('inline')) {
                 $response->headers->set('Content-Disposition', 'inline');
-                if (str_ends_with(strtolower($filename), '.pdf')) {
-                    $response->headers->set('Content-Type', 'application/pdf');
+                // Correct the MIME type, which VichUploader falls back to
+                // application/octet-stream for when the entity has no mimeType field.
+                $contentType = PreviewableFile::contentTypeFor($filename);
+                if (null !== $contentType) {
+                    $response->headers->set('Content-Type', $contentType);
                 }
             }
 

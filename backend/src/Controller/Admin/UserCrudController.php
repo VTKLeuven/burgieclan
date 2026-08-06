@@ -51,10 +51,8 @@ class UserCrudController extends AbstractCrudController
                 ->setRequired($pageName === Crud::PAGE_NEW)
                 ->setLabel($pageName === Crud::PAGE_NEW ? 'Password' : 'New Password (leave empty to keep current)');
 
-            // On the "new" page a password is mandatory. setRequired() only adds the client-side
-            // "required" attribute; without a server-side constraint an empty submit (e.g. via
-            // "Create and add another") slipped through to persistEntity() and threw an uncaught
-            // exception → 500. A NotBlank constraint turns that into a normal validation error.
+            // setRequired() only enforces client-side validation. We need NotBlank here to prevent
+            // 500 errors on empty submits (e.g. "Create and add another").
             if ($pageName === Crud::PAGE_NEW) {
                 $passwordField->setFormTypeOption(
                     'constraints',
@@ -67,11 +65,34 @@ class UserCrudController extends AbstractCrudController
             yield $passwordField;
         }
 
-        yield ChoiceField::new('roles')
+        // Local overrides only. These can add to what VTK grants but never take it
+        // away; see User::getRoles() for the effective set.
+        //
+        // Bound to `localRoles`, not `roles`: the property accessor reads `roles`
+        // through getRoles(), which returns the union with the VTK-granted ones, so
+        // this form would show them pre-ticked and write them into the local column
+        // on save — permanently, since a later resync can no longer revoke them.
+        yield ChoiceField::new('localRoles', 'Roles (local)')
             ->setChoices(array_combine(User::getAvailableRoles(), User::getAvailableRoles()))
             ->allowMultipleChoices()
             ->renderExpanded()
-            ->renderAsBadges();
+            ->renderAsBadges()
+            ->setHelp(
+                'Assigned here, in Burgieclan. Granted on top of the roles that come from VTK, ' .
+                'and never removed by a resync.'
+            );
+
+        // Read-only: this is written by FluxusRoleSynchronizer on login. Without it an
+        // admin cannot see why someone is a moderator.
+        yield ChoiceField::new('ssoRoles', 'Roles (from VTK)')
+            ->setChoices(array_combine(User::getAvailableRoles(), User::getAvailableRoles()))
+            ->allowMultipleChoices()
+            ->renderAsBadges()
+            ->setDisabled()
+            ->setHelp(
+                'Derived from the permissions VTK reports at login. Change these in the ' .
+                'VTK admin under Rollen, not here.'
+            );
         yield AssociationField::new('favoritePrograms')
             ->setFormTypeOptions(['by_reference' => false])
             ->autocomplete()

@@ -27,6 +27,12 @@ const nextConfig: NextConfig = {
             // +5 MB headroom over the file limit for multipart/form-data overhead.
             bodySizeLimit: `${FILE_SIZE_MB + 5}mb`,
         },
+        // src/proxy.ts matches every page route, including the one the upload action posts
+        // to, so Next buffers the request body on its behalf. That buffer defaults to 10MB
+        // and *truncates* rather than rejects, handing the action a half-written multipart
+        // body — "Unexpected end of form", surfacing as a 500 with no mention of size.
+        // Separate gate from bodySizeLimit above; both have to clear the file limit.
+        proxyClientMaxBodySize: `${FILE_SIZE_MB + 5}mb`,
     },
 };
 

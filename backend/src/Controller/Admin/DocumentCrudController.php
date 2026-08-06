@@ -8,6 +8,7 @@ use App\Entity\Document;
 use App\Entity\DocumentCategory;
 use App\Entity\Tag;
 use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -24,6 +25,14 @@ class DocumentCrudController extends AbstractCrudController
     public static function getEntityFqcn(): string
     {
         return Document::class;
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        // Inherited by DocumentPendingCrudController, so both the regular and the
+        // pending document edit pages get the inline preview panel.
+        return $crud
+            ->overrideTemplate('crud/edit', 'admin/document_edit_with_preview.html.twig');
     }
 
     public function createEntity(string $entityFqcn): Document
@@ -75,7 +84,9 @@ class DocumentCrudController extends AbstractCrudController
                 ]
             )
             ->hideOnIndex();
-        yield TextField::new('file_name', 'File & Preview')
+        yield TextField::new('file_name', 'File Name')
+            ->onlyOnIndex();
+        yield TextField::new('file_name', 'Preview')
             ->setTemplatePath('admin/field/file_preview_toggle.html.twig')
             ->onlyOnIndex();
     }

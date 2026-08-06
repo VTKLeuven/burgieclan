@@ -80,7 +80,19 @@ export default function DocumentPreview({ id }: { id: string }) {
         return <ErrorPage status={error.status} detail={error.message} />;
     }
 
-    return (document &&
+    if (!document) return null;
+
+    const isPdf = document.mimetype === "application/pdf" ||
+        document.filename?.toLowerCase().endsWith('.pdf') ||
+        document.contentUrl?.toLowerCase().endsWith('.pdf');
+    const isImage = document.mimetype?.startsWith("image/") ||
+        ['.png', '.jpg', '.jpeg', '.gif', '.webp'].some(ext =>
+            document.filename?.toLowerCase().endsWith(ext) ||
+            document.contentUrl?.toLowerCase().endsWith(ext)
+        );
+    const canPreview = document.contentUrl && (isPdf || isImage);
+
+    return (
         <div className="vtk-shell pb-16">
             {/* Editorial page head: breadcrumb kicker, filename as the display
                 title, and the file facts as a right-aligned spec block. */}
@@ -132,7 +144,7 @@ export default function DocumentPreview({ id }: { id: string }) {
                                 fileSize={document.fileSize ? formatFileSize(document.fileSize) : undefined}
                                 disabled={!user}
                             />
-                            {document.mimetype === "application/pdf" && document.contentUrl && (
+                            {canPreview && (
                                 <a
                                     href={`${document.contentUrl}?inline=1`}
                                     target="_blank"
@@ -151,20 +163,25 @@ export default function DocumentPreview({ id }: { id: string }) {
                         </div>
                     </div>
 
-                    {/*TODO: expand preview to other file types*/}
                     <div ref={previewRef} className="flex justify-center overflow-x-auto bg-vtk-paper-2 p-4">
-                        {(() => {
-                            const isPdf = document.mimetype === "application/pdf" ||
-                                document.filename?.toLowerCase().endsWith('.pdf') ||
-                                document.contentUrl?.toLowerCase().endsWith('.pdf');
-                            return (document.contentUrl && isPdf) ? (
-                                <PDFViewer file={document.contentUrl} width={containerWidth} />
-                            ) : (
-                                <div className="vtk-empty flex h-96 w-full items-center justify-center">
-                                    {t('document.no-preview', { filename: document.filename })}
-                                </div>
-                            );
-                        })()}
+                        {document.contentUrl && isPdf ? (
+                            <PDFViewer file={document.contentUrl} width={containerWidth} />
+                        ) : document.contentUrl && isImage ? (
+                            // Not next/image: contentUrl points at the backend's download
+                            // route, which would need a remotePatterns entry per deployment
+                            // and gains nothing here — the file is authenticated, one-off,
+                            // and never a candidate for the optimizer's cache.
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                                src={`${document.contentUrl}?inline=1`}
+                                alt={document.name}
+                                className="max-h-[75vh] max-w-full rounded shadow-sm object-contain"
+                            />
+                        ) : (
+                            <div className="vtk-empty flex h-96 w-full items-center justify-center">
+                                {t('document.no-preview', { filename: document.filename })}
+                            </div>
+                        )}
                     </div>
                 </div>
 

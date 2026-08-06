@@ -10,7 +10,7 @@
 
             {# Step 1: search #}
             <form method="get" action="{{ path('admin_onderwijsaanbod_import') }}" class="mb-4">
-                <div class="d-flex" style="gap: .5rem;">
+                <div class="d-flex bc-toolbar-row">
                     <input type="text" name="q" value="{{ query }}" class="form-control"
                            placeholder="e.g. burgerlijk ingenieur informatica" autofocus>
                     <button type="submit" class="btn btn-secondary">Search</button>
@@ -26,11 +26,11 @@
                             <tbody>
                                 {% for r in searchResults %}
                                     <tr>
-                                        <td style="width: 1%;">
+                                        <td class="bc-col-shrink">
                                             <input type="radio" name="programId" value="{{ r.programId }}"
                                                    {{ loop.first ? 'checked' : '' }}>
                                         </td>
-                                        <td style="width: 1%;"><code>{{ r.programId }}</code></td>
+                                        <td class="bc-col-shrink"><code>{{ r.programId }}</code></td>
                                         <td>{{ r.title }}</td>
                                     </tr>
                                 {% endfor %}

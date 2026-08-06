@@ -12,8 +12,10 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Security\FluxusAuthenticator;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2Client;
+use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -64,18 +66,36 @@ final class SecurityController extends AbstractController
         );
     }
 
-    #[Route("/login/litus", name: "login_litus")]
-    public function loginLitus(Request $request, ClientRegistry $clientRegistry)
+    #[Route("/login/fluxus", name: "login_fluxus")]
+    public function loginFluxus(Request $request, ClientRegistry $clientRegistry)
     {
-        //This is handled in the LitusAuthenticator
+        //This is handled in the FluxusAuthenticator
     }
 
-    #[Route("/login/litus/start", name: "login_litus_start")]
-    public function loginLitusStart(ClientRegistry $clientRegistry): RedirectResponse
+    #[Route("/login/fluxus/start", name: "login_fluxus_start")]
+    public function loginFluxusStart(Request $request, ClientRegistry $clientRegistry): RedirectResponse
     {
         /** @var OAuth2Client $oauthClient */
-        $oauthClient = $clientRegistry->getClient("litus_backend");
-        return $oauthClient->redirect();
+        $oauthClient = $clientRegistry->getClient("fluxus_backend");
+
+        // redirect() is what generates the PKCE verifier, so read it back afterwards
+        // and park it in the session for FluxusAuthenticator to pick up.
+        $response = $oauthClient->redirect();
+
+        // Same guard as FluxusOAuthInitiateController: an empty verifier here means
+        // FluxusProvider stopped declaring an S256 PKCE method, which would break
+        // every admin login at the callback with a far less obvious error.
+        $pkceVerifier = $oauthClient->getOAuth2Provider()->getPkceCode();
+        if (null === $pkceVerifier || '' === $pkceVerifier) {
+            throw new LogicException(
+                'The OAuth provider produced no PKCE verifier; check that FluxusProvider::getPkceMethod() '
+                . 'still returns S256.'
+            );
+        }
+
+        $request->getSession()->set(FluxusAuthenticator::PKCE_SESSION_KEY, $pkceVerifier);
+
+        return $response;
     }
 
     /**

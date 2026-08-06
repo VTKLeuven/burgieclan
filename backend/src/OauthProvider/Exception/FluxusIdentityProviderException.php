@@ -5,7 +5,7 @@ namespace App\OauthProvider\Exception;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Psr\Http\Message\ResponseInterface;
 
-class LitusIdentityProviderException extends IdentityProviderException
+class FluxusIdentityProviderException extends IdentityProviderException
 {
     /**
      * Creates client exception from response
@@ -16,10 +16,14 @@ class LitusIdentityProviderException extends IdentityProviderException
      */
     public static function clientException(ResponseInterface $response, array $data): IdentityProviderException
     {
-        return static::fromResponse(
-            $response,
-            $data['message'] ?? json_encode($data)
-        );
+        // OAuth2 error responses carry `error_description`/`error` (RFC 6749 §5.2); the
+        // better-auth provider follows that, so prefer those over a generic dump.
+        $message = $data['error_description']
+            ?? $data['error']
+            ?? $data['message']
+            ?? json_encode($data);
+
+        return static::fromResponse($response, is_string($message) ? $message : json_encode($data));
     }
 
     /**

@@ -1,27 +1,30 @@
 knpu_oauth2_client:
   clients:
     # configure your clients as described here: https://github.com/knpuniversity/oauth2-client-bundle#configuration
-    litus_backend:
+    # VTK is the authorization server for all VTK applications; see docs/sso.md in
+    # the vtk-website-new repository. All three endpoints hang off one issuer.
+    fluxus_backend:
       type: generic
-      provider_class: App\OauthProvider\LitusProvider
+      provider_class: App\OauthProvider\FluxusProvider
       provider_options:
-        urlAuthorize: "%env(LITUS_OAUTH_AUTHORIZE)%"
-        urlAccessToken: "%env(LITUS_OAUTH_TOKEN)%"
-        urlResourceOwnerDetails: "%env(LITUS_OAUTH_RESOURCE_OWNER_DETAILS)%"
-      client_id: "%env(LITUS_API_KEY)%"
-      client_secret: "%env(LITUS_SECRET)%"
-      redirect_route: login_litus
-      use_state: false # needed to allow login through kuleuven shibboleth
+        issuer: "%env(FLUXUS_SSO_ISSUER)%"
+      client_id: "%env(FLUXUS_SSO_CLIENT_ID)%"
+      client_secret: "%env(FLUXUS_SSO_CLIENT_SECRET)%"
+      redirect_route: login_fluxus
+      # "stateless" here only means KnpU does not park the state in the session. The
+      # `state` parameter is still sent (the league provider always adds it); this
+      # client verifies it through the session-backed PKCE flow in FluxusAuthenticator.
+      use_state: false
 
     # client for API/frontend login
-    litus_api:
+    fluxus_api:
       type: generic
-      provider_class: App\OauthProvider\LitusProvider
+      provider_class: App\OauthProvider\FluxusProvider
       provider_options:
-        urlAuthorize: "%env(LITUS_OAUTH_AUTHORIZE)%"
-        urlAccessToken: "%env(LITUS_OAUTH_TOKEN)%"
-        urlResourceOwnerDetails: "%env(LITUS_OAUTH_RESOURCE_OWNER_DETAILS)%"
-      client_id: "%env(LITUS_API_KEY)%"
-      client_secret: "%env(LITUS_SECRET)%"
+        issuer: "%env(FLUXUS_SSO_ISSUER)%"
+      client_id: "%env(FLUXUS_SSO_CLIENT_ID)%"
+      client_secret: "%env(FLUXUS_SSO_CLIENT_SECRET)%"
       redirect_route: api_oauth_callback
-      use_state: false # needed to allow login through kuleuven shibboleth
+      # The API firewall is stateless, so there is no session to hold the state in.
+      # FluxusOAuthCallbackController verifies it against a cookie instead.
+      use_state: false

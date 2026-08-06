@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\User;
 use App\Repository\DocumentRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -26,12 +27,21 @@ class DashboardController extends AbstractDashboardController
 
     public function configureDashboard(): Dashboard
     {
-        // admin-assets is not proxied to the frontend, so it is accessible
+        // admin-assets is not proxied to the frontend, so it is accessible.
+        // The logo is sized by .bc-dashboard-logo in admin.css, not by a style="" attribute:
+        // EasyAdmin nonces style-src, which blocks inline style attributes outright.
         return Dashboard::new()
-            ->setTitle('<img src="/admin-assets/images/logo.png" alt="Icon" style="height: 20px; margin-right: 10px;"> Burgieclan')
+            ->setTitle('<img src="/admin-assets/images/logo.png" alt="Icon" class="bc-dashboard-logo"> Burgieclan')
             // Follow the OS preference by default; users can switch light/dark from the user menu.
             ->setDefaultColorScheme(ColorScheme::AUTO);
-        //TODO add Burgieclan logo here
+    }
+
+    public function configureAssets(): Assets
+    {
+        // Styles the custom admin templates rely on. Served straight from public/ rather
+        // than through Encore, whose entrypoint the admin does not load. @see admin.css
+        return parent::configureAssets()
+            ->addCssFile('/admin-assets/css/admin.css');
     }
 
     public function configureCrud(): Crud

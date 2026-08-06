@@ -126,6 +126,9 @@ export default async function proxy(request: NextRequest) {
 
     // Check authentication
     let isAuthenticated = checkAuthentication(request);
+    // Set once the backend has actually rejected the refresh token: the only proof
+    // we get here that the session is dead rather than merely unproven.
+    let sessionRejected = false;
 
     // If not authenticated, try to refresh tokens
     if (!isAuthenticated) {
@@ -161,6 +164,8 @@ export default async function proxy(request: NextRequest) {
                 isAuthenticated = true;
                 return response;
             }
+
+            sessionRejected = true;
         }
     }
 
@@ -175,10 +180,19 @@ export default async function proxy(request: NextRequest) {
                 ? loginUrl
                 : `${loginUrl}?redirectTo=${encodeURIComponent(request.nextUrl.pathname)}`;
 
-            // Clear invalid cookies when redirecting to login
             const response = NextResponse.redirect(new URL(redirectUrl, baseUrl));
-            response.cookies.delete(COOKIE_NAMES.JWT);
-            response.cookies.delete(COOKIE_NAMES.REFRESH_TOKEN);
+
+            // Only clear on a rejected refresh. This runs on prefetches too, so
+            // clearing whenever the cookies look absent logs out a session that was
+            // still being established.
+            // The path has to match the one storeTokensInCookies() set, or the browser
+            // scopes the deletion to the requesting URL's directory (e.g. /en/documents)
+            // and leaves the real Path=/ cookie in place. Same reason as in
+            // clearTokenCookies().
+            if (sessionRejected) {
+                response.cookies.delete({ name: COOKIE_NAMES.JWT, path: '/' });
+                response.cookies.delete({ name: COOKIE_NAMES.REFRESH_TOKEN, path: '/' });
+            }
 
             return response;
         }

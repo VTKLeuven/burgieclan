@@ -26,7 +26,13 @@ This project uses Docker and Dev Containers for local development.
    ```bash
    cp .env.dist .env
    ```
-   Replace the `LITUS_API_KEY` with a valid key to enable login with Litus Oauth2.
+   Replace `FLUXUS_SSO_CLIENT_ID` and `FLUXUS_SSO_CLIENT_SECRET` with the credentials of
+   the Burgieclan client on the VTK authorization server, to enable login with a VTK
+   account. Create the client at `/admin/sso/nieuw` on the VTK website; the secret is
+   shown only once.
+
+   The frontend runs on http://localhost:3002 in development, because port 3000
+   belongs to the VTK website locally and the SSO flow needs it to stay there.
 
 2. **Start the development environment**:
    ```bash
@@ -44,7 +50,7 @@ This project uses Docker and Dev Containers for local development.
    - Choose either "Burgieclan Backend" or "Burgieclan Frontend"
 
 That's it! You can now work on the frontend or backend code within the containerized environment.
- - Frontend: http://localhost:3000
+ - Frontend: http://localhost:3002
  - Backend: http://localhost:8000
 
 #### Stopping the Environment
@@ -164,9 +170,10 @@ If you prefer manual deployment or GitHub Actions is not configured:
    DATA_DIR=/opt/burgieclan/data
    JWT_DIR=/opt/burgieclan/jwt
    
-   # OAuth (Litus)
-   LITUS_API_KEY=your-litus-api-key
-   LITUS_SECRET=your-litus-secret
+   # OAuth (Fluxus SSO)
+   FLUXUS_SSO_ISSUER=https://vtk.be/api/auth/better
+   FLUXUS_SSO_CLIENT_ID=your-vtk-client-id
+   FLUXUS_SSO_CLIENT_SECRET=your-vtk-client-secret
    
    # JWT
    JWT_PASSPHRASE=your-jwt-passphrase

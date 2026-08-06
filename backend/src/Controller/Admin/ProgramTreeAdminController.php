@@ -28,6 +28,15 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted(User::ROLE_ADMIN)]
 class ProgramTreeAdminController extends AbstractController
 {
+    /**
+     * CSRF intention shared by every mutating form in the tree editor.
+     *
+     * One intention rather than one per action: the forms all live on the same page
+     * and are all submitted by the same admin, so a shared token is no weaker here
+     * and much harder to forget on a new form. @see assertCsrf()
+     */
+    private const CSRF_INTENTION = 'program_tree';
+
     public function __construct(
         private readonly ProgramRepository $programRepository,
         private readonly ModuleRepository $moduleRepository,
@@ -62,9 +71,31 @@ class ProgramTreeAdminController extends AbstractController
         );
     }
 
+    /**
+     * Reject a mutating request that did not come from the tree editor.
+     *
+     * Returns the redirect to send back on failure, or null when the token is good.
+     * A return value rather than an exception so each action keeps the same
+     * flash-and-redirect behaviour it has for every other bad input.
+     */
+    private function assertCsrf(int $programId, Request $request): ?Response
+    {
+        if ($this->isCsrfTokenValid(self::CSRF_INTENTION, (string) $request->request->get('_token'))) {
+            return null;
+        }
+
+        $this->addFlash('danger', 'Invalid CSRF token, action aborted.');
+
+        return $this->redirectToRoute('admin_program_tree', ['id' => $programId]);
+    }
+
     #[AdminRoute('/program/{id}/tree/add-module', name: 'program_tree_add_module', options: ['methods' => ['POST']])]
     public function addModule(int $id, Request $request): Response
     {
+        if ($invalid = $this->assertCsrf($id, $request)) {
+            return $invalid;
+        }
+
         $program = $this->programRepository->find($id);
         if (!$program) {
             $this->addFlash('danger', 'Program not found.');
@@ -107,6 +138,10 @@ class ProgramTreeAdminController extends AbstractController
     #[AdminRoute('/program/{id}/tree/attach-courses', name: 'program_tree_attach_courses', options: ['methods' => ['POST']])]
     public function attachCourses(int $id, Request $request): Response
     {
+        if ($invalid = $this->assertCsrf($id, $request)) {
+            return $invalid;
+        }
+
         $program = $this->programRepository->find($id);
         if (!$program) {
             $this->addFlash('danger', 'Program not found.');
@@ -147,6 +182,10 @@ class ProgramTreeAdminController extends AbstractController
     #[AdminRoute('/program/{id}/tree/bulk-move', name: 'program_tree_bulk_move', options: ['methods' => ['POST']])]
     public function bulkMove(int $id, Request $request): Response
     {
+        if ($invalid = $this->assertCsrf($id, $request)) {
+            return $invalid;
+        }
+
         $program = $this->programRepository->find($id);
         if (!$program) {
             $this->addFlash('danger', 'Program not found.');
@@ -228,6 +267,10 @@ class ProgramTreeAdminController extends AbstractController
     #[AdminRoute('/program/{id}/tree/bulk-remove', name: 'program_tree_bulk_remove', options: ['methods' => ['POST']])]
     public function bulkRemove(int $id, Request $request): Response
     {
+        if ($invalid = $this->assertCsrf($id, $request)) {
+            return $invalid;
+        }
+
         $program = $this->programRepository->find($id);
         if (!$program) {
             $this->addFlash('danger', 'Program not found.');
@@ -351,6 +394,10 @@ class ProgramTreeAdminController extends AbstractController
     #[AdminRoute('/program/{id}/tree/reorder-module', name: 'program_tree_reorder_module', options: ['methods' => ['POST']])]
     public function reorderModule(int $id, Request $request): Response
     {
+        if ($invalid = $this->assertCsrf($id, $request)) {
+            return $invalid;
+        }
+
         $program = $this->programRepository->find($id);
         if (!$program) {
             $this->addFlash('danger', 'Program not found.');
@@ -420,6 +467,10 @@ class ProgramTreeAdminController extends AbstractController
     #[AdminRoute('/program/{id}/tree/rename-module', name: 'program_tree_rename_module', options: ['methods' => ['POST']])]
     public function renameModule(int $id, Request $request): Response
     {
+        if ($invalid = $this->assertCsrf($id, $request)) {
+            return $invalid;
+        }
+
         $program = $this->programRepository->find($id);
         if (!$program) {
             $this->addFlash('danger', 'Program not found.');
@@ -448,10 +499,8 @@ class ProgramTreeAdminController extends AbstractController
     #[AdminRoute('/program/{id}/tree/sync-onderwijsaanbod', name: 'program_tree_sync', options: ['methods' => ['POST']])]
     public function syncOnderwijsaanbod(int $id, Request $request): Response
     {
-        if (!$this->isCsrfTokenValid('program_sync', (string) $request->request->get('_token'))) {
-            $this->addFlash('danger', 'Invalid CSRF token, sync aborted.');
-
-            return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
+        if ($invalid = $this->assertCsrf($id, $request)) {
+            return $invalid;
         }
 
         $program = $this->programRepository->find($id);

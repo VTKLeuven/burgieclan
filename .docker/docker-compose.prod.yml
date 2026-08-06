@@ -59,12 +59,10 @@ services:
       # Database configuration
       DATABASE_URL: "postgresql://burgieclan_db_user:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@burgieclan-db:5432/burgieclan_db?serverVersion=18&charset=utf8"
 
-      # Litus oauth
-      LITUS_OAUTH_AUTHORIZE: "https://vtk.be/api/oauth/authorize"
-      LITUS_OAUTH_TOKEN: "https://vtk.be/api/oauth/token"
-      LITUS_OAUTH_RESOURCE_OWNER_DETAILS: "https://vtk.be/api/auth/me"
-      LITUS_API_KEY: ${LITUS_API_KEY:?LITUS_API_KEY is required}
-      LITUS_SECRET: ${LITUS_SECRET:?LITUS_SECRET is required}
+      # Fluxus SSO (OAuth2 / OIDC)
+      FLUXUS_SSO_ISSUER: ${FLUXUS_SSO_ISSUER:?FLUXUS_SSO_ISSUER is required}
+      FLUXUS_SSO_CLIENT_ID: ${FLUXUS_SSO_CLIENT_ID:?FLUXUS_SSO_CLIENT_ID is required}
+      FLUXUS_SSO_CLIENT_SECRET: ${FLUXUS_SSO_CLIENT_SECRET:?FLUXUS_SSO_CLIENT_SECRET is required}
 
       # Sentry error tracking
       SENTRY_DSN: ${SENTRY_DSN:-}
