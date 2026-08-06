@@ -51,10 +51,8 @@ class UserCrudController extends AbstractCrudController
                 ->setRequired($pageName === Crud::PAGE_NEW)
                 ->setLabel($pageName === Crud::PAGE_NEW ? 'Password' : 'New Password (leave empty to keep current)');
 
-            // On the "new" page a password is mandatory. setRequired() only adds the client-side
-            // "required" attribute; without a server-side constraint an empty submit (e.g. via
-            // "Create and add another") slipped through to persistEntity() and threw an uncaught
-            // exception → 500. A NotBlank constraint turns that into a normal validation error.
+            // setRequired() only enforces client-side validation. We need NotBlank here to prevent
+            // 500 errors on empty submits (e.g. "Create and add another").
             if ($pageName === Crud::PAGE_NEW) {
                 $passwordField->setFormTypeOption(
                     'constraints',

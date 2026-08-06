@@ -21,22 +21,28 @@
         <style nonce="{{ csp_nonce('style') }}">
             .pdf-preview-title { color: var(--text-color-light); }
             .pdf-preview-nav { border-bottom: 1px solid var(--border-color); }
+            /* Replaces Bootstrap's bg-white, which stays white in dark mode. */
+            .pdf-preview-header { background: var(--content-bg); }
             .pdf-page-info {
                 color: var(--text-color-light);
                 min-width: 100px;
                 text-align: center;
             }
+            /* Deliberately a shade off the panel behind it, so white PDF pages read as
+               pages. --gray-* are fixed palette tokens rather than theme-aware ones, so
+               the dark variant has to be spelled out. */
             .pdf-pages-container {
                 overflow: auto;
                 max-height: 70vh;
                 padding: 16px;
-                background: var(--body-bg);
+                background: var(--gray-200);
                 text-align: center;
             }
+            .ea-dark-scheme .pdf-pages-container { background: var(--gray-950); }
         </style>
 
         <div class="card mb-4 shadow-sm">
-            <div class="card-header d-flex align-items-center justify-content-between py-2 bg-white">
+            <div class="card-header d-flex align-items-center justify-content-between py-2 pdf-preview-header">
                 <span class="small fw-semibold pdf-preview-title">
                     <i class="fa-solid fa-file-pdf text-danger me-1"></i> Document Preview
                 </span>

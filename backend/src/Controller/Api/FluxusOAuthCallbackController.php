@@ -134,10 +134,8 @@ class FluxusOAuthCallbackController extends AbstractController
             // Get frontend redirect URL
             $frontendRedirectTo = $request->cookies->get(FluxusOAuthCookies::FRONTEND_REDIRECT, '/');
 
-            // Redirect to frontend with all tokens and expiration. The VTK token
-            // itself never reaches the browser: it is used once here and dropped.
-            // It would expire in ten minutes anyway, because it carries
-            // `entitlements`.
+            // Redirect to frontend with local JWTs. (The VTK token is dropped here
+            // as it's short-lived and only needed for sync).
             return $this->finish(
                 $request,
                 "{$frontendUrl}/auth/callback?token=" . urlencode($jwt) .
