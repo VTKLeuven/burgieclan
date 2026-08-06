@@ -4,20 +4,30 @@
 
 {% set filename = field.value %}
 {% set entityId = entity.primaryKeyValue %}
-{% if filename %}
-    <div class="d-inline-flex align-items-center gap-2">
-        <span class="fw-medium text-break">{{ filename }}</span>
+{% set ext = filename ? filename|lower : '' %}
+{% set isPdf = ext ends with '.pdf' %}
+{% set isImage = ext ends with '.png' or ext ends with '.jpg' or ext ends with '.jpeg' or ext ends with '.gif' or ext ends with '.webp' %}
 
-        {% if filename|lower ends with '.pdf' %}
+{% if filename %}
+    <div class="d-inline-flex align-items-center gap-1">
+        {% if isPdf or isImage %}
             <button type="button"
-                    class="btn btn-xs btn-outline-primary d-inline-flex align-items-center gap-1 py-0 px-2 toggle-pdf-btn"
+                    class="btn btn-xs btn-outline-primary d-inline-flex align-items-center py-0 px-2 toggle-pdf-btn"
                     data-entity-id="{{ entityId }}"
+                    data-file-type="{{ isImage ? 'image' : 'pdf' }}"
                     data-pdf-url="{{ path('admin_document_preview', {filename: filename}) }}"
-                    title="Toggle Full Row PDF Preview">
+                    title="Toggle Full Row Preview">
                 <i class="fa-solid fa-chevron-down" id="chevron-{{ entityId }}"></i>
-                <span class="small">Preview</span>
             </button>
         {% endif %}
+
+        <a href="{{ path('admin_document_preview', {filename: filename}) }}"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="btn btn-xs btn-outline-secondary d-inline-flex align-items-center py-0 px-2"
+           title="Open document in new tab">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </a>
     </div>
 {% else %}
     <span class="text-muted small">No file</span>
@@ -52,6 +62,27 @@ if (typeof window.pdfPreviewListenerAdded === 'undefined') {
                 page.render({ canvasContext: ctx, viewport: viewport });
             });
         }, 50);
+    }
+
+    function loadImage(imgUrl, container) {
+        var imgWrapper = document.createElement('div');
+        imgWrapper.style.overflow = 'auto';
+        imgWrapper.style.maxHeight = '70vh';
+        imgWrapper.style.padding = '16px';
+        imgWrapper.style.background = '#edf0f2';
+        imgWrapper.style.textAlign = 'center';
+
+        var img = document.createElement('img');
+        img.src = imgUrl;
+        img.style.maxHeight = '65vh';
+        img.style.maxWidth = '100%';
+        img.style.margin = '0 auto';
+        img.style.display = 'block';
+        img.style.borderRadius = '4px';
+        img.style.boxShadow = '0 1px 4px rgba(0,0,0,0.12)';
+
+        imgWrapper.appendChild(img);
+        container.appendChild(imgWrapper);
     }
 
     function loadPdf(pdfUrl, container, entityId) {
@@ -139,6 +170,7 @@ if (typeof window.pdfPreviewListenerAdded === 'undefined') {
         evt.preventDefault();
         var entityId = btn.getAttribute('data-entity-id');
         var pdfUrl = btn.getAttribute('data-pdf-url');
+        var fileType = btn.getAttribute('data-file-type') || 'pdf';
         var tr = btn.closest('tr');
         var chevron = document.getElementById('chevron-' + entityId);
 
@@ -184,7 +216,9 @@ if (typeof window.pdfPreviewListenerAdded === 'undefined') {
         var titleSpan = document.createElement('span');
         titleSpan.className = 'small fw-semibold';
         titleSpan.style.color = 'var(--bs-secondary-color, #6c757d)';
-        titleSpan.innerHTML = '<i class="fa-solid fa-file-pdf text-danger me-1"></i> Preview';
+        titleSpan.innerHTML = fileType === 'image'
+            ? '<i class="fa-solid fa-file-image text-primary me-1"></i> Preview'
+            : '<i class="fa-solid fa-file-pdf text-danger me-1"></i> Preview';
 
         var closeBtn = document.createElement('button');
         closeBtn.type = 'button';
@@ -214,7 +248,11 @@ if (typeof window.pdfPreviewListenerAdded === 'undefined') {
             chevron.classList.add('fa-chevron-up');
         }
 
-        loadPdf(pdfUrl, body, entityId);
+        if (fileType === 'image') {
+            loadImage(pdfUrl, body);
+        } else {
+            loadPdf(pdfUrl, body, entityId);
+        }
     });
 }
 </script>

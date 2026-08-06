@@ -112,7 +112,9 @@ class DocumentPendingCrudController extends DocumentCrudController
                 ]
             )
             ->hideOnIndex();
-        yield TextField::new('file_name', 'File & Preview')
+        yield TextField::new('file_name', 'File Name')
+            ->onlyOnIndex();
+        yield TextField::new('file_name', 'Preview')
             ->setTemplatePath('admin/field/file_preview_toggle.html.twig')
             ->onlyOnIndex();
     }
