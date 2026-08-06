@@ -29,8 +29,10 @@ class DocumentCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
+        // Inherited by DocumentPendingCrudController, so both the regular and the
+        // pending document edit pages get the inline preview panel.
         return $crud
-            ->overrideTemplate('crud/edit', 'admin/document_pending_edit.html.twig');
+            ->overrideTemplate('crud/edit', 'admin/document_edit_with_preview.html.twig');
     }
 
     public function createEntity(string $entityFqcn): Document

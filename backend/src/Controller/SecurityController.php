@@ -15,6 +15,7 @@ use App\Entity\User;
 use App\Security\FluxusAuthenticator;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2Client;
+use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -80,10 +81,19 @@ final class SecurityController extends AbstractController
         // redirect() is what generates the PKCE verifier, so read it back afterwards
         // and park it in the session for FluxusAuthenticator to pick up.
         $response = $oauthClient->redirect();
-        $request->getSession()->set(
-            FluxusAuthenticator::PKCE_SESSION_KEY,
-            $oauthClient->getOAuth2Provider()->getPkceCode()
-        );
+
+        // Same guard as FluxusOAuthInitiateController: an empty verifier here means
+        // FluxusProvider stopped declaring an S256 PKCE method, which would break
+        // every admin login at the callback with a far less obvious error.
+        $pkceVerifier = $oauthClient->getOAuth2Provider()->getPkceCode();
+        if (null === $pkceVerifier || '' === $pkceVerifier) {
+            throw new LogicException(
+                'The OAuth provider produced no PKCE verifier; check that FluxusProvider::getPkceMethod() '
+                . 'still returns S256.'
+            );
+        }
+
+        $request->getSession()->set(FluxusAuthenticator::PKCE_SESSION_KEY, $pkceVerifier);
 
         return $response;
     }

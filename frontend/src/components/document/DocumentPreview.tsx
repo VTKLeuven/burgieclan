@@ -167,6 +167,11 @@ export default function DocumentPreview({ id }: { id: string }) {
                         {document.contentUrl && isPdf ? (
                             <PDFViewer file={document.contentUrl} width={containerWidth} />
                         ) : document.contentUrl && isImage ? (
+                            // Not next/image: contentUrl points at the backend's download
+                            // route, which would need a remotePatterns entry per deployment
+                            // and gains nothing here — the file is authenticated, one-off,
+                            // and never a candidate for the optimizer's cache.
+                            // eslint-disable-next-line @next/next/no-img-element
                             <img
                                 src={`${document.contentUrl}?inline=1`}
                                 alt={document.name}

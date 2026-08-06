@@ -446,6 +446,9 @@ class DocumentBulkUploadController extends AbstractController
                 $doc['tags'] = $tags[$index];
             }
         }
+        // $doc still points at the last element; a later foreach over the same array
+        // would overwrite it through the dangling reference.
+        unset($doc);
 
         return $documentsMetadata;
     }

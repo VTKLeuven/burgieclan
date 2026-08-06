@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\PreviewableFile;
 use App\Repository\DocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,17 +44,11 @@ final class DocumentPreviewController extends AbstractController
             $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
             // Force inline rendering — override whatever VichUploader set
             $response->headers->set('Content-Disposition', 'inline');
-            $lowerName = strtolower($filename);
-            if (str_ends_with($lowerName, '.pdf')) {
-                $response->headers->set('Content-Type', 'application/pdf');
-            } elseif (str_ends_with($lowerName, '.png')) {
-                $response->headers->set('Content-Type', 'image/png');
-            } elseif (str_ends_with($lowerName, '.jpg') || str_ends_with($lowerName, '.jpeg')) {
-                $response->headers->set('Content-Type', 'image/jpeg');
-            } elseif (str_ends_with($lowerName, '.gif')) {
-                $response->headers->set('Content-Type', 'image/gif');
-            } elseif (str_ends_with($lowerName, '.webp')) {
-                $response->headers->set('Content-Type', 'image/webp');
+            // Correct the MIME type, which VichUploader falls back to
+            // application/octet-stream for when the entity has no mimeType field.
+            $contentType = PreviewableFile::contentTypeFor($filename);
+            if (null !== $contentType) {
+                $response->headers->set('Content-Type', $contentType);
             }
 
             return $response;
