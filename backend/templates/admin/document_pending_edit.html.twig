@@ -9,7 +9,11 @@
     {% set document = entity.instance %}
     {% set filename = document.fileName %}
 
-    {% if filename and filename|lower ends with '.pdf' %}
+    {% set ext = filename ? filename|lower : '' %}
+    {% set isPdf = ext ends with '.pdf' %}
+    {% set isImage = ext ends with '.png' or ext ends with '.jpg' or ext ends with '.jpeg' or ext ends with '.gif' or ext ends with '.webp' %}
+
+    {% if filename and (isPdf or isImage) %}
         {% set previewUrl = path('admin_document_preview', {filename: filename}) %}
 
         {# Styles live here rather than in style="" attributes: EasyAdmin puts a nonce on
@@ -44,33 +48,52 @@
         <div class="card mb-4 shadow-sm">
             <div class="card-header d-flex align-items-center justify-content-between py-2 pdf-preview-header">
                 <span class="small fw-semibold pdf-preview-title">
-                    <i class="fa-solid fa-file-pdf text-danger me-1"></i> Document Preview
+                    {% if isImage %}
+                        <i class="fa-solid fa-file-image text-primary me-1"></i> Document Preview
+                    {% else %}
+                        <i class="fa-solid fa-file-pdf text-danger me-1"></i> Document Preview
+                    {% endif %}
                 </span>
-                <button type="button" class="btn btn-sm btn-outline-secondary" id="toggle-edit-preview">
-                    <i class="fa-solid fa-chevron-up" id="toggle-edit-preview-icon"></i>
-                    <span class="small ms-1">Hide</span>
-                </button>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ previewUrl }}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center py-0 px-2"
+                       title="Open document in new tab">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="toggle-edit-preview">
+                        <i class="fa-solid fa-chevron-up" id="toggle-edit-preview-icon"></i>
+                        <span class="small ms-1">Hide</span>
+                    </button>
+                </div>
             </div>
             <div id="pdf-edit-preview-container" data-pdf-url="{{ previewUrl }}">
-                {# Navigation bar #}
-                <div class="d-flex align-items-center justify-content-center gap-3 py-2 pdf-preview-nav">
-                    <button type="button" class="btn btn-sm btn-outline-secondary pdf-prev-btn" disabled>
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-                    <span class="small fw-medium pdf-page-info">
-                        Loading...
-                    </span>
-                    <button type="button" class="btn btn-sm btn-outline-secondary pdf-next-btn" disabled>
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-                </div>
-
-                {# PDF canvas container #}
-                <div class="pdf-pages-container">
-                    <div class="text-center py-4 text-muted pdf-loading">
-                        <i class="fa-solid fa-spinner fa-spin me-2"></i>Loading PDF...
+                {% if isImage %}
+                    <div class="pdf-pages-container text-center py-3">
+                        <img src="{{ previewUrl }}" class="img-fluid rounded shadow-sm" style="max-height: 65vh; margin: 0 auto; display: block;" alt="Document Preview">
                     </div>
-                </div>
+                {% else %}
+                    {# Navigation bar #}
+                    <div class="d-flex align-items-center justify-content-center gap-3 py-2 pdf-preview-nav">
+                        <button type="button" class="btn btn-sm btn-outline-secondary pdf-prev-btn" disabled>
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <span class="small fw-medium pdf-page-info">
+                            Loading...
+                        </span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary pdf-next-btn" disabled>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    {# PDF canvas container #}
+                    <div class="pdf-pages-container">
+                        <div class="text-center py-4 text-muted pdf-loading">
+                            <i class="fa-solid fa-spinner fa-spin me-2"></i>Loading PDF...
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
 
@@ -96,6 +119,7 @@
                 });
             }
 
+            {% if isPdf %}
             var pdfUrl = container.dataset.pdfUrl;
             var pagesContainer = container.querySelector('.pdf-pages-container');
             var loadingEl = container.querySelector('.pdf-loading');
@@ -158,6 +182,7 @@
                     pageInfo.classList.add('text-danger');
                 });
             });
+            {% endif %}
         })();
         </script>
     {% endif %}

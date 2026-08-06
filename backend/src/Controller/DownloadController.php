@@ -39,8 +39,17 @@ final class DownloadController extends AbstractController
             // When ?inline=1 is set, serve for in-browser viewing instead of download
             if ($request->query->get('inline')) {
                 $response->headers->set('Content-Disposition', 'inline');
-                if (str_ends_with(strtolower($filename), '.pdf')) {
+                $lowerName = strtolower($filename);
+                if (str_ends_with($lowerName, '.pdf')) {
                     $response->headers->set('Content-Type', 'application/pdf');
+                } elseif (str_ends_with($lowerName, '.png')) {
+                    $response->headers->set('Content-Type', 'image/png');
+                } elseif (str_ends_with($lowerName, '.jpg') || str_ends_with($lowerName, '.jpeg')) {
+                    $response->headers->set('Content-Type', 'image/jpeg');
+                } elseif (str_ends_with($lowerName, '.gif')) {
+                    $response->headers->set('Content-Type', 'image/gif');
+                } elseif (str_ends_with($lowerName, '.webp')) {
+                    $response->headers->set('Content-Type', 'image/webp');
                 }
             }
 

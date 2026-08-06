@@ -43,10 +43,17 @@ final class DocumentPreviewController extends AbstractController
             $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
             // Force inline rendering — override whatever VichUploader set
             $response->headers->set('Content-Disposition', 'inline');
-            // Ensure correct MIME type for PDFs (VichUploader may fall back
-            // to application/octet-stream when the entity has no mimeType field)
-            if (str_ends_with(strtolower($filename), '.pdf')) {
+            $lowerName = strtolower($filename);
+            if (str_ends_with($lowerName, '.pdf')) {
                 $response->headers->set('Content-Type', 'application/pdf');
+            } elseif (str_ends_with($lowerName, '.png')) {
+                $response->headers->set('Content-Type', 'image/png');
+            } elseif (str_ends_with($lowerName, '.jpg') || str_ends_with($lowerName, '.jpeg')) {
+                $response->headers->set('Content-Type', 'image/jpeg');
+            } elseif (str_ends_with($lowerName, '.gif')) {
+                $response->headers->set('Content-Type', 'image/gif');
+            } elseif (str_ends_with($lowerName, '.webp')) {
+                $response->headers->set('Content-Type', 'image/webp');
             }
 
             return $response;
