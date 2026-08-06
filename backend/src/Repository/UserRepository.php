@@ -17,7 +17,6 @@ use App\Service\FluxusRoleSynchronizer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use League\OAuth2\Client\Token\AccessToken;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
@@ -39,10 +38,7 @@ class UserRepository extends ServiceEntityRepository
 {
     public function __construct(
         ManagerRegistry $registry,
-        private readonly FluxusRoleSynchronizer $roleSynchronizer,
-        // TEMPORARY (SSO-DIAG): only used by the diagnostic logging below. Remove
-        // this argument together with it.
-        private readonly LoggerInterface $logger
+        private readonly FluxusRoleSynchronizer $roleSynchronizer
     ) {
         parent::__construct($registry, User::class);
     }
@@ -71,9 +67,6 @@ class UserRepository extends ServiceEntityRepository
             throw new AuthenticationException('VTK userinfo is missing sub or email.');
         }
 
-        // TEMPORARY (SSO-DIAG): how the account was reached, for the log below.
-        $matchedBy = 'sub';
-
         $user = $this->findOneBy(["fluxusSub" => $sub]);
 
         if (null === $user) {
@@ -82,9 +75,7 @@ class UserRepository extends ServiceEntityRepository
             if (null !== $user) {
                 // Pre-existing account, first login through VTK: link it once.
                 $user->setFluxusSub($sub);
-                $matchedBy = 'email';
             } else {
-                $matchedBy = 'created';
                 $user = new User();
                 $user->setFluxusSub($sub);
                 $user->setEmail($email);
@@ -99,47 +90,11 @@ class UserRepository extends ServiceEntityRepository
             }
         }
 
-        $rolesBefore = $user->getSsoRoles();
-
         $this->roleSynchronizer->synchronize($user, $fluxusUser);
 
         $user->setAccessToken($accessToken);
 
         $this->getEntityManager()->flush();
-
-        // ---------------------------------------------------------------------
-        // TEMPORARY (SSO-DIAG): remove once the missing-admin question is settled.
-        //
-        // Logged at error level on purpose: in prod monolog buffers behind
-        // fingers_crossed with action_level: error, so anything lower is dropped
-        // unless the request happens to fail as well.
-        //
-        // The raw claims contain personal data (name, address, student number).
-        // That is the point — it is what we are trying to see — but it is also why
-        // this must not outlive the diagnosis or reach production.
-        // ---------------------------------------------------------------------
-        $this->logger->error(
-            '[SSO-DIAG] VTK login resolved',
-            [
-                'matched_by' => $matchedBy,
-                'sub' => $sub,
-                'email' => $email,
-                'username' => $user->getUsername(),
-                // The distinction that decides everything: absent means VTK never
-                // answered and synchronize() left the roles alone; an empty list
-                // means it answered "none" and did clear them.
-                'has_permissions_claim' => $fluxusUser->hasPermissionsClaim(),
-                'permissions' => $fluxusUser->getPermissions(),
-                'sso_roles_before' => $rolesBefore,
-                'sso_roles_after' => $user->getSsoRoles(),
-                'local_roles' => $user->getLocalRoles(),
-                'effective_roles' => $user->getRoles(),
-                // Everything UserInfo returned, so a missing `permissions` key can
-                // be told apart from a claim that arrived empty.
-                'raw_claims' => $fluxusUser->toArray(),
-                'granted_scopes' => $accessToken->getValues()['scope'] ?? '(no scope in token response)',
-            ]
-        );
 
         return $user;
     }
