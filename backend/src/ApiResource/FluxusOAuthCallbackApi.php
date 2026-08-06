@@ -7,14 +7,14 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\Response;
-use App\Controller\Api\LitusOAuthCallbackController;
+use App\Controller\Api\FluxusOAuthCallbackController;
 
 #[ApiResource(
-    shortName: 'Litus OAuth',
+    shortName: 'Fluxus OAuth',
     operations: [
         new Get(
             uriTemplate: '/auth/oauth/callback',
-            controller: LitusOAuthCallbackController::class,
+            controller: FluxusOAuthCallbackController::class,
             openapi: new Operation(
                 responses: [
                     '302' => new Response(
@@ -26,7 +26,7 @@ use App\Controller\Api\LitusOAuthCallbackController;
                                     'description' => 'Frontend callback URL with JWT tokens and redirect parameters',
                                     'schema' => [
                                         'type' => 'string',
-                                        'example' => 'http://localhost:3000/auth/callback?token=jwt&refresh_token=refresh'
+                                        'example' => 'http://localhost:3002/auth/callback?token=jwt&refresh_token=x'
                                     ]
                                 ]
                             ]
@@ -41,15 +41,16 @@ use App\Controller\Api\LitusOAuthCallbackController;
                                     'description' => 'Frontend callback URL with error parameter',
                                     'schema' => [
                                         'type' => 'string',
-                                        'example' => 'http://localhost:3000/auth/callback?error=Invalid%20OAuth%20state'
+                                        'example' => 'http://localhost:3002/auth/callback?error=invalid_state'
                                     ]
                                 ]
                             ]
                         )
                     )
                 ],
-                summary: 'OAuth callback from Litus',
-                description: 'Handles the OAuth callback from Litus provider and redirects to frontend with JWT tokens',
+                summary: 'OAuth callback from Fluxus',
+                description: 'Handles the OAuth callback from the VTK authorization server and redirects to ' .
+                    'the frontend with JWT tokens',
                 parameters: [
                     new Parameter(
                         name: 'code',
@@ -92,6 +93,6 @@ use App\Controller\Api\LitusOAuthCallbackController;
         ),
     ]
 )]
-class LitusOAuthCallbackApi
+class FluxusOAuthCallbackApi
 {
 }

@@ -1,10 +1,12 @@
 {# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
 {# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
 {# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+{# The colour lives in .bc-semester-icon (admin.css); a style="" attribute would be
+   blocked, because EasyAdmin nonces style-src. #}
 <i
-    {% if field.formattedValue|trans|raw == 'Semester 1' %} class="fa-solid fa-circle-half-stroke"
-    {% elseif field.formattedValue|trans|raw == 'Semester 2' %} class="fa-solid fa-circle-half-stroke fa-rotate-180"
-    {% elseif field.formattedValue|trans|raw == '' %} class="fa-regular fa-circle"
-    {% else %} class="fa-solid fa-circle"
+    {% if field.formattedValue|trans|raw == 'Semester 1' %} class="bc-semester-icon fa-solid fa-circle-half-stroke"
+    {% elseif field.formattedValue|trans|raw == 'Semester 2' %} class="bc-semester-icon fa-solid fa-circle-half-stroke fa-rotate-180"
+    {% elseif field.formattedValue|trans|raw == '' %} class="bc-semester-icon fa-regular fa-circle"
+    {% else %} class="bc-semester-icon fa-solid fa-circle"
     {% endif %}
-style="color: #74C0FC;"></i>
+></i>

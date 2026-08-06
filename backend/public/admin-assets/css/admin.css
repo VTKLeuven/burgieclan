@@ -1,0 +1,168 @@
+/*
+ * Styles for the custom admin templates.
+ *
+ * These live in a stylesheet rather than in style="" attributes because they cannot
+ * work as attributes at all: EasyAdmin's _css_assets.html.twig calls csp_nonce('style'),
+ * which makes nelmio emit a nonce on the style-src directive, and a nonce voids the
+ * 'unsafe-inline' in nelmio_security.yaml for the whole directive. A <style> element can
+ * carry that nonce; a style="" attribute has nowhere to put one, so every inline style on
+ * an admin page is blocked with "Applying inline style violates ... Content Security Policy".
+ *
+ * So: no style="" in anything under templates/admin or templates/form. Put it here, or in
+ * a <style nonce="{{ csp_nonce('style') }}"> block when it is specific to one template.
+ *
+ * Loaded by DashboardController::configureAssets(). Served straight from public/, not
+ * built by Encore — the admin does not load the Encore entrypoint.
+ *
+ * Everything defined here is prefixed bc- (Burgieclan), never ea-. The ea- namespace
+ * belongs to EasyAdmin — it ships .ea-form, .ea-dark-scheme, .ea-lightbox-thumbnail and
+ * more — and a name we invent there can start colliding on any version bump, silently
+ * restyling or hiding part of the admin. Referencing their classes in a selector is
+ * fine (see .ea-dark-scheme below); defining new ones under their prefix is not.
+ */
+
+/* ---- Dashboard branding ---- */
+
+.bc-dashboard-logo {
+    height: 20px;
+    margin-right: 10px;
+}
+
+/* ---- Shared helpers ---- */
+
+/* Scrollable panel inside a card or form, so a long list does not run off the page. */
+.bc-scroll-360 {
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.bc-scroll-350 {
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+/* Table column that should shrink to its content. */
+.bc-col-shrink {
+    width: 1%;
+}
+
+.bc-col-30 {
+    width: 30px;
+}
+
+/* ---- Onderwijsaanbod import ---- */
+
+.bc-toolbar-row {
+    gap: 0.5rem;
+}
+
+/*
+ * Indentation of the folder tree in the import preview. A data attribute rather than a
+ * computed style="padding-left: …", for the CSP reason above. listGroups() recurses over
+ * the KU Leuven module tree, which is only a few levels deep; anything deeper than 9
+ * renders at the depth-9 indent rather than growing without bound.
+ */
+.bc-tree-cell {
+    padding-left: 0.75rem;
+}
+
+.bc-tree-cell[data-depth="1"] { padding-left: 2.25rem; }
+.bc-tree-cell[data-depth="2"] { padding-left: 3.75rem; }
+.bc-tree-cell[data-depth="3"] { padding-left: 5.25rem; }
+.bc-tree-cell[data-depth="4"] { padding-left: 6.75rem; }
+.bc-tree-cell[data-depth="5"] { padding-left: 8.25rem; }
+.bc-tree-cell[data-depth="6"] { padding-left: 9.75rem; }
+.bc-tree-cell[data-depth="7"] { padding-left: 11.25rem; }
+.bc-tree-cell[data-depth="8"] { padding-left: 12.75rem; }
+.bc-tree-cell[data-depth="9"] { padding-left: 14.25rem; }
+
+/* ---- Program structure tree editor ---- */
+
+.bc-bulk-action-bar {
+    top: 15px;
+    z-index: 1020;
+}
+
+/* ---- Document preview ----
+ *
+ * Shared by the preview panel on the edit page and the one the index row toggle builds
+ * in JavaScript (admin/field/file_preview_toggle.html.twig). The JS used to set these
+ * through element.style — allowed by CSP, unlike a style attribute, but it hardcoded
+ * #edf0f2 / #fff and Bootstrap's --bs-* variables, none of which follow EasyAdmin's dark
+ * mode. Colours below use EA's own tokens so both panels theme correctly.
+ */
+
+.bc-preview-image {
+    display: block;
+    margin: 0 auto;
+    max-height: 65vh;
+    max-width: 100%;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* Deliberately a shade off the panel behind it, so white PDF pages read as pages.
+   --gray-* are fixed palette tokens rather than theme-aware ones, so the dark
+   variant has to be spelled out. */
+.bc-preview-scroll {
+    overflow: auto;
+    max-height: 70vh;
+    padding: 16px;
+    text-align: center;
+    background: var(--gray-200);
+}
+
+.ea-dark-scheme .bc-preview-scroll {
+    background: var(--gray-950);
+}
+
+/* A PDF page is paper: white in both schemes. */
+.bc-pdf-canvas {
+    display: block;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.bc-preview-navbar,
+.bc-preview-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.bc-preview-wrapper {
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.bc-preview-cell {
+    padding: 0;
+    background: var(--content-bg);
+}
+
+.bc-preview-title {
+    color: var(--text-color-light);
+}
+
+/* Replaces Bootstrap's bg-white on the edit-page panel header, which stays white
+   in dark mode. */
+.bc-preview-panel-header {
+    background: var(--content-bg);
+}
+
+.bc-preview-pageinfo {
+    color: var(--text-color-light);
+    min-width: 100px;
+    text-align: center;
+}
+
+/* ---- Vich file/image widget ---- */
+
+.bc-vich-thumbnail {
+    cursor: initial;
+}
+
+/* ---- Course semester field ---- */
+
+.bc-semester-icon {
+    color: #74c0fc;
+}

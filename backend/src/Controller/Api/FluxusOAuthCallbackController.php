@@ -2,7 +2,8 @@
 
 namespace App\Controller\Api;
 
-use App\OauthProvider\LitusResourceOwner;
+use App\Constants\FluxusOAuthCookies;
+use App\OauthProvider\FluxusResourceOwner;
 use App\Repository\UserRepository;
 use Exception;
 use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface;
@@ -17,7 +18,7 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class LitusOAuthCallbackController extends AbstractController
+class FluxusOAuthCallbackController extends AbstractController
 {
     public function __construct(
         private readonly JWTTokenManagerInterface $jwtManager,
@@ -58,7 +59,8 @@ class LitusOAuthCallbackController extends AbstractController
             throw new Exception('Invalid frontend URL configuration: ' . $e->getMessage());
         }
 
-        // Handle OAuth error
+        // Handle OAuth error. `access_denied` is the one to expect in normal use:
+        // it means the member declined on the VTK consent screen.
         if ($error) {
             $this->logger->error(
                 "OAuth error received",
@@ -66,14 +68,13 @@ class LitusOAuthCallbackController extends AbstractController
                     'oauth_error' => $error,
                 ]
             );
-            return new RedirectResponse(
-                "{$frontendUrl}/auth/callback?error=oauth_failed"
-            );
+            return $this->finish($request, "{$frontendUrl}/auth/callback?error=oauth_failed");
         }
 
-        // Verify state parameter
-        $sessionState = $request->cookies->get('x-oauth-state');
-        if ($state !== $sessionState) {
+        // Verify state parameter. KnpU is configured stateless, so it does not do
+        // this itself; the cookie set during initiate is the expected value.
+        $sessionState = $request->cookies->get(FluxusOAuthCookies::STATE);
+        if (!$state || !$sessionState || !hash_equals($sessionState, $state)) {
             $this->logger->error(
                 "OAuth state mismatch",
                 [
@@ -81,26 +82,36 @@ class LitusOAuthCallbackController extends AbstractController
                     'received_state' => $state,
                 ]
             );
-            return new RedirectResponse(
-                "{$frontendUrl}/auth/callback?error=invalid_state"
-            );
+            return $this->finish($request, "{$frontendUrl}/auth/callback?error=invalid_state");
+        }
+
+        $pkceVerifier = $request->cookies->get(FluxusOAuthCookies::PKCE_VERIFIER);
+        if (!$pkceVerifier) {
+            // Without the verifier the token exchange cannot succeed; failing here
+            // gives a clearer error than letting VTK reject the request.
+            $this->logger->error("OAuth PKCE verifier cookie missing");
+            return $this->finish($request, "{$frontendUrl}/auth/callback?error=invalid_state");
         }
 
         try {
-            // Use your existing Litus client
             /** @var OAuth2Client $client */
-            $client = $this->clientRegistry->getClient('litus_api');
+            $client = $this->clientRegistry->getClient('fluxus_api');
+
+            // The verifier was generated in the initiate controller and parked in a
+            // cookie; the provider needs it back before it will send code_verifier.
+            $client->getOAuth2Provider()->setPkceCode($pkceVerifier);
 
             // Exchange code for access token
             /** @var AccessToken $accessToken */
             $accessToken = $client->getAccessToken();
 
-            // Get user info using your existing LitusResourceOwner
-            /** @var LitusResourceOwner $litusUser */
-            $litusUser = $client->fetchUserFromToken($accessToken);
+            // Fetch the claims. `permissions` lives only on UserInfo, never in the
+            // access token, so this call is what drives the role sync.
+            /** @var FluxusResourceOwner $fluxusUser */
+            $fluxusUser = $client->fetchUserFromToken($accessToken);
 
             // Create or find user
-            $user = $this->userRepository->createUserfromLitusUser($litusUser, $accessToken);
+            $user = $this->userRepository->createUserFromFluxusUser($fluxusUser, $accessToken);
 
             // Generate JWT
             $jwt = $this->jwtManager->create($user);
@@ -121,10 +132,12 @@ class LitusOAuthCallbackController extends AbstractController
             $refreshTokenExpiration = $refreshToken->getValid()->getTimestamp();
 
             // Get frontend redirect URL
-            $frontendRedirectTo = $request->cookies->get('x-frontend-redirect-to', '/');
+            $frontendRedirectTo = $request->cookies->get(FluxusOAuthCookies::FRONTEND_REDIRECT, '/');
 
-            // Redirect to frontend with all tokens and expiration
-            return new RedirectResponse(
+            // Redirect to frontend with local JWTs. (The VTK token is dropped here
+            // as it's short-lived and only needed for sync).
+            return $this->finish(
+                $request,
                 "{$frontendUrl}/auth/callback?token=" . urlencode($jwt) .
                     "&refresh_token=" . urlencode($refreshToken->getRefreshToken()) .
                     "&refresh_token_expiration=" . $refreshTokenExpiration .
@@ -132,16 +145,29 @@ class LitusOAuthCallbackController extends AbstractController
             );
         } catch (Exception $e) {
             $this->logger->error(
-                "Litus OAuth callback error",
+                "Fluxus OAuth callback error",
                 [
                     'exception' => $e,
                     'oauth_state' => $state,
                 ]
             );
 
-            return new RedirectResponse(
-                "{$frontendUrl}/auth/callback?error=authentication_failed"
-            );
+            return $this->finish($request, "{$frontendUrl}/auth/callback?error=authentication_failed");
         }
+    }
+
+    /**
+     * Redirect to the frontend and clear the flow cookies on the way out, so a
+     * failed attempt cannot leave a stale verifier or state behind.
+     */
+    private function finish(Request $request, string $url): RedirectResponse
+    {
+        $response = new RedirectResponse($url);
+
+        foreach (FluxusOAuthCookies::all() as $cookie) {
+            $response->headers->clearCookie($cookie, '/', null, $request->isSecure(), true, 'lax');
+        }
+
+        return $response;
     }
 }

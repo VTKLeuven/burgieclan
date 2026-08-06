@@ -48,10 +48,39 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     private ?string $plainPassword = null;
 
     /**
+     * Roles assigned inside Burgieclan itself, through the admin panel.
+     *
+     * These are the local overrides: they can only add to what VTK grants, never
+     * take away. Kept separate from @see $ssoRoles so a resync never wipes a role
+     * a moderator handed out here, and so ROLE_SUPER_ADMIN can stay local-only.
+     *
      * @var string[]
      */
     #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
+
+    /**
+     * Roles derived from the `permissions` claim on VTK's /oauth2/userinfo during
+     * the last login where VTK actually answered.
+     *
+     * Persisted rather than resolved per request on purpose: when VTK is
+     * unreachable the previous value stays put, so a moderator does not silently
+     * lose their rights over one failed HTTP call. See FluxusRoleSynchronizer.
+     *
+     * @var string[]
+     */
+    #[ORM\Column(type: Types::JSON, options: ['default' => '[]'])]
+    private array $ssoRoles = [];
+
+    /**
+     * The OIDC subject identifier from VTK, stable across email changes.
+     *
+     * Nullable because accounts that predate the VTK SSO switch only get it filled
+     * in on their first login through VTK; after that it is the primary way an
+     * account is matched.
+     */
+    #[ORM\Column(type: Types::STRING, unique: true, nullable: true)]
+    private ?string $fluxusSub = null;
 
     /**
      * @var string|null
@@ -201,17 +230,46 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
 
     /**
      * Returns the roles or permissions granted to the user for security.
+     *
+     * The union of what VTK grants and what was assigned locally. Union-only and
+     * never subtraction, so there is never a question of which side wins: both can
+     * grant, neither can revoke the other.
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
+        $roles = array_merge($this->roles, $this->ssoRoles);
 
         // guarantees that a user always has at least one role for security
         if (empty($roles)) {
             $roles[] = self::ROLE_USER;
         }
 
-        return array_unique($roles);
+        return array_values(array_unique($roles));
+    }
+
+    /**
+     * The locally assigned roles only, without the ones VTK granted.
+     *
+     * Anything editing the local roles has to go through the `localRoles` property
+     * rather than `roles`: a form bound to `roles` reads back through getRoles(),
+     * which returns the union, and would write the VTK-granted roles into the local
+     * column on save — making them permanent and unrevokable. UserCrudController
+     * binds to this pair for exactly that reason. @see getRoles() for the effective
+     * set.
+     *
+     * @return string[]
+     */
+    public function getLocalRoles(): array
+    {
+        return $this->roles;
+    }
+
+    /**
+     * @param string[] $localRoles
+     */
+    public function setLocalRoles(array $localRoles): void
+    {
+        $this->setRoles($localRoles);
     }
 
     /**
@@ -219,7 +277,33 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
      */
     public function setRoles(array $roles): void
     {
-        $this->roles = $roles;
+        $this->roles = array_values(array_unique($roles));
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSsoRoles(): array
+    {
+        return $this->ssoRoles;
+    }
+
+    /**
+     * @param string[] $ssoRoles
+     */
+    public function setSsoRoles(array $ssoRoles): void
+    {
+        $this->ssoRoles = array_values(array_unique($ssoRoles));
+    }
+
+    public function getFluxusSub(): ?string
+    {
+        return $this->fluxusSub;
+    }
+
+    public function setFluxusSub(?string $fluxusSub): void
+    {
+        $this->fluxusSub = $fluxusSub;
     }
 
     /**

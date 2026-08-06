@@ -9,42 +9,66 @@
     {% set document = entity.instance %}
     {% set filename = document.fileName %}
 
-    {% if filename and filename|lower ends with '.pdf' %}
+    {# Which extensions count lives in App\Constants\PreviewableFile, not here. #}
+    {% set isPdf = is_previewable_pdf(filename) %}
+    {% set isImage = is_previewable_image(filename) %}
+
+    {# The bc-preview-* classes are in public/admin-assets/css/admin.css, shared with the
+       index row toggle. Not style="" attributes: EasyAdmin nonces style-src, and a nonce
+       makes the browser ignore the 'unsafe-inline' in nelmio_security.yaml, so inline
+       style attributes are blocked on every admin page. #}
+    {% if is_previewable(filename) %}
         {% set previewUrl = path('admin_document_preview', {filename: filename}) %}
 
         <div class="card mb-4 shadow-sm">
-            <div class="card-header d-flex align-items-center justify-content-between py-2 bg-white">
-                <span class="small fw-semibold" style="color: var(--bs-secondary-color, #6c757d);">
-                    <i class="fa-solid fa-file-pdf text-danger me-1"></i> Document Preview
+            <div class="card-header d-flex align-items-center justify-content-between py-2 bc-preview-panel-header">
+                <span class="small fw-semibold bc-preview-title">
+                    {% if isImage %}
+                        <i class="fa-solid fa-file-image text-primary me-1"></i> Document Preview
+                    {% else %}
+                        <i class="fa-solid fa-file-pdf text-danger me-1"></i> Document Preview
+                    {% endif %}
                 </span>
-                <button type="button" class="btn btn-sm btn-outline-secondary" id="toggle-edit-preview">
-                    <i class="fa-solid fa-chevron-up" id="toggle-edit-preview-icon"></i>
-                    <span class="small ms-1">Hide</span>
-                </button>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ previewUrl }}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center py-0 px-2"
+                       title="Open document in new tab">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="toggle-edit-preview">
+                        <i class="fa-solid fa-chevron-up" id="toggle-edit-preview-icon"></i>
+                        <span class="small ms-1">Hide</span>
+                    </button>
+                </div>
             </div>
             <div id="pdf-edit-preview-container" data-pdf-url="{{ previewUrl }}">
-                {# Navigation bar #}
-                <div class="d-flex align-items-center justify-content-center gap-3 py-2"
-                     style="border-bottom: 1px solid var(--bs-border-color, #dee2e6);">
-                    <button type="button" class="btn btn-sm btn-outline-secondary pdf-prev-btn" disabled>
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-                    <span class="small fw-medium pdf-page-info"
-                          style="color: var(--bs-secondary-color, #6c757d); min-width: 100px; text-align: center;">
-                        Loading...
-                    </span>
-                    <button type="button" class="btn btn-sm btn-outline-secondary pdf-next-btn" disabled>
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-                </div>
-
-                {# PDF canvas container #}
-                <div class="pdf-pages-container"
-                     style="overflow: auto; max-height: 70vh; padding: 16px; background: #edf0f2; text-align: center;">
-                    <div class="text-center py-4 text-muted pdf-loading">
-                        <i class="fa-solid fa-spinner fa-spin me-2"></i>Loading PDF...
+                {% if isImage %}
+                    <div class="bc-preview-scroll text-center py-3">
+                        <img src="{{ previewUrl }}" class="img-fluid rounded shadow-sm bc-preview-image" alt="Document Preview">
                     </div>
-                </div>
+                {% else %}
+                    {# Navigation bar #}
+                    <div class="d-flex align-items-center justify-content-center gap-3 py-2 bc-preview-navbar">
+                        <button type="button" class="btn btn-sm btn-outline-secondary pdf-prev-btn" disabled>
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <span class="small fw-medium bc-preview-pageinfo">
+                            Loading...
+                        </span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary pdf-next-btn" disabled>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    {# PDF canvas container #}
+                    <div class="bc-preview-scroll">
+                        <div class="text-center py-4 text-muted pdf-loading">
+                            <i class="fa-solid fa-spinner fa-spin me-2"></i>Loading PDF...
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
 
@@ -70,10 +94,11 @@
                 });
             }
 
+            {% if isPdf %}
             var pdfUrl = container.dataset.pdfUrl;
-            var pagesContainer = container.querySelector('.pdf-pages-container');
+            var pagesContainer = container.querySelector('.bc-preview-scroll');
             var loadingEl = container.querySelector('.pdf-loading');
-            var pageInfo = container.querySelector('.pdf-page-info');
+            var pageInfo = container.querySelector('.bc-preview-pageinfo');
             var prevBtn = container.querySelector('.pdf-prev-btn');
             var nextBtn = container.querySelector('.pdf-next-btn');
 
@@ -132,6 +157,7 @@
                     pageInfo.classList.add('text-danger');
                 });
             });
+            {% endif %}
         })();
         </script>
     {% endif %}

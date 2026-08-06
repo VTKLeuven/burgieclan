@@ -31,6 +31,19 @@ nelmio_security:
                 - 'self'
                 - 'unsafe-inline'
                 - 'https://cdnjs.cloudflare.com'
+            # googleapis serves the @font-face stylesheet; the font files themselves
+            # come from gstatic (see font-src).
+            #
+            # 'unsafe-inline' only covers pages that do NOT request a style nonce.
+            # EasyAdmin's _css_assets.html.twig calls csp_nonce('style'), which makes
+            # nelmio emit a nonce on this directive — and a nonce voids 'unsafe-inline'
+            # for that response. So on /admin, inline style="" attributes are dropped
+            # and styling has to go in a <style nonce="..."> block; elsewhere (the Twig
+            # login page) inline styles still work. See admin/document_pending_edit.html.twig.
+            style-src:
+                - 'self'
+                - 'unsafe-inline'
+                - 'https://fonts.googleapis.com'
             worker-src:
                 - 'self'
                 - 'blob:'
