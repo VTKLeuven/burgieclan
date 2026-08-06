@@ -175,8 +175,13 @@ export const storeTokensInCookies = async (
  */
 export const clearTokenCookies = async () => {
     const cookieStore = await cookies();
-    cookieStore.delete(COOKIE_NAMES.JWT);
-    cookieStore.delete(COOKIE_NAMES.REFRESH_TOKEN);
+    // The path must match the one the cookies were set with (see storeTokensInCookies).
+    // A browser only replaces a cookie when name, domain and path all match, and a
+    // Set-Cookie without an explicit Path is scoped to the requesting URL's directory
+    // — so deleting by name alone left the real Path=/ cookies in place, and the stale
+    // session was picked up by whoever logged in next.
+    cookieStore.delete({ name: COOKIE_NAMES.JWT, path: '/' });
+    cookieStore.delete({ name: COOKIE_NAMES.REFRESH_TOKEN, path: '/' });
 };
 
 /**

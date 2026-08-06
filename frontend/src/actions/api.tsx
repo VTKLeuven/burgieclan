@@ -113,7 +113,7 @@ async function redirectToLogin(frontendBaseUrl: string) {
     const refererUrl = headersList.get('referer') || "";
     const loginUrl = `${frontendBaseUrl}/login`;
 
-    logOut(); // Clear any existing session (e.g., cookies, to prevent infinite redirect loop)
+    await logOut(); // Clear any existing session (e.g., cookies, to prevent infinite redirect loop)
 
     let targetPath = "";
     if (refererUrl) {
