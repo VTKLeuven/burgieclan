@@ -780,11 +780,16 @@ File uploads are restricted by:
   |---|---|---|
   | Client-side check | `FILE_SIZE_MB` in `frontend/src/utils/constants/upload.ts` | 200M |
   | Next.js server action body | `serverActions.bodySizeLimit` in `frontend/next.config.ts` | 205M (derived from `FILE_SIZE_MB`) |
+  | Next.js proxy body buffer | `experimental.proxyClientMaxBodySize` in `frontend/next.config.ts` | 205M (derived from `FILE_SIZE_MB`) |
   | PHP (prod) | `upload_max_filesize` / `post_max_size` in `backend/.docker/production/production.ini` | 200M / 205M |
   | PHP (dev) | same directives in `backend/php.dev.ini` | 200M / 205M |
   | Admin bulk upload | `maxSize` in `src/Controller/Admin/DocumentBulkUploadController.php` | 200M |
 
   nginx's `client_max_body_size` (500M) sits above all of these on purpose, so PHP produces the error rather than nginx.
+
+  `proxyClientMaxBodySize` is the easiest one to miss: it defaults to 10MB, applies because `src/proxy.ts`
+  matches the page routes, and *truncates* an oversized body instead of rejecting it. The upload then fails as
+  `Error: Unexpected end of form` — a 500 with no mention of size, and no request reaching the backend at all.
 
   PHP's defaults are 2M/8M. If the ini directives are ever missing, uploads over 2MB fail as `"file" is required`
   (the file is dropped from `$_FILES` before Symfony sees it), not as a 413 — so verify with
