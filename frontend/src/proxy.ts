@@ -185,9 +185,13 @@ export default async function proxy(request: NextRequest) {
             // Only clear on a rejected refresh. This runs on prefetches too, so
             // clearing whenever the cookies look absent logs out a session that was
             // still being established.
+            // The path has to match the one storeTokensInCookies() set, or the browser
+            // scopes the deletion to the requesting URL's directory (e.g. /en/documents)
+            // and leaves the real Path=/ cookie in place. Same reason as in
+            // clearTokenCookies().
             if (sessionRejected) {
-                response.cookies.delete(COOKIE_NAMES.JWT);
-                response.cookies.delete(COOKIE_NAMES.REFRESH_TOKEN);
+                response.cookies.delete({ name: COOKIE_NAMES.JWT, path: '/' });
+                response.cookies.delete({ name: COOKIE_NAMES.REFRESH_TOKEN, path: '/' });
             }
 
             return response;

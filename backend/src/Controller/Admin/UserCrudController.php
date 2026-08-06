@@ -67,7 +67,12 @@ class UserCrudController extends AbstractCrudController
 
         // Local overrides only. These can add to what VTK grants but never take it
         // away; see User::getRoles() for the effective set.
-        yield ChoiceField::new('roles', 'Roles (local)')
+        //
+        // Bound to `localRoles`, not `roles`: the property accessor reads `roles`
+        // through getRoles(), which returns the union with the VTK-granted ones, so
+        // this form would show them pre-ticked and write them into the local column
+        // on save — permanently, since a later resync can no longer revoke them.
+        yield ChoiceField::new('localRoles', 'Roles (local)')
             ->setChoices(array_combine(User::getAvailableRoles(), User::getAvailableRoles()))
             ->allowMultipleChoices()
             ->renderExpanded()

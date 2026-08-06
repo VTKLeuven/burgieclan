@@ -4,13 +4,12 @@
 
 {% set filename = field.value %}
 {% set entityId = entity.primaryKeyValue %}
-{% set ext = filename ? filename|lower : '' %}
-{% set isPdf = ext ends with '.pdf' %}
-{% set isImage = ext ends with '.png' or ext ends with '.jpg' or ext ends with '.jpeg' or ext ends with '.gif' or ext ends with '.webp' %}
+{# Which extensions count lives in App\Constants\PreviewableFile, not here. #}
+{% set isImage = is_previewable_image(filename) %}
 
 {% if filename %}
     <div class="d-inline-flex align-items-center gap-1">
-        {% if isPdf or isImage %}
+        {% if is_previewable(filename) %}
             <button type="button"
                     class="btn btn-xs btn-outline-primary d-inline-flex align-items-center py-0 px-2 toggle-pdf-btn"
                     data-entity-id="{{ entityId }}"

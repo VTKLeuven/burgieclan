@@ -28,6 +28,12 @@ class Module extends BaseEntity
      * Sort order of this module among its siblings (the children of one parent module, or the
      * top-level modules of a program). Lower comes first; ties break on name. Editable from the
      * program structure tree editor so admins can arrange modules in a meaningful order.
+     *
+     * One position per module, but $modules is a self-referencing ManyToMany, so a module that
+     * hangs under two parents shares a single value: reordering it under one parent reorders it
+     * under the other as well. That is accepted for now — modules are effectively a tree in
+     * practice — and fixing it properly means moving the ordering onto the join table, which
+     * needs an explicit association entity.
      */
     #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
     private int $position = 0;

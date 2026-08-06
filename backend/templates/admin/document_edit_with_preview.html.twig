@@ -9,11 +9,11 @@
     {% set document = entity.instance %}
     {% set filename = document.fileName %}
 
-    {% set ext = filename ? filename|lower : '' %}
-    {% set isPdf = ext ends with '.pdf' %}
-    {% set isImage = ext ends with '.png' or ext ends with '.jpg' or ext ends with '.jpeg' or ext ends with '.gif' or ext ends with '.webp' %}
+    {# Which extensions count lives in App\Constants\PreviewableFile, not here. #}
+    {% set isPdf = is_previewable_pdf(filename) %}
+    {% set isImage = is_previewable_image(filename) %}
 
-    {% if filename and (isPdf or isImage) %}
+    {% if is_previewable(filename) %}
         {% set previewUrl = path('admin_document_preview', {filename: filename}) %}
 
         {# Styles live here rather than in style="" attributes: EasyAdmin puts a nonce on

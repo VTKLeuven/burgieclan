@@ -250,7 +250,12 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     /**
      * The locally assigned roles only, without the ones VTK granted.
      *
-     * This is what the admin panel edits; @see getRoles() for the effective set.
+     * Anything editing the local roles has to go through the `localRoles` property
+     * rather than `roles`: a form bound to `roles` reads back through getRoles(),
+     * which returns the union, and would write the VTK-granted roles into the local
+     * column on save — making them permanent and unrevokable. UserCrudController
+     * binds to this pair for exactly that reason. @see getRoles() for the effective
+     * set.
      *
      * @return string[]
      */
@@ -260,11 +265,19 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     }
 
     /**
+     * @param string[] $localRoles
+     */
+    public function setLocalRoles(array $localRoles): void
+    {
+        $this->setRoles($localRoles);
+    }
+
+    /**
      * @param string[] $roles
      */
     public function setRoles(array $roles): void
     {
-        $this->roles = $roles;
+        $this->roles = array_values(array_unique($roles));
     }
 
     /**
