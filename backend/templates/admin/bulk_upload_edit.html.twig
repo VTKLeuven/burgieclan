@@ -585,9 +585,8 @@ Review and Edit Document Metadata
                                                autocomplete="off">
                                         <div class="row-dropdown row-course-dropdown" data-index="{{ index }}"></div>
                                         <select name="course[{{ index }}]" 
-                                                class="form-select form-select-sm row-course-select" 
-                                                data-index="{{ index }}"
-                                                style="display: none;">
+                                                class="form-select form-select-sm row-course-select d-none" 
+                                                data-index="{{ index }}">
                                             {% for course in courses %}
                                             <option value="{{ course.id }}" 
                                                     {% if doc.courseEntity and doc.courseEntity.id==course.id %}selected{% endif %}>
@@ -606,9 +605,8 @@ Review and Edit Document Metadata
                                                autocomplete="off">
                                         <div class="row-dropdown row-category-dropdown" data-index="{{ index }}"></div>
                                         <select name="category[{{ index }}]" 
-                                                class="form-select form-select-sm row-category-select" 
-                                                data-index="{{ index }}"
-                                                style="display: none;">
+                                                class="form-select form-select-sm row-category-select d-none" 
+                                                data-index="{{ index }}">
                                             {% for category in categories %}
                                             <option value="{{ category.id }}" 
                                                     {% if doc.categoryEntity and doc.categoryEntity.id==category.id %}selected{% endif %}>
@@ -654,9 +652,8 @@ Review and Edit Document Metadata
                                         </div>
                                         <select name="tags[{{ index }}][]" 
                                                 multiple 
-                                                class="form-select form-select-sm row-tags-select" 
-                                                data-index="{{ index }}"
-                                                style="display: none;">
+                                                class="form-select form-select-sm row-tags-select d-none" 
+                                                data-index="{{ index }}">
                                             {% for tag in tags %}
                                             <option value="{{ tag.id }}" 
                                                     {% if doc.tagEntities and tag in doc.tagEntities %}selected{% endif %}>
