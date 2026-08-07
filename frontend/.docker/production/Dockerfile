@@ -3,7 +3,7 @@
 #   the Sentry auth token) works consistently across Docker installs / CI runners.
 
 # Stage 1: Dependencies
-FROM node:24-alpine@sha256:2bdb65ed1dab192432bc31c95f94155ca5ad7fc1392fb7eb7526ab682fa5bf14 AS base
+FROM node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS base
 
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
