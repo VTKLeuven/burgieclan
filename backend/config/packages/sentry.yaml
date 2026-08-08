@@ -5,7 +5,7 @@ when@prod:
         # automatic instrumentation (there might be some performance penalty)
         # https://docs.sentry.io/platforms/php/guides/symfony/performance/instrumentation/automatic-instrumentation/
         tracing:
-            enabled: false
+            enabled: true
 
         # Capture unhandled exceptions as Sentry issues. The Monolog handler below
         # feeds Sentry Logs (a separate product), so the two are complementary.
@@ -23,6 +23,7 @@ when@prod:
             # Ignore 404 errors
             ignore_exceptions:
                 - Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+                - Symfony\Component\Security\Core\Exception\AccessDeniedException
 
     monolog:
         handlers:
