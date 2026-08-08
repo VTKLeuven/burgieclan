@@ -1,0 +1,79 @@
+name: Auto Audit Fix
+
+on:
+  schedule:
+    - cron: "30 4 * * *" # Daily at 04:30 UTC
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+  workflow_run:
+    workflows: ["Security"]
+    types: [completed]
+    branches: [main]
+
+# Only one auto-fix at a time.
+concurrency:
+  group: auto-audit-fix
+  cancel-in-progress: true
+
+jobs:
+  npm-audit-fix:
+    runs-on: ubuntu-latest
+    # Only run after a failed Security workflow, or on schedule/manual trigger.
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'failure'
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+
+      - name: Run npm audit fix
+        run: |
+          if npm audit --audit-level high; then
+            echo "No vulnerabilities to fix."
+            echo "has_fix=false" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          npm audit fix
+
+          if git diff --quiet package-lock.json; then
+            echo "npm audit fix made no changes."
+            echo "has_fix=false" >> "$GITHUB_ENV"
+          else
+            echo "has_fix=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Create Pull Request
+        id: create-pr
+        if: env.has_fix == 'true'
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b31e2c788f8122c6d27f # v7
+        with:
+          commit-message: "fix(security): automatic npm audit fix"
+          title: "fix(security): automatic npm audit fix"
+          body: |
+            Automated `npm audit fix` for high/critical severity vulnerabilities
+            detected in `frontend/package-lock.json`.
+
+            This PR was created automatically by the **Auto Audit Fix** workflow.
+          branch: auto/npm-audit-fix
+          labels: dependencies, security
+          delete-branch: true
+
+      - name: Enable auto-merge
+        if: steps.create-pr.outputs.pull-request-number
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge ${{ steps.create-pr.outputs.pull-request-number }} --auto --squash
