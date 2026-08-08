@@ -59,7 +59,7 @@ jobs:
       - name: Create Pull Request
         id: create-pr
         if: env.has_fix == 'true'
-        uses: peter-evans/create-pull-request@271a8d0340265f705b14b31e2c788f8122c6d27f # v7
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
         with:
           commit-message: "fix(security): automatic npm audit fix"
           title: "fix(security): automatic npm audit fix"
