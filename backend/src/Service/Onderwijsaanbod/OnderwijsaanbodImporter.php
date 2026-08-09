@@ -114,6 +114,7 @@ class OnderwijsaanbodImporter
             $result->modulesUpdated++;
         }
         $module->setName($data->name);
+        $module->setIsElective($data->isElective);
 
         // KU Leuven orders module groups meaningfully (curriculum order, not alphabetical), so carry
         // that order over as the sibling position. Only write it while the module still sits at the
@@ -131,6 +132,16 @@ class OnderwijsaanbodImporter
             // Nested module: reachable through its parent; program stays unset so Program::getModules
             // returns only the top level and the tree is walked via Module::getModules.
             $parent->addModule($module);
+
+            // A module that was top-level in an earlier import still carries its program FK, and
+            // nothing else ever clears it. Changing a structural option (flatten/semester/merge)
+            // can demote a former root to a child, after which Program::getModules() would keep
+            // listing it at the top level while it also renders under its new parent. Detach it so
+            // the module appears exactly once.
+            $previousProgram = $module->getProgram();
+            if ($previousProgram !== null) {
+                $previousProgram->removeModule($module);
+            }
         }
         $this->entityManager->persist($module);
 

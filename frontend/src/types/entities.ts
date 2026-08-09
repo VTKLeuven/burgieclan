@@ -26,6 +26,7 @@ export interface Course extends BaseEntity {
 
 export interface Module extends BaseEntity {
     name?: string;
+    isElective?: boolean;
     courses?: Course[];
     modules?: Module[];
     program?: Program;

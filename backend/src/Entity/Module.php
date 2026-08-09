@@ -39,6 +39,14 @@ class Module extends BaseEntity
     private int $position = 0;
 
     /**
+     * Whether this module is an elective option (KU Leuven moduleGroupType "01" / "Optie") rather
+     * than a compulsory structural group ("02" / "Groep"). Set by the importer; false for manually
+     * created modules.
+     */
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+    private bool $isElective = false;
+
+    /**
      * @var Collection<int, Course>
      */
     #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'modules')]
@@ -98,6 +106,18 @@ class Module extends BaseEntity
     public function setPosition(int $position): self
     {
         $this->position = $position;
+
+        return $this;
+    }
+
+    public function isElective(): bool
+    {
+        return $this->isElective;
+    }
+
+    public function setIsElective(bool $isElective): self
+    {
+        $this->isElective = $isElective;
 
         return $this;
     }

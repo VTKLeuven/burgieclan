@@ -75,7 +75,7 @@ class OnderwijsaanbodImportController extends AbstractController
 
         // The untransformed named tree provides the full list of selectable groups (checkboxes),
         // independent of what the current flatten/semester choices removed from the result.
-        $namedTree = $this->buildProgramData(['programId' => $options['programId'], 'lang' => $options['lang'], 'flatten' => [], 'semester' => [], 'merge' => false, 'enrich' => false]);
+        $namedTree = $this->buildProgramData(['programId' => $options['programId'], 'lang' => $options['lang'], 'flatten' => [], 'semester' => [], 'merge' => false, 'enrich' => false, 'electiveGrouping' => ProgramTreeMapper::ELECTIVES_NONE]);
 
         return $this->render(
             'admin/onderwijsaanbod/preview.html.twig',
@@ -143,7 +143,7 @@ class OnderwijsaanbodImportController extends AbstractController
     }
 
     /**
-     * @return array{programId: string, lang: 'nl'|'en', flatten: list<string>, semester: list<string>, merge: bool, enrich: bool}
+     * @return array{programId: string, lang: 'nl'|'en', flatten: list<string>, semester: list<string>, merge: bool, enrich: bool, electiveGrouping: string}
      */
     private function readOptions(Request $request): array
     {
@@ -167,12 +167,17 @@ class OnderwijsaanbodImportController extends AbstractController
             $flatten = $request->request->all('flatten');
             $semester = $request->request->all('semester');
             $merge = $request->request->getBoolean('merge');
+            $requested = (string) $request->request->get('electiveGrouping', '');
+            $electiveGrouping = in_array($requested, ProgramTreeMapper::ELECTIVE_GROUPINGS, true)
+                ? $requested
+                : ProgramTreeMapper::ELECTIVES_PER_TRACK;
         } else {
             /** @var list<string> $flatten */
             $flatten = $saved['flatten'] ?? Program::DEFAULT_FLATTEN;
             /** @var list<string> $semester */
             $semester = $saved['semester'] ?? [];
             $merge = (bool) ($saved['merge'] ?? true);
+            $electiveGrouping = $saved['electiveGrouping'] ?? ProgramTreeMapper::ELECTIVES_PER_TRACK;
         }
 
         // Enrich: explicit request parameter takes precedence over saved settings
@@ -189,11 +194,12 @@ class OnderwijsaanbodImportController extends AbstractController
             'semester' => array_values(array_filter(array_map('strval', $semester))),
             'merge' => $merge,
             'enrich' => $enrich,
+            'electiveGrouping' => $electiveGrouping,
         ];
     }
 
     /**
-     * @param array{programId: string, lang: 'nl'|'en', flatten: list<string>, semester: list<string>, merge: bool, enrich: bool} $options
+     * @param array{programId: string, lang: 'nl'|'en', flatten: list<string>, semester: list<string>, merge: bool, enrich: bool, electiveGrouping: string} $options
      */
     private function buildProgramData(array $options): ?ProgramData
     {
@@ -212,6 +218,7 @@ class OnderwijsaanbodImportController extends AbstractController
             $options['flatten'],
             $options['semester'],
             $options['merge'],
+            $options['electiveGrouping'],
         );
     }
 

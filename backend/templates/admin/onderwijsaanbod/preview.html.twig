@@ -9,6 +9,7 @@
         {% else %}
             <span class="badge badge-success">new</span>
         {% endif %}
+        {% if m.isElective %}<span class="badge badge-info">keuze</span>{% endif %}
         {% if m.courses is not empty or m.children is not empty %}
             <ul>
                 {% for c in m.courses %}
@@ -86,6 +87,40 @@
                     <label class="form-check-label" for="merge">Merge a folder that contains only a single sub-folder</label>
                 </div>
 
+                <div class="form-group mt-2">
+                    <label class="form-label d-block">Keuzepakketten</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="electiveGroupingPerTrack"
+                               name="electiveGrouping" value="perTrack"
+                               {{ options.electiveGrouping == 'perTrack' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="electiveGroupingPerTrack">
+                            One “Keuzepakketten” folder <strong>per afstudeerrichting</strong>
+                            <small class="text-muted d-block">Keeps which packages a student may actually choose.</small>
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="electiveGroupingProgramme"
+                               name="electiveGrouping" value="programme"
+                               {{ options.electiveGrouping == 'programme' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="electiveGroupingProgramme">
+                            One folder for the <strong>whole programme</strong>
+                            <small class="text-muted d-block">Tidier tree, but loses which track offers what.</small>
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="electiveGroupingNone"
+                               name="electiveGrouping" value="none"
+                               {{ options.electiveGrouping == 'none' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="electiveGroupingNone">
+                            <strong>Leave them</strong> where KU Leuven puts them
+                        </label>
+                    </div>
+                    <small class="form-text text-muted">
+                        KU Leuven repeats the same package under every afstudeerrichting that offers it,
+                        so both grouping modes deduplicate them into a single shared module.
+                    </small>
+                </div>
+
                 <button type="submit" class="btn btn-secondary btn-sm mt-2">Update preview</button>
             </form>
 
@@ -114,6 +149,7 @@
                 <input type="hidden" name="lang" value="{{ options.lang }}">
                 <input type="hidden" name="enrich" value="{{ options.enrich ? '1' : '0' }}">
                 <input type="hidden" name="merge" value="{{ options.merge ? '1' : '0' }}">
+                <input type="hidden" name="electiveGrouping" value="{{ options.electiveGrouping }}">
                 {% for id in options.flatten %}<input type="hidden" name="flatten[]" value="{{ id }}">{% endfor %}
                 {% for id in options.semester %}<input type="hidden" name="semester[]" value="{{ id }}">{% endfor %}
 
