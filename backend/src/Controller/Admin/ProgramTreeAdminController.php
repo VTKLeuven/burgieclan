@@ -527,6 +527,7 @@ class ProgramTreeAdminController extends AbstractController
             $settings['flatten'],
             $settings['semester'],
             $settings['merge'],
+            $settings['electiveGrouping'],
         );
         if ($programData === null) {
             $this->addFlash('danger', 'Failed to map program data.');

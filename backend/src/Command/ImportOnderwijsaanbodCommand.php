@@ -49,6 +49,7 @@ class ImportOnderwijsaanbodCommand extends Command
             ->addOption('flatten', null, InputOption::VALUE_REQUIRED, 'Comma-separated group names/ids whose folder is skipped (courses attach to the parent)', 'Verplichte opleidingsonderdelen,Compulsory courses')
             ->addOption('semester', null, InputOption::VALUE_REQUIRED, 'Comma-separated group names/ids to regroup by degree-wide semester (Semester 1..N)')
             ->addOption('no-merge', null, InputOption::VALUE_NONE, 'Do not collapse single-child, course-less modules')
+            ->addOption('electives', null, InputOption::VALUE_REQUIRED, 'How to group the lettered keuzepakketten: none | perTrack | programme', ProgramTreeMapper::ELECTIVES_PER_TRACK)
             ->addOption('no-enrich', null, InputOption::VALUE_NONE, 'Skip fetching professors and identical courses from the OPO index')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Compute changes but write nothing to the database');
     }
@@ -73,6 +74,12 @@ class ImportOnderwijsaanbodCommand extends Command
         $flatten = $this->splitList((string) $input->getOption('flatten'));
         $semester = $this->splitList((string) $input->getOption('semester'));
         $merge = !$input->getOption('no-merge');
+        $electiveGrouping = (string) $input->getOption('electives');
+        if (!in_array($electiveGrouping, ProgramTreeMapper::ELECTIVE_GROUPINGS, true)) {
+            $io->error(sprintf('--electives must be one of: %s', implode(', ', ProgramTreeMapper::ELECTIVE_GROUPINGS)));
+
+            return Command::INVALID;
+        }
         $enrich = !$input->getOption('no-enrich');
         $dryRun = (bool) $input->getOption('dry-run');
 
@@ -84,7 +91,7 @@ class ImportOnderwijsaanbodCommand extends Command
             return Command::FAILURE;
         }
 
-        $programData = $this->mapper->map($source, $programId, $lang, $flatten, $semester, $merge);
+        $programData = $this->mapper->map($source, $programId, $lang, $flatten, $semester, $merge, $electiveGrouping);
         if ($programData === null) {
             $io->error(sprintf('Programme document did not contain programId %s.', $programId));
 

@@ -1,0 +1,617 @@
+{
+  "programSet": [
+    {
+      "programId": "888",
+      "programLanguageSet": [
+        {
+          "programLangu": "NL",
+          "programTitleSet": [
+            {
+              "description": "Testopleiding keuzes"
+            }
+          ]
+        },
+        {
+          "programLangu": "EN",
+          "programTitleSet": [
+            {
+              "description": "Test programme electives"
+            }
+          ]
+        }
+      ],
+      "moduleGroupSet": [
+        {
+          "moduleGroupId": "a1",
+          "parentType": "programme",
+          "parentId": "888",
+          "moduleGroupLanguageSet": [
+            {
+              "moduleGroupLangu": "NL",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Afstudeerrichting alfa"
+                }
+              ]
+            },
+            {
+              "moduleGroupLangu": "EN",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Specialisation Alpha"
+                }
+              ]
+            }
+          ],
+          "moduleSet": [],
+          "moduleGroupType": "02"
+        },
+        {
+          "moduleGroupId": "a2",
+          "parentType": "modulegroup",
+          "parentId": "a1",
+          "moduleGroupLanguageSet": [
+            {
+              "moduleGroupLangu": "NL",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Afstudeerrichting alfa"
+                }
+              ]
+            },
+            {
+              "moduleGroupLangu": "EN",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Specialisation Alpha"
+                }
+              ]
+            }
+          ],
+          "moduleSet": [
+            {
+              "moduleId": "m1",
+              "short": "A0001A",
+              "credits": "6",
+              "mandatory": "True",
+              "originalLangu": "NL",
+              "stageStart": "1",
+              "moduleLanguageSet": [
+                {
+                  "moduleLangu": "NL",
+                  "moduleTitleSet": [
+                    {
+                      "description": "Alfa kernvak"
+                    }
+                  ],
+                  "moduleSessionPatternSet": [
+                    {
+                      "offerPeriod": "1"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "moduleGroupType": "01"
+        },
+        {
+          "moduleGroupId": "a3",
+          "parentType": "modulegroup",
+          "parentId": "a1",
+          "moduleGroupLanguageSet": [
+            {
+              "moduleGroupLangu": "NL",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Keuzepakket A"
+                }
+              ]
+            },
+            {
+              "moduleGroupLangu": "EN",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Elective Package A"
+                }
+              ]
+            }
+          ],
+          "moduleSet": [
+            {
+              "moduleId": "m2",
+              "short": "A0002A",
+              "credits": "6",
+              "mandatory": "True",
+              "originalLangu": "NL",
+              "stageStart": "1",
+              "moduleLanguageSet": [
+                {
+                  "moduleLangu": "NL",
+                  "moduleTitleSet": [
+                    {
+                      "description": "Keuzevak A1"
+                    }
+                  ],
+                  "moduleSessionPatternSet": [
+                    {
+                      "offerPeriod": "1"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "moduleGroupType": "01"
+        },
+        {
+          "moduleGroupId": "a4",
+          "parentType": "modulegroup",
+          "parentId": "a1",
+          "moduleGroupLanguageSet": [
+            {
+              "moduleGroupLangu": "NL",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Keuzepakket B"
+                }
+              ]
+            },
+            {
+              "moduleGroupLangu": "EN",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Elective Package B"
+                }
+              ]
+            }
+          ],
+          "moduleSet": [
+            {
+              "moduleId": "m3",
+              "short": "A0003A",
+              "credits": "6",
+              "mandatory": "True",
+              "originalLangu": "NL",
+              "stageStart": "1",
+              "moduleLanguageSet": [
+                {
+                  "moduleLangu": "NL",
+                  "moduleTitleSet": [
+                    {
+                      "description": "Keuzevak B1"
+                    }
+                  ],
+                  "moduleSessionPatternSet": [
+                    {
+                      "offerPeriod": "1"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "moduleGroupType": "01"
+        },
+        {
+          "moduleGroupId": "a5",
+          "parentType": "modulegroup",
+          "parentId": "a1",
+          "moduleGroupLanguageSet": [
+            {
+              "moduleGroupLangu": "NL",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Keuzepakket C"
+                }
+              ]
+            },
+            {
+              "moduleGroupLangu": "EN",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Elective Package C"
+                }
+              ]
+            }
+          ],
+          "moduleSet": [
+            {
+              "moduleId": "m4",
+              "short": "A0004A",
+              "credits": "6",
+              "mandatory": "True",
+              "originalLangu": "NL",
+              "stageStart": "1",
+              "moduleLanguageSet": [
+                {
+                  "moduleLangu": "NL",
+                  "moduleTitleSet": [
+                    {
+                      "description": "Keuzevak C1"
+                    }
+                  ],
+                  "moduleSessionPatternSet": [
+                    {
+                      "offerPeriod": "1"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "moduleGroupType": "01"
+        },
+        {
+          "moduleGroupId": "b1",
+          "parentType": "programme",
+          "parentId": "888",
+          "moduleGroupLanguageSet": [
+            {
+              "moduleGroupLangu": "NL",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Afstudeerrichting beta"
+                }
+              ]
+            },
+            {
+              "moduleGroupLangu": "EN",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Specialisation Beta"
+                }
+              ]
+            }
+          ],
+          "moduleSet": [],
+          "moduleGroupType": "02"
+        },
+        {
+          "moduleGroupId": "b2",
+          "parentType": "modulegroup",
+          "parentId": "b1",
+          "moduleGroupLanguageSet": [
+            {
+              "moduleGroupLangu": "NL",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Afstudeerrichting beta"
+                }
+              ]
+            },
+            {
+              "moduleGroupLangu": "EN",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Specialisation Beta"
+                }
+              ]
+            }
+          ],
+          "moduleSet": [
+            {
+              "moduleId": "m5",
+              "short": "B0001A",
+              "credits": "6",
+              "mandatory": "True",
+              "originalLangu": "NL",
+              "stageStart": "1",
+              "moduleLanguageSet": [
+                {
+                  "moduleLangu": "NL",
+                  "moduleTitleSet": [
+                    {
+                      "description": "Beta kernvak"
+                    }
+                  ],
+                  "moduleSessionPatternSet": [
+                    {
+                      "offerPeriod": "1"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "moduleGroupType": "01"
+        },
+        {
+          "moduleGroupId": "b3",
+          "parentType": "modulegroup",
+          "parentId": "b1",
+          "moduleGroupLanguageSet": [
+            {
+              "moduleGroupLangu": "NL",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Administratieve optie"
+                }
+              ]
+            },
+            {
+              "moduleGroupLangu": "EN",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Technical option"
+                }
+              ]
+            }
+          ],
+          "moduleSet": [
+            {
+              "moduleId": "m6",
+              "short": "B0002A",
+              "credits": "6",
+              "mandatory": "True",
+              "originalLangu": "NL",
+              "stageStart": "1",
+              "moduleLanguageSet": [
+                {
+                  "moduleLangu": "NL",
+                  "moduleTitleSet": [
+                    {
+                      "description": "Beta optievak"
+                    }
+                  ],
+                  "moduleSessionPatternSet": [
+                    {
+                      "offerPeriod": "1"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "moduleGroupType": "01"
+        },
+        {
+          "moduleGroupId": "c1",
+          "parentType": "programme",
+          "parentId": "888",
+          "moduleGroupLanguageSet": [
+            {
+              "moduleGroupLangu": "NL",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Master gamma"
+                }
+              ]
+            },
+            {
+              "moduleGroupLangu": "EN",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Master Gamma"
+                }
+              ]
+            }
+          ],
+          "moduleSet": [],
+          "moduleGroupType": "02"
+        },
+        {
+          "moduleGroupId": "c2",
+          "parentType": "modulegroup",
+          "parentId": "c1",
+          "moduleGroupLanguageSet": [
+            {
+              "moduleGroupLangu": "NL",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Keuzepakket accountancy"
+                }
+              ]
+            },
+            {
+              "moduleGroupLangu": "EN",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Elective Package Accountancy"
+                }
+              ]
+            }
+          ],
+          "moduleSet": [
+            {
+              "moduleId": "m7",
+              "short": "C0001A",
+              "credits": "6",
+              "mandatory": "True",
+              "originalLangu": "NL",
+              "stageStart": "1",
+              "moduleLanguageSet": [
+                {
+                  "moduleLangu": "NL",
+                  "moduleTitleSet": [
+                    {
+                      "description": "Boekhouden"
+                    }
+                  ],
+                  "moduleSessionPatternSet": [
+                    {
+                      "offerPeriod": "1"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "moduleGroupType": "01"
+        },
+        {
+          "moduleGroupId": "c3",
+          "parentType": "modulegroup",
+          "parentId": "c1",
+          "moduleGroupLanguageSet": [
+            {
+              "moduleGroupLangu": "NL",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Keuzepakket verzekeringen"
+                }
+              ]
+            },
+            {
+              "moduleGroupLangu": "EN",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Elective Package Insurance"
+                }
+              ]
+            }
+          ],
+          "moduleSet": [
+            {
+              "moduleId": "m8",
+              "short": "C0002A",
+              "credits": "6",
+              "mandatory": "True",
+              "originalLangu": "NL",
+              "stageStart": "1",
+              "moduleLanguageSet": [
+                {
+                  "moduleLangu": "NL",
+                  "moduleTitleSet": [
+                    {
+                      "description": "Verzekeringsrecht"
+                    }
+                  ],
+                  "moduleSessionPatternSet": [
+                    {
+                      "offerPeriod": "1"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "moduleGroupType": "01"
+        },
+        {
+          "moduleGroupId": "d1",
+          "parentType": "programme",
+          "parentId": "888",
+          "moduleGroupLanguageSet": [
+            {
+              "moduleGroupLangu": "NL",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Afstudeerrichting delta"
+                }
+              ]
+            },
+            {
+              "moduleGroupLangu": "EN",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Specialisation Delta"
+                }
+              ]
+            }
+          ],
+          "moduleSet": [],
+          "moduleGroupType": "02"
+        },
+        {
+          "moduleGroupId": "d2",
+          "parentType": "modulegroup",
+          "parentId": "d1",
+          "moduleGroupLanguageSet": [
+            {
+              "moduleGroupLangu": "NL",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Keuzepakket B"
+                }
+              ]
+            },
+            {
+              "moduleGroupLangu": "EN",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Elective Package B"
+                }
+              ]
+            }
+          ],
+          "moduleSet": [
+            {
+              "moduleId": "m3",
+              "short": "A0003A",
+              "credits": "6",
+              "mandatory": "True",
+              "originalLangu": "NL",
+              "stageStart": "1",
+              "moduleLanguageSet": [
+                {
+                  "moduleLangu": "NL",
+                  "moduleTitleSet": [
+                    {
+                      "description": "Keuzevak B1"
+                    }
+                  ],
+                  "moduleSessionPatternSet": [
+                    {
+                      "offerPeriod": "1"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "moduleGroupType": "01"
+        },
+        {
+          "moduleGroupId": "d3",
+          "parentType": "modulegroup",
+          "parentId": "d1",
+          "moduleGroupLanguageSet": [
+            {
+              "moduleGroupLangu": "NL",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Keuzepakket A"
+                }
+              ]
+            },
+            {
+              "moduleGroupLangu": "EN",
+              "moduleGroupTitleSet": [
+                {
+                  "description": "Elective Package A"
+                }
+              ]
+            }
+          ],
+          "moduleSet": [
+            {
+              "moduleId": "m9",
+              "short": "D0001A",
+              "credits": "6",
+              "mandatory": "True",
+              "originalLangu": "NL",
+              "stageStart": "1",
+              "moduleLanguageSet": [
+                {
+                  "moduleLangu": "NL",
+                  "moduleTitleSet": [
+                    {
+                      "description": "Delta keuzevak A"
+                    }
+                  ],
+                  "moduleSessionPatternSet": [
+                    {
+                      "offerPeriod": "1"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "moduleGroupType": "01"
+        }
+      ]
+    }
+  ]
+}
