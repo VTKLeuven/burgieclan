@@ -66,8 +66,8 @@ class OnderwijsaanbodImporter
         }
 
         // Build the module tree and attach courses.
-        foreach ($data->modules as $moduleData) {
-            $this->upsertModule($moduleData, $program, null, $coursesByCode, $result);
+        foreach ($data->modules as $index => $moduleData) {
+            $this->upsertModule($moduleData, $program, null, $coursesByCode, $result, ($index + 1) * 10);
         }
 
         if ($dryRun) {
@@ -95,6 +95,7 @@ class OnderwijsaanbodImporter
 
     /**
      * @param array<string, Course> $coursesByCode
+     * @param int                   $position sibling order from the KU Leuven tree, spaced by 10
      */
     private function upsertModule(
         ModuleData $data,
@@ -102,6 +103,7 @@ class OnderwijsaanbodImporter
         ?Module $parent,
         array $coursesByCode,
         ImportResult $result,
+        int $position,
     ): void {
         $module = $this->moduleRepository->findOneByKulId($data->kulId);
         if (!$module instanceof Module) {
@@ -112,6 +114,15 @@ class OnderwijsaanbodImporter
             $result->modulesUpdated++;
         }
         $module->setName($data->name);
+
+        // KU Leuven orders module groups meaningfully (curriculum order, not alphabetical), so carry
+        // that order over as the sibling position. Only write it while the module still sits at the
+        // default 0: the tree editor normalises a whole sibling set to (i + 1) * 10 when an admin
+        // reorders it, so any non-zero position means someone arranged this module by hand and a
+        // re-import must not undo that.
+        if ($module->getPosition() === 0) {
+            $module->setPosition($position);
+        }
 
         if ($parent === null) {
             // Top-level module: belongs directly to the program.
@@ -131,8 +142,8 @@ class OnderwijsaanbodImporter
             }
         }
 
-        foreach ($data->children as $child) {
-            $this->upsertModule($child, $program, $module, $coursesByCode, $result);
+        foreach ($data->children as $index => $child) {
+            $this->upsertModule($child, $program, $module, $coursesByCode, $result, ($index + 1) * 10);
         }
     }
 
