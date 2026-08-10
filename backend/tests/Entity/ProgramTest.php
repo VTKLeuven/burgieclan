@@ -42,4 +42,39 @@ class ProgramTest extends KernelTestCase
         $this->assertContains($m2, $program->getModules());
         $this->assertNotContains($m3, $program->getModules());
     }
+
+    /**
+     * Programmes imported before semesterFlat existed have no such key in their stored JSON. The
+     * resolver has to fill it in rather than let an undefined index reach the mapper.
+     */
+    public function testResolvedImportSettingsDefaultSemesterFlatForOlderPrograms(): void
+    {
+        $program = new Program();
+        $program->setImportSettings(
+            [
+            'lang' => 'en',
+            'flatten' => ['Compulsory courses'],
+            'semester' => ['Common core'],
+            'merge' => true,
+            'enrich' => true,
+            'electiveGrouping' => 'perTrack',
+            ]
+        );
+
+        $settings = $program->getResolvedImportSettings();
+
+        $this->assertSame([], $settings['semesterFlat']);
+        $this->assertSame(['Common core'], $settings['semester'], 'the existing keys stay put');
+    }
+
+    public function testResolvedImportSettingsKeepsStoredSemesterFlat(): void
+    {
+        $program = new Program();
+        $program->setImportSettings(['semesterFlat' => ['Options', 'Compulsory courses']]);
+
+        $this->assertSame(
+            ['Options', 'Compulsory courses'],
+            $program->getResolvedImportSettings()['semesterFlat'],
+        );
+    }
 }

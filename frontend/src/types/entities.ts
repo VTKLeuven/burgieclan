@@ -11,6 +11,9 @@ interface NodeEntity extends BaseEntity {
 
 export interface Course extends BaseEntity {
     name?: string;
+    /** KU Leuven's Dutch and English titles; usually differ. Use localizedCourseName() to pick. */
+    nameNl?: string;
+    nameEn?: string;
     courseComments?: CourseComment[];
     modules?: Module[];
     code?: string;

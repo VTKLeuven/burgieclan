@@ -62,6 +62,7 @@
                                 <th>Folder</th>
                                 <th class="text-center" title="Skip this folder; its courses attach to the parent">Flatten</th>
                                 <th class="text-center" title="Replace this folder's subgroups with Semester 1..N folders">By semester</th>
+                                <th class="text-center" title="Top-level only: make this folder disappear and pool its courses into one shared set of Semester 1..N folders. Elective options inside it become a folder per semester.">Dissolve to semesters</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -75,6 +76,17 @@
                                     <td class="text-center">
                                         <input type="checkbox" name="semester[]" value="{{ g.kulId }}"
                                                {{ (g.kulId in options.semester or g.name in options.semester) ? 'checked' : '' }}>
+                                    </td>
+                                    <td class="text-center">
+                                        {# Only top-level groups can dissolve: pulling a nested group's
+                                           courses up to the programme root would empty a parent the
+                                           admin never selected. #}
+                                        {% if g.depth == 0 %}
+                                            <input type="checkbox" name="semesterFlat[]" value="{{ g.kulId }}"
+                                                   {{ (g.kulId in options.semesterFlat or g.name in options.semesterFlat) ? 'checked' : '' }}>
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -126,7 +138,7 @@
 
             {# ---- Result summary + tree ---- #}
             <ul class="list-inline text-muted">
-                <li class="list-inline-item">Modules: <strong>{{ summary.modulesCreated }}</strong> new, <strong>{{ summary.modulesUpdated }}</strong> update</li>
+                <li class="list-inline-item">Modules: <strong>{{ summary.modulesCreated }}</strong> new, <strong>{{ summary.modulesUpdated }}</strong> update{% if summary.modulesDetached %}, <strong>{{ summary.modulesDetached }}</strong> detached{% endif %}</li>
                 <li class="list-inline-item">Courses: <strong>{{ summary.coursesCreated }}</strong> new, <strong>{{ summary.coursesUpdated }}</strong> update</li>
                 <li class="list-inline-item">Enriched: <strong>{{ summary.enrichedCourses }}</strong></li>
             </ul>
@@ -134,9 +146,13 @@
             <div class="alert alert-info">Nothing has been written yet. Review the tree below and confirm to import.</div>
 
             {% if summary.warnings is not empty %}
+                {# Mixed bag: courses that left the curriculum AND folders detached by a changed
+                   structural option. Labelling the count "course(s)" mis-described the latter. #}
                 <div class="alert alert-warning">
-                    <strong>{{ summary.warnings|length }} course(s) no longer in the KU Leuven programme.</strong>
-                    They stay linked and keep their comments and documents — remove them in the tree editor if you want them gone.
+                    <strong>{{ summary.warnings|length }} thing(s) worth checking.</strong>
+                    Nothing is deleted here: courses keep their comments and documents, and detached
+                    folders keep their courses and position. Clean up in the tree editor if you want
+                    them gone.
                     <ul class="mb-0 mt-2">
                         {% for warning in summary.warnings %}<li>{{ warning }}</li>{% endfor %}
                     </ul>

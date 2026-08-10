@@ -11,6 +11,7 @@ import {
 import type { Course, Document, DocumentCategory } from "@/types/entities";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
+import { localizedCourseName } from '@/utils/courseName';
 
 interface DynamicBreadcrumbProps {
     course?: Course;
@@ -19,7 +20,7 @@ interface DynamicBreadcrumbProps {
 }
 
 export default function DynamicBreadcrumb({ course, category, document }: DynamicBreadcrumbProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const breadcrumbItems = [];
 
@@ -40,7 +41,7 @@ export default function DynamicBreadcrumb({ course, category, document }: Dynami
     // Add Course if available
     if (course) {
         breadcrumbItems.push({
-            label: course.name || `Course ${course.id}`,
+            label: localizedCourseName(course, i18n.language) || `Course ${course.id}`,
             href: `/course/${course.id}`,
             isCurrentPage: !category && !document
         });

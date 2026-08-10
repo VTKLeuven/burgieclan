@@ -9,11 +9,12 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { localizedCourseName } from '@/utils/courseName';
 
 const PDFViewer = dynamic(() => import('@/components/document/pdf/PDFViewer'), { ssr: false });
 
 function AccountDocumentCard({ document }: { document: Document }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [expanded, setExpanded] = useState(false);
     const [containerWidth, setContainerWidth] = useState(600);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -49,7 +50,7 @@ function AccountDocumentCard({ document }: { document: Document }) {
             </div>
 
             <div className="mt-1 text-sm text-vtk-body">
-                {document.course?.name && <p className="truncate font-medium">{document.course.name}</p>}
+                {document.course?.name && <p className="truncate font-medium">{localizedCourseName(document.course, i18n.language)}</p>}
                 {document.category?.name && <p className="text-xs text-vtk-muted truncate">{document.category.name}</p>}
             </div>
 

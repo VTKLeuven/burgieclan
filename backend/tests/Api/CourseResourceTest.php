@@ -66,6 +66,35 @@ class CourseResourceTest extends ApiTestCase
             ->assertJsonMatches('"@id"', '/api/courses/' . $course->getId());
     }
 
+    /**
+     * The exact-key assertion above passes with these absent because API Platform omits nulls, so
+     * it does not prove they are exposed. Set them and check they reach the client.
+     */
+    public function testGetCourseExposesBothLanguageTitles(): void
+    {
+        $course = CourseFactory::createOne(
+            [
+            'name' => 'Distributed Systems',
+            'nameNl' => 'Gedistribueerde systemen',
+            'nameEn' => 'Distributed Systems',
+            ]
+        );
+
+        $this->browser()
+            ->get(
+                '/api/courses/' . $course->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('nameNl', 'Gedistribueerde systemen')
+            ->assertJsonMatches('nameEn', 'Distributed Systems');
+    }
+
     public function testGetCourseFilterByName(): void
     {
         $course1 = CourseFactory::createOne(

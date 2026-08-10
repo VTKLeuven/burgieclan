@@ -528,6 +528,7 @@ class ProgramTreeAdminController extends AbstractController
             $settings['semester'],
             $settings['merge'],
             $settings['electiveGrouping'],
+            $settings['semesterFlat'],
         );
         if ($programData === null) {
             $this->addFlash('danger', 'Failed to map program data.');
@@ -540,10 +541,11 @@ class ProgramTreeAdminController extends AbstractController
         $this->addFlash(
             'success',
             sprintf(
-                'Synced from KU Leuven! Modules created: %d, Modules updated: %d, ' .
+                'Synced from KU Leuven! Modules created: %d, Modules updated: %d, Modules detached: %d, ' .
                 'Courses created: %d, Courses updated: %d',
                 $result->modulesCreated,
                 $result->modulesUpdated,
+                $result->modulesDetached,
                 $result->coursesCreated,
                 $result->coursesUpdated
             )
