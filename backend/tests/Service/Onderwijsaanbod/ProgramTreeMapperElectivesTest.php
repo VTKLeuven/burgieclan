@@ -75,7 +75,7 @@ class ProgramTreeMapperElectivesTest extends TestCase
 
         $folder = $this->childByName($alfa, 'Keuzepakketten');
         self::assertTrue($folder->isElective);
-        self::assertSame('keuzepakketten:a1', $folder->kulId, 'folder id is scoped to its parent');
+        self::assertSame('keuzepakketten:888:a1', $folder->kulId, 'folder id is scoped to its parent');
         self::assertSame([], $folder->courses, 'the folder holds packages, not courses');
 
         // Each package survives as its own sub-module, keeping its own courses.
@@ -125,7 +125,7 @@ class ProgramTreeMapperElectivesTest extends TestCase
         $deltaA = $this->childByName($this->childByName($this->rootByName($program->modules, 'Afstudeerrichting delta'), 'Keuzepakketten'), 'Keuzepakket A');
 
         self::assertNotSame($alfaA->kulId, $deltaA->kulId);
-        self::assertSame('d3', $deltaA->kulId, 'the colliding one keeps its original moduleGroupId');
+        self::assertSame('888:d3', $deltaA->kulId, 'the colliding one keeps its own (namespaced) moduleGroupId');
         self::assertSame(['A0002A'], array_map(static fn (CourseData $c): string => $c->code, $alfaA->courses));
         self::assertSame(['D0001A'], array_map(static fn (CourseData $c): string => $c->code, $deltaA->courses));
     }
