@@ -50,6 +50,33 @@ class ProgramTreeMapperTest extends TestCase
         self::assertTrue($course->mandatory);
     }
 
+    /**
+     * KU Leuven reuses a moduleGroupId across programmes, and the importer matches modules on
+     * kulId alone, so the id must carry the programme it belongs to.
+     */
+    public function testModuleKulIdsAreNamespacedByProgramme(): void
+    {
+        $program = $this->mapper->map($this->source, '999', 'nl', [], [], false, ProgramTreeMapper::ELECTIVES_NONE);
+
+        self::assertNotNull($program);
+        $basis = $program->modules[0];
+        self::assertSame('999:g1', $basis->kulId);
+        self::assertSame('999:g2', $this->childByName($basis, 'Wiskunde')->kulId);
+    }
+
+    /**
+     * Selecting a group by its bare moduleGroupId still works, so import settings and CLI
+     * invocations saved before the namespacing keep matching.
+     */
+    public function testBareModuleGroupIdStillMatchesForTransforms(): void
+    {
+        $program = $this->mapper->map($this->source, '999', 'nl', ['g3'], [], false, ProgramTreeMapper::ELECTIVES_NONE);
+
+        self::assertNotNull($program);
+        $childNames = array_map(static fn (ModuleData $m): string => $m->name, $program->modules[0]->children);
+        self::assertNotContains('Verplichte opleidingsonderdelen', $childNames, 'g3 was flattened away');
+    }
+
     public function testFlattenHoistsCoursesToParentAndReparentsChildren(): void
     {
         $program = $this->mapper->map($this->source, '999', 'nl', ['Verplichte opleidingsonderdelen'], [], false);

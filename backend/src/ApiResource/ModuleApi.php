@@ -41,6 +41,12 @@ class ModuleApi extends BaseEntityApi
     public ?string $name = null;
 
     /**
+     * Whether this module is an elective option rather than a compulsory group.
+     */
+    #[Groups([SerializationGroups::MODULE_GET, SerializationGroups::PROGRAM_GET])]
+    public ?bool $isElective = null;
+
+    /**
      * @var CourseApi[]
      */
     #[Groups([SerializationGroups::MODULE_GET, SerializationGroups::PROGRAM_GET])]

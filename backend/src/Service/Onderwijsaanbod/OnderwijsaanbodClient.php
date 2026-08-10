@@ -22,6 +22,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class OnderwijsaanbodClient
 {
+    /**
+     * How many academic-year indices a single alias is assumed to span. Two are live today
+     * (e.g. opo2025 + opo2026); the headroom only costs a larger page on the enrichment query.
+     */
+    private const MAX_YEAR_INDICES = 4;
+
     private LoggerInterface $logger;
 
     public function __construct(
@@ -193,6 +199,12 @@ class OnderwijsaanbodClient
             [
             'size' => 1,
             'query' => ['term' => ['programSet.programId' => $programId]],
+            // The alias spans one index per academic year (pg2025, pg2026, ...) and a programme
+            // usually exists in several. Without a sort the top *relevance* hit wins, so the year
+            // you import is undefined and can flip between runs. Index names start with the year,
+            // so ordering by name descending deterministically yields the newest — and, for two
+            // snapshots of the same year, the more recent one.
+            'sort' => [['_index' => 'desc']],
             ]
         );
 
@@ -206,7 +218,11 @@ class OnderwijsaanbodClient
 
     /**
      * Fetch course (OPO) documents for a set of ECTS codes, keyed by uppercase ECTS code.
-     * Duplicate hits across year indices are collapsed (first hit wins).
+     *
+     * A code exists once per academic-year index, so the response holds several documents per code
+     * and the first one seen wins. Sorted by index name descending, that first one is always the
+     * newest year — matching how fetchProgramSource() picks a programme, so a course's details come
+     * from the same year as the programme structure that referenced it.
      *
      * @param list<string> $codes
      *
@@ -224,9 +240,12 @@ class OnderwijsaanbodClient
             $response = $this->search(
                 $this->opoIndex,
                 [
-                'size' => count($chunk),
+                // Room for every year's copy of every code, so the sort below actually decides
+                // which one wins instead of the page boundary cutting the result short.
+                'size' => count($chunk) * self::MAX_YEAR_INDICES,
                 // exact-match keyword field; the analysed `ectsCode` field would not match codes verbatim.
                 'query' => ['terms' => ['ectsCode.keyword' => $chunk]],
+                'sort' => [['_index' => 'desc']],
                 ]
             );
             foreach ($response['hits']['hits'] ?? [] as $hit) {

@@ -33,6 +33,7 @@ class ModuleEntityToApiMapper extends BaseEntityToApiMapper
         assert($to instanceof ModuleApi);
 
         $to->name = $from->getName();
+        $to->isElective = $from->isElective();
         $to->courses = array_map(
             function (Course $course) {
                 return $this->microMapper->map(

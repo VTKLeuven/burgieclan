@@ -20,9 +20,29 @@ class ImportResult
     /** @var list<string> */
     public array $warnings = [];
 
+    /**
+     * Fields the import would overwrite on courses that already exist, so the preview can show what
+     * a sync is about to replace. Every field listed here is also editable in the admin, so an entry
+     * may well be a hand-made change about to be lost.
+     *
+     * @var list<array{code: string, course: string, field: string, from: string, to: string}>
+     */
+    public array $courseChanges = [];
+
     public function addWarning(string $message): void
     {
         $this->warnings[] = $message;
+    }
+
+    public function addCourseChange(string $code, string $course, string $field, string $from, string $to): void
+    {
+        $this->courseChanges[] = [
+            'code' => $code,
+            'course' => $course,
+            'field' => $field,
+            'from' => $from,
+            'to' => $to,
+        ];
     }
 
     /**

@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20260809111922 extends AbstractMigration
+final class Version20260809172758 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,6 +20,7 @@ final class Version20260809111922 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
+        $this->addSql('ALTER TABLE module ADD is_elective BOOLEAN DEFAULT false NOT NULL');
         $this->addSql('ALTER TABLE refresh_tokens ADD family VARCHAR(32) DEFAULT NULL');
         $this->addSql('ALTER TABLE refresh_tokens ADD family_valid TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL');
         $this->addSql('CREATE INDEX IDX_9BACE7E1A5E6215B ON refresh_tokens (family)');
@@ -28,6 +29,7 @@ final class Version20260809111922 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
+        $this->addSql('ALTER TABLE module DROP is_elective');
         $this->addSql('DROP INDEX IDX_9BACE7E1A5E6215B');
         $this->addSql('ALTER TABLE refresh_tokens DROP family');
         $this->addSql('ALTER TABLE refresh_tokens DROP family_valid');
