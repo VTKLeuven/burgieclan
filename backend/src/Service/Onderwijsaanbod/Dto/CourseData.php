@@ -12,6 +12,10 @@ final class CourseData
     /**
      * @param string        $code        The 6-character ECTS code (KU Leuven "short"); our Course.code.
      * @param string        $name        Course title in the requested language.
+     * @param string|null   $nameNl      Dutch title, or null when KU Leuven publishes none.
+     * @param string|null   $nameEn      English title, or null when KU Leuven publishes none.
+     *                                   Carried whatever the import language is, so a course shared
+     *                                   between a Dutch and an English programme keeps both.
      * @param 'nl'|'en'     $language    Original language of instruction.
      * @param int|null      $credits     ECTS credits.
      * @param list<string>  $semesters   Subset of Course::SEMESTERS values.
@@ -23,6 +27,8 @@ final class CourseData
     public function __construct(
         public readonly string $code,
         public readonly string $name,
+        public readonly ?string $nameNl,
+        public readonly ?string $nameEn,
         public readonly string $language,
         public readonly ?int $credits,
         public readonly array $semesters = [],

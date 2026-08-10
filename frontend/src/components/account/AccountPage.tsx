@@ -9,11 +9,12 @@ import FavoriteList from "@/components/account/FavoriteList";
 import type { Course, Document, Module, Program } from "@/types/entities";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { localizedCourseName } from '@/utils/courseName';
 
-const mapCoursesToItems = (courses: Course[]) => {
+const mapCoursesToItems = (courses: Course[], locale: string) => {
     return courses.map(course => ({
         id: course.id,
-        name: course.name,
+        name: localizedCourseName(course, locale),
         code: course.code,
         redirectUrl: `/course/${course.id}`,
         type: 'course' as const
@@ -49,7 +50,7 @@ const mapDocumentsToItems = (documents: Document[]) => {
 
 export default function AccountPage() {
     const { user, loading } = useUser();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const router = useRouter();
 
     if (loading || !user) {
@@ -93,7 +94,7 @@ export default function AccountPage() {
                 <div className="grid gap-4 lg:grid-cols-2">
                     <FavoriteList
                         title={t('account.favorite.courses')}
-                        items={mapCoursesToItems(favoriteCourses)}
+                        items={mapCoursesToItems(favoriteCourses, i18n.language)}
                         emptyMessage={t('account.favorite.no_courses')}
                     />
                     <FavoriteList

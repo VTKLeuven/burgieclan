@@ -34,6 +34,8 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
         assert($to instanceof CourseApi);
 
         $to->name = $from->getName();
+        $to->nameNl = $from->getNameNl();
+        $to->nameEn = $from->getNameEn();
         $to->code = $from->getCode();
         $to->language = $from->getLanguage();
         $to->professors = array_values($from->getProfessors());

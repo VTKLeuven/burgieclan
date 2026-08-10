@@ -8,11 +8,12 @@ import { ChevronDown, File, FolderClosed, Home, PanelLeft, PanelLeftClose } from
 import Link from 'next/link';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { localizedCourseName } from '@/utils/courseName';
 
-const mapCoursesToItems = (courses: Course[]) => {
+const mapCoursesToItems = (courses: Course[], locale: string) => {
   return courses.map(course => ({
     id: course.id,
-    name: course.name,
+    name: localizedCourseName(course, locale),
     code: course.code,
     redirectUrl: `/course/${course.id}`,
     type: 'course' as const
@@ -105,7 +106,7 @@ const NavigationSidebar = () => {
           </button>
           {!isCollapsed && expandedSections.courses && (
             <ItemList
-              items={mapCoursesToItems(user.favoriteCourses ?? [])}
+              items={mapCoursesToItems(user.favoriteCourses ?? [], i18n.language)}
               emptyMessage={t('account.favorite.no_courses')}
             />
           )}

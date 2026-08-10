@@ -75,7 +75,18 @@ class OnderwijsaanbodImportController extends AbstractController
 
         // The untransformed named tree provides the full list of selectable groups (checkboxes),
         // independent of what the current flatten/semester choices removed from the result.
-        $namedTree = $this->buildProgramData(['programId' => $options['programId'], 'lang' => $options['lang'], 'flatten' => [], 'semester' => [], 'merge' => false, 'enrich' => false, 'electiveGrouping' => ProgramTreeMapper::ELECTIVES_NONE]);
+        $namedTree = $this->buildProgramData(
+            [
+            'programId' => $options['programId'],
+            'lang' => $options['lang'],
+            'flatten' => [],
+            'semester' => [],
+            'semesterFlat' => [],
+            'merge' => false,
+            'enrich' => false,
+            'electiveGrouping' => ProgramTreeMapper::ELECTIVES_NONE,
+            ]
+        );
 
         return $this->render(
             'admin/onderwijsaanbod/preview.html.twig',
@@ -143,7 +154,16 @@ class OnderwijsaanbodImportController extends AbstractController
     }
 
     /**
-     * @return array{programId: string, lang: 'nl'|'en', flatten: list<string>, semester: list<string>, merge: bool, enrich: bool, electiveGrouping: string}
+     * @return array{
+     *     programId: string,
+     *     lang: 'nl'|'en',
+     *     flatten: list<string>,
+     *     semester: list<string>,
+     *     semesterFlat: list<string>,
+     *     merge: bool,
+     *     enrich: bool,
+     *     electiveGrouping: string,
+     * }
      */
     private function readOptions(Request $request): array
     {
@@ -166,6 +186,7 @@ class OnderwijsaanbodImportController extends AbstractController
         if ($request->request->getBoolean('configured')) {
             $flatten = $request->request->all('flatten');
             $semester = $request->request->all('semester');
+            $semesterFlat = $request->request->all('semesterFlat');
             $merge = $request->request->getBoolean('merge');
             $requested = (string) $request->request->get('electiveGrouping', '');
             $electiveGrouping = in_array($requested, ProgramTreeMapper::ELECTIVE_GROUPINGS, true)
@@ -176,6 +197,8 @@ class OnderwijsaanbodImportController extends AbstractController
             $flatten = $saved['flatten'] ?? Program::DEFAULT_FLATTEN;
             /** @var list<string> $semester */
             $semester = $saved['semester'] ?? [];
+            /** @var list<string> $semesterFlat */
+            $semesterFlat = $saved['semesterFlat'] ?? [];
             $merge = (bool) ($saved['merge'] ?? true);
             $electiveGrouping = $saved['electiveGrouping'] ?? ProgramTreeMapper::ELECTIVES_PER_TRACK;
         }
@@ -192,6 +215,7 @@ class OnderwijsaanbodImportController extends AbstractController
             'lang' => $lang,
             'flatten' => array_values(array_filter(array_map('strval', $flatten))),
             'semester' => array_values(array_filter(array_map('strval', $semester))),
+            'semesterFlat' => array_values(array_filter(array_map('strval', $semesterFlat))),
             'merge' => $merge,
             'enrich' => $enrich,
             'electiveGrouping' => $electiveGrouping,
@@ -199,7 +223,16 @@ class OnderwijsaanbodImportController extends AbstractController
     }
 
     /**
-     * @param array{programId: string, lang: 'nl'|'en', flatten: list<string>, semester: list<string>, merge: bool, enrich: bool, electiveGrouping: string} $options
+     * @param array{
+     *     programId: string,
+     *     lang: 'nl'|'en',
+     *     flatten: list<string>,
+     *     semester: list<string>,
+     *     semesterFlat: list<string>,
+     *     merge: bool,
+     *     enrich: bool,
+     *     electiveGrouping: string,
+     * } $options
      */
     private function buildProgramData(array $options): ?ProgramData
     {
@@ -219,6 +252,7 @@ class OnderwijsaanbodImportController extends AbstractController
             $options['semester'],
             $options['merge'],
             $options['electiveGrouping'],
+            $options['semesterFlat'],
         );
     }
 

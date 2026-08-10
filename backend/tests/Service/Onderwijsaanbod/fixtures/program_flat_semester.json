@@ -1,0 +1,689 @@
+{
+ "programSet": [
+  {
+   "programId": "777",
+   "programLanguageSet": [
+    {
+     "programLangu": "NL",
+     "programTitleSet": [
+      {
+       "description": "Testopleiding semesters"
+      }
+     ]
+    },
+    {
+     "programLangu": "EN",
+     "programTitleSet": [
+      {
+       "description": "Test programme semesters"
+      }
+     ]
+    }
+   ],
+   "moduleGroupSet": [
+    {
+     "moduleGroupId": "cc",
+     "parentType": "programme",
+     "parentId": "777",
+     "moduleGroupType": "02",
+     "moduleGroupLanguageSet": [
+      {
+       "moduleGroupLangu": "NL",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Verplichte vakken"
+        }
+       ]
+      },
+      {
+       "moduleGroupLangu": "EN",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Compulsory Courses"
+        }
+       ]
+      }
+     ],
+     "moduleSet": []
+    },
+    {
+     "moduleGroupId": "cc1",
+     "parentType": "modulegroup",
+     "parentId": "cc",
+     "moduleGroupType": "02",
+     "moduleGroupLanguageSet": [
+      {
+       "moduleGroupLangu": "NL",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Groep een"
+        }
+       ]
+      },
+      {
+       "moduleGroupLangu": "EN",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Group One"
+        }
+       ]
+      }
+     ],
+     "moduleSet": [
+      {
+       "moduleId": "mC0001A",
+       "short": "C0001A",
+       "originalLangu": "NL",
+       "stageStart": "1",
+       "mandatory": "True",
+       "credits": "6",
+       "moduleLanguageSet": [
+        {
+         "moduleLangu": "NL",
+         "moduleTitleSet": [
+          {
+           "description": "Vak een"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "NL",
+           "offerPeriod": "1"
+          }
+         ]
+        },
+        {
+         "moduleLangu": "EN",
+         "moduleTitleSet": [
+          {
+           "description": "Course One"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "EN",
+           "offerPeriod": "1"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "moduleId": "mC0002A",
+       "short": "C0002A",
+       "originalLangu": "NL",
+       "stageStart": "1",
+       "mandatory": "True",
+       "credits": "6",
+       "moduleLanguageSet": [
+        {
+         "moduleLangu": "NL",
+         "moduleTitleSet": [
+          {
+           "description": "Vak twee"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "NL",
+           "offerPeriod": "2"
+          }
+         ]
+        },
+        {
+         "moduleLangu": "EN",
+         "moduleTitleSet": [
+          {
+           "description": "Course Two"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "EN",
+           "offerPeriod": "2"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "moduleGroupId": "cc2",
+     "parentType": "modulegroup",
+     "parentId": "cc",
+     "moduleGroupType": "02",
+     "moduleGroupLanguageSet": [
+      {
+       "moduleGroupLangu": "NL",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Groep twee"
+        }
+       ]
+      },
+      {
+       "moduleGroupLangu": "EN",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Group Two"
+        }
+       ]
+      }
+     ],
+     "moduleSet": [
+      {
+       "moduleId": "mC0003A",
+       "short": "C0003A",
+       "originalLangu": "NL",
+       "stageStart": "2",
+       "mandatory": "True",
+       "credits": "6",
+       "moduleLanguageSet": [
+        {
+         "moduleLangu": "NL",
+         "moduleTitleSet": [
+          {
+           "description": "Vak drie"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "NL",
+           "offerPeriod": "1"
+          }
+         ]
+        },
+        {
+         "moduleLangu": "EN",
+         "moduleTitleSet": [
+          {
+           "description": "Course Three"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "EN",
+           "offerPeriod": "1"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "moduleGroupId": "fu",
+     "parentType": "programme",
+     "parentId": "777",
+     "moduleGroupType": "02",
+     "moduleGroupLanguageSet": [
+      {
+       "moduleGroupLangu": "NL",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Fundamenten"
+        }
+       ]
+      },
+      {
+       "moduleGroupLangu": "EN",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Fundamentals"
+        }
+       ]
+      }
+     ],
+     "moduleSet": []
+    },
+    {
+     "moduleGroupId": "fu1",
+     "parentType": "modulegroup",
+     "parentId": "fu",
+     "moduleGroupType": "02",
+     "moduleGroupLanguageSet": [
+      {
+       "moduleGroupLangu": "NL",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Basis"
+        }
+       ]
+      },
+      {
+       "moduleGroupLangu": "EN",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Basics"
+        }
+       ]
+      }
+     ],
+     "moduleSet": [
+      {
+       "moduleId": "mC0004A",
+       "short": "C0004A",
+       "originalLangu": "NL",
+       "stageStart": "1",
+       "mandatory": "True",
+       "credits": "6",
+       "moduleLanguageSet": [
+        {
+         "moduleLangu": "NL",
+         "moduleTitleSet": [
+          {
+           "description": "Vak vier"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "NL",
+           "offerPeriod": "1"
+          }
+         ]
+        },
+        {
+         "moduleLangu": "EN",
+         "moduleTitleSet": [
+          {
+           "description": "Course Four"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "EN",
+           "offerPeriod": "1"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "moduleId": "mC0005A",
+       "short": "C0005A",
+       "originalLangu": "NL",
+       "stageStart": "1",
+       "mandatory": "True",
+       "credits": "6",
+       "moduleLanguageSet": [
+        {
+         "moduleLangu": "NL",
+         "moduleTitleSet": [
+          {
+           "description": "Jaarvak"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "NL",
+           "offerPeriod": "3"
+          }
+         ]
+        },
+        {
+         "moduleLangu": "EN",
+         "moduleTitleSet": [
+          {
+           "description": "Year-long Course"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "EN",
+           "offerPeriod": "3"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "moduleGroupId": "op",
+     "parentType": "programme",
+     "parentId": "777",
+     "moduleGroupType": "02",
+     "moduleGroupLanguageSet": [
+      {
+       "moduleGroupLangu": "NL",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Opties"
+        }
+       ]
+      },
+      {
+       "moduleGroupLangu": "EN",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Options"
+        }
+       ]
+      }
+     ],
+     "moduleSet": []
+    },
+    {
+     "moduleGroupId": "op1",
+     "parentType": "modulegroup",
+     "parentId": "op",
+     "moduleGroupType": "01",
+     "moduleGroupLanguageSet": [
+      {
+       "moduleGroupLangu": "NL",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Optie alfa"
+        }
+       ]
+      },
+      {
+       "moduleGroupLangu": "EN",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Option Alpha"
+        }
+       ]
+      }
+     ],
+     "moduleSet": [
+      {
+       "moduleId": "mO0001A",
+       "short": "O0001A",
+       "originalLangu": "NL",
+       "stageStart": "1",
+       "mandatory": "True",
+       "credits": "6",
+       "moduleLanguageSet": [
+        {
+         "moduleLangu": "NL",
+         "moduleTitleSet": [
+          {
+           "description": "Alfa een"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "NL",
+           "offerPeriod": "1"
+          }
+         ]
+        },
+        {
+         "moduleLangu": "EN",
+         "moduleTitleSet": [
+          {
+           "description": "Alpha One"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "EN",
+           "offerPeriod": "1"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "moduleId": "mO0002A",
+       "short": "O0002A",
+       "originalLangu": "NL",
+       "stageStart": "1",
+       "mandatory": "True",
+       "credits": "6",
+       "moduleLanguageSet": [
+        {
+         "moduleLangu": "NL",
+         "moduleTitleSet": [
+          {
+           "description": "Alfa twee"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "NL",
+           "offerPeriod": "2"
+          }
+         ]
+        },
+        {
+         "moduleLangu": "EN",
+         "moduleTitleSet": [
+          {
+           "description": "Alpha Two"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "EN",
+           "offerPeriod": "2"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "moduleGroupId": "op1a",
+     "parentType": "modulegroup",
+     "parentId": "op1",
+     "moduleGroupType": "02",
+     "moduleGroupLanguageSet": [
+      {
+       "moduleGroupLangu": "NL",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Alfa verdieping"
+        }
+       ]
+      },
+      {
+       "moduleGroupLangu": "EN",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Alpha Advanced"
+        }
+       ]
+      }
+     ],
+     "moduleSet": [
+      {
+       "moduleId": "mO0003A",
+       "short": "O0003A",
+       "originalLangu": "NL",
+       "stageStart": "1",
+       "mandatory": "True",
+       "credits": "6",
+       "moduleLanguageSet": [
+        {
+         "moduleLangu": "NL",
+         "moduleTitleSet": [
+          {
+           "description": "Alfa drie"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "NL",
+           "offerPeriod": "1"
+          }
+         ]
+        },
+        {
+         "moduleLangu": "EN",
+         "moduleTitleSet": [
+          {
+           "description": "Alpha Three"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "EN",
+           "offerPeriod": "1"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "moduleGroupId": "op2",
+     "parentType": "modulegroup",
+     "parentId": "op",
+     "moduleGroupType": "01",
+     "moduleGroupLanguageSet": [
+      {
+       "moduleGroupLangu": "NL",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Optie beta"
+        }
+       ]
+      },
+      {
+       "moduleGroupLangu": "EN",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Option Beta"
+        }
+       ]
+      }
+     ],
+     "moduleSet": [
+      {
+       "moduleId": "mO0004A",
+       "short": "O0004A",
+       "originalLangu": "NL",
+       "stageStart": "2",
+       "mandatory": "True",
+       "credits": "6",
+       "moduleLanguageSet": [
+        {
+         "moduleLangu": "NL",
+         "moduleTitleSet": [
+          {
+           "description": "Beta een"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "NL",
+           "offerPeriod": "1"
+          }
+         ]
+        },
+        {
+         "moduleLangu": "EN",
+         "moduleTitleSet": [
+          {
+           "description": "Beta One"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "EN",
+           "offerPeriod": "1"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "moduleGroupId": "op3",
+     "parentType": "modulegroup",
+     "parentId": "op",
+     "moduleGroupType": "01",
+     "moduleGroupLanguageSet": [
+      {
+       "moduleGroupLangu": "NL",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Optie gamma"
+        }
+       ]
+      },
+      {
+       "moduleGroupLangu": "EN",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Option Gamma"
+        }
+       ]
+      }
+     ],
+     "moduleSet": []
+    },
+    {
+     "moduleGroupId": "vr",
+     "parentType": "programme",
+     "parentId": "777",
+     "moduleGroupType": "02",
+     "moduleGroupLanguageSet": [
+      {
+       "moduleGroupLangu": "NL",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Vrije keuze"
+        }
+       ]
+      },
+      {
+       "moduleGroupLangu": "EN",
+       "moduleGroupTitleSet": [
+        {
+         "description": "Free Choice"
+        }
+       ]
+      }
+     ],
+     "moduleSet": [
+      {
+       "moduleId": "mV0001A",
+       "short": "V0001A",
+       "originalLangu": "NL",
+       "stageStart": "1",
+       "mandatory": "True",
+       "credits": "6",
+       "moduleLanguageSet": [
+        {
+         "moduleLangu": "NL",
+         "moduleTitleSet": [
+          {
+           "description": "Vrij vak"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "NL",
+           "offerPeriod": "1"
+          }
+         ]
+        },
+        {
+         "moduleLangu": "EN",
+         "moduleTitleSet": [
+          {
+           "description": "Free Course"
+          }
+         ],
+         "moduleSessionPatternSet": [
+          {
+           "moduleLangu": "EN",
+           "offerPeriod": "1"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

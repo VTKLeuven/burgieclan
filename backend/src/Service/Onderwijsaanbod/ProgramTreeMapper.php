@@ -40,7 +40,32 @@ class ProgramTreeMapper
     public const ELECTIVE_GROUPINGS = [self::ELECTIVES_NONE, self::ELECTIVES_PER_TRACK, self::ELECTIVES_PROGRAMME];
 
     /** Synthetic kulId prefix for the elective-packages folder, mirroring the "sem:" convention. */
-    private const ELECTIVE_FOLDER_PREFIX = 'keuzepakketten:';
+    public const ELECTIVE_FOLDER_PREFIX = 'keuzepakketten:';
+
+    /** Synthetic kulId prefix for a "Semester N" folder inside one semesterised group. */
+    public const SEMESTER_PREFIX = 'sem:';
+
+    /** Synthetic kulId prefix for a shared, programme-level "Semester N" folder. */
+    public const SEMESTER_FLAT_PREFIX = 'semflat:';
+
+    /** Synthetic kulId prefix for one elective option's slice of a single semester. */
+    public const SEMESTER_OPTION_PREFIX = 'semopt:';
+
+    /**
+     * kulId prefixes of folders the transforms invent, as opposed to real KU Leuven module groups.
+     *
+     * A synthetic folder exists only because of the structural options chosen for the import, so it
+     * disappearing means the admin changed an option — not that KU Leuven dropped anything. The
+     * importer needs to tell those two apart when it reports what it detached.
+     *
+     * @var list<string>
+     */
+    public const SYNTHETIC_KULID_PREFIXES = [
+        self::SEMESTER_PREFIX,
+        self::SEMESTER_FLAT_PREFIX,
+        self::SEMESTER_OPTION_PREFIX,
+        self::ELECTIVE_FOLDER_PREFIX,
+    ];
 
     /**
      * The lettered "Keuzepakket A".."Keuzepakket H" / "Elective Package A".. groups.
@@ -61,6 +86,8 @@ class ProgramTreeMapper
      * @param list<string>         $semesterKeys  moduleGroupIds or names to regroup by semester
      * @param bool                 $mergeSingleChild collapse single-child, course-less modules
      * @param string               $electiveGrouping one of self::ELECTIVE_GROUPINGS
+     * @param list<string>         $semesterFlatKeys top-level groups to dissolve into one shared
+     *                                               set of "Semester N" folders
      */
     public function map(
         array $programSource,
@@ -70,6 +97,7 @@ class ProgramTreeMapper
         array $semesterKeys = [],
         bool $mergeSingleChild = true,
         string $electiveGrouping = self::ELECTIVES_PER_TRACK,
+        array $semesterFlatKeys = [],
     ): ?ProgramData {
         $programSet = $this->findProgramSet($programSource, $programId);
         if ($programSet === null) {
@@ -85,6 +113,12 @@ class ProgramTreeMapper
 
         $roots = $this->buildNamedTree($programSet, $language, $programId);
         $roots = $this->unwrapRedundantProgramRoots($roots, $name);
+
+        // First of the transforms: it rebuilds the top level wholesale, so everything after it
+        // should see the shape the admin actually asked for.
+        if ($semesterFlatKeys !== []) {
+            $roots = $this->applyFlatSemesterize($roots, $programId, $semesterFlatKeys);
+        }
 
         if ($semesterKeys !== []) {
             // Semesterising a branch that also holds keuzepakketten must not swallow them: their
@@ -216,7 +250,10 @@ class ProgramTreeMapper
             foreach ($this->semesterNumbers($course) as $number) {
                 if (!isset($bySemester[$number])) {
                     $label = $number > 0 ? sprintf('Semester %d', $number) : 'Overige vakken';
-                    $bySemester[$number] = new ModuleData(sprintf('sem:%s:%s:%d', $programId, $module->kulId, $number), $label);
+                    $bySemester[$number] = new ModuleData(
+                        sprintf('%s%s:%s:%d', self::SEMESTER_PREFIX, $programId, $module->kulId, $number),
+                        $label,
+                    );
                 }
                 $this->addCourseOnce($bySemester[$number], $course);
             }
@@ -259,6 +296,160 @@ class ProgramTreeMapper
         }
 
         return $packages;
+    }
+
+    /**
+     * Dissolve the named top-level groups into a single shared set of "Semester N" folders.
+     *
+     * Unlike $semesterKeys, which turns one group into a folder *containing* Semester folders, this
+     * makes the selected groups disappear entirely and pools their courses: naming both "Common
+     * Compulsory Courses" and "Materials Engineering Fundamentals" yields one "Semester 1" holding
+     * the courses of both, not two competing ones.
+     *
+     * Elective groups (moduleGroupType "01") survive the dissolve as a folder per semester they
+     * actually teach in, keeping their KU Leuven name and their isElective flag so the UI can badge
+     * them. So naming "Options" too gives:
+     *
+     *     Semester 1
+     *       ├─ Advanced Metal Processing & Case Studies   (compulsory, pooled)
+     *       ├─ Materials Selection                        (compulsory, pooled)
+     *       ├─ Biomaterials              [keuze]  → its 2 semester-1 courses
+     *       └─ Metals and Ceramics       [keuze]  → its 1 semester-1 course
+     *
+     * Folders are created lazily, so an option that teaches nothing in a semester gets no folder
+     * there, and a semester with no courses at all does not appear. An option with a single course
+     * in a semester still gets its folder — the point is to show which choice the course belongs to.
+     *
+     * Only top-level groups are matched. Dissolving a nested group would yank its courses out of a
+     * parent the admin did not name, which is never what "make this folder disappear" means.
+     *
+     * @param list<ModuleData> $roots
+     * @param list<string>     $keys
+     *
+     * @return list<ModuleData>
+     */
+    private function applyFlatSemesterize(array $roots, string $programId, array $keys): array
+    {
+        /** @var list<ModuleData> $selected */
+        $selected = [];
+        /** @var list<ModuleData> $kept */
+        $kept = [];
+        $insertAt = null;
+        foreach ($roots as $root) {
+            if ($this->matches($root, $keys)) {
+                // The merged block takes the place of the first group it replaces, so the semesters
+                // land where the admin expects rather than being appended after everything else.
+                $insertAt ??= count($kept);
+                $selected[] = $root;
+            } else {
+                $kept[] = $root;
+            }
+        }
+
+        if ($selected === []) {
+            return $roots;
+        }
+
+        /** @var array<int, ModuleData> $semesters keyed by degree-wide semester (0 = unknown) */
+        $semesters = [];
+        /** @var array<string, ModuleData> $optionFolders "<semester>|<option kulId>" => folder */
+        $optionFolders = [];
+
+        foreach ($selected as $root) {
+            $this->spreadOverSemesters($root, $programId, $semesters, $optionFolders, null);
+        }
+
+        ksort($semesters);
+        // Show the "unknown semester" bucket last rather than first.
+        if (isset($semesters[0])) {
+            $unknown = $semesters[0];
+            unset($semesters[0]);
+            $semesters[] = $unknown;
+        }
+
+        return array_merge(
+            array_slice($kept, 0, $insertAt),
+            array_values($semesters),
+            array_slice($kept, (int) $insertAt),
+        );
+    }
+
+    /**
+     * Walk a selected subtree, dropping every course into the semester it is taught in — directly
+     * when it is compulsory, or into the enclosing option's folder for that semester.
+     *
+     * @param array<int, ModuleData>    $semesters
+     * @param array<string, ModuleData> $optionFolders
+     * @param ModuleData|null           $option the elective group this subtree sits under, if any
+     */
+    private function spreadOverSemesters(
+        ModuleData $module,
+        string $programId,
+        array &$semesters,
+        array &$optionFolders,
+        ?ModuleData $option,
+    ): void {
+        foreach ($module->courses as $course) {
+            foreach ($this->semesterNumbers($course) as $number) {
+                $semester = $this->semesterFolder($semesters, $programId, $number);
+                $target = $option === null
+                    ? $semester
+                    : $this->optionFolder($optionFolders, $semester, $option, $number);
+                $this->addCourseOnce($target, $course);
+            }
+        }
+
+        foreach ($module->children as $child) {
+            // Only the outermost elective group becomes a folder: an option with sub-groups of its
+            // own would otherwise sprout one folder per level inside every semester.
+            $this->spreadOverSemesters(
+                $child,
+                $programId,
+                $semesters,
+                $optionFolders,
+                $option ?? ($child->isElective ? $child : null),
+            );
+        }
+    }
+
+    /**
+     * @param array<int, ModuleData> $semesters
+     */
+    private function semesterFolder(array &$semesters, string $programId, int $number): ModuleData
+    {
+        if (!isset($semesters[$number])) {
+            $semesters[$number] = new ModuleData(
+                sprintf('%s%s:%d', self::SEMESTER_FLAT_PREFIX, $programId, $number),
+                $number > 0 ? sprintf('Semester %d', $number) : 'Overige vakken',
+            );
+        }
+
+        return $semesters[$number];
+    }
+
+    /**
+     * @param array<string, ModuleData> $optionFolders
+     */
+    private function optionFolder(
+        array &$optionFolders,
+        ModuleData $semester,
+        ModuleData $option,
+        int $number,
+    ): ModuleData {
+        $key = $number . '|' . $option->kulId;
+        if (!isset($optionFolders[$key])) {
+            $folder = new ModuleData(
+                sprintf('%s%s:%d', self::SEMESTER_OPTION_PREFIX, $option->kulId, $number),
+                $option->name,
+                [],
+                [],
+                true,
+            );
+            $optionFolders[$key] = $folder;
+            $semester->addChild($folder);
+        }
+
+        return $optionFolders[$key];
     }
 
     /**
@@ -538,8 +729,14 @@ class ProgramTreeMapper
         // merging would replace a meaningful name ("Afstudeerrichting werktuigkunde") with the
         // generic folder name ("Keuzepakketten"). The wrapper is not redundant here — the folder
         // only exists because the elective grouping created it.
+        // Same reasoning for a "Semester N" folder whose only content is one option: collapsing it
+        // would put the option at the top level and lose the semester it is taught in, which is the
+        // whole point of the layout.
         $onlyChildIsElectiveFolder = count($children) === 1
-            && str_starts_with($children[0]->kulId, self::ELECTIVE_FOLDER_PREFIX);
+            && (
+                str_starts_with($children[0]->kulId, self::ELECTIVE_FOLDER_PREFIX)
+                || str_starts_with($children[0]->kulId, self::SEMESTER_OPTION_PREFIX)
+            );
 
         if (count($children) === 1 && $module->courses === [] && !$onlyChildIsElectiveFolder) {
             return $children[0];
@@ -648,9 +845,16 @@ class ProgramTreeMapper
             ? (int) $module['credits']
             : null;
 
+        // Both titles travel with every course regardless of the import language: they are already
+        // in the response we fetched, and a course shared by a Dutch and an English programme must
+        // not have its name decided by whichever import ran last.
+        $titles = $module['moduleLanguageSet'] ?? [];
+
         return new CourseData(
             code: $code,
             name: $name,
+            nameNl: $this->localized($titles, 'moduleLangu', 'moduleTitleSet', 'nl', false),
+            nameEn: $this->localized($titles, 'moduleLangu', 'moduleTitleSet', 'en', false),
             language: $this->normalizeLanguage((string) ($module['originalLangu'] ?? '')),
             credits: $credits,
             semesters: $this->semestersOf($module),
@@ -716,8 +920,13 @@ class ProgramTreeMapper
      *
      * @param list<array<string, mixed>> $languageSet
      */
-    private function localized(array $languageSet, string $languKey, string $titleSetKey, string $language): ?string
-    {
+    private function localized(
+        array $languageSet,
+        string $languKey,
+        string $titleSetKey,
+        string $language,
+        bool $fallbackToAnyLanguage = true,
+    ): ?string {
         $fallback = null;
         foreach ($languageSet as $entry) {
             $entryLangu = strtoupper((string) ($entry[$languKey] ?? ''));
@@ -733,7 +942,10 @@ class ProgramTreeMapper
             }
         }
 
-        return $fallback;
+        // Storing a per-language title must not fall back: putting the Dutch title in nameEn would
+        // claim a translation exists when it does not, and the entity's own fallback to $name can
+        // no longer tell the difference.
+        return $fallbackToAnyLanguage ? $fallback : null;
     }
 
     /**
