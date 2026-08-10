@@ -39,6 +39,31 @@ class OnderwijsaanbodImporter
         $result = new ImportResult();
         $result->dryRun = $dryRun;
 
+        // A dry run still walks the whole upsert path — that is what makes the preview accurate —
+        // so it needs the writes to happen and then not stick. A transaction that is rolled back
+        // does exactly that. The previous approach (flush nothing, then EntityManager::clear())
+        // detached *every* managed entity in the request, not just this import's, leaving the
+        // caller holding stale objects.
+        if ($dryRun) {
+            $this->entityManager->beginTransaction();
+        }
+
+        try {
+            return $this->runImport($data, $enrich, $dryRun, $result);
+        } finally {
+            if ($dryRun) {
+                $this->entityManager->rollback();
+                $this->entityManager->clear();
+            }
+        }
+    }
+
+    /**
+     * @param bool $enrich fetch professors and identical-course links from the OPO index
+     * @param bool $dryRun compute the changes but persist nothing
+     */
+    private function runImport(ProgramData $data, bool $enrich, bool $dryRun, ImportResult $result): ImportResult
+    {
         // Enrichment lookup table: ECTS code => ['professors' => [...], 'identical' => [...]].
         $enrichment = $enrich ? $this->fetchEnrichment($data->allCourseCodes()) : [];
 
@@ -55,26 +80,18 @@ class OnderwijsaanbodImporter
             $coursesByCode[$code] = $this->upsertCourse($courseData, $enrichment[$code] ?? null, $result);
         }
 
-        // Link identical courses now that all courses exist.
-        foreach ($coursesByCode as $code => $course) {
-            foreach ($enrichment[$code]['identical'] ?? [] as $identicalCode) {
-                $identical = $coursesByCode[$identicalCode] ?? $this->courseRepository->findOneBy(['code' => $identicalCode]);
-                if ($identical instanceof Course && $identical !== $course) {
-                    $course->addIdenticalCourse($identical);
-                }
-            }
-        }
+        $this->syncIdenticalCourses($coursesByCode, $enrichment, $result);
 
         // Build the module tree and attach courses.
-        foreach ($data->modules as $moduleData) {
-            $this->upsertModule($moduleData, $program, null, $coursesByCode, $result);
+        foreach ($data->modules as $index => $moduleData) {
+            $this->upsertModule($moduleData, $program, null, $coursesByCode, $result, ($index + 1) * 10);
         }
 
-        if ($dryRun) {
-            $this->entityManager->clear();
-        } else {
-            $this->entityManager->flush();
-        }
+        $this->reportRemovedCourses($data, $coursesByCode, $result);
+
+        // Flush in both cases: on a dry run the surrounding transaction is rolled back, so the
+        // writes are computed (and any constraint violation surfaces) without being kept.
+        $this->entityManager->flush();
 
         return $result;
     }
@@ -95,6 +112,7 @@ class OnderwijsaanbodImporter
 
     /**
      * @param array<string, Course> $coursesByCode
+     * @param int                   $position sibling order from the KU Leuven tree, spaced by 10
      */
     private function upsertModule(
         ModuleData $data,
@@ -102,6 +120,7 @@ class OnderwijsaanbodImporter
         ?Module $parent,
         array $coursesByCode,
         ImportResult $result,
+        int $position,
     ): void {
         $module = $this->moduleRepository->findOneByKulId($data->kulId);
         if (!$module instanceof Module) {
@@ -112,6 +131,16 @@ class OnderwijsaanbodImporter
             $result->modulesUpdated++;
         }
         $module->setName($data->name);
+        $module->setIsElective($data->isElective);
+
+        // KU Leuven orders module groups meaningfully (curriculum order, not alphabetical), so carry
+        // that order over as the sibling position. Only write it while the module still sits at the
+        // default 0: the tree editor normalises a whole sibling set to (i + 1) * 10 when an admin
+        // reorders it, so any non-zero position means someone arranged this module by hand and a
+        // re-import must not undo that.
+        if ($module->getPosition() === 0) {
+            $module->setPosition($position);
+        }
 
         if ($parent === null) {
             // Top-level module: belongs directly to the program.
@@ -120,6 +149,16 @@ class OnderwijsaanbodImporter
             // Nested module: reachable through its parent; program stays unset so Program::getModules
             // returns only the top level and the tree is walked via Module::getModules.
             $parent->addModule($module);
+
+            // A module that was top-level in an earlier import still carries its program FK, and
+            // nothing else ever clears it. Changing a structural option (flatten/semester/merge)
+            // can demote a former root to a child, after which Program::getModules() would keep
+            // listing it at the top level while it also renders under its new parent. Detach it so
+            // the module appears exactly once.
+            $previousProgram = $module->getProgram();
+            if ($previousProgram !== null) {
+                $previousProgram->removeModule($module);
+            }
         }
         $this->entityManager->persist($module);
 
@@ -131,8 +170,8 @@ class OnderwijsaanbodImporter
             }
         }
 
-        foreach ($data->children as $child) {
-            $this->upsertModule($child, $program, $module, $coursesByCode, $result);
+        foreach ($data->children as $index => $child) {
+            $this->upsertModule($child, $program, $module, $coursesByCode, $result, ($index + 1) * 10);
         }
     }
 
@@ -142,7 +181,8 @@ class OnderwijsaanbodImporter
     private function upsertCourse(CourseData $data, ?array $enrichment, ImportResult $result): Course
     {
         $course = $this->courseRepository->findOneBy(['code' => $data->code]);
-        if (!$course instanceof Course) {
+        $isNew = !$course instanceof Course;
+        if ($isNew) {
             $course = new Course();
             $course->setCode($data->code);
             $result->coursesCreated++;
@@ -150,19 +190,225 @@ class OnderwijsaanbodImporter
             $result->coursesUpdated++;
         }
 
+        // Every field below is admin-editable, and the import overwrites it unconditionally. Record
+        // what actually changes on an existing course so the preview can show it before anything is
+        // committed — a hand-edited name or credit value shows up here as a pending overwrite.
+        if (!$isNew) {
+            $this->recordChange($result, $course, 'name', $course->getName(), $data->name);
+            $this->recordChange($result, $course, 'language', $course->getLanguage(), $data->language);
+            $this->recordChange($result, $course, 'credits', $course->getCredits(), $data->credits);
+            $this->recordChange($result, $course, 'semesters', $course->getSemesters(), $data->semesters);
+            $this->recordChange($result, $course, 'mandatory', $course->isMandatory() ? 'yes' : 'no', $data->mandatory ? 'yes' : 'no');
+            if ($enrichment !== null) {
+                $this->recordChange($result, $course, 'professors', $course->getProfessors(), $enrichment['professors']);
+            }
+        }
+
         $course->setName($data->name);
         $course->setLanguage($data->language);
         $course->setCredits($data->credits);
         $course->setSemesters($data->semesters);
+        $course->setMandatory($data->mandatory);
 
-        if ($enrichment !== null && $enrichment['professors'] !== []) {
+        // A null $enrichment means the OPO index had nothing for this code (or enrichment was
+        // switched off), so the stored professors are all we know and must be left alone. When the
+        // document *was* found it is authoritative — including when it lists nobody, otherwise a
+        // course whose teaching staff was removed upstream would keep the old names forever.
+        if ($enrichment !== null) {
             $course->setProfessors($enrichment['professors']);
-            $result->enrichedCourses++;
+            if ($enrichment['professors'] !== []) {
+                $result->enrichedCourses++;
+            }
         }
 
         $this->entityManager->persist($course);
 
         return $course;
+    }
+
+    /**
+     * Bring identical-course links in line with the OPO index, adding what is missing and removing
+     * what is gone.
+     *
+     * Removal is deliberately narrow: a link is only dropped when **both** courses took part in
+     * this import *and* the index returned a document for both, i.e. when the importer has
+     * authoritative data for the pair and could have created that link itself. Links reaching a
+     * course outside this programme, or one whose document was not found, are left alone — those
+     * may well have been added by an admin, and `Course::addIdenticalCourse()` mirrors the relation
+     * so a wrong removal would silently affect both sides.
+     *
+     * The desired set is built as an unordered pair set first, so an asymmetric answer from the API
+     * (A lists B, B does not list A) cannot make two passes fight over the same link.
+     *
+     * @param array<string, Course>                                                 $coursesByCode
+     * @param array<string, array{professors: list<string>, identical: list<string>}> $enrichment
+     */
+    private function syncIdenticalCourses(array $coursesByCode, array $enrichment, ImportResult $result): void
+    {
+        /** @var array<string, string> $before code => comma-joined identical codes */
+        $before = [];
+        foreach ($coursesByCode as $code => $course) {
+            $before[$code] = implode(', ', $this->identicalCodes($course));
+        }
+
+        /** @var array<string, true> $desiredPairs */
+        $desiredPairs = [];
+        foreach ($coursesByCode as $code => $course) {
+            foreach ($enrichment[$code]['identical'] ?? [] as $identicalCode) {
+                $identical = $coursesByCode[$identicalCode] ?? $this->courseRepository->findOneBy(['code' => $identicalCode]);
+                if ($identical instanceof Course && $identical !== $course) {
+                    $course->addIdenticalCourse($identical);
+                    $desiredPairs[$this->pairKey($code, $identicalCode)] = true;
+                }
+            }
+        }
+
+        foreach ($coursesByCode as $code => $course) {
+            if (!isset($enrichment[$code])) {
+                // No authoritative answer for this course: never drop any of its links.
+                continue;
+            }
+            foreach ($course->getIdenticalCourses()->toArray() as $linked) {
+                $linkedCode = $linked->getCode();
+                if (!isset($coursesByCode[$linkedCode], $enrichment[$linkedCode])) {
+                    continue;
+                }
+                if (isset($desiredPairs[$this->pairKey($code, $linkedCode)])) {
+                    continue;
+                }
+                $course->removeIdenticalCourse($linked);
+            }
+        }
+
+        foreach ($coursesByCode as $code => $course) {
+            $after = implode(', ', $this->identicalCodes($course));
+            if ($after !== $before[$code]) {
+                $result->addCourseChange(
+                    $code,
+                    $course->getName(),
+                    'identicalCourses',
+                    $before[$code] === '' ? '—' : $before[$code],
+                    $after === '' ? '—' : $after,
+                );
+            }
+        }
+    }
+
+    /**
+     * @return list<string> sorted, so the comparison ignores collection order
+     */
+    private function identicalCodes(Course $course): array
+    {
+        $codes = array_map(static fn (Course $c): string => $c->getCode(), $course->getIdenticalCourses()->toArray());
+        sort($codes);
+
+        return $codes;
+    }
+
+    /**
+     * Order-independent key for a pair of course codes.
+     */
+    private function pairKey(string $a, string $b): string
+    {
+        return $a < $b ? $a . '|' . $b : $b . '|' . $a;
+    }
+
+    /**
+     * Report courses that are still attached to this programme's import-managed modules but no
+     * longer appear anywhere in the incoming tree — KU Leuven dropped them from the programme.
+     *
+     * They are only reported, never unlinked: a course carries user comments and documents, and
+     * deciding what to do with a course that left the curriculum is an admin's call, not the
+     * importer's. This is the reporting half the class docblock has always claimed.
+     *
+     * @param array<string, Course> $coursesByCode courses present in the incoming tree
+     */
+    private function reportRemovedCourses(ProgramData $data, array $coursesByCode, ImportResult $result): void
+    {
+        $incoming = [];
+        foreach (array_keys($coursesByCode) as $code) {
+            $incoming[$code] = true;
+        }
+
+        /** @var array<string, string> $stale code => "module name" */
+        $stale = [];
+        foreach ($this->collectModuleKulIds($data->modules) as $kulId) {
+            $module = $this->moduleRepository->findOneByKulId($kulId);
+            if (!$module instanceof Module) {
+                continue;
+            }
+            foreach ($module->getCourses() as $course) {
+                $code = $course->getCode();
+                if (!isset($incoming[$code]) && !isset($stale[$code])) {
+                    $stale[$code] = $module->getName();
+                }
+            }
+        }
+
+        foreach ($stale as $code => $moduleName) {
+            $result->addWarning(
+                sprintf(
+                    'Course %s is still linked to "%s" but is no longer in the KU Leuven programme; left in place.',
+                    $code,
+                    $moduleName,
+                )
+            );
+        }
+    }
+
+    /**
+     * @param list<ModuleData> $modules
+     *
+     * @return list<string>
+     */
+    private function collectModuleKulIds(array $modules): array
+    {
+        $ids = [];
+        foreach ($modules as $module) {
+            $ids[] = $module->kulId;
+            foreach ($this->collectModuleKulIds($module->children) as $childId) {
+                $ids[] = $childId;
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * Note a field the import is about to overwrite on an existing course, unless the value is
+     * already identical. Arrays are compared order-insensitively so a reshuffled professor list
+     * does not read as a change.
+     *
+     * @param list<string>|string|int|null $old
+     * @param list<string>|string|int|null $new
+     */
+    private function recordChange(ImportResult $result, Course $course, string $field, array|string|int|null $old, array|string|int|null $new): void
+    {
+        if (is_array($old) && is_array($new)) {
+            $a = $old;
+            $b = $new;
+            sort($a);
+            sort($b);
+            if ($a === $b) {
+                return;
+            }
+        } elseif ($old === $new) {
+            return;
+        }
+
+        $result->addCourseChange($course->getCode(), $course->getName(), $field, $this->display($old), $this->display($new));
+    }
+
+    /**
+     * @param list<string>|string|int|null $value
+     */
+    private function display(array|string|int|null $value): string
+    {
+        if (is_array($value)) {
+            return $value === [] ? '—' : implode(', ', $value);
+        }
+
+        return $value === null || $value === '' ? '—' : (string) $value;
     }
 
     /**

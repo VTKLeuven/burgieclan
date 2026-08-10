@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ProgramRepository;
+use App\Service\Onderwijsaanbod\ProgramTreeMapper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -125,7 +126,7 @@ class Program extends BaseEntity
     /**
      * Return saved import settings with defaults applied for any missing keys.
      *
-     * @return array{lang: 'nl'|'en', flatten: list<string>, semester: list<string>, merge: bool, enrich: bool}
+     * @return array{lang: 'nl'|'en', flatten: list<string>, semester: list<string>, merge: bool, enrich: bool, electiveGrouping: string}
      */
     public function getResolvedImportSettings(): array
     {
@@ -144,6 +145,9 @@ class Program extends BaseEntity
             'semester' => $semester,
             'merge' => (bool) ($s['merge'] ?? true),
             'enrich' => (bool) ($s['enrich'] ?? true),
+            'electiveGrouping' => in_array($s['electiveGrouping'] ?? null, ProgramTreeMapper::ELECTIVE_GROUPINGS, true)
+                ? (string) $s['electiveGrouping']
+                : ProgramTreeMapper::ELECTIVES_PER_TRACK,
         ];
     }
 }
