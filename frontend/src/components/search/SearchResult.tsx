@@ -1,6 +1,8 @@
 import { ComboboxOption } from "@headlessui/react";
 import { Course, Document, Module, Program } from "@/types/entities";
 import clsx from "clsx";
+import { useTranslation } from 'react-i18next';
+import { localizedCourseName } from '@/utils/courseName';
 
 type SearchResultProps = {
     mainResult: string;
@@ -24,7 +26,8 @@ export default function SearchResult({ mainResult, extraInfo, redirect }: Search
 }
 
 export function CourseSearchResult({ course }: { course: Course }) {
-    return <SearchResult mainResult={course.name!} extraInfo={course.code}
+    const { i18n } = useTranslation();
+    return <SearchResult mainResult={localizedCourseName(course, i18n.language)} extraInfo={course.code}
         redirect={"/course/" + course.id} />
 }
 
@@ -38,6 +41,7 @@ export function ProgramSearchResult({ program }: { program: Program }) {
 }
 
 export function DocumentSearchResult({ document }: { document: Document }) {
-    return <SearchResult mainResult={document.name!} extraInfo={document.course!.name}
+    const { i18n } = useTranslation();
+    return <SearchResult mainResult={document.name!} extraInfo={localizedCourseName(document.course, i18n.language)}
         redirect={"/document/" + document.id} />
 }

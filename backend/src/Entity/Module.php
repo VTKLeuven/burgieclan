@@ -17,9 +17,14 @@ class Module extends BaseEntity
 
     /**
      * KU Leuven onderwijsaanbod identifier used to match this module when (re-)importing.
-     * In "named" grouping this is the KU Leuven moduleGroupId; in "stage" grouping it is a
-     * synthetic key like "stage:<programId>:<n>". Null for manually created modules, which
-     * the importer never touches.
+     *
+     * Normally the programme-scoped moduleGroupId ("<programId>:<moduleGroupId>"). Folders that the
+     * structural transforms invent instead carry one of ProgramTreeMapper::SYNTHETIC_KULID_PREFIXES
+     * ("sem:", "semflat:", "semopt:", "keuzepakketten:") — the importer uses that to tell an admin
+     * whether a detached module vanished because KU Leuven dropped it or because an import option
+     * changed.
+     *
+     * Null for manually created modules, which the importer never touches.
      */
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $kulId = null;

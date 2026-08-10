@@ -5,6 +5,8 @@ import FavoriteDocuments from "@/components/documentcategorypage/FavoriteDocumen
 import DynamicBreadcrumb from "@/components/ui/DynamicBreadcrumb";
 import type { Course, DocumentCategory } from "@/types/entities";
 import { FileText } from "lucide-react";
+import { localizedCourseName } from '@/utils/courseName';
+import { useTranslation } from 'react-i18next';
 
 interface DocumentCategoryPageProps {
     category: DocumentCategory;
@@ -12,6 +14,7 @@ interface DocumentCategoryPageProps {
 }
 
 export default function DocumentCategoryPage({ category, course }: DocumentCategoryPageProps) {
+    const { i18n } = useTranslation();
     return (
         <div className="vtk-shell pb-16">
             <div className="vtk-page-head">
@@ -23,7 +26,7 @@ export default function DocumentCategoryPage({ category, course }: DocumentCateg
                         <FileText className="mt-1.5 h-6 w-6 shrink-0 text-vtk-muted" />
                         <h1 className="vtk-page-title">{category.name}</h1>
                     </div>
-                    <p className="vtk-page-subtitle">{course.name}</p>
+                    <p className="vtk-page-subtitle">{localizedCourseName(course, i18n.language)}</p>
                 </div>
             </div>
 

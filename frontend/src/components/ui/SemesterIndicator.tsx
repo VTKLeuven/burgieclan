@@ -6,14 +6,32 @@ interface SemesterIndicatorProps {
     size?: number;
 }
 
+/**
+ * Half circle = taught in that semester, full circle = year course, nothing = unknown.
+ *
+ * The "nothing" case matters: courses whose KU Leuven offerPeriod is neither 1, 2 nor 3 (notably
+ * the ones marked "not offered") arrive with an empty semesters array. The previous version tested
+ * `!Array.isArray(semesters)` first, so an empty array fell through to the SVG and, because
+ * `includes("Semester 1")` was false, took the mirrored transform — drawing the Semester 2 icon for
+ * every course with no semester data at all.
+ */
 const SemesterIndicator: React.FC<SemesterIndicatorProps> = ({
     semesters,
     size = 24
 }) => {
     const sizeStyle = { width: `${size}px`, height: `${size}px` };
 
-    if (!Array.isArray(semesters) || semesters.includes("Semester 1") && semesters.includes("Semester 2")) {
-        // Default - empty circle outline
+    const list = Array.isArray(semesters) ? semesters : semesters ? [semesters] : [];
+    const first = list.includes("Semester 1");
+    const second = list.includes("Semester 2");
+
+    // Nothing known — say nothing. Claiming a semester here is worse than leaving the cell empty,
+    // and it also keeps the full circle below unambiguous: it now only ever means "year course".
+    if (!first && !second) {
+        return null;
+    }
+
+    if (first && second) {
         return <Circle style={sizeStyle} />;
     }
 
@@ -27,7 +45,7 @@ const SemesterIndicator: React.FC<SemesterIndicatorProps> = ({
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            transform={semesters.includes("Semester 1") ? "" : "scale(-1, 1)"}
+            transform={first ? "" : "scale(-1, 1)"}
         >
             <path d="M12 2a10 10 0 0 0 0 20" />
             <path d="M12 2v20" />

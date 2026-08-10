@@ -87,6 +87,7 @@ class OnderwijsaanbodImporter
             $this->upsertModule($moduleData, $program, null, $coursesByCode, $result, ($index + 1) * 10);
         }
 
+        $this->pruneStaleModules($data, $program, $result);
         $this->reportRemovedCourses($data, $coursesByCode, $result);
 
         // Flush in both cases: on a dry run the surrounding transaction is rolled back, so the
@@ -204,6 +205,8 @@ class OnderwijsaanbodImporter
         // committed — a hand-edited name or credit value shows up here as a pending overwrite.
         if (!$isNew) {
             $this->recordChange($result, $course, 'name', $course->getName(), $data->name);
+            $this->recordChange($result, $course, 'nameNl', $course->getNameNl(), $data->nameNl);
+            $this->recordChange($result, $course, 'nameEn', $course->getNameEn(), $data->nameEn);
             $this->recordChange($result, $course, 'language', $course->getLanguage(), $data->language);
             $this->recordChange($result, $course, 'credits', $course->getCredits(), $data->credits);
             $this->recordChange($result, $course, 'semesters', $course->getSemesters(), $data->semesters);
@@ -213,6 +216,15 @@ class OnderwijsaanbodImporter
         }
 
         $course->setName($data->name);
+        // Only overwrite a stored translation when KU Leuven actually published one. A programme
+        // that ships titles in a single language must not wipe the other language's title that an
+        // earlier import of a different programme already recorded for this shared course.
+        if ($data->nameNl !== null) {
+            $course->setNameNl($data->nameNl);
+        }
+        if ($data->nameEn !== null) {
+            $course->setNameEn($data->nameEn);
+        }
         $course->setLanguage($data->language);
         $course->setCredits($data->credits);
         $course->setSemesters($data->semesters);
@@ -361,6 +373,112 @@ class OnderwijsaanbodImporter
                 )
             );
         }
+    }
+
+    /**
+     * Detach modules that the programme's stored tree still holds but the incoming tree no longer
+     * produces. Without this the importer only ever adds: changing a structural option leaves the
+     * previous shape attached next to the new one, so "Common Compulsory Courses" ends up holding
+     * both its four named groups *and* the four Semester folders built from those same courses —
+     * every course rendered twice, the two sets interleaved because both were numbered 10..40.
+     *
+     * Detach, not delete. An orphaned module keeps its hand-set position and its course links, so
+     * switching an option back re-adopts it exactly as it was (upsertModule finds it by kulId).
+     * Deleting would also mean deciding what happens to the users who favourited it.
+     *
+     * Three rules keep this from touching anything an admin owns:
+     *  - modules without a kulId were created by hand; they are never detached and never descended
+     *    into, so a manual folder can hold whatever an admin put in it;
+     *  - descent only continues through modules the incoming tree also contains, so a subtree an
+     *    admin re-parented under something manual is out of reach;
+     *  - a stale module is detached but not descended into, leaving its own children hanging off it
+     *    ready for re-adoption rather than shredding the subtree.
+     */
+    private function pruneStaleModules(ProgramData $data, Program $program, ImportResult $result): void
+    {
+        /** @var array<string, true> $incoming */
+        $incoming = [];
+        foreach ($this->collectModuleKulIds($data->modules) as $kulId) {
+            $incoming[$kulId] = true;
+        }
+
+        // $modules is a self-referencing ManyToMany, so nothing in the schema forbids a cycle.
+        /** @var array<int, true> $visited */
+        $visited = [];
+        $this->pruneChildren($program->getModules()->toArray(), $incoming, $visited, $result, $program, null);
+    }
+
+    /**
+     * @param list<Module>          $children
+     * @param array<string, true>   $incoming kulIds the incoming tree contains
+     * @param array<int, true>      $visited  module ids already walked
+     */
+    private function pruneChildren(
+        array $children,
+        array $incoming,
+        array &$visited,
+        ImportResult $result,
+        Program $program,
+        ?Module $parent,
+    ): void {
+        foreach ($children as $child) {
+            $kulId = $child->getKulId();
+            if ($kulId === null) {
+                continue;
+            }
+
+            if (!isset($incoming[$kulId])) {
+                if ($parent === null) {
+                    $program->removeModule($child);
+                } else {
+                    $parent->removeModule($child);
+                }
+                $result->modulesDetached++;
+                $result->addWarning($this->describeDetachment($child, $parent, $result->dryRun));
+
+                continue;
+            }
+
+            $id = $child->getId();
+            if ($id !== null && isset($visited[$id])) {
+                continue;
+            }
+            if ($id !== null) {
+                $visited[$id] = true;
+            }
+
+            $this->pruneChildren($child->getModules()->toArray(), $incoming, $visited, $result, $program, $child);
+        }
+    }
+
+    /**
+     * Why a module was detached, in the admin's terms rather than the importer's.
+     *
+     * A "Semester 3" or "Keuzepakketten" folder only ever existed because of the structural options
+     * chosen for the import, so it vanishing means those options changed — saying KU Leuven dropped
+     * it would send an admin looking for a curriculum change that never happened. A real module
+     * group disappearing is the opposite: nothing changed here, the source did.
+     */
+    private function describeDetachment(Module $module, ?Module $parent, bool $dryRun): string
+    {
+        $synthetic = false;
+        foreach (ProgramTreeMapper::SYNTHETIC_KULID_PREFIXES as $prefix) {
+            if (str_starts_with((string) $module->getKulId(), $prefix)) {
+                $synthetic = true;
+                break;
+            }
+        }
+
+        return sprintf(
+            '%s "%s" %s %s %s; its courses and position are kept in case the structure changes back.',
+            $synthetic ? 'Folder' : 'Module',
+            $module->getName(),
+            $synthetic
+                ? 'was built by structure options this import no longer uses, so it is'
+                : 'is no longer in the KU Leuven programme, so it is',
+            $dryRun ? 'about to be detached from' : 'detached from',
+            $parent === null ? 'the programme' : sprintf('"%s"', $parent->getName()),
+        );
     }
 
     /**

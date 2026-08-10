@@ -17,12 +17,13 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { localizedCourseName } from '@/utils/courseName';
 
 export default function CoursePage() {
     const { id: courseId } = useParams();
     const [course, setCourse] = useState<Course | null>(null);
     const { loading: userLoading, refreshUser } = useUser();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { request, loading, error } = useApi();
 
     useEffect(() => {
@@ -43,11 +44,13 @@ export default function CoursePage() {
         }
     }, [courseId, userLoading, request]);
 
+    const courseName = localizedCourseName(course, i18n.language);
+
     useEffect(() => {
-        if (course?.name) {
-            document.title = `${course.name} | Burgieclan`;
+        if (courseName) {
+            document.title = `${courseName} | Burgieclan`;
         }
-    }, [course?.name]);
+    }, [courseName]);
 
     const handleCommentsUpdate = (newComments: CourseComment[]) => {
         if (course) {
@@ -92,7 +95,7 @@ export default function CoursePage() {
                                     refreshUser();
                                 }}
                             />
-                            <h1 className="vtk-page-title">{course.name}</h1>
+                            <h1 className="vtk-page-title">{courseName}</h1>
                         </div>
 
                         <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-vtk-body">
@@ -103,14 +106,17 @@ export default function CoursePage() {
                                 {course.credits} {t('credits')}
                             </span>
 
-                            <span className="flex items-center gap-2">
-                                <SemesterIndicator semesters={course.semesters} size={15} />
-                                {Array.isArray(course.semesters)
-                                    ? (course.semesters.includes("Semester 1") && course.semesters.includes("Semester 2"))
-                                        ? t('Year course')
-                                        : course.semesters.join(", ")
-                                    : course.semesters}
-                            </span>
+                            {/* Skipped entirely when the semester is unknown: the indicator renders
+                                nothing in that case, so the span would be an empty flex item and
+                                the row would show a stray gap. */}
+                            {(course.semesters?.length ?? 0) > 0 && (
+                                <span className="flex items-center gap-2">
+                                    <SemesterIndicator semesters={course.semesters} size={15} />
+                                    {course.semesters!.includes("Semester 1") && course.semesters!.includes("Semester 2")
+                                        ? t('course-page.year-course')
+                                        : course.semesters!.join(", ")}
+                                </span>
+                            )}
 
                             <Link
                                 href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`}
