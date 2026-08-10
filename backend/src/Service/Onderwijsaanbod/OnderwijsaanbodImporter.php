@@ -162,12 +162,21 @@ class OnderwijsaanbodImporter
         }
         $this->entityManager->persist($module);
 
+        // The KU Leuven mandatory flag sits on each course entry but never varies within a group,
+        // so it is stored once on the module. A module with no courses of its own keeps the default.
+        $mandatory = null;
         foreach ($data->courses as $courseData) {
             $course = $coursesByCode[$courseData->code] ?? null;
             if ($course instanceof Course) {
                 $module->addCourse($course);
                 $result->courseLinks++;
             }
+            // Should the API ever disagree within one group, the compulsory reading wins: showing a
+            // course as required when it is optional is the safer of the two errors for a student.
+            $mandatory = ($mandatory ?? false) || $courseData->mandatory;
+        }
+        if ($mandatory !== null) {
+            $module->setCoursesMandatory($mandatory);
         }
 
         foreach ($data->children as $index => $child) {
@@ -198,7 +207,6 @@ class OnderwijsaanbodImporter
             $this->recordChange($result, $course, 'language', $course->getLanguage(), $data->language);
             $this->recordChange($result, $course, 'credits', $course->getCredits(), $data->credits);
             $this->recordChange($result, $course, 'semesters', $course->getSemesters(), $data->semesters);
-            $this->recordChange($result, $course, 'mandatory', $course->isMandatory() ? 'yes' : 'no', $data->mandatory ? 'yes' : 'no');
             if ($enrichment !== null) {
                 $this->recordChange($result, $course, 'professors', $course->getProfessors(), $enrichment['professors']);
             }
@@ -208,7 +216,6 @@ class OnderwijsaanbodImporter
         $course->setLanguage($data->language);
         $course->setCredits($data->credits);
         $course->setSemesters($data->semesters);
-        $course->setMandatory($data->mandatory);
 
         // A null $enrichment means the OPO index had nothing for this code (or enrichment was
         // switched off), so the stored professors are all we know and must be left alone. When the

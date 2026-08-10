@@ -49,13 +49,6 @@ class Course extends BaseEntity
     private ?int $credits = null;
 
     /**
-     * Whether the course is compulsory within the module that offers it. Comes from the KU Leuven
-     * `mandatory` flag on the course entry; true for manually created courses.
-     */
-    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
-    private bool $mandatory = true;
-
-    /**
      * @var Collection<int, self>
      */
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'newCourses')]
@@ -235,18 +228,6 @@ class Course extends BaseEntity
     public function setCredits(?int $credits): self
     {
         $this->credits = $credits;
-
-        return $this;
-    }
-
-    public function isMandatory(): bool
-    {
-        return $this->mandatory;
-    }
-
-    public function setMandatory(bool $mandatory): self
-    {
-        $this->mandatory = $mandatory;
 
         return $this;
     }
