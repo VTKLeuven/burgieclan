@@ -118,21 +118,11 @@ const ModuleNode = ({
 
             <div className={`transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100 overflow-visible' : 'max-h-0 opacity-0 overflow-hidden'}`}>
                 <div className="pl-4 mt-1 space-y-1">
-                    {/* Render submodules recursively */}
-                    {module.modules?.map(submodule => (
-                        <ModuleNode
-                            key={submodule.id}
-                            module={submodule}
-                            autoExpand={autoExpand}
-                            searchFilters={searchFilters}
-                            favoriteCourses={favoriteCourses}
-                            parentVisible={expanded}
-                        />
-                    ))}
-
-                    {/* Render courses */}
+                    {/* Courses this module teaches itself come first: they belong to the module you
+                        just opened, whereas submodules are a level down. Putting the submodules
+                        first pushed a module's own courses below an arbitrarily deep subtree. */}
                     {module.courses && module.courses.length > 0 && (
-                        <div className="border border-vtk-line rounded-md mt-1">
+                        <div className="border border-vtk-line rounded-md">
                             <CourseTableHeader />
                             {module.courses.map((course, index) => (
                                 <CourseRow
@@ -145,6 +135,18 @@ const ModuleNode = ({
                             ))}
                         </div>
                     )}
+
+                    {/* Render submodules recursively */}
+                    {module.modules?.map(submodule => (
+                        <ModuleNode
+                            key={submodule.id}
+                            module={submodule}
+                            autoExpand={autoExpand}
+                            searchFilters={searchFilters}
+                            favoriteCourses={favoriteCourses}
+                            parentVisible={expanded}
+                        />
+                    ))}
 
                     {/* Empty state when no submodules and no courses */}
                     {(!module.modules || module.modules.length === 0) &&
