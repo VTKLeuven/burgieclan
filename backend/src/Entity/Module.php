@@ -47,6 +47,22 @@ class Module extends BaseEntity
     private bool $isElective = false;
 
     /**
+     * Whether the courses in this module are compulsory.
+     *
+     * KU Leuven puts a `mandatory` flag on each course entry, but it never varies inside a group:
+     * across ten engineering programmes, 0 of 193 course-holding groups had mixed values. So it is
+     * a property of the module, not of the course — and storing it on the shared Course row (as an
+     * earlier attempt did) let whichever programme was imported last win, because a course can be
+     * compulsory in one programme and elective in another (67 of 172 shared courses differ).
+     *
+     * Independent of $isElective: a type=01 "Optie" group can hold compulsory courses (45 groups)
+     * and a type=02 "Groep" can hold non-compulsory ones (105 groups). Different questions —
+     * "is this a choice you make" versus "must you pass these".
+     */
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+    private bool $coursesMandatory = true;
+
+    /**
      * @var Collection<int, Course>
      */
     #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'modules')]
@@ -106,6 +122,18 @@ class Module extends BaseEntity
     public function setPosition(int $position): self
     {
         $this->position = $position;
+
+        return $this;
+    }
+
+    public function areCoursesMandatory(): bool
+    {
+        return $this->coursesMandatory;
+    }
+
+    public function setCoursesMandatory(bool $coursesMandatory): self
+    {
+        $this->coursesMandatory = $coursesMandatory;
 
         return $this;
     }
