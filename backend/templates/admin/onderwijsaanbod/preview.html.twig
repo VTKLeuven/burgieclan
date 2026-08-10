@@ -216,8 +216,12 @@
                 <input type="hidden" name="enrich" value="{{ options.enrich ? '1' : '0' }}">
                 <input type="hidden" name="merge" value="{{ options.merge ? '1' : '0' }}">
                 <input type="hidden" name="electiveGrouping" value="{{ options.electiveGrouping }}">
+                {# Every structural option has to be replayed here. The commit posts a fresh request,
+                   so anything missing silently reverts to its default and the import writes a tree
+                   that does not match the preview above. #}
                 {% for id in options.flatten %}<input type="hidden" name="flatten[]" value="{{ id }}">{% endfor %}
                 {% for id in options.semester %}<input type="hidden" name="semester[]" value="{{ id }}">{% endfor %}
+                {% for id in options.semesterFlat %}<input type="hidden" name="semesterFlat[]" value="{{ id }}">{% endfor %}
 
                 <button type="submit" class="btn btn-primary">Confirm import</button>
                 <a href="{{ path('admin_onderwijsaanbod_import') }}" class="btn btn-secondary">Back</a>
