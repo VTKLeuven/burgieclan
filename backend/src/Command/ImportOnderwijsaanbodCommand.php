@@ -120,6 +120,20 @@ class ImportOnderwijsaanbodCommand extends Command
             ['Courses enriched' => (string) $result->enrichedCourses],
         );
 
+        if ($result->courseChanges !== []) {
+            $io->section(sprintf('%d field(s) overwritten on existing courses', count($result->courseChanges)));
+            $io->table(
+                ['Course', 'Field', 'Current', $dryRun ? 'Would become' : 'Now'],
+                array_map(
+                    static fn (array $c): array => [$c['code'] . ' ' . $c['course'], $c['field'], $c['from'], $c['to']],
+                    array_slice($result->courseChanges, 0, 40),
+                ),
+            );
+            if (count($result->courseChanges) > 40) {
+                $io->writeln(sprintf('<comment>… and %d more</comment>', count($result->courseChanges) - 40));
+            }
+        }
+
         foreach ($result->warnings as $warning) {
             $io->warning($warning);
         }

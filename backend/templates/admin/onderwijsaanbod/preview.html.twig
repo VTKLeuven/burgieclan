@@ -133,6 +133,56 @@
 
             <div class="alert alert-info">Nothing has been written yet. Review the tree below and confirm to import.</div>
 
+            {% if summary.warnings is not empty %}
+                <div class="alert alert-warning">
+                    <strong>{{ summary.warnings|length }} course(s) no longer in the KU Leuven programme.</strong>
+                    They stay linked and keep their comments and documents — remove them in the tree editor if you want them gone.
+                    <ul class="mb-0 mt-2">
+                        {% for warning in summary.warnings %}<li>{{ warning }}</li>{% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            {# ---- What this import would overwrite on courses that already exist ---- #}
+            {% if summary.courseChanges is not empty %}
+                <div class="content-panel">
+                    <div class="content-panel-header">
+                        <div class="content-panel-title">
+                            Existing courses that would change
+                            <span class="badge badge-warning">{{ summary.courseChanges|length }}</span>
+                        </div>
+                    </div>
+                    <div class="content-panel-body">
+                        <p class="text-muted small">
+                            These fields are also editable in the admin, so anything changed by hand will be
+                            replaced by the KU Leuven value below.
+                        </p>
+                        <div class="table-responsive">
+                            <table class="table datagrid">
+                                <thead>
+                                    <tr>
+                                        <th>Course</th>
+                                        <th>Field</th>
+                                        <th>Current</th>
+                                        <th>After import</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for change in summary.courseChanges %}
+                                        <tr>
+                                            <td><code>{{ change.code }}</code> {{ change.course }}</td>
+                                            <td>{{ change.field }}</td>
+                                            <td class="text-muted">{{ change.from }}</td>
+                                            <td><strong>{{ change.to }}</strong></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
             <div class="onderwijsaanbod-tree mb-4">
                 <ul>
                     {% for module in program.modules %}

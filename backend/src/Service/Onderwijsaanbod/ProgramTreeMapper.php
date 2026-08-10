@@ -83,7 +83,7 @@ class ProgramTreeMapper
             $language,
         ) ?? $programId;
 
-        $roots = $this->buildNamedTree($programSet, $language);
+        $roots = $this->buildNamedTree($programSet, $language, $programId);
         $roots = $this->unwrapRedundantProgramRoots($roots, $name);
 
         if ($semesterKeys !== []) {
@@ -130,7 +130,7 @@ class ProgramTreeMapper
      *
      * @return list<ModuleData>
      */
-    private function buildNamedTree(array $programSet, string $language): array
+    private function buildNamedTree(array $programSet, string $language, string $programId): array
     {
         /** @var array<string, array<string, mixed>> $groups indexed by moduleGroupId */
         $groups = [];
@@ -153,7 +153,10 @@ class ProgramTreeMapper
             // moduleGroupType "01" = Optie (elective), "02" = Groep (compulsory structural group).
             // Those are the only two values the API uses.
             $isElective = (string) ($group['moduleGroupType'] ?? '') === '01';
-            $module = new ModuleData($id, $name, isElective: $isElective);
+            // Namespaced with the programId: KU Leuven reuses a moduleGroupId across programmes
+            // (76 of 1696 in the corpus), and the importer matches modules on kulId alone, so a
+            // bare id would let importing one programme re-parent another programme's module.
+            $module = new ModuleData($this->scopedKulId($programId, $id), $name, isElective: $isElective);
             foreach ($this->coursesOf($group, $language) as $course) {
                 $this->addCourseOnce($module, $course);
             }
@@ -546,12 +549,30 @@ class ProgramTreeMapper
     }
 
     /**
+     * Namespace a KU Leuven moduleGroupId with the programme it belongs to, so modules stay
+     * distinct per programme even when KU Leuven reuses the id.
+     */
+    private function scopedKulId(string $programId, string $moduleGroupId): string
+    {
+        return $programId . ':' . $moduleGroupId;
+    }
+
+    /**
      * @param list<string> $keys moduleGroupIds or (case-insensitive) group names
      */
     private function matches(ModuleData $module, array $keys): bool
     {
         foreach ($keys as $key) {
-            if ($module->kulId === $key || mb_strtolower(trim($module->name)) === mb_strtolower(trim($key))) {
+            // The bare moduleGroupId is still accepted alongside the namespaced one: saved import
+            // settings and CLI invocations from before the namespacing carry the raw id.
+            $bare = str_contains($module->kulId, ':')
+                ? substr($module->kulId, (int) strpos($module->kulId, ':') + 1)
+                : $module->kulId;
+            if (
+                $module->kulId === $key
+                || $bare === $key
+                || mb_strtolower(trim($module->name)) === mb_strtolower(trim($key))
+            ) {
                 return true;
             }
         }
@@ -635,7 +656,6 @@ class ProgramTreeMapper
             semesters: $this->semestersOf($module),
             mandatory: filter_var($module['mandatory'] ?? true, FILTER_VALIDATE_BOOL),
             stage: isset($module['stageStart']) && is_numeric($module['stageStart']) ? (int) $module['stageStart'] : null,
-            kulModuleId: isset($module['moduleId']) ? (string) $module['moduleId'] : null,
         );
     }
 
