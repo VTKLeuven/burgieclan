@@ -3,6 +3,7 @@ import type { Course, Module, Program } from '@/types/entities';
 import { captureException } from "@sentry/nextjs";
 import type { FuseResult } from 'fuse.js';
 import { FuseBudgetSearch } from './fuseBudgetSearch';
+import { courseNameVariants } from '@/utils/courseName';
 
 // Persistent budget-aware Fuse instances
 let coursesBudgetFuse: FuseBudgetSearch<Course> | null = null;
@@ -102,9 +103,12 @@ export function courseMatchesText(course: Course, searchQuery?: string): boolean
   if (!searchQuery) return false;
 
   // Quick exact match check first (performance optimization)
+  // Match every title the course is known by: a student typing "distributed" should find a course
+  // stored under its Dutch name, whichever language they are browsing in.
+  const needle = searchQuery.toLowerCase();
   if (
-    course.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    course.code?.toLowerCase().includes(searchQuery.toLowerCase())
+    courseNameVariants(course).some(name => name.toLowerCase().includes(needle)) ||
+    course.code?.toLowerCase().includes(needle)
   ) {
     return true;
   }

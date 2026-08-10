@@ -11,7 +11,9 @@ import { Star } from "lucide-react";
 import Link from "next/link";
 import { memo, useCallback, useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { useTranslation } from 'react-i18next';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { localizedCourseName } from '@/utils/courseName';
 
 interface CourseRowProps {
     course: Course;
@@ -27,6 +29,7 @@ export const CourseRow = memo(({
     parentVisible = true,
 }: CourseRowProps) => {
     const { user } = useUser();
+    const { i18n } = useTranslation();
     const { updateFavorite } = useFavorites(user);
     const [course, setCourse] = useState<Course | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -96,7 +99,7 @@ export const CourseRow = memo(({
         star: <Skeleton circle width={16} height={16} />,
         professor: <Skeleton circle width={28} height={28} />
     } : {
-        name: course.name,
+        name: localizedCourseName(course, i18n.language),
         code: course.code,
         credits: (
             <span className="vtk-badge vtk-badge-muted">

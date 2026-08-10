@@ -29,6 +29,12 @@ class CourseCrudController extends AbstractCrudController
     {
         yield IdField::new('id')->onlyOnDetail();
         yield TextField::new('name');
+        yield TextField::new('nameNl', 'Name (NL)')
+            ->setHelp('Dutch title from KU Leuven. Empty falls back to Name.')
+            ->hideOnIndex();
+        yield TextField::new('nameEn', 'Name (EN)')
+            ->setHelp('English title from KU Leuven. Empty falls back to Name.')
+            ->hideOnIndex();
         yield TextField::new('code');
         yield ChoiceField::new('language')
             ->setChoices(

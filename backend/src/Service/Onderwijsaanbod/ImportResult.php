@@ -12,6 +12,7 @@ class ImportResult
     public bool $programCreated = false;
     public int $modulesCreated = 0;
     public int $modulesUpdated = 0;
+    public int $modulesDetached = 0;
     public int $coursesCreated = 0;
     public int $coursesUpdated = 0;
     public int $courseLinks = 0;
@@ -55,6 +56,7 @@ class ImportResult
             'programCreated' => $this->programCreated,
             'modulesCreated' => $this->modulesCreated,
             'modulesUpdated' => $this->modulesUpdated,
+            'modulesDetached' => $this->modulesDetached,
             'coursesCreated' => $this->coursesCreated,
             'coursesUpdated' => $this->coursesUpdated,
             'courseLinks' => $this->courseLinks,

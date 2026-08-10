@@ -24,9 +24,31 @@ class Course extends BaseEntity
         'Semester 2' => 'Semester 2',
     ];
 
+    /**
+     * Display name in the language the programme was imported in. Kept as the single non-null
+     * name so search, admin lists and every existing API consumer keep working unchanged.
+     */
     #[ORM\Column(type: Types::STRING, length: 255)]
     #[Assert\NotBlank]
     private string $name;
+
+    /**
+     * The Dutch and English titles KU Leuven publishes for this course.
+     *
+     * A course carries both: of the 86 courses in Master of Materials Engineering all 86 have an NL
+     * and an EN title, and 79 of those differ ("Gedistribueerde systemen" / "Distributed Systems"
+     * for H0N08A). Storing only one meant the import language decided it — and since 66 courses in
+     * this database belong to more than one programme, importing one programme in Dutch silently
+     * renamed the same course inside an English-taught one. Whichever import ran last won.
+     *
+     * Nullable because a programme may publish only one language; getLocalizedName() falls back to
+     * $name, so a missing translation degrades to what we already showed.
+     */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $nameNl = null;
+
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $nameEn = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
     #[Assert\NotBlank]
@@ -103,6 +125,40 @@ class Course extends BaseEntity
         $this->name = $name;
 
         return $this;
+    }
+
+    public function getNameNl(): ?string
+    {
+        return $this->nameNl;
+    }
+
+    public function setNameNl(?string $nameNl): self
+    {
+        $this->nameNl = $nameNl;
+
+        return $this;
+    }
+
+    public function getNameEn(): ?string
+    {
+        return $this->nameEn;
+    }
+
+    public function setNameEn(?string $nameEn): self
+    {
+        $this->nameEn = $nameEn;
+
+        return $this;
+    }
+
+    /**
+     * The title to show a reader of $locale, falling back to $name when that language has no title.
+     */
+    public function getLocalizedName(?string $locale): string
+    {
+        $localized = strtolower((string) $locale) === 'en' ? $this->nameEn : $this->nameNl;
+
+        return $localized !== null && $localized !== '' ? $localized : $this->name;
     }
 
     public function getModules(): Collection

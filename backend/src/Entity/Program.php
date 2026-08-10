@@ -27,7 +27,7 @@ class Program extends BaseEntity
     private ?string $kulId = null;
 
     /**
-     * Saved import/sync settings (e.g. lang, flatten, semester, merge, enrich).
+     * Saved import/sync settings (e.g. lang, flatten, semester, semesterFlat, merge, enrich).
      *
      * @var array<string, mixed>|null
      */
@@ -126,7 +126,15 @@ class Program extends BaseEntity
     /**
      * Return saved import settings with defaults applied for any missing keys.
      *
-     * @return array{lang: 'nl'|'en', flatten: list<string>, semester: list<string>, merge: bool, enrich: bool, electiveGrouping: string}
+     * @return array{
+     *     lang: 'nl'|'en',
+     *     flatten: list<string>,
+     *     semester: list<string>,
+     *     semesterFlat: list<string>,
+     *     merge: bool,
+     *     enrich: bool,
+     *     electiveGrouping: string,
+     * }
      */
     public function getResolvedImportSettings(): array
     {
@@ -138,11 +146,14 @@ class Program extends BaseEntity
         $flatten = is_array($s['flatten'] ?? null) ? $s['flatten'] : self::DEFAULT_FLATTEN;
         /** @var list<string> $semester */
         $semester = is_array($s['semester'] ?? null) ? $s['semester'] : [];
+        /** @var list<string> $semesterFlat */
+        $semesterFlat = is_array($s['semesterFlat'] ?? null) ? $s['semesterFlat'] : [];
 
         return [
             'lang' => $lang,
             'flatten' => $flatten,
             'semester' => $semester,
+            'semesterFlat' => $semesterFlat,
             'merge' => (bool) ($s['merge'] ?? true),
             'enrich' => (bool) ($s['enrich'] ?? true),
             'electiveGrouping' => in_array($s['electiveGrouping'] ?? null, ProgramTreeMapper::ELECTIVE_GROUPINGS, true)

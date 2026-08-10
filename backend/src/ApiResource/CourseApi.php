@@ -42,6 +42,36 @@ class CourseApi extends BaseEntityApi
     )]
     public ?string $name = null;
 
+    /**
+     * The Dutch and English titles as published by KU Leuven. Null when there is no title in that
+     * language; clients should fall back to $name, which is always set.
+     */
+    #[Groups(
+        [
+            SerializationGroups::COURSE_GET,
+            SerializationGroups::PROGRAM_GET,
+            SerializationGroups::MODULE_GET,
+            SerializationGroups::SEARCH,
+            SerializationGroups::USER,
+            SerializationGroups::DOCUMENT_GET,
+            SerializationGroups::USER_DOCUMENT_VIEWS
+        ]
+    )]
+    public ?string $nameNl = null;
+
+    #[Groups(
+        [
+            SerializationGroups::COURSE_GET,
+            SerializationGroups::PROGRAM_GET,
+            SerializationGroups::MODULE_GET,
+            SerializationGroups::SEARCH,
+            SerializationGroups::USER,
+            SerializationGroups::DOCUMENT_GET,
+            SerializationGroups::USER_DOCUMENT_VIEWS
+        ]
+    )]
+    public ?string $nameEn = null;
+
     #[Assert\NotBlank]
     #[Assert\Length(6)]
     #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]

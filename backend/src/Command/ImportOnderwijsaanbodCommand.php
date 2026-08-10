@@ -48,6 +48,13 @@ class ImportOnderwijsaanbodCommand extends Command
             ->addOption('lang', null, InputOption::VALUE_REQUIRED, 'Title language: nl or en', 'nl')
             ->addOption('flatten', null, InputOption::VALUE_REQUIRED, 'Comma-separated group names/ids whose folder is skipped (courses attach to the parent)', 'Verplichte opleidingsonderdelen,Compulsory courses')
             ->addOption('semester', null, InputOption::VALUE_REQUIRED, 'Comma-separated group names/ids to regroup by degree-wide semester (Semester 1..N)')
+            ->addOption(
+                'semester-flat',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Comma-separated TOP-LEVEL group names/ids to dissolve into one shared set of Semester 1..N '
+                . 'folders; elective options inside them become a folder per semester'
+            )
             ->addOption('no-merge', null, InputOption::VALUE_NONE, 'Do not collapse single-child, course-less modules')
             ->addOption('electives', null, InputOption::VALUE_REQUIRED, 'How to group the lettered keuzepakketten: none | perTrack | programme', ProgramTreeMapper::ELECTIVES_PER_TRACK)
             ->addOption('no-enrich', null, InputOption::VALUE_NONE, 'Skip fetching professors and identical courses from the OPO index')
@@ -73,6 +80,7 @@ class ImportOnderwijsaanbodCommand extends Command
         $lang = (string) $input->getOption('lang') === 'en' ? 'en' : 'nl';
         $flatten = $this->splitList((string) $input->getOption('flatten'));
         $semester = $this->splitList((string) $input->getOption('semester'));
+        $semesterFlat = $this->splitList((string) $input->getOption('semester-flat'));
         $merge = !$input->getOption('no-merge');
         $electiveGrouping = (string) $input->getOption('electives');
         if (!in_array($electiveGrouping, ProgramTreeMapper::ELECTIVE_GROUPINGS, true)) {
@@ -91,7 +99,16 @@ class ImportOnderwijsaanbodCommand extends Command
             return Command::FAILURE;
         }
 
-        $programData = $this->mapper->map($source, $programId, $lang, $flatten, $semester, $merge, $electiveGrouping);
+        $programData = $this->mapper->map(
+            $source,
+            $programId,
+            $lang,
+            $flatten,
+            $semester,
+            $merge,
+            $electiveGrouping,
+            $semesterFlat,
+        );
         if ($programData === null) {
             $io->error(sprintf('Programme document did not contain programId %s.', $programId));
 
@@ -114,6 +131,7 @@ class ImportOnderwijsaanbodCommand extends Command
             ['Program' => $result->programCreated ? 'created' : 'updated'],
             ['Modules created' => (string) $result->modulesCreated],
             ['Modules updated' => (string) $result->modulesUpdated],
+            ['Modules detached' => (string) $result->modulesDetached],
             ['Courses created' => (string) $result->coursesCreated],
             ['Courses updated' => (string) $result->coursesUpdated],
             ['Course links' => (string) $result->courseLinks],
