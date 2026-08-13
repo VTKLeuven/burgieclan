@@ -10,6 +10,13 @@
   "prConcurrentLimit": 4,
   "minimumReleaseAge": "3 days",
   "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "description": "Security fixes bypass the release-age wait and the PR concurrency limit, so a red audit never sits blocked behind routine dependency PRs.",
+    "enabled": true,
+    "minimumReleaseAge": null,
+    "prPriority": 10,
+    "labels": ["dependencies", "security"]
+  },
   "packageRules": [
     {
       "description": "Automerge patch/minor updates, digest bumps, and lockfile maintenance when CI passes. Major bumps still require manual review.",
