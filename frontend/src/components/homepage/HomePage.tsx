@@ -1,12 +1,12 @@
 'use client';
 
 import AnnouncementSlideShow from '@/components/announcement/AnnouncementSlideShow';
+import { DidacticFeedbackForm } from '@/components/homepage/DidacticFeedbackForm';
 import { QuickLinks } from '@/components/homepage/QuickLinks';
+import { RecentActivities } from "@/components/homepage/recent/RecentActivities";
 import { DragDropZone } from '@/components/upload/DragDropZone';
 import UploadDialog from '@/components/upload/UploadDialog';
 import { useUploadFlow } from '@/hooks/useUploadFlow';
-import { useTranslation } from 'react-i18next';
-import { RecentActivities } from "@/components/homepage/recent/RecentActivities";
 
 export default function HomePage() {
     const {
@@ -16,29 +16,17 @@ export default function HomePage() {
         closeDialog
     } = useUploadFlow();
 
-    const { t } = useTranslation();
-
     return (
-        <main className="vtk-shell pb-16">
+        <main className="vtk-shell pt-4 pb-16">
             <AnnouncementSlideShow />
 
-            {/* Editorial page head: kicker, large tight title, rule underneath. */}
-            <div className="vtk-page-head">
-                <div>
-                    <div className="vtk-page-kicker">Burgieclan</div>
-                    <h1 className="vtk-page-title">{t('home.title')}</h1>
-                    <p className="vtk-page-subtitle">{t('home.description')}</p>
-                </div>
-            </div>
-
-            {/* Recent activity carries the page; upload and navigation sit
-                beside it as a narrower utility column. */}
-            <div className="mt-7 grid items-start gap-4 lg:grid-cols-[1.7fr_1fr]">
+            <div className="mt-4 grid items-start gap-4 lg:grid-cols-[1.3fr_1fr]">
                 <RecentActivities />
 
                 <div className="grid gap-4">
-                    <DragDropZone onFileDrop={handleFileDrop} className="min-h-64" />
-                    <div className="vtk-panel p-6">
+                    <DragDropZone onFileDrop={handleFileDrop} className="min-h-52" />
+                    <DidacticFeedbackForm />
+                    <div className="vtk-panel p-4">
                         <QuickLinks />
                     </div>
                 </div>
