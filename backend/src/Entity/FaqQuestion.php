@@ -23,6 +23,11 @@ class FaqQuestion extends BaseEntity
     public const STATUS_HANDLED = 'handled';
     public const STATUS_ARCHIVED = 'archived';
 
+    public const TYPE_GENERAL = 'general_faq';
+    public const TYPE_COURSE_ISSUE = 'course_issue';
+    public const TYPE_EXAM = 'exam_feedback';
+    public const TYPE_OTHER = 'other';
+
     /**
      * Mirrors FaqItem::$DEFAULT_LANGUAGE, which is a static property and so cannot be used in the
      * constant expressions this default is needed in (property defaults, attribute arguments).
@@ -33,6 +38,13 @@ class FaqQuestion extends BaseEntity
         'New' => self::STATUS_NEW,
         'Handled' => self::STATUS_HANDLED,
         'Archived' => self::STATUS_ARCHIVED,
+    ];
+
+    public static array $TYPES = [
+        'General FAQ' => self::TYPE_GENERAL,
+        'Course / Exercise Session Issue' => self::TYPE_COURSE_ISSUE,
+        'Exam Feedback' => self::TYPE_EXAM,
+        'Other' => self::TYPE_OTHER,
     ];
 
     #[ORM\Column(type: Types::TEXT)]
@@ -54,6 +66,17 @@ class FaqQuestion extends BaseEntity
 
     #[ORM\Column(length: 20)]
     private string $status = self::STATUS_NEW;
+
+    #[ORM\Column(length: 30)]
+    private string $type = self::TYPE_GENERAL;
+
+    /**
+     * @return string[]
+     */
+    public static function getAvailableTypes(): array
+    {
+        return array_values(self::$TYPES);
+    }
 
     /**
      * The locales a question may be asked in — the same set FaqItem publishes answers in.
@@ -109,6 +132,18 @@ class FaqQuestion extends BaseEntity
     public function setStatus(string $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
 
         return $this;
     }

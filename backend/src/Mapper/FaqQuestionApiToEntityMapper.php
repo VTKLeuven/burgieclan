@@ -41,6 +41,7 @@ class FaqQuestionApiToEntityMapper implements MapperInterface
 
         $to->setQuestion($from->question);
         $to->setLocale($from->locale);
+        $to->setType($from->type);
 
         // Taken from the session rather than the payload: /api is IS_AUTHENTICATED_FULLY, so there
         // is always a user, and letting the client name the author would let it forge one.

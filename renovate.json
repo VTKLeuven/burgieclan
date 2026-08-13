@@ -14,7 +14,6 @@
     "description": "Security fixes bypass the release-age wait and the PR concurrency limit, so a red audit never sits blocked behind routine dependency PRs.",
     "enabled": true,
     "minimumReleaseAge": null,
-    "prPriority": 10,
     "labels": ["dependencies", "security"]
   },
   "packageRules": [
