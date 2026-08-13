@@ -11,6 +11,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\FaqQuestion;
 use App\Entity\User;
 use App\Factory\AnnouncementFactory;
 use App\Factory\CommentCategoryFactory;
@@ -22,6 +23,8 @@ use App\Factory\DocumentCommentFactory;
 use App\Factory\DocumentCommentVoteFactory;
 use App\Factory\DocumentFactory;
 use App\Factory\DocumentVoteFactory;
+use App\Factory\FaqItemFactory;
+use App\Factory\FaqQuestionFactory;
 use App\Factory\ModuleFactory;
 use App\Factory\PageFactory;
 use App\Factory\ProgramFactory;
@@ -54,6 +57,12 @@ final class AppFixtures extends Fixture
         DocumentCommentFactory::createMany(400);
         PageFactory::createMany(20);
         QuickLinkFactory::createMany(10);
+        FaqItemFactory::createMany(8);
+        // A spread of statuses so the admin inbox shows both a populated badge and rows that have
+        // already been dealt with — the "new" ones are the ones with Promote/Mark handled buttons.
+        FaqQuestionFactory::createMany(6);
+        FaqQuestionFactory::createMany(3, ['status' => FaqQuestion::STATUS_HANDLED]);
+        FaqQuestionFactory::createMany(2, ['status' => FaqQuestion::STATUS_ARCHIVED]);
         // Create unique UserDocumentView combinations to avoid violating unique constraint
         $uniqueUserDocumentViews = UserDocumentViewFactory::createUniqueSequence(100);
         UserDocumentViewFactory::createSequence($uniqueUserDocumentViews);

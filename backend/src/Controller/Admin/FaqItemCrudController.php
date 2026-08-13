@@ -3,7 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Entity\FaqItem;
+use App\Entity\FaqQuestion;
 use App\Entity\User;
+use App\Repository\FaqQuestionRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -17,9 +19,42 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted(User::ROLE_ADMIN)]
 class FaqItemCrudController extends AbstractCrudController
 {
+    public function __construct(private readonly FaqQuestionRepository $faqQuestionRepository) {}
+
     public static function getEntityFqcn(): string
     {
         return FaqItem::class;
+    }
+
+    /**
+     * Prefills the question when an admin got here through "Promote" in the FAQ Questions inbox,
+     * so the wording a user actually asked in carries over instead of being retyped.
+     *
+     * @see FaqQuestionCrudController::promote()
+     */
+    public function createEntity(string $entityFqcn): object
+    {
+        $faqItem = new FaqItem();
+
+        $questionId = $this->getContext()?->getRequest()->query->get(FaqQuestionCrudController::PROMOTE_PARAM);
+        if (!$questionId) {
+            return $faqItem;
+        }
+
+        $question = $this->faqQuestionRepository->find($questionId);
+        if (!$question instanceof FaqQuestion) {
+            return $faqItem;
+        }
+
+        // Dutch is the required field and the fallback the frontend reads, so an English question
+        // fills the English field and leaves the Dutch one for the admin to write.
+        if ($question->getLocale() === 'en') {
+            $faqItem->setQuestionEn($question->getQuestion());
+        } else {
+            $faqItem->setQuestionNl($question->getQuestion());
+        }
+
+        return $faqItem;
     }
 
     public function configureCrud(Crud $crud): Crud

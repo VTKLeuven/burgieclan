@@ -301,6 +301,7 @@
         "no_results_sub": "Try searching for something else or check your spelling."
     },
     "header": {
+        "admin": "Admin",
         "my_vtk": "My VTK"
     },
     "sidebar": {
@@ -338,7 +339,18 @@
         "description": "Find answers to the most common questions about Burgieclan. Can't find what you're looking for? Feel free to reach out to us!",
         "no_items": "No FAQ items available yet.",
         "ask_title": "Have a question?",
-        "ask_description": "If you can't find the answer to your question, don't hesitate to reach out to us via email. We'll be happy to help!",
-        "ask_button": "Send us an email"
+        "ask_description": "Can't find the answer you're looking for? Ask it here and we'll pass it on to the Burgieclan team. Good questions end up in this list.",
+        "ask_button": "Send question",
+        "ask_label": "Your question",
+        "ask_placeholder": "What can we help you with?",
+        "ask_hint": "At least 10 characters.",
+        "ask_mail": "Or email us directly",
+        "ask_mail_subject": "Question via the Burgieclan FAQ",
+        "ask_submitting": "Sending...",
+        "ask_success": "Your question has been sent.",
+        "ask_success_title": "Thanks for your question!",
+        "ask_success_description": "The Burgieclan team will look at it as soon as they can. If it's useful to others, it will show up here among the frequently asked questions.",
+        "ask_another": "Ask another question",
+        "ask_error": "Your question could not be sent. Please try again later."
     }
 }
