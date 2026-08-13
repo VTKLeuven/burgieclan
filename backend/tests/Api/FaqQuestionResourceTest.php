@@ -30,8 +30,30 @@ class FaqQuestionResourceTest extends ApiTestCase
             ->assertStatus(201)
             ->assertJsonMatches('question', 'Hoe upload ik een oud examen?')
             ->assertJsonMatches('locale', 'nl')
+            ->assertJsonMatches('type', FaqQuestion::TYPE_GENERAL)
             // Everything arrives unhandled; only the admin moves it on.
             ->assertJsonMatches('status', FaqQuestion::STATUS_NEW);
+    }
+
+    public function testPostToCreateCourseIssueComplaint(): void
+    {
+        $this->browser()
+            ->post(
+                '/api/faq_questions',
+                [
+                    'json' => [
+                        'question' => 'Het oefenzitting van Analyse III was slecht georganiseerd.',
+                        'locale' => 'nl',
+                        'type' => FaqQuestion::TYPE_COURSE_ISSUE,
+                    ],
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json',
+                        'Authorization' => 'Bearer ' . $this->token,
+                    ],
+                ]
+            )
+            ->assertStatus(201)
+            ->assertJsonMatches('type', FaqQuestion::TYPE_COURSE_ISSUE);
     }
 
     /**

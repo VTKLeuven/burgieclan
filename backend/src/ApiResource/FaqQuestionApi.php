@@ -64,6 +64,10 @@ class FaqQuestionApi extends BaseEntityApi
     #[Groups([SerializationGroups::FAQ_QUESTION_GET])]
     public string $locale = FaqQuestion::DEFAULT_LOCALE;
 
+    #[Assert\Choice(callback: [FaqQuestion::class, 'getAvailableTypes'])]
+    #[Groups([SerializationGroups::FAQ_QUESTION_GET])]
+    public string $type = FaqQuestion::TYPE_GENERAL;
+
     #[ApiProperty(writable: false)]
     #[Groups([SerializationGroups::FAQ_QUESTION_GET])]
     public string $status = FaqQuestion::STATUS_NEW;

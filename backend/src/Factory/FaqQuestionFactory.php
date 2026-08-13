@@ -32,6 +32,7 @@ final class FaqQuestionFactory extends PersistentObjectFactory
             'question' => rtrim(self::faker()->sentence(), '.') . '?',
             'locale' => self::faker()->randomElement(FaqQuestion::getAvailableLocales()),
             'status' => FaqQuestion::STATUS_NEW,
+            'type' => self::faker()->randomElement(FaqQuestion::getAvailableTypes()),
             'author' => UserFactory::randomOrCreate(),
         ];
     }
