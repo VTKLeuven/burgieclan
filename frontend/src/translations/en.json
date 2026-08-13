@@ -117,7 +117,24 @@
         "no_recent_activities": "No recent activities found yet",
         "news": "News",
         "navigate_to": "Navigate to",
-        "no_quick_links": "No quick links found"
+        "no_quick_links": "No quick links found",
+        "feedback_title": "Feedback or Complaint for Team Onderwijs",
+        "feedback_description": "Have an issue with an exercise session, course delivery, or exam? Send a report directly to the VTK Didactic team.",
+        "feedback_type_label": "Category",
+        "feedback_type_course_issue": "Exercise session / Course issue",
+        "feedback_type_exam": "Exam / Evaluation issue",
+        "feedback_type_general": "General question",
+        "feedback_type_other": "Other feedback",
+        "feedback_label": "Your feedback or complaint",
+        "feedback_placeholder": "Describe what went wrong or what can be improved...",
+        "feedback_button": "Send feedback",
+        "feedback_mail": "Or email Team Onderwijs",
+        "feedback_mail_subject": "Feedback via Burgieclan",
+        "feedback_success": "Your feedback has been sent to Team Onderwijs.",
+        "feedback_success_title": "Thank you for your feedback!",
+        "feedback_success_description": "The VTK Didactic team will review your report as soon as possible.",
+        "feedback_another": "Send another report",
+        "feedback_error": "Failed to send feedback. Please try again later."
     },
     "form": {
         "errors": {

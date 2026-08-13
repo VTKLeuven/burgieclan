@@ -111,6 +111,18 @@ class FaqQuestionCrudController extends AbstractCrudController
             ->setChoices(array_flip(FaqItem::$AVAILABLE_LANGUAGES))
             ->hideOnForm();
 
+        yield ChoiceField::new('type')
+            ->setLabel('Category')
+            ->setChoices(FaqQuestion::$TYPES)
+            ->renderAsBadges(
+                [
+                    FaqQuestion::TYPE_GENERAL => 'info',
+                    FaqQuestion::TYPE_COURSE_ISSUE => 'danger',
+                    FaqQuestion::TYPE_EXAM => 'warning',
+                    FaqQuestion::TYPE_OTHER => 'secondary',
+                ]
+            );
+
         yield ChoiceField::new('status')
             ->setLabel('Status')
             ->setChoices(FaqQuestion::$STATUSES)
@@ -127,6 +139,7 @@ class FaqQuestionCrudController extends AbstractCrudController
     {
         return $filters
             ->add('question')
+            ->add('type')
             ->add('status')
             ->add('locale')
             ->add('author')
@@ -136,8 +149,11 @@ class FaqQuestionCrudController extends AbstractCrudController
     /**
      * Turn a question into a published FAQ item: mark it handled, then hand the admin a new
      * FaqItem form with the question already filled in for the language it was asked in.
+     *
+     * POST-only: this changes state, and the session cookie is SameSite=lax, so refusing GET is
+     * what stops another site from driving it with an admin's cookie. @see approve_action.html.twig
      */
-    #[AdminRoute('/promote', name: 'promote')]
+    #[AdminRoute('/promote', name: 'promote', options: ['methods' => ['POST']])]
     public function promote(
         AdminContext $adminContext,
         EntityManagerInterface $entityManager,
@@ -167,7 +183,8 @@ class FaqQuestionCrudController extends AbstractCrudController
         return $this->redirect($targetUrl);
     }
 
-    #[AdminRoute('/mark-handled', name: 'markHandled')]
+    /** POST-only for the same reason as promote(). */
+    #[AdminRoute('/mark-handled', name: 'markHandled', options: ['methods' => ['POST']])]
     public function markHandled(
         AdminContext $adminContext,
         EntityManagerInterface $entityManager,
@@ -197,9 +214,11 @@ class FaqQuestionCrudController extends AbstractCrudController
             throw new LogicException('Entity ID is missing from the request');
         }
 
+        // Not a LogicException: two moderators working the same inbox will race, and the one who
+        // clicks second on an already-deleted question is looking at a stale page, not a bug.
         $question = $entityManager->getRepository(FaqQuestion::class)->find($entityId);
         if (!$question instanceof FaqQuestion) {
-            throw new LogicException('FAQ question not found with ID: ' . $entityId);
+            throw $this->createNotFoundException('FAQ question not found with ID: ' . $entityId);
         }
 
         return $question;

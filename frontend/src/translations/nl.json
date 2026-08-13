@@ -117,7 +117,24 @@
         "no_recent_activities": "Nog geen recente activiteiten gevonden",
         "news": "Nieuws",
         "navigate_to": "Navigeer naar",
-        "no_quick_links": "Geen snelkoppelingen gevonden"
+        "no_quick_links": "Geen snelkoppelingen gevonden",
+        "feedback_title": "Vraag of Klacht voor Team Onderwijs",
+        "feedback_description": "Probleem met een oefenzitting, vak of examen? Meld het hier rechtstreeks aan het VTK Onderwijsteam.",
+        "feedback_type_label": "Categorie",
+        "feedback_type_course_issue": "Oefenzitting / Vakprobleem",
+        "feedback_type_exam": "Examen / Evaluatie",
+        "feedback_type_general": "Algemene vraag",
+        "feedback_type_other": "Andere feedback",
+        "feedback_label": "Je feedback of klacht",
+        "feedback_placeholder": "Beschrijf wat er misging of wat beter kan...",
+        "feedback_button": "Feedback versturen",
+        "feedback_mail": "Of mail Team Onderwijs",
+        "feedback_mail_subject": "Feedback via Burgieclan",
+        "feedback_success": "Je feedback is verstuurd naar Team Onderwijs.",
+        "feedback_success_title": "Bedankt voor je feedback!",
+        "feedback_success_description": "Het VTK Onderwijsteam bekijkt je melding zo snel mogelijk.",
+        "feedback_another": "Nog een melding versturen",
+        "feedback_error": "Kon je feedback niet versturen. Probeer het later opnieuw."
     },
     "form": {
         "errors": {
