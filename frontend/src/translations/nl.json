@@ -339,7 +339,18 @@
         "description": "Vind antwoorden op de meest gestelde vragen over Burgieclan. Staat je vraag er niet bij? Neem dan gerust contact met ons op!",
         "no_items": "Er zijn nog geen veelgestelde vragen beschikbaar.",
         "ask_title": "Heb je een vraag?",
-        "ask_description": "Als je het antwoord op je vraag niet kunt vinden, aarzel dan niet om ons een e-mail te sturen. We helpen je graag!",
-        "ask_button": "Stuur ons een e-mail"
+        "ask_description": "Vind je het antwoord op je vraag niet terug? Stel ze hier en we bezorgen ze aan het Burgieclan-team. Goede vragen belanden achteraf in deze lijst.",
+        "ask_button": "Vraag versturen",
+        "ask_label": "Je vraag",
+        "ask_placeholder": "Waarmee kunnen we je helpen?",
+        "ask_hint": "Minstens 10 tekens.",
+        "ask_mail": "Of mail ons rechtstreeks",
+        "ask_mail_subject": "Vraag via de Burgieclan FAQ",
+        "ask_submitting": "Versturen...",
+        "ask_success": "Je vraag is verstuurd.",
+        "ask_success_title": "Bedankt voor je vraag!",
+        "ask_success_description": "Het Burgieclan-team bekijkt ze zo snel mogelijk. Is ze interessant voor anderen, dan verschijnt ze hier bij de veelgestelde vragen.",
+        "ask_another": "Nog een vraag stellen",
+        "ask_error": "Je vraag kon niet verstuurd worden. Probeer het later opnieuw."
     }
 }
