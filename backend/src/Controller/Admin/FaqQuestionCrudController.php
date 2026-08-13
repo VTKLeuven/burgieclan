@@ -111,6 +111,18 @@ class FaqQuestionCrudController extends AbstractCrudController
             ->setChoices(array_flip(FaqItem::$AVAILABLE_LANGUAGES))
             ->hideOnForm();
 
+        yield ChoiceField::new('type')
+            ->setLabel('Category')
+            ->setChoices(FaqQuestion::$TYPES)
+            ->renderAsBadges(
+                [
+                    FaqQuestion::TYPE_GENERAL => 'info',
+                    FaqQuestion::TYPE_COURSE_ISSUE => 'danger',
+                    FaqQuestion::TYPE_EXAM => 'warning',
+                    FaqQuestion::TYPE_OTHER => 'secondary',
+                ]
+            );
+
         yield ChoiceField::new('status')
             ->setLabel('Status')
             ->setChoices(FaqQuestion::$STATUSES)
@@ -127,6 +139,7 @@ class FaqQuestionCrudController extends AbstractCrudController
     {
         return $filters
             ->add('question')
+            ->add('type')
             ->add('status')
             ->add('locale')
             ->add('author')
