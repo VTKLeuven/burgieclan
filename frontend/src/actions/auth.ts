@@ -1,7 +1,7 @@
 'use server'
 
 import { COOKIE_NAMES } from '@/utils/cookieNames';
-import { getUserIdFromJWT, isJWTExpired } from '@/utils/jwt';
+import { getUserIdFromJWT, getUserRolesFromJWT, isJWTExpired } from '@/utils/jwt';
 import { captureException } from '@sentry/nextjs';
 import { cookies } from 'next/headers';
 
@@ -24,6 +24,28 @@ export const getUserId = async (): Promise<number | null> => {
     }
 
     return getUserIdFromJWT(jwt);
+};
+
+/**
+ * Roles that get past the backend's `^/admin` firewall rule. Spelled out in full because the JWT
+ * carries stored roles rather than the hierarchy-expanded set, so ROLE_ADMIN does not imply
+ * ROLE_MODERATOR here the way it does in Symfony. Keep in sync with config/packages/security.yaml.
+ */
+const ADMIN_ROLES = ['ROLE_MODERATOR', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'];
+
+/**
+ * Whether the current user may open the admin panel. Only decides whether to *show* the link —
+ * the backend firewall is what actually keeps non-admins out.
+ */
+export const canAccessAdmin = async (): Promise<boolean> => {
+    const cookieStore = await cookies();
+    const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
+
+    if (!jwt || isJWTExpired(jwt)) {
+        return false;
+    }
+
+    return getUserRolesFromJWT(jwt).some((role) => ADMIN_ROLES.includes(role));
 };
 
 /**
