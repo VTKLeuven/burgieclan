@@ -1,10 +1,10 @@
 'use client';
 
 import FaqAccordion from '@/components/faq/FaqAccordion';
+import FaqQuestionForm from '@/components/faq/FaqQuestionForm';
 import { HydraCollection, useApi } from '@/hooks/useApi';
 import { FaqItem } from '@/types/entities';
 import { convertToFaqItem } from '@/utils/convertToEntity';
-import { Mail } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -35,7 +35,7 @@ export default function FaqPage() {
     }, [currentLocale, request]);
 
     return (
-        <main className="vtk-shell pb-16">
+        <main className="vtk-shell pb-10">
             {/* Page header */}
             <div className="vtk-page-head">
                 <div>
@@ -64,23 +64,9 @@ export default function FaqPage() {
                 )}
             </div>
 
-            {/* Ask a question CTA */}
-            <div className="mt-10 max-w-3xl">
-                <div className="vtk-panel vtk-panel-muted p-8">
-                    <h2 className="text-lg font-semibold text-vtk-ink">
-                        {t('faq.ask_title')}
-                    </h2>
-                    <p className="mt-2 text-[14px] leading-relaxed text-vtk-body">
-                        {t('faq.ask_description')}
-                    </p>
-                    <a
-                        href="mailto:burgieclan@vtk.be"
-                        className="vtk-button vtk-button-accent mt-4 inline-flex items-center gap-2"
-                    >
-                        <Mail className="h-4 w-4" aria-hidden="true" />
-                        {t('faq.ask_button')}
-                    </a>
-                </div>
+            {/* Ask a question */}
+            <div className="mt-6 max-w-3xl">
+                <FaqQuestionForm />
             </div>
         </main>
     );

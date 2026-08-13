@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Repository\DocumentRepository;
+use App\Repository\FaqQuestionRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -18,7 +19,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
-    public function __construct(private readonly DocumentRepository $documentRepository) {}
+    public function __construct(
+        private readonly DocumentRepository $documentRepository,
+        private readonly FaqQuestionRepository $faqQuestionRepository,
+    ) {}
 
     public function index(): Response
     {
@@ -105,8 +109,25 @@ class DashboardController extends AbstractDashboardController
             ->setPermission(User::ROLE_ADMIN);
         yield MenuItem::linkTo(QuickLinkCrudController::class, 'Quick Links', 'fa-solid fa-link')
             ->setPermission(User::ROLE_ADMIN);
-        yield MenuItem::linkTo(FaqItemCrudController::class, 'FAQ Items', 'fa-solid fa-circle-question')
+        $faqQuestionsMenu = MenuItem::linkTo(FaqQuestionCrudController::class, 'FAQ Questions', 'fa-solid fa-inbox')
             ->setPermission(User::ROLE_ADMIN);
+        $faqMenu = MenuItem::subMenu('FAQ', 'fa-solid fa-circle-question')
+            ->setPermission(User::ROLE_ADMIN)
+            ->setSubItems(
+                [
+                    MenuItem::linkTo(FaqItemCrudController::class, 'FAQ Items', 'fa-solid fa-circle-question')
+                        ->setPermission(User::ROLE_ADMIN),
+                    $faqQuestionsMenu,
+                ]
+            );
+        // Badged on both, like Documents above: the parent is collapsed by default, so a badge only
+        // on the child would go unseen.
+        $amountNewQuestions = $this->faqQuestionRepository->getAmountNew();
+        if ($amountNewQuestions > 0) {
+            $faqMenu->setBadge($amountNewQuestions, 'danger');
+            $faqQuestionsMenu->setBadge($amountNewQuestions, 'danger');
+        }
+        yield $faqMenu;
 
         yield MenuItem::section('Frontend');
         yield MenuItem::linkToUrl('Home', 'fa fa-window-maximize', '/');
