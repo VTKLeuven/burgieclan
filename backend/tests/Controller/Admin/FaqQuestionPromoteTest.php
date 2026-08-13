@@ -6,6 +6,7 @@ use App\Entity\FaqQuestion;
 use App\Entity\User;
 use App\Factory\FaqQuestionFactory;
 use App\Factory\UserFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -99,6 +100,35 @@ class FaqQuestionPromoteTest extends WebTestCase
         self::assertStringContainsString('/admin/faq-question', $client->getResponse()->headers->get('Location'));
 
         self::assertSame(FaqQuestion::STATUS_HANDLED, $this->statusOf($question->getId()));
+    }
+
+    /**
+     * Both actions change state, so neither may be reachable by GET. Combined with the
+     * SameSite=lax session cookie, refusing GET is what keeps another site from driving these
+     * with a logged-in admin's cookie — a bare <img src="...promote?entityId=1"> would otherwise
+     * do it. Losing the method restriction reopens that, hence the test.
+     *
+     * Asserted against the route collection rather than by firing a GET: once the POST-only route
+     * stops matching, the request falls through to admin_faq_question_detail (GET /{entityId},
+     * no numeric requirement), which tries find('promote') and raises a Postgres 22P02. That
+     * aborts the transaction dama/doctrine-test-bundle wraps the test in, so nothing can be read
+     * back afterwards to prove the action did not run. The route config is the property anyway.
+     */
+    #[DataProvider('stateChangingActions')]
+    public function testStateChangingActionsRejectGet(string $routeName): void
+    {
+        self::bootKernel();
+
+        $route = static::getContainer()->get('router')->getRouteCollection()->get($routeName);
+
+        self::assertNotNull($route, sprintf('route %s is gone; the action was renamed or removed', $routeName));
+        self::assertSame(['POST'], $route->getMethods(), sprintf('%s must not be reachable by GET', $routeName));
+    }
+
+    public static function stateChangingActions(): iterable
+    {
+        yield 'promote' => ['admin_faq_question_promote'];
+        yield 'mark handled' => ['admin_faq_question_markHandled'];
     }
 
     /**
