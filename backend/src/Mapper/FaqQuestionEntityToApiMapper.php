@@ -27,6 +27,7 @@ class FaqQuestionEntityToApiMapper extends BaseEntityToApiMapper
         $to->question = $from->getQuestion();
         $to->locale = $from->getLocale();
         $to->status = $from->getStatus();
+        $to->type = $from->getType();
 
         // The author is intentionally not exposed: the only consumer is the submitting user's own
         // POST response, which would just be telling them who they are.
