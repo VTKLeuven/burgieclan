@@ -22,9 +22,11 @@ import { useTranslation } from 'react-i18next';
 export default function HeaderProfileButton() {
     const { t } = useTranslation();
     const router = useRouter()
-    const { user } = useUser();
+    const { user, isAdmin } = useUser();
 
     const [isOpen, setIsOpen] = useState(false);
+
+    const adminUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin`;
 
     const onClickLogout = async () => {
         await logOut();
@@ -47,6 +49,21 @@ export default function HeaderProfileButton() {
                 <DropdownMenuItem onClick={handleMenuItemClick}>
                     <Link className="font-normal text-sm" href="/account">{t('account.account')}</Link>
                 </DropdownMenuItem>
+                {isAdmin && (
+                    <DropdownMenuItem onClick={handleMenuItemClick}>
+                        {/* The admin lives on the backend host, so this leaves the Next app entirely
+                            and has to be a plain anchor rather than a next/link route. */}
+                        <a
+                            className="font-normal text-sm flex items-center gap-1"
+                            href={adminUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {t('header.admin')}
+                            <ExternalLink size={14} className="ml-1" />
+                        </a>
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={handleMenuItemClick}>
                     <Link className="font-normal text-sm flex items-center gap-1" href="https://vtk.be/account/">
                         {t('header.my_vtk')}

@@ -1,4 +1,4 @@
-import { getUserId } from "@/actions/auth";
+import { canAccessAdmin, getUserId } from "@/actions/auth";
 import "@/app/globals.css";
 import initTranslations from "@/app/i18n";
 import CookieBanner from "@/components/cookie-banner/CookieBanner";
@@ -29,15 +29,16 @@ type Params = Promise<{ locale: string }>;
 export default async function RootLayout({ children, params }: Readonly<{ children: React.ReactNode; params: Params; }>) {
   const { locale } = await params;
 
-  const [translations, userId] = await Promise.all([
+  const [translations, userId, isAdmin] = await Promise.all([
     initTranslations(locale),
-    getUserId()
+    getUserId(),
+    canAccessAdmin()
   ]);
   const { resources } = translations;
 
   return (
     // UserProvider and TranslationsProvider are server components designed for root-level wrapping.
-    <UserProvider userId={userId}>
+    <UserProvider userId={userId} isAdmin={isAdmin}>
       <TranslationsProvider
         locale={locale}
         resources={resources}>
