@@ -130,7 +130,10 @@ class DashboardController extends AbstractDashboardController
         yield $faqMenu;
 
         yield MenuItem::section('Frontend');
-        yield MenuItem::linkToUrl('Home', 'fa fa-window-maximize', '/');
+        // Was '/', which only worked because nginx puts both apps on one origin in production
+        // (@see .docker/nginx.conf) — locally the backend and frontend are separate ports, so '/'
+        // hit the backend's own root. The configured URL resolves to the same place in production.
+        yield MenuItem::linkToUrl('Home', 'fa fa-window-maximize', $this->getParameter('app.frontend_url'));
 
         $commitHash = getenv('COMMIT_HASH') ?: 'dev';
         $version = getenv('VERSION') ?: '';

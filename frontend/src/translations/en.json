@@ -301,6 +301,7 @@
         "no_results_sub": "Try searching for something else or check your spelling."
     },
     "header": {
+        "admin": "Admin",
         "my_vtk": "My VTK"
     },
     "sidebar": {
