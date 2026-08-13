@@ -23,6 +23,7 @@ final class SerializationGroups
     public const TAG_GET = 'tag:get';
     public const QUICKLINK_GET = 'quicklink:get';
     public const FAQ_ITEM_GET = 'faq_item:get';
+    public const FAQ_QUESTION_GET = 'faq_question:get';
 
     // Create/Write operations
     public const DOCUMENT_CREATE = 'document:create';
