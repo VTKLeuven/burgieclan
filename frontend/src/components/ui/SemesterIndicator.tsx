@@ -45,10 +45,11 @@ const SemesterIndicator: React.FC<SemesterIndicatorProps> = ({
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            transform={first ? "" : "scale(-1, 1)"}
         >
-            <path d="M12 2a10 10 0 0 0 0 20" />
-            <path d="M12 2v20" />
+            <g transform={first ? undefined : "translate(24, 0) scale(-1, 1)"}>
+                <path d="M12 2a10 10 0 0 0 0 20" />
+                <path d="M12 2v20" />
+            </g>
         </svg>
     );
 };
