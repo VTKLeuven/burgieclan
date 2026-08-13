@@ -9,6 +9,8 @@ import { createContext, ReactNode, useCallback, useContext, useEffect, useState 
 
 interface UserContextType {
     user: User | null;
+    /** Whether this user may open the admin panel. Decided server-side from the JWT roles. */
+    isAdmin: boolean;
     loading: boolean;
     isRedirecting: boolean;
     error: ApiError | null;
@@ -18,7 +20,7 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider = ({ children, userId }: { children: ReactNode, userId: number | null }) => {
+export const UserProvider = ({ children, userId, isAdmin = false }: { children: ReactNode, userId: number | null, isAdmin?: boolean }) => {
     const [user, setUser] = useState<User | null>(null);
     const { loading, error, isRedirecting, request } = useApi();
 
@@ -52,6 +54,7 @@ export const UserProvider = ({ children, userId }: { children: ReactNode, userId
 
     const contextValue: UserContextType = {
         user,
+        isAdmin,
         loading,
         isRedirecting,
         error,

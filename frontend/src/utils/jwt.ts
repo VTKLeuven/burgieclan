@@ -37,6 +37,15 @@ export function getUserIdFromJWT(token: string): number | null {
     return payload.id ?? null;
 }
 
+/**
+ * Roles the backend put in the token. These are the user's stored roles, not the hierarchy-expanded
+ * set — an admin's token lists ROLE_ADMIN and never the ROLE_MODERATOR it implies — so anything
+ * checking them has to spell out every role that qualifies. @see ADMIN_ROLES
+ */
+export function getUserRolesFromJWT(token: string): string[] {
+    return decodeJWT(token)?.roles ?? [];
+}
+
 export function isJWTExpired(token: string): boolean {
     const payload = decodeJWT(token);
     if (!payload || !payload.exp) return true;
