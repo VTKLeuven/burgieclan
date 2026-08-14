@@ -37,6 +37,7 @@ export interface Module extends BaseEntity {
 
 export interface Program extends BaseEntity {
     name?: string;
+    language?: string;
     modules?: Module[];
 }
 

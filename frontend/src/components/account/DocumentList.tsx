@@ -34,6 +34,10 @@ function AccountDocumentCard({ document }: { document: Document }) {
         document.filename?.toLowerCase().endsWith('.pdf') ||
         document.contentUrl?.toLowerCase().endsWith('.pdf');
 
+    // Guarded on below rather than `course.name`: a course can carry nameNl/nameEn without the
+    // fallback `name` being set, and guarding on `name` would hide a title we can render.
+    const courseName = localizedCourseName(document.course, i18n.language);
+
     return (
         <div ref={containerRef} className="border border-vtk-line p-4 rounded-md shadow-xs bg-vtk-paper hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start gap-2">
@@ -50,7 +54,7 @@ function AccountDocumentCard({ document }: { document: Document }) {
             </div>
 
             <div className="mt-1 text-sm text-vtk-body">
-                {document.course?.name && <p className="truncate font-medium">{localizedCourseName(document.course, i18n.language)}</p>}
+                {courseName && <p className="truncate font-medium">{courseName}</p>}
                 {document.category?.name && <p className="text-xs text-vtk-muted truncate">{document.category.name}</p>}
             </div>
 

@@ -99,6 +99,7 @@ export function convertToProgram(program: unknown): Program {
     return {
         id: parseId(data['@id']),
         name: typeof data.name === 'string' ? data.name : undefined,
+        language: typeof data.language === 'string' ? data.language : undefined,
         modules: asArray(data.modules)?.map(convertToModule)
     };
 }
