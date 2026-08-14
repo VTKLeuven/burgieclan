@@ -1,4 +1,4 @@
-import type { ErrorEvent, EventHint } from "@sentry/core";
+import type { ErrorEvent, EventHint } from "@sentry/nextjs";
 import { inspect } from "util";
 
 type BeforeSend = (event: ErrorEvent, hint?: EventHint) => ErrorEvent | null;
