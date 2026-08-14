@@ -67,6 +67,50 @@ class ProgramTest extends KernelTestCase
         $this->assertSame(['Common core'], $settings['semester'], 'the existing keys stay put');
     }
 
+    public function testLanguageDefaultsToDutchForProgramsThatWereNeverImported(): void
+    {
+        $this->assertSame('nl', (new Program())->getLanguage());
+    }
+
+    /**
+     * The language column is denormalized from the import settings, so importing has to move it.
+     */
+    public function testImportingSetsTheLanguage(): void
+    {
+        $program = new Program();
+        $program->setImportSettings(['lang' => 'en']);
+
+        $this->assertSame('en', $program->getLanguage());
+    }
+
+    /**
+     * Correcting the language by hand in the admin has to move the import parameter with it,
+     * otherwise the next Quick Sync re-fetches module names in the language we just corrected away
+     * from and silently undoes half the fix.
+     */
+    public function testCorrectingTheLanguageMovesTheImportParameterToo(): void
+    {
+        $program = new Program();
+        $program->setImportSettings(['lang' => 'nl', 'merge' => false]);
+
+        $program->setLanguage('en');
+
+        $this->assertSame('en', $program->getLanguage());
+        $this->assertSame('en', $program->getResolvedImportSettings()['lang']);
+        $this->assertFalse(
+            $program->getResolvedImportSettings()['merge'],
+            'the unrelated import settings must survive'
+        );
+    }
+
+    public function testUnknownLanguageFallsBackToDutch(): void
+    {
+        $program = new Program();
+        $program->setLanguage('fr');
+
+        $this->assertSame('nl', $program->getLanguage());
+    }
+
     public function testResolvedImportSettingsKeepsStoredSemesterFlat(): void
     {
         $program = new Program();
