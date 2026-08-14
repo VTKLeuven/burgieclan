@@ -1,5 +1,6 @@
 import { SearchFilters } from '@/components/courses/CurriculumSearchBar';
 import ModuleNode from '@/components/courses/ModuleNode';
+import { ProgramLanguageProvider } from '@/components/courses/ProgramLanguageContext';
 import DownloadButton from '@/components/ui/DownloadButton';
 import type { Course, Program } from '@/types/entities';
 import {
@@ -51,6 +52,7 @@ const ProgramNode = ({
   const matchingItems = searchQuery ? countMatchesInProgram(program, searchQuery) : 0;
 
   return (
+    <ProgramLanguageProvider language={program.language}>
     <div className="program-node">
       {/* A search hit is marked with a yellow accent rail, not a fill. */}
       <div
@@ -96,6 +98,7 @@ const ProgramNode = ({
         )}
       </div>
     </div>
+    </ProgramLanguageProvider>
   );
 };
 
