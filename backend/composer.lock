@@ -3596,16 +3596,16 @@
         },
         {
             "name": "league/flysystem-bundle",
-            "version": "3.7.0",
+            "version": "3.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem-bundle.git",
-                "reference": "5eb41be38fc3759f74c9e458a6a5f0ef5f49284a"
+                "reference": "9cccb6862c9fcd16e6d8a0fbd62254abb8017c99"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem-bundle/zipball/5eb41be38fc3759f74c9e458a6a5f0ef5f49284a",
-                "reference": "5eb41be38fc3759f74c9e458a6a5f0ef5f49284a",
+                "url": "https://api.github.com/repos/thephpleague/flysystem-bundle/zipball/9cccb6862c9fcd16e6d8a0fbd62254abb8017c99",
+                "reference": "9cccb6862c9fcd16e6d8a0fbd62254abb8017c99",
                 "shasum": ""
             },
             "require": {
@@ -3660,9 +3660,9 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/flysystem-bundle/issues",
-                "source": "https://github.com/thephpleague/flysystem-bundle/tree/3.7.0"
+                "source": "https://github.com/thephpleague/flysystem-bundle/tree/3.7.1"
             },
-            "time": "2026-03-28T22:14:56+00:00"
+            "time": "2026-08-10T15:55:07+00:00"
         },
         {
             "name": "league/flysystem-local",
