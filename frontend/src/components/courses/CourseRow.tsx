@@ -1,6 +1,7 @@
 import ProfessorDiv from '@/components/coursepage/ProfessorDiv';
 import DownloadButton from '@/components/ui/DownloadButton';
 import SemesterIndicator from "@/components/ui/SemesterIndicator";
+import { useProgramLanguage } from '@/components/courses/ProgramLanguageContext';
 import { useUser } from '@/components/UserContext';
 import { useApi } from "@/hooks/useApi";
 import { useFavorites } from '@/hooks/useFavorites';
@@ -30,6 +31,9 @@ export const CourseRow = memo(({
 }: CourseRowProps) => {
     const { user } = useUser();
     const { i18n } = useTranslation();
+    // Inside the curriculum navigator the programme decides the title language; elsewhere there is
+    // no programme in context and the reader's own locale is the right fallback.
+    const programLanguage = useProgramLanguage();
     const { updateFavorite } = useFavorites(user);
     const [course, setCourse] = useState<Course | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -99,7 +103,7 @@ export const CourseRow = memo(({
         star: <Skeleton circle width={16} height={16} />,
         professor: <Skeleton circle width={28} height={28} />
     } : {
-        name: localizedCourseName(course, i18n.language),
+        name: localizedCourseName(course, programLanguage ?? i18n.language),
         code: course.code,
         credits: (
             <span className="vtk-badge vtk-badge-muted">

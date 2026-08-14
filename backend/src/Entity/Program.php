@@ -16,8 +16,27 @@ class Program extends BaseEntity
     /** @var list<string> Default module names to flatten during import. */
     public const DEFAULT_FLATTEN = ['Verplichte opleidingsonderdelen', 'Compulsory courses'];
 
+    /** @var list<string> The languages a programme may be taught in. */
+    public const LANGUAGES = ['nl', 'en'];
+
+    public const DEFAULT_LANGUAGE = 'nl';
+
     #[ORM\Column(length: 255)]
     private string $name;
+
+    /**
+     * The language this programme is taught in, and therefore the language its course titles are
+     * shown in — independent of the language a visitor is browsing the site in. A Dutch programme
+     * lists Dutch titles to an English-speaking reader, because that is what those courses are
+     * actually called.
+     *
+     * Denormalized from importSettings['lang'], which is the *import parameter* (which language to
+     * fetch from KU Leuven). This column is the programme's own property: it is what the API and
+     * the curriculum navigator read, it can be filtered and indexed, and it can be corrected
+     * without touching import settings. setImportSettings() keeps the two in step.
+     */
+    #[ORM\Column(length: 2, options: ['default' => self::DEFAULT_LANGUAGE])]
+    private string $language = self::DEFAULT_LANGUAGE;
 
     /**
      * KU Leuven onderwijsaanbod identifier (programId), used to match this program
@@ -119,6 +138,35 @@ class Program extends BaseEntity
     public function setImportSettings(?array $importSettings): self
     {
         $this->importSettings = $importSettings;
+        // Keep the denormalized column in step. Done here rather than at the call site because this
+        // is the only write path, so there is nowhere for the two to drift apart.
+        $this->language = $this->getResolvedImportSettings()['lang'];
+
+        return $this;
+    }
+
+    public function getLanguage(): string
+    {
+        return $this->language;
+    }
+
+    /**
+     * Correcting a programme's language fixes its course titles immediately, because every course
+     * stores both nameNl and nameEn (@see ProgramTreeMapper::toCourse()) and the navigator simply
+     * picks by this value. Module names are not translated that way — they carry a single name in
+     * whichever language they were imported — so the import parameter is moved along with it, and
+     * the next Quick Sync re-fetches module names in the corrected language too.
+     */
+    public function setLanguage(string $language): self
+    {
+        $language = in_array($language, self::LANGUAGES, true) ? $language : self::DEFAULT_LANGUAGE;
+        $this->language = $language;
+
+        // Written straight to the array rather than via setImportSettings(), which would call back
+        // into this method.
+        $settings = $this->importSettings ?? [];
+        $settings['lang'] = $language;
+        $this->importSettings = $settings;
 
         return $this;
     }

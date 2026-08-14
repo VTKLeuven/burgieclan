@@ -29,12 +29,39 @@ class ProgramResourceTest extends ApiTestCase
                 '@id',
                 '@type',
                 'name',
+                'language',
                 'modules',
                 'createdAt',
                 'updatedAt',
             ],
             array_keys($json->decoded()['hydra:member'][0])
         );
+    }
+
+    /**
+     * The programme's language drives which course titles the curriculum navigator shows, so it
+     * has to survive the trip to the frontend. It is derived from the import settings and defaults
+     * to Dutch for programmes that were never imported.
+     */
+    public function testProgramExposesItsLanguage(): void
+    {
+        $dutch = ProgramFactory::createOne();
+        $english = ProgramFactory::createOne(['importSettings' => ['lang' => 'en']]);
+
+        foreach ([[$dutch, 'nl'], [$english, 'en']] as [$program, $expected]) {
+            $this->browser()
+                ->get(
+                    '/api/programs/' . $program->getId(),
+                    [
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $this->token
+                        ]
+                    ]
+                )
+                ->assertStatus(200)
+                ->assertJson()
+                ->assertJsonMatches('language', $expected);
+        }
     }
 
     public function testGetOneProgram(): void

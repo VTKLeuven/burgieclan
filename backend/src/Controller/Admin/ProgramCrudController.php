@@ -13,6 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -44,6 +45,16 @@ class ProgramCrudController extends AbstractCrudController
     {
         yield IdField::new('id')->onlyOnDetail();
         yield TextField::new('name');
+        yield ChoiceField::new('language')
+            ->setLabel('Language')
+            ->setChoices(['Dutch' => 'nl', 'English' => 'en'])
+            ->setHelp(
+                'The language this programme is taught in, and the language its course titles are '
+                . 'shown in — regardless of the language a visitor is browsing the site in. '
+                . 'Changing it fixes course titles straight away; module names follow on the next '
+                . 'Quick Sync. Set by the importer, so a full re-import overwrites it.'
+            )
+            ->renderAsBadges(['nl' => 'primary', 'en' => 'info']);
         yield TextField::new('kulId', 'KU Leuven id')->onlyOnDetail();
         yield AssociationField::new('modules');
     }

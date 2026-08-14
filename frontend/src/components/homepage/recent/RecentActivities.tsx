@@ -3,12 +3,13 @@ import { Activity } from '@/components/homepage/recent/Activity';
 import { HydraCollection, useApi } from '@/hooks/useApi';
 import type { DocumentView } from '@/types/entities';
 import { convertToDocumentView } from '@/utils/convertToEntity';
+import { localizedCourseName } from '@/utils/courseName';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 
 export const RecentActivities = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { request, loading, error } = useApi<HydraCollection<unknown>>();
     const [documentViews, setDocumentViews] = useState<DocumentView[]>([]);
 
@@ -44,7 +45,7 @@ export const RecentActivities = () => {
                     <Activity
                         key={documentView.id}
                         documentName={documentView.document?.name || ''}
-                        courseName={documentView.document?.course?.name || ''}
+                        courseName={localizedCourseName(documentView.document?.course, i18n.language)}
                         timestamp={documentView.lastViewed?.toISOString() || ''}
                         link={`document/${documentView.document?.id}`}
                     />
