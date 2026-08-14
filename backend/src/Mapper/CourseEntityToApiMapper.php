@@ -5,6 +5,7 @@ namespace App\Mapper;
 use App\ApiResource\CourseApi;
 use App\ApiResource\CourseCommentApi;
 use App\ApiResource\ModuleApi;
+use App\Constants\MappingContext;
 use App\Entity\Course;
 use App\Entity\CourseComment;
 use App\Entity\Module;
@@ -41,6 +42,13 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
         $to->professors = array_values($from->getProfessors());
         $to->semesters = $from->getSemesters();
         $to->credits = $from->getCredits();
+
+        // A course row already has everything it renders. Avoid walking comments, replacement
+        // courses and reverse module associations when embedded in a module detail response.
+        if ($context[MappingContext::SUMMARY] ?? false) {
+            return $to;
+        }
+
         $to->oldCourses = array_map(
             function (Course $course) {
                 return $this->microMapper->map(

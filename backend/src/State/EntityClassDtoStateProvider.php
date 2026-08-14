@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
+use App\Constants\MappingContext;
 use ArrayIterator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -36,7 +37,7 @@ class EntityClassDtoStateProvider implements ProviderInterface
 
             $dtos = [];
             foreach ($entities as $entity) {
-                $dtos[] = $this->mapEntityToDto($entity, $resourceClass);
+                $dtos[] = $this->mapEntityToDto($entity, $resourceClass, $operation, true);
             }
 
             // If pagination is disabled, return the raw array of DTOs
@@ -61,13 +62,25 @@ class EntityClassDtoStateProvider implements ProviderInterface
             return null;
         }
 
-        return $this->mapEntityToDto($entity, $resourceClass);
+        return $this->mapEntityToDto($entity, $resourceClass, $operation, false);
     }
 
-    private function mapEntityToDto(object $entity, string $resourceClass): object
-    {
+    private function mapEntityToDto(
+        object $entity,
+        string $resourceClass,
+        Operation $operation,
+        bool $collectionOperation,
+    ): object {
         $request = $this->requestStack->getCurrentRequest();
         $lang = $request->query->get('lang'); // If the language is given as param, pass it to the mapper
-        return $this->microMapper->map($entity, $resourceClass, ["lang" => $lang]);
+        return $this->microMapper->map(
+            $entity,
+            $resourceClass,
+            [
+                'lang' => $lang,
+                MappingContext::COLLECTION_OPERATION => $collectionOperation,
+                MappingContext::OPERATION_NAME => $operation->getName(),
+            ]
+        );
     }
 }

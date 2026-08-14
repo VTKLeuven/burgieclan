@@ -10,8 +10,8 @@ import {
     moduleContainsChildMatches,
     moduleMatchesText
 } from '@/utils/curriculumSearchUtils';
-import { ChevronRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ChevronRight, LoaderCircle } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ModuleNodeProps {
@@ -19,7 +19,6 @@ interface ModuleNodeProps {
     autoExpand?: boolean;
     searchFilters?: SearchFilters | null;
     favoriteCourses?: Course[];
-    parentVisible?: boolean;
 }
 
 const ModuleNode = ({
@@ -27,34 +26,38 @@ const ModuleNode = ({
     autoExpand = false,
     searchFilters = null,
     favoriteCourses = [],
-    parentVisible = true
 }: ModuleNodeProps) => {
     const { t } = useTranslation();
-    const { request } = useApi();
+    const { request, loading, error } = useApi<unknown>();
     const [expanded, setExpanded] = useState(false);
     const [module, setModule] = useState<Module>(initialModule);
+    const [loaded, setLoaded] = useState(
+        () => Array.isArray(initialModule.courses) && Array.isArray(initialModule.modules)
+    );
+    const requestInFlight = useRef(false);
 
+    const loadModule = useCallback(async () => {
+        if (loaded || requestInFlight.current) return;
 
-    // Fetch full module if shallow and parent is visible
-    useEffect(() => {
-        async function fetchModule() {
-            const data = await request('GET', `/api/modules/${module.id}`);
-            if (!data) {
-                return null;
-            }
-            setModule(convertToModule(data));
+        requestInFlight.current = true;
+        const data = await request('GET', `/api/modules/${initialModule.id}`);
+        requestInFlight.current = false;
+
+        if (!data) return;
+
+        setModule(convertToModule(data));
+        setLoaded(true);
+    }, [initialModule.id, loaded, request]);
+
+    const toggleExpanded = () => {
+        if (expanded) {
+            setExpanded(false);
+            return;
         }
 
-        // Helper: is shallow module (only id is defined, all other properties are null or undefined)
-        const isShallow = module && Object.entries(module).every(([key, value]) => {
-            if (key === 'id') return typeof value === 'number';
-            return value === undefined || value === null;
-        });
-
-        if (isShallow && parentVisible) {
-            fetchModule();
-        }
-    }, [module, module.id, request, parentVisible]);
+        setExpanded(true);
+        void loadModule();
+    };
 
     // Get search query
     const searchQuery = searchFilters?.query?.toLowerCase();
@@ -72,8 +75,9 @@ const ModuleNode = ({
         if (autoExpand && hasChildMatches) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setExpanded(true);
+            void loadModule();
         }
-    }, [autoExpand, hasChildMatches]);
+    }, [autoExpand, hasChildMatches, loadModule]);
 
     // Calculate if any child items match
     const getChildMatches = (): {
@@ -99,7 +103,7 @@ const ModuleNode = ({
             <div
                 className={`flex cursor-pointer items-center gap-2.5 py-2 px-3 border border-vtk-line bg-vtk-paper rounded-md hover:bg-vtk-paper-2 ${moduleMatches ? 'ring-1 ring-vtk-yellow' : ''
                     }`}
-                onClick={() => setExpanded(!expanded)}
+                onClick={toggleExpanded}
             >
                 <ChevronRight
                     size={16}
@@ -116,49 +120,59 @@ const ModuleNode = ({
                 <DownloadButton modules={[module]} />
             </div>
 
-            <div className={`transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100 overflow-visible' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+            {expanded && (
                 <div className="pl-4 mt-1 space-y-1">
-                    {/* Courses this module teaches itself come first: they belong to the module you
-                        just opened, whereas submodules are a level down. Putting the submodules
-                        first pushed a module's own courses below an arbitrarily deep subtree. */}
-                    {module.courses && module.courses.length > 0 && (
-                        <div className="border border-vtk-line rounded-md">
-                            <CourseTableHeader />
-                            {module.courses.map((course, index) => (
-                                <CourseRow
-                                    key={course.id}
-                                    course={course}
-                                    highlightMatch={!!searchQuery && courseMatchesText(course, searchQuery)}
-                                    isFirstRow={index === 0}
-                                    parentVisible={expanded}
+                    {loading && !loaded ? (
+                        <div className="flex items-center justify-center py-5">
+                            <LoaderCircle className="animate-spin text-vtk-navy" size={20} />
+                        </div>
+                    ) : error && !loaded ? (
+                        <div className="px-2 py-3 text-sm text-vtk-muted">
+                            {t('unexpected')}
+                        </div>
+                    ) : (
+                        <>
+                            {/* Courses this module teaches itself come first: they belong to the module you
+                                just opened, whereas submodules are a level down. Putting the submodules
+                                first pushed a module's own courses below an arbitrarily deep subtree. */}
+                            {module.courses && module.courses.length > 0 && (
+                                <div className="border border-vtk-line rounded-md">
+                                    <CourseTableHeader />
+                                    {module.courses.map((course, index) => (
+                                        <CourseRow
+                                            key={course.id}
+                                            course={course}
+                                            highlightMatch={!!searchQuery && courseMatchesText(course, searchQuery)}
+                                            isFirstRow={index === 0}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Render submodules recursively */}
+                            {module.modules?.map(submodule => (
+                                <ModuleNode
+                                    key={submodule.id}
+                                    module={submodule}
+                                    autoExpand={autoExpand}
+                                    searchFilters={searchFilters}
+                                    favoriteCourses={favoriteCourses}
                                 />
                             ))}
-                        </div>
+
+                            {/* Empty state when no submodules and no courses */}
+                            {(!module.modules || module.modules.length === 0) &&
+                                (!module.courses || module.courses.length === 0) && (
+                                    <div className="py-3 px-2">
+                                        <div className="text-vtk-muted text-sm italic">
+                                            {t('curriculum-navigator.no-courses-in-module')}
+                                        </div>
+                                    </div>
+                                )}
+                        </>
                     )}
-
-                    {/* Render submodules recursively */}
-                    {module.modules?.map(submodule => (
-                        <ModuleNode
-                            key={submodule.id}
-                            module={submodule}
-                            autoExpand={autoExpand}
-                            searchFilters={searchFilters}
-                            favoriteCourses={favoriteCourses}
-                            parentVisible={expanded}
-                        />
-                    ))}
-
-                    {/* Empty state when no submodules and no courses */}
-                    {(!module.modules || module.modules.length === 0) &&
-                        (!module.courses || module.courses.length === 0) && (
-                            <div className="py-3 px-2">
-                                <div className="text-vtk-muted text-sm italic">
-                                    {t('curriculum-navigator.no-courses-in-module')}
-                                </div>
-                            </div>
-                        )}
                 </div>
-            </div>
+            )}
         </div>
     );
 };

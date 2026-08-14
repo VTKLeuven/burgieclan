@@ -14,14 +14,26 @@ import {
   initializeFuseInstances,
   searchWithAnalytics
 } from '@/utils/curriculumSearchUtils';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function CurriculumNavigator() {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [originalPrograms, setOriginalPrograms] = useState<Program[]>([]);
+  const [searchPrograms, setSearchPrograms] = useState<Program[] | null>(null);
   const [searchFilters, setSearchFilters] = useState<SearchFilters | null>(null);
-  const { request, loading, error } = useApi<HydraCollection<unknown>>();
+  const [showSearchError, setShowSearchError] = useState(false);
+  const searchRequestVersion = useRef(0);
+  const {
+    request: requestPrograms,
+    loading: initialLoading,
+    error: programError
+  } = useApi<HydraCollection<unknown>>();
+  const {
+    request: requestSearchPrograms,
+    loading: searchLoading,
+    error: searchError
+  } = useApi<HydraCollection<unknown>>();
   const { t } = useTranslation();
   const { user } = useUser();
   const [matchCounts, setMatchCounts] = useState({
@@ -38,7 +50,7 @@ export default function CurriculumNavigator() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const result = await request('GET', `/api/programs?order[name]=asc`);
+      const result = await requestPrograms('GET', `/api/programs?pagination=false&order[name]=asc`);
       if (!result) {
         return null;
       }
@@ -47,32 +59,58 @@ export default function CurriculumNavigator() {
       setPrograms(fetchedPrograms);
       setOriginalPrograms(fetchedPrograms);
 
-      // Extract all entities and initialize budget-aware Fuse instances
-      const { courses, modules, programs } = extractEntities(fetchedPrograms);
-
-      // Store total entity counts
+      // The initial response intentionally contains program names only.
       setTotalEntities({
-        courses: courses.length,
-        modules: modules.length,
-        programs: programs.length
+        courses: 0,
+        modules: 0,
+        programs: fetchedPrograms.length
       });
 
-      initializeFuseInstances(courses, modules, programs);
+      initializeFuseInstances([], [], fetchedPrograms);
     };
 
     fetchData();
-  }, [request]);
+  }, [requestPrograms]);
 
-  const handleSearch = (filters: SearchFilters) => {
-    setSearchFilters(filters);
+  const handleSearch = async (filters: SearchFilters) => {
+    const requestVersion = ++searchRequestVersion.current;
 
     if (!filters.query && !filters.semester && !filters.minCredits &&
       !filters.maxCredits && !filters.showOnlyFavorites) {
+      setShowSearchError(false);
+      setSearchFilters(null);
       setPrograms(originalPrograms);
       setMatchCounts({ programs: 0, modules: 0, courses: 0 });
       setSearchAnalytics(null);
       return;
     }
+
+    // Filtering by modules/courses needs the tree, so load it only after the user explicitly
+    // searches. Normal browsing remains fully incremental through the opened dropdowns.
+    let curriculum = searchPrograms;
+    if (!curriculum) {
+      setShowSearchError(true);
+      const result = await requestSearchPrograms(
+        'GET',
+        `/api/programs/tree?pagination=false&order[name]=asc`
+      );
+      if (requestVersion !== searchRequestVersion.current) return;
+      if (!result) return;
+
+      setShowSearchError(false);
+      curriculum = result['hydra:member'].map(convertToProgram);
+      setSearchPrograms(curriculum);
+
+      const entities = extractEntities(curriculum);
+      setTotalEntities({
+        courses: entities.courses.length,
+        modules: entities.modules.length,
+        programs: entities.programs.length
+      });
+      initializeFuseInstances(entities.courses, entities.modules, entities.programs);
+    }
+
+    setSearchFilters(filters);
 
     // Use enhanced search with analytics if we have a text query
     if (filters.query) {
@@ -81,7 +119,7 @@ export default function CurriculumNavigator() {
 
       // Apply additional filters to the budget-filtered results
       const { filteredPrograms, matchCounts: newMatchCounts } = filterCurriculum(
-        originalPrograms, filters, user?.favoriteCourses || []
+        curriculum, filters, user?.favoriteCourses || []
       );
 
       setPrograms(filteredPrograms);
@@ -89,7 +127,7 @@ export default function CurriculumNavigator() {
     } else {
       // Use the regular filtering for non-text searches
       const { filteredPrograms, matchCounts: newMatchCounts } = filterCurriculum(
-        originalPrograms, filters, user?.favoriteCourses || []
+        curriculum, filters, user?.favoriteCourses || []
       );
 
       setPrograms(filteredPrograms);
@@ -99,13 +137,15 @@ export default function CurriculumNavigator() {
   };
 
   const clearSearch = () => {
+    searchRequestVersion.current += 1;
+    setShowSearchError(false);
     setSearchFilters(null);
     setPrograms(originalPrograms);
     setMatchCounts({ programs: 0, modules: 0, courses: 0 });
     setSearchAnalytics(null);
   };
 
-  if (loading) {
+  if (initialLoading) {
     return <Loading />;
   }
 
@@ -127,25 +167,29 @@ export default function CurriculumNavigator() {
         </div>
         <div className="vtk-page-meta hidden sm:block">
           <b>{totalEntities.programs}</b> programs<br />
-          <b>{totalEntities.courses}</b> courses
+          {searchPrograms && <><b>{totalEntities.courses}</b> courses</>}
         </div>
       </div>
 
       <div className="mt-7">
-        <CurriculumSearchBar onSearch={handleSearch} clearSearch={clearSearch} />
+        <CurriculumSearchBar
+          onSearch={handleSearch}
+          clearSearch={clearSearch}
+          loading={searchLoading}
+        />
       </div>
 
-      {error && (
+      {(programError || (showSearchError && searchError)) && (
         <div className="vtk-panel vtk-empty mt-5">
           {t('unexpected')}
         </div>
       )}
 
-      {!error && (programs.length > 0 ? (
+      {!programError && (programs.length > 0 ? (
         <div className="curriculum-tree mt-5 grid gap-2.5">
           {programs.map((program) => (
             <ProgramNode
-              key={program.id}
+              key={`${program.id}:${hasActiveSearch ? JSON.stringify(searchFilters) : 'browse'}`}
               program={program}
               autoExpand={hasActiveSearch}
               searchFilters={searchFilters}
