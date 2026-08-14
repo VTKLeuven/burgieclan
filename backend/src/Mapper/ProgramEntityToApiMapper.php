@@ -32,6 +32,8 @@ class ProgramEntityToApiMapper extends BaseEntityToApiMapper
         assert($to instanceof ProgramApi);
 
         $to->name = $from->getName();
+        // Defaults to 'nl' for manually created programs, which were never imported.
+        $to->language = $from->getLanguage();
 
         $to->modules = array_map(
             function (Module $module) {
