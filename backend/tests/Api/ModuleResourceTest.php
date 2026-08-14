@@ -110,7 +110,10 @@ class ModuleResourceTest extends ApiTestCase
             ->json();
 
         // Find parent modules (those with 2 submodules)
-        $parents = array_filter($json->decoded()['hydra:member'], fn($m) => isset($m['modules']) && count($m['modules']) === 2);
+        $parents = array_filter(
+            $json->decoded()['hydra:member'],
+            fn($m) => isset($m['modules']) && count($m['modules']) === 2
+        );
         $this->assertCount(3, $parents);
         foreach ($parents as $module) {
             $this->assertArrayHasKey('modules', $module);
@@ -149,6 +152,8 @@ class ModuleResourceTest extends ApiTestCase
         foreach ($json->decoded()['modules'] as $submodule) {
             $this->assertArrayHasKey('@id', $submodule);
             $this->assertArrayHasKey('name', $submodule);
+            $this->assertArrayNotHasKey('courses', $submodule);
+            $this->assertArrayNotHasKey('modules', $submodule);
         }
     }
 

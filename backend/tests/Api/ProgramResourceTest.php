@@ -3,6 +3,7 @@
 namespace App\Tests\Api;
 
 use App\Factory\ProgramFactory;
+use App\Factory\ModuleFactory;
 
 class ProgramResourceTest extends ApiTestCase
 {
@@ -29,13 +30,97 @@ class ProgramResourceTest extends ApiTestCase
                 '@id',
                 '@type',
                 'name',
-                'language',
-                'modules',
-                'createdAt',
-                'updatedAt',
             ],
             array_keys($json->decoded()['hydra:member'][0])
         );
+    }
+
+    public function testProgramCollectionDoesNotEmbedItsCurriculum(): void
+    {
+        $program = ProgramFactory::createOne(['name' => 'Civil Engineering']);
+        $child = ModuleFactory::createOne(['program' => null, 'modules' => []]);
+        ModuleFactory::createOne(
+            [
+            'program' => $program,
+            'name' => 'Bachelor year one',
+            'modules' => [$child],
+            ]
+        );
+
+        $programJson = $this->browser()
+            ->get(
+                '/api/programs',
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->json()
+            ->decoded()['hydra:member'][0];
+
+        $this->assertSame('Civil Engineering', $programJson['name']);
+        $this->assertArrayNotHasKey('modules', $programJson);
+        $this->assertArrayNotHasKey('language', $programJson);
+    }
+
+    public function testProgramDetailOnlyEmbedsDirectModuleNames(): void
+    {
+        $program = ProgramFactory::createOne();
+        $child = ModuleFactory::createOne(['program' => null, 'modules' => []]);
+        ModuleFactory::createOne(
+            [
+            'program' => $program,
+            'name' => 'Direct module',
+            'modules' => [$child],
+            ]
+        );
+
+        $programJson = $this->browser()
+            ->get(
+                '/api/programs/' . $program->getId(),
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->json()
+            ->decoded();
+
+        $this->assertCount(1, $programJson['modules']);
+        $this->assertEqualsCanonicalizing(
+            ['@id', '@type', 'name'],
+            array_keys($programJson['modules'][0])
+        );
+        $this->assertSame('Direct module', $programJson['modules'][0]['name']);
+        $this->assertArrayNotHasKey('courses', $programJson['modules'][0]);
+        $this->assertArrayNotHasKey('modules', $programJson['modules'][0]);
+    }
+
+    public function testCurriculumTreeRemainsAvailableForExplicitSearches(): void
+    {
+        $program = ProgramFactory::createOne();
+        $child = ModuleFactory::createOne(
+            [
+            'program' => null,
+            'name' => 'Searchable child',
+            'modules' => [],
+            ]
+        );
+        ModuleFactory::createOne(
+            [
+            'program' => $program,
+            'name' => 'Searchable parent',
+            'modules' => [$child],
+            ]
+        );
+
+        $programJson = $this->browser()
+            ->get(
+                '/api/programs/tree?pagination=false',
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->json()
+            ->decoded()['hydra:member'][0];
+
+        $this->assertSame('Searchable parent', $programJson['modules'][0]['name']);
+        $this->assertSame('Searchable child', $programJson['modules'][0]['modules'][0]['name']);
     }
 
     /**

@@ -20,6 +20,7 @@ final class SerializationGroups
     public const MODULE_GET = 'module:get';
     public const PAGE_GET = 'page:get';
     public const PROGRAM_GET = 'program:get';
+    public const PROGRAM_LIST = 'program:list';
     public const TAG_GET = 'tag:get';
     public const QUICKLINK_GET = 'quicklink:get';
     public const FAQ_ITEM_GET = 'faq_item:get';

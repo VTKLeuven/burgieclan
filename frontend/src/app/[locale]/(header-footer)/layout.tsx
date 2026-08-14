@@ -11,7 +11,12 @@ export default function HeaderLayout({ children }: Readonly<{ children: React.Re
             <Header />
             <div className="flex flex-1 items-start">
                 <Sidebar />
-                <main className="min-w-0 flex-1">
+                <main
+                    className="min-w-0 flex-1"
+                    style={{
+                        '--vtk-loading-min-height': 'calc(100dvh - var(--vtk-header-height))'
+                    } as React.CSSProperties}
+                >
                     {children}
                 </main>
             </div>

@@ -20,14 +20,19 @@ interface CourseRowProps {
     course: Course;
     highlightMatch?: boolean;
     isFirstRow?: boolean;
-    parentVisible?: boolean;
+}
+
+function hasCourseRowData(course: Course): boolean {
+    return course.name !== undefined &&
+        course.code !== undefined &&
+        course.professors !== undefined &&
+        course.semesters !== undefined;
 }
 
 export const CourseRow = memo(({
     course: initialCourse,
     highlightMatch = false,
     isFirstRow = false,
-    parentVisible = true,
 }: CourseRowProps) => {
     const { user } = useUser();
     const { i18n } = useTranslation();
@@ -35,22 +40,20 @@ export const CourseRow = memo(({
     // no programme in context and the reader's own locale is the right fallback.
     const programLanguage = useProgramLanguage();
     const { updateFavorite } = useFavorites(user);
-    const [course, setCourse] = useState<Course | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [course, setCourse] = useState<Course | null>(
+        () => hasCourseRowData(initialCourse) ? initialCourse : null
+    );
+    const [loading, setLoading] = useState<boolean>(() => !hasCourseRowData(initialCourse));
     const { request } = useApi();
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
-    // Fetch complete course data if we only have the ID and parent is visible
+    // Module details embed all row data. Keep a defensive item fallback for older/cached API
+    // responses, but a normal curriculum expansion does not trigger one request per course.
     useEffect(() => {
         async function fetchCourseData() {
             if (!initialCourse.id) return;
 
             // If we have essential data, just use it
-            if (initialCourse.name && initialCourse.code && initialCourse.credits && initialCourse.semesters) {
-                setCourse(initialCourse);
-                return;
-            }
-
             setLoading(true);
             try {
                 const courseData = await request('GET', `/api/courses/${initialCourse.id}`);
@@ -70,10 +73,10 @@ export const CourseRow = memo(({
             }
         }
 
-        if (parentVisible) {
+        if (!hasCourseRowData(initialCourse)) {
             fetchCourseData();
         }
-    }, [initialCourse, request, parentVisible]);
+    }, [initialCourse, request]);
 
     // Update favorite status when user data changes
     useEffect(() => {

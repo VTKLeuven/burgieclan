@@ -1,11 +1,12 @@
 import Input from '@/components/ui/Input';
-import { Filter, Search, X } from 'lucide-react';
+import { Filter, LoaderCircle, Search, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface SearchProps {
-    onSearch: (filters: SearchFilters) => void;
+    onSearch: (filters: SearchFilters) => void | Promise<void>;
     clearSearch: () => void;
+    loading?: boolean;
 }
 
 export interface SearchFilters {
@@ -16,7 +17,7 @@ export interface SearchFilters {
     showOnlyFavorites: boolean;
 }
 
-export default function CurriculumSearchBar({ onSearch, clearSearch }: SearchProps) {
+export default function CurriculumSearchBar({ onSearch, clearSearch, loading = false }: SearchProps) {
     const { t } = useTranslation();
     const [query, setQuery] = useState('');
     const [showFilters, setShowFilters] = useState(false);
@@ -25,8 +26,8 @@ export default function CurriculumSearchBar({ onSearch, clearSearch }: SearchPro
     const [maxCredits, setMaxCredits] = useState<string>('');
     const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
 
-    const handleSearch = () => {
-        onSearch({
+    const handleSearch = async () => {
+        await onSearch({
             query: query.trim(),
             semester: semester,
             minCredits: minCredits ? parseInt(minCredits) : null,
@@ -46,7 +47,7 @@ export default function CurriculumSearchBar({ onSearch, clearSearch }: SearchPro
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') handleSearch();
+        if (e.key === 'Enter' && !loading) void handleSearch();
     };
 
     return (
@@ -79,9 +80,11 @@ export default function CurriculumSearchBar({ onSearch, clearSearch }: SearchPro
                     <Filter size={16} />
                 </button>
                 <button
-                    onClick={handleSearch}
+                    onClick={() => void handleSearch()}
+                    disabled={loading}
                     className="vtk-button vtk-button-primary h-[42px]"
                 >
+                    {loading && <LoaderCircle className="animate-spin" size={16} />}
                     {t('curriculum-navigator.search-submit')}
                 </button>
             </div>

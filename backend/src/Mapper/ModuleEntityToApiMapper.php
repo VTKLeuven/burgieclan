@@ -5,6 +5,7 @@ namespace App\Mapper;
 use App\ApiResource\CourseApi;
 use App\ApiResource\ModuleApi;
 use App\ApiResource\ProgramApi;
+use App\Constants\MappingContext;
 use App\Entity\Course;
 use App\Entity\Module;
 use Symfonycasts\MicroMapper\AsMapper;
@@ -34,8 +35,24 @@ class ModuleEntityToApiMapper extends BaseEntityToApiMapper
 
         $to->name = $from->getName();
         $to->isElective = $from->isElective();
+
+        // Embedded modules only need enough information to draw the next row. Their relationships
+        // stay uninitialized so Symfony omits them; expanding the row requests its real detail.
+        if ($context[MappingContext::SUMMARY] ?? false) {
+            return $to;
+        }
+
+        $includeCurriculumTree = $context[MappingContext::CURRICULUM_TREE] ?? false;
         $to->courses = array_map(
-            function (Course $course) {
+            function (Course $course) use ($includeCurriculumTree) {
+                if (!$includeCurriculumTree) {
+                    return $this->microMapper->map(
+                        $course,
+                        CourseApi::class,
+                        [MappingContext::SUMMARY => true]
+                    );
+                }
+
                 return $this->microMapper->map(
                     $course,
                     CourseApi::class,
@@ -47,12 +64,21 @@ class ModuleEntityToApiMapper extends BaseEntityToApiMapper
             $from->getCourses()->getValues()
         );
         $to->modules = array_map(
-            function (Module $module) {
+            function (Module $module) use ($includeCurriculumTree) {
+                if (!$includeCurriculumTree) {
+                    return $this->microMapper->map(
+                        $module,
+                        ModuleApi::class,
+                        [MappingContext::SUMMARY => true]
+                    );
+                }
+
                 return $this->microMapper->map(
                     $module,
                     ModuleApi::class,
                     [
                         MicroMapperInterface::MAX_DEPTH => 1,
+                        MappingContext::CURRICULUM_TREE => true,
                     ]
                 );
             },

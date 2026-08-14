@@ -85,6 +85,7 @@ export function convertToModule(module: unknown): Module {
     return {
         id: parseId(data['@id']),
         name: typeof data.name === 'string' ? data.name : undefined,
+        isElective: typeof data.isElective === 'boolean' ? data.isElective : undefined,
         courses: asArray(data.courses)?.map(convertToCourse),
         modules: asArray(data.modules)?.map(convertToModule),
         program: data.program ? convertToProgram(data.program) : undefined

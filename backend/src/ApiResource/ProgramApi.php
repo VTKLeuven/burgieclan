@@ -20,10 +20,26 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     shortName: 'Program',
     operations: [
-        new Get(),
-        new GetCollection(),
+        // Full-tree data remains opt-in for the curriculum search, which cannot filter unloaded
+        // descendants. It is never requested during the initial page load. Keep this static route
+        // before the /programs/{id} route so "tree" is not interpreted as an identifier.
+        new GetCollection(
+            uriTemplate: 'programs/tree',
+            name: 'program_tree',
+            normalizationContext: [
+                'groups' => [SerializationGroups::PROGRAM_GET, SerializationGroups::MODULE_GET],
+            ],
+        ),
+        // The normal collection is deliberately shallow: opening /courses only needs the names.
+        new GetCollection(
+            name: 'program_list',
+            normalizationContext: ['groups' => [SerializationGroups::PROGRAM_LIST]],
+        ),
+        new Get(
+            name: 'program_detail',
+            normalizationContext: ['groups' => [SerializationGroups::PROGRAM_GET]],
+        ),
     ],
-    normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::PROGRAM_GET]],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: Program::class),
@@ -36,6 +52,7 @@ class ProgramApi extends BaseEntityApi
     #[Groups(
         [
             SerializationGroups::PROGRAM_GET,
+            SerializationGroups::PROGRAM_LIST,
             SerializationGroups::SEARCH,
             SerializationGroups::USER
         ]
