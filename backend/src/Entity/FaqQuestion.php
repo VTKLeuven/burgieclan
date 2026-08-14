@@ -17,6 +17,9 @@ use Doctrine\ORM\Mapping as ORM;
 // The admin menu badge counts new questions on every admin page load.
 #[ORM\Index(name: 'idx_faq_question_status', columns: ['status'])]
 #[ORM\Index(name: 'idx_faq_question_author', columns: ['author_id'])]
+// Declared because Version20260813120000 created it and the admin filters on type; without it here
+// every migrations:diff proposes dropping it. @see FaqQuestionCrudController::configureFilters()
+#[ORM\Index(name: 'idx_faq_question_type', columns: ['type'])]
 class FaqQuestion extends BaseEntity
 {
     public const STATUS_NEW = 'new';
@@ -67,7 +70,9 @@ class FaqQuestion extends BaseEntity
     #[ORM\Column(length: 20)]
     private string $status = self::STATUS_NEW;
 
-    #[ORM\Column(length: 30)]
+    // The DB default never fires — the property default means Doctrine always sends a value on
+    // INSERT — but declaring it keeps the mapping honest about what the column actually looks like.
+    #[ORM\Column(length: 30, options: ['default' => self::TYPE_GENERAL])]
     private string $type = self::TYPE_GENERAL;
 
     /**

@@ -150,9 +150,23 @@ class Program extends BaseEntity
         return $this->language;
     }
 
+    /**
+     * Correcting a programme's language fixes its course titles immediately, because every course
+     * stores both nameNl and nameEn (@see ProgramTreeMapper::toCourse()) and the navigator simply
+     * picks by this value. Module names are not translated that way — they carry a single name in
+     * whichever language they were imported — so the import parameter is moved along with it, and
+     * the next Quick Sync re-fetches module names in the corrected language too.
+     */
     public function setLanguage(string $language): self
     {
-        $this->language = in_array($language, self::LANGUAGES, true) ? $language : self::DEFAULT_LANGUAGE;
+        $language = in_array($language, self::LANGUAGES, true) ? $language : self::DEFAULT_LANGUAGE;
+        $this->language = $language;
+
+        // Written straight to the array rather than via setImportSettings(), which would call back
+        // into this method.
+        $settings = $this->importSettings ?? [];
+        $settings['lang'] = $language;
+        $this->importSettings = $settings;
 
         return $this;
     }
