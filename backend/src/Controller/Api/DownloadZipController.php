@@ -8,6 +8,7 @@ use App\Entity\Document;
 use App\Entity\Module;
 use App\Entity\Program;
 use App\Repository\DocumentRepository;
+use App\Utils\DownloadFilename;
 use DateTime;
 use DateTimeZone;
 use RuntimeException;
@@ -28,6 +29,16 @@ final class DownloadZipController extends AbstractController
         private readonly StorageInterface $storage,
         private readonly KernelInterface $kernel,
     ) {}
+
+    /**
+     * The entry name each document was actually written under inside the zip, by
+     * document id. Filled while adding files, read back when the HTML index is
+     * generated so its links match the entries — including the "_1" suffix the
+     * duplicate handling may have added.
+     *
+     * @var array<int, string>
+     */
+    private array $zipEntryNames = [];
 
     public function __invoke(ZipApi $zipApi): Response
     {
@@ -86,7 +97,7 @@ final class DownloadZipController extends AbstractController
         }
 
         foreach ($documents as $document) {
-            $content .= $document->getFileName();
+            $content .= $this->getDocumentContent($document);
         }
 
         return md5($content);
@@ -120,10 +131,23 @@ final class DownloadZipController extends AbstractController
         $content = $course->getName();
 
         foreach ($this->documentRepository->findByCourseAndHasFile($course) as $document) {
-            $content .= $document->getFileName();
+            $content .= $this->getDocumentContent($document);
         }
 
         return $content;
+    }
+
+    /**
+     * What identifies a document for zip-caching purposes.
+     *
+     * The stored filename alone is not enough: it is unique per upload, but it no
+     * longer decides what the file is called inside the zip. Mixing the served name
+     * in means renaming a document invalidates the cached archive instead of handing
+     * out one that still carries the old name.
+     */
+    private function getDocumentContent(Document $document): string
+    {
+        return $document->getFileName() . DownloadFilename::forDocument($document);
     }
 
     private function createZipFile(
@@ -217,9 +241,12 @@ final class DownloadZipController extends AbstractController
                 if ($document->getFileName()) {
                     $fileStream = $this->storage->resolveStream($document, 'file');
                     if ($fileStream !== null) {
-                        $originalFileName = $document->getFileName();
+                        // The stored name carries the uniqid the SmartUniqueNamer appended
+                        // on upload; inside the zip we want the document's own name.
+                        $originalFileName = DownloadFilename::forDocument($document);
                         $fileNameToUse = $this->getUniqueFileName($originalFileName, $usedFilenames[$category]);
                         $usedFilenames[$category][] = $fileNameToUse;
+                        $this->zipEntryNames[$document->getId()] = $fileNameToUse;
 
                         $zip->addFromString($categoryDir . '/' . $fileNameToUse, stream_get_contents($fileStream));
                     }
@@ -708,12 +735,13 @@ final class DownloadZipController extends AbstractController
      */
     private function renderDocumentHTML(Document $document, string $parentPath = ''): string
     {
-        $fileName = $document->getFileName();
-
         // Skip documents without files entirely
-        if (!$fileName) {
+        if (!$document->getFileName()) {
             return '';
         }
+
+        // Link to the name the file carries inside the zip, not the storage name.
+        $fileName = $this->zipEntryNames[$document->getId()] ?? DownloadFilename::forDocument($document);
 
         $filePath = '';
 
