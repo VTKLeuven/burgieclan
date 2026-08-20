@@ -19,12 +19,6 @@ interface FavoriteDocumentsProps {
     course: Course;
 }
 
-const extractFilename = (contentUrl?: string): string => {
-    if (!contentUrl) return '';
-    const parts = contentUrl.split('/');
-    return parts[parts.length - 1]; // Get the last part of the path
-};
-
 const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course }) => {
     const { user, loading: userLoading } = useUser();
     const { t } = useTranslation();
@@ -119,9 +113,6 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
                                     <Badge text={t('document.under_review')} color="yellow" />
                                 )}
                             </div>
-                            <p className="text-xs text-vtk-muted truncate">
-                                {extractFilename(document.contentUrl)}
-                            </p>
 
                             <div className="text-xs text-vtk-muted flex justify-between mt-1">
                                 <p className="whitespace-nowrap">
