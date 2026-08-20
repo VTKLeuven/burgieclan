@@ -1,12 +1,15 @@
 import { isErrorResponse, useApi } from "@/hooks/useApi";
+import { useUser } from "@/components/UserContext";
 import { User } from "@/types/entities";
 import { ApiError } from "@/utils/error/apiError";
 import { useState } from "react";
 
 type FavoriteType = "course" | "module" | "program" | "document";
 
-export function useFavorites(user: User | null) {
+export function useFavorites(userParam?: User | null) {
     const { request, loading } = useApi();
+    const { user: contextUser, refreshUser } = useUser();
+    const user = userParam !== undefined ? userParam : contextUser;
     const [error, setError] = useState<Error | null>(null);
 
     const updateFavorite = async (id: number, type: FavoriteType, isFavorite: boolean) => {
@@ -44,6 +47,8 @@ export function useFavorites(user: User | null) {
             if (isErrorResponse(result)) {
                 throw new ApiError(result.error?.message ?? 'Failed to update favorites', result.error?.status || 500);
             }
+
+            await refreshUser();
 
             return result;
         } catch (err: unknown) {
