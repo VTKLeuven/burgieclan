@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Constants\PreviewableFile;
 use App\Repository\DocumentRepository;
+use App\Utils\DownloadFilename;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,7 +34,9 @@ final class DownloadController extends AbstractController
                 $document,
                 'file',
                 null,
-                null,
+                // Serve under the document's own name instead of the storage name,
+                // which carries the uniqid the SmartUniqueNamer appended on upload.
+                DownloadFilename::forDocument($document),
                 false
             );
 

@@ -259,11 +259,18 @@ class DocumentBulkUploadController extends AbstractController
                     continue;
                 }
 
-                // Move file to temporary location
+                // Move file to temporary location. The file keeps its original name and
+                // gets a directory of its own to collide in instead: the temp basename
+                // ends up as the uploaded file's client name (ReplacingFile derives it
+                // from the path), and from there into the stored filename — so a
+                // uniqid prefix here would show up in every download of this document.
                 $originalName = $uploadedFile->getClientOriginalName();
-                $tmpFilename = uniqid() . '_' . $originalName;
-                $uploadedFile->move($tempDir, $tmpFilename);
-                $tmpPath = $tempDir . '/' . $tmpFilename;
+                $fileTempDir = $tempDir . '/' . uniqid();
+                if (!is_dir($fileTempDir) && !mkdir($fileTempDir, 0777, true) && !is_dir($fileTempDir)) {
+                    throw new \RuntimeException('Could not create temporary directory: ' . $fileTempDir);
+                }
+                $uploadedFile->move($fileTempDir, $originalName);
+                $tmpPath = $fileTempDir . '/' . $originalName;
 
                 // Preserve the original file timestamp if available
                 $timestamp = $fileTimestamps[$fileIndex];
@@ -705,8 +712,10 @@ class DocumentBulkUploadController extends AbstractController
     private function cleanupTempFiles(array $documentsMetadata): void
     {
         foreach ($documentsMetadata as $doc) {
-            if (isset($doc['tmpPath']) && file_exists($doc['tmpPath'])) {
+            if (isset($doc['tmpPath']) && is_string($doc['tmpPath']) && file_exists($doc['tmpPath'])) {
                 @unlink($doc['tmpPath']);
+                // Each file lives in its own directory under the session dir.
+                @rmdir(dirname($doc['tmpPath']));
             }
         }
 

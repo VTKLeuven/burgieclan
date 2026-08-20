@@ -13,6 +13,29 @@ export interface DownloadOptions {
 }
 
 /**
+ * Read the filename out of a Content-Disposition header.
+ *
+ * The backend sends both forms: an ASCII-only `filename=` that high characters have
+ * been stripped from, and an RFC 5987 `filename*=` that keeps them. Prefer the latter
+ * so a document called "Résumé" does not download as "Rsum".
+ */
+const parseContentDispositionFilename = (contentDisposition: string): string | null => {
+    const extended = contentDisposition.match(/filename\*=\s*([^']*)'[^']*'([^;]+)/i);
+    if (extended && extended[2]) {
+        try {
+            return decodeURIComponent(extended[2].trim());
+        } catch {
+            // Malformed percent-encoding: fall through to the plain filename.
+        }
+    }
+
+    const plain = contentDisposition.match(/filename=\s*"([^"]+)"|filename=\s*([^;]+)/i);
+    const value = plain?.[1] ?? plain?.[2];
+
+    return value ? value.trim() : null;
+};
+
+/**
  * A general hook for downloading different types of content (documents, programs, modules, courses)
  * either individually or as a ZIP archive
  */
@@ -96,9 +119,9 @@ const useDownloadContent = () => {
             const contentDisposition = response.headers.get('Content-Disposition');
             let filename = document.name || `document-${document.id}.pdf`;
             if (contentDisposition) {
-                const match = contentDisposition.match(/filename="?([^";]+)"?/i);
-                if (match && match[1]) {
-                    filename = match[1];
+                const parsed = parseContentDispositionFilename(contentDisposition);
+                if (parsed) {
+                    filename = parsed;
                 }
             }
 
@@ -187,9 +210,9 @@ const useDownloadContent = () => {
             const contentDisposition = response.headers.get('Content-Disposition');
             let filename = 'download.zip';
             if (contentDisposition) {
-                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
-                if (filenameMatch && filenameMatch[1]) {
-                    filename = filenameMatch[1];
+                const parsed = parseContentDispositionFilename(contentDisposition);
+                if (parsed) {
+                    filename = parsed;
                 }
             }
 
