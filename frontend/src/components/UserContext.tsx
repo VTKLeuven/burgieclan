@@ -22,20 +22,25 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children, userId, isAdmin = false }: { children: ReactNode, userId: number | null, isAdmin?: boolean }) => {
     const [user, setUser] = useState<User | null>(null);
-    const { loading, error, isRedirecting, request } = useApi();
+    const [loading, setLoading] = useState<boolean>(() => userId !== null);
+    const { error, isRedirecting, request } = useApi();
 
     const fetchUser = useCallback(async () => {
         if (!userId) {
             setUser(null);
+            setLoading(false);
             return;
         }
 
-
-        const userData = await request('GET', `/api/users/${userId}`);
-        if (userData && !isErrorResponse(userData)) {
-            setUser(convertToUser(userData));
-        } else {
-            notFound();
+        try {
+            const userData = await request('GET', `/api/users/${userId}`);
+            if (userData && !isErrorResponse(userData)) {
+                setUser(convertToUser(userData));
+            } else {
+                notFound();
+            }
+        } finally {
+            setLoading(false);
         }
     }, [userId, request]);
 

@@ -22,7 +22,7 @@ import { localizedCourseName } from '@/utils/courseName';
 export default function CoursePage() {
     const { id: courseId } = useParams();
     const [course, setCourse] = useState<Course | null>(null);
-    const { loading: userLoading, refreshUser } = useUser();
+    const { loading: userLoading } = useUser();
     const { t, i18n } = useTranslation();
     const { request, loading, error } = useApi();
 
@@ -91,9 +91,6 @@ export default function CoursePage() {
                                 itemType="course"
                                 size={20}
                                 className="mt-2"
-                                onToggle={() => {
-                                    refreshUser();
-                                }}
                             />
                             <h1 className="vtk-page-title">{courseName}</h1>
                         </div>
