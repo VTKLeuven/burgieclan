@@ -49,7 +49,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     const [optimisticFavorite, setOptimisticFavorite] = useState<boolean | null>(null);
     const isFavorite = optimisticFavorite ?? derivedFavorite;
 
-    const handleToggleFavorite = (e: React.MouseEvent) => {
+    const handleToggleFavorite = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -59,12 +59,20 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
             // Optimistically update UI
             setOptimisticFavorite(newFavoriteState);
 
-            // Persist change via API
-            updateFavorite(itemId, itemType, newFavoriteState);
+            try {
+                // Persist change via API and refresh user context
+                await updateFavorite(itemId, itemType, newFavoriteState);
 
-            // Propagate if parent cares
-            if (onToggleFavorite) {
-                onToggleFavorite(newFavoriteState);
+                // Clear optimistic override now that context is fresh
+                setOptimisticFavorite(null);
+
+                // Propagate if parent cares
+                if (onToggleFavorite) {
+                    onToggleFavorite(newFavoriteState);
+                }
+            } catch {
+                // Revert optimistic update on error
+                setOptimisticFavorite(null);
             }
         }
     };
@@ -88,6 +96,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
 
     return (
         <button
+            type="button"
             onClick={handleToggleFavorite}
             className={`${baseClasses} ${favoriteClasses} ${className}`}
             title={isFavorite
