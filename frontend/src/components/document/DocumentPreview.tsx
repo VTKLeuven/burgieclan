@@ -94,7 +94,7 @@ export default function DocumentPreview({ id }: { id: string }) {
 
     return (
         <div className="vtk-shell pb-16">
-            {/* Editorial page head: breadcrumb kicker, filename as the display
+            {/* Editorial page head: breadcrumb kicker, document name as the display
                 title, and the file facts as a right-aligned spec block. */}
             <div className="vtk-page-head">
                 <div>
