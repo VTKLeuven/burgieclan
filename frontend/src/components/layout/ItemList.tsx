@@ -16,7 +16,7 @@ interface ItemListProps {
 }
 
 const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage }) => {
-    const itemsPerList = 4;
+    const itemsPerList = 10;
     const displayedItems = items.slice(0, itemsPerList);
 
     return (
