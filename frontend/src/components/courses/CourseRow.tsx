@@ -1,16 +1,14 @@
 import ProfessorDiv from '@/components/coursepage/ProfessorDiv';
 import DownloadButton from '@/components/ui/DownloadButton';
+import FavoriteButton from '@/components/ui/FavoriteButton';
 import SemesterIndicator from "@/components/ui/SemesterIndicator";
 import { useProgramLanguage } from '@/components/courses/ProgramLanguageContext';
-import { useUser } from '@/components/UserContext';
 import { useApi } from "@/hooks/useApi";
-import { useFavorites } from '@/hooks/useFavorites';
 import type { Course } from '@/types/entities';
 import { convertToCourse } from "@/utils/convertToEntity";
 import { captureException } from '@sentry/nextjs';
-import { Star } from "lucide-react";
 import Link from "next/link";
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useTranslation } from 'react-i18next';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -34,18 +32,15 @@ export const CourseRow = memo(({
     highlightMatch = false,
     isFirstRow = false,
 }: CourseRowProps) => {
-    const { user } = useUser();
     const { i18n } = useTranslation();
     // Inside the curriculum navigator the programme decides the title language; elsewhere there is
     // no programme in context and the reader's own locale is the right fallback.
     const programLanguage = useProgramLanguage();
-    const { updateFavorite } = useFavorites(user);
     const [course, setCourse] = useState<Course | null>(
         () => hasCourseRowData(initialCourse) ? initialCourse : null
     );
     const [loading, setLoading] = useState<boolean>(() => !hasCourseRowData(initialCourse));
     const { request } = useApi();
-    const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
     // Module details embed all row data. Keep a defensive item fallback for older/cached API
     // responses, but a normal curriculum expansion does not trigger one request per course.
@@ -78,22 +73,6 @@ export const CourseRow = memo(({
         }
     }, [initialCourse, request]);
 
-    // Update favorite status when user data changes
-    useEffect(() => {
-        if (user?.favoriteCourses && initialCourse.id) {
-            setIsFavorite(user.favoriteCourses.some(favCourse => favCourse.id === initialCourse.id));
-        }
-    }, [user, initialCourse.id]);
-
-    const handleFavoriteClick = useCallback(async () => {
-        if (!user || !initialCourse.id) return;
-
-        const isCurrentlyFavorite = user.favoriteCourses?.some(favCourse => favCourse.id === initialCourse.id);
-        const newFavoriteState = !isCurrentlyFavorite;
-        setIsFavorite(newFavoriteState);
-        await updateFavorite(initialCourse.id, "course", newFavoriteState);
-    }, [user, initialCourse.id, updateFavorite]);
-
     // Add margin-top classes conditionally based on whether this is the first row
     const marginClass = isFirstRow ? '' : 'mt-0';
 
@@ -103,7 +82,6 @@ export const CourseRow = memo(({
         code: <Skeleton />,
         credits: <Skeleton />,
         semesters: <Skeleton circle width={16} height={16} />,
-        star: <Skeleton circle width={16} height={16} />,
         professor: <Skeleton circle width={28} height={28} />
     } : {
         name: localizedCourseName(course, programLanguage ?? i18n.language),
@@ -114,7 +92,6 @@ export const CourseRow = memo(({
             </span>
         ),
         semesters: <SemesterIndicator semesters={course.semesters} size={16} />,
-        star: <Star className='text-vtk-yellow' fill={isFavorite ? "currentColor" : "none"} size={16} />,
         professor: (
             <div className="flex -space-x-1.5">
                 {course.professors?.map((unumber, index) => (
@@ -134,13 +111,18 @@ export const CourseRow = memo(({
         <div className={`grid grid-cols-12 py-2 px-3 border-b leading-tight hover:bg-vtk-paper rounded-md ${highlightMatch ? 'ring-1 ring-vtk-yellow' : ''
             } ${marginClass}`}>
             <div className="col-span-5 flex items-center">
-                <div
-                    className={`hover:scale-110 ${!loading && 'hover:cursor-pointer'} transition-transform duration-300 flex items-center`}
-                    onClick={!loading && course ? handleFavoriteClick : undefined}>
-                    <div className="inline-block mr-2">
-                        {content.star}
+                {loading || !course ? (
+                    <div className="mr-2 inline-block">
+                        <Skeleton circle width={16} height={16} />
                     </div>
-                </div>
+                ) : (
+                    <FavoriteButton
+                        itemId={course.id}
+                        itemType="course"
+                        size={16}
+                        className="mr-1 shrink-0"
+                    />
+                )}
                 {loading || !course ? (
                     <div className="grow">
                         {content.name}
@@ -167,3 +149,4 @@ export const CourseRow = memo(({
 });
 
 CourseRow.displayName = "CourseRow";
+
