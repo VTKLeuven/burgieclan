@@ -34,7 +34,7 @@ const mapDocumentsToItems = (documents: Document[]) => {
  * pane, so the page still scrolls as one document.
  */
 const NavigationSidebar = () => {
-  const { user, loading } = useUser();
+  const { user } = useUser();
   const { t, i18n } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
@@ -42,7 +42,7 @@ const NavigationSidebar = () => {
     documents: false
   });
 
-  if (!user || loading) {
+  if (!user) {
     return null;
   }
 

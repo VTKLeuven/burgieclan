@@ -23,9 +23,9 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage }) => {
         <div className="pl-2">
             {items && items.length > 0 ? (
                 <ul className="m-0 list-none space-y-0 p-0">
-                    {displayedItems.map((item, index) => (
+                    {displayedItems.map((item) => (
                         <li
-                            key={index}
+                            key={`${item.type}-${item.id}`}
                             className="group rounded-lg transition-colors duration-100 hover:bg-vtk-paper-2"
                         >
                             <div className="flex w-full items-center px-2 py-1.5">
