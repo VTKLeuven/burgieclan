@@ -14,12 +14,6 @@ interface DocumentListItemProps {
     onToggleSelect: (document: Document) => void;
 }
 
-const extractFilename = (contentUrl?: string): string => {
-    if (!contentUrl) return '';
-    const parts = contentUrl.split('/');
-    return parts[parts.length - 1]; // Get the last part of the path
-};
-
 const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelected, onToggleSelect }) => {
     const { t } = useTranslation();
 
@@ -43,11 +37,9 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                 >
                     {document.name}
                 </Link>
-                <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-vtk-muted">
-                    <span className="max-w-xs truncate">{extractFilename(document.contentUrl)}</span>
-
-                    {/* Display tags if they exist */}
-                    {document.tags && document.tags.length > 0 && (
+                {/* Display tags if they exist */}
+                {document.tags && document.tags.length > 0 && (
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-vtk-muted">
                         <span className="flex items-center gap-1.5">
                             <TagIcon size={12} className="shrink-0" />
                             <span className="flex flex-wrap gap-1">
@@ -61,8 +53,8 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                                 ))}
                             </span>
                         </span>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
 
             {document.underReview && (
