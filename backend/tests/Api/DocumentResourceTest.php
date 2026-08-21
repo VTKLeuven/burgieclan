@@ -1088,4 +1088,136 @@ class DocumentResourceTest extends ApiTestCase
             }
         }
     }
+
+    public function testUploadMatlabFile(): void
+    {
+        $course = CourseFactory::createOne();
+        $category = DocumentCategoryFactory::createOne();
+
+        // Create temporary matlab script file (.m)
+        $filePath = tempnam(sys_get_temp_dir(), 'matlab_') . '.m';
+        file_put_contents($filePath, "function y = square(x)\n  y = x^2;\nend\n");
+        $file = new UploadedFile($filePath, 'square.m', 'text/x-matlab', null, true);
+
+        $json = $this->browser()
+            ->post(
+                '/api/documents',
+                [
+                    'headers' => [
+                        'Content-Type' => 'multipart/form-data',
+                        'Authorization' => 'Bearer ' . $this->token
+                    ],
+                    'body' => [
+                        'name' => 'Matlab Script',
+                        'course' => '/api/courses/' . $course->getId(),
+                        'category' => '/api/document_categories/' . $category->getId(),
+                        'anonymous' => false,
+                    ],
+                    'files' => [
+                        'file' => $file,
+                    ],
+                ]
+            )
+            ->assertStatus(201)
+            ->assertJsonMatches('name', 'Matlab Script')
+            ->json()->decoded();
+
+        $documentIRI = $json['@id'];
+
+        // Verify GET returns document with correct name and filename
+        $document = $this->browser()
+            ->get(
+                $documentIRI,
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->json()->decoded();
+
+        $this->assertEquals('Matlab Script', $document['name']);
+        $this->assertStringEndsWith('.m', $document['filename']);
+
+        // Clean up
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+        $contentUrl = $document['contentUrl'] ?? null;
+        if ($contentUrl) {
+            $array = explode('/', $contentUrl);
+            $filename = end($array);
+            $target = __DIR__ . '/../../data/documents/' . $filename;
+            if (is_file($target)) {
+                unlink($target);
+            }
+        }
+    }
+
+    public function testUploadCadFile(): void
+    {
+        $course = CourseFactory::createOne();
+        $category = DocumentCategoryFactory::createOne();
+
+        // Create temporary STEP CAD file (.step)
+        $filePath = tempnam(sys_get_temp_dir(), 'cad_') . '.step';
+        file_put_contents($filePath, "ISO-10303-21;\nHEADER;\nFILE_DESCRIPTION(('STEP test file'),'2;1');\nENDSEC;\nEND-ISO-10303-21;\n");
+        $file = new UploadedFile($filePath, 'bracket.step', 'model/step', null, true);
+
+        $json = $this->browser()
+            ->post(
+                '/api/documents',
+                [
+                    'headers' => [
+                        'Content-Type' => 'multipart/form-data',
+                        'Authorization' => 'Bearer ' . $this->token
+                    ],
+                    'body' => [
+                        'name' => 'CAD Bracket STEP',
+                        'course' => '/api/courses/' . $course->getId(),
+                        'category' => '/api/document_categories/' . $category->getId(),
+                        'anonymous' => false,
+                    ],
+                    'files' => [
+                        'file' => $file,
+                    ],
+                ]
+            )
+            ->assertStatus(201)
+            ->assertJsonMatches('name', 'CAD Bracket STEP')
+            ->json()->decoded();
+
+        $documentIRI = $json['@id'];
+
+        // Verify GET returns document with correct name and filename
+        $document = $this->browser()
+            ->get(
+                $documentIRI,
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->json()->decoded();
+
+        $this->assertEquals('CAD Bracket STEP', $document['name']);
+        $this->assertStringEndsWith('.step', $document['filename']);
+
+        // Clean up
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+        $contentUrl = $document['contentUrl'] ?? null;
+        if ($contentUrl) {
+            $array = explode('/', $contentUrl);
+            $filename = end($array);
+            $target = __DIR__ . '/../../data/documents/' . $filename;
+            if (is_file($target)) {
+                unlink($target);
+            }
+        }
+    }
 }

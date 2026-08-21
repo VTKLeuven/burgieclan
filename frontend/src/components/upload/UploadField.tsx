@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { UploadFormData } from '@/types/upload';
-import { ALLOWED_MIME_TYPES, FILE_SIZE_MB } from '@/utils/constants/upload';
+import { ALLOWED_ACCEPT_STRING, FILE_SIZE_MB, getFileExtension } from '@/utils/constants/upload';
 import { fileTypeFromBlob } from 'file-type';
 import { X } from 'lucide-react';
 import Image from 'next/image';
@@ -34,6 +34,7 @@ export const UploadField: React.FC<FileUploadProps> = ({
 
     const getFileIcon = useCallback(async (file: File): Promise<JSX.Element> => {
         const type = await fileTypeFromBlob(file);
+        const ext = getFileExtension(file.name);
         const iconMap: Record<string, string> = {
             'application/pdf': '/images/icons/PDF.svg',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '/images/icons/DOCX.svg',
@@ -47,11 +48,24 @@ export const UploadField: React.FC<FileUploadProps> = ({
             'text/csv': '/images/icons/CSV.svg',
         };
 
-        const iconSrc = iconMap[type?.mime || ''] || '/images/icons/default.svg';
+        const extIconMap: Record<string, string> = {
+            '.pdf': '/images/icons/PDF.svg',
+            '.docx': '/images/icons/DOCX.svg',
+            '.doc': '/images/icons/DOC.svg',
+            '.pptx': '/images/icons/PPT.svg',
+            '.ppt': '/images/icons/PPT.svg',
+            '.jpg': '/images/icons/JPG.svg',
+            '.jpeg': '/images/icons/JPG.svg',
+            '.png': '/images/icons/PNG.svg',
+            '.zip': '/images/icons/ZIP.svg',
+            '.csv': '/images/icons/CSV.svg',
+        };
+
+        const iconSrc = iconMap[type?.mime || ''] || extIconMap[ext] || '/images/icons/default.svg';
         return (
             <Image
                 src={iconSrc}
-                alt={`${type?.mime || 'File'} icon`}
+                alt={`${ext || type?.mime || 'File'} icon`}
                 width={32}
                 height={32}
                 className="h-8 w-8"
@@ -146,7 +160,7 @@ export const UploadField: React.FC<FileUploadProps> = ({
                                     type="file"
                                     className="sr-only"
                                     onChange={handleInputChange}
-                                    accept={ALLOWED_MIME_TYPES.join(',')}
+                                    accept={ALLOWED_ACCEPT_STRING}
                                 />
                             </label>
                             <p className="pl-1 sm:block hidden text-sm">{t('upload.field.drag_drop_text')}</p>
