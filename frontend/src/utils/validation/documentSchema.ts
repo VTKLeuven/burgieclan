@@ -2,11 +2,18 @@ import type { UploadFormData } from '@/types/upload';
 import { fileTypeFromBlob } from 'file-type';
 import type { TFunction } from 'i18next';
 import * as yup from 'yup';
-import { ALLOWED_MIME_TYPES, FILE_SIZE_LIMIT, FILE_SIZE_MB } from '../constants/upload';
+import { ALLOWED_MIME_TYPES, FILE_SIZE_LIMIT, FILE_SIZE_MB, isAllowedFile } from '../constants/upload';
 
 const isAllowedMimeType = (mime: string): mime is typeof ALLOWED_MIME_TYPES[number] => {
-    return ALLOWED_MIME_TYPES.includes(mime as typeof ALLOWED_MIME_TYPES[number]);
+    return (ALLOWED_MIME_TYPES as readonly string[]).includes(mime);
 };
+
+const BLOCKED_EXECUTABLE_MIME_TYPES = [
+    'application/x-msdownload',
+    'application/x-executable',
+    'application/x-mach-binary',
+    'application/x-dosexec'
+];
 
 export const documentSchema = (t: TFunction): yup.ObjectSchema<UploadFormData> => yup.object({
     name: yup
@@ -62,8 +69,22 @@ export const documentSchema = (t: TFunction): yup.ObjectSchema<UploadFormData> =
             (value) => !value || (value instanceof File && value.size <= FILE_SIZE_LIMIT))
         .test('fileType', t('upload.form.validation.file.type'), async (value) => {
             if (!value) return false;
-            const type = await fileTypeFromBlob(value as Blob);
-            if (!type?.mime) return false;
-            return isAllowedMimeType(type.mime);
+
+            // Check if detected binary mime type is a blocked executable
+            try {
+                const detected = await fileTypeFromBlob(value as Blob);
+                if (detected?.mime) {
+                    if (BLOCKED_EXECUTABLE_MIME_TYPES.includes(detected.mime)) {
+                        return false;
+                    }
+                    if (isAllowedMimeType(detected.mime)) {
+                        return true;
+                    }
+                }
+            } catch {
+                // Ignore sniffing error and fall back to extension/mime check
+            }
+
+            return isAllowedFile(value as File);
         })
-}).required();
+}).required();

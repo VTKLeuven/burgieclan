@@ -6,7 +6,9 @@ vich_uploader:
         document_object:
             uri_prefix: /files/download
             upload_destination: '%kernel.project_dir%/data/documents'
-            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            namer:
+                service: Vich\UploaderBundle\Naming\SmartUniqueNamer
+                options: { keep_extension: true }
 
 # Production: use Flysystem (S3) storage instead of local filesystem
 when@prod:
@@ -16,4 +18,6 @@ when@prod:
             document_object:
                 uri_prefix: /files/download
                 upload_destination: default.storage
-                namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+                namer:
+                    service: Vich\UploaderBundle\Naming\SmartUniqueNamer
+                    options: { keep_extension: true }
