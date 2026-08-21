@@ -201,7 +201,8 @@ class DocumentBulkUploadController extends AbstractController
                             ]
                         ),
                     ],
-                    'help' => 'Select multiple documents to upload (PDF, Word, Excel, PowerPoint, or text files, max 200MB each)',
+                    'help' => 'Select multiple documents to upload ' .
+                        '(PDF, Office, text, MATLAB, CAD, images, or archives, max 200MB each)',
                 ]
             )
             ->add(

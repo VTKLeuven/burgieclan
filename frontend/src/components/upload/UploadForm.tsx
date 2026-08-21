@@ -13,7 +13,7 @@ import { getSuggestedNameFromFilename } from '@/utils/documentNameSuggestion';
 import { documentSchema } from '@/utils/validation/documentSchema';
 import { localizedCourseName } from '@/utils/courseName';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch, type FieldError } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -56,15 +56,19 @@ export default function UploadForm({
     const { courses, categories, isLoading: isLoadingFields, error } = useFormFields();
     const yearOptions = useYearOptions();
 
-    const courseOptions = courses.map(course => ({
-        id: course.id,
-        name: localizedCourseName(course, i18n.language) || course.name || course.code || `Course ${course.id}`
-    }));
+    const courseOptions = useMemo(() => {
+        return courses.map(course => ({
+            id: course.id,
+            name: localizedCourseName(course, i18n.language) || course.name || course.code || `${t('upload.form.course.label')} #${course.id}`
+        }));
+    }, [courses, i18n.language, t]);
 
-    const categoryOptions = categories.map(cat => ({
-        id: cat.id,
-        name: cat.name || `Category ${cat.id}`
-    }));
+    const categoryOptions = useMemo(() => {
+        return categories.map(cat => ({
+            id: cat.id,
+            name: cat.name || `${t('upload.form.category.label')} #${cat.id}`
+        }));
+    }, [categories, t]);
 
     // Watch the file and name fields using useWatch for better memoization compatibility
     const watchedFile = useWatch({ control, name: 'file' });
