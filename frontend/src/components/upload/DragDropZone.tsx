@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useCallback, useState, useRef } from 'react';
-import { cn } from '@/lib/utils';
-import { FileText } from 'lucide-react';
-import { ALLOWED_MIME_TYPES, FILE_SIZE_LIMIT, FILE_SIZE_MB } from '@/utils/constants/upload';
 import { useToast } from '@/components/ui/Toast';
+import { cn } from '@/lib/utils';
+import { ALLOWED_ACCEPT_STRING, FILE_SIZE_LIMIT, FILE_SIZE_MB, isAllowedFile } from '@/utils/constants/upload';
+import { FileText } from 'lucide-react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-type AllowedMimeType = typeof ALLOWED_MIME_TYPES[number];
 
 interface DragDropZoneProps {
     onFileDrop: (file: File) => void;
@@ -24,7 +22,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
     const { t } = useTranslation();
 
     const validateFile = useCallback((file: File): boolean => {
-        if (!ALLOWED_MIME_TYPES.includes(file.type as AllowedMimeType)) {
+        if (!isAllowedFile(file)) {
             showToast(t('upload.errors.unsupported_format'), 'error');
             return false;
         }
@@ -99,7 +97,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
                 type="file"
                 className="hidden"
                 onChange={handleFileInput}
-                accept={ALLOWED_MIME_TYPES.join(',')}
+                accept={ALLOWED_ACCEPT_STRING}
             />
             <FileText
                 className={cn(
