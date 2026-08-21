@@ -1,23 +1,24 @@
 import { HydraCollection, useApi } from '@/hooks/useApi';
-import type { CommentCategory, Course } from '@/types/entities';
-import { convertToCommentCategory, convertToCourse } from '@/utils/convertToEntity';
+import type { Course, DocumentCategory } from '@/types/entities';
+import { convertToCourse, convertToDocumentCategory } from '@/utils/convertToEntity';
 import { captureException } from "@sentry/nextjs";
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const useFormFields = () => {
     const [courses, setCourses] = useState<Course[]>([]);
-    const [categories, setCategories] = useState<CommentCategory[]>([]);
+    const [categories, setCategories] = useState<DocumentCategory[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { request } = useApi<HydraCollection<unknown>>();
 
     const fetchData = useCallback(async () => {
         try {
+            const lang = i18n.language;
             const [courseResponse, categoryResponse] = await Promise.all([
                 request('GET', `/api/courses?pagination=false`),
-                request('GET', `/api/document_categories?pagination=false`)
+                request('GET', `/api/document_categories?pagination=false&lang=${lang}`)
             ]);
 
             if (!courseResponse || courseResponse.error) {
@@ -29,7 +30,7 @@ export const useFormFields = () => {
             }
 
             setCourses(courseResponse['hydra:member']?.map(convertToCourse) || []);
-            setCategories(categoryResponse['hydra:member']?.map(convertToCommentCategory) || []);
+            setCategories(categoryResponse['hydra:member']?.map(convertToDocumentCategory) || []);
         } catch (err) {
             setError(t('form.errors.fetch_failed'));
             captureException(
@@ -41,14 +42,12 @@ export const useFormFields = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [t, request]);
+    }, [t, i18n.language, request]);
 
     useEffect(() => {
         const initiateFetch = async () => {
             setIsLoading(true);
             await fetchData();
-            await new Promise(resolve => setTimeout(resolve, 4000));
-            setIsLoading(false);
         };
         initiateFetch();
     }, [fetchData]);

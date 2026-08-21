@@ -11,6 +11,7 @@ import { UploadFormData } from '@/types/upload';
 import { VISIBLE_YEARS } from "@/utils/constants/upload";
 import { getSuggestedNameFromFilename } from '@/utils/documentNameSuggestion';
 import { documentSchema } from '@/utils/validation/documentSchema';
+import { localizedCourseName } from '@/utils/courseName';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useState } from 'react';
 import { useForm, useWatch, type FieldError } from 'react-hook-form';
@@ -32,7 +33,7 @@ export default function UploadForm({
     initialFile,
     initialData,
 }: FormProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { user } = useUser();
     const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
     const [selectedTagQueries, setSelectedTagQueries] = useState<string[]>([]);
@@ -55,6 +56,16 @@ export default function UploadForm({
     const { courses, categories, isLoading: isLoadingFields, error } = useFormFields();
     const yearOptions = useYearOptions();
 
+    const courseOptions = courses.map(course => ({
+        id: course.id,
+        name: localizedCourseName(course, i18n.language) || course.name || course.code || `Course ${course.id}`
+    }));
+
+    const categoryOptions = categories.map(cat => ({
+        id: cat.id,
+        name: cat.name || `Category ${cat.id}`
+    }));
+
     // Watch the file and name fields using useWatch for better memoization compatibility
     const watchedFile = useWatch({ control, name: 'file' });
     const watchedName = useWatch({ control, name: 'name' });
@@ -68,7 +79,7 @@ export default function UploadForm({
 
     // Suggest name based on filename when file changes and name is empty
     useEffect(() => {
-        if (watchedFile && !watchedName) {
+        if (watchedFile && typeof watchedFile === 'object' && 'name' in watchedFile && typeof watchedFile.name === 'string' && !watchedName) {
             const suggestedName = getSuggestedNameFromFilename(watchedFile.name);
             setValue('name', suggestedName, { shouldValidate: true });
         }
@@ -95,8 +106,8 @@ export default function UploadForm({
 
     // Update form values when tags change
     useEffect(() => {
-        setValue('tagIds', selectedTagIds);
-        setValue('tagQueries', selectedTagQueries);
+        setValue('tagIds', selectedTagIds, { shouldValidate: true });
+        setValue('tagQueries', selectedTagQueries, { shouldValidate: true });
     }, [selectedTagIds, selectedTagQueries, setValue]);
 
     const handleTagSelectionChange = (tagIds: number[], tagQueries: string[]) => {
@@ -128,7 +139,7 @@ export default function UploadForm({
                     <FormField
                         label={t('upload.form.course.label')}
                         type="combobox"
-                        options={courses}
+                        options={courseOptions}
                         error={errors.course}
                         name="course"
                         control={control}
@@ -153,7 +164,7 @@ export default function UploadForm({
                     <FormField
                         label={t('upload.form.category.label')}
                         type="combobox"
-                        options={categories}
+                        options={categoryOptions}
                         error={errors.category}
                         name="category"
                         control={control}
@@ -169,8 +180,6 @@ export default function UploadForm({
                         selectedTagIds={selectedTagIds}
                         selectedTagQueries={selectedTagQueries}
                         onTagSelectionChange={handleTagSelectionChange}
-                        course={control._formValues.course ? { id: parseInt(control._formValues.course) } : undefined}
-                        category={control._formValues.category ? { id: parseInt(control._formValues.category) } : undefined}
                     />
                 </div>
 

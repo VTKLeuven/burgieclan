@@ -27,21 +27,21 @@ export default function SearchResult({ mainResult, extraInfo, redirect }: Search
 
 export function CourseSearchResult({ course }: { course: Course }) {
     const { i18n } = useTranslation();
-    return <SearchResult mainResult={localizedCourseName(course, i18n.language)} extraInfo={course.code}
+    return <SearchResult mainResult={localizedCourseName(course, i18n.language) || course.name || course.code || `Course ${course.id}`} extraInfo={course.code}
         redirect={"/course/" + course.id} />
 }
 
 export function ModuleSearchResult({ module }: { module: Module }) {
-    return <SearchResult mainResult={module.name!} extraInfo={module.program!.name}
+    return <SearchResult mainResult={module.name || `Module ${module.id}`} extraInfo={module.program?.name}
         redirect={"/module/" + module.id} />
 }
 
 export function ProgramSearchResult({ program }: { program: Program }) {
-    return <SearchResult mainResult={program.name!} redirect={"/program/" + program.id} />
+    return <SearchResult mainResult={program.name || `Program ${program.id}`} redirect={"/program/" + program.id} />
 }
 
 export function DocumentSearchResult({ document }: { document: Document }) {
     const { i18n } = useTranslation();
-    return <SearchResult mainResult={document.name!} extraInfo={localizedCourseName(document.course, i18n.language)}
+    return <SearchResult mainResult={document.name || document.filename || `Document ${document.id}`} extraInfo={localizedCourseName(document.course, i18n.language)}
         redirect={"/document/" + document.id} />
 }
