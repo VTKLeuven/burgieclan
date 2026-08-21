@@ -35,7 +35,7 @@ class CommentCategoryApi extends BaseEntityApi
             'name' => ['name_nl', 'name_en'],
         ]
     )]
-    #[Groups([SerializationGroups::COMMENT_CATEGORY_GET])]
+    #[Groups([SerializationGroups::COMMENT_CATEGORY_GET, SerializationGroups::COURSE_GET, SerializationGroups::COURSE_COMMENT_GET])]
     public ?string $name = null;
 
     #[ApiFilter(
@@ -44,6 +44,6 @@ class CommentCategoryApi extends BaseEntityApi
             'description' => ['description_nl', 'description_en'],
         ]
     )]
-    #[Groups([SerializationGroups::COMMENT_CATEGORY_GET])]
+    #[Groups([SerializationGroups::COMMENT_CATEGORY_GET, SerializationGroups::COURSE_GET, SerializationGroups::COURSE_COMMENT_GET])]
     public ?string $description = null;
 }

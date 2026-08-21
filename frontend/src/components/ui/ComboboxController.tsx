@@ -30,7 +30,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
 
     // Find the currently selected option based on its id.
     const selectedOption = useMemo(
-        () => options.find((option) => option.id === value) || null,
+        () => options.find((option) => option && String(option.id) === String(value)) || null,
         [options, value]
     );
 
@@ -38,7 +38,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
     const filteredOptions = useMemo(() => {
         if (!query) return options;
         return options.filter((option) =>
-            option.name?.toLowerCase().includes(query.toLowerCase())
+            option?.name?.toLowerCase().includes(query.toLowerCase())
         );
     }, [options, query]);
 
@@ -78,7 +78,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
                                             }`
                                         }
                                     >
-                                        {option.name}
+                                        {option?.name || ''}
                                     </Combobox.Option>
                                 ))}
                                 {limitedOptions.length === 0 && query !== '' && (
