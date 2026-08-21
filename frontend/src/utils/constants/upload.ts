@@ -58,8 +58,7 @@ export const ALLOWED_MIME_TYPES = [
     'application/object',
     'application/sldworks',
     'application/x-solidworks',
-    'application/x-inventor',
-    'application/octet-stream'
+    'application/x-inventor'
 ] as const;
 
 export const ALLOWED_FILE_EXTENSIONS = [
@@ -150,7 +149,7 @@ export const isAllowedFile = (file: File): boolean => {
     if (ext && (ALLOWED_FILE_EXTENSIONS as readonly string[]).includes(ext)) {
         return true;
     }
-    if (file.type && file.type !== 'application/octet-stream' && (ALLOWED_MIME_TYPES as readonly string[]).includes(file.type)) {
+    if (file.type && (ALLOWED_MIME_TYPES as readonly string[]).includes(file.type)) {
         return true;
     }
     return false;

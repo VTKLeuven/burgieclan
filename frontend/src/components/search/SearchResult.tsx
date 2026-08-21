@@ -27,23 +27,23 @@ export default function SearchResult({ mainResult, extraInfo, redirect }: Search
 
 export function CourseSearchResult({ course }: { course: Course }) {
     const { t, i18n } = useTranslation();
-    return <SearchResult mainResult={localizedCourseName(course, i18n.language) || course.name || course.code || `${t('courses')} #${course.id}`} extraInfo={course.code}
+    return <SearchResult mainResult={localizedCourseName(course, i18n.language) || course.name || course.code || `${t('curriculum-navigator.course', { defaultValue: 'Vak' })} #${course.id}`} extraInfo={course.code}
         redirect={"/course/" + course.id} />
 }
 
 export function ModuleSearchResult({ module }: { module: Module }) {
     const { t } = useTranslation();
-    return <SearchResult mainResult={module.name || `${t('modules')} #${module.id}`} extraInfo={module.program?.name}
+    return <SearchResult mainResult={module.name || `${t('curriculum-navigator.module', { defaultValue: 'Module' })} #${module.id}`} extraInfo={module.program?.name}
         redirect={"/module/" + module.id} />
 }
 
 export function ProgramSearchResult({ program }: { program: Program }) {
     const { t } = useTranslation();
-    return <SearchResult mainResult={program.name || `${t('programs')} #${program.id}`} redirect={"/program/" + program.id} />
+    return <SearchResult mainResult={program.name || `${t('curriculum-navigator.program', { defaultValue: 'Richting' })} #${program.id}`} redirect={"/program/" + program.id} />
 }
 
 export function DocumentSearchResult({ document }: { document: Document }) {
-    const { t, i18n } = useTranslation();
-    return <SearchResult mainResult={document.name || document.filename || `${t('documents')} #${document.id}`} extraInfo={localizedCourseName(document.course, i18n.language)}
+    const { i18n } = useTranslation();
+    return <SearchResult mainResult={document.name || document.filename || `Document #${document.id}`} extraInfo={localizedCourseName(document.course, i18n.language)}
         redirect={"/document/" + document.id} />
 }
