@@ -125,7 +125,7 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
                     className="shrink-0 text-vtk-muted transition-transform duration-200"
                     style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
                 />
-                <span className="min-w-0 flex-1 truncate text-[15px] font-medium text-vtk-ink">{category?.name || `Category ${category.id}`}</span>
+                <span className="min-w-0 flex-1 truncate text-[15px] font-medium text-vtk-ink">{category.name}</span>
 
                 {/* Add comment button */}
                 {onCommentAdded && (

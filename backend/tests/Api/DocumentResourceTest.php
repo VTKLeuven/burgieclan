@@ -1162,7 +1162,10 @@ class DocumentResourceTest extends ApiTestCase
 
         // Create temporary STEP CAD file (.step)
         $filePath = tempnam(sys_get_temp_dir(), 'cad_') . '.step';
-        file_put_contents($filePath, "ISO-10303-21;\nHEADER;\nFILE_DESCRIPTION(('STEP test file'),'2;1');\nENDSEC;\nEND-ISO-10303-21;\n");
+        $stepContent = "ISO-10303-21;\nHEADER;\n" .
+            "FILE_DESCRIPTION(('STEP test file'),'2;1');\n" .
+            "ENDSEC;\nEND-ISO-10303-21;\n";
+        file_put_contents($filePath, $stepContent);
         $file = new UploadedFile($filePath, 'bracket.step', 'model/step', null, true);
 
         $json = $this->browser()

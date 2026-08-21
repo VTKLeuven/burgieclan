@@ -29,19 +29,19 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
         return availableTags.filter(tag => tag.id && selectedTagIds.includes(tag.id));
     }, [availableTags, selectedTagIds]);
 
-    // Filter available tags based on input
+    // Filter available tags based on input (capped at 20 suggestions)
     const filteredTags = useMemo(() => {
         const selectedIds = new Set(selectedTagIds);
         const trimmed = tagInput.trim().toLowerCase();
 
         if (trimmed === '') {
-            return availableTags.filter(tag => tag.id && !selectedIds.has(tag.id));
+            return availableTags.filter(tag => tag.id && !selectedIds.has(tag.id)).slice(0, 20);
         }
 
         return availableTags.filter(tag =>
             tag.name?.toLowerCase().includes(trimmed) &&
             tag.id && !selectedIds.has(tag.id)
-        );
+        ).slice(0, 20);
     }, [tagInput, availableTags, selectedTagIds]);
 
     // Check if the current input exactly matches an existing tag (case-insensitive)
@@ -267,7 +267,7 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
             </div>
 
             {/* Tag suggestions dropdown */}
-            {showSuggestions && !tagsLoading && (filteredTags.length > 0 || (tagInput.trim() !== '' && !hasExactMatch)) && (
+            {showSuggestions && !tagsLoading && (filteredTags.length > 0 || tagInput.trim() !== '') && (
                 <ul className="absolute z-20 left-0 right-0 mt-1.5 max-h-60 overflow-y-auto rounded-[14px] border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)] py-1">
                     {/* Existing tag suggestions */}
                     {filteredTags.map((tag, index) => (
@@ -298,6 +298,13 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
                         >
                             <Plus size={16} className="mr-1.5 shrink-0" />
                             {t('upload.form.tags.create', { tag: tagInput.trim() })}
+                        </li>
+                    )}
+
+                    {/* No results message when exact match is already selected */}
+                    {filteredTags.length === 0 && hasExactMatch && (
+                        <li className="px-3 py-2 text-sm text-vtk-muted">
+                            {t('upload.form.tags.no-results')}
                         </li>
                     )}
                 </ul>
