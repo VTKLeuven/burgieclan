@@ -26,22 +26,24 @@ export default function SearchResult({ mainResult, extraInfo, redirect }: Search
 }
 
 export function CourseSearchResult({ course }: { course: Course }) {
-    const { i18n } = useTranslation();
-    return <SearchResult mainResult={localizedCourseName(course, i18n.language)} extraInfo={course.code}
+    const { t, i18n } = useTranslation();
+    return <SearchResult mainResult={localizedCourseName(course, i18n.language) || course.name || course.code || `${t('curriculum-navigator.course', { defaultValue: 'Vak' })} #${course.id}`} extraInfo={course.code}
         redirect={"/course/" + course.id} />
 }
 
 export function ModuleSearchResult({ module }: { module: Module }) {
-    return <SearchResult mainResult={module.name!} extraInfo={module.program!.name}
+    const { t } = useTranslation();
+    return <SearchResult mainResult={module.name || `${t('curriculum-navigator.module', { defaultValue: 'Module' })} #${module.id}`} extraInfo={module.program?.name}
         redirect={"/module/" + module.id} />
 }
 
 export function ProgramSearchResult({ program }: { program: Program }) {
-    return <SearchResult mainResult={program.name!} redirect={"/program/" + program.id} />
+    const { t } = useTranslation();
+    return <SearchResult mainResult={program.name || `${t('curriculum-navigator.program', { defaultValue: 'Richting' })} #${program.id}`} redirect={"/program/" + program.id} />
 }
 
 export function DocumentSearchResult({ document }: { document: Document }) {
     const { i18n } = useTranslation();
-    return <SearchResult mainResult={document.name!} extraInfo={localizedCourseName(document.course, i18n.language)}
+    return <SearchResult mainResult={document.name || document.filename || `Document #${document.id}`} extraInfo={localizedCourseName(document.course, i18n.language)}
         redirect={"/document/" + document.id} />
 }
