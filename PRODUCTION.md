@@ -555,49 +555,107 @@ For high-traffic scenarios, consider:
 - Connection pooling (PgBouncer)
 - Vertical scaling (more CPU/RAM)
 
-### Backup Recommendations
+### Backups
 
-#### Database Backups
-
-**Manual backup**:
-```bash
-docker compose -f docker-compose.prod.yml exec db pg_dump -U burgieclan_db_user burgieclan_db > backup-$(date +%Y%m%d-%H%M%S).sql
-```
-
-**Restore backup**:
-```bash
-docker compose -f docker-compose.prod.yml exec -T db psql -U burgieclan_db_user burgieclan_db < backup-20240101-120000.sql
-```
-
-**Automated backups** (cron):
-```bash
-0 2 * * * cd /opt/burgieclan && docker compose -f docker-compose.prod.yml exec -T db pg_dump -U burgieclan_db_user burgieclan_db | gzip > /backups/burgieclan-$(date +\%Y\%m\%d).sql.gz
-```
-
-#### Data Directory Backups
+`app:backup` is the supported path. It backs up the two things that matter and
+skips the things that only look like they matter.
 
 ```bash
-# Stop backend to ensure consistency
-docker compose -f docker-compose.prod.yml stop backend
+cd /opt/burgieclan
+docker compose -f docker-compose.prod.yml exec -T backend php bin/console app:backup
 
-# Backup data directory
-tar -czf data-backup-$(date +%Y%m%d).tar.gz /opt/burgieclan/data
+# report what it would do, write nothing
+docker compose -f docker-compose.prod.yml exec -T backend php bin/console app:backup --dry-run
 
-# Restart backend
-docker compose -f docker-compose.prod.yml start backend
+# useful flags
+#   --skip-documents   database only (fast)
+#   --skip-database    documents only
+#   --keep=30          how many dumps to retain (default 30)
 ```
 
-#### JWT Keys Backup
+**What it covers**
 
-**Critical**: Back up JWT keys immediately after generation
+| Included | Why |
+| --- | --- |
+| The Postgres database | Every program, module, course, document row, comment, vote, tag and user. `pg_dump` custom format, verified before upload. |
+| Document files in S3 | Copied server-side into a *separate* bucket. The bytes never pass through the app, so it stays viable at tens of GB. Incremental — objects already present are skipped. |
+
+**What it deliberately excludes**
+
+- `data/exports` — a cache of generated zips that `app:delete-old-zips` prunes
+  after seven days. Derived from the database and the bucket; restoring it would
+  at best do nothing and at worst reinstate stale downloads.
+- `data/temp-uploads` — uploads still in flight. Half a file is not worth keeping.
+- `jwt/` and `.env` — see below. Excluded on purpose, not by oversight.
+
+**Configuration.** In `.env` on the production host:
+
+```dotenv
+S3_BACKUP_BUCKET=burgieclan-vtk-backup
+S3_BACKUP_ENDPOINT=https://hel1.your-objectstorage.com
+S3_BACKUP_REGION=hel1
+```
+
+Only `S3_BACKUP_BUCKET` is mandatory. Endpoint, region and credentials fall back
+to the `S3_*` values, so a same-location backup needs nothing else. Hetzner keys
+are valid for every bucket in the project regardless of location, so the existing
+`S3_ACCESS_KEY` / `S3_SECRET_KEY` reach Helsinki without change.
+`S3_BACKUP_ACCESS_KEY` / `S3_BACKUP_SECRET_KEY` exist if you ever want separate
+credentials.
+
+The command refuses to run when the backup bucket *and* endpoint match the
+source, since a backup sharing a bucket with the original shares its fate.
+
+**Copy mode is chosen automatically** and printed at the top of every run:
+
+| Endpoints | Mode | Meaning |
+| --- | --- | --- |
+| Same | `server-side` | `CopyObject`; bytes never enter the app. |
+| Different | `streamed` | Object is pulled down and pushed back up, promoting to multipart for large files. Each Hetzner location is a separate cluster, so `nbg1` cannot `CopyObject` from `hel1`. |
+
+Documents live in **`burgieclan-vtk` (nbg1)** and back up to
+**`burgieclan-vtk-backup` (hel1)**, so runs are streamed. That is slower on the
+first pass — it moves the whole corpus over the network once — but the sync is
+incremental, so subsequent runs move only new documents. The cost buys real
+geographic separation: a failure confined to Nuremberg does not touch the backup.
+
+`pg_dump` comes from `postgresql18-client`, installed in the backend image. Its
+major version must match the server: `pg_dump` refuses to dump a server newer
+than itself, which is why `php_base` is pinned to `alpine3.23` — Alpine 3.22 only
+ships up to `postgresql17-client`.
+
+#### Restoring
 
 ```bash
-tar -czf jwt-keys-backup.tar.gz /opt/burgieclan/jwt
+# fetch a dump from the backup bucket, then:
+docker compose -f docker-compose.prod.yml exec -T db \
+    pg_restore -U burgieclan_db_user -d burgieclan_db --clean --if-exists < burgieclan-<stamp>.dump
 ```
 
-Store in secure location (encrypted storage, password manager, etc.)
+> An untested backup is not a backup. Restore one into a scratch database before
+> you need to rely on it.
 
-If the JWT keys are lost, you can create new keys (see command above). The consequence of this is that all users will be logged out.
+#### Secrets: escrow once, by hand
+
+`jwt/private.pem` and the values in `.env` are **not** in the automated backup.
+They change almost never and are tiny, so including them on every run would
+multiply the number of copies of your secrets for no benefit — each backup would
+become a credential leak waiting to happen.
+
+Store them once in the password manager instead:
+
+```bash
+tar -czf jwt-keys-backup.tar.gz /opt/burgieclan/jwt   # then upload, then delete the tarball
+```
+
+Losing the JWT keys is recoverable — you can regenerate them, at the cost of
+logging every user out and invalidating stored refresh tokens.
+
+#### Break-glass
+
+`scripts/backup/backup-production.sh` does the same job with plain `pg_dump` and
+`rsync`, without needing the application to boot. Keep it for the case where
+`app:backup` itself is what is broken.
 
 ### Updating the Application
 

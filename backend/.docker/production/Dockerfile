@@ -2,16 +2,22 @@
 # STAGE 1: CORE RUNTIME BASE (php_base)
 # Contains minimal system packages and compiled PHP extensions needed for R-U-N-T-I-M-E
 # ===============================================
-FROM php:8.4-fpm-alpine3.22@sha256:e0f1ffe8bd43a137facdccdcac41cabdfc23e8d0fdd0665916a062f16e2f4058 AS php_base
+FROM php:8.4-fpm-alpine3.23@sha256:6397578dd6209a93c22ae5fc06cd48d8e4c3aaea94f10f2d65ceb6f80678c18e AS php_base
 
-# Install minimal runtime system dependencies
+# Install minimal runtime system dependencies.
+#
+# postgresql18-client supplies pg_dump for `app:backup`. The major version must
+# match the server: pg_dump refuses to dump a server newer than itself, and the
+# database is PostgreSQL 18. Alpine ships postgresql18-client only from 3.23
+# onward, which is why php_base is pinned to alpine3.23 rather than 3.22.
 RUN apk update && \
     apk add --no-cache \
     curl \
     libpq \
     libzip \
     icu \
-    icu-data-full && \
+    icu-data-full \
+    postgresql18-client && \
     rm -rf /var/cache/apk/*
 
 # Install required PHP extensions and immediately clean up the *-dev packages
