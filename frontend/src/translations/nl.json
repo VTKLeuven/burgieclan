@@ -238,7 +238,9 @@
         "show-only-favorites": "Toon alleen favorieten",
         "matches-found": "Gevonden overeenkomsten",
         "no-modules-in-program": "Deze richting bevat geen modules.",
-        "no-courses-in-module": "Deze module bevat geen vakken."
+        "no-courses-in-module": "Deze module bevat geen vakken.",
+        "meta-programs": "richtingen",
+        "meta-courses": "vakken"
     },
     "account": {
         "account": "Account",
@@ -370,5 +372,8 @@
         "ask_success_description": "Het Burgieclan-team bekijkt ze zo snel mogelijk. Is ze interessant voor anderen, dan verschijnt ze hier bij de veelgestelde vragen.",
         "ask_another": "Nog een vraag stellen",
         "ask_error": "Je vraag kon niet verstuurd worden. Probeer het later opnieuw."
+    },
+    "metadata": {
+        "courses": "Blader door alle vakken op Burgieclan."
     }
 }
