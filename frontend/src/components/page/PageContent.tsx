@@ -2,6 +2,7 @@
 
 import Loading from "@/app/[locale]/loading";
 import ErrorPage from "@/components/error/ErrorPage";
+import PageHead from "@/components/ui/PageHead";
 import { useApi } from "@/hooks/useApi";
 import { type Page } from "@/types/entities";
 import { convertToPage } from "@/utils/convertToEntity";
@@ -57,11 +58,15 @@ export default function PageContent({ url_key }: PageContentProps) {
     const content = { __html: page.content || "" };
 
     return (
-        <div className="bg-white px-6 py-32 lg:px-8">
-            <div className="mx-auto max-w-3xl text-base leading-7 text-vtk-body">
-                <h1>{page.name}</h1>
-                <div dangerouslySetInnerHTML={content} />
-            </div>
+        <div className="vtk-shell pb-16">
+            {/* Managed pages have no hierarchy to trace, so the kicker carries the site
+                name rather than a breadcrumb. */}
+            <PageHead kicker="Burgieclan" title={page.name} />
+
+            <div
+                className="mt-7 max-w-3xl text-base leading-7 text-vtk-body"
+                dangerouslySetInnerHTML={content}
+            />
         </div>
     );
 }

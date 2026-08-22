@@ -2,6 +2,7 @@
 
 import FaqAccordion from '@/components/faq/FaqAccordion';
 import FaqQuestionForm from '@/components/faq/FaqQuestionForm';
+import PageHead from '@/components/ui/PageHead';
 import { HydraCollection, useApi } from '@/hooks/useApi';
 import { FaqItem } from '@/types/entities';
 import { convertToFaqItem } from '@/utils/convertToEntity';
@@ -37,13 +38,11 @@ export default function FaqPage() {
     return (
         <main className="vtk-shell pb-10">
             {/* Page header */}
-            <div className="vtk-page-head">
-                <div>
-                    <div className="vtk-page-kicker">Burgieclan</div>
-                    <h1 className="vtk-page-title">{t('faq.title')}</h1>
-                    <p className="vtk-page-subtitle">{t('faq.description')}</p>
-                </div>
-            </div>
+            <PageHead
+                kicker={t('FAQ')}
+                title={t('faq.title')}
+                subtitle={t('faq.description')}
+            />
 
             {/* FAQ Items */}
             <div className="mt-7 max-w-3xl">

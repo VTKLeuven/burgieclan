@@ -6,6 +6,7 @@ import { useUser } from "@/components/UserContext";
 import AnonymousSetting from "@/components/account/AnonymousSetting";
 import DocumentList from "@/components/account/DocumentList";
 import FavoriteList from "@/components/account/FavoriteList";
+import PageHead from "@/components/ui/PageHead";
 import type { Course, Document, Module, Program } from "@/types/entities";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
@@ -71,22 +72,17 @@ export default function AccountPage() {
 
     return (
         <div className="vtk-shell pb-16">
-            <div className="vtk-page-head">
-                <div>
-                    <div className="vtk-page-kicker">{t('account.account')}</div>
-                    <h1 className="vtk-page-title">
-                        {t('account.greeting', { name: user.fullName })}
-                    </h1>
-                    <p
-                        className="vtk-page-subtitle [&_p]:m-0"
-                        dangerouslySetInnerHTML={{ __html: t('account.welcome_text') }}
-                    />
-                </div>
-                <div className="vtk-page-meta hidden sm:block">
-                    <b>{favoriteCourses.length}</b> courses<br />
-                    <b>{favoriteDocuments.length}</b> documents
-                </div>
-            </div>
+            <PageHead
+                kicker={t('account.account')}
+                title={t('account.greeting', { name: user.fullName })}
+                subtitle={<span dangerouslySetInnerHTML={{ __html: t('account.welcome_text') }} />}
+                meta={
+                    <>
+                        <b>{favoriteCourses.length}</b> {t('account.meta-courses')}<br />
+                        <b>{favoriteDocuments.length}</b> {t('account.meta-documents')}
+                    </>
+                }
+            />
 
             <div className="mt-7 grid gap-4">
                 <DocumentList />

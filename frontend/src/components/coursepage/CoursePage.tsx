@@ -6,6 +6,7 @@ import DocumentSections from "@/components/coursepage/DocumentSections";
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import ErrorPage from "@/components/error/ErrorPage";
 import DynamicBreadcrumb from "@/components/ui/DynamicBreadcrumb";
+import PageHead from "@/components/ui/PageHead";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import { useUser } from '@/components/UserContext';
@@ -79,64 +80,59 @@ export default function CoursePage() {
             <div className="vtk-shell pb-16">
                 {/* Editorial page head: breadcrumb kicker, display title, and
                     the course facts as a right-aligned spec block. */}
-                <div className="vtk-page-head">
-                    <div>
-                        <div className="vtk-page-kicker">
-                            <DynamicBreadcrumb course={course} />
-                        </div>
-
-                        <div className="flex items-start gap-3">
-                            <FavoriteButton
-                                itemId={course.id}
-                                itemType="course"
-                                size={20}
-                                className="mt-2"
-                            />
-                            <h1 className="vtk-page-title">{courseName}</h1>
-                        </div>
-
-                        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-vtk-body">
-                            <span className="vtk-badge vtk-badge-muted font-mono">{course.code}</span>
-
-                            <span className="flex items-center gap-2">
-                                <ChartPie size={15} className="text-vtk-muted" />
-                                {course.credits} {t('credits')}
-                            </span>
-
-                            {/* Skipped entirely when the semester is unknown: the indicator renders
-                                nothing in that case, so the span would be an empty flex item and
-                                the row would show a stray gap. */}
-                            {(course.semesters?.length ?? 0) > 0 && (
-                                <span className="flex items-center gap-2">
-                                    <SemesterIndicator semesters={course.semesters} size={15} />
-                                    {course.semesters!.includes("Semester 1") && course.semesters!.includes("Semester 2")
-                                        ? t('course-page.year-course')
-                                        : course.semesters!.join(", ")}
-                                </span>
-                            )}
-
-                            <Link
-                                href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`}
-                                className="vtk-link flex items-center gap-1.5"
-                            >
-                                <LinkIcon size={14} />
-                                ECTS
-                            </Link>
-                        </div>
-                    </div>
-
-                    {/* Teachers */}
-                    {course?.professors && course.professors.length > 0 && (
-                        <div className="text-right">
-                            <div className="vtk-label mb-2.5">{t('course-page.teachers')}</div>
-                            <div className="flex justify-end -space-x-3">
-                                {course.professors.map((p, index) => (
-                                    <ProfessorDiv key={index} unumber={p} index={index} />
-                                ))}
+                <PageHead
+                    kicker={<DynamicBreadcrumb course={course} />}
+                    title={courseName}
+                    actions={
+                        <FavoriteButton
+                            itemId={course.id}
+                            itemType="course"
+                            size={20}
+                            className="mt-2"
+                        />
+                    }
+                    aside={
+                        course?.professors && course.professors.length > 0 ? (
+                            <div className="text-right">
+                                <div className="vtk-label mb-2.5">{t('course-page.teachers')}</div>
+                                <div className="flex justify-end -space-x-3">
+                                    {course.professors.map((p, index) => (
+                                        <ProfessorDiv key={index} unumber={p} index={index} />
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
-                </div>
+                        ) : undefined
+                    }
+                >
+                    <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-vtk-body">
+                        <span className="vtk-badge vtk-badge-muted font-mono">{course.code}</span>
+
+                        <span className="flex items-center gap-2">
+                            <ChartPie size={15} className="text-vtk-muted" />
+                            {course.credits} {t('credits')}
+                        </span>
+
+                        {/* Skipped entirely when the semester is unknown: the indicator renders
+                            nothing in that case, so the span would be an empty flex item and
+                            the row would show a stray gap. */}
+                        {(course.semesters?.length ?? 0) > 0 && (
+                            <span className="flex items-center gap-2">
+                                <SemesterIndicator semesters={course.semesters} size={15} />
+                                {course.semesters!.includes("Semester 1") && course.semesters!.includes("Semester 2")
+                                    ? t('course-page.year-course')
+                                    : course.semesters!.join(", ")}
+                            </span>
+                        )}
+
+                        <Link
+                            href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`}
+                            className="vtk-link flex items-center gap-1.5"
+                        >
+                            <LinkIcon size={14} />
+                            ECTS
+                        </Link>
+                    </div>
+                </PageHead>
 
                 {/* Documents */}
                 <div className="mt-8">
