@@ -157,17 +157,18 @@ export default function CurriculumNavigator() {
   return (
     <div className="vtk-shell pb-16">
 
-      {/* Editorial page head: breadcrumb as kicker, then the display title. */}
+      {/* Editorial page head: the breadcrumb already names this page, so the
+          heading is visually hidden rather than repeated as a display title. */}
       <div className="vtk-page-head">
         <div>
-          <div className="vtk-page-kicker">
+          <div className="vtk-page-kicker mb-0">
             <DynamicBreadcrumb />
           </div>
-          <h1 className="vtk-page-title">Curriculum Navigator</h1>
+          <h1 className="sr-only">{t('courses')}</h1>
         </div>
         <div className="vtk-page-meta hidden sm:block">
-          <b>{totalEntities.programs}</b> programs<br />
-          {searchPrograms && <><b>{totalEntities.courses}</b> courses</>}
+          <b>{totalEntities.programs}</b> {t('curriculum-navigator.meta-programs')}<br />
+          {searchPrograms && <><b>{totalEntities.courses}</b> {t('curriculum-navigator.meta-courses')}</>}
         </div>
       </div>
 
