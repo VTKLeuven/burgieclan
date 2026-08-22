@@ -12,7 +12,8 @@ After cloning the repository, install the git hooks to ensure code quality and c
 
 This will install two hooks:
 - **pre-commit**: Runs PHP CodeSniffer on staged PHP files to enforce code style standards
-- **commit-msg**: Enforces that all commit messages start with `BUR-XXX` (where XXX is a ticket number)
+- **commit-msg**: Enforces [Conventional Commits](https://www.conventionalcommits.org/), e.g.
+  `feat: add MATLAB file uploads` or `fix(frontend): resolve favorites toggle`
 
 See [.githooks/README.md](.githooks/README.md) for more details.
 
