@@ -4,6 +4,7 @@ import Loading from '@/app/[locale]/loading';
 import CurriculumSearchBar, { SearchFilters } from '@/components/courses/CurriculumSearchBar';
 import ProgramNode from '@/components/courses/ProgramNode';
 import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
+import PageHead from '@/components/ui/PageHead';
 import { useUser } from "@/components/UserContext";
 import { HydraCollection, useApi } from '@/hooks/useApi';
 import type { Program } from '@/types/entities';
@@ -157,20 +158,16 @@ export default function CurriculumNavigator() {
   return (
     <div className="vtk-shell pb-16">
 
-      {/* Editorial page head: the breadcrumb already names this page, so the
-          heading is visually hidden rather than repeated as a display title. */}
-      <div className="vtk-page-head">
-        <div>
-          <div className="vtk-page-kicker mb-0">
-            <DynamicBreadcrumb />
-          </div>
-          <h1 className="sr-only">{t('courses')}</h1>
-        </div>
-        <div className="vtk-page-meta hidden sm:block">
-          <b>{totalEntities.programs}</b> {t('curriculum-navigator.meta-programs')}<br />
-          {searchPrograms && <><b>{totalEntities.courses}</b> {t('curriculum-navigator.meta-courses')}</>}
-        </div>
-      </div>
+      <PageHead
+        kicker={<DynamicBreadcrumb />}
+        title={t('courses')}
+        meta={
+          <>
+            <b>{totalEntities.programs}</b> {t('curriculum-navigator.meta-programs')}<br />
+            {searchPrograms && <><b>{totalEntities.courses}</b> {t('curriculum-navigator.meta-courses')}</>}
+          </>
+        }
+      />
 
       <div className="mt-7">
         <CurriculumSearchBar

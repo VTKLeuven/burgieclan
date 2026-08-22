@@ -8,6 +8,7 @@ import LoadingPage from "@/components/loading/LoadingPage";
 import DownloadSingleDocumentButton from "@/components/ui/buttons/DownloadSingleDocumentButton";
 import VoteButton from "@/components/ui/buttons/VoteButton";
 import DynamicBreadcrumb from "@/components/ui/DynamicBreadcrumb";
+import PageHead from "@/components/ui/PageHead";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import { useUser } from "@/components/UserContext";
 import { logDocumentView } from "@/hooks/logDocumentView";
@@ -96,31 +97,27 @@ export default function DocumentPreview({ id }: { id: string }) {
         <div className="vtk-shell pb-16">
             {/* Editorial page head: breadcrumb kicker, document name as the display
                 title, and the file facts as a right-aligned spec block. */}
-            <div className="vtk-page-head">
-                <div>
-                    <div className="vtk-page-kicker">
-                        <DynamicBreadcrumb
-                            course={document.course}
-                            category={document.category}
-                            document={document}
-                        />
-                    </div>
-                    <div className="flex items-start gap-3">
-                        <File className="mt-1.5 h-6 w-6 shrink-0 text-vtk-muted" />
-                        <h1 className="vtk-page-title">{document.name}</h1>
-                    </div>
-
-                    <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
-                        {document.createdAt && <DocumentInfoField icon={Calendar} value={document.createdAt?.toLocaleDateString()} />}
-                        {document.fileSize && <DocumentInfoField icon={Package} value={formatFileSize(document.fileSize)} />}
-                        {document.year && <DocumentInfoField icon={ChartPie} value={document.year} />}
-                        <DocumentInfoField
-                            icon={CircleUser}
-                            value={document.anonymous ? t("document.anonymous") : document.creator?.fullName || ""}
-                        />
-                    </div>
+            <PageHead
+                kicker={
+                    <DynamicBreadcrumb
+                        course={document.course}
+                        category={document.category}
+                        document={document}
+                    />
+                }
+                title={document.name}
+                icon={File}
+            >
+                <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+                    {document.createdAt && <DocumentInfoField icon={Calendar} value={document.createdAt?.toLocaleDateString()} />}
+                    {document.fileSize && <DocumentInfoField icon={Package} value={formatFileSize(document.fileSize)} />}
+                    {document.year && <DocumentInfoField icon={ChartPie} value={document.year} />}
+                    <DocumentInfoField
+                        icon={CircleUser}
+                        value={document.anonymous ? t("document.anonymous") : document.creator?.fullName || ""}
+                    />
                 </div>
-            </div>
+            </PageHead>
 
             {/* Under review box */}
             {document.underReview && (
