@@ -1,0 +1,124 @@
+{
+  "cluster_id": 5,
+  "cluster_name": "Chemical & Materials (CIT/MTK)",
+  "stats": {
+    "docs": 649,
+    "courses": 14,
+    "blind_docs": 330,
+    "rich_docs": 319
+  },
+  "courses": [
+    {
+      "course_code": "H01G9A",
+      "course_name": "Atoomtheorie, chemische periodiciteit en chemische binding",
+      "course_id": 64,
+      "total_docs": 19,
+      "rich_docs": 15,
+      "blind_docs": 4
+    },
+    {
+      "course_code": "H08U1A",
+      "course_name": "Kunststoffen",
+      "course_id": 71,
+      "total_docs": 36,
+      "rich_docs": 22,
+      "blind_docs": 14
+    },
+    {
+      "course_code": "H01J9A",
+      "course_name": "Chemische reactorkunde en bioreactorkunde",
+      "course_id": 53,
+      "total_docs": 87,
+      "rich_docs": 12,
+      "blind_docs": 75
+    },
+    {
+      "course_code": "H0R12A",
+      "course_name": "Transport Phenomena",
+      "course_id": 23,
+      "total_docs": 135,
+      "rich_docs": 54,
+      "blind_docs": 81
+    },
+    {
+      "course_code": "H0R32A",
+      "course_name": "Analytische scheikunde",
+      "course_id": 67,
+      "total_docs": 11,
+      "rich_docs": 3,
+      "blind_docs": 8
+    },
+    {
+      "course_code": "H01K7A",
+      "course_name": "Scheidingsprocessen",
+      "course_id": 70,
+      "total_docs": 72,
+      "rich_docs": 35,
+      "blind_docs": 37
+    },
+    {
+      "course_code": "H08Z2A",
+      "course_name": "Structures and Microstructures of Materials",
+      "course_id": 876,
+      "total_docs": 53,
+      "rich_docs": 24,
+      "blind_docs": 29
+    },
+    {
+      "course_code": "H02U6A",
+      "course_name": "Polymeercomposieten",
+      "course_id": 87,
+      "total_docs": 14,
+      "rich_docs": 9,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H01D0B",
+      "course_name": "Inleiding tot de materiaalkunde",
+      "course_id": 13,
+      "total_docs": 156,
+      "rich_docs": 110,
+      "blind_docs": 46
+    },
+    {
+      "course_code": "H06U0A",
+      "course_name": "Design and Analysis of Multiphase Reactors",
+      "course_id": 1812,
+      "total_docs": 8,
+      "rich_docs": 3,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H04Q0A",
+      "course_name": "Physics of Nuclear Reactors",
+      "course_id": 2469,
+      "total_docs": 3,
+      "rich_docs": 0,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H01I8A",
+      "course_name": "Structurele materialen",
+      "course_id": 2484,
+      "total_docs": 8,
+      "rich_docs": 5,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H01I6A",
+      "course_name": "Materialen gebruik & degradatie",
+      "course_id": 2485,
+      "total_docs": 11,
+      "rich_docs": 6,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H01J3A",
+      "course_name": "Thermo en kinetica",
+      "course_id": 2486,
+      "total_docs": 36,
+      "rich_docs": 21,
+      "blind_docs": 15
+    }
+  ]
+}

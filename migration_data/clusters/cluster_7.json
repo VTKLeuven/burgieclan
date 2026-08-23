@@ -1,0 +1,84 @@
+{
+  "cluster_id": 7,
+  "cluster_name": "Biomedical & Energy (BMT/ENERG)",
+  "stats": {
+    "docs": 181,
+    "courses": 9,
+    "blind_docs": 81,
+    "rich_docs": 100
+  },
+  "courses": [
+    {
+      "course_code": "H0H10A",
+      "course_name": "Cellulaire biofysica",
+      "course_id": 52,
+      "total_docs": 26,
+      "rich_docs": 21,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "L01N7A",
+      "course_name": "Research Topics in Human Movement Biomechanics",
+      "course_id": 2070,
+      "total_docs": 4,
+      "rich_docs": 4,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H06W1A",
+      "course_name": "Selected Topics in Biomedical Signal Processing",
+      "course_id": 1381,
+      "total_docs": 2,
+      "rich_docs": 2,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H03I2A",
+      "course_name": "Biomedical Data Processing",
+      "course_id": 1730,
+      "total_docs": 26,
+      "rich_docs": 10,
+      "blind_docs": 16
+    },
+    {
+      "course_code": "H03H7A",
+      "course_name": "Biomedical Measurements and Stimulation",
+      "course_id": 2064,
+      "total_docs": 19,
+      "rich_docs": 5,
+      "blind_docs": 14
+    },
+    {
+      "course_code": "H0N44A",
+      "course_name": "Numerical Modelling in Biomedical Engineering",
+      "course_id": 2065,
+      "total_docs": 7,
+      "rich_docs": 2,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H0R25A",
+      "course_name": "Celbiologie",
+      "course_id": 44,
+      "total_docs": 8,
+      "rich_docs": 5,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H08U4A",
+      "course_name": "Systeemtheorie",
+      "course_id": 2473,
+      "total_docs": 62,
+      "rich_docs": 27,
+      "blind_docs": 35
+    },
+    {
+      "course_code": "H0H61A",
+      "course_name": "Statistische methoden voor biomedische",
+      "course_id": 2474,
+      "total_docs": 27,
+      "rich_docs": 24,
+      "blind_docs": 3
+    }
+  ]
+}

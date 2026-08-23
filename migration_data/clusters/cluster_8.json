@@ -1,0 +1,1780 @@
+{
+  "cluster_id": 8,
+  "cluster_name": "Athens & General Electives",
+  "stats": {
+    "docs": 5702,
+    "courses": 221,
+    "blind_docs": 2609,
+    "rich_docs": 3093
+  },
+  "courses": [
+    {
+      "course_code": "H09D9A",
+      "course_name": "Management Challenges in the Chemical Industry",
+      "course_id": 1814,
+      "total_docs": 8,
+      "rich_docs": 5,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H09E0A",
+      "course_name": "Water Technology",
+      "course_id": 901,
+      "total_docs": 7,
+      "rich_docs": 7,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H04B5B",
+      "course_name": "Nuclear Energy: Basic Aspects",
+      "course_id": 1214,
+      "total_docs": 40,
+      "rich_docs": 37,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H04A4A",
+      "course_name": "Electrical Drives; Advanced Topics in Electrical Machines, including Implementation Aspects",
+      "course_id": 1219,
+      "total_docs": 29,
+      "rich_docs": 20,
+      "blind_docs": 9
+    },
+    {
+      "course_code": "H0A21A",
+      "course_name": "Two-Phase Flow: Theory and Applications",
+      "course_id": 1240,
+      "total_docs": 37,
+      "rich_docs": 30,
+      "blind_docs": 7
+    },
+    {
+      "course_code": "G0B01A",
+      "course_name": "Intellectual Property Management",
+      "course_id": 585,
+      "total_docs": 22,
+      "rich_docs": 17,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H0R57A",
+      "course_name": "Systems Theory and Control Theory",
+      "course_id": 24,
+      "total_docs": 94,
+      "rich_docs": 53,
+      "blind_docs": 41
+    },
+    {
+      "course_code": "H03Y1A",
+      "course_name": "Theory of Elasticity and Plasticity",
+      "course_id": 1551,
+      "total_docs": 179,
+      "rich_docs": 25,
+      "blind_docs": 154
+    },
+    {
+      "course_code": "H04X7A",
+      "course_name": "Sensors and Measurements Systems",
+      "course_id": 2098,
+      "total_docs": 43,
+      "rich_docs": 7,
+      "blind_docs": 36
+    },
+    {
+      "course_code": "H0T52A",
+      "course_name": "Aircraft MRO, Maintenance, Repair & Overhaul",
+      "course_id": 2224,
+      "total_docs": 11,
+      "rich_docs": 10,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H05V3A",
+      "course_name": "Aircraft Structures",
+      "course_id": 2221,
+      "total_docs": 24,
+      "rich_docs": 14,
+      "blind_docs": 10
+    },
+    {
+      "course_code": "H0R74A",
+      "course_name": "Aircraft Materials",
+      "course_id": 2219,
+      "total_docs": 42,
+      "rich_docs": 5,
+      "blind_docs": 37
+    },
+    {
+      "course_code": "H04Y7A",
+      "course_name": "Turbulence",
+      "course_id": 1238,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0H00A",
+      "course_name": "Thermal Systems",
+      "course_id": 1222,
+      "total_docs": 50,
+      "rich_docs": 12,
+      "blind_docs": 38
+    },
+    {
+      "course_code": "H04P5A",
+      "course_name": "Embedded Control Systems",
+      "course_id": 2207,
+      "total_docs": 10,
+      "rich_docs": 1,
+      "blind_docs": 9
+    },
+    {
+      "course_code": "H04X3B",
+      "course_name": "Systems and Control Theory",
+      "course_id": 2196,
+      "total_docs": 497,
+      "rich_docs": 400,
+      "blind_docs": 97
+    },
+    {
+      "course_code": "H0O82A",
+      "course_name": "Precision Engineering",
+      "course_id": 2103,
+      "total_docs": 8,
+      "rich_docs": 2,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H04Z5A",
+      "course_name": "Combustion",
+      "course_id": 2213,
+      "total_docs": 25,
+      "rich_docs": 15,
+      "blind_docs": 10
+    },
+    {
+      "course_code": "H0P79A",
+      "course_name": "Funderingstechniek",
+      "course_id": 1506,
+      "total_docs": 83,
+      "rich_docs": 35,
+      "blind_docs": 48
+    },
+    {
+      "course_code": "H03T3A",
+      "course_name": "Zaalakoestiek en lichttechniek",
+      "course_id": 1535,
+      "total_docs": 10,
+      "rich_docs": 2,
+      "blind_docs": 8
+    },
+    {
+      "course_code": "G0U12B",
+      "course_name": "Historical and Social Aspects of Physics",
+      "course_id": 591,
+      "total_docs": 2,
+      "rich_docs": 0,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "G9X25A",
+      "course_name": "Molecular Photonics",
+      "course_id": 2423,
+      "total_docs": 14,
+      "rich_docs": 3,
+      "blind_docs": 11
+    },
+    {
+      "course_code": "G0G71A",
+      "course_name": "Physical Chemistry of Biological Systems",
+      "course_id": 2412,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H06A6A",
+      "course_name": "Chemistry at Nanometre Scale",
+      "course_id": 891,
+      "total_docs": 2,
+      "rich_docs": 1,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H06G4A",
+      "course_name": "Materials Physics for Nanotechnology",
+      "course_id": 857,
+      "total_docs": 2,
+      "rich_docs": 1,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H06D3A",
+      "course_name": "Nanostructured Bio-Macromolecules",
+      "course_id": 2396,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H06G0A",
+      "course_name": "Technology of Integrated Systems",
+      "course_id": 2406,
+      "total_docs": 6,
+      "rich_docs": 0,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H08T5A",
+      "course_name": "Electronic Components, Circuits and Sensors",
+      "course_id": 2392,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H06F2A",
+      "course_name": "Semiconductor Physics",
+      "course_id": 138,
+      "total_docs": 4,
+      "rich_docs": 3,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H06F6A",
+      "course_name": "Structure, Synthesis and Cellular Function of Macromolecules",
+      "course_id": 884,
+      "total_docs": 4,
+      "rich_docs": 1,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H06N2A",
+      "course_name": "Lectures on Nanoscience and Nanotechnology",
+      "course_id": 2400,
+      "total_docs": 4,
+      "rich_docs": 2,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "I0P50C",
+      "course_name": "Microscopy for Molecular Biotechnology",
+      "course_id": 2411,
+      "total_docs": 3,
+      "rich_docs": 3,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H06D1A",
+      "course_name": "Integrated Photonics",
+      "course_id": 2408,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H0G03A",
+      "course_name": "Electronic Transport in Solids and Nanostructures",
+      "course_id": 2405,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H06D9B",
+      "course_name": "Physical Materials Characterization Techniques",
+      "course_id": 2397,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H0M72A",
+      "course_name": "Electricity, Magnetism and Waves",
+      "course_id": 2395,
+      "total_docs": 82,
+      "rich_docs": 38,
+      "blind_docs": 44
+    },
+    {
+      "course_code": "H0A07A",
+      "course_name": "Transportation Systems Analysis",
+      "course_id": 1548,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0R80A",
+      "course_name": "Complex Analysis and Applications",
+      "course_id": 1717,
+      "total_docs": 10,
+      "rich_docs": 7,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "I0N57C",
+      "course_name": "Experimental Design",
+      "course_id": 596,
+      "total_docs": 33,
+      "rich_docs": 4,
+      "blind_docs": 29
+    },
+    {
+      "course_code": "H08J0A",
+      "course_name": "Supply Chain Engineering",
+      "course_id": 2288,
+      "total_docs": 30,
+      "rich_docs": 13,
+      "blind_docs": 17
+    },
+    {
+      "course_code": "H04E0A",
+      "course_name": "Engineering Ethics",
+      "course_id": 576,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "P00H0A",
+      "course_name": "Psychology, incl. Psychology of Perception",
+      "course_id": 597,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "A04D5A",
+      "course_name": "Religions",
+      "course_id": 27,
+      "total_docs": 57,
+      "rich_docs": 39,
+      "blind_docs": 18
+    },
+    {
+      "course_code": "H0O00A",
+      "course_name": "Global Sustainability Challenges",
+      "course_id": 594,
+      "total_docs": 12,
+      "rich_docs": 12,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "A08C4A",
+      "course_name": "Perspectives on Religion and Meaning",
+      "course_id": 136,
+      "total_docs": 7,
+      "rich_docs": 0,
+      "blind_docs": 7
+    },
+    {
+      "course_code": "H09B9C",
+      "course_name": "Modellering van weefselfysiologie",
+      "course_id": 51,
+      "total_docs": 21,
+      "rich_docs": 14,
+      "blind_docs": 7
+    },
+    {
+      "course_code": "H0S57A",
+      "course_name": "Composites Manufacturing",
+      "course_id": 865,
+      "total_docs": 2,
+      "rich_docs": 1,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0S49A",
+      "course_name": "Materials Modelling and Simulation Techniques",
+      "course_id": 854,
+      "total_docs": 20,
+      "rich_docs": 15,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H0S51A",
+      "course_name": "Surface Science and Engineering",
+      "course_id": 856,
+      "total_docs": 12,
+      "rich_docs": 7,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H0V01A",
+      "course_name": "Selected Topics in Engineering: Athens I",
+      "course_id": 564,
+      "total_docs": 335,
+      "rich_docs": 314,
+      "blind_docs": 21
+    },
+    {
+      "course_code": "H0R18A",
+      "course_name": "Industrial Management and Entrepreneurship",
+      "course_id": 9,
+      "total_docs": 8,
+      "rich_docs": 6,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H01C6A",
+      "course_name": "Organische scheikunde",
+      "course_id": 66,
+      "total_docs": 308,
+      "rich_docs": 96,
+      "blind_docs": 212
+    },
+    {
+      "course_code": "H01D7B",
+      "course_name": "Economie",
+      "course_id": 28,
+      "total_docs": 83,
+      "rich_docs": 70,
+      "blind_docs": 13
+    },
+    {
+      "course_code": "H06T7A",
+      "course_name": "Advanced Separation Processes",
+      "course_id": 1806,
+      "total_docs": 7,
+      "rich_docs": 5,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H09D7A",
+      "course_name": "Analytical Chemistry",
+      "course_id": 1808,
+      "total_docs": 9,
+      "rich_docs": 2,
+      "blind_docs": 7
+    },
+    {
+      "course_code": "H06T1A",
+      "course_name": "Applied Physical Chemistry",
+      "course_id": 900,
+      "total_docs": 18,
+      "rich_docs": 7,
+      "blind_docs": 11
+    },
+    {
+      "course_code": "H09D6A",
+      "course_name": "Chemical Process Design",
+      "course_id": 1807,
+      "total_docs": 3,
+      "rich_docs": 2,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H06T4A",
+      "course_name": "Systems Analysis of Chemical Processes",
+      "course_id": 1805,
+      "total_docs": 16,
+      "rich_docs": 7,
+      "blind_docs": 9
+    },
+    {
+      "course_code": "H06T3A",
+      "course_name": "Biochemical Process Engineering",
+      "course_id": 1810,
+      "total_docs": 16,
+      "rich_docs": 6,
+      "blind_docs": 10
+    },
+    {
+      "course_code": "H06T2A",
+      "course_name": "Process Control in the Chemical Industry",
+      "course_id": 1809,
+      "total_docs": 16,
+      "rich_docs": 14,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H09E1A",
+      "course_name": "Powder Technology",
+      "course_id": 902,
+      "total_docs": 16,
+      "rich_docs": 11,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H06T5A",
+      "course_name": "Industrial Chemical Processes",
+      "course_id": 1816,
+      "total_docs": 17,
+      "rich_docs": 6,
+      "blind_docs": 11
+    },
+    {
+      "course_code": "H09F4A",
+      "course_name": "Air Pollution and Control",
+      "course_id": 1835,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H03C8A",
+      "course_name": "Resource Recovery and Recycling",
+      "course_id": 890,
+      "total_docs": 14,
+      "rich_docs": 13,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H09F0A",
+      "course_name": "Chemical Product Design",
+      "course_id": 1833,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H09E2A",
+      "course_name": "Design and Analysis of Polymeric Systems",
+      "course_id": 1831,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H09F7A",
+      "course_name": "Polymer Processing",
+      "course_id": 866,
+      "total_docs": 4,
+      "rich_docs": 1,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H03U4A",
+      "course_name": "Biomaterials",
+      "course_id": 96,
+      "total_docs": 29,
+      "rich_docs": 12,
+      "blind_docs": 17
+    },
+    {
+      "course_code": "H9X53A",
+      "course_name": "Energy Challenges",
+      "course_id": 1223,
+      "total_docs": 3,
+      "rich_docs": 2,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0E95A",
+      "course_name": "Chemical Engineering for Human Health",
+      "course_id": 1813,
+      "total_docs": 8,
+      "rich_docs": 4,
+      "blind_docs": 4
+    },
+    {
+      "course_code": "H06T8A",
+      "course_name": "Hazardous Materials and Safety in the Process Industries",
+      "course_id": 893,
+      "total_docs": 7,
+      "rich_docs": 5,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H09F2A",
+      "course_name": "Bioconversion Technology",
+      "course_id": 1818,
+      "total_docs": 12,
+      "rich_docs": 7,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H09E7A",
+      "course_name": "Waste Water Treatment Technology",
+      "course_id": 1817,
+      "total_docs": 20,
+      "rich_docs": 18,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H08P0A",
+      "course_name": "Explosion Safety",
+      "course_id": 1821,
+      "total_docs": 5,
+      "rich_docs": 1,
+      "blind_docs": 4
+    },
+    {
+      "course_code": "H09K3A",
+      "course_name": "Advanced Topics on Analog and RF IC Design",
+      "course_id": 1373,
+      "total_docs": 28,
+      "rich_docs": 23,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H06A3A",
+      "course_name": "Analog and Mixed-Signal Electronics for Signal Processing",
+      "course_id": 1358,
+      "total_docs": 33,
+      "rich_docs": 23,
+      "blind_docs": 10
+    },
+    {
+      "course_code": "H05A0A",
+      "course_name": "Analysis of Digital Communication Systems",
+      "course_id": 1361,
+      "total_docs": 46,
+      "rich_docs": 17,
+      "blind_docs": 29
+    },
+    {
+      "course_code": "H05K2A",
+      "course_name": "Antennas for PCBs, Microelectronics and Nanotechnology",
+      "course_id": 1385,
+      "total_docs": 65,
+      "rich_docs": 30,
+      "blind_docs": 35
+    },
+    {
+      "course_code": "H05H2A",
+      "course_name": "Compute Platforms for AI and Embedded Processing",
+      "course_id": 1371,
+      "total_docs": 5,
+      "rich_docs": 4,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0E92A",
+      "course_name": "Design and Implementation of Analog Circuits",
+      "course_id": 1363,
+      "total_docs": 36,
+      "rich_docs": 19,
+      "blind_docs": 17
+    },
+    {
+      "course_code": "H05E3A",
+      "course_name": "Design of Analog and Mixed-Signal Integrated Circuits",
+      "course_id": 1365,
+      "total_docs": 28,
+      "rich_docs": 13,
+      "blind_docs": 15
+    },
+    {
+      "course_code": "H09K1A",
+      "course_name": "Design of Digital Integrated Circuits",
+      "course_id": 1368,
+      "total_docs": 100,
+      "rich_docs": 37,
+      "blind_docs": 63
+    },
+    {
+      "course_code": "H09J6B",
+      "course_name": "Design of Digital Platforms: Concepts",
+      "course_id": 2077,
+      "total_docs": 23,
+      "rich_docs": 4,
+      "blind_docs": 19
+    },
+    {
+      "course_code": "H09I9A",
+      "course_name": "Design of RF and mm-Wave Integrated Circuits",
+      "course_id": 1367,
+      "total_docs": 13,
+      "rich_docs": 11,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H09L4A",
+      "course_name": "e-Security",
+      "course_id": 1393,
+      "total_docs": 2,
+      "rich_docs": 1,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H05T0A",
+      "course_name": "Electromagnetic Propagation",
+      "course_id": 1386,
+      "total_docs": 40,
+      "rich_docs": 14,
+      "blind_docs": 26
+    },
+    {
+      "course_code": "H09J2A",
+      "course_name": "Image Analysis and Understanding",
+      "course_id": 557,
+      "total_docs": 7,
+      "rich_docs": 2,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H05F7A",
+      "course_name": "Measurement Systems",
+      "course_id": 1252,
+      "total_docs": 2,
+      "rich_docs": 2,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H06C9A",
+      "course_name": "MEMS and Microsystems",
+      "course_id": 1372,
+      "total_docs": 18,
+      "rich_docs": 7,
+      "blind_docs": 11
+    },
+    {
+      "course_code": "H0E89A",
+      "course_name": "Mobile Networks",
+      "course_id": 1389,
+      "total_docs": 29,
+      "rich_docs": 15,
+      "blind_docs": 14
+    },
+    {
+      "course_code": "H09P9A",
+      "course_name": "Multimedia Technology and Coding",
+      "course_id": 1379,
+      "total_docs": 8,
+      "rich_docs": 5,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H05I7A",
+      "course_name": "Stochastic Signal and System Analysis",
+      "course_id": 1360,
+      "total_docs": 16,
+      "rich_docs": 9,
+      "blind_docs": 7
+    },
+    {
+      "course_code": "H05J1A",
+      "course_name": "Technology for Microelectronics",
+      "course_id": 1366,
+      "total_docs": 28,
+      "rich_docs": 22,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H05F1A",
+      "course_name": "Digital Signal Processing for Communications and Information Systems",
+      "course_id": 1357,
+      "total_docs": 35,
+      "rich_docs": 30,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H04A2A",
+      "course_name": "Power Electronics",
+      "course_id": 1212,
+      "total_docs": 55,
+      "rich_docs": 41,
+      "blind_docs": 14
+    },
+    {
+      "course_code": "H04A9A",
+      "course_name": "Power System Calculations",
+      "course_id": 1213,
+      "total_docs": 43,
+      "rich_docs": 15,
+      "blind_docs": 28
+    },
+    {
+      "course_code": "H04A0A",
+      "course_name": "Power Systems",
+      "course_id": 1211,
+      "total_docs": 34,
+      "rich_docs": 18,
+      "blind_docs": 16
+    },
+    {
+      "course_code": "H04C4A",
+      "course_name": "Energy Economics",
+      "course_id": 906,
+      "total_docs": 39,
+      "rich_docs": 36,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H04C2A",
+      "course_name": "Energy Markets and Regulation",
+      "course_id": 1221,
+      "total_docs": 7,
+      "rich_docs": 2,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H00P3A",
+      "course_name": "Smart Distribution Systems",
+      "course_id": 1218,
+      "total_docs": 31,
+      "rich_docs": 7,
+      "blind_docs": 24
+    },
+    {
+      "course_code": "H04D0A",
+      "course_name": "Industrial Automation and Control",
+      "course_id": 1227,
+      "total_docs": 3,
+      "rich_docs": 1,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H0P08A",
+      "course_name": "Optimization Problems in Energy Systems",
+      "course_id": 1247,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H06P1A",
+      "course_name": "Electricity and Gas Markets",
+      "course_id": 1248,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H04Y6A",
+      "course_name": "Turbomachinery, Part 2",
+      "course_id": 1243,
+      "total_docs": 15,
+      "rich_docs": 5,
+      "blind_docs": 10
+    },
+    {
+      "course_code": "H09G2A",
+      "course_name": "Integrated Problem Solving in Energy",
+      "course_id": 1217,
+      "total_docs": 51,
+      "rich_docs": 20,
+      "blind_docs": 31
+    },
+    {
+      "course_code": "H9X34A",
+      "course_name": "Numerical Methods in Energy Sciences",
+      "course_id": 1216,
+      "total_docs": 122,
+      "rich_docs": 50,
+      "blind_docs": 72
+    },
+    {
+      "course_code": "H04M0B",
+      "course_name": "Eindige elementen",
+      "course_id": 1504,
+      "total_docs": 101,
+      "rich_docs": 47,
+      "blind_docs": 54
+    },
+    {
+      "course_code": "H9X30A",
+      "course_name": "Electrical Drives",
+      "course_id": 2228,
+      "total_docs": 50,
+      "rich_docs": 30,
+      "blind_docs": 20
+    },
+    {
+      "course_code": "H04C1B",
+      "course_name": "Renewable Energy",
+      "course_id": 1220,
+      "total_docs": 18,
+      "rich_docs": 1,
+      "blind_docs": 17
+    },
+    {
+      "course_code": "H06R6A",
+      "course_name": "Energy Law",
+      "course_id": 1249,
+      "total_docs": 7,
+      "rich_docs": 7,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H0T59A",
+      "course_name": "Host Response to Implanted Materials",
+      "course_id": 869,
+      "total_docs": 17,
+      "rich_docs": 3,
+      "blind_docs": 14
+    },
+    {
+      "course_code": "I0D35A",
+      "course_name": "Introduction to Genetics",
+      "course_id": 2093,
+      "total_docs": 19,
+      "rich_docs": 3,
+      "blind_docs": 16
+    },
+    {
+      "course_code": "I0U28B",
+      "course_name": "Omics Techniques and Data Analysis",
+      "course_id": 2107,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H04W0A",
+      "course_name": "Production Machines and Systems",
+      "course_id": 887,
+      "total_docs": 5,
+      "rich_docs": 2,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "D0I69A",
+      "course_name": "ICT Service Management",
+      "course_id": 584,
+      "total_docs": 23,
+      "rich_docs": 23,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H06R5A",
+      "course_name": "Management and Policy Aspects of Technology in Healthcare",
+      "course_id": 2111,
+      "total_docs": 2,
+      "rich_docs": 2,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H02C5A",
+      "course_name": "Object Oriented Programming",
+      "course_id": 2080,
+      "total_docs": 2,
+      "rich_docs": 0,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H06W8A",
+      "course_name": "Medical Image Analysis",
+      "course_id": 2072,
+      "total_docs": 3,
+      "rich_docs": 2,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0N48A",
+      "course_name": "Orthopaedic Implants",
+      "course_id": 2071,
+      "total_docs": 8,
+      "rich_docs": 2,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H03J3A",
+      "course_name": "Mechanobiology",
+      "course_id": 2075,
+      "total_docs": 9,
+      "rich_docs": 0,
+      "blind_docs": 9
+    },
+    {
+      "course_code": "H02H6B",
+      "course_name": "Bio-informatics",
+      "course_id": 537,
+      "total_docs": 20,
+      "rich_docs": 7,
+      "blind_docs": 13
+    },
+    {
+      "course_code": "H0N40A",
+      "course_name": "Medical Equipment",
+      "course_id": 2066,
+      "total_docs": 9,
+      "rich_docs": 7,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H03H5A",
+      "course_name": "Medical Imaging",
+      "course_id": 1731,
+      "total_docs": 37,
+      "rich_docs": 9,
+      "blind_docs": 28
+    },
+    {
+      "course_code": "H03I4D",
+      "course_name": "Human System Physiology",
+      "course_id": 50,
+      "total_docs": 16,
+      "rich_docs": 11,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H0M70A",
+      "course_name": "Mechanics",
+      "course_id": 2394,
+      "total_docs": 176,
+      "rich_docs": 97,
+      "blind_docs": 79
+    },
+    {
+      "course_code": "I0P05D",
+      "course_name": "Biofluidics",
+      "course_id": 2413,
+      "total_docs": 7,
+      "rich_docs": 5,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H0N17A",
+      "course_name": "Master's Thesis",
+      "course_id": 570,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H04D8A",
+      "course_name": "Communication Skills for a Technical and Organisational Context",
+      "course_id": 592,
+      "total_docs": 2,
+      "rich_docs": 1,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H08N0A",
+      "course_name": "Introduction to Safety Engineering",
+      "course_id": 1399,
+      "total_docs": 2,
+      "rich_docs": 0,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H04Z8A",
+      "course_name": "Aircraft Engines",
+      "course_id": 1239,
+      "total_docs": 187,
+      "rich_docs": 6,
+      "blind_docs": 181
+    },
+    {
+      "course_code": "H04W6A",
+      "course_name": "Aircraft Performance and Stability",
+      "course_id": 2216,
+      "total_docs": 30,
+      "rich_docs": 22,
+      "blind_docs": 8
+    },
+    {
+      "course_code": "H0R78A",
+      "course_name": "Helicopters",
+      "course_id": 2222,
+      "total_docs": 3,
+      "rich_docs": 1,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H04X5A",
+      "course_name": "Spacecraft Technology and Space Environment",
+      "course_id": 2217,
+      "total_docs": 4,
+      "rich_docs": 2,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H04Q4A",
+      "course_name": "Advanced Techniques for Vibro-acoustic Measurement and Analysis",
+      "course_id": 2229,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H0E62A",
+      "course_name": "Advanced Subtractive Manufacturing",
+      "course_id": 2204,
+      "total_docs": 2,
+      "rich_docs": 1,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0O79A",
+      "course_name": "Dimensional Metrology",
+      "course_id": 2200,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H0T49A",
+      "course_name": "Mechatronic Drive Systems",
+      "course_id": 1253,
+      "total_docs": 2,
+      "rich_docs": 2,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H04Q1B",
+      "course_name": "Advanced Thermodynamics and Plasma Physics",
+      "course_id": 1242,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H03E3A",
+      "course_name": "Optimization",
+      "course_id": 1250,
+      "total_docs": 5,
+      "rich_docs": 0,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H0T54A",
+      "course_name": "Automotive Structures and Vehicle Dynamics",
+      "course_id": 2225,
+      "total_docs": 26,
+      "rich_docs": 18,
+      "blind_docs": 8
+    },
+    {
+      "course_code": "H0E70A",
+      "course_name": "Vehicle Propulsion",
+      "course_id": 2214,
+      "total_docs": 7,
+      "rich_docs": 7,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H04U1C",
+      "course_name": "Optimization of Mechatronic Systems",
+      "course_id": 2089,
+      "total_docs": 7,
+      "rich_docs": 5,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H0T56A",
+      "course_name": "Noise Abatement in Machines, Vehicles and Aircraft",
+      "course_id": 2223,
+      "total_docs": 4,
+      "rich_docs": 3,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0P82A",
+      "course_name": "Project- en werfbeheer",
+      "course_id": 1508,
+      "total_docs": 12,
+      "rich_docs": 12,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H0T88A",
+      "course_name": "Structural Optimization",
+      "course_id": 1544,
+      "total_docs": 3,
+      "rich_docs": 1,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H0P98A",
+      "course_name": "Stedelijke hydrologie en rivierkunde",
+      "course_id": 1521,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0P99A",
+      "course_name": "Sediment Mechanics & Morphodynamics",
+      "course_id": 1522,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H06E2A",
+      "course_name": "Quantum Physics",
+      "course_id": 60,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H06F0B",
+      "course_name": "Semiconductor Devices",
+      "course_id": 899,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H06X4C",
+      "course_name": "Micro- and Nanofluidics",
+      "course_id": 2101,
+      "total_docs": 3,
+      "rich_docs": 0,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H06V4A",
+      "course_name": "Scheikunde",
+      "course_id": 108,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0N89A",
+      "course_name": "Materials and Technology for Quantum Systems",
+      "course_id": 2417,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "D0S99A",
+      "course_name": "Applied Optimization",
+      "course_id": 2312,
+      "total_docs": 20,
+      "rich_docs": 19,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "D0S92A",
+      "course_name": "Operations Strategy in Manufacturing and Services",
+      "course_id": 2311,
+      "total_docs": 22,
+      "rich_docs": 20,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "D0R18A",
+      "course_name": "Project Management and Scheduling",
+      "course_id": 2310,
+      "total_docs": 26,
+      "rich_docs": 23,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "C00M0A",
+      "course_name": "Intellectual Property Management",
+      "course_id": 582,
+      "total_docs": 15,
+      "rich_docs": 13,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H0T92A",
+      "course_name": "Transport Infrastructure Planning and Appraisal",
+      "course_id": 1549,
+      "total_docs": 13,
+      "rich_docs": 10,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "I0N48B",
+      "course_name": "Statistical Data Analysis",
+      "course_id": 577,
+      "total_docs": 31,
+      "rich_docs": 25,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H0T95A",
+      "course_name": "Transport Models",
+      "course_id": 2294,
+      "total_docs": 2,
+      "rich_docs": 0,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H00M8B",
+      "course_name": "Intelligent Transportation Systems",
+      "course_id": 2295,
+      "total_docs": 18,
+      "rich_docs": 12,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H0T93A",
+      "course_name": "Public Transportation, Design and Management",
+      "course_id": 2290,
+      "total_docs": 7,
+      "rich_docs": 7,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H05K3A",
+      "course_name": "Freight Transport Management",
+      "course_id": 2296,
+      "total_docs": 9,
+      "rich_docs": 8,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0T94A",
+      "course_name": "Traffic and Transport Safety",
+      "course_id": 2299,
+      "total_docs": 9,
+      "rich_docs": 7,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H03G3B",
+      "course_name": "Deterministic and Stochastic Integration Techniques",
+      "course_id": 1719,
+      "total_docs": 8,
+      "rich_docs": 5,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H0E76A",
+      "course_name": "Model Predictive Control",
+      "course_id": 1384,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H03D9A",
+      "course_name": "Nonlinear Systems",
+      "course_id": 1713,
+      "total_docs": 2,
+      "rich_docs": 1,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0M80A",
+      "course_name": "Numerical Simulation of Differential Equations",
+      "course_id": 1716,
+      "total_docs": 23,
+      "rich_docs": 11,
+      "blind_docs": 12
+    },
+    {
+      "course_code": "H03E1B",
+      "course_name": "System Identification and Modeling",
+      "course_id": 1712,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H02B1A",
+      "course_name": "Natural Language Processing",
+      "course_id": 524,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H0P66A",
+      "course_name": "Scripting Languages",
+      "course_id": 1647,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H00D3A",
+      "course_name": "Advanced Metal Processing & Case Studies",
+      "course_id": 850,
+      "total_docs": 11,
+      "rich_docs": 4,
+      "blind_docs": 7
+    },
+    {
+      "course_code": "H02V8A",
+      "course_name": "Design and Analysis of Experimentation",
+      "course_id": 861,
+      "total_docs": 11,
+      "rich_docs": 10,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H02U3A",
+      "course_name": "Metals: Production and Recycling",
+      "course_id": 851,
+      "total_docs": 9,
+      "rich_docs": 2,
+      "blind_docs": 7
+    },
+    {
+      "course_code": "H01J4A",
+      "course_name": "Materials Characterisation Techniques I",
+      "course_id": 853,
+      "total_docs": 17,
+      "rich_docs": 12,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H00S5A",
+      "course_name": "Next Generation Biomaterials",
+      "course_id": 870,
+      "total_docs": 4,
+      "rich_docs": 1,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H0P65A",
+      "course_name": "Adhesion Science and Engineering",
+      "course_id": 858,
+      "total_docs": 9,
+      "rich_docs": 2,
+      "blind_docs": 7
+    },
+    {
+      "course_code": "H02W8A",
+      "course_name": "Materials Characterisation Techniques II",
+      "course_id": 898,
+      "total_docs": 4,
+      "rich_docs": 0,
+      "blind_docs": 4
+    },
+    {
+      "course_code": "H0S53B",
+      "course_name": "Quality Control and Advanced Non-Destructive Testing",
+      "course_id": 859,
+      "total_docs": 4,
+      "rich_docs": 0,
+      "blind_docs": 4
+    },
+    {
+      "course_code": "H0S55A",
+      "course_name": "Metals: Shaping and Joining",
+      "course_id": 863,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H00D5B",
+      "course_name": "Ceramics and Powder Metallurgy",
+      "course_id": 852,
+      "total_docs": 7,
+      "rich_docs": 4,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H00B4A",
+      "course_name": "Materials Modelling for Forming Process Simulations",
+      "course_id": 873,
+      "total_docs": 11,
+      "rich_docs": 11,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H02C6A",
+      "course_name": "Data Mining",
+      "course_id": 525,
+      "total_docs": 70,
+      "rich_docs": 29,
+      "blind_docs": 41
+    },
+    {
+      "course_code": "H02D3A",
+      "course_name": "Support Vector Machines: Methods and Applications",
+      "course_id": 536,
+      "total_docs": 5,
+      "rich_docs": 5,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H0V14A",
+      "course_name": "Fundamentals of Human-Machine Interaction",
+      "course_id": 554,
+      "total_docs": 10,
+      "rich_docs": 4,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H0N08A",
+      "course_name": "Distributed Systems",
+      "course_id": 6,
+      "total_docs": 27,
+      "rich_docs": 23,
+      "blind_docs": 4
+    },
+    {
+      "course_code": "H0N05A",
+      "course_name": "Modelling of Complex Systems",
+      "course_id": 522,
+      "total_docs": 238,
+      "rich_docs": 79,
+      "blind_docs": 159
+    },
+    {
+      "course_code": "H02C3A",
+      "course_name": "Knowledge Representation",
+      "course_id": 534,
+      "total_docs": 53,
+      "rich_docs": 33,
+      "blind_docs": 20
+    },
+    {
+      "course_code": "H02A6A",
+      "course_name": "Speech Recognition",
+      "course_id": 533,
+      "total_docs": 15,
+      "rich_docs": 14,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H04I0A",
+      "course_name": "Industrial Internet Infrastructure",
+      "course_id": 549,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H01D2D",
+      "course_name": "Informatieoverdracht en -verwerking",
+      "course_id": 21,
+      "total_docs": 155,
+      "rich_docs": 82,
+      "blind_docs": 73
+    },
+    {
+      "course_code": "H01T4A",
+      "course_name": "DEP",
+      "course_id": 2446,
+      "total_docs": 3,
+      "rich_docs": 1,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H02A8A",
+      "course_name": "Audio and Speech Processing",
+      "course_id": 2447,
+      "total_docs": 12,
+      "rich_docs": 10,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H01M4A",
+      "course_name": "Electromagnetic Interference",
+      "course_id": 2448,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H04J7A",
+      "course_name": "Environmental and Transportation",
+      "course_id": 2451,
+      "total_docs": 33,
+      "rich_docs": 24,
+      "blind_docs": 9
+    },
+    {
+      "course_code": "H04V3A",
+      "course_name": "Additive Manufacturing",
+      "course_id": 2452,
+      "total_docs": 13,
+      "rich_docs": 2,
+      "blind_docs": 11
+    },
+    {
+      "course_code": "H03F0A",
+      "course_name": "exam (for int students",
+      "course_id": 2453,
+      "total_docs": 3,
+      "rich_docs": 1,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H03G0A",
+      "course_name": "bioethics",
+      "course_id": 2454,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "D0H36A",
+      "course_name": "Innovation Management and Strategy",
+      "course_id": 573,
+      "total_docs": 5,
+      "rich_docs": 3,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H04M1A",
+      "course_name": "surface technology",
+      "course_id": 2455,
+      "total_docs": 50,
+      "rich_docs": 27,
+      "blind_docs": 23
+    },
+    {
+      "course_code": "H0H08A",
+      "course_name": "Anatomie",
+      "course_id": 2456,
+      "total_docs": 21,
+      "rich_docs": 5,
+      "blind_docs": 16
+    },
+    {
+      "course_code": "H09M0A",
+      "course_name": "P&D Information Systems and Signal Processing",
+      "course_id": 1378,
+      "total_docs": 34,
+      "rich_docs": 19,
+      "blind_docs": 15
+    },
+    {
+      "course_code": "D0M14A",
+      "course_name": "Marketing",
+      "course_id": 2468,
+      "total_docs": 22,
+      "rich_docs": 5,
+      "blind_docs": 17
+    },
+    {
+      "course_code": "H0N52A",
+      "course_name": "Project Hydraulic Engineering 1",
+      "course_id": 1520,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H01A0A",
+      "course_name": "Ingenieur en bouwkunst",
+      "course_id": 2477,
+      "total_docs": 2,
+      "rich_docs": 2,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H04O6A",
+      "course_name": "BEESD",
+      "course_id": 2478,
+      "total_docs": 9,
+      "rich_docs": 7,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H01C2B",
+      "course_name": "Bouwmaterialen: bindmiddelen",
+      "course_id": 2479,
+      "total_docs": 9,
+      "rich_docs": 7,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H06P6B",
+      "course_name": "Baggertechnologie voor bouwkundig ingenieurs",
+      "course_id": 1523,
+      "total_docs": 7,
+      "rich_docs": 1,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H0P97A",
+      "course_name": "Hydrodynamica",
+      "course_id": 1519,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H06A1A",
+      "course_name": "Advanced Nano-Electronic Components",
+      "course_id": 2480,
+      "total_docs": 21,
+      "rich_docs": 7,
+      "blind_docs": 14
+    },
+    {
+      "course_code": "H06E6A",
+      "course_name": "Integrated RF Components and Circuits (H06E6A)",
+      "course_id": 2481,
+      "total_docs": 4,
+      "rich_docs": 0,
+      "blind_docs": 4
+    },
+    {
+      "course_code": "H06B0A",
+      "course_name": "Superconductivity",
+      "course_id": 2482,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "D0M15A",
+      "course_name": "Decision Making",
+      "course_id": 2483,
+      "total_docs": 48,
+      "rich_docs": 41,
+      "blind_docs": 7
+    },
+    {
+      "course_code": "H0T97A",
+      "course_name": "Integrated Practicum 1: Organisation of Logistics and Transportation",
+      "course_id": 2292,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "D0M18A",
+      "course_name": "Human resource management",
+      "course_id": 2487,
+      "total_docs": 13,
+      "rich_docs": 10,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H01S0A",
+      "course_name": "Management accounting",
+      "course_id": 2488,
+      "total_docs": 53,
+      "rich_docs": 40,
+      "blind_docs": 13
+    },
+    {
+      "course_code": "H02A1A",
+      "course_name": "Declarative Problem Solving Paradigms in AI",
+      "course_id": 2489,
+      "total_docs": 5,
+      "rich_docs": 2,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H01T0A",
+      "course_name": "Cel- en Weefselbiologie",
+      "course_id": 2490,
+      "total_docs": 3,
+      "rich_docs": 1,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H02V3A",
+      "course_name": "Computational Thermodynamics in Materials Design",
+      "course_id": 871,
+      "total_docs": 6,
+      "rich_docs": 2,
+      "blind_docs": 4
+    },
+    {
+      "course_code": "H06C0A",
+      "course_name": "Materials physics and technology for nanoelectronics",
+      "course_id": 2491,
+      "total_docs": 2,
+      "rich_docs": 1,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H02C8A",
+      "course_name": "Information Retrieval and Search Engines",
+      "course_id": 1641,
+      "total_docs": 2,
+      "rich_docs": 1,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H01F2A",
+      "course_name": "Anki Flashcards Semester 5 Gemeenschappelijk",
+      "course_id": 2493,
+      "total_docs": 129,
+      "rich_docs": 89,
+      "blind_docs": 40
+    }
+  ]
+}
