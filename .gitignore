@@ -6,6 +6,13 @@
 __pycache__/
 *.py[cod]
 
+# Swarm intermediates - regenerable from the manifest plus scripts/migration/,
+# and ~40 MB in total, so they stay out of history.
+migration_data/course_payloads/
+migration_data/cluster_outputs/
+migration_data/batches/
+migration_data/full_ai_normalized_output.json
+
 # Large migration data manifests (staged on liv /mnt/immich/burgieclan-staging/)
 migration_data/*.jsonl
 migration_data/manifest_*.json
