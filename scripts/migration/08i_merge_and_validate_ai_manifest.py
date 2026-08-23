@@ -164,6 +164,18 @@ def is_plausible_author(name):
     return True
 
 
+JUNK_EXTENSIONS = {'ini', 'db', 'lnk', 'download', 'exe', 'dll', 'bak', 'orig', 'cpgz'}
+
+def is_junk_artifact(record):
+    """Detects useless OS artifacts, partial downloads, and shortcuts."""
+    ext = record.get('extension', '').lower()
+    fn = record.get('filename', '').lower()
+    if ext in JUNK_EXTENSIONS:
+        return True
+    if fn.startswith('.') or fn in {'thumbs.db', 'desktop.ini', '.ds_store'}:
+        return True
+    return False
+
 def is_takehome_graded_submission(record):
     """Detects student's graded coursework / take-home exam submissions."""
     full_str = f"{record.get('path', '')} {record.get('filename', '')}".lower()
@@ -177,7 +189,7 @@ def is_meme_or_varia(record):
 def resolve_photo_sequences(records):
     """
     Detects photo sequences in parent folders and assigns clean sort-stable page titles.
-    E.g. /ScanOefeningen/1.jpg ... 106.jpg -> "Oefeningen Scan (p. 1/106)"
+    E.g. /Oefeningen/R0deel1/001.jpg -> "Oefeningen - R0 Deel 1 (p. 1/10)"
     """
     image_exts = {'jpg', 'jpeg', 'png', 'heic', 'bmp'}
     folder_images = defaultdict(list)
@@ -206,8 +218,27 @@ def resolve_photo_sequences(records):
                 
             sorted_imgs = sorted(imgs, key=natural_sort_key)
             total = len(sorted_imgs)
-            folder_name = os.path.basename(parent[2]) or "Document"
-            clean_folder_title = re.sub(r'[_.\-]+', ' ', folder_name).strip()
+            
+            # Derive human-readable title incorporating parent folder context
+            folder_path = parent[2].strip('/')
+            path_parts = folder_path.split('/')
+            
+            if len(path_parts) >= 2:
+                gp = path_parts[-2]
+                p = path_parts[-1]
+                gp_clean = re.sub(r'[_.\-]+', ' ', gp).strip()
+                p_clean = re.sub(r'[_.\-]+', ' ', p).strip()
+                p_clean = re.sub(r'deel\s*(\d+)', r'Deel \1', p_clean, flags=re.IGNORECASE)
+                
+                if gp_clean.lower() in {'examens', 'oefeningen', 'theorie', 'samenvattingen', 'slides', 'labo', 'midterms', 'ttt'}:
+                    clean_folder_title = f"{gp_clean} - {p_clean}"
+                else:
+                    clean_folder_title = p_clean
+            else:
+                raw_name = os.path.basename(parent[2]) or "Document"
+                clean_folder_title = re.sub(r'[_.\-]+', ' ', raw_name).strip()
+            
+            clean_folder_title = " ".join(clean_folder_title.split())
             
             for idx, img_rec in enumerate(sorted_imgs, start=1):
                 img_rec['_photo_sequence_title'] = f"{clean_folder_title} (p. {idx}/{total})"
@@ -335,7 +366,7 @@ def run_pipeline(records, ai_by_file_id=None):
     ai_by_file_id = ai_by_file_id or {}
     stats = Counter()
 
-    kept = [r for r in records if not is_meme_or_varia(r)]
+    kept = [r for r in records if not is_meme_or_varia(r) and not is_junk_artifact(r)]
     stats['input'] = len(records)
     stats['filtered_meme_varia'] = len(records) - len(kept)
 

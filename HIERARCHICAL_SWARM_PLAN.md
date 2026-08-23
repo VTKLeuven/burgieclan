@@ -62,22 +62,27 @@ flowchart TD
 ## 3. Step-by-Step Execution Phases
 
 ### Phase 0: Pre-Flight Verification Checklist
+> [!IMPORTANT]
+> All infrastructure prerequisites must be verified prior to launching the swarm.
+
 1. **Production Database (`liv`)**:
-   - Total Courses in catalog: **781 courses**.
+   - Total Courses in catalog: **781 courses** (all 16,816 documents resolve to valid DB `course_id` rows; 0 missing).
+   - Categories in catalog: **6 active categories** (IDs 2–7; 0 invalid references).
    - `Document` entity columns: `author VARCHAR(255)`, `seafile_file_id VARCHAR(40)` with unique composite index `(seafile_file_id, course_id)`.
    - Migration Service Account: `it@vtk.be` (User ID: `24`, Roles: `["ROLE_USER", "ROLE_ADMIN"]`, locked).
 2. **Staged Physical Files**:
-   - All 16,905 documents present at `liv:/mnt/immich/burgieclan-staging/` (58 GB).
+   - All 16,816 valid documents present at `liv:/mnt/immich/burgieclan-staging/` (58 GB).
    - Extracted Page 1 text previews available on NFS (`manifest_with_content_previews.jsonl`).
 3. **Storage & Tag Vocabulary**:
    - Hetzner S3 bucket `burgieclan-vtk` accessible via Flysystem.
-   - `migration_data/tag_vocabulary.json` loaded with all 16 tag categories, toolings, and `old-burgieclan`.
+   - `migration_data/tag_vocabulary.json` loaded with all 16 tag categories, toolings, and case-insensitive aliases.
 
 ---
 
 ### Phase 1: Payload Preparation & Course Partitioning
 1. Generate cluster definition manifests: `migration_data/clusters/cluster_{1..8}.json`.
-2. Generate course-level input JSONs containing Page 1 text previews, paths, file sizes, and scan flags for each course.
+2. Generate course-level input JSONs containing Page 1 text previews, paths, file sizes, and scan flags.
+3. Optimize LLM calls: Blind documents (<30 chars text) use deterministic regex normalization; documents with rich previews are batched in 20–25 doc chunks.
 
 ---
 
@@ -93,38 +98,57 @@ flowchart TD
 
 ### Phase 3: Assembly & Mechanical Quality Gate (`08i`)
 1. Aggregator merges all batch outputs into `migration_data/full_ai_normalized_output.json`.
-2. Run `scripts/migration/08i_merge_and_validate_ai_manifest.py`:
-   - **Mechanical Year Verification**: Verifies `YYYY - YYYY` string appears literally in filename/path/page text; nulls hallucinations.
-   - **Photo Sequence Formatting**: Formats multi-image sets as `[Folder Name] (p. X/N)`.
+2. Run [`scripts/migration/08i_merge_and_validate_ai_manifest.py`](file:///home/jasperve/Documents/VTK/IT/burgieclan/scripts/migration/08i_merge_and_validate_ai_manifest.py):
+   - **Mechanical Year Verification**: Asserts `YYYY - YYYY` string appears literally in filename/path/page text; nulls hallucinations.
+   - **Photo Sequence Formatting**: Formats multi-image sets as `[Parent Context] - [Folder] (p. X/N)`.
    - **Provenance Tag**: Injects `'old-burgieclan'` into 100% of records.
    - **Author Cleansing**: Rejects status markers `(Empty)`, `(Student)`, `(Oplossing Caro)`.
    - **Collision Disambiguation**: Appends `(2)`, `(3)` on duplicate per-course titles.
-   - **Junk Filtering**: Drops the 32 useless OS artifacts (`.ini`, `Thumbs.db`, `.lnk`, `.bak`).
-3. Produces final verified manifest: `migration_data/manifest_final_standardized_validated.json`.
+   - **Junk Filtering**: Excludes the 84 meme / non-coursework and OS junk artifacts (`.ini`, `Thumbs.db`, `.lnk`, `.bak`).
+3. Produces final verified manifest: `migration_data/manifest_final_standardized_validated.json` (**16,816 records**).
 
 ---
 
-### Phase 4: Staging & Dry-Run on Production (`liv`)
-1. Transfer `manifest_final_standardized_validated.json` to `liv:/mnt/immich/burgieclan-staging/manifest_final_for_import.jsonl`.
-2. Execute dry run in production container:
+### Phase 4: Production Backup & Container Staging Dry-Run
+1. Create a pre-migration database & S3 snapshot on `liv`:
    ```bash
-   ssh it@liv "docker exec -i burgieclan-backend /usr/local/bin/console app:import:seafile \
-     /mnt/immich/burgieclan-staging/manifest_final_for_import.jsonl \
-     --dry-run --creator=it@vtk.be"
+   ssh it@liv "cd /opt/burgieclan && docker compose -f docker-compose.prod.yml run --rm backend console app:backup"
    ```
-3. Assert that all 16,905 physical files exist and can be read with 0 missing files.
+2. Transfer `manifest_final_standardized_validated.json` to `liv:/mnt/immich/burgieclan-staging/manifest_final_for_import.jsonl`.
+3. Execute dry run in throwaway container with staging volume mount:
+   ```bash
+   ssh it@liv "cd /opt/burgieclan && docker compose -f docker-compose.prod.yml run --rm \
+     -v /mnt/immich/burgieclan-staging:/staging:ro backend \
+     console app:import:seafile \
+       --manifest=/staging/manifest_final_for_import.jsonl \
+       --staged-dir=/staging \
+       --creator=it@vtk.be \
+       --dry-run"
+   ```
+4. Assert:
+   - Command exits with code `0`.
+   - Dry-run inspects all **16,816 physical files** with 0 missing files.
+   - `--manifest.failures.jsonl` does not exist or has 0 rows.
 
 ---
 
-### Phase 5: Final Production Ingestion & S3 Upload
-1. Run live ingestion on `liv`:
+### Phase 5: Live Ingestion & S3 Streaming
+1. Run live ingestion inside a detached session (`screen` / `tmux`) to survive SSH drops:
    ```bash
-   ssh it@liv "docker exec -i burgieclan-backend /usr/local/bin/console app:import:seafile \
-     /mnt/immich/burgieclan-staging/manifest_final_for_import.jsonl \
-     --creator=it@vtk.be"
+   ssh it@liv "cd /opt/burgieclan && screen -dmS seafile-import docker compose -f docker-compose.prod.yml run --rm \
+     -v /mnt/immich/burgieclan-staging:/staging:ro backend \
+     console app:import:seafile \
+       --manifest=/staging/manifest_final_for_import.jsonl \
+       --staged-dir=/staging \
+       --creator=it@vtk.be"
    ```
-2. Monitor real-time streaming progress to Hetzner S3 (`burgieclan-vtk`) and PostgreSQL insertions.
-3. Verify database records:
-   - `SELECT count(*) FROM document WHERE seafile_file_id IS NOT NULL;` -> **16,873 documents**.
-   - `SELECT count(*) FROM tag_document;` -> **100% tagged with old-burgieclan**.
-4. Confirm user-facing UI search in Burgieclan Next.js frontend!
+2. Monitor progress:
+   ```bash
+   ssh it@liv "docker logs -f \$(docker ps -q --filter ancestor=burgieclan-backend)"
+   ```
+3. Post-Ingestion Verification:
+   - Check failure log: `test ! -s /mnt/immich/burgieclan-staging/manifest_final_for_import.jsonl.failures.jsonl`
+   - Database row count: `SELECT count(*) FROM document WHERE seafile_file_id IS NOT NULL;` -> **16,816 documents**.
+   - Tag assignments: `SELECT count(*) FROM tag_document;` -> **100% tagged with old-burgieclan**.
+   - Take post-migration backup: `docker compose -f docker-compose.prod.yml run --rm backend console app:backup`
+4. Verify user-facing course pages on `https://burgieclan.vtk.be`!
