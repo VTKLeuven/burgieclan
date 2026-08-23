@@ -1,0 +1,314 @@
+{
+  "H01T4A": {
+    "code": "H01T4A",
+    "name": "DEP",
+    "name_nl": "DEP",
+    "name_en": "DEP"
+  },
+  "H02A8A": {
+    "code": "H02A8A",
+    "name": "Audio and Speech Processing",
+    "name_nl": "Audio and Speech Processing",
+    "name_en": "Audio and Speech Processing"
+  },
+  "H01M4A": {
+    "code": "H01M4A",
+    "name": "Electromagnetic Interference",
+    "name_nl": "Electromagnetic Interference",
+    "name_en": "Electromagnetic Interference"
+  },
+  "H01B8A": {
+    "code": "H01B8A",
+    "name": "Anki Flashcards Semester 4 WTK",
+    "name_nl": "Anki Flashcards Semester 4 WTK",
+    "name_en": "Anki Flashcards Semester 4 WTK"
+  },
+  "H01M0A": {
+    "code": "H01M0A",
+    "name": "Anki Flashcards Semester 6 ELT",
+    "name_nl": "Anki Flashcards Semester 6 ELT",
+    "name_en": "Anki Flashcards Semester 6 ELT"
+  },
+  "H04J7A": {
+    "code": "H04J7A",
+    "name": "Environmental and Transportation",
+    "name_nl": "Environmental and Transportation",
+    "name_en": "Environmental and Transportation"
+  },
+  "GLOBAL": {
+    "code": "GLOBAL",
+    "name": "Global and environmental politics",
+    "name_nl": "Global and environmental politics",
+    "name_en": "Global and environmental politics"
+  },
+  "H04V3A": {
+    "code": "H04V3A",
+    "name": "Additive Manufacturing",
+    "name_nl": "Additive Manufacturing",
+    "name_en": "Additive Manufacturing"
+  },
+  "H03F0A": {
+    "code": "H03F0A",
+    "name": "exam (for int students",
+    "name_nl": "exam (for int students",
+    "name_en": "exam (for int students"
+  },
+  "H03G0A": {
+    "code": "H03G0A",
+    "name": "bioethics",
+    "name_nl": "bioethics",
+    "name_en": "bioethics"
+  },
+  "BOOKFI": {
+    "code": "BOOKFI",
+    "name": "[Michael_Affenzeller,_Stephan_Winkler,_Stefan_Wagn(BookFi.org).pdf",
+    "name_nl": "[Michael_Affenzeller,_Stephan_Winkler,_Stefan_Wagn(BookFi.org).pdf",
+    "name_en": "[Michael_Affenzeller,_Stephan_Winkler,_Stefan_Wagn(BookFi.org).pdf"
+  },
+  "H04M1A": {
+    "code": "H04M1A",
+    "name": "surface technology",
+    "name_nl": "surface technology",
+    "name_en": "surface technology"
+  },
+  "H0H08A": {
+    "code": "H0H08A",
+    "name": "Anatomie",
+    "name_nl": "Anatomie",
+    "name_en": "Anatomie"
+  },
+  "H04T1A": {
+    "code": "H04T1A",
+    "name": "DimensioneleMeettechniek",
+    "name_nl": "DimensioneleMeettechniek",
+    "name_en": "DimensioneleMeettechniek"
+  },
+  "H04T5A": {
+    "code": "H04T5A",
+    "name": "GevorderdeVerspanendeTechnieken",
+    "name_nl": "GevorderdeVerspanendeTechnieken",
+    "name_en": "GevorderdeVerspanendeTechnieken"
+  },
+  "H04U0A": {
+    "code": "H04U0A",
+    "name": "Computer Integrated Manufacturing",
+    "name_nl": "Computer Integrated Manufacturing",
+    "name_en": "Computer Integrated Manufacturing"
+  },
+  "H01J6A": {
+    "code": "H01J6A",
+    "name": "E&P",
+    "name_nl": "E&P",
+    "name_en": "E&P"
+  },
+  "H04T7A": {
+    "code": "H04T7A",
+    "name": "Niet-conventionele bewerkingsmethoden",
+    "name_nl": "Niet-conventionele bewerkingsmethoden",
+    "name_en": "Niet-conventionele bewerkingsmethoden"
+  },
+  "H01A4A": {
+    "code": "H01A4A",
+    "name": "Natuurkunde 1 (prof Indekeu",
+    "name_nl": "Natuurkunde 1 (prof Indekeu",
+    "name_en": "Natuurkunde 1 (prof Indekeu"
+  },
+  "H01D0A": {
+    "code": "H01D0A",
+    "name": "oefeningen CVG",
+    "name_nl": "oefeningen CVG",
+    "name_en": "oefeningen CVG"
+  },
+  "H01D2A": {
+    "code": "H01D2A",
+    "name": "cvg 2",
+    "name_nl": "cvg 2",
+    "name_en": "cvg 2"
+  },
+  "BETON1": {
+    "code": "BETON1",
+    "name": "Beton1 YoanaVanWalle.docx",
+    "name_nl": "Beton1 YoanaVanWalle.docx",
+    "name_en": "Beton1 YoanaVanWalle.docx"
+  },
+  "H01G8B": {
+    "code": "H01G8B",
+    "name": "BIM",
+    "name_nl": "BIM",
+    "name_en": "BIM"
+  },
+  "H9XA1A": {
+    "code": "H9XA1A",
+    "name": "Constructiematerialen",
+    "name_nl": "Constructiematerialen",
+    "name_en": "Constructiematerialen"
+  },
+  "H01Q8A": {
+    "code": "H01Q8A",
+    "name": "cvg3",
+    "name_nl": "cvg3",
+    "name_en": "cvg3"
+  },
+  "D0M14A": {
+    "code": "D0M14A",
+    "name": "Marketing",
+    "name_nl": "Marketing",
+    "name_en": "Marketing"
+  },
+  "H04Q0A": {
+    "code": "H04Q0A",
+    "name": "Physics of Nuclear Reactors",
+    "name_nl": "Physics of Nuclear Reactors",
+    "name_en": "Physics of Nuclear Reactors"
+  },
+  "H08T9A": {
+    "code": "H08T9A",
+    "name": "Hydraulica",
+    "name_nl": "Hydraulica",
+    "name_en": "Hydraulica"
+  },
+  "H01C6B": {
+    "code": "H01C6B",
+    "name": "Wegenbouw",
+    "name_nl": "Wegenbouw",
+    "name_en": "Wegenbouw"
+  },
+  "H09M1A": {
+    "code": "H09M1A",
+    "name": "Verkeersstroomtheorie",
+    "name_nl": "Verkeersstroomtheorie",
+    "name_en": "Verkeersstroomtheorie"
+  },
+  "H08U4A": {
+    "code": "H08U4A",
+    "name": "Systeemtheorie",
+    "name_nl": "Systeemtheorie",
+    "name_en": "Systeemtheorie"
+  },
+  "H0H61A": {
+    "code": "H0H61A",
+    "name": "Statistische methoden voor biomedische",
+    "name_nl": "Statistische methoden voor biomedische",
+    "name_en": "Statistische methoden voor biomedische"
+  },
+  "H01O2A": {
+    "code": "H01O2A",
+    "name": "Landscape Architecture",
+    "name_nl": "Landscape Architecture",
+    "name_en": "Landscape Architecture"
+  },
+  "H01U1A": {
+    "code": "H01U1A",
+    "name": "Constructie van gebouwen 4",
+    "name_nl": "Constructie van gebouwen 4",
+    "name_en": "Constructie van gebouwen 4"
+  },
+  "H01A0A": {
+    "code": "H01A0A",
+    "name": "Ingenieur en bouwkunst",
+    "name_nl": "Ingenieur en bouwkunst",
+    "name_en": "Ingenieur en bouwkunst"
+  },
+  "H04O6A": {
+    "code": "H04O6A",
+    "name": "BEESD",
+    "name_nl": "BEESD",
+    "name_en": "BEESD"
+  },
+  "H01C2B": {
+    "code": "H01C2B",
+    "name": "Bouwmaterialen: bindmiddelen",
+    "name_nl": "Bouwmaterialen: bindmiddelen",
+    "name_en": "Bouwmaterialen: bindmiddelen"
+  },
+  "H06A1A": {
+    "code": "H06A1A",
+    "name": "Advanced Nano-Electronic Components",
+    "name_nl": "Advanced Nano-Electronic Components",
+    "name_en": "Advanced Nano-Electronic Components"
+  },
+  "H06E6A": {
+    "code": "H06E6A",
+    "name": "Integrated RF Components and Circuits (H06E6A)",
+    "name_nl": "Integrated RF Components and Circuits (H06E6A)",
+    "name_en": "Integrated RF Components and Circuits (H06E6A)"
+  },
+  "H06B0A": {
+    "code": "H06B0A",
+    "name": "Superconductivity",
+    "name_nl": "Superconductivity",
+    "name_en": "Superconductivity"
+  },
+  "D0M15A": {
+    "code": "D0M15A",
+    "name": "Decision Making",
+    "name_nl": "Decision Making",
+    "name_en": "Decision Making"
+  },
+  "H01I8A": {
+    "code": "H01I8A",
+    "name": "Structurele materialen",
+    "name_nl": "Structurele materialen",
+    "name_en": "Structurele materialen"
+  },
+  "H01I6A": {
+    "code": "H01I6A",
+    "name": "Materialen gebruik & degradatie",
+    "name_nl": "Materialen gebruik & degradatie",
+    "name_en": "Materialen gebruik & degradatie"
+  },
+  "H01J3A": {
+    "code": "H01J3A",
+    "name": "Thermo en kinetica",
+    "name_nl": "Thermo en kinetica",
+    "name_en": "Thermo en kinetica"
+  },
+  "D0M18A": {
+    "code": "D0M18A",
+    "name": "Human resource management",
+    "name_nl": "Human resource management",
+    "name_en": "Human resource management"
+  },
+  "H01S0A": {
+    "code": "H01S0A",
+    "name": "Management accounting",
+    "name_nl": "Management accounting",
+    "name_en": "Management accounting"
+  },
+  "H02A1A": {
+    "code": "H02A1A",
+    "name": "Declarative Problem Solving Paradigms in AI",
+    "name_nl": "Declarative Problem Solving Paradigms in AI",
+    "name_en": "Declarative Problem Solving Paradigms in AI"
+  },
+  "H01T0A": {
+    "code": "H01T0A",
+    "name": "Cel- en Weefselbiologie",
+    "name_nl": "Cel- en Weefselbiologie",
+    "name_en": "Cel- en Weefselbiologie"
+  },
+  "H06C0A": {
+    "code": "H06C0A",
+    "name": "Materials physics and technology for nanoelectronics",
+    "name_nl": "Materials physics and technology for nanoelectronics",
+    "name_en": "Materials physics and technology for nanoelectronics"
+  },
+  "DENTAL": {
+    "code": "DENTAL",
+    "name": "Comparative Analysis of Microstructure, Hardness, and Fracture Toughness in Commercially Available Dental Ceramics presentation.pdf",
+    "name_nl": "Comparative Analysis of Microstructure, Hardness, and Fracture Toughness in Commercially Available Dental Ceramics presentation.pdf",
+    "name_en": "Comparative Analysis of Microstructure, Hardness, and Fracture Toughness in Commercially Available Dental Ceramics presentation.pdf"
+  },
+  "H02A9A": {
+    "code": "H02A9A",
+    "name": "Software for Real-time and Embedded Systems",
+    "name_nl": "Software for Real-time and Embedded Systems",
+    "name_en": "Software for Real-time and Embedded Systems"
+  },
+  "H01F2A": {
+    "code": "H01F2A",
+    "name": "Anki Flashcards Semester 5 Gemeenschappelijk",
+    "name_nl": "Anki Flashcards Semester 5 Gemeenschappelijk",
+    "name_en": "Anki Flashcards Semester 5 Gemeenschappelijk"
+  }
+}

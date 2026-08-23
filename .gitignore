@@ -1,3 +1,18 @@
 /.idea
 
 .env
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+
+# Large migration data manifests (staged on liv /mnt/immich/burgieclan-staging/)
+migration_data/*.jsonl
+migration_data/manifest_*.json
+migration_data/unmapped_residue.json
+migration_data/classified_*.jsonl
+migration_data/recovered_*.jsonl
+
+# Scratch
+2026-*.txt
+.~lock.*#

@@ -1,0 +1,248 @@
+{
+  "Ma - Biomedical Engineering::Elective courses/Additive Manufacturing": {
+    "course_id": null,
+    "course_code": "H04V3A",
+    "course_name": "Additive Manufacturing",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Schakel - Werktuigkunde::2e master/Computer Integrated Manufacturing": {
+    "course_id": null,
+    "course_code": "H04U0A",
+    "course_name": "Computer Integrated Manufacturing",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Architectuur::1 BIRA/Analyse (met boek Pearson)": {
+    "course_id": 2,
+    "course_code": "H01A0B",
+    "course_name": "Analyse, deel 1",
+    "resolution_type": "known_code_or_equivalent"
+  },
+  "Ba - Architectuur::2 BIRA/aanvullende natuurkunde": {
+    "course_id": null,
+    "course_code": "H01A4A",
+    "course_name": "aanvullende natuurkunde",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Architectuur::2 BIRA/cvg 2": {
+    "course_id": null,
+    "course_code": "H01D2A",
+    "course_name": "cvg 2",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Architectuur::3 BIRA/thud": {
+    "course_id": 19,
+    "course_code": "H01B4B",
+    "course_name": "Thermodynamica",
+    "resolution_type": "known_code_or_equivalent"
+  },
+  "Ma - Mechanical Engineering::Option: Thermotechnical Sciences - Thermotechnische Wetenschappen/H04Q0A - Physics of Nuclear Reactors": {
+    "course_id": null,
+    "course_code": "H04Q0A",
+    "course_name": "H04Q0A - Physics of Nuclear Reactors",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Bouwkunde::2de bach/H9XA1A - Constructiematerialen [Oude bachelor]": {
+    "course_id": null,
+    "course_code": "H9XA1A",
+    "course_name": "H9XA1A - Constructiematerialen [Oude bachelor]",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Bouwkunde::3de bach/Beton 1": {
+    "course_id": 25,
+    "course_code": "H01D4B",
+    "course_name": "Probleemoplossen en ontwerpen, deel 2",
+    "resolution_type": "known_code_or_equivalent"
+  },
+  "Ba - Bouwkunde::3de bach/H08T9A - Hydraulica": {
+    "course_id": null,
+    "course_code": "H08T9A",
+    "course_name": "H08T9A - Hydraulica",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Biomedische technologie::2de bach/H08U4A - Systeemtheorie": {
+    "course_id": null,
+    "course_code": "H08U4A",
+    "course_name": "H08U4A - Systeemtheorie",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Biomedische technologie::2de bach/H0H08A - Anatomie": {
+    "course_id": null,
+    "course_code": "H0H08A",
+    "course_name": "H0H08A - Anatomie",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ma - Architectuur::Constructie van gebouwen 4/!!! Examenvragen !!!": {
+    "course_id": null,
+    "course_code": "H01U1A",
+    "course_name": "!!! Examenvragen !!!",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ma - Architectuur::Constructie van gebouwen 4/Gerechtsgebouw  Antwerpen": {
+    "course_id": null,
+    "course_code": "H01U1A",
+    "course_name": "Gerechtsgebouw  Antwerpen",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ma - Architectuur::Constructie van gebouwen 4/Gerechtsgebouw Gent": {
+    "course_id": null,
+    "course_code": "H01U1A",
+    "course_name": "Gerechtsgebouw Gent",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ma - Architectuur::Constructie van gebouwen 4/Kunsthal Rotterdam": {
+    "course_id": null,
+    "course_code": "H01U1A",
+    "course_name": "Kunsthal Rotterdam",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ma - Architectuur::Constructie van gebouwen 4/MAS Antwerpen": {
+    "course_id": null,
+    "course_code": "H01U1A",
+    "course_name": "MAS Antwerpen",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ma - Architectuur::Constructie van gebouwen 4/Museum M Leuven": {
+    "course_id": null,
+    "course_code": "H01U1A",
+    "course_name": "Museum M Leuven",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ma - Architectuur::Constructie van gebouwen 4/Muziekgebouw Amsterdam": {
+    "course_id": null,
+    "course_code": "H01U1A",
+    "course_name": "Muziekgebouw Amsterdam",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ma - Architectuur::Constructie van gebouwen 4/OBA Amsterdam": {
+    "course_id": null,
+    "course_code": "H01U1A",
+    "course_name": "OBA Amsterdam",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ma - Architectuur::Constructie van gebouwen 4/TU Delft bib": {
+    "course_id": null,
+    "course_code": "H01U1A",
+    "course_name": "TU Delft bib",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ma - Nanoscience, -technology and -engineering::Core/Advanced Nano-Electronic Components (H06A1A)": {
+    "course_id": null,
+    "course_code": "H06A1A",
+    "course_name": "Advanced Nano-Electronic Components (H06A1A)",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ma - Mobility and Supply Chain Engineering::Phase 1/Semester 1 - Decision Making": {
+    "course_id": null,
+    "course_code": "D0M15A",
+    "course_name": "Semester 1 - Decision Making",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ma - Mobility and Supply Chain Engineering::Phase 2/Semester 1 - Environmental and Transportation Economics": {
+    "course_id": null,
+    "course_code": "H04J7A",
+    "course_name": "Semester 1 - Environmental and Transportation Economics",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ma - Mobility and Supply Chain Engineering::Phase 1/Semester 1 - GIS": {
+    "course_id": 1378,
+    "course_code": "H09M0A",
+    "course_name": "P&D Information Systems and Signal Processing",
+    "resolution_type": "known_code_or_equivalent"
+  },
+  "Ma - Mobility and Supply Chain Engineering::Phase 1/Semester 1 - Traffic Engineering": {
+    "course_id": null,
+    "course_code": "H09M1A",
+    "course_name": "Semester 1 - Traffic Engineering",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Materiaalkunde::2de bach/Mechanisch gedrag van materialen": {
+    "course_id": null,
+    "course_code": "H01J6A",
+    "course_name": "Mechanisch gedrag van materialen",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Materiaalkunde::2de bach/Structurele materialen": {
+    "course_id": null,
+    "course_code": "H01I8A",
+    "course_name": "Structurele materialen",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Materiaalkunde::3de bach/Thermo en kinetica": {
+    "course_id": null,
+    "course_code": "H01J3A",
+    "course_name": "Thermo en kinetica",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Bedrijfsbeheer::2de bach/Productinnovatie en industriële marketing": {
+    "course_id": null,
+    "course_code": "D0M14A",
+    "course_name": "Productinnovatie en industriële marketing",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Bedrijfsbeheer::3de bach/Decision Making": {
+    "course_id": null,
+    "course_code": "D0M15A",
+    "course_name": "Decision Making",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Bedrijfsbeheer::3de bach/Management accounting": {
+    "course_id": null,
+    "course_code": "H01S0A",
+    "course_name": "Management accounting",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Architectuur en omgeving::H08U4A - Systeemtheorie/examenvragen BOKU 2012.rar": {
+    "course_id": null,
+    "course_code": "H08U4A",
+    "course_name": "examenvragen BOKU 2012.rar",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Architectuur en omgeving::H08U4A - Systeemtheorie/oefeningenbundel 2009 BOKU 2012.rar": {
+    "course_id": null,
+    "course_code": "H08U4A",
+    "course_name": "oefeningenbundel 2009 BOKU 2012.rar",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Architectuur en omgeving::H08U4A - Systeemtheorie/oefenzittingen 2006 BOKU 2012.rar": {
+    "course_id": null,
+    "course_code": "H08U4A",
+    "course_name": "oefenzittingen 2006 BOKU 2012.rar",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Architectuur en omgeving::H08U4A - Systeemtheorie/Examenvragen": {
+    "course_id": null,
+    "course_code": "H08U4A",
+    "course_name": "Examenvragen",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Architectuur en omgeving::H08U4A - Systeemtheorie/Oefenzittingen 2019": {
+    "course_id": null,
+    "course_code": "H08U4A",
+    "course_name": "Oefenzittingen 2019",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Architectuur en omgeving::H08U4A - Systeemtheorie/Rar-files unpacked": {
+    "course_id": null,
+    "course_code": "H08U4A",
+    "course_name": "Rar-files unpacked",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ba - Architectuur en omgeving::H08U4A - Systeemtheorie/Systeemtheorie Samenvattingen": {
+    "course_id": null,
+    "course_code": "H08U4A",
+    "course_name": "Systeemtheorie Samenvattingen",
+    "resolution_type": "new_kuleuven_course_imported"
+  },
+  "Ma - Computer Science::Options/AI - Advanced Programming Languages for AI": {
+    "course_id": 532,
+    "course_code": "H02A5A",
+    "course_name": "Computer Vision",
+    "resolution_type": "known_code_or_equivalent"
+  },
+  "Ba - Algemene gemeenschappelijke basis::Semester 5/H01F2A - Bedrijfskunde & entrepreneurship": {
+    "course_id": null,
+    "course_code": "H01F2A",
+    "course_name": "H01F2A - Bedrijfskunde & entrepreneurship",
+    "resolution_type": "new_kuleuven_course_imported"
+  }
+}
