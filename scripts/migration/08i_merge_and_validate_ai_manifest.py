@@ -164,13 +164,15 @@ def is_plausible_author(name):
     return True
 
 
-JUNK_EXTENSIONS = {'ini', 'db', 'lnk', 'download', 'exe', 'dll', 'bak', 'orig', 'cpgz'}
+JUNK_EXTENSIONS = {'ini', 'lnk', 'download', 'exe', 'dll', 'bak', 'orig', 'cpgz'}
 
 def is_junk_artifact(record):
     """Detects useless OS artifacts, partial downloads, and shortcuts."""
     ext = record.get('extension', '').lower()
     fn = record.get('filename', '').lower()
     if ext in JUNK_EXTENSIONS:
+        return True
+    if 'thumbs' in fn and ext == 'db':
         return True
     if fn.startswith('.') or fn in {'thumbs.db', 'desktop.ini', '.ds_store'}:
         return True
