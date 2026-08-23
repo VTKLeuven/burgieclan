@@ -25,6 +25,8 @@ export interface Course extends BaseEntity {
     description_bottom?: string;
     oldCourses?: Course[];
     newCourses?: Course[];
+    /** Courses teaching the same subject under another code, e.g. a sister-faculty variant. */
+    identicalCourses?: Course[];
 }
 
 export interface Module extends BaseEntity {
