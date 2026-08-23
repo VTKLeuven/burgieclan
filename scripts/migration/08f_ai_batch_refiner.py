@@ -95,6 +95,20 @@ The keys are exactly `display_title` and `year`. Do not emit `canonical_title` o
 Set `year` to null unless the year is explicitly present in the filename, path or page
 text. Never infer it from context or from how old a document looks.
 
+RULES FOR CATEGORY CLASSIFICATION (DETECTING MISPLACED FILES):
+Do NOT blindly trust the folder path if the document content clearly indicates a different category:
+- If a document in /Samenvattingen/ is actually an exam ("Examen Januari 2021", "Vraag 1"), assign category_id: 2 (Examens).
+- If a document in /Examens/ is actually a summary or lecture notes ("Samenvatting Hoofdstuk 1-5"), assign category_id: 3 (Samenvattingen).
+- If a document is a midterm / TTT ("Tussentijdse toets", "TTT", "Midterm"), assign category_id: 5 (TTT's).
+- If a document in /Examens/ or /Oefeningen/ is a lecture slide deck, assign category_id: 6 (Slides / Lesmateriaal).
+- If a document is executable source code (.m, .py, .java, .c) or a lab assignment, assign category_id: 7 (Labo & Code).
+- If a document is an exercise session / homework problem set, assign category_id: 4 (Oefenzittingen).
+
+RULES FOR SCAN VS HANDWRITTEN:
+- 'Scan' (Medium): Tag only if the document is an image or photo scan (PDF without selectable font text).
+- 'Handgeschreven' (Content): Tag ONLY when the document contains actual handwritten student handwriting, calculations, or notes.
+  CRITICAL: Do NOT tag official printed exam sheets as 'Handgeschreven' merely because the exam instructions mention open-book rules (e.g. "open boek ... zelfgeschreven nota's").
+
 RULES FOR CANONICAL TITLES:
 - Exams: "Examen [Dag] [Maand] [Jaar] [- Deel X] [(Oplossing|Modeloplossing|Opgave)] [(Auteur)]"
   Example: "Examen 19 Juni 2017 - Deel 1 (Oplossing)" or "Examen Januari 2021 (Opgave)"
