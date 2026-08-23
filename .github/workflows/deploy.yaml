@@ -157,13 +157,22 @@ jobs:
               exit 1
             fi
 
-            # Run database migrations
+            # Run database migrations.
+            #
+            # -u www-data matters: `exec` enters as root, and a console command
+            # boots the kernel and rewrites /app/var/cache/prod as whoever ran it.
+            # A root-owned cache is readable but not writable by the PHP-FPM
+            # workers, so the next login dies on a lazily-created cache directory
+            # ("/app/var/cache/prod/vich_uploader is not writable").
             echo "Running database migrations..."
-            docker compose -f $COMPOSE_FILE exec -T backend php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration < /dev/null
+            docker compose -f $COMPOSE_FILE exec -T -u www-data backend php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration < /dev/null
 
-            # Generate JWT keys
+            # Generate JWT keys. --skip-if-exists makes this a no-op once the keys
+            # are present, which is why www-data not being able to write
+            # config/jwt is fine here. Generating them for real stays a manual,
+            # root, restart-afterwards step (see PRODUCTION.md).
             echo "Generating JWT keys..."
-            docker compose -f $COMPOSE_FILE exec -T backend php bin/console lexik:jwt:generate-keypair --skip-if-exists < /dev/null
+            docker compose -f $COMPOSE_FILE exec -T -u www-data backend php bin/console lexik:jwt:generate-keypair --skip-if-exists < /dev/null
 
             # Cleanup all old images on VM
             echo "Cleaning up old images..."
