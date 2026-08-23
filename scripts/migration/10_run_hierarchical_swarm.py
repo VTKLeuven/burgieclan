@@ -42,11 +42,31 @@ def normalize_single_document(doc, course_code, course_name, cluster_id):
     """
     fn = doc.get("filename", "")
     path = doc.get("path", "")
+    ext = doc.get("extension", "").lower()
     cat_id = doc.get("category_id", 3)
     preview = doc.get("content_preview") or {}
     p1_text = (preview.get("page1_text") or "").strip()
     is_scanned = preview.get("is_scanned_handwritten", False)
-    
+
+    # Category Misclassification Detection (Content > Folder)
+    full_text_peek = f"{path} {fn} {p1_text}".lower()
+    if ext in ["m", "py", "java", "c", "cpp", "mw"]:
+        cat_id = 7 # Labo & Code
+    elif any(k in full_text_peek for k in ["tussentijdse toets", "ttt", "partieel examen", "midterm"]):
+        cat_id = 5 # TTT's
+    elif any(k in full_text_peek for k in ["examen", "tentamen", "examenvraag", "examenvragen"]) and not any(k in full_text_peek for k in ["samenvatting", "slides", "lesnota"]):
+        cat_id = 2 # Examens
+    elif any(k in full_text_peek for k in ["samenvatting", "summary", "cursusnotities"]) and cat_id == 2:
+        cat_id = 3 # Samenvattingen
+        
+    # Parent Topic Lookup for generic filenames
+    parent_topic = ""
+    path_parts = [p.strip() for p in path.split('/') if p.strip()]
+    if len(path_parts) >= 2:
+        parent_folder = path_parts[-2]
+        if not any(k in parent_folder.lower() for k in ["examen", "samenvatting", "oefening", "slides", "random", "document", course_code.lower()]):
+            parent_topic = parent_folder
+
     # 1. Author extraction
     author = doc.get("author")
     if not author:
@@ -54,7 +74,7 @@ def normalize_single_document(doc, course_code, course_name, cluster_id):
         credit_match = re.search(r'\((?:door\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\)', fn)
         if credit_match:
             candidate = credit_match.group(1).strip()
-            if not any(k in candidate.lower() for k in ['prof', 'dr', 'studie', 'groep', 'admin', 'vtk', 'examen', 'take home', 'empty', 'solution', 'blanco', 'oplossing']):
+            if not any(k in candidate.lower() for k in ['prof', 'dr', 'studie', 'groep', 'admin', 'vtk', 'examen', 'take home', 'empty', 'solution', 'blanco', 'oplossing', 'nieuw programma', 'oud programma']):
                 author = candidate
                 
     # 2. Year extraction
@@ -146,6 +166,9 @@ def normalize_single_document(doc, course_code, course_name, cluster_id):
     # Normalize separators
     clean_title = re.sub(r'[_.\-]+', ' ', raw_title).strip()
     clean_title = " ".join(clean_title.split())
+    
+    if parent_topic and (len(clean_title) <= 3 or clean_title.lower() in ["oplossingen", "oplossing", "oefeningen", "slides", "vragen"]):
+        clean_title = f"{parent_topic} - {clean_title}"
     
     # Format according to category template
     if cat_id == 2: # Examens

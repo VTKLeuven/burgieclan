@@ -119,25 +119,71 @@ def extract_boundary_year(text):
     return None
 
 
+def extract_mtime_year(record):
+    """
+    Extracts academic year from Seafile commit / last update timestamp (mtime).
+    """
+    ts = record.get('mtime')
+    if ts:
+        try:
+            import datetime
+            dt = datetime.datetime.fromtimestamp(ts, tz=datetime.timezone.utc)
+            acad_y1 = dt.year if dt.month >= 9 else dt.year - 1
+            if 1995 <= acad_y1 <= CURRENT_MAX_YEAR:
+                return f"{acad_y1} - {acad_y1+1}"
+        except Exception:
+            pass
+    return None
+
+
+def extract_exact_date_year(text):
+    """
+    Extracts academic year from explicit dates like YYYY-MM-DD or DD-MM-YYYY in filename/title.
+    """
+    m = re.search(r'(?:^|[\s_/\-\.])(19\d\d|20\d\d)[-_](0[1-9]|1[0-2])[-_](0[1-9]|[12]\d|3[01])(?:$|[\s_/\-\.])', text)
+    if m:
+        yr = int(m.group(1))
+        mo = int(m.group(2))
+        acad_y1 = yr if mo >= 9 else yr - 1
+        if 1990 <= acad_y1 <= CURRENT_MAX_YEAR:
+            return f"{acad_y1} - {acad_y1+1}"
+            
+    m = re.search(r'(?:^|[\s_/\-\.])(0[1-9]|[12]\d|3[01])[-/.](0[1-9]|1[0-2])[-/.](19\d\d|20\d\d)(?:$|[\s_/\-\.])', text)
+    if m:
+        mo = int(m.group(2))
+        yr = int(m.group(3))
+        acad_y1 = yr if mo >= 9 else yr - 1
+        if 1990 <= acad_y1 <= CURRENT_MAX_YEAR:
+            return f"{acad_y1} - {acad_y1+1}"
+    return None
+
+
 def verify_academic_year(year_candidate, record):
     """
     Mechanically verifies that year_candidate matches 'YYYY - YYYY',
     satisfies y2 == y1 + 1 and y1 <= CURRENT_MAX_YEAR,
     and actually appears in the input filename, path, or page preview text.
-    Fallback: extracts boundary years from folder paths (e.g. 'pre 2018' -> '2017 - 2018').
+    Priority 1: exact date in filename or title (e.g. '2022-01-26' -> '2021 - 2022').
+    Fallback 1: extracts boundary years from folder paths (e.g. 'pre 2018' -> '2017 - 2018').
+    Fallback 2: extracts academic year from Seafile last update timestamp (mtime).
     """
+    fn_title = f"{record.get('filename', '')} {record.get('display_title', '')}"
+    exact_date_yr = extract_exact_date_year(fn_title)
+    if exact_date_yr:
+        return exact_date_yr
+
     input_text = f"{record.get('path', '')} {record.get('filename', '')} {record.get('content_preview', {}).get('page1_text', '')} {record.get('content_preview', {}).get('fallback_text', '')}"
 
     if not year_candidate:
-        return extract_boundary_year(input_text)
+        return extract_boundary_year(input_text) or extract_mtime_year(record)
         
     year_match = re.match(r'^(\d{4})\s*-\s*(\d{4})$', str(year_candidate).strip())
     if not year_match:
-        return extract_boundary_year(input_text)
+        return extract_boundary_year(input_text) or extract_mtime_year(record)
         
     y1, y2 = int(year_match.group(1)), int(year_match.group(2))
     if y2 != y1 + 1 or y1 > CURRENT_MAX_YEAR or y1 < 1980:
-        return extract_boundary_year(input_text)
+        return extract_boundary_year(input_text) or extract_mtime_year(record)
         
     y1_str = str(y1)
     y2_str = str(y2)
@@ -168,7 +214,7 @@ def verify_academic_year(year_candidate, record):
     if any(re.search(p, input_text, re.IGNORECASE) for p in patterns):
         return f"{y1} - {y2}"
         
-    return extract_boundary_year(input_text)
+    return extract_boundary_year(input_text) or extract_mtime_year(record)
 
 HANDWRITING_EVIDENCE = re.compile(
     r'\b(handgeschreven|handwritten|manueel|hand-geschreven|eigen\s+notities|eigen\s+nota)\b',
@@ -336,11 +382,16 @@ def validate_and_merge_record(ai_output, orig_record):
         merged['display_title'] = orig_record['_photo_sequence_title']
         
     # 2. Year validation
-    ai_year = ai_output.get('year') or ai_output.get('academic_year')
-    verified_year = verify_academic_year(ai_year, orig_record)
-    if verified_year is None and orig_record.get('year_confidence') in ['high', 'medium']:
-        # Keep original verified year if AI returned null/invalid
-        verified_year = orig_record.get('year')
+    fn_title = f"{orig_record.get('filename', '')} {clean_title}"
+    exact_date_yr = extract_exact_date_year(fn_title)
+    if exact_date_yr:
+        verified_year = exact_date_yr
+    else:
+        ai_year = ai_output.get('year') or ai_output.get('academic_year')
+        verified_year = verify_academic_year(ai_year, orig_record)
+        if verified_year is None and orig_record.get('year_confidence') in ['high', 'medium']:
+            # Keep original verified year if AI returned null/invalid
+            verified_year = orig_record.get('year')
     merged['year'] = verified_year
     
     # 3. Category ID validation (must be in [2, 3, 4, 5, 6, 7])
