@@ -7,6 +7,7 @@ use App\ApiResource\DocumentApi;
 use App\ApiResource\DocumentCategoryApi;
 use App\ApiResource\TagApi;
 use App\ApiResource\UserApi;
+use App\Constants\MappingContext;
 use App\Entity\Document;
 use App\Entity\Tag;
 use Symfonycasts\MicroMapper\AsMapper;
@@ -41,14 +42,16 @@ class DocumentEntityToApiMapper extends BaseEntityToApiMapper
             $from->getCourse(),
             CourseApi::class,
             [
-                MicroMapperInterface::MAX_DEPTH => 2,
+                MappingContext::SUMMARY => true,
+                MicroMapperInterface::MAX_DEPTH => 1,
             ]
         );
         $to->category = $this->microMapper->map(
             $from->getCategory(),
             DocumentCategoryApi::class,
             [
-                MicroMapperInterface::MAX_DEPTH => 2,
+                MappingContext::SUMMARY => true,
+                MicroMapperInterface::MAX_DEPTH => 1,
                 'lang' => isset($context['lang']) ? $context['lang'] : null,
             ]
         );
@@ -60,6 +63,7 @@ class DocumentEntityToApiMapper extends BaseEntityToApiMapper
             $from->getCreator(),
             UserApi::class,
             [
+                MappingContext::SUMMARY => true,
                 MicroMapperInterface::MAX_DEPTH => 1,
             ]
         );
@@ -70,7 +74,8 @@ class DocumentEntityToApiMapper extends BaseEntityToApiMapper
                     $tag,
                     TagApi::class,
                     [
-                        MicroMapperInterface::MAX_DEPTH => 1,
+                        MappingContext::SUMMARY => true,
+                        MicroMapperInterface::MAX_DEPTH => 0,
                     ]
                 );
             },

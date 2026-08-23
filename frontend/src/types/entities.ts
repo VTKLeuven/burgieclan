@@ -104,7 +104,6 @@ export interface QuickLink extends BaseEntity {
 
 export interface Tag extends BaseEntity {
     name?: string;
-    documents?: Document[];
 }
 
 export interface Announcement extends NodeEntity {

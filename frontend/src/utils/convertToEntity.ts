@@ -222,7 +222,6 @@ export function convertToTag(tag: unknown): Tag {
     return {
         id: parseId(data['@id']),
         name: typeof data.name === 'string' ? data.name : undefined,
-        documents: asArray(data.documents)?.map(convertToDocument)
     };
 }
 
