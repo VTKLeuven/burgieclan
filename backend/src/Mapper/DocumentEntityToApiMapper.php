@@ -53,6 +53,7 @@ class DocumentEntityToApiMapper extends BaseEntityToApiMapper
             ]
         );
         $to->year = $from->getYear();
+        $to->author = $from->getAuthor();
         $to->under_review = $from->isUnderReview();
         $to->anonymous = $from->isAnonymous();
         $to->creator = $this->microMapper->map(

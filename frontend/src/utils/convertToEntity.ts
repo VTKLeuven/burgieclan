@@ -124,6 +124,7 @@ export function convertToDocument(doc: unknown): Document {
             : typeof data.year === 'number'
                 ? data.year.toString()
                 : undefined,
+        author: typeof data.author === 'string' ? data.author : undefined,
         underReview: typeof data['under_review'] === 'boolean'
             ? data['under_review']
             : undefined,
