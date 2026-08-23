@@ -1,7 +1,7 @@
 # AGENTS.md
 
 This file provides guidance to coding agents when working with
-code in this repository. `CLAUDE.md` imports this file, so edit this one; the two never drift.
+code in this repository.
 
 ## Layout
 

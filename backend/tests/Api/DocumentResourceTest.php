@@ -973,6 +973,17 @@ class DocumentResourceTest extends ApiTestCase
         );
         $this->assertContains('/api/tags/' . $existingTag->getId(), $tagIRIs);
 
+        // An embedded tag must carry its name, not just its IRI - the frontend renders
+        // the name as a chip. Mapping a tag at MAX_DEPTH 0 skips populate() and leaves
+        // this null while every IRI assertion above still passes.
+        $tagNames = array_map(
+            function ($tag) {
+                return $tag['name'] ?? null;
+            },
+            $response['tags']
+        );
+        $this->assertContains($existingTag->getName(), $tagNames);
+
         // Also verify the document is findable by that tag. TagApi does not expose
         // its documents - a tag can hold tens of thousands of them - so the
         // supported direction is the documents collection filtered by tag.
