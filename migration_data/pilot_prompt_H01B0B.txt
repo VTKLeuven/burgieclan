@@ -1,0 +1,308 @@
+### Course: [H01B0B] Toegepaste algebra
+Total Documents in this batch: 30
+
+Documents to standardize:
+[
+  {
+    "file_id": "ec5e7ee2fb27056a2e48f2ae64c9c1f6762482c2",
+    "path": "/1e semester/Mechanica/AfleidingImpulsMomentVector.pdf",
+    "filename": "AfleidingImpulsMomentVector.pdf",
+    "ext": "pdf",
+    "size_kb": 249.5,
+    "is_scanned": false,
+    "page1_text": "Afleiding door: Olivier Renders – Jaar 2018 Beste hieronder staat een eigengemaakt bewijs ivm het systematisch berekenen van de relatieve impulsmomentvector. Ik heb deze formules op mijn examen toegepast en had een 18/20. Bijgevolg vermoed ik dat ze ",
+    "fallback_text": null
+  },
+  {
+    "file_id": "c03628e17237d89d975fccc1f4a337c1c73fdf7c",
+    "path": "/1e semester/Mechanica/Examens/9Januari2015.jpg",
+    "filename": "9Januari2015.jpg",
+    "ext": "jpg",
+    "size_kb": 1539.4,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "6bb55451062636745adfb8bfd4b243c31b38906c",
+    "path": "/1e semester/Mechanica/Oefeningen/Mechanica Oefeningen Notities.pdf",
+    "filename": "Mechanica Oefeningen Notities.pdf",
+    "ext": "pdf",
+    "size_kb": 13942.5,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "eb2911f9cd77c23658e33352d1f89158c53ab6ce",
+    "path": "/1e semester/Mechanica/Theorie/Mechanica Theorie Notities.pdf",
+    "filename": "Mechanica Theorie Notities.pdf",
+    "ext": "pdf",
+    "size_kb": 22620.3,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "c766063c632a0be7bce834d6f0863581703baddc",
+    "path": "/1e semester/Mechanica/Theorie/Notas_JeroenBelis_Mechanica.pdf",
+    "filename": "Notas_JeroenBelis_Mechanica.pdf",
+    "ext": "pdf",
+    "size_kb": 15505.4,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "6162f8a0f67943fbc206782ed6d73015c6ec72f1",
+    "path": "/1e semester/Mechanica/Theorie/NotasLaatsteLes_JeroenBelis.pdf",
+    "filename": "NotasLaatsteLes_JeroenBelis.pdf",
+    "ext": "pdf",
+    "size_kb": 7039.9,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "b2dc27c472dcb888b37363b963e51ce7c16ab4a1",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel1/001.jpg",
+    "filename": "001.jpg",
+    "ext": "jpg",
+    "size_kb": 826.2,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "8ff641ec30806a21b4fa8fcd6af733b5c2ebabff",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel1/002.jpg",
+    "filename": "002.jpg",
+    "ext": "jpg",
+    "size_kb": 835.2,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "6b6e1cc819dc5bb42da3cde296665c16a71dd3cf",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel1/003.jpg",
+    "filename": "003.jpg",
+    "ext": "jpg",
+    "size_kb": 857.8,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "f97e573b2551893baa6a958f8f90f1d9b8dc4604",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel1/004.jpg",
+    "filename": "004.jpg",
+    "ext": "jpg",
+    "size_kb": 885.1,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "04ae57afa50074303a93619cdd07360f6102620e",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel1/005.jpg",
+    "filename": "005.jpg",
+    "ext": "jpg",
+    "size_kb": 832.3,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "29c1016af3a387d92d9a858cb00d6d7f2f65cd28",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel1/006.jpg",
+    "filename": "006.jpg",
+    "ext": "jpg",
+    "size_kb": 893.5,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "05f6438c4f9e5e7a5f3dae134f297a71f8c2aeb9",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel1/007.jpg",
+    "filename": "007.jpg",
+    "ext": "jpg",
+    "size_kb": 1488.6,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "03d8ffd22afb9b9a7e02e5b6eecefadd9ed4aa87",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel1/008.jpg",
+    "filename": "008.jpg",
+    "ext": "jpg",
+    "size_kb": 755.1,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "568165c6776905a824191afaf2497bba72fe5360",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel1/009.jpg",
+    "filename": "009.jpg",
+    "ext": "jpg",
+    "size_kb": 544.0,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "440a4c4ac40abcd93968700d4e5d06bd9cb4c360",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel1/Foto 23-12-14 20 37 38.jpg",
+    "filename": "Foto 23-12-14 20 37 38.jpg",
+    "ext": "jpg",
+    "size_kb": 1586.6,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "84785d66ede9f3b01e3c7e4522890c9f1db15c3f",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel2/010.jpg",
+    "filename": "010.jpg",
+    "ext": "jpg",
+    "size_kb": 739.0,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "a2caea756d54c4d33e83641bf3c9aa47b14a6f05",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel2/011.jpg",
+    "filename": "011.jpg",
+    "ext": "jpg",
+    "size_kb": 760.0,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "98775c1c0d299d9878df2562c7931865b50a6912",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel2/012.jpg",
+    "filename": "012.jpg",
+    "ext": "jpg",
+    "size_kb": 1492.3,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "4c558e0ccf278b06598f08604e5e0cc29c40d6e3",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel2/013.jpg",
+    "filename": "013.jpg",
+    "ext": "jpg",
+    "size_kb": 775.3,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "1e6205167e80518deec36275c43120b9f7bf33f6",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel2/015.jpg",
+    "filename": "015.jpg",
+    "ext": "jpg",
+    "size_kb": 728.9,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "15179ef946ba43ed00f0b6209fd1b3eb88874d1b",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel2/016.jpg",
+    "filename": "016.jpg",
+    "ext": "jpg",
+    "size_kb": 730.4,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "c98b50fdb47dc28bcb96f7757a944e6aa2e51a23",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel2/Foto 23-12-14 20 39 57.jpg",
+    "filename": "Foto 23-12-14 20 39 57.jpg",
+    "ext": "jpg",
+    "size_kb": 1734.7,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "1aadc8466c5ca7b64b4fddad6f79450c2f72db6d",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel3/001.jpg",
+    "filename": "001.jpg",
+    "ext": "jpg",
+    "size_kb": 1487.3,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "501b3cdbafc39e71cb7dd61d7caa40d6161db877",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel3/002.jpg",
+    "filename": "002.jpg",
+    "ext": "jpg",
+    "size_kb": 736.0,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "b44f5a9d5ca21fba3ad462fc2ec1f406b15ef473",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel3/003.jpg",
+    "filename": "003.jpg",
+    "ext": "jpg",
+    "size_kb": 1508.5,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "7932e16db16ab7725864a155531e1421691ba237",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel3/004.jpg",
+    "filename": "004.jpg",
+    "ext": "jpg",
+    "size_kb": 780.8,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "41a5d31b3e13d1ee841453a5b1fff7547a867d2d",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel3/005.jpg",
+    "filename": "005.jpg",
+    "ext": "jpg",
+    "size_kb": 887.3,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "26b87b4ee9c918acc8e2ae715d93d9859780f788",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel3/006.jpg",
+    "filename": "006.jpg",
+    "ext": "jpg",
+    "size_kb": 866.6,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "0a63a6e8a4c3886cbbf3954ea2ae8b4c162a0a78",
+    "path": "/1e semester/Mechanica/Oefeningen/R0deel3/007.jpg",
+    "filename": "007.jpg",
+    "ext": "jpg",
+    "size_kb": 857.5,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  }
+]
+
+Output only valid JSON array matching the schema.

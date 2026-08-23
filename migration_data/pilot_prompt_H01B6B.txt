@@ -1,0 +1,258 @@
+### Course: [H01B6B] Informatica
+Total Documents in this batch: 25
+
+Documents to standardize:
+[
+  {
+    "file_id": "413ee94c73cf12e0fbb18d501d1bca7f9328d497",
+    "path": "/1 BIRA/Informatica (met JAVA!)/Informatica/Antwoorden examenvragen.docx",
+    "filename": "Antwoorden examenvragen.docx",
+    "ext": "docx",
+    "size_kb": 131.8,
+    "is_scanned": false,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "8948ed03c55bee0aa136ed0af0a503ec327f4854",
+    "path": "/1 BIRA/Informatica (met JAVA!)/Informatica/Examenvragen informatica.doc",
+    "filename": "Examenvragen informatica.doc",
+    "ext": "doc",
+    "size_kb": 62.0,
+    "is_scanned": false,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "bda62f23b20107ce745107623c5c285c386b231e",
+    "path": "/1 BIRA/Informatica (met JAVA!)/Informatica/Examenvragen Socs.doc",
+    "filename": "Examenvragen Socs.doc",
+    "ext": "doc",
+    "size_kb": 21.5,
+    "is_scanned": false,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "727d689ee74710ef39c05f925e96773d77be72f3",
+    "path": "/1 BIRA/Informatica (met JAVA!)/Informatica/JAVA_BlueJ_Oplossingen.pdf",
+    "filename": "JAVA_BlueJ_Oplossingen.pdf",
+    "ext": "pdf",
+    "size_kb": 3256.2,
+    "is_scanned": false,
+    "page1_text": "Methodiek van de Informatica: een lijst van oefeningen M. Hemeryck 16 juni 2006",
+    "fallback_text": "[P2]: Voorwoord Deze bundel bevat een aantal oplossingen van oefeningen die ik zelf heb uitgew- erkt. Ik kan in geen geval voorlopig de correctheid va"
+  },
+  {
+    "file_id": "cb05ba7863f597c17004dc09bb79785fac7e9b0c",
+    "path": "/1 BIRA/Informatica (met JAVA!)/Informatica/Oplossingen.pdf",
+    "filename": "Oplossingen.pdf",
+    "ext": "pdf",
+    "size_kb": 154.0,
+    "is_scanned": false,
+    "page1_text": "Methodiek van de informatica Dani¨el Slenders Faculteit Ingenieurswetenschappen Katholieke Universiteit Leuven Academiejaar 2009 - 2010",
+    "fallback_text": null
+  },
+  {
+    "file_id": "37916818bac4307eaac67980d574211607e41ab3",
+    "path": "/1 BIRA/Informatica (met JAVA!)/Informatica/Stof_tot_nadenken.docx",
+    "filename": "Stof_tot_nadenken.docx",
+    "ext": "docx",
+    "size_kb": 15.2,
+    "is_scanned": false,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "28fca75a50b6bd262d5989eabbb5a5988f6d23b2",
+    "path": "/Bachelor verbredend/Informatica/Info - Bedrijfskunde/Oplossingen-Theorievragen-BE 2017-2018.pdf",
+    "filename": "Oplossingen-Theorievragen-BE 2017-2018.pdf",
+    "ext": "pdf",
+    "size_kb": 933.2,
+    "is_scanned": false,
+    "page1_text": "Oplossingen Theorievragen Bedrijfskunde & Entrepreneurship Robin Haveneers Met dank aan: ​ Axel Lemmens, Mathilde Brusselmans, Pieter-Jan Coenen, Simon Van den Eynde, Lore Van Humbeeck, Michael Vanderstuyft, Jonas Soenen, Jasper Callaerts, Elias Gijs",
+    "fallback_text": null
+  },
+  {
+    "file_id": "5c71dd0468270e2adb9f44a776d767bc75a55c28",
+    "path": "/Bachelor verbredend/Informatica/Info - Digitale Elektronica en Processoren/ZIE_BACH2_ELEKTRO.md",
+    "filename": "ZIE_BACH2_ELEKTRO.md",
+    "ext": "md",
+    "size_kb": 0.3,
+    "is_scanned": false,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "c414274592117f263ed82daabbe35c1ca8fd5e7e",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Cursustekst/H1+2 Cursustekst.pdf",
+    "filename": "H1+2 Cursustekst.pdf",
+    "ext": "pdf",
+    "size_kb": 428.7,
+    "is_scanned": false,
+    "page1_text": "Hoofdstuk 1 Modellen en simulaties Mensen willen systemen bestuderen om de interactie tussen d e componenten te begrijpen of om het gedrag van het systeem te kunnen voorsp ellen onder gewijzigde omstandigheden. Soms kan men experimenteren me t het sy",
+    "fallback_text": null
+  },
+  {
+    "file_id": "2011c50f4b21a7048ce3493e1e075f83e914e2c7",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Cursustekst/H8 Cursustekst.pdf",
+    "filename": "H8 Cursustekst.pdf",
+    "ext": "pdf",
+    "size_kb": 291.2,
+    "is_scanned": false,
+    "page1_text": "Hoofdstuk 8 Monte Carlo simulaties 8.1 Inleiding In dit hoofdstuk gaan we systemen bekijken waarvan het gedra g stochastisch, of willekeurig, is. Een typisch voorbeeld is diﬀusie. Beschouw bijvoorbeeld een kop zwarte koﬃe en plaats rustig een druppel",
+    "fallback_text": null
+  },
+  {
+    "file_id": "8360475d78098bd50d04664c006594c540995461",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Examen/Oplossingen Examenvragen Modellering & Simulatie 2017-2018.pdf",
+    "filename": "Oplossingen Examenvragen Modellering & Simulatie 2017-2018.pdf",
+    "ext": "pdf",
+    "size_kb": 1736.8,
+    "is_scanned": false,
+    "page1_text": "Hoofdstuk 2 NIEUW DIT JAAR - Hoe werkt pagerank? Webpagina’s verwijzen naar elkaar met hyperlinks. Crawlers brengen dit in kaart. Op regelmatige basis wordt er voor elke pagina een score berekend. Op basis van deze score worden webpagina’s gesuggeree",
+    "fallback_text": null
+  },
+  {
+    "file_id": "a277616a23ef8e14e3baca3bc58ec715b0b089f2",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Oefenzittingen/0. Opfrissing Matlab.pdf",
+    "filename": "0. Opfrissing Matlab.pdf",
+    "ext": "pdf",
+    "size_kb": 145.4,
+    "is_scanned": false,
+    "page1_text": "K.U.Leuven Departement Computerwetenschappen MODELLERING EN SIMULATIE Opfrissen van Matlabvaardigheden Copyright c⃝ 2005 liesbeth.vanherpe@cs.kuleuven.be Laatste wijziging: 17 september 2009",
+    "fallback_text": null
+  },
+  {
+    "file_id": "9a18337be5b8ce535e51322b36b18c9ec1685420",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Oefenzittingen/1. QR-ontbinding.pdf",
+    "filename": "1. QR-ontbinding.pdf",
+    "ext": "pdf",
+    "size_kb": 210.5,
+    "is_scanned": false,
+    "page1_text": "Modellering en Simulatie Oefenzitting 1: QR-ontbinding Academiejaar 2017–2018 1 Algoritmen voor de QR-ontbinding De QR-ontbinding van een matrix A∈Rm×n wordt gegeven door A= QR, waarbij Q∈Rm×m een orthogonale matrix is en R∈Rm×n een bovendriehoeksmat",
+    "fallback_text": null
+  },
+  {
+    "file_id": "01eab4b09b5ab0455ecb4e6e1b94dd4e1d073084",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Oefenzittingen/2. Agrigento.mat",
+    "filename": "2. Agrigento.mat",
+    "ext": "mat",
+    "size_kb": 3551.4,
+    "is_scanned": false,
+    "page1_text": "MATLAB 5.0 MAT-file, Platform: GLNXA64, Created on: Mon Nov  3 15:10:59 2014                                        \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0001IM\u000f\u0000\u0000\u0000u\u0002\u000e\u0000xn\\E\u0010\u0007\u0010\bn\u0010\u0006{]q \n\b\u0012ǀ7 \u000b\u0017ނ,!\t!\u000bY<vq\u0005\u0006\ttuKQi\u0006[֯9}oZ{]}8ZVkmu}{\u0013V-\u001dc*\u0014YGJX+\t)GOU~8{$W\u001f9O?\tjG4o`Qg\u001c+6{9anLX&X\u000f\u001doH5\u001dE0R",
+    "fallback_text": null
+  },
+  {
+    "file_id": "eef982f92ff0e8ad7bd9cfce268690c1d26bafa1",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Oefenzittingen/2. SVD en eigenwaardeontbinding.pdf",
+    "filename": "2. SVD en eigenwaardeontbinding.pdf",
+    "ext": "pdf",
+    "size_kb": 238.2,
+    "is_scanned": false,
+    "page1_text": "Modellering en Simulatie Oefenzitting 2: Singuliere- en eigenwaardenontbindingen Academiejaar 2017–2018 1 Singulierewaardenontbinding De singulierewaardenontbinding van een matrix A ∈Rm×n met1 m ≥n kan aangewend worden om lagerangbenaderingen van Aop",
+    "fallback_text": null
+  },
+  {
+    "file_id": "0e9dc35ddb83c38a3fccfb1d1ce69d9ccceb9137",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Oefenzittingen/3. Monte Carlo Simulaties.pdf",
+    "filename": "3. Monte Carlo Simulaties.pdf",
+    "ext": "pdf",
+    "size_kb": 206.9,
+    "is_scanned": false,
+    "page1_text": "Modellering en Simulatie Oefenzitting 3: Monte Carlo-simulaties Academiejaar 2017–2018 1 Driehoeken Beschouw de eenheidscirkel S1 in het vlak. Kies willekeurig 3 punten p1,p2,p3 op S1 volgens een uniforme verdeling. Hoeveel bedraagt de kans dat de oo",
+    "fallback_text": null
+  },
+  {
+    "file_id": "772420e078fa96f53da250854700d43b8134d2df",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Oefenzittingen/4. Toevalsgeneratoren.pdf",
+    "filename": "4. Toevalsgeneratoren.pdf",
+    "ext": "pdf",
+    "size_kb": 160.1,
+    "is_scanned": false,
+    "page1_text": "Modellering en Simulatie Oefenzitting 4: Toevalsgeneratoren Academiejaar 2017–2018 1 Theorie Opgave 1. De stochastische variabele X stelt de som voor van de ogen van twee eerlijke dobbel- stenen. Wat is de uitkomstenverzameling χ? Wat is de kansverde",
+    "fallback_text": null
+  },
+  {
+    "file_id": "1059b33a8e6c333f927138afd3ad01d4ab842eb9",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Oefenzittingen/5. lineSearch.m",
+    "filename": "5. lineSearch.m",
+    "ext": "m",
+    "size_kb": 2.5,
+    "is_scanned": false,
+    "page1_text": "function [alpha] = lineSearch(f,gradF,x,p) \n% Implementation of strong wolfe line search, based on Nocedal&Wright. \n% \n% Adapted from a code \n% (c) Mark Bangert \n% Source: https://nl.mathworks.com/matlabcentral/fileexchange/34835-optimization-tutoria",
+    "fallback_text": null
+  },
+  {
+    "file_id": "4144e5763a92d40b6c08f3cc5dea2b6276ee570c",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Oefenzittingen/5. Optimalisatie.pdf",
+    "filename": "5. Optimalisatie.pdf",
+    "ext": "pdf",
+    "size_kb": 199.2,
+    "is_scanned": false,
+    "page1_text": "Modellering en Simulatie Oefenzitting 5: Optimalisatie Academiejaar 2017–2018 1 Optimalisatiemethoden zonder beperkingen Een algemene klasse van optimalisatiemethoden voor het onbegrensd minimaliseren van een aﬂeid- bare vectorfunctie f : Rm →R zijn ",
+    "fallback_text": null
+  },
+  {
+    "file_id": "0661ee22243d705274e3ed4eddaa474e5f878dec",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Oefenzittingen/6. dailyArea.mat",
+    "filename": "6. dailyArea.mat",
+    "ext": "mat",
+    "size_kb": 85.4,
+    "is_scanned": false,
+    "page1_text": "MATLAB 5.0 MAT-file, Platform: GLNXA64, Created on: Thu Nov 13 13:57:31 2014                                        \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0001IM\u000f\u0000\u0000\u00008U\u0001\u0000x˱\t@\u0010D\u0011T4\u0011HK9@02\t;\u0010lr \n,=\u0012.?0<v٭$G,^,\"fb-\u001bƹz\u0017n/ \"\"\"\"bdoDDDDD?_\u0000\u0000\u0000š \n\u0000 \u0010\u0004\u001bE\u0011@ `O@5zi۶me۶mm\u001f\u0000\u0000\u0000ű\u0011\u0000\u0010\u0014\u0005W(eQ&U0_K$מ#Ym",
+    "fallback_text": null
+  },
+  {
+    "file_id": "136caeb238f37f7223ea73cce3a7c87fd8fb69d6",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Oefenzittingen/6. FFT.pdf",
+    "filename": "6. FFT.pdf",
+    "ext": "pdf",
+    "size_kb": 168.9,
+    "is_scanned": false,
+    "page1_text": "Modellering en Simulatie Oefenzitting 6: Snelle Fouriertransformatie Academiejaar 2017–2018 1 Zonnevlekken Zonnevlekken zijn relatief donkere vlekken op het oppervlak van de zon. Deze zonnevlekken hangen samen met koelere plekken op de zon. Hun aanta",
+    "fallback_text": null
+  },
+  {
+    "file_id": "0b75a8fa4f2360acb471cfdea559b9b68948d282",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Oefenzittingen/6. Lighthouse.mat",
+    "filename": "6. Lighthouse.mat",
+    "ext": "mat",
+    "size_kb": 1920.7,
+    "is_scanned": false,
+    "page1_text": "MATLAB 5.0 MAT-file, Platform: GLNXA64, Created on: Wed Nov 19 11:53:36 2014                                        \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0001IM\u000f\u0000\u0000\u0000t\u0014\u0000xM\u001cE\u0010 \u0010H3\u0014'!IUÛ\t\u0003\t\u0010\f3\u001e{zpb\u0001hxaW\u001d4\u001eY\u0017_7G{>;:\u001eb#OwG[?}-\u0003o#渋\u0011\u001d\u001bٓ\u0011[\u0011/'{u\u001d݋u \n萧\u0017뱿ԇ<˹.\u0007noxb߆;5<9K=\\žnFlO{`{\u0016m\u000bo_yw\u0005\u0019G;\u00035",
+    "fallback_text": null
+  },
+  {
+    "file_id": "6d399b0acb301c34f5c1ae9566fc2d4944855fef",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Oefenzittingen/7. Markovketens.pdf",
+    "filename": "7. Markovketens.pdf",
+    "ext": "pdf",
+    "size_kb": 195.1,
+    "is_scanned": false,
+    "page1_text": "Modellering en Simulatie Oefenzitting 7: Markovketens Academiejaar 2017–2018 In deze opgave zullen we een tennismatch modelleren door middel van een Markovketen. Hier- mee kunnen we vervolgens verschillende tennismatchen simuleren. 1 Game Een game in",
+    "fallback_text": null
+  },
+  {
+    "file_id": "d602bfdb2d74decca58e964b1be6c213833eced8",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Slides/Slides DFT.pdf",
+    "filename": "Slides DFT.pdf",
+    "ext": "pdf",
+    "size_kb": 1290.4,
+    "is_scanned": false,
+    "page1_text": "Ontbinding: met Gegeven: rij rij rij Discrete Fourier Transformatie(DFT)",
+    "fallback_text": "[P2]: met stel Formules (herhaling) | [P3]: = + + + Voorbeeld N=4 Re Imag"
+  },
+  {
+    "file_id": "ac99dfa37dcd7c5ae78b5ce48cb837ca3630f8ac",
+    "path": "/Bachelor verbredend/Informatica/Info - Modellering en Simulatie/Slides/Slides Fourierreeks.pdf",
+    "filename": "Slides Fourierreeks.pdf",
+    "ext": "pdf",
+    "size_kb": 596.6,
+    "is_scanned": false,
+    "page1_text": "Fourier reeks functie op het interval [-¼, ¼] variant 1 variant 2 )ontbinding van f in periodieke basisfuncties, met stijgende frequenties",
+    "fallback_text": null
+  }
+]
+
+Output only valid JSON array matching the schema.

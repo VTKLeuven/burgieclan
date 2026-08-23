@@ -1,0 +1,258 @@
+### Course: [H01G7A] Toegepaste mechanica, deel 3
+Total Documents in this batch: 25
+
+Documents to standardize:
+[
+  {
+    "file_id": "c6343072ed9d77713bb700ea0c6abcf063472bfb",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Mech3SlidesEnergiemethodesLessenEn5Examens20-21(Thomas de wolf).zip",
+    "filename": "Mech3SlidesEnergiemethodesLessenEn5Examens20-21(Thomas de wolf).zip",
+    "ext": "zip",
+    "size_kb": 40918.8,
+    "is_scanned": false,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "6600e28c028245ee41ec41158569fe45e6bd88b5",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Toegepaste Mechanica, deel 3 - Lesnotities en Oefenzittingen (Glenn Peeters) - 2017-2018.pdf",
+    "filename": "Toegepaste Mechanica, deel 3 - Lesnotities en Oefenzittingen (Glenn Peeters) - 2017-2018.pdf",
+    "ext": "pdf",
+    "size_kb": 78381.7,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "67ceea3b6ee5aafa99df5c56ee84ac4ddd920419",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/190617modeloplossing1.pdf",
+    "filename": "190617modeloplossing1.pdf",
+    "ext": "pdf",
+    "size_kb": 2048.8,
+    "is_scanned": false,
+    "page1_text": "17 juni 2019, 08u30 Examen H1G7 — Toegepaste Mechanica 3 — vraag 1 Een draagconstructie is opgebouwd als een vakwerk met vijf staven. De normaalstijfheid EA van elk van de staven bedraagt 108N. x y P=36kNex-54kNey 1.35m 1.35m 1.05m1.05m 1.80m A C D E",
+    "fallback_text": null
+  },
+  {
+    "file_id": "aeac64711ca452c424626fd08889643736a95eb7",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/2023-voorbeeld-examenvragen-Kobe.pdf",
+    "filename": "2023-voorbeeld-examenvragen-Kobe.pdf",
+    "ext": "pdf",
+    "size_kb": 10557.6,
+    "is_scanned": false,
+    "page1_text": "1 Virtuele arbeid -- discreet Een vakvset•k telt. 17 st oven, alle elkaar zijn. Twee soorten staven zijn beschikbaar, met, stijfheid EA en stijfheid 2/3/1, elk voor maximaal 9 stavcn. gevmagd : bereken de verplaatsing van het aangrijpingspunt van (Ie",
+    "fallback_text": null
+  },
+  {
+    "file_id": "747d606162dfedb2789013ee566a3902b325a1b1",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen 2007-06-21 (Oplossing).pdf",
+    "filename": "Examen 2007-06-21 (Oplossing).pdf",
+    "ext": "pdf",
+    "size_kb": 110.2,
+    "is_scanned": false,
+    "page1_text": "30 21 juni 2007 maximum voor deze vraag : duid aan 4 | 6 | 8 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H1G7 | Toegepaste Mechanica 3 | vraag 1 Een slinger hangt met een wrijvingsloos scharnier en met ee",
+    "fallback_text": null
+  },
+  {
+    "file_id": "b0f9cd23233a145618f299550f27db0151b82dd5",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen 2008-06-20 (Oplossing).pdf",
+    "filename": "Examen 2008-06-20 (Oplossing).pdf",
+    "ext": "pdf",
+    "size_kb": 175.6,
+    "is_scanned": false,
+    "page1_text": "34 20 juni 2008, 13u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H1G7 — Toegepaste Mechanica 3 Een balans bestaat uit 3 starre en massaloze stangen, met lengten H, L1 en L2, die in een stijve verbinding",
+    "fallback_text": null
+  },
+  {
+    "file_id": "65ece3a34d2c29ad1f97856345e5306a33c0a157",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen 2009-06-17 (Oplossing).pdf",
+    "filename": "Examen 2009-06-17 (Oplossing).pdf",
+    "ext": "pdf",
+    "size_kb": 557.6,
+    "is_scanned": false,
+    "page1_text": "17 juni 2009, 13u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H1G7 — Toegepaste Mechanica 3 — vraag 1 Een balans dient als proefopstelling voor een stabiliteitstest. De balans rust op een wrijvingsloos ",
+    "fallback_text": null
+  },
+  {
+    "file_id": "a4a5fbaac8bbcecd0b79ef43debbd60bdacc26da",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen 2010-06-14 (Oplossing).pdf",
+    "filename": "Examen 2010-06-14 (Oplossing).pdf",
+    "ext": "pdf",
+    "size_kb": 486.1,
+    "is_scanned": false,
+    "page1_text": "14 juni 2010, 8u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H1G7 — Toegepaste Mechanica 3 — vraag 1 Een draagconstructie bestaat uit twee elastische balken die elk star in een vaste wand zijn ingeklemd",
+    "fallback_text": null
+  },
+  {
+    "file_id": "94972a01242ca3e3ffd52fd02dc4e794742bfd30",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen 2011-06-10 (Oplossing).pdf",
+    "filename": "Examen 2011-06-10 (Oplossing).pdf",
+    "ext": "pdf",
+    "size_kb": 543.5,
+    "is_scanned": false,
+    "page1_text": "10 juni 2011, 8u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen XC85 — Toegepaste Mechanica 3 — vraag 1 Een balk met constante buigstijfheid EI heeft een overspanning L. Aan beide uiteinden is de balk star",
+    "fallback_text": null
+  },
+  {
+    "file_id": "f5d2992fc7f3eb90e69ed0e2c7a05d5ff48a3b0b",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen 2012-06-11 (Oplossing).pdf",
+    "filename": "Examen 2012-06-11 (Oplossing).pdf",
+    "ext": "pdf",
+    "size_kb": 757.2,
+    "is_scanned": false,
+    "page1_text": "10 11 juni 2012, 8u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen XC85 — Toegepaste Mechanica 3 — vraag 2 Een drukveer bestaat uit een draad met diameterd die metn volledige windingen is opgewikkeld met e",
+    "fallback_text": null
+  },
+  {
+    "file_id": "9bd4fe161ac476a65bb4ecd6ab24a7b5c61e242d",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen 2013-06-10 (Oplossing).pdf",
+    "filename": "Examen 2013-06-10 (Oplossing).pdf",
+    "ext": "pdf",
+    "size_kb": 776.9,
+    "is_scanned": false,
+    "page1_text": "52 10 juni 2013, 9u00 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen XC85 — Toegepaste Mechanica 3 — vraag 1 Een vlak vakwerk overspant een lengte 4 L tussen de steunpunten A en B, en het heeft een uitkragin",
+    "fallback_text": null
+  },
+  {
+    "file_id": "b605bec281b1743bc1190a653d66c744725e21d6",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen 2014-06-16 (Oplossing) (vraag 3).pdf",
+    "filename": "Examen 2014-06-16 (Oplossing) (vraag 3).pdf",
+    "ext": "pdf",
+    "size_kb": 271.8,
+    "is_scanned": false,
+    "page1_text": "16 juni 2013, 8u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H1G7 — Toegepaste Mechanica 3 — vraag 3 Richtlijnen bij vraag 3 1. De nadruk ligt op de procedures (conceptuele oplossing), het is niet de be",
+    "fallback_text": null
+  },
+  {
+    "file_id": "76988632b8d3ceb49d805b0288f39c83766f7878",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen 2015-06-15 (Oplossing) (deel 2).pdf",
+    "filename": "Examen 2015-06-15 (Oplossing) (deel 2).pdf",
+    "ext": "pdf",
+    "size_kb": 212.1,
+    "is_scanned": false,
+    "page1_text": "15 juni 2015, 8u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H1G7 — Toegepaste Mechanica 3 — vraag 3 Richtlijnen bij vraag 3 1. De nadruk ligt op de procedures (conceptuele oplossing), het is niet de be",
+    "fallback_text": null
+  },
+  {
+    "file_id": "fe37c648f34b0d410a2d36042392f74f9df80f41",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen 2016-06-13 (Oplossing).pdf",
+    "filename": "Examen 2016-06-13 (Oplossing).pdf",
+    "ext": "pdf",
+    "size_kb": 514.4,
+    "is_scanned": false,
+    "page1_text": "13 juni 2016, 08u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H1G7 — Toegepaste Mechanica 3 — vraag 1 Een boogconstructie heeft een straal R. Deze straal is gemeten vanaf het centrum van de boog tot het",
+    "fallback_text": null
+  },
+  {
+    "file_id": "1c5f75710d37c1505a69a606b94a1a16f7edb905",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen 2017-06-19 (Oplossing) (deel 1).pdf",
+    "filename": "Examen 2017-06-19 (Oplossing) (deel 1).pdf",
+    "ext": "pdf",
+    "size_kb": 316.3,
+    "is_scanned": false,
+    "page1_text": "19 juni 2017, 08u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H1G7 — Toegepaste Mechanica 3 — vraag 1 Een balk met buigstijfheid EI overspant een lengte L. Aan het linkeruiteinde is de balk in een starr",
+    "fallback_text": null
+  },
+  {
+    "file_id": "a6be19365ea1cde94adaaa89f2e0e34612585d82",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen 2017-06-19 (Oplossing) (deel 2).pdf",
+    "filename": "Examen 2017-06-19 (Oplossing) (deel 2).pdf",
+    "ext": "pdf",
+    "size_kb": 4915.5,
+    "is_scanned": false,
+    "page1_text": "19 juni 2017, 8u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H01G7A — Toegepaste Mechanica 3 — vraag 3 Richtlijnen bij vraag 3 1. De nadruk ligt op de procedures (conceptuele oplossing), het is niet de ",
+    "fallback_text": null
+  },
+  {
+    "file_id": "dfc27e6437410740bfde7dc70de7652728f56808",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen2022_11juni_modeloplossing.pdf",
+    "filename": "Examen2022_11juni_modeloplossing.pdf",
+    "ext": "pdf",
+    "size_kb": 185.1,
+    "is_scanned": false,
+    "page1_text": "11 juni 2022, 9u studentennummer: . . . . . . . . . . . . . . . . . . . naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H1G7 — Toegepaste Mechanica 3 — vraag 3 Richtlijnen bij vraag 3 1. De nadruk ligt op de ",
+    "fallback_text": null
+  },
+  {
+    "file_id": "ff8bd180aead5d72326e9dcd578033a20b061d72",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/examen2022_18juni_modeloplossing.pdf",
+    "filename": "examen2022_18juni_modeloplossing.pdf",
+    "ext": "pdf",
+    "size_kb": 396.6,
+    "is_scanned": false,
+    "page1_text": "18 juni 2022, 9u00 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H1G7 — Toegepaste Mechanica 3 — vraag 3 Richtlijnen bij vraag 3 1. De nadruk ligt op de procedures (conceptuele oplossing), het is niet de be",
+    "fallback_text": null
+  },
+  {
+    "file_id": "d093da4ceda7f92b5e6dfd429835ff637d6e27b2",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen_2007-06-21_Opgave.pdf",
+    "filename": "Examen_2007-06-21_Opgave.pdf",
+    "ext": "pdf",
+    "size_kb": 103.9,
+    "is_scanned": false,
+    "page1_text": "30 21 juni 2007 maximum voor deze vraag : duid aan 4 | 6 | 8 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H1G7 | Toegepaste Mechanica 3 | vraag 1 Een slinger hangt met een wrijvingsloos scharnier en met ee",
+    "fallback_text": null
+  },
+  {
+    "file_id": "cf726bf2ce04bfa94673ff4f7fd6c6dbc4430718",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen_2008-06-20_Opgave.pdf",
+    "filename": "Examen_2008-06-20_Opgave.pdf",
+    "ext": "pdf",
+    "size_kb": 197.2,
+    "is_scanned": false,
+    "page1_text": "34 20 juni 2008, 13u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H1G7 — Toegepaste Mechanica 3 Een balans bestaat uit 3 starre en massaloze stangen, met lengten H, L1 en L2, die in een stijve verbinding",
+    "fallback_text": null
+  },
+  {
+    "file_id": "075c38749ea7155894f5e416bf7329c0d12347ed",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen_2009-06-17_Opgave.pdf",
+    "filename": "Examen_2009-06-17_Opgave.pdf",
+    "ext": "pdf",
+    "size_kb": 551.1,
+    "is_scanned": false,
+    "page1_text": "17 juni 2009, 13u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H1G7 — Toegepaste Mechanica 3 — vraag 1 Een balans dient als proefopstelling voor een stabiliteitstest. De balans rust op een wrijvingsloos ",
+    "fallback_text": null
+  },
+  {
+    "file_id": "18f0b315a16fd06349ee7091002a709d691b9b47",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen_2010-06-14_Opgave.pdf",
+    "filename": "Examen_2010-06-14_Opgave.pdf",
+    "ext": "pdf",
+    "size_kb": 516.6,
+    "is_scanned": false,
+    "page1_text": "14 juni 2010, 8u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen H1G7 — Toegepaste Mechanica 3 — vraag 1 Een draagconstructie bestaat uit twee elastische balken die elk star in een vaste wand zijn ingeklemd",
+    "fallback_text": null
+  },
+  {
+    "file_id": "4e1447f899d3fc77e5d4bb3a3446c061d5d215ec",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen_2011-06-10_en_20_Opgave.pdf",
+    "filename": "Examen_2011-06-10_en_20_Opgave.pdf",
+    "ext": "pdf",
+    "size_kb": 557.7,
+    "is_scanned": false,
+    "page1_text": "10 juni 2011, 8u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen XC85 — Toegepaste Mechanica 3 — vraag 1 Een balk met constante buigstijfheid EI heeft een overspanning L. Aan beide uiteinden is de balk star",
+    "fallback_text": null
+  },
+  {
+    "file_id": "1e3e1155fc550bbb5f00f77bddb103fcbb423b01",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen_2012-06-11_en_18_Opgave.pdf",
+    "filename": "Examen_2012-06-11_en_18_Opgave.pdf",
+    "ext": "pdf",
+    "size_kb": 746.8,
+    "is_scanned": false,
+    "page1_text": "10 11 juni 2012, 8u30 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen XC85 — Toegepaste Mechanica 3 — vraag 2 Een drukveer bestaat uit een draad met diameterd die metn volledige windingen is opgewikkeld met e",
+    "fallback_text": null
+  },
+  {
+    "file_id": "d766692f225362c3a7296beec409649b17eb64d8",
+    "path": "/2de bach/H01G7A - Toegepaste Mechanica III/Examens/Examen_2013-06-10_en_17_Opgave.pdf",
+    "filename": "Examen_2013-06-10_en_17_Opgave.pdf",
+    "ext": "pdf",
+    "size_kb": 762.4,
+    "is_scanned": false,
+    "page1_text": "52 10 juni 2013, 9u00 naam : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Examen XC85 — Toegepaste Mechanica 3 — vraag 1 Een vlak vakwerk overspant een lengte 4 L tussen de steunpunten A en B, en het heeft een uitkragin",
+    "fallback_text": null
+  }
+]
+
+Output only valid JSON array matching the schema.

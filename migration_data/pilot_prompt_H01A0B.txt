@@ -1,0 +1,258 @@
+### Course: [H01A0B] Analyse, deel 1
+Total Documents in this batch: 25
+
+Documents to standardize:
+[
+  {
+    "file_id": "d7f6184f48e36d35aa9a6ac48049b5cbd9fe0ee6",
+    "path": "/Semester 1/H01A0B - Analyse I/Studiewijzer Analyse I 2020-2021.pdf",
+    "filename": "Studiewijzer Analyse I 2020-2021.pdf",
+    "ext": "pdf",
+    "size_kb": 826.5,
+    "is_scanned": false,
+    "page1_text": "Studiewijzer oefenzittingen Analyse 1 Doel van de oefenzittingen Tijdens de oefenzittingen is het vooral de bedoeling dat je zelf oefeningen maakt. Uiteraard zal dit niet altijd vanzelf gaan. Daarom is er een assistent aanwezig om vragen aan te stell",
+    "fallback_text": null
+  },
+  {
+    "file_id": "b6f7dbe969de347ccec0fb1de74745c50d7c319a",
+    "path": "/Semester 1/H01A0B - Analyse I/Oefenzittingen/Examenoefeningen in de oefbundel.docx",
+    "filename": "Examenoefeningen in de oefbundel.docx",
+    "ext": "docx",
+    "size_kb": 15.6,
+    "is_scanned": false,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "b4b27db3df07001748f5fe3e87f7c09972fea4a3",
+    "path": "/Semester 1/H01A0B - Analyse I/Oefenzittingen/oefeningen_analyse1 (LukasVandenBroeck).pdf",
+    "filename": "oefeningen_analyse1 (LukasVandenBroeck).pdf",
+    "ext": "pdf",
+    "size_kb": 22289.9,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "cf84e583b04a0753cc2a3759304a19317cb4de4a",
+    "path": "/Semester 1/H01A0B - Analyse I/Random/Theorievragen Analyse 1.docx",
+    "filename": "Theorievragen Analyse 1.docx",
+    "ext": "docx",
+    "size_kb": 14.0,
+    "is_scanned": false,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "460172997743ac335d86e8f0727a30d0996bc96a",
+    "path": "/Semester 1/H01A0B - Analyse I/Samenvattingen/Handleiding oefeningen 2016-2017 (Tibo Geenen).pdf",
+    "filename": "Handleiding oefeningen 2016-2017 (Tibo Geenen).pdf",
+    "ext": "pdf",
+    "size_kb": 8389.1,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "355b01f6e00898acd918ea346a21847a67d5fdd2",
+    "path": "/Semester 1/H01A0B - Analyse I/Samenvattingen/Nuttige Taylorveeltermen (Riet Van Puyenbroeck).pdf",
+    "filename": "Nuttige Taylorveeltermen (Riet Van Puyenbroeck).pdf",
+    "ext": "pdf",
+    "size_kb": 346.3,
+    "is_scanned": false,
+    "page1_text": "Exponentiële & logaritmische functies rond 0 1. 𝑒𝑥 = 1+𝑥 + 𝑥2 2 + 𝑥3 6 +𝑜(𝑥3) 2. 𝑒𝑥 −1 = 𝑥 + 𝑥2 2 + 𝑥3 6 +𝑜(𝑥3) 3. 𝑒−𝑥 = 1−𝑥 + 𝑥2 2 − 𝑥3 6 +𝑜(𝑥3) 4. ln⁡(1+𝑥) = 𝑥 − 𝑥2 2 + 𝑥3 3 +𝑜(𝑥3) 5. ln⁡(1−𝑥) = −𝑥 − 𝑥2 2 − 𝑥3 3 +𝑜(𝑥3) 6. 1 1−𝑥 = 1+𝑥 +𝑥2 +𝑥3 +𝑜(𝑥3)",
+    "fallback_text": null
+  },
+  {
+    "file_id": "daf8aa14e728574af0787c46bbc743afbe20ffd8",
+    "path": "/Semester 1/H01A0B - Analyse I/Samenvattingen/Samenvatting & Formules 2016-2017 (Arthur Stockman).pdf",
+    "filename": "Samenvatting & Formules 2016-2017 (Arthur Stockman).pdf",
+    "ext": "pdf",
+    "size_kb": 34366.7,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "ff5695bb097af5b410421f44af5c6840b028b336",
+    "path": "/Semester 1/H01A0B - Analyse I/Samenvattingen/Samenvatting 2009-2010 (Laurens De Poorter).pdf",
+    "filename": "Samenvatting 2009-2010 (Laurens De Poorter).pdf",
+    "ext": "pdf",
+    "size_kb": 20516.3,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "a127eb67c5d82bc915e3712b8729e0273d08bb90",
+    "path": "/Semester 1/H01A0B - Analyse I/Samenvattingen/Samenvatting 2024-2025 (Hanna Leysen).pdf",
+    "filename": "Samenvatting 2024-2025 (Hanna Leysen).pdf",
+    "ext": "pdf",
+    "size_kb": 15452.9,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "49e12af49f476ecb703aa47525debc3eb2c247a4",
+    "path": "/Semester 1/H01A0B - Analyse I/Samenvattingen/samenvatting_analyse1 (LukasVandenBroeck).pdf",
+    "filename": "samenvatting_analyse1 (LukasVandenBroeck).pdf",
+    "ext": "pdf",
+    "size_kb": 13259.7,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "6d2498d246f818f9367a9d575c27b84b65d034eb",
+    "path": "/Semester 1/H01A0B - Analyse I/Samenvattingen/Samenvatting_H6.pdf",
+    "filename": "Samenvatting_H6.pdf",
+    "ext": "pdf",
+    "size_kb": 13972.6,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "f4ac4161f64eebb46f2068f312c17d5c0fd140f8",
+    "path": "/Semester 1/H01A0B - Analyse I/Samenvattingen/Schema's 2024-2025 (Hanna Leysen).pdf",
+    "filename": "Schema's 2024-2025 (Hanna Leysen).pdf",
+    "ext": "pdf",
+    "size_kb": 22175.3,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "6220fca0d1788acbfd3f14b500fbdb1c33dfcc16",
+    "path": "/Semester 1/H01A0B - Analyse I/Transparanten/limiet.pdf",
+    "filename": "limiet.pdf",
+    "ext": "pdf",
+    "size_kb": 34.9,
+    "is_scanned": false,
+    "page1_text": "Bereken de volgende limiet: lim x→0 sin (ex − 1) − ( x + x2 2 ) x4 + 2x5 . Oplossing: Eerst zoeken we de Taylorveelterm van graad n voor de functiesin (ex − 1) rondx = 0. In de teller staat een veelterm van graad 2, dus hoogstwaarschijnlijk hebben we",
+    "fallback_text": null
+  },
+  {
+    "file_id": "a9076a41b39340fac29063c2f1aeaeb2e81562fa",
+    "path": "/Semester 1/H01A0B - Analyse I/Examen en TTT/TTT/TTT 2006 Opgaven.pdf",
+    "filename": "TTT 2006 Opgaven.pdf",
+    "ext": "pdf",
+    "size_kb": 129.6,
+    "is_scanned": false,
+    "page1_text": "1e bachelor ingenieurswetenschappen Testnamiddag analyse oktober 2006 1. Een asurne heeft de vorm van het omwentelingsoppervlak S dat men bekomt door de kromme y = √ |1 −z4|, −21/4 ≤z ≤1, x = 0, te roteren rond de z–as. Met een laserstraal gericht va",
+    "fallback_text": null
+  },
+  {
+    "file_id": "dfe00fe65a7091094dca04d4d0b41f5a2763e7f1",
+    "path": "/Semester 1/H01A0B - Analyse I/Examen en TTT/TTT/TTT 2006 Oplossing.pdf",
+    "filename": "TTT 2006 Oplossing.pdf",
+    "ext": "pdf",
+    "size_kb": 166.5,
+    "is_scanned": false,
+    "page1_text": "1e bachelor ingenieurswetenschappen Modeloplossing testnamiddag analyse oktober 2006 1. Een asurne heeft de vorm van het omwentelingsoppervlak S dat men bekomt door de kromme y = √ |1 −z4|, −21/4 ≤ z ≤ 1, x = 0, te roteren rond de z–as. Met een laser",
+    "fallback_text": null
+  },
+  {
+    "file_id": "71b767f5ef75b40813266f4506b32e91402a021f",
+    "path": "/Semester 1/H01A0B - Analyse I/Examen en TTT/TTT/TTT 2007 Opgaven.pdf",
+    "filename": "TTT 2007 Opgaven.pdf",
+    "ext": "pdf",
+    "size_kb": 194.7,
+    "is_scanned": false,
+    "page1_text": "1e bachelor ingenieurswetenschappen Testnamiddag analyse oktober 2007 1. Beschouw de krommeC gelegen in hetx-y–vlak (z = 0), met als vergelijking in poolco¨ordinaten r = sin 2θ,0 ≤ θ ≤ π/2 en het omwentelingsoppervlakS dat men bekomt door deze kromme",
+    "fallback_text": null
+  },
+  {
+    "file_id": "4c414a32089e726698256c95033cd1a4f9d28784",
+    "path": "/Semester 1/H01A0B - Analyse I/Examen en TTT/TTT/TTT 2007 Oplossing.pdf",
+    "filename": "TTT 2007 Oplossing.pdf",
+    "ext": "pdf",
+    "size_kb": 217.6,
+    "is_scanned": false,
+    "page1_text": "1e bachelor ingenieurswetenschappen Modeloplossing testnamiddag analyse oktober 2007 1. Beschouw de krommeC gelegen in hetx-y–vlak (z = 0), met als vergelijking in poolco¨ordinaten r = sin 2θ,0 ≤ θ ≤ π/2 en het omwentelingsoppervlakS dat men bekomt d",
+    "fallback_text": null
+  },
+  {
+    "file_id": "670d15aa6047500bc3ba78ae6d5ef63ea258f722",
+    "path": "/Semester 1/H01A0B - Analyse I/Examen en TTT/TTT/TTT 2008 Opgaven.pdf",
+    "filename": "TTT 2008 Opgaven.pdf",
+    "ext": "pdf",
+    "size_kb": 201.6,
+    "is_scanned": false,
+    "page1_text": "1e bachelor ingenieurswetenschappen Testnamiddag analyse oktober 2008 0.5 1 1.5 2 –2 –1 1 2 –1–0.5 0.51 1.52 1 –2 –1 1 2–1 –0.5 0.5 1 1.5 2 1. (a) Geef een parametrisatie voor het kegeloppervlakS dat men bekomt door het vast punt￿p0 =( 0, 1, 1) te ve",
+    "fallback_text": null
+  },
+  {
+    "file_id": "2a9442ecc6e14a6167c0db757aea65445f37bb25",
+    "path": "/Semester 1/H01A0B - Analyse I/Examen en TTT/TTT/TTT 2008 Oplossing.pdf",
+    "filename": "TTT 2008 Oplossing.pdf",
+    "ext": "pdf",
+    "size_kb": 238.2,
+    "is_scanned": false,
+    "page1_text": "1e bachelor ingenieurswetenschappen Modeloplossing testnamiddag analyse oktober 2008 0.5 1 1.5 2 –2 –1 1 2 –1–0.5 0.51 1.52 1 –2 –1 1 2–1 –0.5 0.5 1 1.5 2 1. (a) Geef een parametrisatie voor het kegeloppervlakS dat men bekomt door het vast punt￿p0 =(",
+    "fallback_text": null
+  },
+  {
+    "file_id": "0045e929bf9aead4b354b42952e8f1714080796b",
+    "path": "/Semester 1/H01A0B - Analyse I/Examen en TTT/TTT/TTT 2009 Opgaven.pdf",
+    "filename": "TTT 2009 Opgaven.pdf",
+    "ext": "pdf",
+    "size_kb": 229.2,
+    "is_scanned": false,
+    "page1_text": "Bachelor ingenieurswetenschappen Tussentijdse toets analyse oktober 2009 1. Beschouw het regeloppervlakS dat men bekomt door het punt￿p0 =( 0, 0, 1) te verbinden met een bewegend punt op de cirkel (x − 2)2 + y2 =4 ,z = −1. (a) Geef een parametrisatie",
+    "fallback_text": null
+  },
+  {
+    "file_id": "7915246a62dcb90fe226af3f176fe45b4501450b",
+    "path": "/Semester 1/H01A0B - Analyse I/Examen en TTT/TTT/TTT 2009 Oplossing.pdf",
+    "filename": "TTT 2009 Oplossing.pdf",
+    "ext": "pdf",
+    "size_kb": 268.8,
+    "is_scanned": false,
+    "page1_text": "Bachelor ingenieurswetenschappen Modeloplossing tussentijdse toets analyse oktober 2009 1. Beschouw het regeloppervlakS dat men bekomt door het punt￿p0 =( 0, 0, 1) te verbinden met een bewegend punt op de cirkel (x − 2)2 + y2 =4 ,z = −1. (a) Geef een",
+    "fallback_text": null
+  },
+  {
+    "file_id": "2bfb3560df2464e98db21c4c824c5d4ad14af282",
+    "path": "/Semester 1/H01A0B - Analyse I/Examen en TTT/TTT/TTT 2010 Opgaven.pdf",
+    "filename": "TTT 2010 Opgaven.pdf",
+    "ext": "pdf",
+    "size_kb": 64.9,
+    "is_scanned": false,
+    "page1_text": "Bachelor ingenieurswetenschappen Tussentijdse toets analyse november 2010 1. Beschouw het regeloppervlakS dat men bekomt door een bewegend punt op de ellips 4x2 + y2 =4 ,z = 0 te verbinden met het vast punt￿p0 =( 0, 2, 1). (a) Geef een parametrisatie",
+    "fallback_text": null
+  },
+  {
+    "file_id": "4265ea84c0c23495ca3463af7d44d1adbc6a3e3e",
+    "path": "/Semester 1/H01A0B - Analyse I/Examen en TTT/TTT/TTT 2010 Oplossing.pdf",
+    "filename": "TTT 2010 Oplossing.pdf",
+    "ext": "pdf",
+    "size_kb": 127.3,
+    "is_scanned": false,
+    "page1_text": "Bachelor ingenieurswetenschappen Modeloplossing tussentijdse toets analyse november 2010 1. Beschouw het regeloppervlakS dat men bekomt door een bewegend punt op de ellips 4x2 + y2 =4 ,z = 0 te verbinden met het vast punt￿p0 =( 0, 2, 1). (a) Geef een",
+    "fallback_text": null
+  },
+  {
+    "file_id": "004096699d26576d657af62543f2396b2c8e064b",
+    "path": "/Semester 1/H01A0B - Analyse I/Examen en TTT/TTT/TTT 2011 Opgaven.pdf",
+    "filename": "TTT 2011 Opgaven.pdf",
+    "ext": "pdf",
+    "size_kb": 51.3,
+    "is_scanned": false,
+    "page1_text": "Bachelor ingenieurswetenschappen Tussentijdse toets analyse november 2011 1. Beschouw de cirkelsC1 en C2 met cartesische vergelijkingx2 + (y − 1)2 = 1, z = 0 enx2 + (y − 2)2 = 4,z = 2 respectievelijk. (a) Geef een parametrisatie⃗ γ1(u) voor C1 en ⃗ γ",
+    "fallback_text": null
+  },
+  {
+    "file_id": "48cc27fd07e4f574b0fd4b3c8b0831794fbca5ae",
+    "path": "/Semester 1/H01A0B - Analyse I/Examen en TTT/TTT/TTT 2011 Oplossing.pdf",
+    "filename": "TTT 2011 Oplossing.pdf",
+    "ext": "pdf",
+    "size_kb": 115.4,
+    "is_scanned": false,
+    "page1_text": "1e bachelor ingenieurswetenschappen Modeloplossing testnamiddag analyse november 2011 1. Beschouw de cirkelsC1 en C2 met cartesische vergelijkingx2 + (y − 1)2 = 1, z = 0 enx2 + (y − 2)2 = 4,z = 2 respectievelijk. (a) Geef een parametrisatie⃗ γ1(u) vo",
+    "fallback_text": null
+  }
+]
+
+Output only valid JSON array matching the schema.
