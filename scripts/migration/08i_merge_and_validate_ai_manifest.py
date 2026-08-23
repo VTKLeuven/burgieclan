@@ -18,14 +18,52 @@ import os
 import re
 from collections import Counter, defaultdict
 
-# Load allowed tags
+# Load the tag vocabulary. This file is the single source of truth: the literal tag
+# names, the aliases that map legacy/regex-era names onto them, and the per-category
+# redundancy rules all live there, not in this module.
 VOCAB_FILE = "migration_data/tag_vocabulary.json"
 ALLOWED_TAGS = set()
+TAG_PATTERNS = []
+TAG_ALIASES = {}
+REDUNDANT_IN_CATEGORY = {}
+
 if os.path.exists(VOCAB_FILE):
     with open(VOCAB_FILE, "r", encoding="utf-8") as f:
         v_data = json.load(f)
-        for cat, tags in v_data.items():
-            ALLOWED_TAGS.update(tags)
+
+    for tags in v_data.get("groups", {}).values():
+        ALLOWED_TAGS.update(tags)
+
+    for spec in v_data.get("patterns", {}).values():
+        TAG_PATTERNS.append(re.compile(spec["regex"]))
+
+    TAG_ALIASES = dict(v_data.get("aliases", {}))
+    REDUNDANT_IN_CATEGORY = {
+        int(cat_id): set(tags)
+        for cat_id, tags in v_data.get("redundant_in_category", {}).items()
+    }
+
+
+def canonicalize_tag(tag):
+    """
+    Maps a raw tag onto its canonical vocabulary name, or None if it is not in the
+    vocabulary at all.
+
+    Aliases are resolved BEFORE the vocabulary check, so a rename in
+    tag_vocabulary.json never silently discards tags already written by an earlier
+    pipeline stage - it migrates them.
+    """
+    t = " ".join(str(tag).strip().split())
+    if not t:
+        return None
+
+    t = TAG_ALIASES.get(t, t)
+
+    if t in ALLOWED_TAGS:
+        return t
+    if any(p.match(t) for p in TAG_PATTERNS):
+        return t
+    return None
 
 CURRENT_MAX_YEAR = 2025
 
@@ -74,6 +112,58 @@ def verify_academic_year(year_candidate, record):
     # Not verified in input -> mechanically reject hallucination
     return None
 
+HANDWRITING_EVIDENCE = re.compile(
+    r'handgeschreven|hand-?written|lesnota|nota\b|notities|geschreven|schrift',
+    re.IGNORECASE,
+)
+
+
+def has_handwriting_evidence(record):
+    """
+    True only when something positively indicates handwriting.
+
+    Deliberately NOT inferred from is_scanned_handwritten: that flag detects an
+    image-based document, which in this archive is overwhelmingly photographed
+    PRINTED material (exam papers, textbook pages). 'Scan' describes the medium,
+    'Handgeschreven' describes the content, and conflating them mislabels roughly
+    1,900 printed scans as handwritten.
+    """
+    text = f"{record.get('path', '')} {record.get('filename', '')}"
+    preview = record.get('content_preview') or {}
+    text += f" {preview.get('page1_text', '')}"
+    return bool(HANDWRITING_EVIDENCE.search(text))
+
+
+# Parenthesised tokens that look like an author slot but are not names. Filenames use
+# "(...)" for both credit ("(Kato Kenis)") and status ("NPV Table (Empty).pdf"), so the
+# status words have to be rejected explicitly.
+NON_AUTHOR_TOKENS = {
+    'empty', 'leeg', 'blanco', 'blank', 'oplossing', 'oplossingen', 'opgave',
+    'opgaven', 'solution', 'solutions', 'antwoorden', 'vragen', 'questions',
+    'theorie', 'theory', 'copy', 'kopie', 'final', 'nieuw', 'new', 'oud', 'old',
+    'herexamen', 'examen', 'exam', 'deel', 'part', 'nl', 'en', 'eng', 'engels',
+    'english', 'dutch', 'scan', 'handgeschreven', 'slides', 'code', 'script',
+    'onbekend', 'unknown', 'student', 'anoniem', 'anonymous', 'praktisch',
+    'samenvatting', 'formularium', 'verslag', 'notities',
+}
+
+
+def is_plausible_author(name):
+    """Rejects status markers and vocabulary words that occupy the author slot."""
+    n = " ".join(str(name).strip().split())
+    if len(n) <= 2:
+        return False
+    if n.lower() in NON_AUTHOR_TOKENS:
+        return False
+    # "Oplossing Caro" style: a status word glued to a name contributes no reliable
+    # attribution, so drop the whole candidate rather than guess where it splits.
+    if any(part.lower() in NON_AUTHOR_TOKENS for part in n.split()):
+        return False
+    if not any(ch.isalpha() for ch in n):
+        return False
+    return True
+
+
 def is_takehome_graded_submission(record):
     """Detects student's graded coursework / take-home exam submissions."""
     full_str = f"{record.get('path', '')} {record.get('filename', '')}".lower()
@@ -95,7 +185,14 @@ def resolve_photo_sequences(records):
     for r in records:
         ext = r.get('extension', '').lower()
         if ext in image_exts:
-            parent = os.path.dirname(r.get('path', ''))
+            # Keyed by repo + course as well as folder: the same folder path can
+            # legitimately exist in two repositories, and a sequence must never be
+            # numbered across a course boundary.
+            parent = (
+                r.get('repo_name', ''),
+                r.get('course_id'),
+                os.path.dirname(r.get('path', '')),
+            )
             folder_images[parent].append(r)
             
     # Process folders with multiple images
@@ -109,15 +206,19 @@ def resolve_photo_sequences(records):
                 
             sorted_imgs = sorted(imgs, key=natural_sort_key)
             total = len(sorted_imgs)
-            folder_name = os.path.basename(parent) or "Document"
+            folder_name = os.path.basename(parent[2]) or "Document"
             clean_folder_title = re.sub(r'[_.\-]+', ' ', folder_name).strip()
             
             for idx, img_rec in enumerate(sorted_imgs, start=1):
                 img_rec['_photo_sequence_title'] = f"{clean_folder_title} (p. {idx}/{total})"
                 img_rec['category_id'] = img_rec.get('category_id', 4) # Default exercises/notes
-                # Ensure Handgeschreven tag
+                # An image sequence is by definition a Scan (medium). It is only
+                # Handgeschreven (content) if something actually says so - most of
+                # these folders are photographed printed exams, not notes.
                 tags = img_rec.get('tags', [])
-                if 'Handgeschreven' not in tags:
+                if 'Scan' not in tags:
+                    tags.append('Scan')
+                if has_handwriting_evidence(img_rec) and 'Handgeschreven' not in tags:
                     tags.append('Handgeschreven')
                 img_rec['tags'] = tags
 
@@ -160,9 +261,9 @@ def validate_and_merge_record(ai_output, orig_record):
     else:
         author = ai_output.get('author') or orig_record.get('author')
         if author:
-            author_str = str(author).strip()
-            # Reject bogus author strings
-            if len(author_str) > 2 and not any(k in author_str.lower() for k in ['prof', 'dr', 'studie', 'groep', 'admin', 'vtk', 'examen', 'take home']):
+            author_str = " ".join(str(author).strip().split())
+            institutional = ['prof', 'dr.', 'studie', 'groep', 'admin', 'vtk', 'take home']
+            if is_plausible_author(author_str) and not any(k in author_str.lower() for k in institutional):
                 merged['author'] = author_str
             else:
                 merged['author'] = None
@@ -174,21 +275,27 @@ def validate_and_merge_record(ai_output, orig_record):
     valid_tags = []
     cat_id = merged['category_id']
     
+    redundant_here = REDUNDANT_IN_CATEGORY.get(cat_id, set())
+
     for t in raw_tags:
-        t_clean = str(t).strip()
-        if t_clean in ALLOWED_TAGS:
-            # Rule: Strip redundant category-mirroring tags
-            if cat_id == 6 and t_clean == 'Slides':
-                continue
-            if cat_id == 7 and t_clean in ['Code / Script', 'Labo & Code']:
-                continue
-            if cat_id == 4 and t_clean in ['Oefeningen', 'Oefenzittingen']:
-                continue
-            if cat_id == 3 and t_clean in ['Samenvatting', 'Samenvattingen']:
-                continue
-            if t_clean not in valid_tags:
-                valid_tags.append(t_clean)
-                
+        # Aliases first, so legacy names are migrated rather than dropped.
+        t_clean = canonicalize_tag(t)
+        if t_clean is None:
+            continue
+        # A tag that only restates this category carries no information here, but may
+        # still be informative in another category - hence the per-category check
+        # rather than removing it from the vocabulary.
+        if t_clean in redundant_here:
+            continue
+        if t_clean not in valid_tags:
+            valid_tags.append(t_clean)
+
+    # Legacy 'Handgeschreven / Scan' aliases to 'Scan' (the only part of it the
+    # detector actually established). Re-add the handwriting claim where there is
+    # independent evidence for it, so genuinely handwritten notes keep the tag.
+    if has_handwriting_evidence(orig_record) and 'Handgeschreven' not in valid_tags:
+        valid_tags.append('Handgeschreven')
+
     merged['tags'] = valid_tags
     return merged
 
@@ -198,17 +305,117 @@ def resolve_course_collisions(records_in_course):
     """
     title_counts = Counter(r['display_title'] for r in records_in_course)
     seen_titles = defaultdict(int)
-    
+
     for r in records_in_course:
         t = r['display_title']
         if title_counts[t] > 1:
             seen_titles[t] += 1
             idx = seen_titles[t]
-            # Disambiguate with part or file index
-            r['display_title'] = f"{t} (Deel {idx})"
+            # Deliberately NOT "(Deel N)": 'Deel' denotes a genuine numbered part of a
+            # document (and is a tag in its own right), so reusing it as a collision
+            # counter would invent parts that do not exist. A bare index reads as what
+            # it is - an arbitrary tie-break - and leaves the first document untouched.
+            if idx > 1:
+                r['display_title'] = f"{t} ({idx})"
             
+def run_pipeline(records, ai_by_file_id=None):
+    """
+    Runs the full validation pipeline over `records`.
+
+    `ai_by_file_id` maps file_id -> the LLM's object for that file. Any record with
+    no entry is merged against an empty dict, which exercises the deterministic
+    fallback: the record keeps its regex-era title, category and tags, validated.
+
+    Returns (output_records, stats).
+    """
+    ai_by_file_id = ai_by_file_id or {}
+    stats = Counter()
+
+    kept = [r for r in records if not is_meme_or_varia(r)]
+    stats['input'] = len(records)
+    stats['filtered_meme_varia'] = len(records) - len(kept)
+
+    resolve_photo_sequences(kept)
+    stats['photo_sequenced'] = sum(1 for r in kept if '_photo_sequence_title' in r)
+
+    merged = []
+    for r in kept:
+        ai_out = ai_by_file_id.get(r.get('file_id'), {})
+        if ai_out:
+            stats['ai_covered'] += 1
+        else:
+            stats['ai_fallback'] += 1
+        merged.append(validate_and_merge_record(ai_out, r))
+
+    by_course = defaultdict(list)
+    for r in merged:
+        by_course[r.get('course_id')].append(r)
+
+    for course_records in by_course.values():
+        before = Counter(r['display_title'] for r in course_records)
+        stats['collisions_resolved'] += sum(n - 1 for n in before.values() if n > 1)
+        resolve_course_collisions(course_records)
+
+    for r in merged:
+        r.pop('_photo_sequence_title', None)
+        stats['year_set'] += 1 if r.get('year') else 0
+        stats['author_set'] += 1 if r.get('author') else 0
+        stats['tags_total'] += len(r.get('tags') or [])
+
+    stats['courses'] = len(by_course)
+    stats['output'] = len(merged)
+    return merged, stats
+
+
 def main():
-    print("08i Validation and Merge Engine ready.")
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Merge and validate AI normalizer output.")
+    parser.add_argument(
+        "--input",
+        default="migration_data/pilot_5_courses_input.json",
+        help="Staged manifest to validate (JSON array).",
+    )
+    parser.add_argument(
+        "--ai-output",
+        default=None,
+        help="LLM output (JSON array of objects with file_id). Omit to run the "
+             "deterministic fallback path only.",
+    )
+    parser.add_argument(
+        "--output",
+        default="migration_data/pilot_5_courses_validated.json",
+        help="Where to write the validated manifest.",
+    )
+    args = parser.parse_args()
+
+    with open(args.input, "r", encoding="utf-8") as f:
+        records = json.load(f)
+
+    ai_by_file_id = {}
+    if args.ai_output:
+        with open(args.ai_output, "r", encoding="utf-8") as f:
+            for obj in json.load(f):
+                if obj.get("file_id"):
+                    ai_by_file_id[obj["file_id"]] = obj
+
+    merged, stats = run_pipeline(records, ai_by_file_id)
+
+    with open(args.output, "w", encoding="utf-8") as f:
+        json.dump(merged, f, indent=2, ensure_ascii=False)
+
+    print(f"input records            {stats['input']}")
+    print(f"  filtered (meme/varia)  {stats['filtered_meme_varia']}")
+    print(f"  photo-sequenced        {stats['photo_sequenced']}")
+    print(f"  LLM-covered            {stats['ai_covered']}")
+    print(f"  deterministic fallback {stats['ai_fallback']}")
+    print(f"collisions resolved      {stats['collisions_resolved']}")
+    print(f"years set                {stats['year_set']}")
+    print(f"authors set              {stats['author_set']}")
+    print(f"tag assignments          {stats['tags_total']}")
+    print(f"courses                  {stats['courses']}")
+    print(f"written to {args.output} ({stats['output']} records)")
+
 
 if __name__ == '__main__':
     main()
