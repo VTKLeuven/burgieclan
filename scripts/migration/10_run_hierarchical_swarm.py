@@ -69,8 +69,13 @@ def normalize_single_document(doc, course_code, course_name, cluster_id):
             tags.append("Scan")
             
     full_text = f"{path} {fn} {p1_text}".lower()
-    if any(k in full_text for k in ["handgeschreven", "handwritten", "lesnota", "notities"]) and "Handgeschreven" not in tags:
-        tags.append("Handgeschreven")
+    fn_path_lower = f"{path} {fn}".lower()
+    if any(k in fn_path_lower for k in ["handgeschreven", "handwritten", "manueel", "eigen notities", "eigen nota"]):
+        if "Handgeschreven" not in tags:
+            tags.append("Handgeschreven")
+    elif any(k in p1_text.lower() for k in ["handgeschreven", "handwritten", "manueel"]) and not any(k in p1_text.lower() for k in ["open boek", "rekenmachine", "examen duurt"]):
+        if "Handgeschreven" not in tags:
+            tags.append("Handgeschreven")
         
     # Tooling & Languages
     ext = doc.get("extension", "").lower()
