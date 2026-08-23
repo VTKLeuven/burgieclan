@@ -100,6 +100,11 @@ flowchart TD
 1. Master Orchestrator spawns **8 Cluster Lead Subagents** via `invoke_subagent`.
 2. Each Cluster Lead dispatches **Course Subagents in dynamic worker pools of 3–5 concurrent courses**.
 3. Each Course Subagent processes its documents in **20–25 document micro-chunks** with fresh context:
+   - **Deep Path & Directory Breadcrumb Reasoning**: Evaluates the full directory hierarchy (e.g. `/2de bach/H08U5A/Cursus/Pre 2018 (Mark Huyse)/...`) alongside Page 1 text:
+     - **Curriculum Eras & Boundary Years**: Resolves cohort years (`2011-2012`, `Pre 2018` $\rightarrow$ `2017 - 2018`, `Vanaf 2018-2019` $\rightarrow$ `2018 - 2019`).
+     - **Parent Topics & Chapter Sub-titles**: Enriches generic filenames with topic breadcrumbs (e.g. `Boek Adams Calculus - Oplossingen Hoofdstuk 10 (Vectors and Coordinate Geometry)`).
+     - **Misplaced File Detection**: Detects and reclassifies misplaced exams, summaries, midterms (TTTs), slides, and code.
+     - **Strict Handwriting Reasoning**: Validates genuine student handwriting vs printed scans.
    - Emits standardized JSON array: `{ file_id, display_title, category_id, year, author, tags }`.
    - Atomic disk checkpointing: immediately saves `migration_data/batches/{course_code}.json`.
 4. Cluster Leads aggregate completed course batches and report completion to Master.
