@@ -113,25 +113,29 @@ def verify_academic_year(year_candidate, record):
     return None
 
 HANDWRITING_EVIDENCE = re.compile(
-    r'handgeschreven|hand-?written|lesnota|nota\b|notities|geschreven|schrift',
+    r'\b(handgeschreven|handwritten|manueel|hand-geschreven|eigen\s+notities|eigen\s+nota)\b',
     re.IGNORECASE,
 )
 
 
 def has_handwriting_evidence(record):
     """
-    True only when something positively indicates handwriting.
-
-    Deliberately NOT inferred from is_scanned_handwritten: that flag detects an
-    image-based document, which in this archive is overwhelmingly photographed
-    PRINTED material (exam papers, textbook pages). 'Scan' describes the medium,
-    'Handgeschreven' describes the content, and conflating them mislabels roughly
-    1,900 printed scans as handwritten.
+    True only when something positively indicates genuine student handwriting.
+    Excludes exam open-book instructions mentioning 'zelfgeschreven nota's'.
     """
-    text = f"{record.get('path', '')} {record.get('filename', '')}"
+    fn_path = f"{record.get('path', '')} {record.get('filename', '')}"
+    if HANDWRITING_EVIDENCE.search(fn_path):
+        return True
+        
     preview = record.get('content_preview') or {}
-    text += f" {preview.get('page1_text', '')}"
-    return bool(HANDWRITING_EVIDENCE.search(text))
+    p1 = preview.get('page1_text', '')
+    if HANDWRITING_EVIDENCE.search(p1):
+        # Guard against open-book exam instructions mentioning 'open boek: ... zelfgeschreven nota's'
+        if 'open boek' in p1.lower() or 'rekenmachine' in p1.lower() or 'examen duurt' in p1.lower():
+            return False
+        return True
+        
+    return False
 
 
 # Parenthesised tokens that look like an author slot but are not names. Filenames use
