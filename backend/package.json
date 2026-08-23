@@ -13,7 +13,7 @@
         "imports-loader": "5.0.0",
         "lato-font": "3.0.0",
         "regenerator-runtime": "0.14.1",
-        "sass": "1.102.0",
+        "sass": "1.103.0",
         "sass-loader": "17.0.0",
         "webpack": "5.109.2",
         "webpack-cli": "7.2.2"
