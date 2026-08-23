@@ -27,20 +27,24 @@ The LLM outputs a structured JSON array matching a strict schema.
 2. CANONICAL NAMING CONVENTIONS BY MATERIAL TYPE
 --------------------------------------------------------------------------------
 
-Every generated `canonical_title` must strictly follow these standard templates:
+Every generated `display_title` must strictly follow these standard templates:
 
 A. EXAMS (Category ID: 2 - Examens)
    Template:  Examen [Dag] [Maand] [Jaar] [- Deel X] [(Oplossing|Modeloplossing|Opgave)] [(Auteur)]
+              Examenvragen [Sessie / Jaar] [- Onderwerp] [(Auteur)]
    Examples:  - "Examen 19 Juni 2017 - Deel 1 (Oplossing)"
               - "Examen Januari 2021 (Opgave)"
-              - "Examen 2 September 2019 (2de zit) (Oplossing) (Student 064)"
+              - "Examen 2 September 2019 (Herexamen) (Oplossing) (Student 064)"
               - "Examenvragen Juni 2023 (Kobe)"
+              - "Examen Reconstructie 2022 - Vraag 1 & 2"
 
 B. EXERCISE SESSIONS & HOMEWORK (Category ID: 4 - Oefenzittingen)
    Template:  Oefenzitting [Nr / Onderwerp] [- Deel X] [(Oplossing|Verslag)] [(Auteur)]
+              Bundel Oefeningen [- Onderwerp] [(Jaar)]
    Examples:  - "Oefenzitting 3 - Pompen en Compressoren (Oplossing)"
               - "Oefenzitting 5 - Fourier Transformaties (Opgave)"
               - "Huiswerk 2 - Statica van Vakwerken (Oplossing) (Student 083)"
+              - "Bundel Oefeningen Pompen & Compressoren (2024 - 2025)"
               - "P&O Verslag - Reverse Engineering Tandwielkast"
 
 C. SUMMARIES & NOTES (Category ID: 3 - Samenvattingen)
@@ -65,36 +69,30 @@ F. MIDTERMS / TTT (Category ID: 5 - TTT's)
    Examples:  - "TTT 1 Oktober 2014 - Vragenreeks 1 (Opgave)"
               - "TTT November 2018 (Oplossing) (Student 105)"
 
+G. PHOTO SEQUENCES (Images in subfolders e.g. 106 page scans)
+   Rule:      Automatically indexed as "[Folder Name] (p. {idx}/{total})".
+              Never name image sequences identically!
+
 --------------------------------------------------------------------------------
-3. ORTHOGONAL TAG TAXONOMY & FORMAT DETECTION
+3. ORTHOGONAL TAG TAXONOMY (Single Source of Truth: tag_vocabulary.json)
 --------------------------------------------------------------------------------
 
-RULE: Tags must be strictly orthogonal to the category. NEVER add 'Oefeningen'
-under Oefenzittingen or 'Samenvatting' under Samenvattingen.
+RULE: Tags must be strictly orthogonal to the category.
+- NEVER add 'Slides' under Category 6 (Slides / Lesmateriaal).
+- NEVER add 'Code / Script' under Category 7 (Labo & Code).
+- NEVER add 'Oefeningen' under Category 4 (Oefenzittingen).
+- NEVER add 'Samenvatting' under Category 3 (Samenvattingen).
 
 Allowed Tag Vocabulary:
-- Solution State:    'Oplossing', 'Modeloplossing', 'Opgave (Blanco)'
-- Exam Sessions:     'Januari', 'Juni', 'Augustus / September (2de zit)', 'Tussentijds (Midterm)'
-- Medium / Format:   'Handgeschreven', 'Code / Script', 'Slides'
-- Document Content:  'Theorie', 'Examenvragen', 'Lesnotities', 'Verslag / Project',
-                     'Formularium', 'Meerkeuze', 'Mondeling'
-- Scope / Division:  'Deel 1', 'Deel 2', 'Deel 3'
+- Solution State:    'Oplossing', 'Oplossing (Student)', 'Modeloplossing', 'Opgave (Blanco)'
+- Exam Sessions:     'Januari', 'Juni', 'Herexamen (2de zit)', 'Tussentijds (Midterm)',
+                     'Reconstructie / Vragen', 'Oefeningen (Examen)'
+- Tools & Languages: 'MATLAB', 'Python', 'Java', 'C / C++', 'Excel'
+- Format & Nature:   'Scan', 'Handgeschreven', 'Theorie', 'Lesnotities', 'Verslag / Project',
+                     'Formularium', 'Bundel / Alle', 'Meerkeuze', 'Mondeling',
+                     'Studiewijzer / Gids', 'Dataset / Data'
+- Scope / Division:  'Deel 1', 'Deel 2', 'Deel 3', 'Deel 4'
 - Language:          'English'
-
-3.1 DEEP HANDWRITTEN VS SCAN VS DIGITAL DETECTION HEURISTICS
-The system inspects 4 distinct technical signals for every document:
-1. Producer/Creator Metadata:
-   - Hardware Scanners (Fujitsu ScanSnap, Canon, HP, Xerox, Samsung): -> 'Handgeschreven'
-   - Mobile Scan Apps (CamScanner, Office Lens, Adobe Scan, Genius Scan): -> 'Handgeschreven'
-   - Digital Engines (Microsoft Word, LaTeX with hyperref, Typst, LibreOffice): -> 'Digitaal'
-2. Page 1 Character Density:
-   - 0 to 30 characters on Page 1 -> Pure raster image / photo scan -> 'Handgeschreven'.
-   - 200+ characters of selectable font streams -> Digital LaTeX / Word document.
-3. Content & Title Cues:
-   - Keywords: 'handgeschreven', 'notities', 'nota', 'lesnota', 'geschreven' -> 'Handgeschreven'
-4. Graphic / Image Object Ratio:
-   - Embedded full-page raster XObjects spanning 100% of media box -> 'Handgeschreven'.
-
 
 --------------------------------------------------------------------------------
 4. AUTHOR & YEAR EXTRACTION RULES
@@ -103,17 +101,19 @@ The system inspects 4 distinct technical signals for every document:
 - Authors:
   - If a student creator name is detected in the filename, path, or Page 1 text
     (e.g., "door Student 064", "Student 083", "Student 053"), populate `author`: "Full Name"
-    and append `(Full Name)` to the canonical title.
-  - Do NOT mistake professor names (e.g. "Prof. Dejaeger", "Prof. Indekeu", "Bultheel")
-    for student authors. Professor names go inside the title e.g. `(Prof. Dejaeger)`.
+    and append `(Full Name)` to the `display_title`.
+  - Do NOT mistake professor names (e.g. "Prof. Dejaeger", "Prof. Indekeu") for student authors.
+    Professor names remain in the title e.g. `(Prof. Dejaeger)`.
+  - Coursework Carve-Out: Student names on graded take-home assignments or individual submissions
+    must NOT be promoted to author credits.
 
 - Academic Years:
-  - Format: Strictly "YYYY - YYYY" (e.g. "2018 - 2019").
-  - Only set if explicit date/year is found in filename, session, or Page 1 text.
-  - If year is unknown, return `null`. NEVER guess from upload timestamp.
+  - Format: Strictly "YYYY - YYYY" (e.g. "2018 - 2019", with Y2 = Y1 + 1 and Y1 <= 2025).
+  - Only set if the year explicitly appears in filename, session, or Page 1 text.
+  - If year is unverified/unknown, return `null`. The validator rejects invented years.
 
 --------------------------------------------------------------------------------
-5. INPUT / OUTPUT SCHEMA EXAMPLE
+5. INPUT / OUTPUT SCHEMA (Exact Importer-Aligned Keys)
 --------------------------------------------------------------------------------
 
 INPUT (Fed to LLM per file):
@@ -129,24 +129,24 @@ INPUT (Fed to LLM per file):
   "fallback_text": null
 }
 
-DESIRED OUTPUT (Returned by LLM):
+DESIRED OUTPUT (Returned by LLM - Matches ImportSeafileCommand keys exactly):
 {
   "file_id": "fb5bb8433d37188637a0f6deb725b62737821d4b",
-  "canonical_title": "Lesnotities Management Challenges Deel 1 (Prof. Dejaeger) (Student 064)",
+  "display_title": "Lesnotities Deel 1 - Will Our Chemical Industry Become a Fossil? (Prof. Dejaeger) (Student 064)",
   "category_id": 3,
-  "academic_year": "2023 - 2024",
+  "year": null,
   "author": "Student 064",
   "tags": ["Lesnotities", "Deel 1", "English"]
 }
 
 --------------------------------------------------------------------------------
-6. SAFETY, VALIDATION & FALLBACK SYSTEM
+6. MECHANICAL VALIDATION & COLLISION GUARDRAILS (08i Script)
 --------------------------------------------------------------------------------
 
-1. Schema Validation: Pydantic / JSON schema validator checks every returned object.
-2. Character Limits: Titles enforced <= 255 chars, years strictly match `^\d{4} - \d{4}$` or null.
-3. Category Guard: `category_id` must be an integer in [2, 3, 4, 5, 6, 7].
-4. Tag Filter: Only allowed tags in the vocabulary are stored.
-5. Deterministic Fallback: If an LLM call fails or times out, the system defaults
-   to the existing high-quality regex title and tags with zero data loss.
+1. Exact ID & Length Check: Hard-fails if any file_id is dropped, duplicated, or misaligned.
+2. Mechanical Year Guard: Asserts year string literally appears in input; nulls hallucinations.
+3. Length Capping: Titles capped at 200 chars (safe for VARCHAR(255) and suffixes).
+4. Per-Course Collision Disambiguation: Detects identical titles in the same course and appends part indices.
+5. Vocabulary Enforcement: Strips any non-vocabulary tags and non-orthogonal category mirrors.
+6. Field-by-Field Merge: Merges each field independently with deterministic fallback.
 ================================================================================

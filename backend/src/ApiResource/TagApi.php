@@ -42,18 +42,4 @@ class TagApi extends BaseEntityApi
         ]
     )]
     public ?string $name = null;
-
-    /**
-     * @var DocumentApi[]
-     */
-    #[Groups(
-        [
-            SerializationGroups::TAG_GET,
-            SerializationGroups::SEARCH,
-            SerializationGroups::USER,
-            SerializationGroups::DOCUMENT_GET,
-            SerializationGroups::DOCUMENT_CREATE
-        ]
-    )]
-    public array $documents = [];
 }
