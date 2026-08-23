@@ -45,7 +45,9 @@ jobs:
         run: php bin/console api:openapi:export > /tmp/openapi-pr.json
 
       - name: Checkout base branch
-        run: git checkout origin/${{ github.base_ref }}
+        run: |
+          git reset --hard
+          git checkout -f origin/${{ github.base_ref }}
 
       - name: Clear stale cache from PR branch
         run: rm -rf var/cache/*
