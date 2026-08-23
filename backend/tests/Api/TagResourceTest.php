@@ -32,7 +32,6 @@ class TagResourceTest extends ApiTestCase
                 '@id',
                 '@type',
                 'name',
-                'documents',
                 'createdAt',
                 'updatedAt',
             ],
@@ -202,7 +201,6 @@ class TagResourceTest extends ApiTestCase
     {
         $tagData = [
             'name' => 'New Test Tag',
-            'documents' => []
         ];
 
         $response = $this->browser()
@@ -218,8 +216,7 @@ class TagResourceTest extends ApiTestCase
             )
             ->assertStatus(201)
             ->assertJson()
-            ->assertJsonMatches('"name"', 'New Test Tag')
-            ->assertJsonMatches('length("documents")', 0);
+            ->assertJsonMatches('"name"', 'New Test Tag');
 
         // Verify the tag was actually created
         $tagIRI = $response->json()->decoded()['@id'] ?? null;
@@ -259,44 +256,18 @@ class TagResourceTest extends ApiTestCase
             ->assertJsonMatches('"@id"', $tagIRI);
     }
 
-    public function testCreateTagWithDocuments(): void
+    public function testTagDoesNotExposeItsDocuments(): void
     {
-        // Create some documents first that we'll associate with our new tag
-        $document1 = DocumentFactory::createOne();
-        $document2 = DocumentFactory::createOne();
+        // A tag can be attached to tens of thousands of documents once the legacy
+        // archive is imported, so TagApi never serializes them. Documents are
+        // attached from the Document side and found through the collection filter.
+        $tag = TagFactory::createOne(['name' => 'Tag With Documents']);
+        $document1 = DocumentFactory::createOne(['tags' => [$tag]]);
+        $document2 = DocumentFactory::createOne(['tags' => [$tag]]);
 
-        $tagData = [
-            'name' => 'Tag With Documents',
-            'documents' => [
-                '/api/documents/' . $document1->getId(),
-                '/api/documents/' . $document2->getId()
-            ]
-        ];
-
-        // Create the tag with document references
-        $response = $this->browser()
-            ->post(
-                '/api/tags',
-                [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->token,
-                        'Content-Type' => 'application/ld+json'
-                    ],
-                    'json' => $tagData
-                ]
-            )
-            ->assertStatus(201)
-            ->assertJson()
-            ->assertJsonMatches('"name"', 'Tag With Documents')
-            ->assertJsonMatches('length("documents")', 2);
-
-        $tagIRI = $response->json()->decoded()['@id'] ?? null;
-        $this->assertNotNull($tagIRI);
-
-        // Verify the tag was created with the correct documents
-        $response = $this->browser()
+        $tagResponse = $this->browser()
             ->get(
-                $tagIRI,
+                '/api/tags/' . $tag->getId(),
                 [
                     'headers' => [
                         'Authorization' => 'Bearer ' . $this->token
@@ -306,38 +277,37 @@ class TagResourceTest extends ApiTestCase
             ->assertStatus(200)
             ->assertJson()
             ->assertJsonMatches('"name"', 'Tag With Documents')
-            ->assertJsonMatches('length("documents")', 2)
             ->json()->decoded();
 
-        $documentIRIsInResponse = array_map(
+        $this->assertArrayNotHasKey('documents', $tagResponse);
+
+        // The supported direction: filter the documents collection by the tag.
+        $filtered = $this->browser()
+            ->get(
+                '/api/documents?tags[]=/api/tags/' . $tag->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJson()
+            ->json()->decoded();
+
+        $documentIRIs = array_map(
             fn($doc) => $doc['@id'],
-            $response['documents']
+            $filtered['member'] ?? $filtered['hydra:member'] ?? []
         );
-        $this->assertContains('/api/documents/' . $document1->getId(), $documentIRIsInResponse);
-        $this->assertContains('/api/documents/' . $document2->getId(), $documentIRIsInResponse);
 
-        // Verify the relationship from the document side (optional)
-        $response = $this->browser()
-            ->get(
-                '/api/documents/' . $document1->getId(),
-                [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->token
-                    ]
-                ]
-            )
-            ->assertStatus(200)
-            ->assertJson()
-            ->json()->decoded();
-
-        $this->assertContains('Tag With Documents', array_column($response['tags'], 'name'));
+        $this->assertContains('/api/documents/' . $document1->getId(), $documentIRIs);
+        $this->assertContains('/api/documents/' . $document2->getId(), $documentIRIs);
     }
 
     public function testCreateTagWithoutAuthentication(): void
     {
         $tagData = [
             'name' => 'Unauthorized Tag',
-            'documents' => []
         ];
 
         $this->browser()
@@ -356,9 +326,7 @@ class TagResourceTest extends ApiTestCase
     public function testCreateTagWithMissingRequiredFields(): void
     {
         // name is required
-        $tagData = [
-            'documents' => []
-        ];
+        $tagData = [];
 
         $this->browser()
             ->post(

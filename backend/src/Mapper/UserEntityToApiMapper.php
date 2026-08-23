@@ -7,6 +7,7 @@ use App\ApiResource\DocumentApi;
 use App\ApiResource\ModuleApi;
 use App\ApiResource\ProgramApi;
 use App\ApiResource\UserApi;
+use App\Constants\MappingContext;
 use App\Entity\Course;
 use App\Entity\Document;
 use App\Entity\Module;
@@ -40,6 +41,12 @@ class UserEntityToApiMapper extends BaseEntityToApiMapper
         $to->fullName = $from->getFullName();
         $to->username = $from->getUsername();
         $to->email = $from->getEmail();
+        $to->defaultAnonymous = $from->isDefaultAnonymous();
+
+        if ($context[MappingContext::SUMMARY] ?? false) {
+            return $to;
+        }
+
         $to->favoriteCourses = array_map(
             function (Course $course) {
                 return $this->microMapper->map(

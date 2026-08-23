@@ -3,21 +3,18 @@
 namespace App\Mapper;
 
 use App\ApiResource\TagApi;
-use App\Entity\Document;
 use App\Entity\Tag;
 use App\Repository\TagRepository;
 use Exception;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
-use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 #[AsMapper(from: TagApi::class, to: Tag::class)]
 class TagApiToEntityMapper implements MapperInterface
 {
     public function __construct(
         private readonly TagRepository $repository,
-        private readonly MicroMapperInterface $microMapper,
     ) {}
 
     /**
@@ -57,16 +54,10 @@ class TagApiToEntityMapper implements MapperInterface
         }
         $to->setName($from->name);
 
-        foreach ($from->documents as $document) {
-            $documentEntity = $this->microMapper->map(
-                $document,
-                Document::class,
-                [
-                    MicroMapperInterface::MAX_DEPTH => 0,
-                ]
-            );
-            $to->addDocument($documentEntity);
-        }
+        // Documents are attached from the Document side (POST /api/documents with
+        // tags[]), never from here. A tag can carry tens of thousands of documents
+        // once the Seafile archive is imported, so TagApi deliberately does not
+        // expose them in either direction.
 
         return $to;
     }
