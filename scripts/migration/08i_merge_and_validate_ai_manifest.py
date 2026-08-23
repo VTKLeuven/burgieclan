@@ -82,8 +82,20 @@ P_VOOR_FULL = re.compile(r'\b(?:voor|pre[-_]?|before)\s*(\d{4})\s*[-_/]\s*(\d{2,
 P_VOOR_SINGLE = re.compile(r'\b(?:voor|pre[-_]?|before)\s*(\d{4})\b', re.IGNORECASE)
 
 
+CURRICULUM_ERA_MAP = {
+    'analyse (met boek pearson)': '2008 - 2009',
+}
+
+
 def extract_boundary_year(text):
     """Extracts boundary academic year from phrases like 'vanaf 2018-2019', 'pre 2018', 'tot 2017'."""
+    text_lower = text.lower()
+    
+    # Check curriculum era mappings (excluding timeless book solution manuals)
+    for era_key, era_year in CURRICULUM_ERA_MAP.items():
+        if era_key in text_lower and 'oplossingen boek' not in text_lower:
+            return era_year
+            
     m = P_VANAF_FULL.search(text)
     if m:
         y1 = int(m.group(1))
