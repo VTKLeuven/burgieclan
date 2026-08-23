@@ -204,6 +204,11 @@
             "deselect-all": "Deselecteer alles",
             "clear-selection": "Selectie wissen",
             "favorites-see-all": "Bekijk alle favorieten"
+        },
+        "related": {
+            "predecessors": "Vroeger gegeven als",
+            "successors": "Nu gegeven als",
+            "equivalents": "Gelijkwaardig aan"
         }
     },
     "download": {
