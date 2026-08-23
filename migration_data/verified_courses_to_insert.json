@@ -1,0 +1,290 @@
+{
+  "H01T4A": {
+    "code": "H01T4A",
+    "name": "Ontwerp van elektronische producten",
+    "name_nl": "Ontwerp van elektronische producten",
+    "name_en": "Design of Electronic Products"
+  },
+  "H02A8A": {
+    "code": "H02A8A",
+    "name": "Spraak- en audioverwerking",
+    "name_nl": "Spraak- en audioverwerking",
+    "name_en": "Audio and Speech Processing"
+  },
+  "H01M4A": {
+    "code": "H01M4A",
+    "name": "Elektromagnetische interferentie",
+    "name_nl": "Elektromagnetische interferentie",
+    "name_en": "Electromagnetic Interference"
+  },
+  "H01B8A": {
+    "code": "H01B8A",
+    "name": "Warmte-overdracht",
+    "name_nl": "Warmte-overdracht",
+    "name_en": "Heat Transfer"
+  },
+  "H01M0A": {
+    "code": "H01M0A",
+    "name": "Vermogenselektronica",
+    "name_nl": "Vermogenselektronica",
+    "name_en": "Power Electronics"
+  },
+  "H04J7A": {
+    "code": "H04J7A",
+    "name": "Milieu- en transporttechniek",
+    "name_nl": "Milieu- en transporttechniek",
+    "name_en": "Environmental and Transportation Engineering"
+  },
+  "H04V3A": {
+    "code": "H04V3A",
+    "name": "Additive Manufacturing",
+    "name_nl": "Additive Manufacturing",
+    "name_en": "Additive Manufacturing"
+  },
+  "H03F0A": {
+    "code": "H03F0A",
+    "name": "Optimalisatietechnieken",
+    "name_nl": "Optimalisatietechnieken",
+    "name_en": "Optimization Techniques"
+  },
+  "H03G0A": {
+    "code": "H03G0A",
+    "name": "Bio-ethiek",
+    "name_nl": "Bio-ethiek",
+    "name_en": "Bioethics"
+  },
+  "H04M1A": {
+    "code": "H04M1A",
+    "name": "Oppervlaktetechnologie van materialen",
+    "name_nl": "Oppervlaktetechnologie van materialen",
+    "name_en": "Surface Technology of Materials"
+  },
+  "H0H08A": {
+    "code": "H0H08A",
+    "name": "Inleiding in celbiologie en anatomie van de mens",
+    "name_nl": "Inleiding in celbiologie en anatomie van de mens",
+    "name_en": "Introduction to Cell Biology and Human Anatomy"
+  },
+  "H04T1A": {
+    "code": "H04T1A",
+    "name": "Dimensionele meettechniek",
+    "name_nl": "Dimensionele meettechniek",
+    "name_en": "Dimensional Metrology"
+  },
+  "H04T5A": {
+    "code": "H04T5A",
+    "name": "Gevorderde verspanende technieken",
+    "name_nl": "Gevorderde verspanende technieken",
+    "name_en": "Advanced Machining Processes"
+  },
+  "H04U0A": {
+    "code": "H04U0A",
+    "name": "Computer Integrated Manufacturing",
+    "name_nl": "Computer Integrated Manufacturing",
+    "name_en": "Computer Integrated Manufacturing"
+  },
+  "H01J6A": {
+    "code": "H01J6A",
+    "name": "Elektronica en signaalverwerking",
+    "name_nl": "Elektronica en signaalverwerking",
+    "name_en": "Electronics and Signal Processing"
+  },
+  "H04T7A": {
+    "code": "H04T7A",
+    "name": "Niet-conventionele bewerkingsmethoden",
+    "name_nl": "Niet-conventionele bewerkingsmethoden",
+    "name_en": "Non-conventional Machining Methods"
+  },
+  "H01A4A": {
+    "code": "H01A4A",
+    "name": "Natuurkunde, deel 1",
+    "name_nl": "Natuurkunde, deel 1",
+    "name_en": "Physics, Part 1"
+  },
+  "H01D0A": {
+    "code": "H01D0A",
+    "name": "Constructie van gebouwen 1",
+    "name_nl": "Constructie van gebouwen 1",
+    "name_en": "Building Construction 1"
+  },
+  "H01D2A": {
+    "code": "H01D2A",
+    "name": "Constructie van gebouwen 2",
+    "name_nl": "Constructie van gebouwen 2",
+    "name_en": "Building Construction 2"
+  },
+  "H01G8B": {
+    "code": "H01G8B",
+    "name": "Building Information Modeling (BIM)",
+    "name_nl": "Building Information Modeling (BIM)",
+    "name_en": "Building Information Modeling (BIM)"
+  },
+  "H9XA1A": {
+    "code": "H9XA1A",
+    "name": "Structurele materialen",
+    "name_nl": "Structurele materialen",
+    "name_en": "Structural Materials"
+  },
+  "H01Q8A": {
+    "code": "H01Q8A",
+    "name": "Constructie van gebouwen 3",
+    "name_nl": "Constructie van gebouwen 3",
+    "name_en": "Building Construction 3"
+  },
+  "D0M14A": {
+    "code": "D0M14A",
+    "name": "Macro-economie I",
+    "name_nl": "Macro-economie I",
+    "name_en": "Advanced Macroeconomics I"
+  },
+  "H04Q0A": {
+    "code": "H04Q0A",
+    "name": "Fysica van kernreactoren",
+    "name_nl": "Fysica van kernreactoren",
+    "name_en": "Physics of Nuclear Reactors"
+  },
+  "H08T9A": {
+    "code": "H08T9A",
+    "name": "Toegepaste hydraulica",
+    "name_nl": "Toegepaste hydraulica",
+    "name_en": "Applied Hydraulics"
+  },
+  "H01C6B": {
+    "code": "H01C6B",
+    "name": "Wegenbouw en spoorwegen",
+    "name_nl": "Wegenbouw en spoorwegen",
+    "name_en": "Road and Railway Engineering"
+  },
+  "H09M1A": {
+    "code": "H09M1A",
+    "name": "Verkeersstroomtheorie en dynamiek",
+    "name_nl": "Verkeersstroomtheorie en dynamiek",
+    "name_en": "Traffic Flow Theory"
+  },
+  "H08U4A": {
+    "code": "H08U4A",
+    "name": "Systeemtheorie",
+    "name_nl": "Systeemtheorie",
+    "name_en": "System Theory"
+  },
+  "H0H61A": {
+    "code": "H0H61A",
+    "name": "Statistische methoden voor biomedische signaal- en beeldanalyse",
+    "name_nl": "Statistische methoden voor biomedische signaal- en beeldanalyse",
+    "name_en": "Statistical Methods for Biomedical Signal and Image Analysis"
+  },
+  "H01O2A": {
+    "code": "H01O2A",
+    "name": "Landschapsarchitectuur",
+    "name_nl": "Landschapsarchitectuur",
+    "name_en": "Landscape Architecture"
+  },
+  "H01U1A": {
+    "code": "H01U1A",
+    "name": "Constructie van gebouwen 4",
+    "name_nl": "Constructie van gebouwen 4",
+    "name_en": "Building Construction 4"
+  },
+  "H01A0A": {
+    "code": "H01A0A",
+    "name": "Ingenieur en bouwkunst",
+    "name_nl": "Ingenieur en bouwkunst",
+    "name_en": "Engineering and Architecture"
+  },
+  "H04O6A": {
+    "code": "H04O6A",
+    "name": "Gebouwentechniek en duurzaamheid",
+    "name_nl": "Gebouwentechniek en duurzaamheid",
+    "name_en": "Building Engineering and Sustainable Design"
+  },
+  "H01C2B": {
+    "code": "H01C2B",
+    "name": "Bouwmaterialen: bindmiddelen en beton",
+    "name_nl": "Bouwmaterialen: bindmiddelen en beton",
+    "name_en": "Building Materials: Binders and Concrete"
+  },
+  "H06A1A": {
+    "code": "H06A1A",
+    "name": "Geavanceerde nano-elektronische componenten",
+    "name_nl": "Geavanceerde nano-elektronische componenten",
+    "name_en": "Advanced Nano-Electronic Components"
+  },
+  "H06E6A": {
+    "code": "H06E6A",
+    "name": "Geïntegreerde RF-componenten en circuits",
+    "name_nl": "Geïntegreerde RF-componenten en circuits",
+    "name_en": "Integrated RF Components and Circuits"
+  },
+  "H06B0A": {
+    "code": "H06B0A",
+    "name": "Supergeleiding en magnetisme",
+    "name_nl": "Supergeleiding en magnetisme",
+    "name_en": "Superconductivity"
+  },
+  "D0M15A": {
+    "code": "D0M15A",
+    "name": "Besluitvormingsmodellen",
+    "name_nl": "Besluitvormingsmodellen",
+    "name_en": "Decision Making Models"
+  },
+  "H01I8A": {
+    "code": "H01I8A",
+    "name": "Structuurgenese van materialen",
+    "name_nl": "Structuurgenese van materialen",
+    "name_en": "Structure Formation of Materials"
+  },
+  "H01I6A": {
+    "code": "H01I6A",
+    "name": "Materiaalkeuze en degradatie",
+    "name_nl": "Materiaalkeuze en degradatie",
+    "name_en": "Materials Selection and Degradation"
+  },
+  "H01J3A": {
+    "code": "H01J3A",
+    "name": "Chemische thermodynamica en kinetica",
+    "name_nl": "Chemische thermodynamica en kinetica",
+    "name_en": "Chemical Thermodynamics and Kinetics"
+  },
+  "D0M18A": {
+    "code": "D0M18A",
+    "name": "Human Resource Management",
+    "name_nl": "Human Resource Management",
+    "name_en": "Human Resource Management"
+  },
+  "H01S0A": {
+    "code": "H01S0A",
+    "name": "Management accounting",
+    "name_nl": "Management accounting",
+    "name_en": "Management Accounting"
+  },
+  "H02A1A": {
+    "code": "H02A1A",
+    "name": "Declaratieve talen en probleemoplossen",
+    "name_nl": "Declaratieve talen en probleemoplossen",
+    "name_en": "Declarative Problem Solving Paradigms in AI"
+  },
+  "H01T0A": {
+    "code": "H01T0A",
+    "name": "Cel- en weefselbiologie",
+    "name_nl": "Cel- en weefselbiologie",
+    "name_en": "Cell and Tissue Biology"
+  },
+  "H06C0A": {
+    "code": "H06C0A",
+    "name": "Fysica en technologie voor nano-elektronica",
+    "name_nl": "Fysica en technologie voor nano-elektronica",
+    "name_en": "Materials Physics and Technology for Nanoelectronics"
+  },
+  "H02A9A": {
+    "code": "H02A9A",
+    "name": "Software voor ingebedde systemen",
+    "name_nl": "Software voor ingebedde systemen",
+    "name_en": "Software for Real-time and Embedded Systems"
+  },
+  "H01F2A": {
+    "code": "H01F2A",
+    "name": "Bedrijfskunde en entrepreneurship",
+    "name_nl": "Bedrijfskunde en entrepreneurship",
+    "name_en": "Business Economics and Entrepreneurship"
+  }
+}

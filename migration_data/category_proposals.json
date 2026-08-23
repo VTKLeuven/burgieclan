@@ -1,0 +1,34 @@
+{
+  "Overig / Other": {
+    "file_count": 2248,
+    "total_mb": 10463.78
+  },
+  "Slides / Lesmateriaal": {
+    "file_count": 3038,
+    "total_mb": 11989.8
+  },
+  "Examens": {
+    "file_count": 2843,
+    "total_mb": 6129.97
+  },
+  "Oefenzittingen": {
+    "file_count": 4623,
+    "total_mb": 12201.23
+  },
+  "Samenvattingen": {
+    "file_count": 2701,
+    "total_mb": 16181.5
+  },
+  "Labo & Code": {
+    "file_count": 2125,
+    "total_mb": 204.41
+  },
+  "Verslagen & Projecten": {
+    "file_count": 597,
+    "total_mb": 902.66
+  },
+  "TTT's": {
+    "file_count": 121,
+    "total_mb": 63.31
+  }
+}

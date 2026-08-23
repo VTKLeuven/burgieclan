@@ -1,0 +1,37 @@
+{
+  "total_documents": 16905,
+  "total_courses": 389,
+  "explicit_verified_years_count": 7035,
+  "null_years_count": 9870,
+  "categories_breakdown": {
+    "Samenvattingen": 5671,
+    "Examens": 2565,
+    "Oefenzittingen": 5461,
+    "Slides / Lesmateriaal": 1621,
+    "Labo & Code": 1472,
+    "TTT's": 115
+  },
+  "authors_identified_count": 303,
+  "total_authored_documents": 1453,
+  "top_tags": {
+    "Oplossing": 3047,
+    "Handgeschreven / Scan": 2063,
+    "Deel 1": 1913,
+    "Deel 2": 1769,
+    "Slides": 1656,
+    "Code / Script": 1475,
+    "Theorie": 864,
+    "Reconstructie / Vragen": 591,
+    "Lesnotities": 546,
+    "Opgave (Blanco)": 472,
+    "Verslag / Project": 244,
+    "Juni": 179,
+    "Modeloplossing": 171,
+    "Oefeningen (Examen)": 110,
+    "Januari": 105,
+    "Augustus / September (2de zit)": 77,
+    "Formularium": 74,
+    "Deel 3": 64,
+    "Mondeling": 1
+  }
+}

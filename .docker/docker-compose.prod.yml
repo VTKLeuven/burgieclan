@@ -80,6 +80,13 @@ services:
       S3_SECRET_KEY: ${S3_SECRET_KEY:?S3_SECRET_KEY is required}
       S3_REGION: ${S3_REGION:?S3_REGION is required}
 
+      # S3 Backup Storage
+      S3_BACKUP_BUCKET: ${S3_BACKUP_BUCKET:-}
+      S3_BACKUP_ENDPOINT: ${S3_BACKUP_ENDPOINT:-}
+      S3_BACKUP_REGION: ${S3_BACKUP_REGION:-}
+      S3_BACKUP_ACCESS_KEY: ${S3_BACKUP_ACCESS_KEY:-}
+      S3_BACKUP_SECRET_KEY: ${S3_BACKUP_SECRET_KEY:-}
+
     # Volume mounts
     volumes:
       # Data directory - where uploaded files are stored

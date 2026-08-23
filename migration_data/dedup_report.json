@@ -1,0 +1,18 @@
+{
+  "total_raw_files": 19604,
+  "quarantined_junk_count": 431,
+  "junk_reasons": {
+    "zero_byte": 11,
+    "junk_filename (^desktop\\.ini$)": 2,
+    "junk_filename (^Thumbs\\.db$)": 1,
+    "junk_filename (^\\._)": 412,
+    "junk_path (/__pycache__/)": 3,
+    "junk_filename (^\\.DS_Store$)": 2
+  },
+  "valid_files_count": 19173,
+  "unique_content_count": 17553,
+  "duplicate_instances": 1620,
+  "total_clean_gb": 57.02,
+  "unique_content_gb": 53.59,
+  "saved_gb": 3.42
+}
