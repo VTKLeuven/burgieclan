@@ -1,0 +1,276 @@
+{
+  "cluster_id": 4,
+  "cluster_name": "Computer Science & AI",
+  "stats": {
+    "docs": 2125,
+    "courses": 33,
+    "blind_docs": 615,
+    "rich_docs": 1510
+  },
+  "courses": [
+    {
+      "course_code": "H01B6B",
+      "course_name": "Methodiek van de informatica",
+      "course_id": 12,
+      "total_docs": 502,
+      "rich_docs": 398,
+      "blind_docs": 104
+    },
+    {
+      "course_code": "H01P1A",
+      "course_name": "Modular Programming",
+      "course_id": 62,
+      "total_docs": 47,
+      "rich_docs": 37,
+      "blind_docs": 10
+    },
+    {
+      "course_code": "G0Q43A",
+      "course_name": "Computernetwerken",
+      "course_id": 76,
+      "total_docs": 127,
+      "rich_docs": 92,
+      "blind_docs": 35
+    },
+    {
+      "course_code": "H06U1A",
+      "course_name": "Artificial Intelligence",
+      "course_id": 73,
+      "total_docs": 75,
+      "rich_docs": 54,
+      "blind_docs": 21
+    },
+    {
+      "course_code": "H01P5B",
+      "course_name": "Computerarchitectuur en systeemsoftware",
+      "course_id": 77,
+      "total_docs": 170,
+      "rich_docs": 97,
+      "blind_docs": 73
+    },
+    {
+      "course_code": "H01P3A",
+      "course_name": "Numerical Approximation with Application in Data Science",
+      "course_id": 63,
+      "total_docs": 164,
+      "rich_docs": 139,
+      "blind_docs": 25
+    },
+    {
+      "course_code": "H01Z2A",
+      "course_name": "Elektrische netwerken",
+      "course_id": 14,
+      "total_docs": 109,
+      "rich_docs": 43,
+      "blind_docs": 66
+    },
+    {
+      "course_code": "H0R01A",
+      "course_name": "Statistiek en data science",
+      "course_id": 18,
+      "total_docs": 116,
+      "rich_docs": 92,
+      "blind_docs": 24
+    },
+    {
+      "course_code": "H03G5A",
+      "course_name": "Advanced Methods in Cryptography",
+      "course_id": 1395,
+      "total_docs": 8,
+      "rich_docs": 8,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H05D3A",
+      "course_name": "Computer Architectures",
+      "course_id": 1364,
+      "total_docs": 18,
+      "rich_docs": 6,
+      "blind_docs": 12
+    },
+    {
+      "course_code": "H05D7A",
+      "course_name": "Computer-Aided IC Design",
+      "course_id": 1370,
+      "total_docs": 9,
+      "rich_docs": 6,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H05E1B",
+      "course_name": "Cryptography and Network Security",
+      "course_id": 546,
+      "total_docs": 58,
+      "rich_docs": 52,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H09J9A",
+      "course_name": "Software for Real-Time Control",
+      "course_id": 1383,
+      "total_docs": 14,
+      "rich_docs": 7,
+      "blind_docs": 7
+    },
+    {
+      "course_code": "H02C1A",
+      "course_name": "Machine Learning and Inductive Inference",
+      "course_id": 1632,
+      "total_docs": 2,
+      "rich_docs": 1,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H08M0A",
+      "course_name": "Brain Computer Interfaces",
+      "course_id": 1643,
+      "total_docs": 6,
+      "rich_docs": 2,
+      "blind_docs": 4
+    },
+    {
+      "course_code": "H0N50A",
+      "course_name": "Artificial Organs and Tissue Engineering",
+      "course_id": 2074,
+      "total_docs": 17,
+      "rich_docs": 0,
+      "blind_docs": 17
+    },
+    {
+      "course_code": "D0I62A",
+      "course_name": "Principles of Database Management",
+      "course_id": 2079,
+      "total_docs": 2,
+      "rich_docs": 1,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H01T3C",
+      "course_name": "Informatica",
+      "course_id": 109,
+      "total_docs": 102,
+      "rich_docs": 51,
+      "blind_docs": 51
+    },
+    {
+      "course_code": "G0Q35A",
+      "course_name": "Besturingssystemen",
+      "course_id": 75,
+      "total_docs": 61,
+      "rich_docs": 37,
+      "blind_docs": 24
+    },
+    {
+      "course_code": "H0N65B",
+      "course_name": "Inleiding tot gegevensbanken",
+      "course_id": 79,
+      "total_docs": 229,
+      "rich_docs": 174,
+      "blind_docs": 55
+    },
+    {
+      "course_code": "H0M82A",
+      "course_name": "Methods and Algorithms for Advanced Process Control",
+      "course_id": 1376,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H0M86B",
+      "course_name": "Scientific Software",
+      "course_id": 561,
+      "total_docs": 6,
+      "rich_docs": 5,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H02D2A",
+      "course_name": "Uncertainty in Artificial Intelligence",
+      "course_id": 1633,
+      "total_docs": 14,
+      "rich_docs": 13,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H02D1A",
+      "course_name": "Genetic Algorithms and Evolutionary Computing",
+      "course_id": 528,
+      "total_docs": 14,
+      "rich_docs": 8,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H07Z9B",
+      "course_name": "Software Architecture",
+      "course_id": 521,
+      "total_docs": 9,
+      "rich_docs": 8,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0V16A",
+      "course_name": "Fundamentals of Computer Graphics",
+      "course_id": 555,
+      "total_docs": 27,
+      "rich_docs": 26,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H04K5A",
+      "course_name": "Development of Secure Software",
+      "course_id": 540,
+      "total_docs": 72,
+      "rich_docs": 66,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H0E98A",
+      "course_name": "Principles of Machine Learning",
+      "course_id": 520,
+      "total_docs": 51,
+      "rich_docs": 45,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "G0K32A",
+      "course_name": "Requirements Engineering for Complex Software Systems",
+      "course_id": 543,
+      "total_docs": 31,
+      "rich_docs": 18,
+      "blind_docs": 13
+    },
+    {
+      "course_code": "H0Q31A",
+      "course_name": "Security Through the Software Lifecycle",
+      "course_id": 547,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H04U0A",
+      "course_name": "Computer Integrated Manufacturing",
+      "course_id": 2459,
+      "total_docs": 42,
+      "rich_docs": 3,
+      "blind_docs": 39
+    },
+    {
+      "course_code": "H02A5A",
+      "course_name": "Computer Vision",
+      "course_id": 532,
+      "total_docs": 20,
+      "rich_docs": 18,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H02A9A",
+      "course_name": "Software for Real-time and Embedded Systems",
+      "course_id": 2492,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    }
+  ]
+}

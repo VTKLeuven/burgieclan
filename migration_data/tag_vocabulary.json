@@ -1,0 +1,112 @@
+{
+  "_comment": [
+    "Single source of truth for the document tag vocabulary.",
+    "Read by scripts/migration/08f_ai_batch_refiner.py (to build the prompt) and by",
+    "scripts/migration/08i_merge_and_validate_ai_manifest.py (to validate LLM output).",
+    "Do not hardcode tag names anywhere else.",
+    "",
+    "Orthogonality test for adding a tag: a tag is allowed to be concentrated in one",
+    "category as long as it SUBDIVIDES that category into groups a student would filter",
+    "on (e.g. 'Formularium' and 'Lesnotities' inside Samenvattingen). A tag that merely",
+    "RESTATES the category name (e.g. 'Slides' inside 'Slides / Lesmateriaal') carries no",
+    "information there - list it under redundant_in_category instead of deleting it, so it",
+    "keeps working in the categories where it is informative."
+  ],
+  "groups": {
+    "solution_state": [
+      "Oplossing",
+      "Modeloplossing",
+      "Opgave (Blanco)"
+    ],
+    "exam_sessions": [
+      "Januari",
+      "Juni",
+      "Herexamen (2de zit)",
+      "Tussentijds (Midterm)"
+    ],
+    "format_and_content": [
+      "Scan",
+      "Handgeschreven",
+      "Slides",
+      "Code / Script",
+      "Theorie",
+      "Lesnotities",
+      "Verslag / Project",
+      "Formularium",
+      "Reconstructie / Vragen",
+      "Oefeningen (Examen)",
+      "Bundel / Alle",
+      "Meerkeuze",
+      "Mondeling",
+      "Studiewijzer / Gids",
+      "Dataset / Data"
+    ],
+    "tools_and_languages": [
+      "MATLAB",
+      "Python",
+      "Java",
+      "C / C++",
+      "Excel"
+    ],
+    "language": [
+      "English"
+    ],
+    "provenance": [
+      "old-burgieclan"
+    ]
+  },
+
+  "notes": [
+    "'Scan' is a MEDIUM: the document is an image or photo rather than selectable text. It says nothing about what is on the page - a photographed printed exam is a Scan.",
+    "'Handgeschreven' is CONTENT: the page carries handwriting. Apply it only when you can actually see handwriting, not merely because the document is a scan.",
+    "The two are independent and may appear together. Most scans in this archive are photographed printed material, so do not assume a scan is handwritten.",
+    "'MATLAB', 'Python', 'Java', 'C / C++', 'Excel' identify the programming language, software stack, or spreadsheet tool used.",
+    "'old-burgieclan' is the provenance tag automatically attached to all documents migrated from the legacy archive."
+  ],
+
+  "patterns": {
+    "divisions": {
+      "regex": "^Deel ([1-9]|1[0-9])$",
+      "prompt_hint": "'Deel 1', 'Deel 2', ... up to 'Deel 19' (only when the document is an explicitly numbered part)"
+    }
+  },
+
+  "aliases": {
+    "Handgeschreven / Scan": "Scan",
+    "Gescand": "Scan",
+    "Augustus / September (2de zit)": "Herexamen (2de zit)",
+    "Augustus": "Herexamen (2de zit)",
+    "September": "Herexamen (2de zit)",
+    "2de zit": "Herexamen (2de zit)",
+    "Oplossing (Student)": "Oplossing",
+    "Antwoorden": "Oplossing",
+    "Opgave": "Opgave (Blanco)",
+    "Code": "Code / Script",
+    "Script": "Code / Script",
+    "Verslag": "Verslag / Project",
+    "Project": "Verslag / Project",
+    "Reconstructie": "Reconstructie / Vragen",
+    "Midterm": "Tussentijds (Midterm)",
+    "Engels": "English",
+    "Matlab": "MATLAB",
+    "C++": "C / C++",
+    "C": "C / C++",
+    "Spreadsheet": "Excel",
+    "Studiewijzer": "Studiewijzer / Gids",
+    "Gids": "Studiewijzer / Gids",
+    "Dataset": "Dataset / Data",
+    "Data": "Dataset / Data",
+    "Old Burgieclan": "old-burgieclan",
+    "old burgieclan": "old-burgieclan",
+    "Old-Burgieclan": "old-burgieclan"
+  },
+
+  "redundant_in_category": {
+    "2": ["Examen", "Examens", "Examenvragen"],
+    "3": ["Samenvatting", "Samenvattingen"],
+    "4": ["Oefeningen", "Oefenzittingen"],
+    "5": ["TTT", "TTT's", "Tussentijds (Midterm)"],
+    "6": ["Slides"],
+    "7": ["Code / Script", "Labo & Code", "Labo"]
+  }
+}

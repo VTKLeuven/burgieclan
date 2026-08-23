@@ -169,6 +169,10 @@ class DocumentApi extends NodeApi
     #[Groups([SerializationGroups::DOCUMENT_GET, SerializationGroups::DOCUMENT_CREATE])]
     public ?string $year = null;
 
+    #[ApiFilter(SearchFilter::class, strategy: 'ipartial')]
+    #[Groups([SerializationGroups::SEARCH, SerializationGroups::DOCUMENT_GET, SerializationGroups::DOCUMENT_CREATE])]
+    public ?string $author = null;
+
     #[ApiProperty(writable: false)]
     #[ApiFilter(BooleanFilter::class)]
     #[Groups([SerializationGroups::SEARCH, SerializationGroups::DOCUMENT_GET])]

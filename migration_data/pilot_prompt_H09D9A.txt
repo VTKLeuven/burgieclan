@@ -1,0 +1,88 @@
+### Course: [H09D9A] Management Challenges in the Chemical Industry
+Total Documents in this batch: 8
+
+Documents to standardize:
+[
+  {
+    "file_id": "fb5bb8433d37188637a0f6deb725b62737821d4b",
+    "path": "/Core Courses (3rd semester)/Management Challenges in the Chemical Industry/Management_Challenges_in_the_Chemical_Industry_(H09D9A)_--_MCCI_Prof._Dejaeger_(Lukas_Hiel).pdf",
+    "filename": "Management_Challenges_in_the_Chemical_Industry_(H09D9A)_--_MCCI_Prof._Dejaeger_(Lukas_Hiel).pdf",
+    "ext": "pdf",
+    "size_kb": 1875.4,
+    "is_scanned": false,
+    "page1_text": "Management Challenges in Chemical Industry – Class Notes Lukas Hiel PROF. DEJAEGER (1) Will Our Chemical Industry Become a Fossil? Fossil • Definition: o A fossil is the remains of a plant and animals are mostly fossilized o It also means outdated: i",
+    "fallback_text": null
+  },
+  {
+    "file_id": "76786318f8013875de3cd0e042ec4decc2afc8ef",
+    "path": "/Core Courses (3rd semester)/Management Challenges in the Chemical Industry/Management_Challenges_in_the_Chemical_Industry_(H09D9A)_--_MCCI_Prof._Sterckx_(Lukas_Hiel).pdf",
+    "filename": "Management_Challenges_in_the_Chemical_Industry_(H09D9A)_--_MCCI_Prof._Sterckx_(Lukas_Hiel).pdf",
+    "ext": "pdf",
+    "size_kb": 1459.8,
+    "is_scanned": false,
+    "page1_text": "Management Challenges in Chemical Industry – Class Notes Lukas Hiel PROF. STERCKX Part 1: Introduction General • Objectives: o Provide insight in the structure and characteristics of the chemical industry in the World, Europe, Belgium and Flanders o ",
+    "fallback_text": null
+  },
+  {
+    "file_id": "7c52ad02ef087bcf1deb56e2afe70a28f794b9c9",
+    "path": "/Core Courses (3rd semester)/Management Challenges in the Chemical Industry/NPV Table (Empty).pdf",
+    "filename": "NPV Table (Empty).pdf",
+    "ext": "pdf",
+    "size_kb": 98.9,
+    "is_scanned": false,
+    "page1_text": "YEAR 0 1 2 3 4 5 6 7 8 9 10 Investmen spread in time Spread of investment Production volume Price(€/ton) Turnover - raw material costs - Variable production costs = Contribution margin - Fixed production costs - EBIT-depreciations - Logistic costs - ",
+    "fallback_text": null
+  },
+  {
+    "file_id": "2da8c4bf7f4051062b65a0669f60d82532ac06dd",
+    "path": "/Core Courses (3rd semester)/Management Challenges in the Chemical Industry/Exams/Exam - Management Challenges (2022).pdf",
+    "filename": "Exam - Management Challenges (2022).pdf",
+    "ext": "pdf",
+    "size_kb": 213.6,
+    "is_scanned": false,
+    "page1_text": "Exam Management Challenges Prof. R. Keldermans 1 Willem De Brandt 1. Construct the balance sheet of your company “BestinChem” by structuring correctly components belonging to the active and passive sides of the balance. Missing positions can be added",
+    "fallback_text": null
+  },
+  {
+    "file_id": "035fb2188646291f64b4047e254ee2e79fbbed67",
+    "path": "/Core Courses (3rd semester)/Management Challenges in the Chemical Industry/Exams/Exam - Management Challenges (2022)_solution (Niels Stevens).pdf",
+    "filename": "Exam - Management Challenges (2022)_solution (Niels Stevens).pdf",
+    "ext": "pdf",
+    "size_kb": 7315.8,
+    "is_scanned": false,
+    "page1_text": "Exam Management Challenges Prof. R. Keldermans 1 Willem De Brandt 1. Construct the balance sheet of your company “BestinChem” by structuring correctly components belonging to the active and passive sides of the balance. Missing positions can be added",
+    "fallback_text": null
+  },
+  {
+    "file_id": "a5c26a58acd30f902554a09ffb5ed2702fe23ba2",
+    "path": "/Core Courses (3rd semester)/Management Challenges in the Chemical Industry/Exams/Management Exam questions wiki (Niels Stevens).docx",
+    "filename": "Management Exam questions wiki (Niels Stevens).docx",
+    "ext": "docx",
+    "size_kb": 31.6,
+    "is_scanned": false,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "0c37ad82c702e63c7f98e13af51d1abaa0a23d7d",
+    "path": "/Core Courses (3rd semester)/Management Challenges in the Chemical Industry/Exams/NPV table exam 2022 (Niels Stevens).xlsx",
+    "filename": "NPV table exam 2022 (Niels Stevens).xlsx",
+    "ext": "xlsx",
+    "size_kb": 17.8,
+    "is_scanned": false,
+    "page1_text": null,
+    "fallback_text": null
+  },
+  {
+    "file_id": "c1aaa71658ba3c10ffb058ef9686a156325b9e90",
+    "path": "/Core Courses (3rd semester)/Management Challenges in the Chemical Industry/Lecture Notes (Willem De Brandt)/Management Challenges (Lecture 1 - 6).pdf",
+    "filename": "Management Challenges (Lecture 1 - 6).pdf",
+    "ext": "pdf",
+    "size_kb": 23709.3,
+    "is_scanned": true,
+    "page1_text": null,
+    "fallback_text": null
+  }
+]
+
+Output only valid JSON array matching the schema.

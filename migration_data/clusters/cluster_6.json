@@ -1,0 +1,372 @@
+{
+  "cluster_id": 6,
+  "cluster_name": "Civil & Architecture (BWK/ARCH)",
+  "stats": {
+    "docs": 2338,
+    "courses": 45,
+    "blind_docs": 1114,
+    "rich_docs": 1224
+  },
+  "courses": [
+    {
+      "course_code": "H03P1B",
+      "course_name": "Constructiecomponenten: staal en hout",
+      "course_id": 38,
+      "total_docs": 14,
+      "rich_docs": 8,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H01S6B",
+      "course_name": "Westerse architectuurgeschiedenis: Middeleeuwen tot Nieuwste Tijd",
+      "course_id": 119,
+      "total_docs": 182,
+      "rich_docs": 59,
+      "blind_docs": 123
+    },
+    {
+      "course_code": "H01S4C",
+      "course_name": "Westerse architectuurtheorie: inleiding",
+      "course_id": 118,
+      "total_docs": 356,
+      "rich_docs": 267,
+      "blind_docs": 89
+    },
+    {
+      "course_code": "H01H3B",
+      "course_name": "Bouwfysica",
+      "course_id": 36,
+      "total_docs": 45,
+      "rich_docs": 44,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H01U3C",
+      "course_name": "Computationeel ontwerpen",
+      "course_id": 110,
+      "total_docs": 145,
+      "rich_docs": 142,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H08Z8A",
+      "course_name": "Sterkteleer 1",
+      "course_id": 111,
+      "total_docs": 61,
+      "rich_docs": 27,
+      "blind_docs": 34
+    },
+    {
+      "course_code": "H01C4C",
+      "course_name": "Wijsbegeerte",
+      "course_id": 26,
+      "total_docs": 127,
+      "rich_docs": 73,
+      "blind_docs": 54
+    },
+    {
+      "course_code": "H0H53A",
+      "course_name": "Technologie van bouwmaterialen",
+      "course_id": 40,
+      "total_docs": 17,
+      "rich_docs": 13,
+      "blind_docs": 4
+    },
+    {
+      "course_code": "H01A8A",
+      "course_name": "Algemene en technische scheikunde",
+      "course_id": 7,
+      "total_docs": 260,
+      "rich_docs": 91,
+      "blind_docs": 169
+    },
+    {
+      "course_code": "H0P86A",
+      "course_name": "Bouwakoestiek",
+      "course_id": 112,
+      "total_docs": 179,
+      "rich_docs": 20,
+      "blind_docs": 159
+    },
+    {
+      "course_code": "H01F5A",
+      "course_name": "Probabilistisch ontwerpen",
+      "course_id": 30,
+      "total_docs": 20,
+      "rich_docs": 17,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H02J6A",
+      "course_name": "Introduction to Environmental Technology",
+      "course_id": 1402,
+      "total_docs": 39,
+      "rich_docs": 25,
+      "blind_docs": 14
+    },
+    {
+      "course_code": "H0H55A",
+      "course_name": "P&O Bouwkunde",
+      "course_id": 35,
+      "total_docs": 46,
+      "rich_docs": 20,
+      "blind_docs": 26
+    },
+    {
+      "course_code": "H0P90A",
+      "course_name": "Duurzaamheid van betonstructuren",
+      "course_id": 1514,
+      "total_docs": 10,
+      "rich_docs": 10,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H04P9A",
+      "course_name": "Integrated Project",
+      "course_id": 2195,
+      "total_docs": 18,
+      "rich_docs": 6,
+      "blind_docs": 12
+    },
+    {
+      "course_code": "H03L1B",
+      "course_name": "Bouweconomie",
+      "course_id": 1530,
+      "total_docs": 16,
+      "rich_docs": 11,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "C00M1A",
+      "course_name": "Construction Law",
+      "course_id": 1531,
+      "total_docs": 45,
+      "rich_docs": 3,
+      "blind_docs": 42
+    },
+    {
+      "course_code": "H0R30A",
+      "course_name": "Theorie en management van verkeersstromen",
+      "course_id": 58,
+      "total_docs": 5,
+      "rich_docs": 0,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H0N82A",
+      "course_name": "Religions",
+      "course_id": 572,
+      "total_docs": 3,
+      "rich_docs": 3,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H03K7A",
+      "course_name": "Sociologie",
+      "course_id": 1929,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H05L7A",
+      "course_name": "Vernieuwbouw van structuren",
+      "course_id": 1509,
+      "total_docs": 29,
+      "rich_docs": 21,
+      "blind_docs": 8
+    },
+    {
+      "course_code": "H03Z0A",
+      "course_name": "Monumentenzorg",
+      "course_id": 1931,
+      "total_docs": 29,
+      "rich_docs": 4,
+      "blind_docs": 25
+    },
+    {
+      "course_code": "H0N76A",
+      "course_name": "Project gebouwentechniek 1",
+      "course_id": 1564,
+      "total_docs": 34,
+      "rich_docs": 25,
+      "blind_docs": 9
+    },
+    {
+      "course_code": "H0P75A",
+      "course_name": "Constructiecomponenten: gewapend beton, deel 2 en spanbeton",
+      "course_id": 1505,
+      "total_docs": 43,
+      "rich_docs": 33,
+      "blind_docs": 10
+    },
+    {
+      "course_code": "H03P7A",
+      "course_name": "Constructiecomponenten: gewapend beton, deel 1",
+      "course_id": 39,
+      "total_docs": 20,
+      "rich_docs": 18,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H0H06A",
+      "course_name": "Sterkteleer 2",
+      "course_id": 31,
+      "total_docs": 86,
+      "rich_docs": 24,
+      "blind_docs": 62
+    },
+    {
+      "course_code": "H01T7D",
+      "course_name": "Architectuurontwerp 1A",
+      "course_id": 124,
+      "total_docs": 4,
+      "rich_docs": 1,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H0H51A",
+      "course_name": "Elasticiteits- en plasticiteitsleer",
+      "course_id": 32,
+      "total_docs": 50,
+      "rich_docs": 30,
+      "blind_docs": 20
+    },
+    {
+      "course_code": "G0P08C",
+      "course_name": "Topografie",
+      "course_id": 1545,
+      "total_docs": 3,
+      "rich_docs": 3,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H04M9A",
+      "course_name": "Dynamica van constructies",
+      "course_id": 1510,
+      "total_docs": 39,
+      "rich_docs": 36,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H0P89A",
+      "course_name": "Constructiecomponenten: staal, deel 2",
+      "course_id": 1513,
+      "total_docs": 11,
+      "rich_docs": 10,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0V09A",
+      "course_name": "Geologie",
+      "course_id": 1547,
+      "total_docs": 41,
+      "rich_docs": 30,
+      "blind_docs": 11
+    },
+    {
+      "course_code": "H01V0A",
+      "course_name": "Westerse architectuurgeschiedenis: 19e-21e eeuw",
+      "course_id": 121,
+      "total_docs": 20,
+      "rich_docs": 18,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H01D0A",
+      "course_name": "oefeningen CVG",
+      "course_id": 2463,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H01D2A",
+      "course_name": "cvg 2",
+      "course_id": 2464,
+      "total_docs": 28,
+      "rich_docs": 1,
+      "blind_docs": 27
+    },
+    {
+      "course_code": "H01G8B",
+      "course_name": "BIM",
+      "course_id": 2465,
+      "total_docs": 3,
+      "rich_docs": 1,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H9XA1A",
+      "course_name": "Constructiematerialen",
+      "course_id": 2466,
+      "total_docs": 16,
+      "rich_docs": 10,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H01Q8A",
+      "course_name": "cvg3",
+      "course_id": 2467,
+      "total_docs": 12,
+      "rich_docs": 6,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H08T9A",
+      "course_name": "Hydraulica",
+      "course_id": 2470,
+      "total_docs": 64,
+      "rich_docs": 27,
+      "blind_docs": 37
+    },
+    {
+      "course_code": "H01C6B",
+      "course_name": "Wegenbouw",
+      "course_id": 2471,
+      "total_docs": 45,
+      "rich_docs": 43,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H09M1A",
+      "course_name": "Verkeersstroomtheorie",
+      "course_id": 2472,
+      "total_docs": 20,
+      "rich_docs": 17,
+      "blind_docs": 3
+    },
+    {
+      "course_code": "H02P4B",
+      "course_name": "Bouwen en wonen in ontwikkelingslanden",
+      "course_id": 1962,
+      "total_docs": 6,
+      "rich_docs": 0,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H01O2A",
+      "course_name": "Landscape Architecture",
+      "course_id": 2475,
+      "total_docs": 18,
+      "rich_docs": 0,
+      "blind_docs": 18
+    },
+    {
+      "course_code": "H02L4A",
+      "course_name": "Theory and Practice of Urbanism since 1945",
+      "course_id": 1944,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H01U1A",
+      "course_name": "Constructie van gebouwen 4",
+      "course_id": 2476,
+      "total_docs": 126,
+      "rich_docs": 25,
+      "blind_docs": 101
+    }
+  ]
+}

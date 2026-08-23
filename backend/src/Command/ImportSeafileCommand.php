@@ -521,6 +521,7 @@ class ImportSeafileCommand extends Command
         $document->setUnderReview(false);
         $document->setAnonymous(false);
         $document->setYear($year);
+        $document->setAuthor($this->toNullableString($record['author'] ?? null));
         $document->setSeafileFileId($fileId);
 
         $tags = $record['tags'] ?? [];

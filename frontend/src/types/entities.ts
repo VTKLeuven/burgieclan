@@ -69,6 +69,7 @@ export interface Document extends NodeEntity {
     course?: Course;
     category?: DocumentCategory;
     year?: string;
+    author?: string;
     underReview?: boolean;
     anonymous?: boolean;
     contentUrl?: string;
@@ -103,7 +104,6 @@ export interface QuickLink extends BaseEntity {
 
 export interface Tag extends BaseEntity {
     name?: string;
-    documents?: Document[];
 }
 
 export interface Announcement extends NodeEntity {

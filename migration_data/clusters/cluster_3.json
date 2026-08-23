@@ -1,0 +1,84 @@
+{
+  "cluster_id": 3,
+  "cluster_name": "Electrical & Nano (ELT)",
+  "stats": {
+    "docs": 779,
+    "courses": 9,
+    "blind_docs": 274,
+    "rich_docs": 505
+  },
+  "courses": [
+    {
+      "course_code": "H01L1A",
+      "course_name": "Digitale elektronica en processoren",
+      "course_id": 84,
+      "total_docs": 118,
+      "rich_docs": 45,
+      "blind_docs": 73
+    },
+    {
+      "course_code": "H01L4A",
+      "course_name": "Digitale en analoge communicatie",
+      "course_id": 85,
+      "total_docs": 178,
+      "rich_docs": 155,
+      "blind_docs": 23
+    },
+    {
+      "course_code": "H01L6A",
+      "course_name": "Digital Signal Processing",
+      "course_id": 45,
+      "total_docs": 157,
+      "rich_docs": 99,
+      "blind_docs": 58
+    },
+    {
+      "course_code": "H01M1A",
+      "course_name": "Elektromagnetische golven",
+      "course_id": 80,
+      "total_docs": 99,
+      "rich_docs": 70,
+      "blind_docs": 29
+    },
+    {
+      "course_code": "H01M3A",
+      "course_name": "Elektronische basisschakelingen",
+      "course_id": 46,
+      "total_docs": 68,
+      "rich_docs": 30,
+      "blind_docs": 38
+    },
+    {
+      "course_code": "H01M5A",
+      "course_name": "Halfgeleidercomponenten",
+      "course_id": 61,
+      "total_docs": 125,
+      "rich_docs": 89,
+      "blind_docs": 36
+    },
+    {
+      "course_code": "H03F6A",
+      "course_name": "Industriële stage: Elektrotechniek / Industrial Internship: Electrical Engineering",
+      "course_id": 1403,
+      "total_docs": 11,
+      "rich_docs": 0,
+      "blind_docs": 11
+    },
+    {
+      "course_code": "H09J4A",
+      "course_name": "Building Blocks for Telecom Systems",
+      "course_id": 1362,
+      "total_docs": 22,
+      "rich_docs": 17,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H01M0A",
+      "course_name": "Anki Flashcards Semester 6 ELT",
+      "course_id": 2450,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    }
+  ]
+}

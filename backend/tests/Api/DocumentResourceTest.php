@@ -973,10 +973,12 @@ class DocumentResourceTest extends ApiTestCase
         );
         $this->assertContains('/api/tags/' . $existingTag->getId(), $tagIRIs);
 
-        // Also verify from the tag side
-        $tagResponse = $this->browser()
+        // Also verify the document is findable by that tag. TagApi does not expose
+        // its documents - a tag can hold tens of thousands of them - so the
+        // supported direction is the documents collection filtered by tag.
+        $filtered = $this->browser()
             ->get(
-                '/api/tags/' . $existingTag->getId(),
+                '/api/documents?tags[]=/api/tags/' . $existingTag->getId(),
                 [
                     'headers' => [
                         'Authorization' => 'Bearer ' . $this->token
@@ -987,13 +989,13 @@ class DocumentResourceTest extends ApiTestCase
             ->assertJson()
             ->json()->decoded();
 
-        $documentIRIsinTag = array_map(
+        $documentIRIsForTag = array_map(
             function ($doc) {
                 return $doc['@id'];
             },
-            $tagResponse['documents']
+            $filtered['member'] ?? $filtered['hydra:member'] ?? []
         );
-        $this->assertContains($documentIRI, $documentIRIsinTag);
+        $this->assertContains($documentIRI, $documentIRIsForTag);
 
         // Clean up the file
         $contentUrl = $json['contentUrl'] ?? null;

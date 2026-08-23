@@ -1,0 +1,300 @@
+{
+  "cluster_id": 2,
+  "cluster_name": "Mechanical & Aero (WTK)",
+  "stats": {
+    "docs": 3598,
+    "courses": 36,
+    "blind_docs": 1532,
+    "rich_docs": 2066
+  },
+  "courses": [
+    {
+      "course_code": "H01G7A",
+      "course_name": "Applied Mechanics 3: Matrix & Energy Methods for Kinetostatics",
+      "course_id": 100,
+      "total_docs": 84,
+      "rich_docs": 47,
+      "blind_docs": 37
+    },
+    {
+      "course_code": "H01N2A",
+      "course_name": "Energy Conversion Machines and Systems",
+      "course_id": 56,
+      "total_docs": 77,
+      "rich_docs": 31,
+      "blind_docs": 46
+    },
+    {
+      "course_code": "H01N8A",
+      "course_name": "Machine Design: Machine Elements",
+      "course_id": 101,
+      "total_docs": 140,
+      "rich_docs": 29,
+      "blind_docs": 111
+    },
+    {
+      "course_code": "H01N0A",
+      "course_name": "Motion and Vibrations",
+      "course_id": 104,
+      "total_docs": 144,
+      "rich_docs": 103,
+      "blind_docs": 41
+    },
+    {
+      "course_code": "H01O1A",
+      "course_name": "Production Engineering and Systems",
+      "course_id": 103,
+      "total_docs": 44,
+      "rich_docs": 31,
+      "blind_docs": 13
+    },
+    {
+      "course_code": "H01L8A",
+      "course_name": "Electrical Energy and Drive Systems",
+      "course_id": 55,
+      "total_docs": 77,
+      "rich_docs": 46,
+      "blind_docs": 31
+    },
+    {
+      "course_code": "H08W4A",
+      "course_name": "Fluid mechanics",
+      "course_id": 1256,
+      "total_docs": 1115,
+      "rich_docs": 990,
+      "blind_docs": 125
+    },
+    {
+      "course_code": "H08W5A",
+      "course_name": "Heat Transfer",
+      "course_id": 1257,
+      "total_docs": 91,
+      "rich_docs": 55,
+      "blind_docs": 36
+    },
+    {
+      "course_code": "H08U5A",
+      "course_name": "Kwantummechanica",
+      "course_id": 81,
+      "total_docs": 113,
+      "rich_docs": 60,
+      "blind_docs": 53
+    },
+    {
+      "course_code": "H04Q9A",
+      "course_name": "Industriële stage: Werktuigkunde / Industrial Internship: Mechanical Engineering",
+      "course_id": 2230,
+      "total_docs": 9,
+      "rich_docs": 0,
+      "blind_docs": 9
+    },
+    {
+      "course_code": "H01B0B",
+      "course_name": "Toegepaste mechanica 1",
+      "course_id": 4,
+      "total_docs": 458,
+      "rich_docs": 113,
+      "blind_docs": 345
+    },
+    {
+      "course_code": "H04U3A",
+      "course_name": "Numerical Modelling in Mechanical Engineering",
+      "course_id": 1726,
+      "total_docs": 235,
+      "rich_docs": 165,
+      "blind_docs": 70
+    },
+    {
+      "course_code": "H0A15A",
+      "course_name": "Virtual Product Development",
+      "course_id": 2102,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H04S6A",
+      "course_name": "Mechanical Drive Systems",
+      "course_id": 1215,
+      "total_docs": 203,
+      "rich_docs": 75,
+      "blind_docs": 128
+    },
+    {
+      "course_code": "H0R71A",
+      "course_name": "Design Methodologies",
+      "course_id": 2197,
+      "total_docs": 62,
+      "rich_docs": 25,
+      "blind_docs": 37
+    },
+    {
+      "course_code": "H01I0B",
+      "course_name": "Bouwmechanica",
+      "course_id": 37,
+      "total_docs": 47,
+      "rich_docs": 14,
+      "blind_docs": 33
+    },
+    {
+      "course_code": "H04O1A",
+      "course_name": "Aerodynamics",
+      "course_id": 1236,
+      "total_docs": 30,
+      "rich_docs": 17,
+      "blind_docs": 13
+    },
+    {
+      "course_code": "H0N71B",
+      "course_name": "Grondmechanica",
+      "course_id": 41,
+      "total_docs": 35,
+      "rich_docs": 13,
+      "blind_docs": 22
+    },
+    {
+      "course_code": "H01K9A",
+      "course_name": "Toegepaste chemische thermodynamica",
+      "course_id": 65,
+      "total_docs": 56,
+      "rich_docs": 36,
+      "blind_docs": 20
+    },
+    {
+      "course_code": "H01B4B",
+      "course_name": "Thermodynamica",
+      "course_id": 19,
+      "total_docs": 84,
+      "rich_docs": 41,
+      "blind_docs": 43
+    },
+    {
+      "course_code": "H01C8B",
+      "course_name": "Toegepaste mechanica 2: dynamica en sterkteleer",
+      "course_id": 20,
+      "total_docs": 96,
+      "rich_docs": 44,
+      "blind_docs": 52
+    },
+    {
+      "course_code": "H07S3A",
+      "course_name": "Theory of Elasticity and Plasticity",
+      "course_id": 140,
+      "total_docs": 132,
+      "rich_docs": 1,
+      "blind_docs": 131
+    },
+    {
+      "course_code": "H0A01B",
+      "course_name": "Operational Management",
+      "course_id": 2289,
+      "total_docs": 58,
+      "rich_docs": 34,
+      "blind_docs": 24
+    },
+    {
+      "course_code": "H04V5A",
+      "course_name": "Deterministic Decision Models",
+      "course_id": 2201,
+      "total_docs": 20,
+      "rich_docs": 5,
+      "blind_docs": 15
+    },
+    {
+      "course_code": "H00K1A",
+      "course_name": "Engineering Economy",
+      "course_id": 574,
+      "total_docs": 18,
+      "rich_docs": 12,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H00N6A",
+      "course_name": "Total Quality Management",
+      "course_id": 1400,
+      "total_docs": 16,
+      "rich_docs": 0,
+      "blind_docs": 16
+    },
+    {
+      "course_code": "H04X3A",
+      "course_name": "Control Theory",
+      "course_id": 2090,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H0E68B",
+      "course_name": "Production and Quality Assurance Processes in the Aerospace Industry",
+      "course_id": 2218,
+      "total_docs": 3,
+      "rich_docs": 1,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H0H12B",
+      "course_name": "Weefselmechanica",
+      "course_id": 47,
+      "total_docs": 8,
+      "rich_docs": 3,
+      "blind_docs": 5
+    },
+    {
+      "course_code": "H01H5A",
+      "course_name": "Grondmechanica",
+      "course_id": 1503,
+      "total_docs": 41,
+      "rich_docs": 22,
+      "blind_docs": 19
+    },
+    {
+      "course_code": "H01B8A",
+      "course_name": "Anki Flashcards Semester 4 WTK",
+      "course_id": 2449,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H04T1A",
+      "course_name": "DimensioneleMeettechniek",
+      "course_id": 2457,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    },
+    {
+      "course_code": "H04T5A",
+      "course_name": "GevorderdeVerspanendeTechnieken",
+      "course_id": 2458,
+      "total_docs": 2,
+      "rich_docs": 0,
+      "blind_docs": 2
+    },
+    {
+      "course_code": "H01J6A",
+      "course_name": "E&P",
+      "course_id": 2460,
+      "total_docs": 86,
+      "rich_docs": 53,
+      "blind_docs": 33
+    },
+    {
+      "course_code": "H04T7A",
+      "course_name": "Niet-conventionele bewerkingsmethoden",
+      "course_id": 2461,
+      "total_docs": 9,
+      "rich_docs": 0,
+      "blind_docs": 9
+    },
+    {
+      "course_code": "H04Y2A",
+      "course_name": "Reliability of Mechanical Systems",
+      "course_id": 2099,
+      "total_docs": 1,
+      "rich_docs": 0,
+      "blind_docs": 1
+    }
+  ]
+}

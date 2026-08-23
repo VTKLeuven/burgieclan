@@ -1,0 +1,156 @@
+{
+  "cluster_id": 1,
+  "cluster_name": "Bachelor Core",
+  "stats": {
+    "docs": 1528,
+    "courses": 18,
+    "blind_docs": 634,
+    "rich_docs": 894
+  },
+  "courses": [
+    {
+      "course_code": "H0N75B",
+      "course_name": "Constructie van gebouwen: prestatie-analyse",
+      "course_id": 42,
+      "total_docs": 66,
+      "rich_docs": 22,
+      "blind_docs": 44
+    },
+    {
+      "course_code": "H01T1A",
+      "course_name": "Lineaire algebra",
+      "course_id": 105,
+      "total_docs": 9,
+      "rich_docs": 2,
+      "blind_docs": 7
+    },
+    {
+      "course_code": "H01B2B",
+      "course_name": "Algemene natuurkunde",
+      "course_id": 11,
+      "total_docs": 141,
+      "rich_docs": 88,
+      "blind_docs": 53
+    },
+    {
+      "course_code": "H01G5A",
+      "course_name": "Applied Discrete Algebra",
+      "course_id": 72,
+      "total_docs": 151,
+      "rich_docs": 92,
+      "blind_docs": 59
+    },
+    {
+      "course_code": "H01D8B",
+      "course_name": "Numerieke wiskunde",
+      "course_id": 16,
+      "total_docs": 231,
+      "rich_docs": 164,
+      "blind_docs": 67
+    },
+    {
+      "course_code": "H0M69B",
+      "course_name": "Applied Algebra and Differential Equations",
+      "course_id": 881,
+      "total_docs": 5,
+      "rich_docs": 1,
+      "blind_docs": 4
+    },
+    {
+      "course_code": "H01A0B",
+      "course_name": "Analyse, deel 1",
+      "course_id": 2,
+      "total_docs": 221,
+      "rich_docs": 140,
+      "blind_docs": 81
+    },
+    {
+      "course_code": "H01B9A",
+      "course_name": "Probleemoplossen en ontwerpen, deel 1a",
+      "course_id": 8,
+      "total_docs": 63,
+      "rich_docs": 26,
+      "blind_docs": 37
+    },
+    {
+      "course_code": "H01C2A",
+      "course_name": "Probleemoplossen en ontwerpen, deel 1b",
+      "course_id": 15,
+      "total_docs": 1,
+      "rich_docs": 1,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H0R05A",
+      "course_name": "Discrete wiskunde en algoritmen",
+      "course_id": 22,
+      "total_docs": 7,
+      "rich_docs": 1,
+      "blind_docs": 6
+    },
+    {
+      "course_code": "H01A4B",
+      "course_name": "Toegepaste algebra",
+      "course_id": 3,
+      "total_docs": 174,
+      "rich_docs": 84,
+      "blind_docs": 90
+    },
+    {
+      "course_code": "H01A2B",
+      "course_name": "Analyse, deel 2",
+      "course_id": 10,
+      "total_docs": 230,
+      "rich_docs": 154,
+      "blind_docs": 76
+    },
+    {
+      "course_code": "H08W0A",
+      "course_name": "Analyse, deel 3",
+      "course_id": 17,
+      "total_docs": 114,
+      "rich_docs": 71,
+      "blind_docs": 43
+    },
+    {
+      "course_code": "H01V8A",
+      "course_name": "Aanvullingen wiskunde",
+      "course_id": 107,
+      "total_docs": 25,
+      "rich_docs": 10,
+      "blind_docs": 15
+    },
+    {
+      "course_code": "H0P81A",
+      "course_name": "Grondstofefficiëntie en levenscyclusanalyse",
+      "course_id": 1507,
+      "total_docs": 8,
+      "rich_docs": 8,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H0P92A",
+      "course_name": "Niet-lineaire structuuranalyse",
+      "course_id": 1515,
+      "total_docs": 7,
+      "rich_docs": 7,
+      "blind_docs": 0
+    },
+    {
+      "course_code": "H01A4A",
+      "course_name": "Natuurkunde 1 (prof Indekeu",
+      "course_id": 2462,
+      "total_docs": 39,
+      "rich_docs": 12,
+      "blind_docs": 27
+    },
+    {
+      "course_code": "H01D4B",
+      "course_name": "Probleemoplossen en ontwerpen, deel 2",
+      "course_id": 25,
+      "total_docs": 36,
+      "rich_docs": 11,
+      "blind_docs": 25
+    }
+  ]
+}

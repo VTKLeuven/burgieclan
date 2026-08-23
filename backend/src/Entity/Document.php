@@ -199,6 +199,18 @@ class Document extends Node implements VotableInterface
         return $this;
     }
 
+    public function getAuthor(): ?string
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?string $author): static
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
     /**
      * Get the academic year choices based on the current year and the first year
      *
