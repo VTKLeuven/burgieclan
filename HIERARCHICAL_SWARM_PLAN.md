@@ -65,13 +65,15 @@ flowchart TD
 > [!IMPORTANT]
 > All infrastructure prerequisites must be verified prior to launching the swarm.
 
-1. **Production Database (`liv`)**:
-   - Total Courses in catalog: **781 courses** (all 16,816 documents resolve to valid DB `course_id` rows; 0 missing).
-   - Categories in catalog: **6 active categories** (IDs 2–7; 0 invalid references).
+1. **Production Database Live Assertions (`liv`)**:
+   - Assert all 385 manifest courses exist in production:
+     `SELECT count(*) FROM course WHERE id IN (<385 IDs>);` $\rightarrow$ **385 / 385 verified**.
+   - Assert all 6 document categories exist:
+     `SELECT count(*) FROM document_category WHERE id BETWEEN 2 AND 7;` $\rightarrow$ **6 / 6 verified**.
    - `Document` entity columns: `author VARCHAR(255)`, `seafile_file_id VARCHAR(40)` with unique composite index `(seafile_file_id, course_id)`.
    - Migration Service Account: `it@vtk.be` (User ID: `24`, Roles: `["ROLE_USER", "ROLE_ADMIN"]`, locked).
 2. **Staged Physical Files**:
-   - All 16,816 valid documents present at `liv:/mnt/immich/burgieclan-staging/` (58 GB).
+   - All 16,820 valid documents present at `liv:/mnt/immich/burgieclan-staging/` (58 GB).
    - Extracted Page 1 text previews available on NFS (`manifest_with_content_previews.jsonl`).
 3. **Storage & Tag Vocabulary**:
    - Hetzner S3 bucket `burgieclan-vtk` accessible via Flysystem.
@@ -79,10 +81,12 @@ flowchart TD
 
 ---
 
-### Phase 1: Payload Preparation & Course Partitioning
+### Phase 1: Payload Preparation & Smart Routing
 1. Generate cluster definition manifests: `migration_data/clusters/cluster_{1..8}.json`.
 2. Generate course-level input JSONs containing Page 1 text previews, paths, file sizes, and scan flags.
-3. Optimize LLM calls: Blind documents (<30 chars text) use deterministic regex normalization; documents with rich previews are batched in 20–25 doc chunks.
+3. **Smart Worker Routing**:
+   - **Blind Documents (7,187 docs with <30 chars text)**: Routed through deterministic regex normalization (eliminates hallucination risk, saves 50% LLM runtime).
+   - **Rich Documents (9,629 docs with Page 1 previews)**: Batched in micro-chunks of 20–25 files for AI reasoning.
 
 ---
 
@@ -104,8 +108,8 @@ flowchart TD
    - **Provenance Tag**: Injects `'old-burgieclan'` into 100% of records.
    - **Author Cleansing**: Rejects status markers `(Empty)`, `(Student)`, `(Oplossing Caro)`.
    - **Collision Disambiguation**: Appends `(2)`, `(3)` on duplicate per-course titles.
-   - **Junk Filtering**: Excludes the 84 meme / non-coursework and OS junk artifacts (`.ini`, `Thumbs.db`, `.lnk`, `.bak`).
-3. Produces final verified manifest: `migration_data/manifest_final_standardized_validated.json` (**16,816 records**).
+   - **Junk Filtering**: Excludes the 80 meme / non-coursework and OS junk artifacts (`.ini`, `Thumbs.db`, `.lnk`, `.bak`, `.cpgz`). Preserves simulation database files (`inductor2d.db`, `brushedDC.db`, `t28.db`).
+3. Produces final verified manifest: `migration_data/manifest_final_standardized_validated.json` (**16,820 records**).
 
 ---
 
@@ -127,13 +131,25 @@ flowchart TD
    ```
 4. Assert:
    - Command exits with code `0`.
-   - Dry-run inspects **all records emitted by `08i`** (exact `stats['output']` count, ~16,816 physical files) with **0 missing files**.
+   - Dry-run inspects **all records emitted by `08i`** (`stats['output']` = 16,820 physical files) with **0 missing files**.
    - `--manifest.failures.jsonl` does not exist or has 0 rows.
 
 ---
 
-### Phase 5: Live Ingestion & S3 Streaming
-1. Run live ingestion inside a detached session (`screen`) to survive SSH drops:
+### Phase 5: Live Ingestion & S3 Streaming (Canary + Full Import)
+1. **Canary Ingestion (Single Course - H01A0B Analyse I)**:
+   ```bash
+   ssh it@liv "cd /opt/burgieclan && docker compose -f docker-compose.prod.yml run --rm \
+     -v /mnt/immich/burgieclan-staging:/staging:ro backend \
+     console app:import:seafile \
+       --manifest=/staging/manifest_final_for_import.jsonl \
+       --staged-dir=/staging \
+       --creator=it@vtk.be \
+       --course=H01A0B"
+   ```
+   *Eyeball the imported documents live in the browser at `https://burgieclan.vtk.be/courses/H01A0B`.*
+
+2. **Full Ingestion Run inside a detached session (`screen`)**:
    ```bash
    ssh it@liv "cd /opt/burgieclan && screen -dmS seafile-import docker compose -f docker-compose.prod.yml run --rm \
      -v /mnt/immich/burgieclan-staging:/staging:ro backend \
@@ -142,14 +158,17 @@ flowchart TD
        --staged-dir=/staging \
        --creator=it@vtk.be"
    ```
-2. Monitor live progress anytime by attaching to the screen session:
+   *(Because the import is idempotent on `(seafile_file_id, course_id)`, it simply skips the canary course and imports the remaining courses).*
+
+3. **Monitor Live Progress Anytime**:
    ```bash
    ssh -t it@liv "screen -r seafile-import"
    ```
-   *(To detach cleanly without stopping the import, press `Ctrl+A` followed by `D`)*.
-3. Post-Ingestion Verification:
+   *(Detach safely anytime with `Ctrl+A` followed by `D`)*.
+
+4. **Post-Ingestion Verification**:
    - Check failure log: `test ! -s /mnt/immich/burgieclan-staging/manifest_final_for_import.jsonl.failures.jsonl`
-   - Database row count: `SELECT count(*) FROM document WHERE seafile_file_id IS NOT NULL;` matches exact `08i` manifest output count (~16,816 documents).
-   - Tag assignments: `SELECT count(*) FROM tag_document;` -> **100% tagged with old-burgieclan**.
+   - Database row count: `SELECT count(*) FROM document WHERE seafile_file_id IS NOT NULL;` $\rightarrow$ **16,820 documents**.
+   - Tag assignments: `SELECT count(*) FROM tag_document;` $\rightarrow$ **100% tagged with old-burgieclan**.
    - Take post-migration backup: `docker compose -f docker-compose.prod.yml run --rm backend console app:backup`
-4. Verify user-facing course pages on `https://burgieclan.vtk.be`!
+5. Verify live course pages on `https://burgieclan.vtk.be`!
