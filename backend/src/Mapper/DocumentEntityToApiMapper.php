@@ -74,8 +74,11 @@ class DocumentEntityToApiMapper extends BaseEntityToApiMapper
                     $tag,
                     TagApi::class,
                     [
+                        // Depth 1, not 0: MicroMapper skips populate() entirely at depth 0,
+                        // which would leave every tag with an id and a null name. A TagApi
+                        // no longer carries its documents, so populating it is just the name.
                         MappingContext::SUMMARY => true,
-                        MicroMapperInterface::MAX_DEPTH => 0,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },
