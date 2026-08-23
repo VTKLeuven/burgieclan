@@ -4,6 +4,8 @@ namespace App\Tests\Api;
 
 use App\Factory\CourseFactory;
 
+use function Zenstruck\Foundry\Persistence\save;
+
 class CourseResourceTest extends ApiTestCase
 {
     public function testGetCollectionOfCourses(): void
@@ -190,5 +192,34 @@ class CourseResourceTest extends ApiTestCase
             ->assertJson()
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3);
+    }
+
+    public function testGetCourseExposesRelatedCourseCodeAndName(): void
+    {
+        // Related courses are rendered as clickable badges on the course page, so an
+        // embedded course has to carry its code and name and not just an IRI. Mapping
+        // them at MAX_DEPTH 0 skips populate() and leaves both null while the key
+        // assertions in testGetCollectionOfCourses still pass.
+        $old = CourseFactory::createOne(['name' => 'Fluidummechanica', 'code' => 'H08W4A']);
+        $course = CourseFactory::createOne(['name' => 'Transportverschijnselen', 'code' => 'H0R12A']);
+        $course->addOldCourse($old);
+        save($course);
+
+        $json = $this->browser()
+            ->get(
+                '/api/courses/' . $course->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJson()
+            ->json()->decoded();
+
+        $this->assertCount(1, $json['oldCourses']);
+        $this->assertSame('H08W4A', $json['oldCourses'][0]['code']);
+        $this->assertSame('Fluidummechanica', $json['oldCourses'][0]['name']);
     }
 }
