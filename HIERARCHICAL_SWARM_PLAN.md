@@ -122,7 +122,7 @@ flowchart TD
 3. Execute dry run in throwaway container with staging volume mount:
    ```bash
    ssh it@liv "cd /opt/burgieclan && docker compose -f docker-compose.prod.yml run --rm \
-     -v /mnt/immich/burgieclan-staging:/staging:ro backend \
+     -v /mnt/immich/burgieclan-staging:/staging backend \
      console app:import:seafile \
        --manifest=/staging/manifest_final_for_import.jsonl \
        --staged-dir=/staging \
@@ -140,7 +140,7 @@ flowchart TD
 1. **Canary Ingestion (Single Course - H01A0B Analyse I)**:
    ```bash
    ssh it@liv "cd /opt/burgieclan && docker compose -f docker-compose.prod.yml run --rm \
-     -v /mnt/immich/burgieclan-staging:/staging:ro backend \
+     -v /mnt/immich/burgieclan-staging:/staging backend \
      console app:import:seafile \
        --manifest=/staging/manifest_final_for_import.jsonl \
        --staged-dir=/staging \
