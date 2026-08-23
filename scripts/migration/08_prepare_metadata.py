@@ -183,7 +183,7 @@ def extract_orthogonal_tags(filename, path, ext, cat_name):
     
     # 1. Format / Medium (Orthogonal across all)
     if ext in ['jpg', 'jpeg', 'png'] or any(k in full_lower for k in ['scan', 'camscanner', 'foto', 'handgeschreven', 'geschreven', 'wp_201', 'img_201']):
-        tags.add('Handgeschreven / Scan')
+        tags.add('Handgeschreven')
     if ext in ['m', 'py', 'c', 'cpp', 'java', 'hs', 'pl', 'r', 'mat', 'mw']:
         tags.add('Code / Script')
     if ext in ['ppt', 'pptx'] or any(k in full_lower for k in ['slides', 'transparanten', 'presentatie', 'powerpoint']):

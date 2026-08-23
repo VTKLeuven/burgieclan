@@ -48,7 +48,7 @@ RULES FOR CANONICAL TITLES:
 RULES FOR ORTHOGONAL TAGS (Do NOT tag 'Oefeningen' under Oefenzittingen or 'Samenvatting' under Samenvattingen):
 - Solution status: 'Oplossing', 'Modeloplossing', 'Opgave (Blanco)'
 - Exam sessions (for Examens): 'Januari', 'Juni', 'Augustus / September (2de zit)', 'Tussentijds (Midterm)'
-- Medium / Format: 'Handgeschreven / Scan', 'Code / Script', 'Slides'
+- Medium / Format: 'Handgeschreven', 'Code / Script', 'Slides'
 - Content nature: 'Theorie', 'Examenvragen', 'Lesnotities', 'Verslag / Project', 'Formularium', 'Meerkeuze', 'Mondeling'
 - Scope: 'Deel 1', 'Deel 2', 'Deel 3'
 - Language: 'English'

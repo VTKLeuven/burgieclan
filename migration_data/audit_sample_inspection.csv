@@ -15,23 +15,23 @@ H01L4A,Digitale en analoge communicatie,Oefenzittingen,,2012 - 2013,fallback,Cod
 H01L6A,Digital Signal Processing,Oefenzittingen,,2022 - 2023,medium,,3 06,3-06.pdf
 H01M5A,Halfgeleidercomponenten,Oefenzittingen,Nick Hosewol,2024 - 2025,fallback,Slides,Part 6 – CMOS Process Technology Nick Hosewol,Part 6 – CMOS process technology -  Nick Hosewol.pdf
 H04A4A,"Electrical Drives; Advanced Topics in Electrical Machines, including Implementation Aspects",Oefenzittingen,,2010 - 2011,fallback,Deel 2,Verslag Joepdriesen,Verslag_JoepDriesen.pdf
-H01B0B,Toegepaste mechanica 1,Oefenzittingen,,2018 - 2019,fallback,Handgeschreven / Scan,B1,B1.jpg
-H04S6A,Mechanical Drive Systems,Oefenzittingen,,2011 - 2012,high,Handgeschreven / Scan,Foto 11 12 14 18 51 39,Foto 11-12-14 18 51 39.jpg
-H0N75B,Constructie van gebouwen: prestatie-analyse,Samenvattingen,,2017 - 2018,fallback,Handgeschreven / Scan,Scan0004,Scan0004.jpg
+H01B0B,Toegepaste mechanica 1,Oefenzittingen,,2018 - 2019,fallback,Handgeschreven,B1,B1.jpg
+H04S6A,Mechanical Drive Systems,Oefenzittingen,,2011 - 2012,high,Handgeschreven,Foto 11 12 14 18 51 39,Foto 11-12-14 18 51 39.jpg
+H0N75B,Constructie van gebouwen: prestatie-analyse,Samenvattingen,,2017 - 2018,fallback,Handgeschreven,Scan0004,Scan0004.jpg
 H01S4C,Westerse architectuurtheorie: inleiding,Samenvattingen,Daan Van,2014 - 2015,high,,29 Daan Van Cauteren,29_Daan Van Cauteren.pdf
 H01S4C,Westerse architectuurtheorie: inleiding,Samenvattingen,,2018 - 2019,high,,27 Vanparysberten 27 Paper Architectuurtheorie2,27_VanparysBerten_27_Paper_ArchitectuurTheorie2.pdf
 H01U3C,Computationeel ontwerpen,Oefenzittingen,,2020 - 2021,low,"Code / Script, Oplossing",Distort Random Chance Solution,distort_random_chance_solution.py
 H01S4C,Westerse architectuurtheorie: inleiding,Samenvattingen,,2012 - 2013,high,Slides,C123 Archtheorie 121129 6,c123 archtheorie 121129-6.pdf
-H01A8A,Algemene en technische scheikunde,Oefenzittingen,,2014 - 2015,high,Handgeschreven / Scan,WP 20150813 005,WP_20150813_005.jpg
-H01B0B,Toegepaste mechanica 1,Oefenzittingen,,2017 - 2018,fallback,"Handgeschreven / Scan, Oplossing",Mechanica009,mechanica009.jpg
+H01A8A,Algemene en technische scheikunde,Oefenzittingen,,2014 - 2015,high,Handgeschreven,WP 20150813 005,WP_20150813_005.jpg
+H01B0B,Toegepaste mechanica 1,Oefenzittingen,,2017 - 2018,fallback,"Handgeschreven, Oplossing",Mechanica009,mechanica009.jpg
 H06U1A,Artificial Intelligence,Samenvattingen,,2007 - 2008,fallback,,Heuristicsearch,heuristicsearch.tex
 G0Q43A,Computernetwerken,Oefenzittingen,,2013 - 2014,fallback,Deel 1,Gnuplot,gnuplot.txt
 H01P5B,Computerarchitectuur en systeemsoftware,Oefenzittingen,,2023 - 2024,low,Oplossing,Oefenz2 Oplossing,Oefenz2 Oplossing.pdf
 G0Q43A,Computernetwerken,Samenvattingen,,2013 - 2014,medium,Slides,11 2014 Network 1 B,11-2014-Network-1_b.pdf
 H03Y1A,Theory of Elasticity and Plasticity,Samenvattingen,,2022 - 2023,high,"Slides, Theorie",EP Slides C9 Plate Theory,EP_slides_C9_-_Plate_theory.pdf
-H0R74A,Aircraft Materials,Oefenzittingen,,2017 - 2018,fallback,Handgeschreven / Scan,Img427,img427.jpg
+H0R74A,Aircraft Materials,Oefenzittingen,,2017 - 2018,fallback,Handgeschreven,Img427,img427.jpg
 H04S6A,Mechanical Drive Systems,Examens,,2018 - 2019,medium,,MDS PH Testexam 2019 2020 Solutions,MDS_PH_Testexam_2019-2020_solutions.pdf
-H03Y1A,Theory of Elasticity and Plasticity,Oefenzittingen,Pieter Smet,2022 - 2023,fallback,"Handgeschreven / Scan, Theorie",Pot En 1 (Pieter Smet),pot en 1.jpg
+H03Y1A,Theory of Elasticity and Plasticity,Oefenzittingen,Pieter Smet,2022 - 2023,fallback,"Handgeschreven, Theorie",Pot En 1 (Pieter Smet),pot en 1.jpg
 H04X3B,Systems and Control Theory,Oefenzittingen,,2017 - 2018,fallback,"Code / Script, Theorie",NXT Getcurrentprogramname,NXT_GetCurrentProgramName.m
 H04U3A,Numerical Modelling in Mechanical Engineering,Oefenzittingen,Nick Hosewol,2024 - 2025,fallback,"Code / Script, Oplossing",Fem Result (Nick Hosewol),fem_result.mat
 H04X3B,Systems and Control Theory,Samenvattingen,,2017 - 2018,fallback,Theorie,Helptoc,helptoc.xml
@@ -39,9 +39,9 @@ H04X3B,Systems and Control Theory,Samenvattingen,,2017 - 2018,fallback,Theorie,B
 H04X3B,Systems and Control Theory,Samenvattingen,,2017 - 2018,fallback,Theorie,Opencompass,OpenCompass.html
 H01H3B,Bouwfysica,Samenvattingen,,2020 - 2021,high,,02 Samenvatting Hoofdstuk 2,02. Samenvatting hoofdstuk 2.pdf
 H01M3A,Elektronische basisschakelingen,Examens,,2006 - 2007,high,"Deel 1, Januari",Examen 2007 Jan,Examen_2007_jan.pdf
-H01J9A,Chemische reactorkunde en bioreactorkunde,Oefenzittingen,,2011 - 2012,fallback,"Deel 1, Handgeschreven / Scan","Oz 3, Oef 5","oz 3, oef 5.jpg"
+H01J9A,Chemische reactorkunde en bioreactorkunde,Oefenzittingen,,2011 - 2012,fallback,"Deel 1, Handgeschreven","Oz 3, Oef 5","oz 3, oef 5.jpg"
 H01K7A,Scheidingsprocessen,Oefenzittingen,,2014 - 2015,low,"Deel 2, Oplossing",Oefening 4,Oefening 4.pdf
-H0P86A,Bouwakoestiek,Oefenzittingen,,2016 - 2017,high,Handgeschreven / Scan,20161107 142630,20161107_142630.jpg
+H0P86A,Bouwakoestiek,Oefenzittingen,,2016 - 2017,high,Handgeschreven,20161107 142630,20161107_142630.jpg
 H03T3A,Zaalakoestiek en lichttechniek,Oefenzittingen,,2018 - 2019,low,Verslag / Project,B2 Absorptieennagalmtijd,B2_AbsorptieEnNagalmtijd.xlsx
 H08Z2A,Structures and Microstructures of Materials,Oefenzittingen,,2009 - 2010,fallback,Slides,Oefenzitting 1 Inleiding Kristallografie,Oefenzitting 1 - Inleiding kristallografie.ppt
 G0B01A,Intellectual Property Management,Samenvattingen,,2022 - 2023,low,"Lesnotities, Slides",1 Inleiding Tot Het Recht,1 - Inleiding tot het recht.pdf
@@ -52,13 +52,13 @@ H01A0B,"Analyse, deel 1",Samenvattingen,,2009 - 2010,high,Deel 1,Samenvatting 20
 H01B0B,Toegepaste mechanica 1,Oefenzittingen,,2019 - 2020,high,"Deel 1, Oplossing",Oplossingen Mechanica 2019 2020 | Marian Van Alphen,Oplossingen Mechanica 2019-2020 | Marian Van Alphen.pdf
 H01D0B,Inleiding tot de materiaalkunde,Oefenzittingen,,2015 - 2016,fallback,Deel 2,Oefeningen Breukmechanica Oplossingsmethode,Oefeningen_breukmechanica_oplossingsmethode.pdf
 H01D7B,Economie,Examens,,2012 - 2013,fallback,,Examen C,Examen C.pdf
-H01B0B,Toegepaste mechanica 1,Samenvattingen,,2017 - 2018,fallback,"Deel 1, Handgeschreven / Scan",26734074 1998491660167474 5520867171130087197 N,26734074_1998491660167474_5520867171130087197_n.jpg
+H01B0B,Toegepaste mechanica 1,Samenvattingen,,2017 - 2018,fallback,"Deel 1, Handgeschreven",26734074 1998491660167474 5520867171130087197 N,26734074_1998491660167474_5520867171130087197_n.jpg
 H01A8A,Algemene en technische scheikunde,TTT's,,2013 - 2014,high,"Deel 1, Opgave (Blanco)",TTT 2013 Theorie (opgave),TTT 2013 Theorie (Opgave).pdf
 H01B0B,Toegepaste mechanica 1,Oefenzittingen,,2021 - 2022,fallback,Deel 1,Werkcollege TM Nick Hosewol,Werkcollege TM - Nick Hosewol.pdf
 H01A2B,"Analyse, deel 2",Examens,,2018 - 2019,low,"Deel 2, Reconstructie / Vragen",Examenvragen Analyse 2,Examenvragen Analyse 2.docx
 H01B6B,Methodiek van de informatica,Samenvattingen,Thijs Peirelinck,2011 - 2012,fallback,Deel 2,Queens (Thijs Peirelinck),Queens.ctxt
 H01C6A,Organische scheikunde,Examens,,2009 - 2010,high,,Examen 2010 01 29,Examen 2010-01-29.pdf
-H01C6A,Organische scheikunde,Oefenzittingen,,2020 - 2021,fallback,"Deel 3, Handgeschreven / Scan",Zelftest 4 Deel 3,Zelftest 4 Deel 3.png
+H01C6A,Organische scheikunde,Oefenzittingen,,2020 - 2021,fallback,"Deel 3, Handgeschreven",Zelftest 4 Deel 3,Zelftest 4 Deel 3.png
 H08W0A,"Analyse, deel 3",Examens,,2024 - 2025,high,,Analyse Examen 20jan 2025,Analyse Examen 20jan 2025.pdf
 H01A2B,"Analyse, deel 2",Oefenzittingen,,2018 - 2019,low,"Code / Script, Deel 2, Oplossing",Oef 11 6,oef 11.6.mw
 H01B6B,Methodiek van de informatica,Oefenzittingen,,2018 - 2019,low,"Code / Script, Deel 2, Oplossing",S08e11 Robots Solution(4),S08E11_robots_solution(4).py
@@ -68,18 +68,18 @@ H06T2A,Process Control in the Chemical Industry,TTT's,,2019 - 2020,high,,Midterm
 H05D7A,Computer-Aided IC Design,Samenvattingen,,2005 - 2006,medium,,ALPS Gecco 2006,ALPS GECCO 2006.pdf
 H06A3A,Analog and Mixed-Signal Electronics for Signal Processing,Oefenzittingen,,2019 - 2020,fallback,,Power Amplifiers,Power amplifiers.pdf
 H09K1A,Design of Digital Integrated Circuits,Samenvattingen,,2018 - 2019,fallback,,Main Base Bundle Optj9gjjfxqwanrffshx9q Js,main-base.bundle.OPtJ9GJjFXqWanRfFSHx9Q.js.download
-H05A0A,Analysis of Digital Communication Systems,Oefenzittingen,,2002 - 2003,low,Handgeschreven / Scan,Photo 01 12 14 10 43 58,Photo 01-12-14 10 43 58.jpg
+H05A0A,Analysis of Digital Communication Systems,Oefenzittingen,,2002 - 2003,low,Handgeschreven,Photo 01 12 14 10 43 58,Photo 01-12-14 10 43 58.jpg
 H09G2A,Integrated Problem Solving in Energy,Oefenzittingen,,2016 - 2017,fallback,Deel 1,Formulas,Formulas.docx
 H0H00A,Thermal Systems,Examens,,2017 - 2018,high,Deel 2,Thermische Systemen En Energiebeheer (h00q0a) Exam Thermal Systems And Energy Management 13 Juni 2018 1529929158,Thermische_systemen_en_energiebeheer_(H00Q0A)_--_Exam_Thermal_Systems_And_Energy_Management_-13_juni_2018.1529929158.pdf
-H09G2A,Integrated Problem Solving in Energy,Oefenzittingen,,2015 - 2016,high,"Deel 1, Handgeschreven / Scan, Oplossing",IMG 20151018 005905,IMG_20151018_005905.jpg
+H09G2A,Integrated Problem Solving in Energy,Oefenzittingen,,2015 - 2016,high,"Deel 1, Handgeschreven, Oplossing",IMG 20151018 005905,IMG_20151018_005905.jpg
 H9X34A,Numerical Methods in Energy Sciences,Oefenzittingen,,2018 - 2019,fallback,"Code / Script, Deel 1, Oplossing",Stability,stability.m
 H03U4A,Biomaterials,Samenvattingen,Hannelore Mussen,2024 - 2025,high,,Biomaterials Anki Flashcards (2024 2025) (Hannelore Mussen),Biomaterials Anki Flashcards (2024 - 2025).apkg
-H07S3A,Theory of Elasticity and Plasticity,Examens,,2018 - 2019,fallback,Handgeschreven / Scan,102,102.JPG
-H01T3C,Informatica,Oefenzittingen,,2017 - 2018,fallback,Handgeschreven / Scan,Telop,telOp.PNG
+H07S3A,Theory of Elasticity and Plasticity,Examens,,2018 - 2019,fallback,Handgeschreven,102,102.JPG
+H01T3C,Informatica,Oefenzittingen,,2017 - 2018,fallback,Handgeschreven,Telop,telOp.PNG
 H01T3C,Informatica,Oefenzittingen,,2023 - 2024,fallback,Code / Script,Oefening 6,oefening_6.py
 H0N65B,Inleiding tot gegevensbanken,Samenvattingen,,2021 - 2022,high,Slides,Elmasri 12 Images,elmasri_12_images.ppt
 H0N65B,Inleiding tot gegevensbanken,Samenvattingen,,2021 - 2022,high,Slides,Gb2015 06 SQL2 En Relationele Calculus,GB2015 - 06 SQL2 en relationele calculus.pdf
-H04Z8A,Aircraft Engines,Oefenzittingen,,2017 - 2018,fallback,Handgeschreven / Scan,Aircraft Engines Oefenzitting 9 002,Aircraft engines oefenzitting 9_002.jpg
+H04Z8A,Aircraft Engines,Oefenzittingen,,2017 - 2018,fallback,Handgeschreven,Aircraft Engines Oefenzitting 9 002,Aircraft engines oefenzitting 9_002.jpg
 H0H06A,Sterkteleer 2,Samenvattingen,,2017 - 2018,fallback,,Sterkteleer 3 Oefz 1,Sterkteleer 3 - Oefz 1.pdf
 H0M70A,Mechanics,Oefenzittingen,,2017 - 2018,fallback,,Stereonet 1,stereonet 1.pdf
 H04M9A,Dynamica van constructies,Samenvattingen,,2023 - 2024,fallback,,Summary Chapter 6,Summary chapter 6.pdf

@@ -1,0 +1,152 @@
+================================================================================
+           VTK BURGIECLAN - AI DOCUMENT NORMALIZER & ARCHIVIST SPECIFICATION
+================================================================================
+
+PROJECT: VTK Burgieclan (Archival Migration of 16,905 Documents across 389 Courses)
+TARGET: Generate consistent display titles, verified authors, orthogonal tags,
+        accurate academic years, and clean category mapping for every document.
+
+--------------------------------------------------------------------------------
+1. ARCHITECTURAL OVERVIEW
+--------------------------------------------------------------------------------
+
+The AI Normalizer operates on course-grouped batches. For each course, an LLM
+acts as an expert Academic Archivist for VTK (KU Leuven Faculty of Engineering
+Science).
+
+The LLM receives:
+- Official Course Context (Course Code + Dutch & English Course Name)
+- Full Folder Path Context (degree programme, semester, module folder)
+- Original Filename & Extension
+- Extracted Page 1 Text Preview (and Pages 2-3 fallback text for cover pages)
+- Physical Properties (Page count, Scanned/Handwritten vs Digital LaTeX/Word flag)
+
+The LLM outputs a structured JSON array matching a strict schema.
+
+--------------------------------------------------------------------------------
+2. CANONICAL NAMING CONVENTIONS BY MATERIAL TYPE
+--------------------------------------------------------------------------------
+
+Every generated `canonical_title` must strictly follow these standard templates:
+
+A. EXAMS (Category ID: 2 - Examens)
+   Template:  Examen [Dag] [Maand] [Jaar] [- Deel X] [(Oplossing|Modeloplossing|Opgave)] [(Auteur)]
+   Examples:  - "Examen 19 Juni 2017 - Deel 1 (Oplossing)"
+              - "Examen Januari 2021 (Opgave)"
+              - "Examen 2 September 2019 (2de zit) (Oplossing) (Lukas Hiel)"
+              - "Examenvragen Juni 2023 (Kobe)"
+
+B. EXERCISE SESSIONS & HOMEWORK (Category ID: 4 - Oefenzittingen)
+   Template:  Oefenzitting [Nr / Onderwerp] [- Deel X] [(Oplossing|Verslag)] [(Auteur)]
+   Examples:  - "Oefenzitting 3 - Pompen en Compressoren (Oplossing)"
+              - "Oefenzitting 5 - Fourier Transformaties (Opgave)"
+              - "Huiswerk 2 - Statica van Vakwerken (Oplossing) (Nick Hosewol)"
+              - "P&O Verslag - Reverse Engineering Tandwielkast"
+
+C. SUMMARIES & NOTES (Category ID: 3 - Samenvattingen)
+   Template:  Samenvatting [- Deel X] [- Onderwerp / Hoofdstukken] [(Auteur)]
+              Lesnotities [- Deel X] [- Onderwerp] [(Auteur)]
+   Examples:  - "Samenvatting Deel 2 - Matrixmethodes (Nick Hosewol)"
+              - "Lesnotities Hoofdstuk 1-6 (Kato Kenis)"
+              - "Formularium & Overzicht Integratietechnieken"
+
+D. LECTURE SLIDES (Category ID: 6 - Slides / Lesmateriaal)
+   Template:  Slides [- Hoofdstuk/Les X] [- Onderwerp] [(Prof. Naam)]
+   Examples:  - "Slides Les 5 - Management Challenges (Prof. Dejaeger)"
+              - "Slides Hoofdstuk 3 - Lineaire Systemen"
+
+E. LABS & CODE (Category ID: 7 - Labo & Code)
+   Template:  Labo [Nr / Onderwerp] - [Scriptnaam / Functie] [(Taal)]
+   Examples:  - "Labo 2 - Filter Design en FFT (MATLAB)"
+              - "Labo Machine Learning - Distort Random Chance (Python)"
+
+F. MIDTERMS / TTT (Category ID: 5 - TTT's)
+   Template:  TTT [Nr / Datum] [- Vragenreeks X] [(Oplossing|Opgave)] [(Auteur)]
+   Examples:  - "TTT 1 Oktober 2014 - Vragenreeks 1 (Opgave)"
+              - "TTT November 2018 (Oplossing) (Sarah Muys)"
+
+--------------------------------------------------------------------------------
+3. ORTHOGONAL TAG TAXONOMY & FORMAT DETECTION
+--------------------------------------------------------------------------------
+
+RULE: Tags must be strictly orthogonal to the category. NEVER add 'Oefeningen'
+under Oefenzittingen or 'Samenvatting' under Samenvattingen.
+
+Allowed Tag Vocabulary:
+- Solution State:    'Oplossing', 'Modeloplossing', 'Opgave (Blanco)'
+- Exam Sessions:     'Januari', 'Juni', 'Augustus / September (2de zit)', 'Tussentijds (Midterm)'
+- Medium / Format:   'Handgeschreven', 'Code / Script', 'Slides'
+- Document Content:  'Theorie', 'Examenvragen', 'Lesnotities', 'Verslag / Project',
+                     'Formularium', 'Meerkeuze', 'Mondeling'
+- Scope / Division:  'Deel 1', 'Deel 2', 'Deel 3'
+- Language:          'English'
+
+3.1 DEEP HANDWRITTEN VS SCAN VS DIGITAL DETECTION HEURISTICS
+The system inspects 4 distinct technical signals for every document:
+1. Producer/Creator Metadata:
+   - Hardware Scanners (Fujitsu ScanSnap, Canon, HP, Xerox, Samsung): -> 'Handgeschreven'
+   - Mobile Scan Apps (CamScanner, Office Lens, Adobe Scan, Genius Scan): -> 'Handgeschreven'
+   - Digital Engines (Microsoft Word, LaTeX with hyperref, Typst, LibreOffice): -> 'Digitaal'
+2. Page 1 Character Density:
+   - 0 to 30 characters on Page 1 -> Pure raster image / photo scan -> 'Handgeschreven'.
+   - 200+ characters of selectable font streams -> Digital LaTeX / Word document.
+3. Content & Title Cues:
+   - Keywords: 'handgeschreven', 'notities', 'nota', 'lesnota', 'geschreven' -> 'Handgeschreven'
+4. Graphic / Image Object Ratio:
+   - Embedded full-page raster XObjects spanning 100% of media box -> 'Handgeschreven'.
+
+
+--------------------------------------------------------------------------------
+4. AUTHOR & YEAR EXTRACTION RULES
+--------------------------------------------------------------------------------
+
+- Authors:
+  - If a student creator name is detected in the filename, path, or Page 1 text
+    (e.g., "door Lukas Hiel", "Nick Hosewol", "Kato Kenis"), populate `author`: "Full Name"
+    and append `(Full Name)` to the canonical title.
+  - Do NOT mistake professor names (e.g. "Prof. Dejaeger", "Prof. Indekeu", "Bultheel")
+    for student authors. Professor names go inside the title e.g. `(Prof. Dejaeger)`.
+
+- Academic Years:
+  - Format: Strictly "YYYY - YYYY" (e.g. "2018 - 2019").
+  - Only set if explicit date/year is found in filename, session, or Page 1 text.
+  - If year is unknown, return `null`. NEVER guess from upload timestamp.
+
+--------------------------------------------------------------------------------
+5. INPUT / OUTPUT SCHEMA EXAMPLE
+--------------------------------------------------------------------------------
+
+INPUT (Fed to LLM per file):
+{
+  "file_id": "fb5bb8433d37188637a0f6deb725b62737821d4b",
+  "path": "/Core Courses/Management Challenges/Management_Challenges_--_MCCI_Prof._Dejaeger_(Lukas_Hiel).pdf",
+  "filename": "Management_Challenges_in_the_Chemical_Industry_Prof._Dejaeger_(Lukas_Hiel).pdf",
+  "ext": "pdf",
+  "size_kb": 1875.4,
+  "is_scanned": false,
+  "page_count": 30,
+  "page1_text": "Management Challenges in Chemical Industry – Class Notes Lukas Hiel PROF. DEJAEGER (1) Will Our Chemical Industry Become a Fossil?...",
+  "fallback_text": null
+}
+
+DESIRED OUTPUT (Returned by LLM):
+{
+  "file_id": "fb5bb8433d37188637a0f6deb725b62737821d4b",
+  "canonical_title": "Lesnotities Management Challenges Deel 1 (Prof. Dejaeger) (Lukas Hiel)",
+  "category_id": 3,
+  "academic_year": "2023 - 2024",
+  "author": "Lukas Hiel",
+  "tags": ["Lesnotities", "Deel 1", "English"]
+}
+
+--------------------------------------------------------------------------------
+6. SAFETY, VALIDATION & FALLBACK SYSTEM
+--------------------------------------------------------------------------------
+
+1. Schema Validation: Pydantic / JSON schema validator checks every returned object.
+2. Character Limits: Titles enforced <= 255 chars, years strictly match `^\d{4} - \d{4}$` or null.
+3. Category Guard: `category_id` must be an integer in [2, 3, 4, 5, 6, 7].
+4. Tag Filter: Only allowed tags in the vocabulary are stored.
+5. Deterministic Fallback: If an LLM call fails or times out, the system defaults
+   to the existing high-quality regex title and tags with zero data loss.
+================================================================================
