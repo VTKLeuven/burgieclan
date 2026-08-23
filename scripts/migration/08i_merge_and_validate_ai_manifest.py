@@ -296,6 +296,10 @@ def validate_and_merge_record(ai_output, orig_record):
     if has_handwriting_evidence(orig_record) and 'Handgeschreven' not in valid_tags:
         valid_tags.append('Handgeschreven')
 
+    # Ensure every migrated document receives the provenance tag
+    if 'old-burgieclan' not in valid_tags:
+        valid_tags.append('old-burgieclan')
+
     merged['tags'] = valid_tags
     return merged
 

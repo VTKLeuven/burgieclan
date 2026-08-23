@@ -50,6 +50,9 @@
     ],
     "language": [
       "English"
+    ],
+    "provenance": [
+      "old-burgieclan"
     ]
   },
 
@@ -57,7 +60,8 @@
     "'Scan' is a MEDIUM: the document is an image or photo rather than selectable text. It says nothing about what is on the page - a photographed printed exam is a Scan.",
     "'Handgeschreven' is CONTENT: the page carries handwriting. Apply it only when you can actually see handwriting, not merely because the document is a scan.",
     "The two are independent and may appear together. Most scans in this archive are photographed printed material, so do not assume a scan is handwritten.",
-    "'MATLAB', 'Python', 'Java', 'C / C++', 'Excel' identify the programming language, software stack, or spreadsheet tool used."
+    "'MATLAB', 'Python', 'Java', 'C / C++', 'Excel' identify the programming language, software stack, or spreadsheet tool used.",
+    "'old-burgieclan' is the provenance tag automatically attached to all documents migrated from the legacy archive."
   ],
 
   "patterns": {
@@ -91,7 +95,10 @@
     "Studiewijzer": "Studiewijzer / Gids",
     "Gids": "Studiewijzer / Gids",
     "Dataset": "Dataset / Data",
-    "Data": "Dataset / Data"
+    "Data": "Dataset / Data",
+    "Old Burgieclan": "old-burgieclan",
+    "old burgieclan": "old-burgieclan",
+    "Old-Burgieclan": "old-burgieclan"
   },
 
   "redundant_in_category": {
