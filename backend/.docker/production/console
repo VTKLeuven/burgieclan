@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# Run bin/console as www-data, the user PHP-FPM runs as.
+#
+# `docker compose exec` enters the container as root. A console command boots the
+# Symfony kernel, which rewrites /app/var/cache/prod as whoever invoked it, so a
+# root run leaves behind a cache the FPM workers can read but not write. Parts of
+# that cache are built lazily on the first request that needs them (Vich's JMS
+# metadata directory, for one) and those writes then fail — every SSO login dies
+# with "The directory /app/var/cache/prod/vich_uploader is not writable".
+#
+# Restarting the container repairs it, because startup.sh chowns /app/var and
+# re-warms the cache as www-data. This wrapper makes that repair unnecessary.
+#
+# Usage: docker compose exec backend console <command> [options]
+
+set -e
+
+if [ "$(id -u)" -eq 0 ]; then
+    exec su-exec www-data php /app/bin/console "$@"
+fi
+
+exec php /app/bin/console "$@"
