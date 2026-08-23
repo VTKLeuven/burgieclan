@@ -127,13 +127,13 @@ flowchart TD
    ```
 4. Assert:
    - Command exits with code `0`.
-   - Dry-run inspects all **16,816 physical files** with 0 missing files.
+   - Dry-run inspects **all records emitted by `08i`** (exact `stats['output']` count, ~16,816 physical files) with **0 missing files**.
    - `--manifest.failures.jsonl` does not exist or has 0 rows.
 
 ---
 
 ### Phase 5: Live Ingestion & S3 Streaming
-1. Run live ingestion inside a detached session (`screen` / `tmux`) to survive SSH drops:
+1. Run live ingestion inside a detached session (`screen`) to survive SSH drops:
    ```bash
    ssh it@liv "cd /opt/burgieclan && screen -dmS seafile-import docker compose -f docker-compose.prod.yml run --rm \
      -v /mnt/immich/burgieclan-staging:/staging:ro backend \
@@ -142,13 +142,14 @@ flowchart TD
        --staged-dir=/staging \
        --creator=it@vtk.be"
    ```
-2. Monitor progress:
+2. Monitor live progress anytime by attaching to the screen session:
    ```bash
-   ssh it@liv "docker logs -f \$(docker ps -q --filter ancestor=burgieclan-backend)"
+   ssh -t it@liv "screen -r seafile-import"
    ```
+   *(To detach cleanly without stopping the import, press `Ctrl+A` followed by `D`)*.
 3. Post-Ingestion Verification:
    - Check failure log: `test ! -s /mnt/immich/burgieclan-staging/manifest_final_for_import.jsonl.failures.jsonl`
-   - Database row count: `SELECT count(*) FROM document WHERE seafile_file_id IS NOT NULL;` -> **16,816 documents**.
+   - Database row count: `SELECT count(*) FROM document WHERE seafile_file_id IS NOT NULL;` matches exact `08i` manifest output count (~16,816 documents).
    - Tag assignments: `SELECT count(*) FROM tag_document;` -> **100% tagged with old-burgieclan**.
    - Take post-migration backup: `docker compose -f docker-compose.prod.yml run --rm backend console app:backup`
 4. Verify user-facing course pages on `https://burgieclan.vtk.be`!
