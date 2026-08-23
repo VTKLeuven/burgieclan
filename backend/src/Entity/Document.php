@@ -12,6 +12,7 @@ use Vich\UploaderBundle\Mapping\Attribute as Vich;
 
 #[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: DocumentRepository::class)]
+#[ORM\UniqueConstraint(name: 'uniq_document_seafile_file_id_course', columns: ['seafile_file_id', 'course_id'])]
 class Document extends Node implements VotableInterface
 {
     #[ORM\Column(length: 255)]
@@ -42,6 +43,19 @@ class Document extends Node implements VotableInterface
 
     #[ORM\Column(length: 11, nullable: true)]
     private ?string $year = null; // Ex. 2024 - 2025
+
+    /**
+     * Seafile content hash of the file this document was migrated from.
+     *
+     * Null for anything uploaded through the app. Set only by the Seafile import,
+     * where it is the resume key: a re-run skips every (file_id, course) pair
+     * already present, so an interrupted import can simply be started again.
+     *
+     * Unique per course rather than globally: one Seafile file can legitimately
+     * belong to two courses, and 170 of the migrated files do.
+     */
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $seafile_file_id = null;
 
     /**
      * @var Collection<int, Tag>
@@ -219,6 +233,17 @@ class Document extends Node implements VotableInterface
     /**
      * @return Collection<int, Tag>
      */
+    public function getSeafileFileId(): ?string
+    {
+        return $this->seafile_file_id;
+    }
+
+    public function setSeafileFileId(?string $seafile_file_id): static
+    {
+        $this->seafile_file_id = $seafile_file_id;
+        return $this;
+    }
+
     public function getTags(): Collection
     {
         return $this->tags;

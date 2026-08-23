@@ -97,7 +97,14 @@ class RestoreCommand extends Command
             $io->note('Dry run - nothing will be modified.');
         }
 
+        if ($skipDatabase && !$withDocuments) {
+            $io->warning('Nothing to do: --skip-database was given without --with-documents.');
+
+            return Command::SUCCESS;
+        }
+
         try {
+            $targetKey = null;
             if (!$skipDatabase) {
                 $targetKey = $this->resolveTargetDump(
                     $backupClient,
@@ -106,25 +113,18 @@ class RestoreCommand extends Command
                 );
 
                 $io->section(sprintf('Target Database Dump: %s', $targetKey));
+            }
 
-                if (!$dryRun && !$force) {
-                    $dsn = $this->parseDatabaseUrl($config['database_url']);
-                    $confirm = $io->confirm(
-                        sprintf(
-                            'Are you sure you want to restore "%s" into "%s"? This will OVERWRITE existing data.',
-                            $targetKey,
-                            $dsn['dbname']
-                        ),
-                        false
-                    );
+            // One prompt covering everything this run will overwrite. Restoring
+            // documents writes into the live bucket, so it needs confirming just
+            // as much as the database does.
+            if (!$dryRun && !$force && !$this->confirmDestructiveRun($io, $config, $targetKey, $withDocuments)) {
+                $io->note('Restore aborted.');
 
-                    if (!$confirm) {
-                        $io->note('Restore aborted.');
+                return Command::SUCCESS;
+            }
 
-                        return Command::SUCCESS;
-                    }
-                }
-
+            if ($targetKey !== null) {
                 $this->restoreDatabase($io, $backupClient, $config, $targetKey, $dryRun);
             }
 
@@ -147,6 +147,42 @@ class RestoreCommand extends Command
         $io->success('Restore completed successfully.');
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Asks for confirmation, spelling out every destructive effect of this run.
+     *
+     * @param array{database_url: string, source: array<string, string>, backup: array<string, string>} $config
+     */
+    private function confirmDestructiveRun(
+        SymfonyStyle $io,
+        array $config,
+        ?string $targetKey,
+        bool $withDocuments
+    ): bool {
+        $actions = [];
+
+        if ($targetKey !== null) {
+            $actions[] = sprintf(
+                'restore "%s" into database "%s", OVERWRITING all existing data',
+                $targetKey,
+                $this->parseDatabaseUrl($config['database_url'])['dbname']
+            );
+        }
+
+        if ($withDocuments) {
+            $actions[] = sprintf(
+                'write missing or mismatched document objects into the LIVE bucket "%s"',
+                $config['source']['bucket']
+            );
+        }
+
+        $io->warning('This run will:');
+        foreach ($actions as $action) {
+            $io->text(sprintf('  - %s', $action));
+        }
+
+        return $io->confirm('Are you sure you want to continue?', false);
     }
 
     /**
@@ -272,6 +308,11 @@ class RestoreCommand extends Command
             '--dbname=' . $dsn['dbname'],
             '--clean',
             '--if-exists',
+            // Without this, pg_restore continues past failures and still exits 1,
+            // so a restore that dropped every table and loaded no rows would look
+            // like a success. --single-transaction implies --exit-on-error and
+            // rolls the whole archive back on the first failure.
+            '--single-transaction',
             '--no-password',
             $file,
         ];
@@ -287,14 +328,15 @@ class RestoreCommand extends Command
             throw new RuntimeException('Could not start pg_restore. Is postgresql-client installed in this image?');
         }
 
-        $stdout = stream_get_contents($pipes[1]) ?: '';
         $stderr = stream_get_contents($pipes[2]) ?: '';
         fclose($pipes[1]);
         fclose($pipes[2]);
         $status = proc_close($process);
 
-        // pg_restore exit status: 0 = success, 1 = warnings (e.g. drop table when table didn't exist), >1 = errors
-        if ($status > 1) {
+        // With --if-exists the benign "does not exist" notices are suppressed and
+        // with --single-transaction any real error aborts the run, so anything
+        // other than 0 means the database was not restored.
+        if ($status !== 0) {
             throw new RuntimeException(sprintf('pg_restore failed (exit %d): %s', $status, trim($stderr)));
         }
     }
