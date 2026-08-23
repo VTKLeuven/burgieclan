@@ -44,6 +44,9 @@ class Document extends Node implements VotableInterface
     #[ORM\Column(length: 11, nullable: true)]
     private ?string $year = null; // Ex. 2024 - 2025
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $author = null;
+
     /**
      * Seafile content hash of the file this document was migrated from.
      *
@@ -230,9 +233,6 @@ class Document extends Node implements VotableInterface
         return $choices;
     }
 
-    /**
-     * @return Collection<int, Tag>
-     */
     public function getSeafileFileId(): ?string
     {
         return $this->seafile_file_id;
@@ -244,6 +244,9 @@ class Document extends Node implements VotableInterface
         return $this;
     }
 
+    /**
+     * @return Collection<int, Tag>
+     */
     public function getTags(): Collection
     {
         return $this->tags;
