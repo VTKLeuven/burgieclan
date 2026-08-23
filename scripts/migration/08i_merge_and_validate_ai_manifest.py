@@ -74,43 +74,80 @@ def sanitize_dedup_suffixes(text):
     text = re.sub(r'_copy\d*$', '', text, flags=re.IGNORECASE)
     return text.strip()
 
+P_VANAF_FULL = re.compile(r'\b(?:vanaf|sinds|from|post[-_]?)\s*(\d{4})\s*[-_/]\s*(\d{2,4})\b', re.IGNORECASE)
+P_VANAF_SINGLE = re.compile(r'\b(?:vanaf|sinds|from|post[-_]?)\s*(\d{4})\b', re.IGNORECASE)
+P_TOT_FULL = re.compile(r'\b(?:tot|tot\s*en\s*met|t/m|until|through)\s*(\d{4})\s*[-_/]\s*(\d{2,4})\b', re.IGNORECASE)
+P_TOT_SINGLE = re.compile(r'\b(?:tot|tot\s*en\s*met|t/m|until|through)\s*(\d{4})\b', re.IGNORECASE)
+P_VOOR_FULL = re.compile(r'\b(?:voor|pre[-_]?|before)\s*(\d{4})\s*[-_/]\s*(\d{2,4})\b', re.IGNORECASE)
+P_VOOR_SINGLE = re.compile(r'\b(?:voor|pre[-_]?|before)\s*(\d{4})\b', re.IGNORECASE)
+
+
+def extract_boundary_year(text):
+    """Extracts boundary academic year from phrases like 'vanaf 2018-2019', 'pre 2018', 'tot 2017'."""
+    m = P_VANAF_FULL.search(text)
+    if m:
+        y1 = int(m.group(1))
+        return f"{y1} - {y1+1}"
+    m = P_VANAF_SINGLE.search(text)
+    if m:
+        y1 = int(m.group(1))
+        return f"{y1} - {y1+1}"
+    m = P_TOT_FULL.search(text)
+    if m:
+        y1 = int(m.group(1))
+        return f"{y1} - {y1+1}"
+    m = P_VOOR_FULL.search(text)
+    if m:
+        y1 = int(m.group(1))
+        return f"{y1-1} - {y1}"
+    m = P_VOOR_SINGLE.search(text)
+    if m:
+        y1 = int(m.group(1))
+        return f"{y1-1} - {y1}"
+    return None
+
+
 def verify_academic_year(year_candidate, record):
     """
     Mechanically verifies that year_candidate matches 'YYYY - YYYY',
     satisfies y2 == y1 + 1 and y1 <= CURRENT_MAX_YEAR,
     and actually appears in the input filename, path, or page preview text.
+    Fallback: extracts boundary years from folder paths (e.g. 'pre 2018' -> '2017 - 2018').
     """
+    input_text = f"{record.get('path', '')} {record.get('filename', '')} {record.get('content_preview', {}).get('page1_text', '')} {record.get('content_preview', {}).get('fallback_text', '')}"
+
     if not year_candidate:
-        return None
+        return extract_boundary_year(input_text)
         
     year_match = re.match(r'^(\d{4})\s*-\s*(\d{4})$', str(year_candidate).strip())
     if not year_match:
-        return None
+        return extract_boundary_year(input_text)
         
     y1, y2 = int(year_match.group(1)), int(year_match.group(2))
     if y2 != y1 + 1 or y1 > CURRENT_MAX_YEAR or y1 < 1980:
-        return None
+        return extract_boundary_year(input_text)
         
-    # Check if year numbers appear in input context
-    input_text = f"{record.get('path', '')} {record.get('filename', '')} {record.get('content_preview', {}).get('page1_text', '')} {record.get('content_preview', {}).get('fallback_text', '')}"
-    
     y1_str = str(y1)
+    y2_str = str(y2)
     y1_short = str(y1)[2:]
     y2_short = str(y2)[2:]
     
-    # Matches "2018", "2018-2019", "18-19", "18_19", "2018_2019"
+    # Matches "2018", "2019", "2018-2019", "18-19", "18_19", "2018_2019", "pre 2019", "voor 2019"
     patterns = [
         rf'\b{y1_str}\b',
+        rf'\b{y2_str}\b',
         rf'\b{y1_short}[-_/]{y2_short}\b',
         rf'\b{y1_str}[-_/]{y2_short}\b',
-        rf'\b{y1_str}[-_/]{y2}\b'
+        rf'\b{y1_str}[-_/]{y2}\b',
+        rf'\b(?:pre|voor)\s*{y2_str}\b',
+        rf'\b(?:tot)\s*{y1_str}\b',
+        rf'\b(?:vanaf)\s*{y1_str}\b'
     ]
     
     if any(re.search(p, input_text, re.IGNORECASE) for p in patterns):
         return f"{y1} - {y2}"
         
-    # Not verified in input -> mechanically reject hallucination
-    return None
+    return extract_boundary_year(input_text)
 
 HANDWRITING_EVIDENCE = re.compile(
     r'\b(handgeschreven|handwritten|manueel|hand-geschreven|eigen\s+notities|eigen\s+nota)\b',
@@ -432,6 +469,8 @@ def main():
 
     with open(args.input, "r", encoding="utf-8") as f:
         records = json.load(f)
+    if isinstance(records, dict) and "documents" in records:
+        records = records["documents"]
 
     ai_by_file_id = {}
     if args.ai_output:
