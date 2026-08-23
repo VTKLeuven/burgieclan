@@ -55,7 +55,12 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
                     $course,
                     CourseApi::class,
                     [
-                        MicroMapperInterface::MAX_DEPTH => 0,
+                        // SUMMARY + depth 1, not depth 0: MicroMapper skips populate()
+                        // entirely at depth 0, which would leave a related course with an
+                        // IRI and no code or name to render. SUMMARY stops it there, so it
+                        // does not walk on into its own relations.
+                        MappingContext::SUMMARY => true,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },
@@ -67,7 +72,12 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
                     $course,
                     CourseApi::class,
                     [
-                        MicroMapperInterface::MAX_DEPTH => 0,
+                        // SUMMARY + depth 1, not depth 0: MicroMapper skips populate()
+                        // entirely at depth 0, which would leave a related course with an
+                        // IRI and no code or name to render. SUMMARY stops it there, so it
+                        // does not walk on into its own relations.
+                        MappingContext::SUMMARY => true,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },
@@ -80,7 +90,12 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
                     $course,
                     CourseApi::class,
                     [
-                        MicroMapperInterface::MAX_DEPTH => 0,
+                        // SUMMARY + depth 1, not depth 0: MicroMapper skips populate()
+                        // entirely at depth 0, which would leave a related course with an
+                        // IRI and no code or name to render. SUMMARY stops it there, so it
+                        // does not walk on into its own relations.
+                        MappingContext::SUMMARY => true,
+                        MicroMapperInterface::MAX_DEPTH => 1,
                     ]
                 );
             },
