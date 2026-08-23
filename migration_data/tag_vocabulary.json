@@ -1,0 +1,35 @@
+{
+  "solution_state": [
+    "Oplossing",
+    "Oplossing (Student)",
+    "Modeloplossing",
+    "Opgave (Blanco)"
+  ],
+  "exam_sessions": [
+    "Januari",
+    "Juni",
+    "Herexamen (2de zit)",
+    "Tussentijds (Midterm)",
+    "Reconstructie / Vragen",
+    "Oefeningen (Examen)"
+  ],
+  "format_and_content": [
+    "Handgeschreven",
+    "Theorie",
+    "Lesnotities",
+    "Verslag / Project",
+    "Formularium",
+    "Bundel / Alle",
+    "Meerkeuze",
+    "Mondeling"
+  ],
+  "divisions": [
+    "Deel 1",
+    "Deel 2",
+    "Deel 3",
+    "Deel 4"
+  ],
+  "language": [
+    "English"
+  ]
+}
