@@ -17,15 +17,19 @@
     "category_name_nl": "Samenvattingen",
     "category_name_en": "Summaries",
     "category_proposal": "Overig / Other",
-    "tags": [],
+    "tags": [
+      "Lesnotities",
+      "Deel 1",
+      "English"
+    ],
     "course_id": 1814,
     "course_code": "H09D9A",
     "course_name": "Management Challenges in the Chemical Industry",
     "match_type": "exact_code_match",
     "year_confidence": "none",
     "year_source": "mtime",
-    "author": null,
-    "display_title": "Management Challenges In The Chemical Industry MCCI Prof Dejaeger (lukas Hiel)",
+    "author": "Lukas Hiel",
+    "display_title": "Lesnotities Deel 1 - Will Our Chemical Industry Become a Fossil? (Prof. Dejaeger) (Lukas Hiel)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 30,
@@ -52,15 +56,18 @@
     "category_name_nl": "Samenvattingen",
     "category_name_en": "Summaries",
     "category_proposal": "Overig / Other",
-    "tags": [],
+    "tags": [
+      "Lesnotities",
+      "English"
+    ],
     "course_id": 1814,
     "course_code": "H09D9A",
     "course_name": "Management Challenges in the Chemical Industry",
     "match_type": "exact_code_match",
     "year_confidence": "none",
     "year_source": "mtime",
-    "author": null,
-    "display_title": "Management Challenges In The Chemical Industry MCCI Prof Sterckx (lukas Hiel)",
+    "author": "Lukas Hiel",
+    "display_title": "Lesnotities - Prof. Sterckx (Lukas Hiel)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 19,
@@ -83,12 +90,12 @@
     "alt_paths": [],
     "title": "Mech3slidesenergiemethodeslessenen5examens20 21(thomas De Wolf)",
     "year": "2020 - 2021",
-    "category_id": 2,
+    "category_id": 6,
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
-      "Slides"
+      "Bundel / Alle"
     ],
     "course_id": 100,
     "course_code": "H01G7A",
@@ -96,8 +103,8 @@
     "match_type": "exact_code_match",
     "year_confidence": "high",
     "year_source": "filename_range_2digit",
-    "author": null,
-    "display_title": "Mech3slidesenergiemethodeslessenen5examens20 21(thomas De Wolf)",
+    "author": "Thomas de Wolf",
+    "display_title": "Slides Energiemethodes en 5 Examens (Thomas de Wolf)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -125,7 +132,9 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Deel 3",
+      "Lesnotities",
+      "Bundel / Alle",
+      "Scan",
       "Handgeschreven"
     ],
     "course_id": 100,
@@ -135,7 +144,7 @@
     "year_confidence": "high",
     "year_source": "filename_range_4digit",
     "author": "Glenn Peeters",
-    "display_title": "Toegepaste Mechanica, Deel 3 Lesnotities En Oefenzittingen (glenn Peeters) 2017 2018",
+    "display_title": "Lesnotities en Oefenzittingen (Glenn Peeters)",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 1,
@@ -163,7 +172,10 @@
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
-    "tags": [],
+    "tags": [
+      "Juni",
+      "Modeloplossing"
+    ],
     "course_id": 100,
     "course_code": "H01G7A",
     "course_name": "Applied Mechanics 3: Matrix & Energy Methods for Kinetostatics",
@@ -171,7 +183,7 @@
     "year_confidence": "high",
     "year_source": "filename_prefix_yymmdd",
     "author": null,
-    "display_title": "190617modeloplossing1",
+    "display_title": "Examen 17 Juni 2019 - Vraag 1 (Modeloplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 14,
@@ -207,8 +219,8 @@
     "match_type": "exact_code_match",
     "year_confidence": "medium",
     "year_source": "filename_single_year",
-    "author": null,
-    "display_title": "2023 Voorbeeld Examenvragen Kobe",
+    "author": "Kobe",
+    "display_title": "Examenvragen 2023 (Kobe)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 26,
@@ -236,6 +248,7 @@
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
+      "Juni",
       "Oplossing"
     ],
     "course_id": 100,
@@ -245,7 +258,7 @@
     "year_confidence": "high",
     "year_source": "filename_iso_date",
     "author": null,
-    "display_title": "Examen 2007 06 21 (oplossing)",
+    "display_title": "Examen 21 Juni 2007 (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 10,
@@ -273,6 +286,7 @@
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
+      "Juni",
       "Oplossing"
     ],
     "course_id": 100,
@@ -282,7 +296,7 @@
     "year_confidence": "high",
     "year_source": "filename_iso_date",
     "author": null,
-    "display_title": "Examen 2008 06 20 (oplossing)",
+    "display_title": "Examen 20 Juni 2008 (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 14,
@@ -310,6 +324,7 @@
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
+      "Juni",
       "Oplossing"
     ],
     "course_id": 100,
@@ -319,7 +334,7 @@
     "year_confidence": "high",
     "year_source": "filename_iso_date",
     "author": null,
-    "display_title": "Examen 2009 06 17 (oplossing)",
+    "display_title": "Examen 17 Juni 2009 (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 12,
@@ -347,6 +362,7 @@
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
+      "Juni",
       "Oplossing"
     ],
     "course_id": 100,
@@ -356,7 +372,7 @@
     "year_confidence": "high",
     "year_source": "filename_iso_date",
     "author": null,
-    "display_title": "Examen 2010 06 14 (oplossing)",
+    "display_title": "Examen 14 Juni 2010 (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 16,
@@ -384,6 +400,7 @@
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
+      "Juni",
       "Oplossing"
     ],
     "course_id": 100,
@@ -393,7 +410,7 @@
     "year_confidence": "high",
     "year_source": "filename_iso_date",
     "author": null,
-    "display_title": "Examen 2011 06 10 (oplossing)",
+    "display_title": "Examen 10 Juni 2011 (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 25,
@@ -421,6 +438,7 @@
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
+      "Juni",
       "Oplossing"
     ],
     "course_id": 100,
@@ -430,7 +448,7 @@
     "year_confidence": "high",
     "year_source": "filename_iso_date",
     "author": null,
-    "display_title": "Examen 2012 06 11 (oplossing)",
+    "display_title": "Examen 11 Juni 2012 (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 23,
@@ -458,6 +476,7 @@
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
+      "Juni",
       "Oplossing"
     ],
     "course_id": 100,
@@ -467,7 +486,7 @@
     "year_confidence": "high",
     "year_source": "filename_iso_date",
     "author": null,
-    "display_title": "Examen 2013 06 10 (oplossing)",
+    "display_title": "Examen 10 Juni 2013 (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 26,
@@ -495,6 +514,7 @@
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
+      "Juni",
       "Oplossing"
     ],
     "course_id": 100,
@@ -504,7 +524,7 @@
     "year_confidence": "high",
     "year_source": "filename_iso_date",
     "author": null,
-    "display_title": "Examen 2014 06 16 (oplossing) (vraag 3)",
+    "display_title": "Examen 16 Juni 2014 - Vraag 3 (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 7,
@@ -532,6 +552,7 @@
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
+      "Juni",
       "Deel 2",
       "Oplossing"
     ],
@@ -542,7 +563,7 @@
     "year_confidence": "high",
     "year_source": "filename_iso_date",
     "author": null,
-    "display_title": "Examen 2015 06 15 (oplossing) (deel 2)",
+    "display_title": "Examen 15 Juni 2015 - Deel 2 (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 7,
@@ -570,6 +591,7 @@
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
+      "Juni",
       "Oplossing"
     ],
     "course_id": 100,
@@ -579,7 +601,7 @@
     "year_confidence": "high",
     "year_source": "filename_iso_date",
     "author": null,
-    "display_title": "Examen 2016 06 13 (oplossing)",
+    "display_title": "Examen 13 Juni 2016 (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 15,
@@ -609,6 +631,7 @@
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
+      "Juni",
       "Deel 1",
       "Oplossing"
     ],
@@ -619,7 +642,7 @@
     "year_confidence": "high",
     "year_source": "filename_iso_date",
     "author": null,
-    "display_title": "Examen 2017 06 19 (oplossing) (deel 1)",
+    "display_title": "Examen 19 Juni 2017 - Deel 1 (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 7,
@@ -649,6 +672,7 @@
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
+      "Juni",
       "Deel 2",
       "Oplossing"
     ],
@@ -659,7 +683,7 @@
     "year_confidence": "high",
     "year_source": "filename_iso_date",
     "author": null,
-    "display_title": "Examen 2017 06 19 (oplossing) (deel 2)",
+    "display_title": "Examen 19 Juni 2017 - Deel 2 (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 9,
@@ -686,7 +710,10 @@
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
-    "tags": [],
+    "tags": [
+      "Juni",
+      "Modeloplossing"
+    ],
     "course_id": 100,
     "course_code": "H01G7A",
     "course_name": "Applied Mechanics 3: Matrix & Energy Methods for Kinetostatics",
@@ -694,7 +721,7 @@
     "year_confidence": "high",
     "year_source": "filename_year_with_session",
     "author": null,
-    "display_title": "Examen2022 11juni Modeloplossing",
+    "display_title": "Examen 11 Juni 2022 (Modeloplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 6,
@@ -721,7 +748,10 @@
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
-    "tags": [],
+    "tags": [
+      "Juni",
+      "Modeloplossing"
+    ],
     "course_id": 100,
     "course_code": "H01G7A",
     "course_name": "Applied Mechanics 3: Matrix & Energy Methods for Kinetostatics",
@@ -729,7 +759,7 @@
     "year_confidence": "high",
     "year_source": "filename_year_with_session",
     "author": null,
-    "display_title": "Examen2022 18juni Modeloplossing",
+    "display_title": "Examen 18 Juni 2022 (Modeloplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 7,
@@ -756,7 +786,10 @@
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
-    "tags": [],
+    "tags": [
+      "Juni",
+      "Opgave (Blanco)"
+    ],
     "course_id": 100,
     "course_code": "H01G7A",
     "course_name": "Applied Mechanics 3: Matrix & Energy Methods for Kinetostatics",
@@ -764,7 +797,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "Examen 2007 06 21 Opgave",
+    "display_title": "Examen 21 Juni 2007 (Opgave)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 10,
@@ -791,7 +824,10 @@
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
-    "tags": [],
+    "tags": [
+      "Juni",
+      "Opgave (Blanco)"
+    ],
     "course_id": 100,
     "course_code": "H01G7A",
     "course_name": "Applied Mechanics 3: Matrix & Energy Methods for Kinetostatics",
@@ -799,7 +835,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "Examen 2008 06 20 Opgave",
+    "display_title": "Examen 20 Juni 2008 (Opgave)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 14,
@@ -826,7 +862,10 @@
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
-    "tags": [],
+    "tags": [
+      "Juni",
+      "Opgave (Blanco)"
+    ],
     "course_id": 100,
     "course_code": "H01G7A",
     "course_name": "Applied Mechanics 3: Matrix & Energy Methods for Kinetostatics",
@@ -834,7 +873,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "Examen 2009 06 17 Opgave",
+    "display_title": "Examen 17 Juni 2009 (Opgave)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 12,
@@ -861,7 +900,10 @@
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
-    "tags": [],
+    "tags": [
+      "Juni",
+      "Opgave (Blanco)"
+    ],
     "course_id": 100,
     "course_code": "H01G7A",
     "course_name": "Applied Mechanics 3: Matrix & Energy Methods for Kinetostatics",
@@ -869,7 +911,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "Examen 2010 06 14 Opgave",
+    "display_title": "Examen 14 Juni 2010 (Opgave)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 16,
@@ -896,7 +938,10 @@
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
-    "tags": [],
+    "tags": [
+      "Juni",
+      "Opgave (Blanco)"
+    ],
     "course_id": 100,
     "course_code": "H01G7A",
     "course_name": "Applied Mechanics 3: Matrix & Energy Methods for Kinetostatics",
@@ -904,7 +949,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "Examen 2011 06 10 En 20 Opgave",
+    "display_title": "Examen 10 & 20 Juni 2011 (Opgave)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 25,
@@ -931,7 +976,10 @@
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
-    "tags": [],
+    "tags": [
+      "Juni",
+      "Opgave (Blanco)"
+    ],
     "course_id": 100,
     "course_code": "H01G7A",
     "course_name": "Applied Mechanics 3: Matrix & Energy Methods for Kinetostatics",
@@ -939,7 +987,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "Examen 2012 06 11 En 18 Opgave",
+    "display_title": "Examen 11 & 18 Juni 2012 (Opgave)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 23,
@@ -966,7 +1014,10 @@
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
-    "tags": [],
+    "tags": [
+      "Juni",
+      "Opgave (Blanco)"
+    ],
     "course_id": 100,
     "course_code": "H01G7A",
     "course_name": "Applied Mechanics 3: Matrix & Energy Methods for Kinetostatics",
@@ -974,7 +1025,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "Examen 2013 06 10 En 17 Opgave",
+    "display_title": "Examen 10 & 17 Juni 2013 (Opgave)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 26,
@@ -1001,15 +1052,18 @@
     "category_name_nl": "Samenvattingen",
     "category_name_en": "Summaries",
     "category_proposal": "Samenvattingen",
-    "tags": [],
+    "tags": [
+      "Theorie",
+      "Formularium"
+    ],
     "course_id": 4,
     "course_code": "H01B0B",
     "course_name": "Toegepaste mechanica 1",
     "match_type": "exact_name_match",
     "year_confidence": "none",
     "year_source": "mtime",
-    "author": null,
-    "display_title": "Afleidingimpulsmomentvector",
+    "author": "Olivier Renders",
+    "display_title": "Afleiding Relatieve Impulsmomentvector (Olivier Renders)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 7,
@@ -1037,6 +1091,7 @@
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
+      "Januari",
       "Scan"
     ],
     "course_id": 4,
@@ -1046,7 +1101,7 @@
     "year_confidence": "high",
     "year_source": "filename_year_with_session",
     "author": null,
-    "display_title": "9januari2015",
+    "display_title": "Examen 9 Januari 2015",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 1,
@@ -1074,6 +1129,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
+      "Lesnotities",
+      "Scan",
       "Handgeschreven"
     ],
     "course_id": 4,
@@ -1083,7 +1140,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "Mechanica Oefeningen Notities",
+    "display_title": "Lesnotities Oefeningen",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 34,
@@ -1113,6 +1170,7 @@
     "tags": [
       "Lesnotities",
       "Theorie",
+      "Scan",
       "Handgeschreven"
     ],
     "course_id": 4,
@@ -1122,7 +1180,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "Mechanica Theorie Notities",
+    "display_title": "Lesnotities Theorie",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 50,
@@ -1150,7 +1208,8 @@
     "category_name_en": "Summaries",
     "category_proposal": "Samenvattingen",
     "tags": [
-      "Theorie"
+      "Lesnotities",
+      "Scan"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1158,8 +1217,8 @@
     "match_type": "exact_name_match",
     "year_confidence": "none",
     "year_source": "mtime",
-    "author": null,
-    "display_title": "Notas Jeroenbelis Mechanica",
+    "author": "Jeroen Belis",
+    "display_title": "Lesnotities (Jeroen Belis)",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 66,
@@ -1187,7 +1246,8 @@
     "category_name_en": "Summaries",
     "category_proposal": "Samenvattingen",
     "tags": [
-      "Theorie"
+      "Lesnotities",
+      "Scan"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1195,8 +1255,8 @@
     "match_type": "exact_name_match",
     "year_confidence": "none",
     "year_source": "mtime",
-    "author": null,
-    "display_title": "Notaslaatsteles Jeroenbelis",
+    "author": "Jeroen Belis",
+    "display_title": "Lesnotities Laatste Les (Jeroen Belis)",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 3,
@@ -1224,7 +1284,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 1"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1261,7 +1322,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 1"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1298,7 +1360,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 1"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1335,7 +1398,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 1"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1372,7 +1436,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 1"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1409,7 +1474,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 1"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1446,7 +1512,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 1"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1483,7 +1550,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 1"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1520,7 +1588,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 1"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1557,7 +1626,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 1"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1594,7 +1664,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 2"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1631,7 +1702,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 2"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1668,7 +1740,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 2"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1705,7 +1778,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 2"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1742,7 +1816,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 2"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1779,7 +1854,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 2"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1816,7 +1892,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 2"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1853,7 +1930,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 3"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1890,7 +1968,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 3"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1927,7 +2006,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 3"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -1964,7 +2044,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 3"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -2001,7 +2082,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 3"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -2038,7 +2120,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 3"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -2075,7 +2158,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Scan"
+      "Scan",
+      "Deel 3"
     ],
     "course_id": 4,
     "course_code": "H01B0B",
@@ -2122,7 +2206,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "Antwoorden Examenvragen",
+    "display_title": "Examenvragen - Antwoorden (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -2196,7 +2280,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "Examenvragen Socs",
+    "display_title": "Examenvragen SOCS",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -2225,15 +2309,18 @@
     "category_name_nl": "Oefenzittingen",
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
-    "tags": [],
+    "tags": [
+      "Oplossing",
+      "Bundel / Alle"
+    ],
     "course_id": 12,
     "course_code": "H01B6B",
     "course_name": "Methodiek van de informatica",
     "match_type": "exact_name_match",
     "year_confidence": "none",
     "year_source": "mtime",
-    "author": null,
-    "display_title": "JAVA Bluej Oplossingen",
+    "author": "M. Hemeryck",
+    "display_title": "Bundel Oefeningen Java BlueJ (Oplossing) (M. Hemeryck)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 220,
@@ -2258,13 +2345,14 @@
       "/Semester 2/H01B6B - Methodiek van de Informatica/pre-python/informatica.pdf"
     ],
     "title": "Oplossingen",
-    "year": null,
+    "year": "2009 - 2010",
     "category_id": 4,
     "category_name_nl": "Oefenzittingen",
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Oplossing"
+      "Oplossing",
+      "Bundel / Alle"
     ],
     "course_id": 12,
     "course_code": "H01B6B",
@@ -2272,8 +2360,8 @@
     "match_type": "exact_name_match",
     "year_confidence": "none",
     "year_source": "mtime",
-    "author": null,
-    "display_title": "Oplossingen",
+    "author": "Daniël Slenders",
+    "display_title": "Bundel Oefeningen (Oplossing) (Daniël Slenders)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 63,
@@ -2302,7 +2390,9 @@
     "category_name_nl": "Samenvattingen",
     "category_name_en": "Summaries",
     "category_proposal": "Overig / Other",
-    "tags": [],
+    "tags": [
+      "Theorie"
+    ],
     "course_id": 12,
     "course_code": "H01B6B",
     "course_name": "Methodiek van de informatica",
@@ -2310,7 +2400,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "Stof Tot Nadenken",
+    "display_title": "Theorie - Stof tot Nadenken",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -2333,11 +2423,12 @@
     "alt_paths": [],
     "title": "Oplossingen Theorievragen Be 2017 2018",
     "year": "2017 - 2018",
-    "category_id": 4,
+    "category_id": 3,
     "category_name_nl": "Oefenzittingen",
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
+      "Theorie",
       "Oplossing"
     ],
     "course_id": 12,
@@ -2346,8 +2437,8 @@
     "match_type": "exact_name_match",
     "year_confidence": "high",
     "year_source": "filename_range_4digit",
-    "author": null,
-    "display_title": "Oplossingen Theorievragen BE 2017 2018",
+    "author": "Robin Haveneers",
+    "display_title": "Theorievragen Bedrijfskunde & Entrepreneurship (Oplossing) (Robin Haveneers)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 19,
@@ -2382,7 +2473,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "ZIE Bach2 Elektro",
+    "display_title": "Info Digitale Elektronica en Processoren",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -2409,7 +2500,9 @@
     "category_name_nl": "Samenvattingen",
     "category_name_en": "Summaries",
     "category_proposal": "Samenvattingen",
-    "tags": [],
+    "tags": [
+      "Theorie"
+    ],
     "course_id": 12,
     "course_code": "H01B6B",
     "course_name": "Methodiek van de informatica",
@@ -2417,7 +2510,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "H1+2 Cursustekst",
+    "display_title": "Cursustekst Hoofdstuk 1-2 - Modellen en Simulaties",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 47,
@@ -2444,7 +2537,9 @@
     "category_name_nl": "Samenvattingen",
     "category_name_en": "Summaries",
     "category_proposal": "Samenvattingen",
-    "tags": [],
+    "tags": [
+      "Theorie"
+    ],
     "course_id": 12,
     "course_code": "H01B6B",
     "course_name": "Methodiek van de informatica",
@@ -2452,7 +2547,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "H8 Cursustekst",
+    "display_title": "Cursustekst Hoofdstuk 8 - Monte Carlo Simulaties",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 24,
@@ -2490,7 +2585,7 @@
     "year_confidence": "high",
     "year_source": "filename_range_4digit",
     "author": null,
-    "display_title": "Oplossingen Examenvragen Modellering & Simulatie 2017 2018",
+    "display_title": "Examenvragen Modellering & Simulatie (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 32,
@@ -2513,11 +2608,13 @@
     "alt_paths": [],
     "title": "0 Opfrissing Matlab",
     "year": null,
-    "category_id": 7,
+    "category_id": 4,
     "category_name_nl": "Labo & Code",
     "category_name_en": "Lab & Code",
     "category_proposal": "Oefenzittingen",
-    "tags": [],
+    "tags": [
+      "Code / Script"
+    ],
     "course_id": 12,
     "course_code": "H01B6B",
     "course_name": "Methodiek van de informatica",
@@ -2525,7 +2622,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "0 Opfrissing Matlab",
+    "display_title": "Oefenzitting 0 - Opfrissing MATLAB",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 8,
@@ -2547,7 +2644,7 @@
     "duplicate_count": 0,
     "alt_paths": [],
     "title": "1 Qr Ontbinding",
-    "year": null,
+    "year": "2017 - 2018",
     "category_id": 4,
     "category_name_nl": "Oefenzittingen",
     "category_name_en": "Exercise Sessions",
@@ -2560,7 +2657,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "1 QR Ontbinding",
+    "display_title": "Oefenzitting 1 - QR-ontbinding",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 5,
@@ -2595,7 +2692,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "2 Agrigento",
+    "display_title": "Labo 2 - Dataset Agrigento (MATLAB)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -2617,7 +2714,7 @@
     "duplicate_count": 0,
     "alt_paths": [],
     "title": "2 Svd En Eigenwaardeontbinding",
-    "year": null,
+    "year": "2017 - 2018",
     "category_id": 4,
     "category_name_nl": "Oefenzittingen",
     "category_name_en": "Exercise Sessions",
@@ -2630,7 +2727,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "2 SVD En Eigenwaardeontbinding",
+    "display_title": "Oefenzitting 2 - SVD en Eigenwaardeontbinding",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 4,
@@ -2652,7 +2749,7 @@
     "duplicate_count": 0,
     "alt_paths": [],
     "title": "3 Monte Carlo Simulaties",
-    "year": null,
+    "year": "2017 - 2018",
     "category_id": 4,
     "category_name_nl": "Oefenzittingen",
     "category_name_en": "Exercise Sessions",
@@ -2665,7 +2762,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "3 Monte Carlo Simulaties",
+    "display_title": "Oefenzitting 3 - Monte Carlo Simulaties",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 2,
@@ -2687,7 +2784,7 @@
     "duplicate_count": 0,
     "alt_paths": [],
     "title": "4 Toevalsgeneratoren",
-    "year": null,
+    "year": "2017 - 2018",
     "category_id": 4,
     "category_name_nl": "Oefenzittingen",
     "category_name_en": "Exercise Sessions",
@@ -2700,7 +2797,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "4 Toevalsgeneratoren",
+    "display_title": "Oefenzitting 4 - Toevalsgeneratoren",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -2735,7 +2832,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "5 Linesearch",
+    "display_title": "Labo 5 - lineSearch (MATLAB)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -2757,7 +2854,7 @@
     "duplicate_count": 0,
     "alt_paths": [],
     "title": "5 Optimalisatie",
-    "year": null,
+    "year": "2017 - 2018",
     "category_id": 4,
     "category_name_nl": "Oefenzittingen",
     "category_name_en": "Exercise Sessions",
@@ -2770,7 +2867,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "5 Optimalisatie",
+    "display_title": "Oefenzitting 5 - Optimalisatie",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 2,
@@ -2805,7 +2902,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "6 Dailyarea",
+    "display_title": "Labo 6 - Dataset dailyArea (MATLAB)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -2827,7 +2924,7 @@
     "duplicate_count": 0,
     "alt_paths": [],
     "title": "6 Fft",
-    "year": null,
+    "year": "2017 - 2018",
     "category_id": 4,
     "category_name_nl": "Oefenzittingen",
     "category_name_en": "Exercise Sessions",
@@ -2840,7 +2937,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "6 FFT",
+    "display_title": "Oefenzitting 6 - Snelle Fouriertransformatie (FFT)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 2,
@@ -2875,7 +2972,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "6 Lighthouse",
+    "display_title": "Labo 6 - Dataset Lighthouse (MATLAB)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -2897,7 +2994,7 @@
     "duplicate_count": 0,
     "alt_paths": [],
     "title": "7 Markovketens",
-    "year": null,
+    "year": "2017 - 2018",
     "category_id": 4,
     "category_name_nl": "Oefenzittingen",
     "category_name_en": "Exercise Sessions",
@@ -2910,7 +3007,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "7 Markovketens",
+    "display_title": "Oefenzitting 7 - Markovketens",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 2,
@@ -2945,7 +3042,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "Slides DFT",
+    "display_title": "Slides - Discrete Fourier Transformatie (DFT)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 16,
@@ -2980,7 +3077,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "Slides Fourierreeks",
+    "display_title": "Slides - Fourierreeksen",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 15,
@@ -3017,7 +3114,7 @@
     "year_confidence": "high",
     "year_source": "filename_range_4digit",
     "author": null,
-    "display_title": "Studiewijzer Analyse I 2020 2021",
+    "display_title": "Studiewijzer Oefenzittingen (2020 - 2021)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 3,
@@ -3040,12 +3137,12 @@
     "alt_paths": [],
     "title": "Examenoefeningen In De Oefbundel",
     "year": null,
-    "category_id": 2,
+    "category_id": 4,
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
-      "Deel 1"
+      "Oefeningen (Examen)"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3054,7 +3151,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "Examenoefeningen In De Oefbundel",
+    "display_title": "Examenoefeningen in de Oefenbundel",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -3082,7 +3179,8 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Deel 1"
+      "Scan",
+      "Bundel / Alle"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3090,8 +3188,8 @@
     "match_type": "exact_code_match",
     "year_confidence": "none",
     "year_source": "mtime",
-    "author": null,
-    "display_title": "Oefeningen Analyse1 (lukasvandenbroeck)",
+    "author": "Lukas Vandenbroeck",
+    "display_title": "Bundel Oefeningen (Lukas Vandenbroeck)",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 49,
@@ -3119,7 +3217,8 @@
     "category_name_en": "Summaries",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Deel 1"
+      "Theorie",
+      "Reconstructie / Vragen"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3128,7 +3227,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "Theorievragen Analyse 1",
+    "display_title": "Overzicht Theorievragen",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -3156,7 +3255,7 @@
     "category_name_en": "Exercise Sessions",
     "category_proposal": "Oefenzittingen",
     "tags": [
-      "Deel 1"
+      "Scan"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3165,7 +3264,7 @@
     "year_confidence": "high",
     "year_source": "filename_range_4digit",
     "author": "Tibo Geenen",
-    "display_title": "Handleiding Oefeningen 2016 2017 (tibo Geenen)",
+    "display_title": "Handleiding Oefeningen (Tibo Geenen)",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 11,
@@ -3193,7 +3292,7 @@
     "category_name_en": "Summaries",
     "category_proposal": "Samenvattingen",
     "tags": [
-      "Deel 1"
+      "Formularium"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3201,8 +3300,8 @@
     "match_type": "exact_code_match",
     "year_confidence": "none",
     "year_source": "default",
-    "author": null,
-    "display_title": "Nuttige Taylorveeltermen (riet Van Puyenbroeck)",
+    "author": "Riet Van Puyenbroeck",
+    "display_title": "Formularium - Nuttige Taylorveeltermen (Riet Van Puyenbroeck)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 3,
@@ -3230,8 +3329,8 @@
     "category_name_en": "Summaries",
     "category_proposal": "Samenvattingen",
     "tags": [
-      "Deel 1",
-      "Formularium"
+      "Formularium",
+      "Scan"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3240,7 +3339,7 @@
     "year_confidence": "high",
     "year_source": "filename_range_4digit",
     "author": "Arthur Stockman",
-    "display_title": "Samenvatting & Formules 2016 2017 (arthur Stockman)",
+    "display_title": "Samenvatting & Formules (Arthur Stockman)",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 1,
@@ -3269,7 +3368,7 @@
     "category_name_en": "Summaries",
     "category_proposal": "Samenvattingen",
     "tags": [
-      "Deel 1"
+      "Scan"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3277,8 +3376,8 @@
     "match_type": "exact_code_match",
     "year_confidence": "high",
     "year_source": "filename_range_4digit",
-    "author": null,
-    "display_title": "Samenvatting 2009 2010 (laurens De Poorter)",
+    "author": "Laurens De Poorter",
+    "display_title": "Samenvatting (Laurens De Poorter)",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 1,
@@ -3307,7 +3406,7 @@
     "category_name_en": "Summaries",
     "category_proposal": "Samenvattingen",
     "tags": [
-      "Deel 1"
+      "Scan"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3316,7 +3415,7 @@
     "year_confidence": "high",
     "year_source": "filename_range_4digit",
     "author": "Hanna Leysen",
-    "display_title": "Samenvatting 2024 2025 (hanna Leysen)",
+    "display_title": "Samenvatting (Hanna Leysen)",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 45,
@@ -3344,7 +3443,7 @@
     "category_name_en": "Summaries",
     "category_proposal": "Samenvattingen",
     "tags": [
-      "Deel 1"
+      "Scan"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3352,8 +3451,8 @@
     "match_type": "exact_code_match",
     "year_confidence": "none",
     "year_source": "mtime",
-    "author": null,
-    "display_title": "Samenvatting Analyse1 (lukasvandenbroeck)",
+    "author": "Lukas Vandenbroeck",
+    "display_title": "Samenvatting (Lukas Vandenbroeck)",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 31,
@@ -3381,7 +3480,7 @@
     "category_name_en": "Summaries",
     "category_proposal": "Samenvattingen",
     "tags": [
-      "Deel 1"
+      "Scan"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3390,7 +3489,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "Samenvatting H6",
+    "display_title": "Samenvatting Hoofdstuk 6",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 6,
@@ -3418,7 +3517,7 @@
     "category_name_en": "Summaries",
     "category_proposal": "Samenvattingen",
     "tags": [
-      "Deel 1"
+      "Scan"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3427,7 +3526,7 @@
     "year_confidence": "high",
     "year_source": "filename_range_4digit",
     "author": "Hanna Leysen",
-    "display_title": "Schema's 2024 2025 (hanna Leysen)",
+    "display_title": "Schema's (Hanna Leysen)",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 1,
@@ -3456,7 +3555,7 @@
     "category_name_en": "Lecture Slides",
     "category_proposal": "Slides / Lesmateriaal",
     "tags": [
-      "Deel 1"
+      "Oplossing"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3465,7 +3564,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "Limiet",
+    "display_title": "Transparant - Berekenen van een Limiet (Oplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 5,
@@ -3493,7 +3592,6 @@
     "category_name_en": "TTT's",
     "category_proposal": "TTT's",
     "tags": [
-      "Deel 1",
       "Opgave (Blanco)"
     ],
     "course_id": 2,
@@ -3503,7 +3601,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "TTT 2006 Opgaven",
+    "display_title": "TTT Oktober 2006 (Opgave)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -3531,8 +3629,7 @@
     "category_name_en": "TTT's",
     "category_proposal": "TTT's",
     "tags": [
-      "Deel 1",
-      "Oplossing"
+      "Modeloplossing"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3541,7 +3638,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "TTT 2006 Oplossing",
+    "display_title": "TTT Oktober 2006 (Modeloplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 4,
@@ -3569,7 +3666,6 @@
     "category_name_en": "TTT's",
     "category_proposal": "TTT's",
     "tags": [
-      "Deel 1",
       "Opgave (Blanco)"
     ],
     "course_id": 2,
@@ -3579,7 +3675,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "TTT 2007 Opgaven",
+    "display_title": "TTT Oktober 2007 (Opgave)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -3607,8 +3703,7 @@
     "category_name_en": "TTT's",
     "category_proposal": "TTT's",
     "tags": [
-      "Deel 1",
-      "Oplossing"
+      "Modeloplossing"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3617,7 +3712,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "TTT 2007 Oplossing",
+    "display_title": "TTT Oktober 2007 (Modeloplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 4,
@@ -3645,7 +3740,6 @@
     "category_name_en": "TTT's",
     "category_proposal": "TTT's",
     "tags": [
-      "Deel 1",
       "Opgave (Blanco)"
     ],
     "course_id": 2,
@@ -3655,7 +3749,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "TTT 2008 Opgaven",
+    "display_title": "TTT Oktober 2008 (Opgave)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -3683,8 +3777,7 @@
     "category_name_en": "TTT's",
     "category_proposal": "TTT's",
     "tags": [
-      "Deel 1",
-      "Oplossing"
+      "Modeloplossing"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3693,7 +3786,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "TTT 2008 Oplossing",
+    "display_title": "TTT Oktober 2008 (Modeloplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 6,
@@ -3721,7 +3814,6 @@
     "category_name_en": "TTT's",
     "category_proposal": "TTT's",
     "tags": [
-      "Deel 1",
       "Opgave (Blanco)"
     ],
     "course_id": 2,
@@ -3731,7 +3823,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "TTT 2009 Opgaven",
+    "display_title": "TTT Oktober 2009 (Opgave)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -3759,8 +3851,7 @@
     "category_name_en": "TTT's",
     "category_proposal": "TTT's",
     "tags": [
-      "Deel 1",
-      "Oplossing"
+      "Modeloplossing"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3769,7 +3860,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "TTT 2009 Oplossing",
+    "display_title": "TTT Oktober 2009 (Modeloplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 4,
@@ -3797,7 +3888,6 @@
     "category_name_en": "TTT's",
     "category_proposal": "TTT's",
     "tags": [
-      "Deel 1",
       "Opgave (Blanco)"
     ],
     "course_id": 2,
@@ -3807,7 +3897,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "TTT 2010 Opgaven",
+    "display_title": "TTT November 2010 (Opgave)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -3835,8 +3925,7 @@
     "category_name_en": "TTT's",
     "category_proposal": "TTT's",
     "tags": [
-      "Deel 1",
-      "Oplossing"
+      "Modeloplossing"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3845,7 +3934,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "TTT 2010 Oplossing",
+    "display_title": "TTT November 2010 (Modeloplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 5,
@@ -3873,7 +3962,6 @@
     "category_name_en": "TTT's",
     "category_proposal": "TTT's",
     "tags": [
-      "Deel 1",
       "Opgave (Blanco)"
     ],
     "course_id": 2,
@@ -3883,7 +3971,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "TTT 2011 Opgaven",
+    "display_title": "TTT November 2011 (Opgave)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -3911,8 +3999,7 @@
     "category_name_en": "TTT's",
     "category_proposal": "TTT's",
     "tags": [
-      "Deel 1",
-      "Oplossing"
+      "Modeloplossing"
     ],
     "course_id": 2,
     "course_code": "H01A0B",
@@ -3921,7 +4008,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": null,
-    "display_title": "TTT 2011 Oplossing",
+    "display_title": "TTT November 2011 (Modeloplossing)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 6,
@@ -3948,7 +4035,10 @@
     "category_name_nl": "Samenvattingen",
     "category_name_en": "Summaries",
     "category_proposal": "Overig / Other",
-    "tags": [],
+    "tags": [
+      "Formularium",
+      "English"
+    ],
     "course_id": 1814,
     "course_code": "H09D9A",
     "course_name": "Management Challenges in the Chemical Industry",
@@ -3957,7 +4047,7 @@
     "year_confidence": "none",
     "year_source": "mtime",
     "author": null,
-    "display_title": "NPV Table (empty)",
+    "display_title": "Formularium - NPV Table (Blanco)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -3984,7 +4074,9 @@
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
-    "tags": [],
+    "tags": [
+      "English"
+    ],
     "course_id": 1814,
     "course_code": "H09D9A",
     "course_name": "Management Challenges in the Chemical Industry",
@@ -3992,8 +4084,8 @@
     "match_score": 1.0,
     "year_confidence": "medium",
     "year_source": "filename_single_year",
-    "author": null,
-    "display_title": "Exam Management Challenges",
+    "author": "Willem De Brandt",
+    "display_title": "Examen 2022 (Prof. Keldermans) (Willem De Brandt)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 4,
@@ -4020,7 +4112,10 @@
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
-    "tags": [],
+    "tags": [
+      "Oplossing",
+      "English"
+    ],
     "course_id": 1814,
     "course_code": "H09D9A",
     "course_name": "Management Challenges in the Chemical Industry",
@@ -4029,7 +4124,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": "Niels Stevens",
-    "display_title": "Exam Management Challenges (2022) Solution (niels Stevens)",
+    "display_title": "Examen 2022 (Oplossing) (Niels Stevens)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 6,
@@ -4057,7 +4152,8 @@
     "category_name_en": "Exams",
     "category_proposal": "Examens",
     "tags": [
-      "Opgave (Blanco)"
+      "Reconstructie / Vragen",
+      "English"
     ],
     "course_id": 1814,
     "course_code": "H09D9A",
@@ -4067,7 +4163,7 @@
     "year_confidence": "none",
     "year_source": "default",
     "author": "Niels Stevens",
-    "display_title": "Management Exam Questions Wiki (niels Stevens)",
+    "display_title": "Examenvragen Wiki (Niels Stevens)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -4094,7 +4190,9 @@
     "category_name_nl": "Examens",
     "category_name_en": "Exams",
     "category_proposal": "Examens",
-    "tags": [],
+    "tags": [
+      "English"
+    ],
     "course_id": 1814,
     "course_code": "H09D9A",
     "course_name": "Management Challenges in the Chemical Industry",
@@ -4103,7 +4201,7 @@
     "year_confidence": "medium",
     "year_source": "filename_single_year",
     "author": "Niels Stevens",
-    "display_title": "NPV Table Exam 2022 (niels Stevens)",
+    "display_title": "Examen 2022 - NPV Table (Niels Stevens)",
     "content_preview": {
       "is_scanned_handwritten": false,
       "page_count": 1,
@@ -4131,7 +4229,9 @@
     "category_name_en": "Summaries",
     "category_proposal": "Slides / Lesmateriaal",
     "tags": [
-      "Lesnotities"
+      "Lesnotities",
+      "English",
+      "Scan"
     ],
     "course_id": 1814,
     "course_code": "H09D9A",
@@ -4140,8 +4240,8 @@
     "match_score": 1.0,
     "year_confidence": "none",
     "year_source": "mtime",
-    "author": null,
-    "display_title": "Management Challenges (lecture 1 6)",
+    "author": "Willem De Brandt",
+    "display_title": "Lesnotities Lessen 1-6 (Willem De Brandt)",
     "content_preview": {
       "is_scanned_handwritten": true,
       "page_count": 1,

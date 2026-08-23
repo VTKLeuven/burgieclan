@@ -37,7 +37,16 @@
       "Oefeningen (Examen)",
       "Bundel / Alle",
       "Meerkeuze",
-      "Mondeling"
+      "Mondeling",
+      "Studiewijzer / Gids",
+      "Dataset / Data"
+    ],
+    "tools_and_languages": [
+      "MATLAB",
+      "Python",
+      "Java",
+      "C / C++",
+      "Excel"
     ],
     "language": [
       "English"
@@ -47,7 +56,8 @@
   "notes": [
     "'Scan' is a MEDIUM: the document is an image or photo rather than selectable text. It says nothing about what is on the page - a photographed printed exam is a Scan.",
     "'Handgeschreven' is CONTENT: the page carries handwriting. Apply it only when you can actually see handwriting, not merely because the document is a scan.",
-    "The two are independent and may appear together. Most scans in this archive are photographed printed material, so do not assume a scan is handwritten."
+    "The two are independent and may appear together. Most scans in this archive are photographed printed material, so do not assume a scan is handwritten.",
+    "'MATLAB', 'Python', 'Java', 'C / C++', 'Excel' identify the programming language, software stack, or spreadsheet tool used."
   ],
 
   "patterns": {
@@ -73,7 +83,15 @@
     "Project": "Verslag / Project",
     "Reconstructie": "Reconstructie / Vragen",
     "Midterm": "Tussentijds (Midterm)",
-    "Engels": "English"
+    "Engels": "English",
+    "Matlab": "MATLAB",
+    "C++": "C / C++",
+    "C": "C / C++",
+    "Spreadsheet": "Excel",
+    "Studiewijzer": "Studiewijzer / Gids",
+    "Gids": "Studiewijzer / Gids",
+    "Dataset": "Dataset / Data",
+    "Data": "Dataset / Data"
   },
 
   "redundant_in_category": {
