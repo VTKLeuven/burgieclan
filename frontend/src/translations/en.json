@@ -204,6 +204,11 @@
             "deselect-all": "Deselect all",
             "clear-selection": "Clear selection",
             "favorites-see-all": "See all favorites"
+        },
+        "related": {
+            "predecessors": "Previously taught as",
+            "successors": "Now taught as",
+            "equivalents": "Equivalent to"
         }
     },
     "download": {

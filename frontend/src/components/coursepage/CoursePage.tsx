@@ -4,6 +4,7 @@ import Loading from '@/app/[locale]/loading';
 import CommentCategories from "@/components/coursepage/comment/CommentCategories";
 import DocumentSections from "@/components/coursepage/DocumentSections";
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
+import RelatedCourses from "@/components/coursepage/RelatedCourses";
 import ErrorPage from "@/components/error/ErrorPage";
 import DynamicBreadcrumb from "@/components/ui/DynamicBreadcrumb";
 import PageHead from "@/components/ui/PageHead";
@@ -132,6 +133,8 @@ export default function CoursePage() {
                             ECTS
                         </Link>
                     </div>
+
+                    <RelatedCourses course={course} />
                 </PageHead>
 
                 {/* Documents */}
