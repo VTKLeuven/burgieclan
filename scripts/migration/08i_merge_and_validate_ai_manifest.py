@@ -144,13 +144,22 @@ def verify_academic_year(year_candidate, record):
     y1_short = str(y1)[2:]
     y2_short = str(y2)[2:]
     
-    # Matches "2018", "2019", "2018-2019", "18-19", "18_19", "2018_2019", "pre 2019", "voor 2019"
+    # Matches 4-digit, 2-digit, date strings, apostrophe years ('21), month pairings (jan 21), and boundaries
+    months_pattern = r'(?:januari|jan|februari|feb|maart|mrt|april|apr|mei|juni|jun|juli|jul|augustus|aug|september|sep|oktober|okt|november|nov|december|dec)'
     patterns = [
         rf'\b{y1_str}\b',
         rf'\b{y2_str}\b',
         rf'\b{y1_short}[-_/]{y2_short}\b',
         rf'\b{y1_str}[-_/]{y2_short}\b',
         rf'\b{y1_str}[-_/]{y2}\b',
+        rf"'{y1_short}\b",
+        rf"'{y2_short}\b",
+        rf'\b{months_pattern}\s*\'?{y1_short}\b',
+        rf'\b{months_pattern}\s*\'?{y2_short}\b',
+        rf'\b\d{{1,2}}[-./]\d{{1,2}}[-./]\'?{y1_short}\b',
+        rf'\b\d{{1,2}}[-./]\d{{1,2}}[-./]\'?{y2_short}\b',
+        rf'[-_]{y1_short}\b',
+        rf'[-_]{y2_short}\b',
         rf'\b(?:pre|voor)\s*{y2_str}\b',
         rf'\b(?:tot)\s*{y1_str}\b',
         rf'\b(?:vanaf)\s*{y1_str}\b'
