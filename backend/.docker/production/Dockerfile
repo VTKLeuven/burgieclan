@@ -10,6 +10,8 @@ FROM php:8.4-fpm-alpine3.23@sha256:6397578dd6209a93c22ae5fc06cd48d8e4c3aaea94f10
 # match the server: pg_dump refuses to dump a server newer than itself, and the
 # database is PostgreSQL 18. Alpine ships postgresql18-client only from 3.23
 # onward, which is why php_base is pinned to alpine3.23 rather than 3.22.
+#
+# su-exec drops root to www-data for the `console` wrapper below.
 RUN apk update && \
     apk add --no-cache \
     curl \
@@ -17,7 +19,8 @@ RUN apk update && \
     libzip \
     icu \
     icu-data-full \
-    postgresql18-client && \
+    postgresql18-client \
+    su-exec && \
     rm -rf /var/cache/apk/*
 
 # Install required PHP extensions and immediately clean up the *-dev packages
@@ -129,6 +132,11 @@ COPY .docker/production/pool.conf /usr/local/etc/php-fpm.d/pool.conf
 # Copy startup script
 COPY .docker/production/startup.sh /usr/local/bin/startup.sh
 RUN chmod +x /usr/local/bin/startup.sh
+
+# Copy the console wrapper. `docker compose exec backend console <cmd>` runs
+# bin/console as www-data; running it as root poisons the cache for PHP-FPM.
+COPY .docker/production/console /usr/local/bin/console
+RUN chmod +x /usr/local/bin/console
 
 # Copy build artifacts from the php_builder stage
 COPY --from=php_builder /app/vendor/ /app/vendor/

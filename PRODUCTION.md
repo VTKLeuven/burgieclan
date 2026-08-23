@@ -492,12 +492,12 @@ zcat /var/lib/docker/containers/<container-id>/<container-id>-json.log.1.gz
 
 **Run migrations**:
 ```bash
-docker compose -f docker-compose.prod.yml exec backend php bin/console doctrine:migrations:migrate --no-interaction
+docker compose -f docker-compose.prod.yml exec backend console doctrine:migrations:migrate --no-interaction
 ```
 
 **Check migration status**:
 ```bash
-docker compose -f docker-compose.prod.yml exec backend php bin/console doctrine:migrations:status
+docker compose -f docker-compose.prod.yml exec backend console doctrine:migrations:status
 ```
 
 **Generate new migration** (on development):
@@ -562,10 +562,10 @@ skips the things that only look like they matter.
 
 ```bash
 cd /opt/burgieclan
-docker compose -f docker-compose.prod.yml exec -T backend php bin/console app:backup
+docker compose -f docker-compose.prod.yml exec -T backend console app:backup
 
 # report what it would do, write nothing
-docker compose -f docker-compose.prod.yml exec -T backend php bin/console app:backup --dry-run
+docker compose -f docker-compose.prod.yml exec -T backend console app:backup --dry-run
 
 # useful flags
 #   --skip-documents   database only (fast)
@@ -626,10 +626,25 @@ ships up to `postgresql17-client`.
 
 #### Restoring
 
+`app:restore` is the supported path to restore from the backup bucket:
+
 ```bash
-# fetch a dump from the backup bucket, then:
-docker compose -f docker-compose.prod.yml exec -T db \
-    pg_restore -U burgieclan_db_user -d burgieclan_db --clean --if-exists < burgieclan-<stamp>.dump
+cd /opt/burgieclan
+
+# List available backups in the backup bucket
+docker compose -f docker-compose.prod.yml exec -T backend console app:restore --list
+
+# Restore the latest database dump (will prompt for confirmation)
+docker compose -f docker-compose.prod.yml exec backend console app:restore
+
+# Restore a specific snapshot non-interactively
+docker compose -f docker-compose.prod.yml exec -T backend console app:restore --stamp=2026-08-22T19-35-24 --force
+
+# Verify and inspect without writing to the database
+docker compose -f docker-compose.prod.yml exec -T backend console app:restore --dry-run
+
+# Also restore missing/deleted document files from the backup bucket to the live bucket
+docker compose -f docker-compose.prod.yml exec -T backend console app:restore --with-documents
 ```
 
 > An untested backup is not a backup. Restore one into a scratch database before
@@ -673,7 +688,7 @@ docker compose -f docker-compose.prod.yml pull
 docker compose -f docker-compose.prod.yml up -d --force-recreate
 
 # Run migrations
-docker compose -f docker-compose.prod.yml exec backend php bin/console doctrine:migrations:migrate --no-interaction
+docker compose -f docker-compose.prod.yml exec backend console doctrine:migrations:migrate --no-interaction
 ```
 
 **Development Update** (using `dev` tag):
@@ -688,7 +703,7 @@ docker compose -f docker-compose.prod.yml pull
 docker compose -f docker-compose.prod.yml up -d --force-recreate
 
 # Run migrations
-docker compose -f docker-compose.prod.yml exec backend php bin/console doctrine:migrations:migrate --no-interaction
+docker compose -f docker-compose.prod.yml exec backend console doctrine:migrations:migrate --no-interaction
 ```
 
 ### Troubleshooting Common Issues
@@ -791,7 +806,11 @@ JWT keys are generated on first deployment and stored in the mounted JWT directo
 
 **Generate keys**:
 ```bash
+# Note the `php bin/console`: this is the one command that must run as root,
+# because the mounted config/jwt directory is not writable by www-data. It
+# therefore leaves a root-owned cache behind — restart the backend afterwards.
 docker compose -f docker-compose.prod.yml exec backend php bin/console lexik:jwt:generate-keypair
+docker compose -f docker-compose.prod.yml restart backend
 ```
 
 **Important**:
