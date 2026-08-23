@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7eed7e8548a45b7ca34e027634950751",
+    "content-hash": "c13e3a867d3d87bc6d03c03a3e85f522",
     "packages": [
         {
             "name": "api-platform/doctrine-common",
@@ -11500,16 +11500,16 @@
         },
         {
             "name": "vich/uploader-bundle",
-            "version": "v2.9.4",
+            "version": "v2.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dustin10/VichUploaderBundle.git",
-                "reference": "6d2def18f1ca4e0d950962caa70b381e09a58ac7"
+                "reference": "0204ac45a09d866be290bc85f3dffe32647056ff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dustin10/VichUploaderBundle/zipball/6d2def18f1ca4e0d950962caa70b381e09a58ac7",
-                "reference": "6d2def18f1ca4e0d950962caa70b381e09a58ac7",
+                "url": "https://api.github.com/repos/dustin10/VichUploaderBundle/zipball/0204ac45a09d866be290bc85f3dffe32647056ff",
+                "reference": "0204ac45a09d866be290bc85f3dffe32647056ff",
                 "shasum": ""
             },
             "require": {
@@ -11538,7 +11538,7 @@
                 "doctrine/mongodb-odm": "^2.4",
                 "doctrine/orm": "^2.13 || ^3.0",
                 "ext-sqlite3": "*",
-                "knplabs/knp-gaufrette-bundle": "dev-master",
+                "knplabs/knp-gaufrette-bundle": "^1.0",
                 "league/flysystem-bundle": "^2.4 || ^3.0",
                 "league/flysystem-memory": "^2.0 || ^3.0",
                 "matthiasnoback/symfony-dependency-injection-test": "^5.1 || ^6.0",
@@ -11602,9 +11602,9 @@
             ],
             "support": {
                 "issues": "https://github.com/dustin10/VichUploaderBundle/issues",
-                "source": "https://github.com/dustin10/VichUploaderBundle/tree/v2.9.4"
+                "source": "https://github.com/dustin10/VichUploaderBundle/tree/v2.10.0"
             },
-            "time": "2026-06-01T13:22:20+00:00"
+            "time": "2026-08-20T07:25:03+00:00"
         },
         {
             "name": "webmozart/assert",
