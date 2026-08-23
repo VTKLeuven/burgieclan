@@ -1,0 +1,68 @@
+'use client';
+
+import type { Course } from '@/types/entities';
+import { localizedCourseName } from '@/utils/courseName';
+import { ArrowLeft, ArrowRight, Equal } from 'lucide-react';
+import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
+
+interface RelatedCoursesProps {
+    course: Course;
+}
+
+/**
+ * Links a course to the other codes the same subject has been taught under.
+ *
+ * Curriculum reforms rename, split and merge courses, so a student on H0R12A
+ * Transportverschijnselen is one click from the Fluïdummechanica and
+ * Warmteoverdracht archives rather than seeing an almost empty page. The
+ * documents themselves deliberately stay on the course they were written for -
+ * merging them into one list buries the 21 current documents under 1300
+ * historical ones.
+ *
+ * Both directions are rendered: oldCourses is the owning side of a directional
+ * relation, so a predecessor page only knows its successor through newCourses.
+ */
+export default function RelatedCourses({ course }: RelatedCoursesProps) {
+    const { t, i18n } = useTranslation();
+
+    const groups = [
+        { key: 'predecessors', icon: ArrowLeft, courses: course.oldCourses ?? [] },
+        { key: 'successors', icon: ArrowRight, courses: course.newCourses ?? [] },
+        { key: 'equivalents', icon: Equal, courses: course.identicalCourses ?? [] },
+    ].filter((group) => group.courses.length > 0);
+
+    if (groups.length === 0) {
+        return null;
+    }
+
+    return (
+        <div className="mt-6 flex flex-col gap-3">
+            {groups.map(({ key, icon: Icon, courses }) => (
+                <div key={key} className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                    <span className="vtk-label flex items-center gap-1.5 text-vtk-muted">
+                        <Icon size={14} aria-hidden="true" />
+                        {t(`course-page.related.${key}`)}
+                    </span>
+                    {courses.map((related) => (
+                        <Link
+                            key={related.id}
+                            href={`/course/${related.id}`}
+                            // Tailwind utilities win over the vtk-* component layer, so the
+                            // hover colours override vtk-badge-muted without a custom variant
+                            // (component-layer classes get no hover: variant of their own).
+                            className="vtk-badge vtk-badge-muted transition-colors hover:border-vtk-yellow hover:bg-vtk-yellow hover:text-vtk-ink"
+                        >
+                            <span className="font-mono">{related.code}</span>
+                            {/* The name is absent when the API returned the course as a bare
+                                IRI reference; the code alone still identifies it. */}
+                            {localizedCourseName(related, i18n.language) && (
+                                <span className="ml-1.5">{localizedCourseName(related, i18n.language)}</span>
+                            )}
+                        </Link>
+                    ))}
+                </div>
+            ))}
+        </div>
+    );
+}
