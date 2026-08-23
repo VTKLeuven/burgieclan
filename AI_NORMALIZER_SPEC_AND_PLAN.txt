@@ -87,8 +87,10 @@ Allowed Tag Vocabulary:
 - Solution State:    'Oplossing', 'Oplossing (Student)', 'Modeloplossing', 'Opgave (Blanco)'
 - Exam Sessions:     'Januari', 'Juni', 'Herexamen (2de zit)', 'Tussentijds (Midterm)',
                      'Reconstructie / Vragen', 'Oefeningen (Examen)'
-- Format & Nature:   'Handgeschreven', 'Theorie', 'Lesnotities', 'Verslag / Project',
-                     'Formularium', 'Bundel / Alle', 'Meerkeuze', 'Mondeling'
+- Tools & Languages: 'MATLAB', 'Python', 'Java', 'C / C++', 'Excel'
+- Format & Nature:   'Scan', 'Handgeschreven', 'Theorie', 'Lesnotities', 'Verslag / Project',
+                     'Formularium', 'Bundel / Alle', 'Meerkeuze', 'Mondeling',
+                     'Studiewijzer / Gids', 'Dataset / Data'
 - Scope / Division:  'Deel 1', 'Deel 2', 'Deel 3', 'Deel 4'
 - Language:          'English'
 
