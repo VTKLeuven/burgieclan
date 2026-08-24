@@ -151,9 +151,17 @@
         "year-course": "Jaarvak",
         "view-documents": "Bekijk documenten",
         "files": "Documenten",
+        "document-count": {
+            "zero": "0 documenten",
+            "one": "1 document",
+            "other": "{{count}} documenten"
+        },
         "comments": {
+            "comment-single": "1 reactie",
+            "comment-multiple": "{{count}} reacties",
             "no-comments": "Nog geen opmerkingen geplaatst",
             "anonymous": "Anoniem",
+
             "title": "Vakevaluatie",
             "description": "Elk van deze opmerkingen is iemands mening. Wees respectvol. Als je een vraag hebt over de cursus, neem dan contact op met de cursuscoördinator.",
             "add-new": "Opmerking toevoegen",

@@ -21,6 +21,13 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
     const { user } = useUser();
 
     const [comments, setComments] = useState<CourseComment[]>(initialComments);
+    const [prevInitialComments, setPrevInitialComments] = useState<CourseComment[]>(initialComments);
+
+    if (initialComments !== prevInitialComments) {
+        setPrevInitialComments(initialComments);
+        setComments(initialComments);
+    }
+
     const [expanded, setExpanded] = useState(false);
     const [showAddForm, setShowAddForm] = useState(false);
     const [formContent, setFormContent] = useState('');
@@ -37,6 +44,8 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
             textareaRef.current.focus();
         }
     }, [showAddForm]);
+
+
 
 
 
@@ -141,8 +150,19 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
                 )}
 
                 {/* Comment count */}
-                <span className="vtk-badge vtk-badge-muted shrink-0">{comments.length}</span>
+                <span
+                    className="vtk-badge vtk-badge-muted shrink-0"
+                    title={comments.length === 1
+                        ? t('course-page.comments.comment-single', { count: 1 })
+                        : t('course-page.comments.comment-multiple', { count: comments.length })}
+                    aria-label={comments.length === 1
+                        ? t('course-page.comments.comment-single', { count: 1 })
+                        : t('course-page.comments.comment-multiple', { count: comments.length })}
+                >
+                    {comments.length}
+                </span>
             </div>
+
 
             {/* Collapsible Content */}
             <div className={`overflow-visible transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>

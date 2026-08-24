@@ -139,8 +139,9 @@ export default function CoursePage() {
 
                 {/* Documents */}
                 <div className="mt-8">
-                    <DocumentSections courseId={course.id} />
+                    <DocumentSections courseId={course.id} documentCounts={course.documentCounts} />
                 </div>
+
 
                 {/* Comments */}
                 <div className="mt-10 border-t border-vtk-line pt-8">

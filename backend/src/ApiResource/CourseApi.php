@@ -152,4 +152,10 @@ class CourseApi extends BaseEntityApi
      */
     #[Groups([SerializationGroups::COURSE_GET])]
     public array $courseComments = [];
+
+    /**
+     * @var array<int, int> Map of category ID to document count
+     */
+    #[Groups([SerializationGroups::COURSE_GET])]
+    public array $documentCounts = [];
 }

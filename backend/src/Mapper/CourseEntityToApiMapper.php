@@ -9,6 +9,7 @@ use App\Constants\MappingContext;
 use App\Entity\Course;
 use App\Entity\CourseComment;
 use App\Entity\Module;
+use App\Repository\DocumentRepository;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
@@ -17,6 +18,7 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
+        private readonly DocumentRepository $documentRepository,
     ) {}
 
     public function load(object $from, string $toClass, array $context): object
@@ -127,6 +129,9 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
             },
             $from->getCourseComments()->getValues()
         );
+
+        $to->documentCounts = $this->documentRepository->countByCategoryForCourse($from);
+
         return $to;
     }
 }

@@ -48,19 +48,25 @@ services:
     build:
       context: .
       dockerfile: ./frontend/.docker/dev/Dockerfile
+    tty: true
+    stdin_open: true
     volumes:
       - .:/app
       - frontend-node-modules:/app/frontend/node_modules
       - frontend-next:/app/frontend/.next:delegated
     ports:
+
       # 3000 on the host belongs to the VTK website in local development; that is
       # where BETTER_AUTH_URL points and what its trusted origins allow.
       - "3002:3000"
     environment:
+      - HOSTNAME=0.0.0.0
+      - PORT=3000
       - NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
       - NEXT_PUBLIC_FRONTEND_URL=http://localhost:3002
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
+
     depends_on:
       - backend
     networks:

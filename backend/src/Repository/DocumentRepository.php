@@ -76,6 +76,29 @@ class DocumentRepository extends ServiceEntityRepository
     }
 
     /**
+     * @return array<int, int> Map of categoryId => documentCount for a given course
+     */
+    public function countByCategoryForCourse(Course $course): array
+    {
+        $qb = $this->createQueryBuilder('d')
+            ->select('IDENTITY(d.category) AS categoryId, COUNT(d.id) AS docCount')
+            ->andWhere('d.course = :course')
+            ->andWhere('d.under_review = :under_review')
+            ->setParameter('course', $course)
+            ->setParameter('under_review', false)
+            ->groupBy('d.category');
+
+        $results = $qb->getQuery()->getArrayResult();
+        $counts = [];
+        foreach ($results as $row) {
+            $counts[(int) $row['categoryId']] = (int) $row['docCount'];
+        }
+
+        return $counts;
+    }
+
+
+    /**
      * @return Document[]
      */
     public function findBySearchQuery(string $query, int $limit = 20): array

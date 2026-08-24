@@ -151,9 +151,17 @@
         "year-course": "Year course",
         "view-documents": "View Documents",
         "files": "Documents",
+        "document-count": {
+            "zero": "0 documents",
+            "one": "1 document",
+            "other": "{{count}} documents"
+        },
         "comments": {
+            "comment-single": "1 comment",
+            "comment-multiple": "{{count}} comments",
             "no-comments": "No comments posted yet",
             "anonymous": "Anonymous",
+
             "title": "Subject evaluation",
             "description": "Each of these comments is someone's opinion. Please be respectful. If you have a question about the course, please contact the course coordinator.",
             "add-new": "Add comment",

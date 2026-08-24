@@ -9,7 +9,12 @@ import { convertToDocumentCategory } from "@/utils/convertToEntity";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-export default function DocumentSections({ courseId }: { courseId: number }) {
+interface DocumentSectionsProps {
+    courseId: number;
+    documentCounts?: Record<number, number>;
+}
+
+export default function DocumentSections({ courseId, documentCounts }: DocumentSectionsProps) {
     const [documentCategories, setDocumentCategories] = useState<DocumentCategory[]>([]);
     const { t, i18n } = useTranslation();
     const { request, loading } = useApi<HydraCollection<unknown>>();
@@ -55,6 +60,7 @@ export default function DocumentSections({ courseId }: { courseId: number }) {
                         key={category.id}
                         title={category.name ?? ''}
                         href={`/course/${courseId}/documents/category/${category.id}`}
+                        count={documentCounts?.[category.id] ?? 0}
                     />
                 ))}
             </div>

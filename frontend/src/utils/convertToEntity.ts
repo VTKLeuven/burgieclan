@@ -73,9 +73,13 @@ export function convertToCourse(course: unknown): Course {
         oldCourses: asArray(data.oldCourses)?.map(convertToCourse),
         newCourses: asArray(data.newCourses)?.map(convertToCourse),
         modules: asArray(data.modules)?.map(convertToModule),
-        courseComments: asArray(data.courseComments)?.map(convertToCourseComment)
+        courseComments: asArray(data.courseComments)?.map(convertToCourseComment),
+        documentCounts: (data.documentCounts && typeof data.documentCounts === 'object' && !Array.isArray(data.documentCounts))
+            ? (data.documentCounts as Record<number, number>)
+            : (Array.isArray(data.documentCounts) && data.documentCounts.length === 0 ? {} : undefined)
     };
 }
+
 
 export function convertToModule(module: unknown): Module {
     if (typeof module === 'string' || typeof module === 'number') {

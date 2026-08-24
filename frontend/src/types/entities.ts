@@ -27,7 +27,9 @@ export interface Course extends BaseEntity {
     newCourses?: Course[];
     /** Courses teaching the same subject under another code, e.g. a sister-faculty variant. */
     identicalCourses?: Course[];
+    documentCounts?: Record<number, number>;
 }
+
 
 export interface Module extends BaseEntity {
     name?: string;

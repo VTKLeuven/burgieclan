@@ -3,6 +3,8 @@
 namespace App\Tests\Api;
 
 use App\Factory\CourseFactory;
+use App\Factory\DocumentCategoryFactory;
+use App\Factory\DocumentFactory;
 
 use function Zenstruck\Foundry\Persistence\save;
 
@@ -43,12 +45,14 @@ class CourseResourceTest extends ApiTestCase
                 'newCourses',
                 'modules',
                 'courseComments',
+                'documentCounts',
                 'createdAt',
                 'updatedAt',
             ],
             array_keys($json->decoded()['hydra:member'][0])
         );
     }
+
 
     public function testGetOneCourse(): void
     {
@@ -221,5 +225,53 @@ class CourseResourceTest extends ApiTestCase
         $this->assertCount(1, $json['oldCourses']);
         $this->assertSame('H08W4A', $json['oldCourses'][0]['code']);
         $this->assertSame('Fluidummechanica', $json['oldCourses'][0]['name']);
+    }
+
+    public function testGetCourseExposesDocumentCountsByCategory(): void
+    {
+        $course = CourseFactory::createOne();
+        $category1 = DocumentCategoryFactory::createOne();
+        $category2 = DocumentCategoryFactory::createOne();
+
+        DocumentFactory::createMany(
+            3,
+            [
+            'course' => $course,
+            'category' => $category1,
+            'under_review' => false,
+            ]
+        );
+        DocumentFactory::createMany(
+            2,
+            [
+            'course' => $course,
+            'category' => $category2,
+            'under_review' => false,
+            ]
+        );
+        DocumentFactory::createOne(
+            [
+            'course' => $course,
+            'category' => $category1,
+            'under_review' => true,
+            ]
+        );
+
+        $json = $this->browser()
+            ->get(
+                '/api/courses/' . $course->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJson()
+            ->json()->decoded();
+
+        $this->assertArrayHasKey('documentCounts', $json);
+        $this->assertSame(3, $json['documentCounts'][$category1->getId()]);
+        $this->assertSame(2, $json['documentCounts'][$category2->getId()]);
     }
 }
