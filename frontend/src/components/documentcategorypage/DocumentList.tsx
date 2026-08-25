@@ -20,7 +20,10 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
     const [page, setPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(50);
     const [filters, setFilters] = useState<DocumentFilters>({});
-    const [sort, setSort] = useState<DocumentSortOptions>({ field: 'name', direction: 'asc' });
+    // Newest academic year first, so a course that has been collecting notes for a
+    // decade opens on the material that is still relevant. `year` is stored as
+    // "2024 - 2025", which sorts correctly as a string.
+    const [sort, setSort] = useState<DocumentSortOptions>({ field: 'year', direction: 'desc' });
 
     const { documents, loading, totalItems } = useRetrieveDocuments(
         page,
