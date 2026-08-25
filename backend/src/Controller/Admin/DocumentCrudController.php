@@ -65,6 +65,15 @@ class DocumentCrudController extends AbstractCrudController
         yield TextField::new('year')
             ->setLabel('Academic Year')
             ->hideOnForm();
+        yield TextField::new('author', 'Original author')
+            ->setHelp(
+                'Only set on files migrated from the old archive: the person who '
+                . 'originally wrote them. Those were all uploaded by one archive account, '
+                . 'so the uploader says nothing useful and this is the real credit. '
+                . 'Leave it empty for anything uploaded through the site - there the '
+                . 'uploader is the author, and the site never asks for this field.'
+            )
+            ->hideOnIndex();
         yield AssociationField::new('tags')
             ->autocomplete()
             ->hideOnIndex()
