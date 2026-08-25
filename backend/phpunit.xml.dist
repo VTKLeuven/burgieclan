@@ -12,9 +12,7 @@
 		<ini name="error_reporting" value="-1"/>
 		<server name="APP_ENV" value="test" force="true"/>
 		<server name="KERNEL_CLASS" value="App\Kernel" force="true"/>
-		<server name="DATABASE_URL" value="postgresql://burgieclan_db_user:burgieclan_db_pass@db:5432/burgieclan_db?serverVersion=18&amp;charset=utf8" force="true"/>
 	    <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak" force="true" />
-
 	</php>
 
 
