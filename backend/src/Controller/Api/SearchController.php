@@ -7,6 +7,7 @@ use App\ApiResource\DocumentApi;
 use App\ApiResource\ModuleApi;
 use App\ApiResource\ProgramApi;
 use App\ApiResource\SearchApi;
+use App\Constants\MappingContext;
 use App\Entity\Course;
 use App\Entity\Document;
 use App\Entity\Module;
@@ -41,7 +42,15 @@ class SearchController extends AbstractController
         $searchApi = new SearchApi();
         $searchApi->courses = array_map(
             function (Course $course) {
-                return $this->microMapper->map($course, CourseApi::class);
+                // A search row shows nothing but the name, code, credits, professors and
+                // semesters, all of which SUMMARY already fills in. Without it every hit
+                // walks its replacement courses and its whole comment thread, and runs a
+                // per-course document count, purely to throw the result away.
+                return $this->microMapper->map(
+                    $course,
+                    CourseApi::class,
+                    [MappingContext::SUMMARY => true]
+                );
             },
             $courses
         );

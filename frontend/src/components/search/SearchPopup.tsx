@@ -70,7 +70,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                 return;
             }
 
-            const result = await request('GET', `/api/search?searchText=${debouncedQuery}`);
+            const result = await request('GET', `/api/search?searchText=${encodeURIComponent(debouncedQuery)}`);
             if (!result) {
                 setItems({ courses: [], modules: [], programs: [], documents: [] });
                 return;

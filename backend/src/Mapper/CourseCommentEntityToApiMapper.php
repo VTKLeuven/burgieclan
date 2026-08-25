@@ -51,10 +51,15 @@ class CourseCommentEntityToApiMapper extends BaseEntityToApiMapper
             ]
         );
 
-        // Only map the creator if the user is not anonymous or if the user is the creator
+        // Only map the creator if the user is not anonymous or if the user is the creator.
+        // getUser() is null on any anonymous request, so guard it: every endpoint reaching
+        // this mapper happens to require authentication today, but a fatal here would
+        // surface as a bare 500 rather than an empty creator.
+        $currentUser = $this->security->getUser();
         if (
             !$from->isAnonymous() ||
-            $from->getCreator()->getUserIdentifier() === $this->security->getUser()->getUserIdentifier()
+            ($currentUser !== null &&
+                $from->getCreator()->getUserIdentifier() === $currentUser->getUserIdentifier())
         ) {
             $to->creator = $this->microMapper->map(
                 $from->getCreator(),
