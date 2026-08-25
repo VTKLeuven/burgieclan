@@ -161,7 +161,6 @@
             "comment-multiple": "{{count}} comments",
             "no-comments": "No comments posted yet",
             "anonymous": "Anonymous",
-
             "title": "Subject evaluation",
             "description": "Each of these comments is someone's opinion. Please be respectful. If you have a question about the course, please contact the course coordinator.",
             "add-new": "Add comment",
@@ -217,7 +216,10 @@
             "predecessors": "Previously taught as",
             "successors": "Now taught as",
             "equivalents": "Equivalent to"
-        }
+        },
+        "show-empty-categories": "Show empty folders ({{count}})",
+        "hide-empty-categories": "Hide empty folders",
+        "no-documents-yet": "This course has no documents yet."
     },
     "download": {
         "download": "Download",
