@@ -1,4 +1,4 @@
-.PHONY: up down test prod clean build rebuild db admin reset-password phpstan phpunit phpcs phpcbf
+.PHONY: up down test prod clean build rebuild db admin reset-password cache-clear phpstan phpunit phpcs phpcbf
 
 # Development (default)
 up:
@@ -48,6 +48,15 @@ admin:
 # Reset password
 reset-password:
 	docker compose exec backend symfony console app:reset-password
+
+# Rebuild the backend metadata cache.
+# API Platform reflects over the attributes on src/ApiResource/*Api.php once and caches the
+# result. Those classes are not services, so dev's auto-rebuild never notices them changing,
+# and backend/var is a named volume that survives `make down`. A stale cache drops the added
+# or renamed property from API responses with no error at all - run this after touching any
+# *Api.php or its #[Groups].
+cache-clear:
+	docker compose exec backend php bin/console cache:clear
 
 # Run PHPStan
 phpstan:
