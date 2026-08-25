@@ -323,7 +323,9 @@
             "error": "Opmerking toevoegen mislukt",
             "title": "Opmerkingen"
         },
-        "under-review-warning": "Dit document is momenteel in behandeling, dus het is alleen zichtbaar voor jou."
+        "under-review-warning": "Dit document is momenteel in behandeling, dus het is alleen zichtbaar voor jou.",
+        "author": "Auteur",
+        "uploaded-by": "Geüpload door"
     },
     "pagination": {
         "previous": "Vorige",

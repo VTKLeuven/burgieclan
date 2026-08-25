@@ -17,6 +17,14 @@ interface DocumentListItemProps {
 const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelected, onToggleSelect }) => {
     const { t } = useTranslation();
 
+    const uploader = document.anonymous
+        ? t('course-page.documents.anonymous')
+        : (document.creator?.fullName || document.creator?.username);
+
+    // `author` is only ever filled in by the Seafile import, but the API does accept it on
+    // create, so anonymity wins the tie rather than trusting that it stays that way.
+    const showAuthor = Boolean(document.author) && !document.anonymous;
+
     return (
         // Wraps on narrow screens: the title row keeps the checkbox, and the
         // badge/meta/action cluster drops to its own line rather than
@@ -63,10 +71,14 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
 
             {/* Contributor and date, as a compact right-aligned spec block. */}
             <div className="hidden shrink-0 text-right lg:block">
-                <div className="text-sm text-vtk-body">
-                    {document.anonymous
-                        ? t('course-page.documents.anonymous')
-                        : (document.creator?.fullName || document.creator?.username)}
+                {/* Migrated archive files carry the original author; for those the uploader
+                    is the archive account and says nothing useful, so the author wins the
+                    line and the uploader moves into the tooltip. */}
+                <div
+                    className="text-sm text-vtk-body"
+                    title={showAuthor ? `${t('document.uploaded-by')}: ${uploader}` : undefined}
+                >
+                    {showAuthor ? document.author : uploader}
                 </div>
                 <div className="flex items-center justify-end gap-1.5 text-xs text-vtk-muted">
                     {document.year && <span className="whitespace-nowrap font-medium">{document.year}</span>}

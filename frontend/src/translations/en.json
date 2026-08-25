@@ -322,7 +322,9 @@
             "error": "Failed to add comment",
             "title": "Comments"
         },
-        "under-review-warning": "This document is currently under review, so it is only visible to you."
+        "under-review-warning": "This document is currently under review, so it is only visible to you.",
+        "author": "Author",
+        "uploaded-by": "Uploaded by"
     },
     "pagination": {
         "previous": "Previous",

@@ -16,7 +16,7 @@ import { useApi } from "@/hooks/useApi";
 import type { Document } from "@/types/entities";
 import { convertToDocument } from "@/utils/convertToEntity";
 import { formatFileSize } from "@/utils/fileSize";
-import { Calendar, ChartPie, CircleUser, ExternalLink, File, Package } from "lucide-react";
+import { Calendar, ChartPie, CircleUser, ExternalLink, File, Package, PenLine } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -112,9 +112,20 @@ export default function DocumentPreview({ id }: { id: string }) {
                     {document.createdAt && <DocumentInfoField icon={Calendar} value={document.createdAt?.toLocaleDateString()} />}
                     {document.fileSize && <DocumentInfoField icon={Package} value={formatFileSize(document.fileSize)} />}
                     {document.year && <DocumentInfoField icon={ChartPie} value={document.year} />}
+                    {/* Only the Seafile import fills `author` in, so this shows up on
+                        migrated archive files, where the uploader is the archive account
+                        rather than the person who actually wrote the notes. */}
+                    {document.author && !document.anonymous && (
+                        <DocumentInfoField
+                            icon={PenLine}
+                            value={`${t("document.author")}: ${document.author}`}
+                        />
+                    )}
                     <DocumentInfoField
                         icon={CircleUser}
-                        value={document.anonymous ? t("document.anonymous") : document.creator?.fullName || ""}
+                        value={document.anonymous
+                            ? t("document.anonymous")
+                            : `${t("document.uploaded-by")}: ${document.creator?.fullName || ""}`}
                     />
                 </div>
             </PageHead>
