@@ -51,7 +51,10 @@ export default function RelatedCourses({ course }: RelatedCoursesProps) {
                             // Tailwind utilities win over the vtk-* component layer, so the
                             // hover colours override vtk-badge-muted without a custom variant
                             // (component-layer classes get no hover: variant of their own).
-                            className="vtk-badge vtk-badge-muted transition-colors hover:border-vtk-yellow hover:bg-vtk-yellow hover:text-vtk-ink"
+                            // Yellow is the accent for an active/selected badge, so hover
+                            // lifts the surface and darkens the text instead - the same
+                            // treatment the rest of the app uses for a hovered control.
+                            className="vtk-badge vtk-badge-muted transition-colors hover:border-vtk-line-2 hover:bg-vtk-surface hover:text-vtk-ink"
                         >
                             <span className="font-mono">{related.code}</span>
                             {/* The name is absent when the API returned the course as a bare
