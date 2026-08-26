@@ -10,43 +10,61 @@
     {% set filename = document.fileName %}
 
     {# Which extensions count lives in App\Constants\PreviewableFile, not here. #}
-    {% set isPdf = is_previewable_pdf(filename) %}
-    {% set isImage = is_previewable_image(filename) %}
+    {% set kind = preview_kind(filename) %}
+    {% set isPdf = kind == 'pdf' %}
+    {% set isImage = kind == 'image' %}
+    {% set isText = kind == 'text' %}
 
     {# The bc-preview-* classes are in public/admin-assets/css/admin.css, shared with the
        index row toggle. Not style="" attributes: EasyAdmin nonces style-src, and a nonce
        makes the browser ignore the 'unsafe-inline' in nelmio_security.yaml, so inline
        style attributes are blocked on every admin page. #}
-    {% if is_previewable(filename) %}
+    {% if filename %}
         {% set previewUrl = path('admin_document_preview', {filename: filename}) %}
 
         <div class="card mb-4 shadow-sm">
             <div class="card-header d-flex align-items-center justify-content-between py-2 bc-preview-panel-header">
-                <span class="small fw-semibold bc-preview-title">
+                <span class="small fw-semibold bc-preview-title text-truncate">
                     {% if isImage %}
-                        <i class="fa-solid fa-file-image text-primary me-1"></i> Document Preview
+                        <i class="fa-solid fa-file-image text-primary me-1"></i>
+                    {% elseif isPdf %}
+                        <i class="fa-solid fa-file-pdf text-danger me-1"></i>
+                    {% elseif isText %}
+                        <i class="fa-solid fa-file-lines text-secondary me-1"></i>
                     {% else %}
-                        <i class="fa-solid fa-file-pdf text-danger me-1"></i> Document Preview
+                        <i class="fa-solid fa-file-arrow-down text-secondary me-1"></i>
                     {% endif %}
+                    {{ filename }}
                 </span>
                 <div class="d-flex align-items-center gap-2">
                     <a href="{{ previewUrl }}"
                        target="_blank"
                        rel="noopener noreferrer"
                        class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center py-0 px-2"
-                       title="Open document in new tab">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                       title="{{ kind ? 'Open document in new tab' : 'Download document' }}">
+                        <i class="fa-solid {{ kind ? 'fa-arrow-up-right-from-square' : 'fa-download' }}"></i>
                     </a>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" id="toggle-edit-preview">
-                        <i class="fa-solid fa-chevron-up" id="toggle-edit-preview-icon"></i>
-                        <span class="small ms-1">Hide</span>
-                    </button>
+                    {% if kind %}
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="toggle-edit-preview">
+                            <i class="fa-solid fa-chevron-up" id="toggle-edit-preview-icon"></i>
+                            <span class="small ms-1">Hide</span>
+                        </button>
+                    {% endif %}
                 </div>
             </div>
             <div id="pdf-edit-preview-container" data-pdf-url="{{ previewUrl }}">
                 {% if isImage %}
                     <div class="bc-preview-scroll text-center py-3">
                         <img src="{{ previewUrl }}" class="img-fluid rounded shadow-sm bc-preview-image" alt="Document Preview">
+                    </div>
+                {% elseif isText %}
+                    <div class="bc-preview-scroll">
+                        <pre class="bc-preview-text js-text-preview">Loading...</pre>
+                    </div>
+                {% elseif not kind %}
+                    <div class="bc-preview-nopreview">
+                        <i class="fa-solid fa-file-circle-question me-1"></i>
+                        This file type cannot be shown in the browser - use the download button above.
                     </div>
                 {% else %}
                     {# Navigation bar #}
@@ -93,6 +111,18 @@
                     }
                 });
             }
+
+            {% if isText %}
+            var textEl = container.querySelector('.js-text-preview');
+            fetch(container.dataset.pdfUrl, { credentials: 'same-origin' })
+                .then(function(r) { return r.ok ? r.text() : Promise.reject(r.status); })
+                .then(function(body) {
+                    // textContent, never innerHTML: this is an uploaded file being shown
+                    // back to a moderator on the same origin as the admin panel.
+                    textEl.textContent = body;
+                })
+                .catch(function() { textEl.textContent = 'Failed to load file.'; });
+            {% endif %}
 
             {% if isPdf %}
             var pdfUrl = container.dataset.pdfUrl;

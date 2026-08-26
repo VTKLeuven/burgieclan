@@ -155,6 +155,26 @@
     text-align: center;
 }
 
+/* Source files (.m, .py, .txt, ...) are rendered as text so a moderator can read what
+   they are approving. Left-aligned inside .bc-preview-scroll, which centres its
+   children for pages and images. */
+.bc-preview-text {
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    white-space: pre;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--text-color);
+}
+
+/* Shown when there is a file but nothing we can draw. */
+.bc-preview-nopreview {
+    padding: 24px 16px;
+    text-align: center;
+    color: var(--text-color-light);
+}
+
 /* ---- Vich file/image widget ---- */
 
 .bc-vich-thumbnail {
