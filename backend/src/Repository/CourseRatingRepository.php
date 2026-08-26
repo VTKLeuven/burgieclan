@@ -78,33 +78,60 @@ class CourseRatingRepository extends ServiceEntityRepository
     }
 
     /**
-     * Average and count per academic year for one course and one section, newest year first.
+     * Average and count per academic year, per rated section, for one course.
+     *
+     * Newest year first, keyed by category id. One query for the whole course rather than one
+     * per section, for the same reason as summaryForCourse(): the page draws every axis at once.
      *
      * Drives the trend strip. A single number cannot say whether a course is getting better,
      * and it cannot explain why the recent and all-time scores differ; this can.
      *
-     * @return array<int, array{year: string, average: float, count: int}>
+     * @return array<int, list<array{year: string, average: float, count: int}>>
      */
-    public function summaryByYear(Course $course, CommentCategory $category): array
+    public function summaryByYearForCourse(Course $course): array
     {
         $rows = $this->createQueryBuilder('r')
-            ->select('r.academicYear AS year, AVG(r.value) AS average, COUNT(r.id) AS ratingCount')
+            ->select(
+                'IDENTITY(r.category) AS categoryId',
+                'r.academicYear AS year',
+                'AVG(r.value) AS average',
+                'COUNT(r.id) AS ratingCount'
+            )
             ->andWhere('r.course = :course')
-            ->andWhere('r.category = :category')
             ->setParameter('course', $course)
-            ->setParameter('category', $category)
-            ->groupBy('r.academicYear')
+            ->groupBy('r.category')
+            ->addGroupBy('r.academicYear')
             ->orderBy('r.academicYear', 'DESC')
             ->getQuery()
             ->getArrayResult();
 
-        return array_map(
-            static fn(array $row): array => [
+        $byCategory = [];
+        foreach ($rows as $row) {
+            $byCategory[(int) $row['categoryId']][] = [
                 'year' => (string) $row['year'],
                 'average' => round((float) $row['average'], 2),
                 'count' => (int) $row['ratingCount'],
-            ],
-            $rows
-        );
+            ];
+        }
+
+        return $byCategory;
+    }
+
+    /**
+     * This user's own scores for one course, keyed by category id.
+     *
+     * The stars have to come back already filled in for whoever gave them, and asking per
+     * section would be a query each.
+     *
+     * @return array<int, int>
+     */
+    public function findUserRatingsForCourse(Course $course, User $creator): array
+    {
+        $ratings = [];
+        foreach ($this->findBy(['course' => $course, 'creator' => $creator]) as $rating) {
+            $ratings[$rating->getCategory()->getId()] = $rating->getValue();
+        }
+
+        return $ratings;
     }
 }

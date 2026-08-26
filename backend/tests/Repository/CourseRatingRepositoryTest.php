@@ -121,20 +121,46 @@ class CourseRatingRepositoryTest extends KernelTestCase
         self::assertArrayHasKey($teaching->getId(), $summary);
     }
 
-    public function testTheYearBreakdownComesBackNewestFirst(): void
+    public function testTheYearBreakdownComesBackNewestFirstPerSection(): void
     {
         $repository = $this->repository();
         $course = CourseFactory::createOne();
         $category = CommentCategoryFactory::createOne(['type' => CommentCategory::TYPE_RATED]);
+        $other = CommentCategoryFactory::createOne(['type' => CommentCategory::TYPE_RATED]);
 
         $this->rate($course, $category, 2, '2023 - 2024');
         $this->rate($course, $category, 4, '2025 - 2026');
         $this->rate($course, $category, 5, '2025 - 2026');
+        $this->rate($course, $other, 1, '2025 - 2026');
 
-        $byYear = $repository->summaryByYear($course, $category);
+        $byYear = $repository->summaryByYearForCourse($course);
 
-        self::assertSame(['2025 - 2026', '2023 - 2024'], array_column($byYear, 'year'));
-        self::assertSame(4.5, $byYear[0]['average']);
-        self::assertSame(2, $byYear[0]['count']);
+        self::assertSame(['2025 - 2026', '2023 - 2024'], array_column($byYear[$category->getId()], 'year'));
+        self::assertSame(4.5, $byYear[$category->getId()][0]['average']);
+        self::assertSame(2, $byYear[$category->getId()][0]['count']);
+        // Sections must not bleed into each other's breakdown.
+        self::assertCount(1, $byYear[$other->getId()]);
+    }
+
+    public function testAUsersOwnScoresComeBackKeyedBySection(): void
+    {
+        $repository = $this->repository();
+        $course = CourseFactory::createOne();
+        $workload = CommentCategoryFactory::createOne(['type' => CommentCategory::TYPE_RATED]);
+        $teaching = CommentCategoryFactory::createOne(['type' => CommentCategory::TYPE_RATED]);
+        $student = UserFactory::createOne();
+        $year = AcademicYear::current();
+
+        CourseRatingFactory::createOne(
+            [
+            'course' => $course, 'category' => $workload, 'creator' => $student, 'value' => 4, 'academicYear' => $year,
+            ]
+        );
+        // Somebody else's score on the same axis must not come back as this student's.
+        $this->rate($course, $teaching, 1, $year);
+
+        $own = $repository->findUserRatingsForCourse($course, $student);
+
+        self::assertSame([$workload->getId() => 4], $own);
     }
 }
