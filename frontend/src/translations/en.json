@@ -340,7 +340,9 @@
     },
     "header": {
         "admin": "Admin",
-        "my_vtk": "My VTK"
+        "my_vtk": "My VTK",
+        "old_burgieclan": "Old Burgieclan",
+        "new_burgieclan_feedback": "Feedback New Burgieclan"
     },
     "sidebar": {
         "home": "Home",

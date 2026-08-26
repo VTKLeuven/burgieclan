@@ -341,7 +341,9 @@
     },
     "header": {
         "admin": "Beheer",
-        "my_vtk": "Mijn VTK"
+        "my_vtk": "Mijn VTK",
+        "old_burgieclan": "Oude Burgieclan",
+        "new_burgieclan_feedback": "Feedback Nieuwe Burgieclan"
     },
     "sidebar": {
         "home": "Home",
