@@ -53,6 +53,11 @@ export interface AbstractComment extends NodeEntity {
 export interface CourseComment extends AbstractComment {
     course?: Course;
     commentCategory?: CommentCategory;
+    /**
+     * The academic year the comment is about, e.g. "2024 - 2025" — not when it was written.
+     * Undefined on comments whose year could not be determined; those sort last.
+     */
+    academicYear?: string;
 }
 
 export interface DocumentComment extends AbstractComment {

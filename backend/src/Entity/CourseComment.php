@@ -19,6 +19,17 @@ class CourseComment extends AbstractComment implements VotableInterface
     private CommentCategory $category;
 
     /**
+     * Which academic year this comment is about, e.g. "2024 - 2025".
+     *
+     * Not the same thing as createdAt: a comment migrated from the old course wiki was
+     * written years before it was imported, and one written today may describe last year.
+     * Nullable because the wiki could not always be read for a year, and because a comment
+     * without one is still worth keeping - it just sorts last.
+     */
+    #[ORM\Column(length: 11, nullable: true)]
+    private ?string $academicYear = null;
+
+    /**
      * @var Collection<int, CourseCommentVote>
      */
     #[ORM\OneToMany(
@@ -55,6 +66,18 @@ class CourseComment extends AbstractComment implements VotableInterface
     public function getCategory(): CommentCategory
     {
         return $this->category;
+    }
+
+    public function getAcademicYear(): ?string
+    {
+        return $this->academicYear;
+    }
+
+    public function setAcademicYear(?string $academicYear): static
+    {
+        $this->academicYear = $academicYear;
+
+        return $this;
     }
 
     public function setCategory(CommentCategory $category): self

@@ -164,6 +164,7 @@ export function convertToCourseComment(comment: unknown): CourseComment {
         commentCategory: data.category ? convertToCommentCategory(data.category) : undefined,
         content: typeof data.content === 'string' ? data.content : undefined,
         anonymous: typeof data.anonymous === 'boolean' ? data.anonymous : undefined,
+        academicYear: typeof data.academicYear === 'string' ? data.academicYear : undefined,
         createdAt: parseDate(data.createdAt),
         updatedAt: parseDate(data.updatedAt),
         creator: data.creator ? convertToUser(data.creator) : undefined

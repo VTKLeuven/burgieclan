@@ -36,6 +36,7 @@ class CourseCommentEntityToApiMapper extends BaseEntityToApiMapper
 
         $to->content = $from->getContent();
         $to->anonymous = $from->isAnonymous();
+        $to->academicYear = $from->getAcademicYear();
         $to->course = $this->microMapper->map(
             $from->getCourse(),
             CourseApi::class,
