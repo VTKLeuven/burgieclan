@@ -3,6 +3,7 @@
 namespace App\Mapper;
 
 use App\ApiResource\CourseCommentApi;
+use App\Constants\AcademicYear;
 use App\Entity\CommentCategory;
 use App\Entity\Course;
 use App\Entity\CourseComment;
@@ -48,6 +49,10 @@ class CourseCommentApiToEntityMapper implements MapperInterface
 
         $to->setContent($from->content);
         $to->setAnonymous($from->anonymous);
+        // Someone commenting on a course is almost always commenting on the year they are in,
+        // and a comment with no year sorts to the bottom of the section - a bad default for
+        // the newest thing on the page. Clients may still send one explicitly.
+        $to->setAcademicYear($from->academicYear ?? AcademicYear::current());
         $to->setCourse(
             $this->microMapper->map(
                 $from->course,

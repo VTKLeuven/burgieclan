@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Constants\PreviewableFile;
 use App\Repository\DocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Vich\UploaderBundle\Exception\NoFileFoundException;
@@ -42,14 +43,30 @@ final class DocumentPreviewController extends AbstractController
             );
             // Allow this response to be framed by the admin panel (same origin)
             $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-            // Force inline rendering — override whatever VichUploader set
-            $response->headers->set('Content-Disposition', 'inline');
+
             // Correct the MIME type, which VichUploader falls back to
             // application/octet-stream for when the entity has no mimeType field.
             $contentType = PreviewableFile::contentTypeFor($filename);
+
             if (null !== $contentType) {
                 $response->headers->set('Content-Type', $contentType);
+                $response->headers->set('Content-Disposition', HeaderUtils::DISPOSITION_INLINE);
+
+                return $response;
             }
+
+            // Nothing we can draw. Saying "inline" anyway used to produce a response that
+            // contradicted itself - application/octet-stream, inline, and nosniff - which
+            // browsers resolve by downloading a file with no usable name. Ask for the
+            // download explicitly instead, and name it.
+            // The fallback is for clients that cannot read filename*; it has to be plain
+            // ASCII with no path separators. Stored names are already slugified, so this
+            // normally leaves them untouched.
+            $fallback = preg_replace('/[^A-Za-z0-9._-]/', '_', $filename) ?: 'document';
+            $response->headers->set(
+                'Content-Disposition',
+                HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_ATTACHMENT, $filename, $fallback)
+            );
 
             return $response;
         } catch (NoFileFoundException $e) {

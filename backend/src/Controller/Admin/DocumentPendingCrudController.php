@@ -28,6 +28,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use LogicException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Vich\UploaderBundle\Form\Type\VichFileType;
 
@@ -92,6 +93,15 @@ class DocumentPendingCrudController extends DocumentCrudController
         yield TextField::new('year')
             ->setLabel('Academic Year')
             ->hideOnForm();
+        yield TextField::new('author', 'Original author')
+            ->setHelp(
+                'Only set on files migrated from the old archive: the person who '
+                . 'originally wrote them. Those were all uploaded by one archive account, '
+                . 'so the uploader says nothing useful and this is the real credit. '
+                . 'Leave it empty for anything uploaded through the site - there the '
+                . 'uploader is the author, and the site never asks for this field.'
+            )
+            ->hideOnIndex();
         yield AssociationField::new('tags')
             ->autocomplete()
             ->hideOnIndex()
@@ -107,7 +117,20 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->setFormType(VichFileType::class)
             ->setFormTypeOptions(
                 [
-                    'download_label' => true,
+                    // Not `true`: in Vich that means "label the link with the mapping's
+                    // originalName", and this mapping has no originalName property, so the
+                    // anchor came out empty - a zero-width, invisible link. The stored name
+                    // is the one thing we always have.
+                    'download_label' => new PropertyPath('file_name'),
+                    // Vich would otherwise build /files/download/..., which sits behind the
+                    // stateless JWT firewall and answers 401 to a session-authenticated
+                    // moderator. admin_document_preview is the same file under /admin.
+                    'download_uri' => fn(Document $document): ?string => null === $document->getFileName()
+                        ? null
+                        : $this->generateUrl(
+                            'admin_document_preview',
+                            ['filename' => $document->getFileName()]
+                        ),
                     'allow_delete' => false,
                 ]
             )

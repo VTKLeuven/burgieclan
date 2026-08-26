@@ -7,8 +7,27 @@ import { useApi } from '@/hooks/useApi';
 import { CommentCategory, CourseComment } from '@/types/entities';
 import { convertToCourseComment } from '@/utils/convertToEntity';
 import { ChevronRight, Info, MessageSquarePlus, Send } from 'lucide-react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+/**
+ * Mirror of the ordering declared on Course::$courseComments: newest academic year first,
+ * oldest comment first inside a year, undated comments last. Only used to place a freshly
+ * posted comment; everything else arrives already ordered.
+ */
+function insertInServerOrder(comments: CourseComment[], added: CourseComment): CourseComment[] {
+    const rank = (c: CourseComment) => c.academicYear ?? '';
+    const addedRank = rank(added);
+    // Undated comments sort last, so an undated addition simply goes to the end.
+    const index = addedRank === ''
+        ? comments.length
+        : comments.findIndex((c) => rank(c) === '' || rank(c) < addedRank);
+
+    if (index === -1) {
+        return [...comments, added];
+    }
+    return [...comments.slice(0, index), added, ...comments.slice(index)];
+}
 
 type CourseCommentListProps = {
     category: CommentCategory;
@@ -50,21 +69,10 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
 
 
     // Sort comments by most recent update/creation date
-    const sortedComments = useMemo(() => {
-        return [...comments].sort((a, b) => {
-            // Use updatedAt if available, otherwise fall back to createdAt
-            const dateA = a.updatedAt || a.createdAt;
-            const dateB = b.updatedAt || b.createdAt;
-
-            // Handle undefined dates (push them to the end)
-            if (!dateA && !dateB) return 0;
-            if (!dateA) return 1;
-            if (!dateB) return -1;
-
-            // Sort newest first (descending order)
-            return dateB.getTime() - dateA.getTime();
-        });
-    }, [comments]);
+    // Order comes from the server now - see the OrderBy on Course::$courseComments - so the
+    // list is rendered as received. The sort that used to live here keyed on
+    // `updatedAt || createdAt`, which meant editing a five-year-old comment jumped it to the
+    // top of the section.
 
     const handleAddComment = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -88,8 +96,9 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
 
             // Convert and notify parent about the new comment
             const newComment = convertToCourseComment(res);
-            // Add the new comment to the local state so it appears immediately
-            setComments((prev) => [newComment, ...prev]);
+            // Insert where the server would have put it - at the end of its academic year -
+            // instead of at the top, so the optimistic list matches the next page load.
+            setComments((prev) => insertInServerOrder(prev, newComment));
             if (onCommentAdded) {
                 onCommentAdded(newComment);
             }
@@ -238,7 +247,7 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
                         </div>
                     ) : (
                         <div className="vtk-panel vtk-rows relative overflow-visible">
-                            {sortedComments.map((comment) => (
+                            {comments.map((comment) => (
                                 <CommentRow
                                     key={comment.id}
                                     comment={comment}

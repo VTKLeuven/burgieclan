@@ -5,15 +5,15 @@
 {% set filename = field.value %}
 {% set entityId = entity.primaryKeyValue %}
 {# Which extensions count lives in App\Constants\PreviewableFile, not here. #}
-{% set isImage = is_previewable_image(filename) %}
+{% set kind = preview_kind(filename) %}
 
 {% if filename %}
     <div class="d-inline-flex align-items-center gap-1">
-        {% if is_previewable(filename) %}
+        {% if kind %}
             <button type="button"
                     class="btn btn-xs btn-outline-primary d-inline-flex align-items-center py-0 px-2 toggle-pdf-btn"
                     data-entity-id="{{ entityId }}"
-                    data-file-type="{{ isImage ? 'image' : 'pdf' }}"
+                    data-file-type="{{ kind }}"
                     data-pdf-url="{{ path('admin_document_preview', {filename: filename}) }}"
                     title="Toggle Full Row Preview">
                 <i class="fa-solid fa-chevron-down" id="chevron-{{ entityId }}"></i>
@@ -24,8 +24,8 @@
            target="_blank"
            rel="noopener noreferrer"
            class="btn btn-xs btn-outline-secondary d-inline-flex align-items-center py-0 px-2"
-           title="Open document in new tab">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+           title="{{ kind ? 'Open document in new tab' : 'Download document' }}">
+            <i class="fa-solid {{ kind ? 'fa-arrow-up-right-from-square' : 'fa-download' }}"></i>
         </a>
     </div>
 {% else %}
@@ -70,6 +70,26 @@ if (typeof window.pdfPreviewListenerAdded === 'undefined') {
 
         imgWrapper.appendChild(img);
         container.appendChild(imgWrapper);
+    }
+
+    function loadText(textUrl, container) {
+        var wrapper = document.createElement('div');
+        wrapper.className = 'bc-preview-scroll';
+
+        var pre = document.createElement('pre');
+        pre.className = 'bc-preview-text';
+        pre.textContent = 'Loading...';
+        wrapper.appendChild(pre);
+        container.appendChild(wrapper);
+
+        fetch(textUrl, { credentials: 'same-origin' })
+            .then(function(r) { return r.ok ? r.text() : Promise.reject(r.status); })
+            .then(function(body) {
+                // textContent, never innerHTML: this is an uploaded file being shown back
+                // to a moderator on the same origin as the admin panel.
+                pre.textContent = body;
+            })
+            .catch(function() { pre.textContent = 'Failed to load file.'; });
     }
 
     function loadPdf(pdfUrl, container, entityId) {
@@ -191,9 +211,12 @@ if (typeof window.pdfPreviewListenerAdded === 'undefined') {
 
         var titleSpan = document.createElement('span');
         titleSpan.className = 'small fw-semibold bc-preview-title';
-        titleSpan.innerHTML = fileType === 'image'
-            ? '<i class="fa-solid fa-file-image text-primary me-1"></i> Preview'
-            : '<i class="fa-solid fa-file-pdf text-danger me-1"></i> Preview';
+        var icons = {
+            image: '<i class="fa-solid fa-file-image text-primary me-1"></i> Preview',
+            text: '<i class="fa-solid fa-file-lines text-secondary me-1"></i> Preview',
+            pdf: '<i class="fa-solid fa-file-pdf text-danger me-1"></i> Preview'
+        };
+        titleSpan.innerHTML = icons[fileType] || icons.pdf;
 
         var closeBtn = document.createElement('button');
         closeBtn.type = 'button';
@@ -225,6 +248,8 @@ if (typeof window.pdfPreviewListenerAdded === 'undefined') {
 
         if (fileType === 'image') {
             loadImage(pdfUrl, body);
+        } else if (fileType === 'text') {
+            loadText(pdfUrl, body);
         } else {
             loadPdf(pdfUrl, body, entityId);
         }

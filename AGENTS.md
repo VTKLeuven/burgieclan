@@ -22,6 +22,7 @@ underlying command instead (`vendor/bin/phpunit`, not `make phpunit`).
 | Static analysis | `make phpstan` (level 5, over `src` and `tests`) |
 | PHP code style | `make phpcs` / `make phpcbf` to autofix |
 | Admin user | `make admin`, `make reset-password` |
+| Rebuild metadata cache | `make cache-clear` — after any `*Api.php` change, see below |
 | Shells | `make backend-shell`, `make frontend-shell` |
 
 A single backend test or file:
@@ -36,6 +37,19 @@ There is no frontend test runner — lint and build are the only automated front
 
 Schema changes: generate migrations with `php bin/console doctrine:migrations:diff` and edit the generated
 file; never hand-write one from scratch.
+
+**After changing any `src/ApiResource/*Api.php` — a new property, a renamed one, an edited `#[Groups]` —
+run `make cache-clear`.** API Platform reflects over those attributes once and caches the result. The
+`*Api` classes are not services, so Symfony's dev-mode auto-rebuild does not watch them, and
+`backend/var` is a named Docker volume that survives `make down`. The failure mode is silent: the
+property simply does not appear in the response, with no error and no warning, which reads exactly like
+a broken mapper. Clearing individual `api_platform.cache.*` pools is not enough — only a full
+`cache:clear` regenerates the warmed metadata.
+
+`make cache-clear` only clears the **dev** environment. `var/cache/test` is a separate pool, so a
+new property can be live in the app and still invisible to PHPUnit — the symptom is a functional test
+asserting `null` on a field that works fine against `localhost:8000`. Clear it with
+`docker compose exec backend php bin/console cache:clear --env=test`.
 
 **Ports**: frontend `3002`, backend `8000`, db `5432`. The frontend deliberately avoids 3000 — locally that
 port belongs to the VTK website, which is the SSO issuer the login flow redirects to.

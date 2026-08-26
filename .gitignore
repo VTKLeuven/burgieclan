@@ -23,3 +23,15 @@ migration_data/recovered_*.jsonl
 # Scratch
 2026-*.txt
 .~lock.*#
+
+# Wiki comment migration: the raw MediaWiki dump is large and re-fetchable with
+# `extract_wiki_comments.py dump`; the SQL is regenerated from the reviewed JSON.
+migration_data/raw/
+migration_data/wiki_comments_import.sql
+migration_data/wiki_comments_rollback.sql
+
+# Wiki comment migration: reviewed JSON carries author r-numbers (personal data).
+# Never commit these to a public repository.
+migration_data/wiki_comments_*.json
+migration_data/course_code_aliases.json
+scripts/wiki_migration/__pycache__/

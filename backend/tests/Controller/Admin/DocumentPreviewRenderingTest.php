@@ -57,7 +57,12 @@ class DocumentPreviewRenderingTest extends WebTestCase
         self::assertStringContainsString('fa-file-image', $crawler->html());
     }
 
-    public function testUnpreviewableFileGetsNoPreviewPanel(): void
+    /**
+     * This used to assert the opposite - that an undrawable file got no panel at all. That
+     * was the bug: the panel is where the working download link lives, so suppressing it
+     * left a zip looking like a document with no file attached.
+     */
+    public function testUnpreviewableFileStillAnnouncesItsFile(): void
     {
         $client = static::createClient();
         $client->loginUser($this->admin());
@@ -67,7 +72,27 @@ class DocumentPreviewRenderingTest extends WebTestCase
         $crawler = $client->request('GET', 'https://localhost/admin/document/' . $document->getId() . '/edit');
 
         self::assertResponseIsSuccessful();
-        self::assertSame(0, $crawler->filter('#pdf-edit-preview-container')->count());
+        self::assertGreaterThan(0, $crawler->filter('.bc-preview-nopreview')->count());
+        self::assertStringContainsString('archive.zip', $crawler->html());
+        // Nothing to draw, so no canvas and no collapse toggle - but a download link.
+        self::assertSame(0, $crawler->filter('#toggle-edit-preview')->count());
+        self::assertGreaterThan(
+            0,
+            $crawler->filter('a[href="/admin/document-preview/archive.zip"]')->count()
+        );
+    }
+
+    public function testMatlabSourceIsRenderedAsTextRatherThanDownloaded(): void
+    {
+        $client = static::createClient();
+        $client->loginUser($this->admin());
+
+        $document = DocumentFactory::createOne(['file_name' => 'oefening.m']);
+
+        $crawler = $client->request('GET', 'https://localhost/admin/document/' . $document->getId() . '/edit');
+
+        self::assertResponseIsSuccessful();
+        self::assertGreaterThan(0, $crawler->filter('#pdf-edit-preview-container .js-text-preview')->count());
     }
 
     public function testIndexTogglePassesTheFileTypeToTheJavascript(): void

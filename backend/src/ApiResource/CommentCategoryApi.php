@@ -58,4 +58,31 @@ class CommentCategoryApi extends BaseEntityApi
         ]
     )]
     public ?string $description = null;
+
+    /**
+     * 'discussion' or 'rated' - see CommentCategory::TYPE_*.
+     *
+     * Which sections carry stars is a per-category setting an admin controls, so the client
+     * branches on this rather than on a list of category names.
+     */
+    #[Groups(
+        [
+            SerializationGroups::COMMENT_CATEGORY_GET,
+            SerializationGroups::COURSE_GET,
+            SerializationGroups::COURSE_COMMENT_GET
+        ]
+    )]
+    public ?string $type = null;
+
+    /**
+     * What 1 and 5 mean on this section's scale, e.g. "licht" and "zwaar".
+     *
+     * Null on a discussion section. Rendered under the stars, because a bare 1-5 does not say
+     * which direction is good and students would otherwise answer in both directions at once.
+     */
+    #[Groups([SerializationGroups::COMMENT_CATEGORY_GET, SerializationGroups::COURSE_GET])]
+    public ?string $ratingLowLabel = null;
+
+    #[Groups([SerializationGroups::COMMENT_CATEGORY_GET, SerializationGroups::COURSE_GET])]
+    public ?string $ratingHighLabel = null;
 }

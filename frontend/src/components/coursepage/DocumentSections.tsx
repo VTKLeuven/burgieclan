@@ -16,8 +16,11 @@ interface DocumentSectionsProps {
 
 export default function DocumentSections({ courseId, documentCounts }: DocumentSectionsProps) {
     const [documentCategories, setDocumentCategories] = useState<DocumentCategory[]>([]);
+    const [showEmpty, setShowEmpty] = useState(false);
     const { t, i18n } = useTranslation();
     const { request, loading } = useApi<HydraCollection<unknown>>();
+
+    const countFor = (category: DocumentCategory) => documentCounts?.[category.id] ?? 0;
 
     useEffect(() => {
         async function fetchDocumentCategories() {
@@ -31,6 +34,20 @@ export default function DocumentSections({ courseId, documentCounts }: DocumentS
 
         fetchDocumentCategories();
     }, [request, i18n.language]);
+
+    // The counts exclude documents still under review, so a category holding nothing but
+    // pending uploads reads as empty here. That is why hiding is reversible rather than
+    // absolute: whoever just uploaded can still reach the folder through the toggle.
+    // convertToCourse leaves documentCounts undefined when the payload has no counts at
+    // all. Every category would read as empty then, so fall back to showing the full grid
+    // rather than blanking the section on a shape we did not expect.
+    const hasCounts = documentCounts !== undefined;
+    const emptyCategories = hasCounts
+        ? documentCategories.filter((category) => countFor(category) === 0)
+        : [];
+    const visibleCategories = showEmpty || !hasCounts
+        ? documentCategories
+        : documentCategories.filter((category) => countFor(category) > 0);
 
     if (loading) {
         return (
@@ -54,16 +71,32 @@ export default function DocumentSections({ courseId, documentCounts }: DocumentS
                     <DownloadButton courses={[{ id: courseId }]} size={16} />
                 </div>
             </div>
-            <div className="vtk-card-grid mt-5">
-                {documentCategories.map((category) => (
-                    <DocumentCategoryPage
-                        key={category.id}
-                        title={category.name ?? ''}
-                        href={`/course/${courseId}/documents/category/${category.id}`}
-                        count={documentCounts?.[category.id] ?? 0}
-                    />
-                ))}
-            </div>
+            {visibleCategories.length === 0 ? (
+                <p className="vtk-empty mt-5">{t('course-page.no-documents-yet')}</p>
+            ) : (
+                <div className="vtk-card-grid mt-5">
+                    {visibleCategories.map((category) => (
+                        <DocumentCategoryPage
+                            key={category.id}
+                            title={category.name ?? ''}
+                            href={`/course/${courseId}/documents/category/${category.id}`}
+                            count={countFor(category)}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {emptyCategories.length > 0 && (
+                <button
+                    type="button"
+                    onClick={() => setShowEmpty((previous) => !previous)}
+                    className="vtk-button vtk-button-sm vtk-button-ghost mt-4"
+                >
+                    {showEmpty
+                        ? t('course-page.hide-empty-categories')
+                        : t('course-page.show-empty-categories', { count: emptyCategories.length })}
+                </button>
+            )}
         </>
     );
 }

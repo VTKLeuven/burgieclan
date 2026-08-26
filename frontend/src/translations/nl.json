@@ -161,7 +161,6 @@
             "comment-multiple": "{{count}} reacties",
             "no-comments": "Nog geen opmerkingen geplaatst",
             "anonymous": "Anoniem",
-
             "title": "Vakevaluatie",
             "description": "Elk van deze opmerkingen is iemands mening. Wees respectvol. Als je een vraag hebt over de cursus, neem dan contact op met de cursuscoördinator.",
             "add-new": "Opmerking toevoegen",
@@ -217,7 +216,10 @@
             "predecessors": "Vroeger gegeven als",
             "successors": "Nu gegeven als",
             "equivalents": "Gelijkwaardig aan"
-        }
+        },
+        "show-empty-categories": "Toon lege mappen ({{count}})",
+        "hide-empty-categories": "Verberg lege mappen",
+        "no-documents-yet": "Er staan nog geen documenten bij dit vak."
     },
     "download": {
         "download": "Download",
@@ -321,7 +323,9 @@
             "error": "Opmerking toevoegen mislukt",
             "title": "Opmerkingen"
         },
-        "under-review-warning": "Dit document is momenteel in behandeling, dus het is alleen zichtbaar voor jou."
+        "under-review-warning": "Dit document is momenteel in behandeling, dus het is alleen zichtbaar voor jou.",
+        "author": "Auteur",
+        "uploaded-by": "Geüpload door"
     },
     "pagination": {
         "previous": "Vorige",

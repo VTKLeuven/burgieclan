@@ -11,6 +11,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Course;
 use App\Entity\FaqQuestion;
 use App\Entity\User;
 use App\Factory\AnnouncementFactory;
@@ -76,6 +77,39 @@ final class AppFixtures extends Fixture
 
         $uniqueCourseCommentVotes = CourseCommentVoteFactory::createUniqueSequence(100);
         CourseCommentVoteFactory::createSequence($uniqueCourseCommentVotes);
+
+        $this->linkRelatedCourses($manager);
+    }
+
+    /**
+     * Wires a few predecessor/successor and equivalence links between courses.
+     *
+     * Curriculum reforms rename, split and merge courses, and the course page renders those
+     * links as badges. Without a seeded example the feature is invisible locally, so the
+     * first handful of courses are chained into the three shapes it has to handle: a plain
+     * rename, a merge of two predecessors into one successor, and an equivalence pair.
+     */
+    private function linkRelatedCourses(ObjectManager $manager): void
+    {
+        $courses = $manager->getRepository(Course::class)->findBy([], ['id' => 'ASC'], 6);
+        if (count($courses) < 6) {
+            return;
+        }
+
+        [$renamed, $predecessor, $merged, $firstMergedFrom, $secondMergedFrom, $equivalent] = $courses;
+
+        // Plain rename: one predecessor, one successor.
+        $renamed->addOldCourse($predecessor);
+
+        // Merge: two former courses now taught as one.
+        $merged->addOldCourse($firstMergedFrom);
+        $merged->addOldCourse($secondMergedFrom);
+
+        // Equivalence: same subject under another faculty's code. addIdenticalCourse()
+        // writes both sides itself, so one call is enough.
+        $merged->addIdenticalCourse($equivalent);
+
+        $manager->flush();
     }
 
     private function loadUsers(ObjectManager $manager): void

@@ -14,6 +14,7 @@ final class SerializationGroups
     public const COMMENT_CATEGORY_GET = 'comment_category:get';
     public const COURSE_GET = 'course:get';
     public const COURSE_COMMENT_GET = 'course_comment:get';
+    public const COURSE_RATING_GET = 'course_rating:get';
     public const DOCUMENT_GET = 'document:get';
     public const DOCUMENT_CATEGORY_GET = 'document_category:get';
     public const DOCUMENT_COMMENT_GET = 'document_comment:get';
@@ -28,6 +29,7 @@ final class SerializationGroups
 
     // Create/Write operations
     public const DOCUMENT_CREATE = 'document:create';
+    public const COURSE_RATING_WRITE = 'course_rating:write';
 
     // User-related groups
     public const USER = 'user';

@@ -82,6 +82,7 @@ const useRetrieveDocuments = (
                     // API expects order[fieldName]=<direction>
                     const fieldMap: Record<string, string> = {
                         'name': 'name',
+                        'year': 'year',
                         'updatedAt': 'updatedAt',
                         'createdAt': 'createdAt',
                         'creator.fullName': 'creator.fullName'
@@ -89,6 +90,14 @@ const useRetrieveDocuments = (
 
                     const apiField = fieldMap[sort.field] || sort.field;
                     url += `&order[${apiField}]=${sort.direction}`;
+
+                    // Every sortable field except the name has ties - a whole academic year
+                    // shares one `year` value. Postgres returns tied rows in no fixed order,
+                    // so without a tiebreaker a row can repeat on page 2 and never appear at
+                    // all on page 1. Name is unique enough to make paging deterministic.
+                    if (apiField !== 'name') {
+                        url += '&order[name]=asc';
+                    }
                 }
 
                 const response = await request('GET', url);

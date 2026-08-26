@@ -28,6 +28,9 @@ class CommentCategoryEntityToApiMapper extends BaseEntityToApiMapper
 
         $to->name = $from->getName($lang);
         $to->description = $from->getDescription($lang);
+        $to->type = $from->getType();
+        $to->ratingLowLabel = $from->getRatingLowLabel($lang);
+        $to->ratingHighLabel = $from->getRatingHighLabel($lang);
         return $to;
     }
 }

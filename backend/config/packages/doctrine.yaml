@@ -4,6 +4,13 @@ doctrine:
             default:
                 url: '%env(resolve:DATABASE_URL)%'
 
+                # refresh_tokens belongs to gesdinet/jwt-refresh-token-bundle, and its mapping
+                # does not declare the index on `family` that Version20260810090000 creates on
+                # purpose because gesdinet v3 queries that column. Without this filter every
+                # doctrine:migrations:diff proposes dropping that index, and a feature migration
+                # that quietly carries the drop along would break token refresh in production.
+                schema_filter: '~^(?!refresh_tokens$)~'
+
         # IMPORTANT: You MUST configure your server version,
         # either here or in the DATABASE_URL env var (see .env file)
         #server_version: '15'

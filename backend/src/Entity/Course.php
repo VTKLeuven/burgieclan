@@ -92,6 +92,20 @@ class Course extends BaseEntity
      * @var Collection<int, CourseComment>
      */
     #[ORM\OneToMany(mappedBy: 'course', targetEntity: CourseComment::class, orphanRemoval: true)]
+    /**
+     * Newest academic year first; oldest comment first inside a year.
+     *
+     * The two directions differ on purpose. Descending years put the years people still
+     * care about at the top, while ascending inside a year is natural reading order and,
+     * for comments migrated from the course wiki, preserves the source order of a section's
+     * bullets - 91.6% of the imported rows share a createdAt with a sibling, so `id` is what
+     * actually orders them and reversing it would reverse every migrated section.
+     *
+     * Comments with no academic year are moved to the end afterwards, in
+     * CourseEntityToApiMapper: Doctrine rejects "DESC NULLS LAST" here, and Postgres sorts
+     * nulls first on a descending order, which would float year-less comments to the top.
+     */
+    #[ORM\OrderBy(['academicYear' => 'DESC', 'createdAt' => 'ASC', 'id' => 'ASC'])]
     private Collection $courseComments;
 
     /**

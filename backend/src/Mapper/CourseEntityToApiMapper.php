@@ -127,11 +127,38 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
                     ]
                 );
             },
-            $from->getCourseComments()->getValues()
+            self::yearlessLast($from->getCourseComments()->getValues())
         );
 
         $to->documentCounts = $this->documentRepository->countByCategoryForCourse($from);
 
         return $to;
+    }
+
+    /**
+     * Move comments with no academic year behind the dated ones, keeping the database order
+     * within each group.
+     *
+     * The association is already ordered by academicYear DESC, but Postgres sorts nulls first
+     * on a descending order and Doctrine's OrderBy attribute rejects "DESC NULLS LAST", so
+     * undated comments would otherwise open the list. Partitioning rather than re-sorting
+     * keeps the ordering decision in exactly one place - the mapping on Course.
+     *
+     * @param CourseComment[] $comments
+     * @return CourseComment[]
+     */
+    private static function yearlessLast(array $comments): array
+    {
+        $dated = [];
+        $undated = [];
+        foreach ($comments as $comment) {
+            if (null === $comment->getAcademicYear()) {
+                $undated[] = $comment;
+            } else {
+                $dated[] = $comment;
+            }
+        }
+
+        return [...$dated, ...$undated];
     }
 }

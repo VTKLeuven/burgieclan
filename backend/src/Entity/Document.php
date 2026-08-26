@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
+use App\Constants\AcademicYear;
 use App\Repository\DocumentRepository;
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -212,37 +212,14 @@ class Document extends Node implements VotableInterface
     }
 
     /**
-     * Get the academic year choices based on the current year and the first year
+     * @see AcademicYear::choices() - kept as a passthrough because the admin controllers
+     *      and the fixtures already call it here.
      *
-     * @param int $amountOfYears The number of years to generate choices for, default is 10
-     * @param string|null $firstYear The first year to start generating choices from, default is null
-     * @return array The array of academic year choices, formatted like '2024 - 2025' => '2024 - 2025'
+     * @return array<string, string>
      */
     public static function getAcademicYearChoices(int $amountOfYears = 10, ?string $firstYear = null): array
     {
-        $currentYear = (int)date('Y');
-        // Calculate the date of the last Monday of September
-        $lastMondayOfSeptember = new DateTime('last monday of september ' . $currentYear);
-        $today = new DateTime();
-
-        if ($today <= $lastMondayOfSeptember) {
-            // If today is before the last Monday of September, we are still in the previous academic year
-            $currentYear--;
-        }
-
-        if (!is_null($firstYear)) {
-            $firstYear = (int)substr($firstYear, 0, 4);
-            $amountOfYears = max($amountOfYears, $currentYear - $firstYear + 1);
-        }
-
-        $choices = [];
-        for ($i = 0; $i < $amountOfYears; $i++) {
-            $startYear = $currentYear - $i;
-            $endYear = $startYear + 1;
-            $formattedYear = sprintf('%d - %d', $startYear, $endYear);
-            $choices[$formattedYear] = $formattedYear;
-        }
-        return $choices;
+        return AcademicYear::choices($amountOfYears, $firstYear);
     }
 
     public function getSeafileFileId(): ?string
