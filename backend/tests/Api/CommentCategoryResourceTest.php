@@ -24,8 +24,10 @@ class CommentCategoryResourceTest extends ApiTestCase
             ->assertJsonMatches('length("hydra:member")', 5)
             ->json();
 
+        // The scale labels are absent rather than null: the factory makes discussion sections,
+        // which have no scale, and null properties are dropped from the response.
         $this->assertEqualsCanonicalizing(
-            ['@id', '@type', 'name', 'description', 'createdAt', 'updatedAt'],
+            ['@id', '@type', 'name', 'description', 'type', 'createdAt', 'updatedAt'],
             array_keys($json->decoded()['hydra:member'][0])
         );
     }
