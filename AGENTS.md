@@ -46,6 +46,11 @@ property simply does not appear in the response, with no error and no warning, w
 a broken mapper. Clearing individual `api_platform.cache.*` pools is not enough — only a full
 `cache:clear` regenerates the warmed metadata.
 
+`make cache-clear` only clears the **dev** environment. `var/cache/test` is a separate pool, so a
+new property can be live in the app and still invisible to PHPUnit — the symptom is a functional test
+asserting `null` on a field that works fine against `localhost:8000`. Clear it with
+`docker compose exec backend php bin/console cache:clear --env=test`.
+
 **Ports**: frontend `3002`, backend `8000`, db `5432`. The frontend deliberately avoids 3000 — locally that
 port belongs to the VTK website, which is the SSO issuer the login flow redirects to.
 
