@@ -15,9 +15,18 @@ namespace App\Constants;
  * Extensions rather than the stored mimetype on purpose: VichUploader falls back to
  * application/octet-stream when the entity has no mimeType field, so the filename is
  * the more reliable signal here.
+ *
+ * Deliberately absent: text/html and image/svg+xml. Both can carry script, and these
+ * files are served from the same origin as /admin, so rendering them inline would be
+ * stored XSS against the moderators reviewing them. SVG is accepted on upload; it is
+ * simply handed over as a download rather than drawn.
  */
 final class PreviewableFile
 {
+    public const KIND_PDF = 'pdf';
+    public const KIND_IMAGE = 'image';
+    public const KIND_TEXT = 'text';
+
     /**
      * @var array<string, string> lower-case extension => Content-Type
      */
@@ -28,6 +37,22 @@ final class PreviewableFile
         'jpeg' => 'image/jpeg',
         'gif' => 'image/gif',
         'webp' => 'image/webp',
+        // Source and plain-text formats. Reviewing a Matlab or Python submission means
+        // reading it, so these are served as text/plain and drawn in the panel rather
+        // than downloaded. Only genuinely textual extensions belong here: .mat, .fig,
+        // .p and .mlx are Matlab *binaries* despite sitting next to .m in the upload
+        // allowlist, so they stay downloads.
+        'txt' => 'text/plain; charset=utf-8',
+        'md' => 'text/plain; charset=utf-8',
+        'markdown' => 'text/plain; charset=utf-8',
+        'csv' => 'text/plain; charset=utf-8',
+        'm' => 'text/plain; charset=utf-8',
+        'py' => 'text/plain; charset=utf-8',
+        'r' => 'text/plain; charset=utf-8',
+        'c' => 'text/plain; charset=utf-8',
+        'cpp' => 'text/plain; charset=utf-8',
+        'h' => 'text/plain; charset=utf-8',
+        'java' => 'text/plain; charset=utf-8',
     ];
 
     /**
@@ -48,9 +73,34 @@ final class PreviewableFile
 
     public static function isImage(string $filename): bool
     {
-        $contentType = self::contentTypeFor($filename);
+        return self::KIND_IMAGE === self::previewKind($filename);
+    }
 
-        return null !== $contentType && str_starts_with($contentType, 'image/');
+    public static function isText(string $filename): bool
+    {
+        return self::KIND_TEXT === self::previewKind($filename);
+    }
+
+    /**
+     * How this file should be drawn, or null when it cannot be drawn at all.
+     *
+     * The templates branch on this rather than on a chain of is*() calls, so a file is
+     * guaranteed to fall into exactly one bucket.
+     */
+    public static function previewKind(string $filename): ?string
+    {
+        $contentType = self::contentTypeFor($filename);
+        if (null === $contentType) {
+            return null;
+        }
+        if (str_starts_with($contentType, 'image/')) {
+            return self::KIND_IMAGE;
+        }
+        if (str_starts_with($contentType, 'text/')) {
+            return self::KIND_TEXT;
+        }
+
+        return self::KIND_PDF;
     }
 
     /**

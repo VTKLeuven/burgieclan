@@ -21,6 +21,7 @@ class PreviewableFileExtension extends AbstractExtension
             new TwigFunction('is_previewable_pdf', [$this, 'isPdf']),
             new TwigFunction('is_previewable_image', [$this, 'isImage']),
             new TwigFunction('is_previewable', [$this, 'isPreviewable']),
+            new TwigFunction('preview_kind', [$this, 'previewKind']),
         ];
     }
 
@@ -37,5 +38,13 @@ class PreviewableFileExtension extends AbstractExtension
     public function isPreviewable(?string $filename): bool
     {
         return null !== $filename && PreviewableFile::isPreviewable($filename);
+    }
+
+    /**
+     * 'pdf', 'image', 'text', or null when the file cannot be drawn at all.
+     */
+    public function previewKind(?string $filename): ?string
+    {
+        return null === $filename ? null : PreviewableFile::previewKind($filename);
     }
 }
