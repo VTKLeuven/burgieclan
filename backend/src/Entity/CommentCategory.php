@@ -6,7 +6,6 @@ use App\Repository\CommentCategoryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: CommentCategoryRepository::class)]
 class CommentCategory extends BaseEntity
@@ -39,12 +38,12 @@ class CommentCategory extends BaseEntity
     private string $type = self::TYPE_DISCUSSION;
 
     /**
-     * What the ends of the scale mean, e.g. "licht" and "zwaar" for Studiebelasting.
+     * Optional: what the ends of the scale mean, e.g. "licht" and "zwaar" for Studiebelasting.
      *
-     * A bare row of stars cannot say which direction is good: "Studiebelasting 5/5" reads as
-     * both "very heavy" and "very well balanced" depending on the reader. That does not just
-     * confuse - it silently mixes, because some students answer one way and some the other.
-     * So the scale carries its own endpoints, per category and per language.
+     * Most axes read fine without them - five stars on "Kwaliteit van de cursus" is obviously
+     * good. Studiebelasting is the awkward one, where 5/5 reads as both "very heavy" and "very
+     * well balanced". Left to the admin's judgement rather than required, since the category
+     * description is already shown above the comments and can carry the explanation instead.
      */
     #[ORM\Column(length: 40, nullable: true)]
     private ?string $rating_low_label_nl = null;
@@ -65,9 +64,9 @@ class CommentCategory extends BaseEntity
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description_nl = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    private ?string $name_en = null;
+    private string $name_en = '';
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description_en = null;
@@ -152,32 +151,6 @@ class CommentCategory extends BaseEntity
         return $this;
     }
 
-    /**
-     * A rated section without labelled ends produces numbers nobody can interpret, so the
-     * Dutch pair is required as soon as the type is switched. English falls back to Dutch,
-     * the same way name and description already do.
-     */
-    #[Assert\Callback]
-    public function validateRatingLabels(ExecutionContextInterface $context): void
-    {
-        if (!$this->isRated()) {
-            return;
-        }
-
-        $required = [
-            'rating_low_label_nl' => $this->rating_low_label_nl,
-            'rating_high_label_nl' => $this->rating_high_label_nl,
-        ];
-
-        foreach ($required as $field => $value) {
-            if (null === $value || '' === trim($value)) {
-                $context->buildViolation('A rated section needs both ends of its scale labelled.')
-                    ->atPath($field)
-                    ->addViolation();
-            }
-        }
-    }
-
     public function getName(string $lang): ?string
     {
         return $this->{'name_' . $lang} ?? $this->{'name_' . self::$DEFAULT_LANGUAGE};
@@ -212,12 +185,12 @@ class CommentCategory extends BaseEntity
         return $this;
     }
 
-    public function getNameEn(): ?string
+    public function getNameEn(): string
     {
         return $this->name_en;
     }
 
-    public function setNameEn(?string $name): static
+    public function setNameEn(string $name): static
     {
         $this->name_en = $name;
 

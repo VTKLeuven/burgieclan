@@ -22,9 +22,6 @@ class CommentCategoryTypeTest extends KernelTestCase
 
     private function category(string $name = 'Studiebelasting'): CommentCategory
     {
-        // nameEn carries Assert\NotBlank even though its column is nullable, so a category
-        // without one never validates. Unrelated to types; set so these tests see only the
-        // violations they are about.
         return (new CommentCategory())->setNameNl($name)->setNameEn('Study load');
     }
 
@@ -36,20 +33,14 @@ class CommentCategoryTypeTest extends KernelTestCase
         self::assertFalse($category->isRated());
     }
 
-    public function testARatedSectionMustLabelBothEndsOfItsScale(): void
+    public function testARatedSectionDoesNotHaveToLabelItsScale(): void
     {
-        // Without labels a score is unreadable: "Studiebelasting 5/5" means both "very heavy"
-        // and "very well balanced", and students would answer in both directions at once.
+        // Most axes read fine unlabelled - five stars on "Kwaliteit van de cursus" is
+        // obviously good - and the category description is already shown above the comments
+        // for the awkward ones like Studiebelasting. Left to the admin's judgement.
         $category = $this->category()->setType(CommentCategory::TYPE_RATED);
 
-        $violations = $this->validator()->validate($category);
-
-        $paths = array_map(
-            static fn($violation) => $violation->getPropertyPath(),
-            iterator_to_array($violations)
-        );
-        self::assertContains('rating_low_label_nl', $paths);
-        self::assertContains('rating_high_label_nl', $paths);
+        self::assertCount(0, $this->validator()->validate($category));
     }
 
     public function testALabelledRatedSectionIsValid(): void
