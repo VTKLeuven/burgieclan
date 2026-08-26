@@ -195,7 +195,20 @@
                     "delete": "Opmerking verwijderen"
                 }
             },
-            "no-categories": "Geen opmerking-categorieën beschikbaar"
+            "no-categories": "Geen opmerking-categorieën beschikbaar",
+            "your-rating": "Jouw beoordeling",
+            "rating-recent": "Laatste {{count}} jaar",
+            "rating-all-time": "Alle jaren",
+            "rating-count-one": "{{count}} beoordeling",
+            "rating-count-other": "{{count}} beoordelingen",
+            "rating-too-few": "Nog te weinig beoordelingen",
+            "rating-saved": "Je beoordeling is opgeslagen",
+            "rating-error": "Beoordeling opslaan mislukt",
+            "rating-clear": "Beoordeling wissen",
+            "rating-stars": "{{count}} van 5 sterren",
+            "year-unknown": "Jaar onbekend",
+            "show-older": "Toon oudere reacties ({{count}})",
+            "hide-older": "Verberg oudere reacties"
         },
         "documents": {
             "header": "Documenten",

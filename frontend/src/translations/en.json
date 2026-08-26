@@ -195,7 +195,20 @@
                     "delete": "Delete comment"
                 }
             },
-            "no-categories": "No comment categories available"
+            "no-categories": "No comment categories available",
+            "your-rating": "Your rating",
+            "rating-recent": "Last {{count}} years",
+            "rating-all-time": "All years",
+            "rating-count-one": "{{count}} rating",
+            "rating-count-other": "{{count}} ratings",
+            "rating-too-few": "Not enough ratings yet",
+            "rating-saved": "Your rating has been saved",
+            "rating-error": "Could not save your rating",
+            "rating-clear": "Clear rating",
+            "rating-stars": "{{count}} out of 5 stars",
+            "year-unknown": "Year unknown",
+            "show-older": "Show older comments ({{count}})",
+            "hide-older": "Hide older comments"
         },
         "documents": {
             "header": "Documents",

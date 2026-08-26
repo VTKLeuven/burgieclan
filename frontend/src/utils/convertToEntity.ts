@@ -3,6 +3,7 @@ import {
     type CommentCategory,
     type Course,
     type CourseComment,
+    type CourseRatingSummary,
     type Document,
     type DocumentCategory,
     type DocumentComment,
@@ -10,6 +11,7 @@ import {
     type FaqItem,
     type Module,
     type Page,
+    type RatingScore,
     type Program,
     type QuickLink,
     type Tag,
@@ -153,6 +155,42 @@ export function convertToPage(page: unknown): Page {
     };
 }
 
+function toScore(value: unknown): RatingScore {
+    const data = (value && typeof value === 'object') ? value as Record<string, unknown> : {};
+    return {
+        // The backend withholds the average below its threshold, so null here is meaningful
+        // rather than missing: it means "too few ratings to say".
+        average: typeof data.average === 'number' ? data.average : null,
+        count: typeof data.count === 'number' ? data.count : 0,
+    };
+}
+
+export function convertToCourseRatingSummary(summary: unknown): CourseRatingSummary {
+    const data = toRecord(summary, 'CourseRatingSummary');
+    return {
+        recentYears: asArray(data.recentYears)?.filter((y): y is string => typeof y === 'string') ?? [],
+        sections: (asArray(data.sections) ?? []).map((raw) => {
+            const section = toRecord(raw, 'SectionRating');
+            return {
+                categoryId: typeof section.categoryId === 'number' ? section.categoryId : 0,
+                recent: toScore(section.recent),
+                allTime: toScore(section.allTime),
+                byYear: (asArray(section.byYear) ?? []).map((entry) => {
+                    const row = toRecord(entry, 'SectionRatingYear');
+                    return {
+                        year: typeof row.year === 'string' ? row.year : '',
+                        average: typeof row.average === 'number' ? row.average : 0,
+                        count: typeof row.count === 'number' ? row.count : 0,
+                    };
+                }),
+                currentUserRating: typeof section.currentUserRating === 'number'
+                    ? section.currentUserRating
+                    : null,
+            };
+        }),
+    };
+}
+
 export function convertToCourseComment(comment: unknown): CourseComment {
     if (typeof comment === 'string' || typeof comment === 'number') {
         return { id: parseId(comment) };
@@ -195,7 +233,10 @@ export function convertToCommentCategory(category: unknown): CommentCategory {
     return {
         id: parseId(data['@id']),
         name: typeof data.name === 'string' ? data.name : undefined,
-        description: typeof data.description === 'string' ? data.description : undefined
+        description: typeof data.description === 'string' ? data.description : undefined,
+        type: data.type === 'rated' || data.type === 'discussion' ? data.type : undefined,
+        ratingLowLabel: typeof data.ratingLowLabel === 'string' ? data.ratingLowLabel : undefined,
+        ratingHighLabel: typeof data.ratingHighLabel === 'string' ? data.ratingHighLabel : undefined
     };
 }
 
