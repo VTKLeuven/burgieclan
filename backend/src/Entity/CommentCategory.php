@@ -6,6 +6,7 @@ use App\Repository\CommentCategoryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: CommentCategoryRepository::class)]
 class CommentCategory extends BaseEntity
@@ -16,6 +17,46 @@ class CommentCategory extends BaseEntity
     ];
 
     public static string $DEFAULT_LANGUAGE = 'nl';
+
+    /** An ordinary thread of comments. What every category was before ratings existed. */
+    public const TYPE_DISCUSSION = 'discussion';
+
+    /** A thread of comments that also carries a 1-5 axis students can rate. */
+    public const TYPE_RATED = 'rated';
+
+    /** @var array<string, string> label => stored value, for the admin dropdown */
+    public const TYPES = [
+        'Discussion only' => self::TYPE_DISCUSSION,
+        'Discussion + star rating' => self::TYPE_RATED,
+    ];
+
+    /**
+     * How this section behaves. Data, not code: switching a section to rated is an admin
+     * decision, so which categories carry stars is never hardcoded anywhere.
+     */
+    #[ORM\Column(length: 16, options: ['default' => self::TYPE_DISCUSSION])]
+    #[Assert\Choice(choices: [self::TYPE_DISCUSSION, self::TYPE_RATED])]
+    private string $type = self::TYPE_DISCUSSION;
+
+    /**
+     * What the ends of the scale mean, e.g. "licht" and "zwaar" for Studiebelasting.
+     *
+     * A bare row of stars cannot say which direction is good: "Studiebelasting 5/5" reads as
+     * both "very heavy" and "very well balanced" depending on the reader. That does not just
+     * confuse - it silently mixes, because some students answer one way and some the other.
+     * So the scale carries its own endpoints, per category and per language.
+     */
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $rating_low_label_nl = null;
+
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $rating_low_label_en = null;
+
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $rating_high_label_nl = null;
+
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $rating_high_label_en = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
@@ -34,6 +75,107 @@ class CommentCategory extends BaseEntity
     public function __toString(): string
     {
         return sprintf('%s (%s)', $this->getNameNl(), $this->getNameEn());
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function isRated(): bool
+    {
+        return self::TYPE_RATED === $this->type;
+    }
+
+    public function getRatingLowLabel(string $lang): ?string
+    {
+        return $this->{'rating_low_label_' . $lang} ?? $this->{'rating_low_label_' . self::$DEFAULT_LANGUAGE};
+    }
+
+    public function getRatingHighLabel(string $lang): ?string
+    {
+        return $this->{'rating_high_label_' . $lang} ?? $this->{'rating_high_label_' . self::$DEFAULT_LANGUAGE};
+    }
+
+    public function getRatingLowLabelNl(): ?string
+    {
+        return $this->rating_low_label_nl;
+    }
+
+    public function setRatingLowLabelNl(?string $label): static
+    {
+        $this->rating_low_label_nl = $label;
+
+        return $this;
+    }
+
+    public function getRatingLowLabelEn(): ?string
+    {
+        return $this->rating_low_label_en;
+    }
+
+    public function setRatingLowLabelEn(?string $label): static
+    {
+        $this->rating_low_label_en = $label;
+
+        return $this;
+    }
+
+    public function getRatingHighLabelNl(): ?string
+    {
+        return $this->rating_high_label_nl;
+    }
+
+    public function setRatingHighLabelNl(?string $label): static
+    {
+        $this->rating_high_label_nl = $label;
+
+        return $this;
+    }
+
+    public function getRatingHighLabelEn(): ?string
+    {
+        return $this->rating_high_label_en;
+    }
+
+    public function setRatingHighLabelEn(?string $label): static
+    {
+        $this->rating_high_label_en = $label;
+
+        return $this;
+    }
+
+    /**
+     * A rated section without labelled ends produces numbers nobody can interpret, so the
+     * Dutch pair is required as soon as the type is switched. English falls back to Dutch,
+     * the same way name and description already do.
+     */
+    #[Assert\Callback]
+    public function validateRatingLabels(ExecutionContextInterface $context): void
+    {
+        if (!$this->isRated()) {
+            return;
+        }
+
+        $required = [
+            'rating_low_label_nl' => $this->rating_low_label_nl,
+            'rating_high_label_nl' => $this->rating_high_label_nl,
+        ];
+
+        foreach ($required as $field => $value) {
+            if (null === $value || '' === trim($value)) {
+                $context->buildViolation('A rated section needs both ends of its scale labelled.')
+                    ->atPath($field)
+                    ->addViolation();
+            }
+        }
     }
 
     public function getName(string $lang): ?string
