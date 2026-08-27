@@ -28,6 +28,12 @@ export default function Header() {
     const navigation = [
         { name: t('courses'), href: '/courses' },
         { name: t('FAQ'), href: '/faq' },
+        { name: t('header.old_burgieclan'), href: 'https://burgieclan-backup.vtk.be', external: true },
+        {
+            name: t('header.new_burgieclan_feedback'),
+            href: 'https://docs.google.com/forms/d/e/1FAIpQLSdv8uIPyN9IMpCLNOzSKoiCbTqrdefb9uw-AfGtr0HjEG4REA/viewform?usp=publish-editor',
+            external: true,
+        },
         //{ name: t('overview'), href: '#' },
     ];
 
@@ -63,7 +69,7 @@ export default function Header() {
                 {/* Mobile menu toggle */}
                 <Suspense fallback={<Skeleton style={{ width: 100, height: 20 }} />}>
                     {isAuthenticated ? (
-                        <div className="ml-auto flex md:hidden">
+                        <div className="ml-auto flex xl:hidden">
                             <button
                                 type="button"
                                 onClick={() => setMobileMenuOpen(true)}
@@ -74,7 +80,7 @@ export default function Header() {
                             </button>
                         </div>
                     ) : (
-                        <div className="ml-auto flex md:hidden">
+                        <div className="ml-auto flex xl:hidden">
                             <Link href="/login" className="vtk-button vtk-button-accent vtk-button-sm">
                                 {t('login')}
                             </Link>
@@ -83,13 +89,15 @@ export default function Header() {
                 </Suspense>
 
                 {/* Desktop navigation and account controls */}
-                <div className="ml-auto hidden items-center gap-x-6 md:flex">
+                <div className="ml-auto hidden items-center gap-x-6 xl:flex">
                     <Suspense fallback={<Skeleton style={{ width: 100, height: 20 }} />}>
                         {isAuthenticated &&
                             navigation.map((item) => (
                                 <Link
                                     key={item.name}
                                     href={item.href}
+                                    target={item.external ? '_blank' : undefined}
+                                    rel={item.external ? 'noopener noreferrer' : undefined}
                                     className="whitespace-nowrap text-sm font-medium text-vtk-paper/80 transition-colors hover:text-white"
                                 >
                                     {item.name}
@@ -111,7 +119,7 @@ export default function Header() {
             </nav>
 
             {/* Mobile menu */}
-            <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="md:hidden">
+            <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="xl:hidden">
                 <div className="fixed inset-0 z-40 bg-vtk-ink/40" aria-hidden="true" />
                 <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-vtk-navy px-6 py-5 text-vtk-paper sm:max-w-sm">
                     <div className="flex items-center justify-between">
@@ -140,6 +148,8 @@ export default function Header() {
                             <Link
                                 key={item.name}
                                 href={item.href}
+                                target={item.external ? '_blank' : undefined}
+                                rel={item.external ? 'noopener noreferrer' : undefined}
                                 onClick={() => setMobileMenuOpen(false)}
                                 className="rounded-xl px-3 py-2.5 text-base font-medium text-vtk-paper/80 transition-colors hover:bg-white/10 hover:text-white"
                             >
