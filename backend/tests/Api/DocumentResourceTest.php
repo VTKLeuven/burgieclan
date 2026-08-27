@@ -100,6 +100,38 @@ class DocumentResourceTest extends ApiTestCase
         ); // Notice that creator is not included in the response.
     }
 
+    public function testGetCollectionCanDeferFileMetadata(): void
+    {
+        $document = DocumentFactory::createOne(['anonymous' => false]);
+
+        $json = $this->browser()
+            ->get(
+                '/api/documents?includeFileMetadata=false',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJson()
+            ->json()->decoded();
+
+        $matchingDocuments = array_values(
+            array_filter(
+                $json['hydra:member'],
+                fn(array $item): bool => $item['@id'] === '/api/documents/' . $document->getId()
+            )
+        );
+        $responseDocument = $matchingDocuments[0];
+
+        $this->assertSame($document->getName(), $responseDocument['name']);
+        $this->assertNull($responseDocument['contentUrl'] ?? null);
+        $this->assertNull($responseDocument['mimetype'] ?? null);
+        $this->assertNull($responseDocument['filename'] ?? null);
+        $this->assertNull($responseDocument['fileSize'] ?? null);
+    }
+
     public function testGetOneDocument(): void
     {
         $document = DocumentFactory::createOne(

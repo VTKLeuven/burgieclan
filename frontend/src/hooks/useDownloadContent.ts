@@ -1,6 +1,8 @@
 import { captureException } from "@sentry/nextjs";
 import { useToast } from '@/components/ui/Toast';
+import { isErrorResponse, useApi } from '@/hooks/useApi';
 import type { Document } from '@/types/entities';
+import { convertToDocument } from '@/utils/convertToEntity';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -45,6 +47,7 @@ const useDownloadContent = () => {
     const { showToast } = useToast();
     const { t } = useTranslation();
     const router = useRouter();
+    const { request } = useApi();
 
     // Handle download error notifications
     useEffect(() => {
@@ -169,9 +172,31 @@ const useDownloadContent = () => {
             return;
         }
 
-        // If only one document is selected and it has a contentUrl, download it directly
-        if (totalItems === 1 && options.documents?.length === 1 && options.documents[0].contentUrl) {
-            downloadSingleDocument(options.documents[0]);
+        // Category lists intentionally omit file metadata. Hydrate one document only when its
+        // download button is used; multi-document downloads need IDs only and go through ZIP.
+        if (totalItems === 1 && options.documents?.length === 1) {
+            let document = options.documents[0];
+
+            if (!document.contentUrl) {
+                try {
+                    setLoading(true);
+                    setError(null);
+                    const response = await request('GET', `/api/documents/${document.id}`);
+                    if (!response) {
+                        throw new Error('Failed to load document details');
+                    }
+                    if (isErrorResponse(response)) {
+                        throw new Error(response.error.message ?? 'Failed to load document details');
+                    }
+                    document = convertToDocument(response);
+                } catch (err) {
+                    setError(err instanceof Error ? err.message : 'Unknown download error');
+                    setLoading(false);
+                    return;
+                }
+            }
+
+            await downloadSingleDocument(document);
             return;
         }
 

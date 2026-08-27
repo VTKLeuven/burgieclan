@@ -67,7 +67,9 @@ class DocumentEntityToApiMapper extends BaseEntityToApiMapper
                 MicroMapperInterface::MAX_DEPTH => 1,
             ]
         );
-        $to->contentUrl = $this->storage->resolveUri($from, 'file');
+        if ($context[MappingContext::INCLUDE_FILE_METADATA] ?? true) {
+            $to->contentUrl = $this->storage->resolveUri($from, 'file');
+        }
         $to->tags = array_map(
             function (Tag $tag) {
                 return $this->microMapper->map(

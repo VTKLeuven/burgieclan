@@ -26,7 +26,7 @@ jobs:
     uses: ./.github/workflows/deploy.yaml
     with:
       environment: production
-      url: https://burgieclan-new.vtk.be
+      url: https://burgieclan.vtk.be
     # secrets: inherit is required here: the secrets live on the GitHub
     # environments, and environment secrets only resolve inside the called
     # workflow's jobs (which declare `environment:`). Explicit

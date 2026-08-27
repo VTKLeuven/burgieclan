@@ -24,11 +24,13 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
     const { t } = useTranslation();
     const { request } = useApi();
     const [favoriteDocuments, setFavoriteDocuments] = useState<Document[]>([]);
+    const [favoriteDocumentCount, setFavoriteDocumentCount] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchFavoriteDocuments = async () => {
             if (!user?.favoriteDocuments || user.favoriteDocuments.length === 0) {
+                setFavoriteDocumentCount(0);
                 setLoading(false);
                 return;
             }
@@ -37,6 +39,7 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
             const potentialFavorites = user.favoriteDocuments.filter(
                 doc => doc.course?.id === course.id && doc.category?.id === category.id
             );
+            setFavoriteDocumentCount(potentialFavorites.length);
 
             if (potentialFavorites.length === 0) {
                 setLoading(false);
@@ -44,8 +47,9 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
             }
 
             try {
-                // Fetch all document details in parallel
-                const documentPromises = potentialFavorites.map(doc =>
+                // Only four cards are rendered. Fetching details for every matching favorite
+                // made large favorite libraries generate a hidden request fan-out.
+                const documentPromises = potentialFavorites.slice(0, 4).map(doc =>
                     request('GET', `/api/documents/${doc.id}`)
                 );
 
@@ -86,7 +90,7 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
         <div className="mt-3 rounded-lg">
             <div className="flex justify-between items-center">
                 <h3>{t('course-page.documents.header-favorites')}</h3>
-                {favoriteDocuments.length > 3 && (
+                {favoriteDocumentCount > 3 && (
                     <Link
                         href="/account"
                         className="flex items-center text-sm text-vtk-navy hover:text-vtk-ink"
@@ -143,6 +147,7 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
                                         setFavoriteDocuments(prev =>
                                             prev.filter(doc => doc.id !== document.id)
                                         );
+                                        setFavoriteDocumentCount(prev => Math.max(0, prev - 1));
                                     }
                                 }}
                             />

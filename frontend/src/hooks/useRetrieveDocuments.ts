@@ -26,6 +26,7 @@ const useRetrieveDocuments = (
     onlyUserDocuments: boolean = true,
     filters?: DocumentFilters,
     sort?: DocumentSortOptions,
+    includeFileMetadata: boolean = true,
 ) => {
     const { user } = useUser();
     const { request, loading } = useApi<HydraCollection<unknown>>();
@@ -38,6 +39,10 @@ const useRetrieveDocuments = (
             try {
                 setError(null);
                 let url = `/api/documents?page=${page}&itemsPerPage=${itemsPerPage}`;
+
+                if (!includeFileMetadata) {
+                    url += '&includeFileMetadata=false';
+                }
 
                 // Filter by user if onlyUserDocuments is true
                 if (onlyUserDocuments && user) {
@@ -120,7 +125,7 @@ const useRetrieveDocuments = (
         };
 
         fetchDocuments();
-    }, [user, page, itemsPerPage, course, category, onlyUserDocuments, filters, sort, request]);
+    }, [user, page, itemsPerPage, course, category, onlyUserDocuments, filters, sort, includeFileMetadata, request]);
 
     return { documents, totalItems, loading, error };
 };
