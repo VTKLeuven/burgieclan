@@ -1,7 +1,7 @@
 'use client';
 
 import { Star } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface StarRatingProps {
@@ -35,9 +35,27 @@ export default function StarRating({
 }: StarRatingProps) {
     const { t } = useTranslation();
     const [hovered, setHovered] = useState<number | null>(null);
+    const starRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
     // Hover previews the score you are about to give without committing to it.
     const shown = hovered ?? value ?? 0;
+
+    const handleKeyDown = (event: React.KeyboardEvent, currentStar: number) => {
+        if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+            event.preventDefault();
+            const next = Math.min(5, (value ?? currentStar) + 1);
+            onChange(next);
+            starRefs.current[next - 1]?.focus();
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+            event.preventDefault();
+            const prev = Math.max(1, (value ?? currentStar) - 1);
+            onChange(prev);
+            starRefs.current[prev - 1]?.focus();
+        } else if (event.key === ' ' || event.key === 'Enter') {
+            event.preventDefault();
+            onChange(currentStar);
+        }
+    };
 
     return (
         <div className="flex flex-col gap-1">
@@ -49,30 +67,23 @@ export default function StarRating({
             >
                 {STARS.map((star) => {
                     const filled = star <= shown;
+                    const isSelected = value === star;
                     return (
                         <button
                             key={star}
+                            ref={(el) => {
+                                starRefs.current[star - 1] = el;
+                            }}
                             type="button"
                             role="radio"
-                            aria-checked={value === star}
+                            aria-checked={isSelected}
                             aria-label={t('course-page.comments.rating-stars', { count: star })}
-                            disabled={disabled}
-                            // Only the selected star is tabbable, so the group is one stop in
-                            // the tab order and the arrow keys move within it.
-                            tabIndex={value === star || (value === null && star === 1) ? 0 : -1}
-                            onClick={() => onChange(star)}
+                            aria-disabled={disabled}
+                            tabIndex={isSelected || (value === null && star === 1) ? 0 : -1}
+                            onClick={() => !disabled && onChange(star)}
                             onMouseEnter={() => !disabled && setHovered(star)}
-                            onKeyDown={(event) => {
-                                if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
-                                    event.preventDefault();
-                                    onChange(Math.min(5, (value ?? 0) + 1));
-                                }
-                                if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
-                                    event.preventDefault();
-                                    onChange(Math.max(1, (value ?? 1) - 1));
-                                }
-                            }}
-                            className={`rounded-sm p-0.5 transition-transform focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vtk-ink ${
+                            onKeyDown={(e) => !disabled && handleKeyDown(e, star)}
+                            className={`rounded-sm p-0.5 transition-transform focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vtk-ink ${
                                 disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:scale-110'
                             }`}
                         >
