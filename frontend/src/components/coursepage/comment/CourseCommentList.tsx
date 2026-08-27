@@ -245,8 +245,17 @@ const CourseCommentList = ({
         <div className="relative z-10">
             {/* Category header, matching the curriculum program rows */}
             <div
-                className="relative z-20 flex cursor-pointer items-center gap-2.5 rounded-[18px] border border-vtk-line bg-vtk-surface px-4 py-3 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper"
+                role="button"
+                tabIndex={0}
+                aria-expanded={expanded}
+                className="relative z-20 flex cursor-pointer items-center gap-2.5 rounded-[18px] border border-vtk-line bg-vtk-surface px-4 py-3 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-2"
                 onClick={() => setExpanded(!expanded)}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setExpanded(!expanded);
+                    }
+                }}
             >
                 <ChevronRight
                     size={16}
@@ -287,7 +296,10 @@ const CourseCommentList = ({
 
 
             {/* Collapsible Content */}
-            <div className={`grid transition-all duration-300 ease-in-out ${expanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+            <div
+                inert={!expanded}
+                className={`grid transition-all duration-300 ease-in-out ${expanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+            >
                 <div className={`ml-5 min-h-0 space-y-1.5 border-l border-vtk-line pl-4 ${expanded ? 'mt-1.5 overflow-visible' : 'overflow-hidden'}`}>
                     {/* Category description */}
                     {category.description && (

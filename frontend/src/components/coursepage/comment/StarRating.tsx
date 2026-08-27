@@ -83,7 +83,7 @@ export default function StarRating({
                             onClick={() => !disabled && onChange(star)}
                             onMouseEnter={() => !disabled && setHovered(star)}
                             onKeyDown={(e) => !disabled && handleKeyDown(e, star)}
-                            className={`rounded-sm p-0.5 transition-transform focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vtk-ink ${
+                            className={`rounded-sm p-1 transition-all focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-2 focus-visible:scale-125 ${
                                 disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:scale-110'
                             }`}
                         >
