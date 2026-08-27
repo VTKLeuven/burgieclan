@@ -238,6 +238,26 @@ def clean_wikitext(text):
     text = re.sub(r"[ \t]+([.,;:!?])", r"\1", text)
     text = re.sub(r"[ \t]{2,}", " ", text)
 
+    # Strip boilerplate wiki disclaimers (e.g. under Herexamendata)
+    text = re.sub(
+        r"^(?:[0-9]+\.\s*)?(?:Dit|Het)\s+is\s+absoluut\s+GEEN\s+garantie\s+dat\s+dit\s+de\s+komende\s+jaren\s+ook\s+zo\s+is\.\s*Puur\s+een\s+overzicht\s+van\s+vorige\s+jaren\.\s*(?:\(Wel\s+een\s+redelijke\s+kans\s+om\s+rond\s+die\s+datum\s+te\s+vallen\)\.?\s*)?",
+        "",
+        text,
+        flags=re.IGNORECASE | re.MULTILINE
+    )
+    text = re.sub(
+        r"^DISCLAIMER:\s*Er\s+is\s+geen\s+garantie\s+dat\s+dit\s+elk\s+jaar\s+op\s+deze\s+dag\s+valt\s+maar\s+het\s+geeft\s+wel\s+een\s+indicatie\s*",
+        "",
+        text,
+        flags=re.IGNORECASE | re.MULTILINE
+    )
+    text = re.sub(
+        r";\s*Is\s+geen\s+garantie\s+dat\s+dit\s+elk\s+jaar\s+op\s+deze\s+dag\s+is\s+maar\s+geeft\s+wel\s+indicatie\.?",
+        "",
+        text,
+        flags=re.IGNORECASE
+    )
+
     lines = [ln.strip() for ln in text.split("\n")]
     lines = [ln for ln in lines if ln and not re.fullmatch(r"[*#:;\-•\s]+", ln)]
     return "\n".join(lines).strip()
