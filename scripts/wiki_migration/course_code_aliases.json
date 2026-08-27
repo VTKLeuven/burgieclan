@@ -1,0 +1,46 @@
+{
+  "_comment": [
+    "Wiki course code -> the Burgieclan course its comments belong on.",
+    "",
+    "Two forms:",
+    "  \"OLD\": \"NEW\"                                        every comment moves",
+    "  \"OLD\": {\"to\": \"NEW\", \"from_academic_year\": \"2018-2019\"}   split by year",
+    "",
+    "The split form is for a renumbering: KU Leuven offered OLD up to a point and NEW",
+    "after it, so comments before the cutoff stay on the old course (it really did run",
+    "then) and later ones move. probe_offering_years.py --suggest drafts these from the",
+    "public syllabus archive; check the _evidence line before accepting one.",
+    "",
+    "Do NOT alias two codes that were offered in the SAME years -- those are parallel",
+    "courses, not a rename (H04O1A and H04O1B both ran 2010-2025).",
+    "Keys starting with _ are ignored. An unknown target code fails the build."
+  ],
+  "H01B0A": {
+    "to": "H01B0B",
+    "from_academic_year": "2018-2019"
+  },
+  "H01A2A": {
+    "to": "H01A2B",
+    "from_academic_year": "2018-2019"
+  },
+  "H01B4A": {
+    "to": "H01B4B",
+    "from_academic_year": "2016-2017"
+  },
+  "H06F0A": {
+    "to": "H06F0B",
+    "from_academic_year": "2016-2017"
+  },
+  "H09P1A": {
+    "to": "H09P1B",
+    "from_academic_year": "2018-2019"
+  },
+  "H01I0A": {
+    "to": "H01I0B",
+    "from_academic_year": "2020-2021"
+  },
+  "H01D2A": {
+    "to": "H01D2D",
+    "from_academic_year": "2025-2026"
+  }
+}

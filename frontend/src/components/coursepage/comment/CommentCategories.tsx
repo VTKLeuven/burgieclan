@@ -1,8 +1,8 @@
 import Loading from '@/app/[locale]/loading';
 import CourseCommentList from '@/components/coursepage/comment/CourseCommentList';
 import { HydraCollection, useApi } from '@/hooks/useApi';
-import { CommentCategory, CourseComment } from '@/types/entities';
-import { convertToCommentCategory } from '@/utils/convertToEntity';
+import { CommentCategory, CourseComment, CourseRatingSummary, SectionRating } from '@/types/entities';
+import { convertToCommentCategory, convertToCourseRatingSummary } from '@/utils/convertToEntity';
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +14,7 @@ type CommentCategoriesProps = {
 
 const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCategoriesProps) => {
     const [allCategories, setAllCategories] = useState<CommentCategory[]>([]);
+    const [ratings, setRatings] = useState<CourseRatingSummary | null>(null);
 
     const { t, i18n } = useTranslation();
     const { request, loading } = useApi<HydraCollection<unknown>>();
@@ -35,6 +36,26 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
         fetchCategories();
     }, [request, i18n.language]);
 
+    // One request for every rated section on the course. Fetching per section would be a round
+    // trip each, and the endpoint is built to answer them together for exactly that reason.
+    useEffect(() => {
+        const fetchRatings = async () => {
+            const data = await request('GET', `/api/courses/${courseId}/ratings`);
+            if (!data) {
+                return;
+            }
+            setRatings(convertToCourseRatingSummary(data));
+        };
+
+        fetchRatings();
+    }, [request, courseId]);
+
+    const ratingFor = useCallback(
+        (categoryId: number): SectionRating | undefined =>
+            ratings?.sections.find((section) => section.categoryId === categoryId),
+        [ratings]
+    );
+
     // Group comments by category - memoized to prevent unnecessary recalculations
     const commentsByCategory = useMemo(() => {
         const grouped: { [key: number]: CourseComment[] } = {};
@@ -55,7 +76,7 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
     }, [commentsByCategory]);
 
     const handleCommentAdded = useCallback((newComment: CourseComment) => {
-        const updatedComments = [...comments, newComment];
+        const updatedComments = [newComment, ...comments];
         if (onCommentsUpdate) {
             onCommentsUpdate(updatedComments);
         }
@@ -96,6 +117,8 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
                     comments={getCommentsByCategory(category.id)}
                     courseId={courseId}
                     onCommentAdded={handleCommentAdded}
+                    rating={ratingFor(category.id)}
+                    recentYearCount={ratings?.recentYears.length ?? 0}
                     />
                 ))}
             </div>

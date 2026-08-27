@@ -85,14 +85,14 @@ const CommentRow: React.FC<CommentRowProps> = ({
     };
 
     return (
-        <div className="py-2 px-3 leading-tight flex flex-col sm:flex-row overflow-visible relative items-center transition-colors border-b border-vtk-line hover:bg-vtk-paper hover:shadow-xs group/comment">
+        <div className="py-2 px-3 leading-tight flex flex-col sm:flex-row overflow-visible relative items-start transition-colors border-b border-vtk-line hover:bg-vtk-paper hover:shadow-xs group/comment">
             {/* Profile Picture - Left side (desktop only) */}
-            <div className="hidden sm:flex items-center mr-2 overflow-visible">
+            <div className="hidden sm:flex items-center mr-2 pt-1 overflow-visible">
                 <CommentUserIcon anonymous={comment.anonymous ?? true} creatorName={comment.creator?.fullName} />
             </div>
 
             {/* Comment content - Center */}
-            <div className="grow mx-3 flex items-center min-w-0 w-full">
+            <div className="grow mx-3 flex items-start min-w-0 w-full">
                 {isEditing ? (
                     <form onSubmit={handleEditSubmit} className="space-y-2 w-full">
                         <textarea
@@ -148,7 +148,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
                     </form>
                 ) : (
                     <>
-                        <p className="text-sm min-h-[1.4rem] text-vtk-body whitespace-pre-line">{comment.content}</p>
+                        <p className="text-sm min-h-[1.4rem] text-vtk-body whitespace-pre-line break-words">{comment.content}</p>
                         <div className="hidden sm:flex items-center w-auto">
                             <CommentActions onEdit={handleEditClick} onDelete={handleDeleteComment} show={isOwnComment && !isEditing} />
                         </div>
@@ -157,7 +157,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
             </div>
 
             {/* Vote Button - Desktop only */}
-            <div className="hidden sm:flex items-center mr-3">
+            <div className="hidden sm:flex items-center mr-3 pt-1">
                 <VoteButton
                     type="course_comment"
                     objectId={comment.id}

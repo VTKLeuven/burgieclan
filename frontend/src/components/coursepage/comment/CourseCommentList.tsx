@@ -4,7 +4,9 @@ import { useToast } from '@/components/ui/Toast';
 import Tooltip from '@/components/ui/Tooltip';
 import { useUser } from '@/components/UserContext';
 import { useApi } from '@/hooks/useApi';
-import { CommentCategory, CourseComment } from '@/types/entities';
+import RatingSummary from '@/components/coursepage/comment/RatingSummary';
+import StarRating from '@/components/coursepage/comment/StarRating';
+import { CommentCategory, CourseComment, SectionRating } from '@/types/entities';
 import { convertToCourseComment } from '@/utils/convertToEntity';
 import { ChevronRight, Info, MessageSquarePlus, Send } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
@@ -29,14 +31,75 @@ function insertInServerOrder(comments: CourseComment[], added: CourseComment): C
     return [...comments.slice(0, index), added, ...comments.slice(index)];
 }
 
+/**
+ * How many academic years stay open before the rest fold away.
+ *
+ * Three, matching the ratings window, so "recent" means the same thing everywhere on the page.
+ * Nothing is hidden permanently - a year group is one click away, which matters because most of
+ * these comments were migrated from the course wiki and are the only record of an old year.
+ */
+const OPEN_YEAR_GROUPS = 3;
+
+type YearGroup = {
+    /** Undefined for comments whose academic year could not be determined. */
+    year?: string;
+    comments: CourseComment[];
+};
+
+/**
+ * Group comments by academic year, always ensuring newest academic years appear first
+ * and undated comments appear at the end.
+ */
+function groupByYear(comments: CourseComment[]): YearGroup[] {
+    const map = new Map<string, CourseComment[]>();
+    const undated: CourseComment[] = [];
+
+    for (const comment of comments) {
+        if (!comment.academicYear) {
+            undated.push(comment);
+        } else {
+            const list = map.get(comment.academicYear) ?? [];
+            list.push(comment);
+            map.set(comment.academicYear, list);
+        }
+    }
+
+    // Sort academic years descending ("2025 - 2026", "2024 - 2025", ...)
+    const sortedYears = Array.from(map.keys()).sort((a, b) => b.localeCompare(a));
+
+    const groups: YearGroup[] = sortedYears.map(year => ({
+        year,
+        comments: map.get(year)!,
+    }));
+
+    if (undated.length > 0) {
+        groups.push({
+            year: undefined,
+            comments: undated,
+        });
+    }
+
+    return groups;
+}
+
 type CourseCommentListProps = {
     category: CommentCategory;
     comments: CourseComment[];
     courseId: number;
     onCommentAdded?: (newComment: CourseComment) => void;
+    /** Absent for a discussion section, and while the summary is still loading. */
+    rating?: SectionRating;
+    recentYearCount?: number;
 };
 
-const CourseCommentList = ({ category, comments: initialComments, courseId, onCommentAdded }: CourseCommentListProps) => {
+const CourseCommentList = ({
+    category,
+    comments: initialComments,
+    courseId,
+    onCommentAdded,
+    rating,
+    recentYearCount = 0,
+}: CourseCommentListProps) => {
     const { user } = useUser();
 
     const [comments, setComments] = useState<CourseComment[]>(initialComments);
@@ -48,6 +111,20 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
     }
 
     const [expanded, setExpanded] = useState(false);
+    const [showOlder, setShowOlder] = useState(false);
+    const [ownRating, setOwnRating] = useState<number | null>(rating?.currentUserRating ?? null);
+    const [prevRating, setPrevRating] = useState<SectionRating | undefined>(rating);
+    const [savingRating, setSavingRating] = useState(false);
+
+    // The summary arrives after the first paint, so adopt the server's answer when it lands -
+    // but never clobber a score the user has since given.
+    if (rating !== prevRating) {
+        setPrevRating(rating);
+        if (!savingRating) {
+            setOwnRating(rating?.currentUserRating ?? null);
+        }
+    }
+
     const [showAddForm, setShowAddForm] = useState(false);
     const [formContent, setFormContent] = useState('');
     const [formAnonymous, setFormAnonymous] = useState(false);
@@ -127,6 +204,39 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
         setExpanded(true);
     };
 
+    // Comments arrive already ordered, so grouping is a scan rather than a sort.
+    const yearGroups = groupByYear(comments);
+    const visibleGroups = showOlder ? yearGroups : yearGroups.slice(0, OPEN_YEAR_GROUPS);
+    const hiddenCommentCount = yearGroups
+        .slice(OPEN_YEAR_GROUPS)
+        .reduce((total, group) => total + group.comments.length, 0);
+
+    const handleRate = async (value: number) => {
+        if (!user || savingRating) return;
+
+        // Optimistic: the star fills straight away, and rolls back if the request fails.
+        const previous = ownRating;
+        setOwnRating(value);
+        setSavingRating(true);
+        try {
+            const res = await request('POST', '/api/course_ratings', {
+                course: `/api/courses/${courseId}`,
+                category: `/api/comment_categories/${category.id}`,
+                value,
+            });
+
+            if (!res) {
+                throw new Error('Failed to save rating');
+            }
+            showToast(t('course-page.comments.rating-saved'), 'success');
+        } catch {
+            setOwnRating(previous);
+            showToast(t('course-page.comments.rating-error'), 'error');
+        } finally {
+            setSavingRating(false);
+        }
+    };
+
     const handleDeleteComment = (commentId: number) => {
         setComments((prev) => prev.filter((c) => c.id !== commentId));
     };
@@ -144,6 +254,9 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
                     style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
                 />
                 <span className="min-w-0 flex-1 truncate text-[15px] font-medium text-vtk-ink">{category.name}</span>
+
+                {/* Visible without expanding: the score is the thing most people came for. */}
+                {rating && <RatingSummary rating={rating} recentYearCount={recentYearCount} compact />}
 
                 {/* Add comment button */}
                 {onCommentAdded && (
@@ -181,6 +294,27 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
                         <div className="flex items-start gap-2.5 rounded-2xl border border-vtk-line bg-vtk-paper-2 px-4 py-3">
                             <Info className="mt-0.5 h-4 w-4 shrink-0 text-vtk-muted" />
                             <p className="m-0 text-sm leading-relaxed text-vtk-body" dangerouslySetInnerHTML={{ __html: category.description }} />
+                        </div>
+                    )}
+
+                    {/* Rating block. Only drawn for a section an admin marked as rated, and only
+                        once the summary has arrived - never a placeholder that shifts the layout. */}
+                    {rating && (
+                        <div className="flex flex-wrap items-start justify-between gap-4 rounded-2xl border border-vtk-line bg-vtk-surface px-4 py-3">
+                            <div className="flex flex-col gap-1.5">
+                                <span className="text-xs font-semibold uppercase tracking-[0.08em] text-vtk-muted">
+                                    {t('course-page.comments.your-rating')}
+                                </span>
+                                <StarRating
+                                    value={ownRating}
+                                    onChange={handleRate}
+                                    disabled={!user || savingRating}
+                                    lowLabel={category.ratingLowLabel}
+                                    highLabel={category.ratingHighLabel}
+                                    label={category.name ?? ''}
+                                />
+                            </div>
+                            <RatingSummary rating={rating} recentYearCount={recentYearCount} />
                         </div>
                     )}
 
@@ -246,15 +380,38 @@ const CourseCommentList = ({ category, comments: initialComments, courseId, onCo
                             {t('course-page.comments.no-comments')}
                         </div>
                     ) : (
-                        <div className="vtk-panel vtk-rows relative overflow-visible">
-                            {comments.map((comment) => (
-                                <CommentRow
-                                    key={comment.id}
-                                    comment={comment}
-                                    onDelete={handleDeleteComment}
-                                />
+                        <>
+                            {visibleGroups.map((group) => (
+                                <div key={group.year ?? 'unknown'} className="flex flex-col gap-1.5">
+                                    <span className="text-xs font-semibold uppercase tracking-[0.08em] text-vtk-muted">
+                                        {group.year ?? t('course-page.comments.year-unknown')}
+                                    </span>
+                                    <div className="vtk-panel vtk-rows relative overflow-visible">
+                                        {group.comments.map((comment) => (
+                                            <CommentRow
+                                                key={comment.id}
+                                                comment={comment}
+                                                onDelete={handleDeleteComment}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
                             ))}
-                        </div>
+
+                            {/* Folded away rather than filtered out: for a migrated course these
+                                older years are the only record there is of them. */}
+                            {hiddenCommentCount > 0 && (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowOlder((previous) => !previous)}
+                                    className="vtk-button vtk-button-sm vtk-button-ghost self-start"
+                                >
+                                    {showOlder
+                                        ? t('course-page.comments.hide-older')
+                                        : t('course-page.comments.show-older', { count: hiddenCommentCount })}
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

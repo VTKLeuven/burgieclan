@@ -133,35 +133,53 @@ export default function VoteButton({
         // fill rather than a second accent colour.
         <span ref={buttonRef} className={`inline-flex items-center rounded-full border border-vtk-line-2 bg-vtk-surface
             ${padding} ${spacing}
-            ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
+            ${disabled ? 'opacity-50' : ''}
             ${className}`}
         >
-            <ArrowBigUpIcon
-                size={iconSize}
-                strokeWidth={isUpvoteHovered ? '2' : '1.5'}
+            <button
+                type="button"
+                aria-label="Upvote"
+                aria-pressed={voteState === VoteDirection.UP}
+                disabled={disabled}
+                onClick={() => handleVote(VoteDirection.UP)}
                 onMouseEnter={() => setIsUpvoteHovered(true)}
                 onMouseLeave={() => setIsUpvoteHovered(false)}
-                onClick={() => handleVote(VoteDirection.UP)}
-                className={`transition-colors
-                    ${disabled ? '' : 'hover:text-vtk-ink'}
-                    ${voteState === VoteDirection.UP ? 'fill-vtk-ink text-vtk-ink' : 'text-vtk-muted'}
-                `}
-            />
+                className={`focus:outline-hidden rounded-full transition-colors ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+            >
+                <ArrowBigUpIcon
+                    size={iconSize}
+                    strokeWidth={isUpvoteHovered ? '2' : '1.5'}
+                    aria-hidden="true"
+                    className={`transition-colors
+                        ${disabled ? '' : 'hover:text-vtk-ink'}
+                        ${voteState === VoteDirection.UP ? 'fill-vtk-ink text-vtk-ink' : 'text-vtk-muted'}
+                    `}
+                />
+            </button>
             <div className={`${textSize} min-w-4 text-center tabular-nums ${voteState === VoteDirection.NONE ? 'text-vtk-body' : 'font-semibold text-vtk-ink'
                 }`}>
                 {voteCount}
             </div>
-            <ArrowBigDownIcon
-                size={iconSize}
-                strokeWidth={isDownvoteHovered ? '2' : '1.5'}
+            <button
+                type="button"
+                aria-label="Downvote"
+                aria-pressed={voteState === VoteDirection.DOWN}
+                disabled={disabled}
+                onClick={() => handleVote(VoteDirection.DOWN)}
                 onMouseEnter={() => setIsDownvoteHovered(true)}
                 onMouseLeave={() => setIsDownvoteHovered(false)}
-                onClick={() => handleVote(VoteDirection.DOWN)}
-                className={`transition-colors
-                    ${disabled ? '' : 'hover:text-vtk-ink'}
-                    ${voteState === VoteDirection.DOWN ? 'fill-vtk-ink text-vtk-ink' : 'text-vtk-muted'}
-                `}
-            />
+                className={`focus:outline-hidden rounded-full transition-colors ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+            >
+                <ArrowBigDownIcon
+                    size={iconSize}
+                    strokeWidth={isDownvoteHovered ? '2' : '1.5'}
+                    aria-hidden="true"
+                    className={`transition-colors
+                        ${disabled ? '' : 'hover:text-vtk-ink'}
+                        ${voteState === VoteDirection.DOWN ? 'fill-vtk-ink text-vtk-ink' : 'text-vtk-muted'}
+                    `}
+                />
+            </button>
         </span>
     );
 }

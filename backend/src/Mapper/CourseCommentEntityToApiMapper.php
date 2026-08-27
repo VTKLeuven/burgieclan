@@ -6,6 +6,7 @@ use App\ApiResource\CommentCategoryApi;
 use App\ApiResource\CourseApi;
 use App\ApiResource\CourseCommentApi;
 use App\ApiResource\UserApi;
+use App\Constants\MappingContext;
 use App\Entity\CourseComment;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfonycasts\MicroMapper\AsMapper;
@@ -48,7 +49,8 @@ class CourseCommentEntityToApiMapper extends BaseEntityToApiMapper
             $from->getCategory(),
             CommentCategoryApi::class,
             [
-                MicroMapperInterface::MAX_DEPTH => 0,
+                MicroMapperInterface::MAX_DEPTH => 1,
+                'lang' => $context['lang'] ?? null,
             ]
         );
 
@@ -67,6 +69,7 @@ class CourseCommentEntityToApiMapper extends BaseEntityToApiMapper
                 UserApi::class,
                 [
                     MicroMapperInterface::MAX_DEPTH => 1,
+                    MappingContext::SUMMARY => true,
                 ]
             );
         }

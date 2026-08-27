@@ -1,0 +1,10 @@
+{
+  "_comment": [
+    "row_key -> corrected academic year, compact form 'YYYY-YYYY'. Keys starting with _ are ignored.",
+    "",
+    "Produced by reviewing scripts/wiki_migration/review_year_conflicts.py output; see",
+    "GEMINI_PROMPT.md. Empty on purpose: the earlier hand-corrections were all superseded",
+    "when the session-heading and revision-date bugs were fixed at the root, and build",
+    "warns about any key that no longer matches a comment."
+  ]
+}

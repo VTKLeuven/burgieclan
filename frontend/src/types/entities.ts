@@ -67,6 +67,33 @@ export interface DocumentComment extends AbstractComment {
 export interface CommentCategory extends BaseEntity {
     name?: string;
     description?: string;
+    /** 'discussion' or 'rated'. Set per category in the admin, never hardcoded here. */
+    type?: 'discussion' | 'rated';
+    /** What 1 and 5 mean on this section's scale. Optional; most axes read fine without. */
+    ratingLowLabel?: string;
+    ratingHighLabel?: string;
+}
+
+/** Average and sample size for one window of ratings. */
+export interface RatingScore {
+    /** Null below the backend's threshold — too few ratings to average honestly. */
+    average: number | null;
+    count: number;
+}
+
+export interface SectionRating {
+    categoryId: number;
+    recent: RatingScore;
+    allTime: RatingScore;
+    byYear: { year: string; average: number; count: number }[];
+    /** This viewer's own score, or null if they have not rated this section. */
+    currentUserRating: number | null;
+}
+
+export interface CourseRatingSummary {
+    /** The academic years the recent score covers, newest first. */
+    recentYears: string[];
+    sections: SectionRating[];
 }
 
 export interface DocumentCategory extends BaseEntity {

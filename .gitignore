@@ -6,32 +6,19 @@
 __pycache__/
 *.py[cod]
 
-# Swarm intermediates - regenerable from the manifest plus scripts/migration/,
-# and ~40 MB in total, so they stay out of history.
-migration_data/course_payloads/
-migration_data/cluster_outputs/
-migration_data/batches/
-migration_data/full_ai_normalized_output.json
-
-# Large migration data manifests (staged on liv /mnt/immich/burgieclan-staging/)
-migration_data/*.jsonl
-migration_data/manifest_*.json
-migration_data/unmapped_residue.json
-migration_data/classified_*.jsonl
-migration_data/recovered_*.jsonl
-
 # Scratch
 2026-*.txt
 .~lock.*#
 
-# Wiki comment migration: the raw MediaWiki dump is large and re-fetchable with
-# `extract_wiki_comments.py dump`; the SQL is regenerated from the reviewed JSON.
-migration_data/raw/
-migration_data/wiki_comments_import.sql
-migration_data/wiki_comments_rollback.sql
-
-# Wiki comment migration: reviewed JSON carries author r-numbers (personal data).
-# Never commit these to a public repository.
-migration_data/wiki_comments_*.json
-migration_data/course_code_aliases.json
+# Migration working data: wiki dumps, extracted comments, reports, generated SQL.
+# This is student-written content and course data, not source code, and it is
+# regenerable from scripts/wiki_migration/. Ignored as a whole rather than by
+# pattern: a blocklist only covers the files someone remembered to add, and
+# migration_data/review_batches/ was already slipping through.
+migration_data/
 scripts/wiki_migration/__pycache__/
+
+# Exported conversation transcripts (`/export`). They quote whatever was on screen,
+# including credentials typed or printed during the session, and are not source code.
+migrate-wiki.txt
+*-conversation.txt

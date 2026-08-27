@@ -56,10 +56,10 @@ class Course extends BaseEntity
     private string $code;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
-    private array $professors = [];
+    private ?array $professors = [];
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
-    private array $semesters = [];
+    private ?array $semesters = [];
 
     #[ORM\Column(type: Types::STRING, length: 7)]
     #[Assert\NotBlank]
@@ -180,7 +180,7 @@ class Course extends BaseEntity
         return $this->modules;
     }
 
-    public function setModules(?Collection $modules): self
+    public function setModules(Collection $modules): self
     {
         $this->modules = $modules;
 
@@ -189,10 +189,10 @@ class Course extends BaseEntity
 
     public function getProfessors(): array
     {
-        return $this->professors;
+        return $this->professors ?? [];
     }
 
-    public function setProfessors(?array $professors): self
+    public function setProfessors(?array $professors): static
     {
         $this->professors = $professors;
 
@@ -201,7 +201,7 @@ class Course extends BaseEntity
 
     public function getSemesters(): array
     {
-        return $this->semesters;
+        return $this->semesters ?? [];
     }
 
     public function setSemesters(?array $semesters): self
@@ -256,7 +256,6 @@ class Course extends BaseEntity
     public function removeOldCourse(self $oldCourse): self
     {
         if ($this->oldCourses->removeElement($oldCourse)) {
-            $this->oldCourses->removeElement($oldCourse);
             $oldCourse->removeNewCourse($this);
         }
         return $this;
@@ -283,7 +282,6 @@ class Course extends BaseEntity
     public function removeNewCourse(self $newCourse): self
     {
         if ($this->newCourses->removeElement($newCourse)) {
-            $this->newCourses->removeElement($newCourse);
             $newCourse->removeOldCourse($this);
         }
 
