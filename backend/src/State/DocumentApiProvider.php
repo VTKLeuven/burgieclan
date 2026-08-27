@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\DocumentApi;
+use App\Constants\MappingContext;
 use App\Entity\Document;
 use App\Entity\DocumentCategory;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -37,8 +38,11 @@ class DocumentApiProvider implements ProviderInterface
     {
         $request = $context['request'] ?? null;
         $lang = $request?->query->get('lang') ?? DocumentCategory::$DEFAULT_LANGUAGE;
+        $includeFileMetadata = null === $request
+            || $request->query->getBoolean('includeFileMetadata', true);
         $mapperContext = [
             'lang' => $lang,
+            MappingContext::INCLUDE_FILE_METADATA => $includeFileMetadata,
         ];
         if ($operation instanceof CollectionOperationInterface) {
             // Get the current user
@@ -139,12 +143,18 @@ class DocumentApiProvider implements ProviderInterface
     {
         $documentApi = $this->microMapper->map($document, DocumentApi::class, $mapperContext);
 
-        // Get file size from document entity
-        $documentApi->fileSize = $document->getFileSize();
-
         if ($document->isAnonymous()) {
             $documentApi->creator = null; // Remove author in GET-requests if document is anonymous
         }
+
+        // Collection screens only need the document's descriptive fields. Resolving and MIME-sniffing
+        // every file is deferred until a user opens or downloads that document.
+        if (!($mapperContext[MappingContext::INCLUDE_FILE_METADATA] ?? true)) {
+            return $documentApi;
+        }
+
+        // Get file size from document entity
+        $documentApi->fileSize = $document->getFileSize();
 
         if ($document->getFileName()) {
             $filename = $document->getFileName();

@@ -20,15 +20,133 @@ permissions:
   packages: write
 
 jobs:
-  deploy:
-    name: Deploy
-    uses: ./.github/workflows/deploy.yaml
+  build_backend:
+    name: Build Backend
+    uses: ./.github/workflows/build-backend.yaml
+    permissions:
+      contents: read
+      packages: write
     with:
       environment: dev
       url: https://dev.burgieclan.vtk.be
-    # secrets: inherit is required here: the secrets live on the GitHub
-    # environments, and environment secrets only resolve inside the called
-    # workflow's jobs (which declare `environment:`). Explicit
-    # `SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}` mappings evaluate in
-    # this caller job, which has no environment, and silently pass empty strings.
+
+  build_frontend:
+    name: Build Frontend
+    uses: ./.github/workflows/build-frontend.yaml
+    permissions:
+      contents: read
+      packages: write
+    with:
+      environment: dev
+      url: https://dev.burgieclan.vtk.be
     secrets: inherit
+
+  deploy:
+    name: Deploy
+    runs-on: self-hosted
+    needs: [build_backend, build_frontend]
+    environment:
+      name: dev
+      url: https://dev.burgieclan.vtk.be
+
+    steps:
+      - name: Deploy containers locally
+        run: |
+          set -e
+
+          # Variables
+          DEPLOY_DIR="${{ vars.DEPLOY_DIR }}"
+          IMAGE_TAG="dev"
+          export IMAGE_TAG
+
+          # Ensure DEPLOY_DIR is present
+          if [ ! -d "$DEPLOY_DIR" ]; then
+            echo "❌ DEPLOY_DIR ($DEPLOY_DIR) does not exist"
+            exit 1
+          fi
+
+          # Change to deployment directory
+          cd "$DEPLOY_DIR"
+
+          # Ensure data directory is present
+          if [ ! -d "${{ vars.DATA_DIR }}" ]; then
+            echo "❌ Data directory does not exist"
+            exit 1
+          fi
+
+          # Ensure JWT directory is present
+          if [ ! -d "${{ vars.JWT_DIR }}" ]; then
+            echo "❌ JWT directory does not exist"
+            exit 1
+          fi
+
+          COMPOSE_FILE="docker-compose.prod.yml"
+
+          # Download the latest compose file from GitHub
+          curl -sSL -o "$COMPOSE_FILE" \
+               "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/.docker/docker-compose.prod.yml"
+
+          # Download the latest nginx.conf file from GitHub
+          curl -sSL -o nginx.conf \
+               "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/.docker/nginx.conf"
+
+          # Log in to GitHub Container Registry
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+          # Pull latest images
+          docker compose -f "$COMPOSE_FILE" pull
+
+          # Stop old containers
+          docker compose -f "$COMPOSE_FILE" down
+
+          # Start new containers
+          docker compose -f "$COMPOSE_FILE" up -d --force-recreate --wait --wait-timeout 30
+
+          # Verify all services are healthy
+          if [ -n "$(docker compose -f $COMPOSE_FILE ps -q)" ] && docker compose -f $COMPOSE_FILE ps --format json | jq -s -e 'all(.Health // "" | IN("healthy", ""))' > /dev/null; then
+            echo "✅ All containers healthy"
+            docker compose -f $COMPOSE_FILE ps
+          else
+            echo "❌ Some containers unhealthy"
+            docker compose -f $COMPOSE_FILE ps
+            docker compose -f $COMPOSE_FILE logs
+            exit 1
+          fi
+
+          # Run database migrations
+          echo "Running database migrations..."
+          docker compose -f "$COMPOSE_FILE" exec -T -u www-data backend php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration < /dev/null
+
+          # Generate JWT keys
+          echo "Generating JWT keys..."
+          docker compose -f "$COMPOSE_FILE" exec -T -u www-data backend php bin/console lexik:jwt:generate-keypair --skip-if-exists < /dev/null
+
+          # Cleanup old images
+          echo "Cleaning up old images..."
+          docker image prune -a -f
+
+  sentry_release:
+    name: Sentry Release
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    continue-on-error: true
+    environment:
+      name: dev
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@ff07929a6537bac57790c3451cf4d364aca38528 # v3.7.0
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: vtko-vzw
+          SENTRY_PROJECT: burgieclan
+        with:
+          release: ${{ github.sha }}
+          environment: dev
+          set_commits: auto
+          ignore_missing: true
+          ignore_empty: true

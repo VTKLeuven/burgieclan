@@ -1,7 +1,7 @@
 import { isErrorResponse, useApi } from "@/hooks/useApi";
 import { convertToVoteSummary } from "@/utils/convertToEntity";
 import { ArrowBigDownIcon, ArrowBigUpIcon } from "lucide-react";
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export enum VoteDirection {
     UP = 1,
@@ -28,6 +28,7 @@ export default function VoteButton({
     const [voteCount, setVoteCount] = useState(0);
     const [isUpvoteHovered, setIsUpvoteHovered] = useState(false);
     const [isDownvoteHovered, setIsDownvoteHovered] = useState(false);
+    const buttonRef = useRef<HTMLSpanElement>(null);
     const { request } = useApi();
 
     let apiEndpoint = '';
@@ -46,9 +47,11 @@ export default function VoteButton({
     }
 
     useEffect(() => {
+        let cancelled = false;
+
         async function getVoteSummary() {
             const result = await request('GET', apiEndpoint);
-            if (!result) {
+            if (!result || cancelled) {
                 return;
             }
 
@@ -57,7 +60,34 @@ export default function VoteButton({
             setVoteState(voteSummary.currentUserVote);
             setVoteCount(voteSummary.sum);
         }
-        getVoteSummary();
+
+        const element = buttonRef.current;
+        if (!element || typeof IntersectionObserver === 'undefined') {
+            void getVoteSummary();
+            return () => {
+                cancelled = true;
+            };
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (!entries.some((entry) => entry.isIntersecting)) {
+                    return;
+                }
+
+                observer.disconnect();
+                void getVoteSummary();
+            },
+            // Start shortly before the row scrolls into view, without issuing one request for
+            // every document in a long category as soon as the page mounts.
+            { rootMargin: '200px' }
+        );
+        observer.observe(element);
+
+        return () => {
+            cancelled = true;
+            observer.disconnect();
+        };
     }, [apiEndpoint, request]);
 
 
@@ -101,7 +131,7 @@ export default function VoteButton({
     return (
         // Both directions read on the navy scale; the active state is an ink
         // fill rather than a second accent colour.
-        <span className={`inline-flex items-center rounded-full border border-vtk-line-2 bg-vtk-surface
+        <span ref={buttonRef} className={`inline-flex items-center rounded-full border border-vtk-line-2 bg-vtk-surface
             ${padding} ${spacing}
             ${disabled ? 'opacity-50' : ''}
             ${className}`}

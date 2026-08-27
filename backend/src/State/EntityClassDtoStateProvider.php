@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
+use App\ApiResource\CourseApi;
 use App\Constants\MappingContext;
 use ArrayIterator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -73,6 +74,7 @@ class EntityClassDtoStateProvider implements ProviderInterface
     ): object {
         $request = $this->requestStack->getCurrentRequest();
         $lang = $request->query->get('lang'); // If the language is given as param, pass it to the mapper
+        $summary = CourseApi::class === $resourceClass && $request->query->getBoolean('summary');
         return $this->microMapper->map(
             $entity,
             $resourceClass,
@@ -80,6 +82,7 @@ class EntityClassDtoStateProvider implements ProviderInterface
                 'lang' => $lang,
                 MappingContext::COLLECTION_OPERATION => $collectionOperation,
                 MappingContext::OPERATION_NAME => $operation->getName(),
+                MappingContext::SUMMARY => $summary,
             ]
         );
     }
