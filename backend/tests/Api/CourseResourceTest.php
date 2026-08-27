@@ -227,6 +227,33 @@ class CourseResourceTest extends ApiTestCase
         $this->assertSame('Fluidummechanica', $json['oldCourses'][0]['name']);
     }
 
+    public function testGetCourseSummarySkipsExpensiveRelationsAndDocumentCounts(): void
+    {
+        $old = CourseFactory::createOne();
+        $course = CourseFactory::createOne();
+        $course->addOldCourse($old);
+        save($course);
+        DocumentFactory::createOne(['course' => $course, 'under_review' => false]);
+
+        $json = $this->browser()
+            ->get(
+                '/api/courses/' . $course->getId() . '?summary=true',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJson()
+            ->json()->decoded();
+
+        $this->assertSame($course->getName(), $json['name']);
+        $this->assertSame([], $json['oldCourses']);
+        $this->assertSame([], $json['courseComments']);
+        $this->assertSame([], $json['documentCounts']);
+    }
+
     public function testGetCourseExposesDocumentCountsByCategory(): void
     {
         $course = CourseFactory::createOne();

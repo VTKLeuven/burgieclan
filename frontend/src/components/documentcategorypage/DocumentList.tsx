@@ -32,7 +32,8 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
         category,
         false,
         filters,
-        sort
+        sort,
+        false,
     );
 
     const [selectedDocuments, setSelectedDocuments] = useState<Document[]>([]);

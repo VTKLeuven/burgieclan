@@ -23,7 +23,9 @@ export default function CourseDocumentsContent({ courseId, categoryId }: CourseD
 
     useEffect(() => {
         async function getCourse() {
-            const courseData = await request('GET', `/api/courses/${courseId}`);
+            // The category page only renders course identity data in its heading/breadcrumb.
+            // Avoid mapping comments, related courses, modules, and document counts again.
+            const courseData = await request('GET', `/api/courses/${courseId}?summary=true`);
 
             if (!courseData) {
                 return null;

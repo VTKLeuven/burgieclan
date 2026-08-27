@@ -11,4 +11,5 @@ final class MappingContext
     public const OPERATION_NAME = 'operation_name';
     public const SUMMARY = 'summary';
     public const CURRICULUM_TREE = 'curriculum_tree';
+    public const INCLUDE_FILE_METADATA = 'include_file_metadata';
 }
