@@ -14,7 +14,7 @@ abstract class AbstractComment extends Node
     private string $content;
 
     #[ORM\Column]
-    private bool $anonymous;
+    private bool $anonymous = false;
 
     public function getContent(): string
     {

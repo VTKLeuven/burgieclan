@@ -52,7 +52,11 @@ class CourseCommentApiToEntityMapper implements MapperInterface
         // Someone commenting on a course is almost always commenting on the year they are in,
         // and a comment with no year sorts to the bottom of the section - a bad default for
         // the newest thing on the page. Clients may still send one explicitly.
-        $to->setAcademicYear($from->academicYear ?? AcademicYear::current());
+        if ($to->getId() === null) {
+            $to->setAcademicYear($from->academicYear ?? AcademicYear::current());
+        } elseif ($from->academicYear !== null) {
+            $to->setAcademicYear($from->academicYear);
+        }
         $to->setCourse(
             $this->microMapper->map(
                 $from->course,

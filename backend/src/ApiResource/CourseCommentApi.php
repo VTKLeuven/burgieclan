@@ -48,13 +48,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class CourseCommentApi extends AbstractCommentApi
 {
+    #[Assert\NotNull]
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Groups([SerializationGroups::COURSE_COMMENT_GET, SerializationGroups::COURSE_GET])]
-    public ?CourseApi $course;
+    public ?CourseApi $course = null;
 
+    #[Assert\NotNull]
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Groups([SerializationGroups::COURSE_COMMENT_GET, SerializationGroups::COURSE_GET])]
-    public ?CommentCategoryApi $category;
+    public ?CommentCategoryApi $category = null;
 
     /**
      * The academic year this comment is about, e.g. "2024 - 2025".
