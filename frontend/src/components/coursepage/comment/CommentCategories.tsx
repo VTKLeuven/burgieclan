@@ -76,7 +76,7 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
     }, [commentsByCategory]);
 
     const handleCommentAdded = useCallback((newComment: CourseComment) => {
-        const updatedComments = [...comments, newComment];
+        const updatedComments = [newComment, ...comments];
         if (onCommentsUpdate) {
             onCommentsUpdate(updatedComments);
         }

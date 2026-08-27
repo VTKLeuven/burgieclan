@@ -47,21 +47,38 @@ type YearGroup = {
 };
 
 /**
- * Split the already-ordered list into runs of the same academic year.
- *
- * The server returns comments newest year first, oldest comment first inside a year, so a run of
- * equal years is contiguous and this never has to sort anything.
+ * Group comments by academic year, always ensuring newest academic years appear first
+ * and undated comments appear at the end.
  */
 function groupByYear(comments: CourseComment[]): YearGroup[] {
-    const groups: YearGroup[] = [];
+    const map = new Map<string, CourseComment[]>();
+    const undated: CourseComment[] = [];
+
     for (const comment of comments) {
-        const last = groups[groups.length - 1];
-        if (last && last.year === comment.academicYear) {
-            last.comments.push(comment);
+        if (!comment.academicYear) {
+            undated.push(comment);
         } else {
-            groups.push({ year: comment.academicYear, comments: [comment] });
+            const list = map.get(comment.academicYear) ?? [];
+            list.push(comment);
+            map.set(comment.academicYear, list);
         }
     }
+
+    // Sort academic years descending ("2025 - 2026", "2024 - 2025", ...)
+    const sortedYears = Array.from(map.keys()).sort((a, b) => b.localeCompare(a));
+
+    const groups: YearGroup[] = sortedYears.map(year => ({
+        year,
+        comments: map.get(year)!,
+    }));
+
+    if (undated.length > 0) {
+        groups.push({
+            year: undefined,
+            comments: undated,
+        });
+    }
+
     return groups;
 }
 
