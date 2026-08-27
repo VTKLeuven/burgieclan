@@ -147,27 +147,19 @@ const CommentRow: React.FC<CommentRowProps> = ({
                         </div>
                     </form>
                 ) : (
-                    <>
-                        <p className="text-sm min-h-[1.4rem] text-vtk-body whitespace-pre-line break-words">{comment.content}</p>
-                        <div className="hidden sm:flex items-center w-auto">
-                            <CommentActions onEdit={handleEditClick} onDelete={handleDeleteComment} show={isOwnComment && !isEditing} />
-                        </div>
-                    </>
+                    <p className="text-sm min-h-[1.4rem] text-vtk-body whitespace-pre-line break-words leading-relaxed">{comment.content}</p>
                 )}
             </div>
 
-            {/* Vote Button - Desktop only */}
-            <div className="hidden sm:flex items-center mr-3 pt-1">
+            {/* Right-side controls (desktop only) */}
+            <div className="hidden sm:flex items-center gap-2.5 shrink-0 pt-0.5 ml-auto">
+                <CommentActions onEdit={handleEditClick} onDelete={handleDeleteComment} show={isOwnComment && !isEditing} />
                 <VoteButton
                     type="course_comment"
                     objectId={comment.id}
                     size="small"
                     className="bg-white"
                 />
-            </div>
-
-            {/* Metadata - Right side (desktop only) */}
-            <div className="hidden sm:flex items-center">
                 <CommentMetadata comment={comment} />
             </div>
 

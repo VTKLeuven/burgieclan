@@ -15,29 +15,57 @@ const CommentActions: React.FC<CommentActionsProps> = ({ onEdit, onDelete, show,
 
   if (!show) return null;
 
+  if (isMobile) {
+    return (
+      <div className="flex items-center gap-1">
+        <Tooltip content={t('course-page.comments.dialog.button.edit')}>
+          <button
+            type="button"
+            onClick={onEdit}
+            aria-label={t('course-page.comments.dialog.button.edit')}
+            className="text-vtk-muted bg-vtk-paper-2 hover:text-vtk-ink hover:bg-vtk-paper-2 rounded transition-colors flex items-center justify-center p-1 cursor-pointer"
+          >
+            <Pencil size={13} aria-hidden="true" />
+          </button>
+        </Tooltip>
+
+        <Tooltip content={t('course-page.comments.dialog.button.delete')}>
+          <button
+            type="button"
+            onClick={onDelete}
+            aria-label={t('course-page.comments.dialog.button.delete')}
+            className="vtk-badge vtk-badge-danger transition-colors flex items-center justify-center p-1 cursor-pointer"
+          >
+            <Trash2 size={13} aria-hidden="true" />
+          </button>
+        </Tooltip>
+      </div>
+    );
+  }
+
   return (
     <div
-      className={`${isMobile ? 'flex flex-col items-center' : 'hidden group-hover/comment:flex group-focus-within/comment:flex items-center'} gap-2 mx-3 justify-end w-full${isMobile ? '' : ' sm:w-auto'}`}
+      className="flex items-center gap-1 opacity-0 group-hover/comment:opacity-100 group-focus-within/comment:opacity-100 transition-opacity duration-150"
     >
       <Tooltip content={t('course-page.comments.dialog.button.edit')}>
         <button
           type="button"
           onClick={onEdit}
           aria-label={t('course-page.comments.dialog.button.edit')}
-          className="text-vtk-muted bg-vtk-paper-2 hover:text-vtk-ink hover:bg-vtk-paper-2 rounded transition-colors opacity-100 sm:opacity-0 sm:group-hover/comment:opacity-100 sm:group-focus-within/comment:opacity-100 flex items-center justify-center px-2 py-0.5 w-full"
+          className="text-vtk-muted bg-vtk-paper-2 hover:text-vtk-ink hover:bg-vtk-paper-2 rounded transition-colors flex items-center justify-center p-1 cursor-pointer"
         >
-          <Pencil size={14} aria-hidden="true" />
+          <Pencil size={13} aria-hidden="true" />
         </button>
       </Tooltip>
-      
+
       <Tooltip content={t('course-page.comments.dialog.button.delete')}>
         <button
           type="button"
           onClick={onDelete}
           aria-label={t('course-page.comments.dialog.button.delete')}
-          className="vtk-badge vtk-badge-danger transition-colors opacity-100 sm:opacity-0 sm:group-hover/comment:opacity-100 sm:group-focus-within/comment:opacity-100 flex items-center justify-center px-2 py-0.5 w-full"
+          className="vtk-badge vtk-badge-danger transition-colors flex items-center justify-center p-1 cursor-pointer"
         >
-          <Trash2 size={14} aria-hidden="true" />
+          <Trash2 size={13} aria-hidden="true" />
         </button>
       </Tooltip>
     </div>
