@@ -17,11 +17,11 @@ interface ProfessorDivProps {
 }
 
 function getInitials(name: string): string {
-    const parts = name.split(' ');
+    const parts = name.trim().split(/\s+/).filter(Boolean);
     if (parts.length >= 2) {
         return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
-    return name.slice(0, 2).toUpperCase();
+    return (parts[0]?.replace(/[^a-zA-Z]/g, '').slice(0, 2) || 'N.').toUpperCase();
 }
 
 // Fallback avatars stay on the navy scale rather than introducing a rainbow
@@ -46,7 +46,7 @@ export default function ProfessorDiv({
     const { i18n, t } = useTranslation();
     const locale = i18n.language || 'en';
 
-    const sanitizedUnumber = unumber.replace(/\D/g, '').padStart(7, '0').slice(-7);
+    const sanitizedUnumber = String(unumber ?? '').replace(/\D/g, '').padStart(7, '0').slice(-7);
     const imgSrc = `https://www.kuleuven.be/wieiswie/nl/person/0${sanitizedUnumber}/photo`;
     const [professorName, setProfessorName] = useState("N.");
     const [imageError, setImageError] = useState(false);

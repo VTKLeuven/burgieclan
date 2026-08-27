@@ -249,6 +249,7 @@
         "search-placeholder": "Search for courses, modules, programs...",
         "no-search-results": "No results found for your search.",
         "no-programs": "No programs found matching your search.",
+        "no-modules": "No modules found matching your search.",
         "no-courses": "No courses found matching your search.",
         "program": "Program",
         "programs": "Programs",

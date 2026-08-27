@@ -74,6 +74,7 @@ export function convertToCourse(course: unknown): Course {
         credits: typeof data.credits === 'number' ? data.credits : undefined,
         oldCourses: asArray(data.oldCourses)?.map(convertToCourse),
         newCourses: asArray(data.newCourses)?.map(convertToCourse),
+        identicalCourses: asArray(data.identicalCourses)?.map(convertToCourse),
         modules: asArray(data.modules)?.map(convertToModule),
         courseComments: asArray(data.courseComments)?.map(convertToCourseComment),
         documentCounts: (data.documentCounts && typeof data.documentCounts === 'object' && !Array.isArray(data.documentCounts))

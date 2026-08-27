@@ -12,8 +12,12 @@ interface RatingSummaryProps {
     compact?: boolean;
 }
 
-function formatAverage(average: number | null): string | null {
-    return average === null ? null : average.toFixed(1).replace('.', ',');
+function formatAverage(average: number | null, locale: string = 'en'): string | null {
+    if (average === null) return null;
+    return new Intl.NumberFormat(locale === 'nl' ? 'nl-BE' : 'en-US', {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+    }).format(average);
 }
 
 /**
@@ -25,7 +29,8 @@ function formatAverage(average: number | null): string | null {
  * the same claim.
  */
 export default function RatingSummary({ rating, recentYearCount, compact = false }: RatingSummaryProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const locale = i18n.language || 'en';
 
     const countLabel = (count: number) =>
         t(count === 1 ? 'course-page.comments.rating-count-one' : 'course-page.comments.rating-count-other', { count });
@@ -33,7 +38,7 @@ export default function RatingSummary({ rating, recentYearCount, compact = false
     if (compact) {
         // The header shows the recent score when there is one, because that is the number a
         // student is actually asking for. Nothing at all when there is nothing honest to show.
-        const headline = formatAverage(rating.recent.average) ?? formatAverage(rating.allTime.average);
+        const headline = formatAverage(rating.recent.average, locale) ?? formatAverage(rating.allTime.average, locale);
         if (headline === null) {
             return null;
         }
@@ -65,7 +70,7 @@ export default function RatingSummary({ rating, recentYearCount, compact = false
     return (
         <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
             {rows.map(({ key, label, score }) => {
-                const average = formatAverage(score.average);
+                const average = formatAverage(score.average, locale);
                 return (
                     <div key={key} className="contents">
                         <dt className="text-vtk-muted">{label}</dt>
