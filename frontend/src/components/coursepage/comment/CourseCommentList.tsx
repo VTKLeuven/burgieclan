@@ -287,8 +287,8 @@ const CourseCommentList = ({
 
 
             {/* Collapsible Content */}
-            <div className={`overflow-visible transition-all duration-300 ease-in-out ${expanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                <div className="ml-5 mt-1.5 space-y-1.5 border-l border-vtk-line pl-4">
+            <div className={`grid transition-all duration-300 ease-in-out ${expanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                <div className={`ml-5 min-h-0 space-y-1.5 border-l border-vtk-line pl-4 ${expanded ? 'mt-1.5 overflow-visible' : 'overflow-hidden'}`}>
                     {/* Category description */}
                     {category.description && (
                         <div className="flex items-start gap-2.5 rounded-2xl border border-vtk-line bg-vtk-paper-2 px-4 py-3">
