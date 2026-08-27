@@ -28,7 +28,7 @@ export default function Header() {
     const navigation = [
         { name: t('courses'), href: '/courses' },
         { name: t('FAQ'), href: '/faq' },
-        { name: t('header.old_burgieclan'), href: 'https://old.burgieclan.vtk.be', external: true },
+        { name: t('header.old_burgieclan'), href: 'https://burgieclan-backup.vtk.be', external: true },
         {
             name: t('header.new_burgieclan_feedback'),
             href: 'https://docs.google.com/forms/d/e/1FAIpQLSdv8uIPyN9IMpCLNOzSKoiCbTqrdefb9uw-AfGtr0HjEG4REA/viewform?usp=publish-editor',
