@@ -1,9 +1,8 @@
 import { CourseRow } from '@/components/courses/CourseRow';
 import { CourseTableHeader } from '@/components/courses/CourseTableHeader';
 import { SearchFilters } from '@/components/courses/CurriculumSearchBar';
-import AddModuleCoursesButton from '@/components/courses/AddModuleCoursesButton';
+import ModuleFavoriteButton from '@/components/courses/ModuleFavoriteButton';
 import DownloadButton from '@/components/ui/DownloadButton';
-import FavoriteButton from '@/components/ui/FavoriteButton';
 import { useApi } from '@/hooks/useApi';
 import type { CurriculumFocus } from '@/types/curriculum';
 import type { Course, Module } from '@/types/entities';
@@ -155,7 +154,7 @@ const ModuleNode = ({
                     )}
                 </button>
 
-                <FavoriteButton itemId={module.id} itemType="module" size={16} className="shrink-0" />
+                <ModuleFavoriteButton module={module} size={16} className="shrink-0" />
                 <DownloadButton modules={[module]} />
             </div>
 
@@ -175,16 +174,9 @@ const ModuleNode = ({
                                 just opened, whereas submodules are a level down. Putting the submodules
                                 first pushed a module's own courses below an arbitrarily deep subtree. */}
                             {hasCourses && (
-                                <>
-                                    {/* Bulk-add sits directly above the table it fills, so it reads as an
-                                        action on these courses rather than on the module header. */}
-                                    <div className="flex justify-end">
-                                        <AddModuleCoursesButton module={module} moduleId={module.id} />
-                                    </div>
-
-                                    <div className="border border-vtk-line rounded-md" role="table" aria-label={module.name}>
-                                        <CourseTableHeader />
-                                        {module.courses?.map((course, index) => (
+                                <div className="border border-vtk-line rounded-md" role="table" aria-label={module.name}>
+                                    <CourseTableHeader />
+                                    {module.courses?.map((course, index) => (
                                             <CourseRow
                                                 key={course.id}
                                                 course={course}
@@ -193,7 +185,6 @@ const ModuleNode = ({
                                             />
                                         ))}
                                     </div>
-                                </>
                             )}
 
                             {/* Render submodules recursively */}
