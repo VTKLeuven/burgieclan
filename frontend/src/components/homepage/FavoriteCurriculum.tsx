@@ -24,7 +24,7 @@ const FavoriteRow = ({ id, name, typeLabel, type, icon: Icon }: FavoriteRowProps
     <div className="group relative">
         <Link
             className="flex items-center gap-3.5 px-5 py-2.5 pr-12 transition-colors hover:bg-vtk-paper-2"
-            href="/courses"
+            href={`/courses?${type}=${id}`}
         >
             <Icon aria-hidden="true" className="h-4 w-4 shrink-0 text-vtk-muted" />
             <div className="min-w-0 flex-1">
@@ -40,7 +40,7 @@ const FavoriteRow = ({ id, name, typeLabel, type, icon: Icon }: FavoriteRowProps
 
 /**
  * Favourite programmes and modules, under the recent-activity panel. Neither has a detail page of
- * its own yet, so both rows lead back to the curriculum navigator.
+ * its own, so both rows deep-link into the curriculum navigator, which opens them in place.
  */
 export const FavoriteCurriculum = () => {
     const { t } = useTranslation();

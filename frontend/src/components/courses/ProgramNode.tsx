@@ -4,6 +4,7 @@ import { ProgramLanguageProvider } from '@/components/courses/ProgramLanguageCon
 import DownloadButton from '@/components/ui/DownloadButton';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import { useApi } from '@/hooks/useApi';
+import type { CurriculumFocus } from '@/types/curriculum';
 import type { Course, Program } from '@/types/entities';
 import { convertToProgram } from '@/utils/convertToEntity';
 import {
@@ -20,13 +21,15 @@ interface ProgramNodeProps {
   autoExpand?: boolean;
   searchFilters?: SearchFilters | null;
   favoriteCourses?: Course[];
+  focus?: CurriculumFocus | null;
 }
 
 const ProgramNode = ({
   program: initialProgram,
   autoExpand = false,
   searchFilters = null,
-  favoriteCourses = []
+  favoriteCourses = [],
+  focus = null
 }: ProgramNodeProps) => {
   const { t } = useTranslation();
   const { request, loading, error } = useApi<unknown>();
@@ -78,6 +81,28 @@ const ProgramNode = ({
     }
   }, [autoExpand, hasChildMatches, loadProgram]);
 
+  // A deep link names this program, either as its destination or as the way down to a module.
+  const onFocusPath = focus?.programId === program.id;
+  const isFocusTarget = onFocusPath && focus?.targetType === 'program';
+
+  useEffect(() => {
+    if (onFocusPath) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setExpanded(true);
+      void loadProgram();
+    }
+  }, [onFocusPath, loadProgram]);
+
+  // Once only: re-scrolling on every render would fight the reader for the viewport.
+  const headerRef = useRef<HTMLDivElement>(null);
+  const scrolledToFocus = useRef(false);
+  useEffect(() => {
+    if (isFocusTarget && !scrolledToFocus.current) {
+      scrolledToFocus.current = true;
+      headerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [isFocusTarget]);
+
   // Get count of matching items for display
   const matchingItems = searchQuery ? countMatchesInProgram(program, searchQuery) : 0;
   const contentId = `program-content-${program.id}`;
@@ -87,7 +112,8 @@ const ProgramNode = ({
       <div className="program-node">
         {/* A search hit is marked with a yellow accent rail, not a fill. */}
         <div
-          className={`flex items-center gap-2.5 rounded-[18px] border border-vtk-line bg-vtk-surface px-4 py-2 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper ${programMatches ? 'shadow-[inset_3px_0_0_var(--yellow)]' : ''
+          ref={headerRef}
+          className={`flex items-center gap-2.5 rounded-[18px] border border-vtk-line bg-vtk-surface px-4 py-2 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper ${programMatches || isFocusTarget ? 'shadow-[inset_3px_0_0_var(--yellow)]' : ''
             }`}
         >
           <button
@@ -134,6 +160,7 @@ const ProgramNode = ({
                     autoExpand={autoExpand}
                     searchFilters={searchFilters}
                     favoriteCourses={favoriteCourses}
+                    focus={focus}
                   />
                 ))}
               </div>

@@ -223,4 +223,87 @@ class ModuleResourceTest extends ApiTestCase
             ->assertJsonMatches('"hydra:totalItems"', 3)
             ->assertJsonMatches('length("hydra:member")', 3);
     }
+
+    public function testGetModulePath(): void
+    {
+        $program = ProgramFactory::createOne();
+        $leaf = ModuleFactory::createOne(['program' => null, 'modules' => []]);
+        $middle = ModuleFactory::createOne(['program' => null, 'modules' => [$leaf]]);
+        $top = ModuleFactory::createOne(['program' => $program, 'modules' => [$middle]]);
+
+        $this->browser()
+            ->get(
+                '/api/modules/' . $leaf->getId() . '/path',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJson()
+            ->assertJsonMatches('program', '/api/programs/' . $program->getId())
+            ->assertJsonMatches(
+                'modules',
+                [
+                    '/api/modules/' . $top->getId(),
+                    '/api/modules/' . $middle->getId(),
+                    '/api/modules/' . $leaf->getId(),
+                ]
+            );
+    }
+
+    public function testGetModulePathOfTopLevelModule(): void
+    {
+        $program = ProgramFactory::createOne();
+        $top = ModuleFactory::createOne(['program' => $program, 'modules' => []]);
+
+        $this->browser()
+            ->get(
+                '/api/modules/' . $top->getId() . '/path',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('program', '/api/programs/' . $program->getId())
+            ->assertJsonMatches('modules', ['/api/modules/' . $top->getId()]);
+    }
+
+    /**
+     * A module no program reaches is drawn nowhere in the navigator, so there is no path to give.
+     */
+    public function testGetModulePathOfModuleOutsideAnyProgram(): void
+    {
+        $orphan = ModuleFactory::createOne(['program' => null, 'modules' => []]);
+
+        $this->browser()
+            ->get(
+                '/api/modules/' . $orphan->getId() . '/path',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('program', null)
+            ->assertJsonMatches('modules', []);
+    }
+
+    public function testGetModulePathOfUnknownModule(): void
+    {
+        $this->browser()
+            ->get(
+                '/api/modules/999999/path',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(404);
+    }
 }

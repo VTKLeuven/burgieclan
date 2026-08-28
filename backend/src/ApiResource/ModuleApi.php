@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use App\Constants\SerializationGroups;
+use App\Controller\Api\GetModulePathController;
 use App\Entity\Module;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
@@ -20,6 +21,14 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(),
         new GetCollection(),
+        // Lets a link to a nested module tell the navigator which branches to open, without
+        // making it download the whole curriculum first.
+        new Get(
+            uriTemplate: 'modules/{id}/path',
+            controller: GetModulePathController::class,
+            read: false,
+            name: 'module_path',
+        ),
     ],
     normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::MODULE_GET]],
     provider: EntityClassDtoStateProvider::class,

@@ -45,6 +45,16 @@ export interface Program extends BaseEntity {
     modules?: Module[];
 }
 
+/**
+ * Where a module sits in the curriculum: the program it hangs under and the chain of modules
+ * from that program's top level down to the module itself. Both are null/empty for a module no
+ * program reaches, which the navigator cannot draw anywhere.
+ */
+export interface ModulePath {
+    programId: number | null;
+    moduleIds: number[];
+}
+
 export interface AbstractComment extends NodeEntity {
     content?: string;
     anonymous?: boolean;

@@ -7,16 +7,25 @@ import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
 import PageHead from '@/components/ui/PageHead';
 import { useUser } from "@/components/UserContext";
 import { HydraCollection, useApi } from '@/hooks/useApi';
+import type { CurriculumFocus } from '@/types/curriculum';
 import type { Program } from '@/types/entities';
-import { convertToProgram } from "@/utils/convertToEntity";
+import { convertToModulePath, convertToProgram } from "@/utils/convertToEntity";
 import {
   extractEntities,
   filterCurriculum,
   initializeFuseInstances,
   searchWithAnalytics
 } from '@/utils/curriculumSearchUtils';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+/** Reads a positive integer query parameter, ignoring anything else the URL might carry. */
+function parseIdParam(value: string | null): number | null {
+  if (!value) return null;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+}
 
 export default function CurriculumNavigator() {
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -35,6 +44,7 @@ export default function CurriculumNavigator() {
     loading: searchLoading,
     error: searchError
   } = useApi<HydraCollection<unknown>>();
+  const { request: requestModulePath } = useApi<unknown>();
   const { t } = useTranslation();
   const { user } = useUser();
   const [matchCounts, setMatchCounts] = useState({
@@ -72,6 +82,49 @@ export default function CurriculumNavigator() {
 
     fetchData();
   }, [requestPrograms]);
+
+  // A link elsewhere in the app can name one node to open — ?program=<id> for a program,
+  // ?module=<id> for a module. The tree loads a level at a time, so a module first has to be
+  // placed: the backend answers with the program and the chain of modules leading down to it.
+  const searchParams = useSearchParams();
+  const programParam = searchParams.get('program');
+  const moduleParam = searchParams.get('module');
+  const [focus, setFocus] = useState<CurriculumFocus | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const resolveFocus = async () => {
+      const moduleId = parseIdParam(moduleParam);
+      if (moduleId !== null) {
+        const result = await requestModulePath('GET', `/api/modules/${moduleId}/path`);
+        if (cancelled || !result) return;
+
+        const path = convertToModulePath(result);
+        // A module no program reaches is drawn nowhere, so there is nothing to open.
+        if (path.programId === null) return;
+
+        setFocus({
+          programId: path.programId,
+          moduleIds: path.moduleIds,
+          targetType: 'module',
+          targetId: moduleId
+        });
+        return;
+      }
+
+      const programId = parseIdParam(programParam);
+      if (programId !== null && !cancelled) {
+        setFocus({ programId, moduleIds: [], targetType: 'program', targetId: programId });
+      }
+    };
+
+    void resolveFocus();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [moduleParam, programParam, requestModulePath]);
 
   const handleSearch = async (filters: SearchFilters) => {
     const requestVersion = ++searchRequestVersion.current;
@@ -200,6 +253,7 @@ export default function CurriculumNavigator() {
               autoExpand={hasActiveSearch}
               searchFilters={searchFilters}
               favoriteCourses={user?.favoriteCourses}
+              focus={focus}
             />
           ))}
         </div>

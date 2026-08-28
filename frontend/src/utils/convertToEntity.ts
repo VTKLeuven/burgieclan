@@ -10,6 +10,7 @@ import {
     type DocumentView,
     type FaqItem,
     type Module,
+    type ModulePath,
     type Page,
     type RatingScore,
     type Program,
@@ -55,6 +56,14 @@ export function convertToUser(user: unknown): User {
         favoritePrograms: asArray(data.favoritePrograms)?.map(convertToProgram),
         favoriteDocuments: asArray(data.favoriteDocuments)?.map(convertToDocument),
         defaultAnonymous: typeof data.defaultAnonymous === 'boolean' ? data.defaultAnonymous : undefined
+    };
+}
+
+export function convertToModulePath(path: unknown): ModulePath {
+    const data = toRecord(path, 'ModulePath');
+    return {
+        programId: data.program ? parseId(data.program) : null,
+        moduleIds: asArray(data.modules)?.map(parseId) ?? []
     };
 }
 

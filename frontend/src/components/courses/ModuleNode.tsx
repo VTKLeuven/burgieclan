@@ -5,6 +5,7 @@ import AddModuleCoursesButton from '@/components/courses/AddModuleCoursesButton'
 import DownloadButton from '@/components/ui/DownloadButton';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import { useApi } from '@/hooks/useApi';
+import type { CurriculumFocus } from '@/types/curriculum';
 import type { Course, Module } from '@/types/entities';
 import { convertToModule } from '@/utils/convertToEntity';
 import {
@@ -21,6 +22,7 @@ interface ModuleNodeProps {
     autoExpand?: boolean;
     searchFilters?: SearchFilters | null;
     favoriteCourses?: Course[];
+    focus?: CurriculumFocus | null;
 }
 
 const ModuleNode = ({
@@ -28,6 +30,7 @@ const ModuleNode = ({
     autoExpand = false,
     searchFilters = null,
     favoriteCourses = [],
+    focus = null,
 }: ModuleNodeProps) => {
     const { t } = useTranslation();
     const { request, loading, error } = useApi<unknown>();
@@ -97,6 +100,28 @@ const ModuleNode = ({
         return { courses, modules };
     };
 
+    // A deep link either ends here or passes through on its way to a module further down.
+    const onFocusPath = !!focus && focus.moduleIds.includes(module.id);
+    const isFocusTarget = focus?.targetType === 'module' && focus.targetId === module.id;
+
+    useEffect(() => {
+        if (onFocusPath) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setExpanded(true);
+            void loadModule();
+        }
+    }, [onFocusPath, loadModule]);
+
+    // Once only: re-scrolling on every render would fight the reader for the viewport.
+    const headerRef = useRef<HTMLDivElement>(null);
+    const scrolledToFocus = useRef(false);
+    useEffect(() => {
+        if (isFocusTarget && !scrolledToFocus.current) {
+            scrolledToFocus.current = true;
+            headerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, [isFocusTarget]);
+
     const { courses: matchingCourses, modules: matchingModules } = getChildMatches();
     const totalMatches = matchingCourses + matchingModules;
     const contentId = `module-content-${module.id}`;
@@ -105,7 +130,8 @@ const ModuleNode = ({
     return (
         <div className="module-node mb-1">
             <div
-                className={`flex items-center gap-2.5 py-1.5 px-3 border border-vtk-line bg-vtk-paper rounded-md hover:bg-vtk-paper-2 ${moduleMatches ? 'ring-1 ring-vtk-yellow' : ''
+                ref={headerRef}
+                className={`flex items-center gap-2.5 py-1.5 px-3 border border-vtk-line bg-vtk-paper rounded-md hover:bg-vtk-paper-2 ${moduleMatches || isFocusTarget ? 'ring-1 ring-vtk-yellow' : ''
                     }`}
             >
                 <button
@@ -178,6 +204,7 @@ const ModuleNode = ({
                                     autoExpand={autoExpand}
                                     searchFilters={searchFilters}
                                     favoriteCourses={favoriteCourses}
+                                    focus={focus}
                                 />
                             ))}
 
