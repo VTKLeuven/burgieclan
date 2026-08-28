@@ -2,6 +2,7 @@ import { SearchFilters } from '@/components/courses/CurriculumSearchBar';
 import ModuleNode from '@/components/courses/ModuleNode';
 import { ProgramLanguageProvider } from '@/components/courses/ProgramLanguageContext';
 import DownloadButton from '@/components/ui/DownloadButton';
+import FavoriteButton from '@/components/ui/FavoriteButton';
 import { useApi } from '@/hooks/useApi';
 import type { Course, Program } from '@/types/entities';
 import { convertToProgram } from '@/utils/convertToEntity';
@@ -110,6 +111,7 @@ const ProgramNode = ({
             )}
           </button>
 
+          <FavoriteButton itemId={program.id} itemType="program" size={16} className="shrink-0" />
           <DownloadButton programs={[program]} />
         </div>
 

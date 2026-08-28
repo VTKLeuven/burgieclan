@@ -142,7 +142,11 @@
         "feedback_success_title": "Bedankt voor je feedback!",
         "feedback_success_description": "Het VTK Onderwijsteam bekijkt je melding zo snel mogelijk.",
         "feedback_another": "Nog een melding versturen",
-        "feedback_error": "Kon je feedback niet versturen. Probeer het later opnieuw."
+        "feedback_error": "Kon je feedback niet versturen. Probeer het later opnieuw.",
+        "favorite_curriculum": "Je favorieten",
+        "favorite_curriculum_all": "Bekijk alle favorieten",
+        "favorite_program_label": "Opleiding",
+        "favorite_module_label": "Module"
     },
     "form": {
         "errors": {
@@ -277,13 +281,13 @@
         "no-courses-in-module": "Deze module bevat geen vakken.",
         "meta-programs": "richtingen",
         "meta-courses": "vakken",
-        "semester-favorites": {
-            "add-label": "Semester toevoegen",
+        "module-favorites": {
+            "add-label": "Voeg alles toe aan favorieten",
             "added-label": "Toegevoegd",
-            "add-title": "Voeg alle vakken van dit semester toe aan Mijn vakken",
-            "added": "De vakken van dit semester zijn toegevoegd aan Mijn vakken.",
-            "already-added": "Alle vakken van dit semester staan al in Mijn vakken.",
-            "error": "Dit semester kon niet aan Mijn vakken worden toegevoegd. Probeer opnieuw."
+            "add-title": "Voeg alle vakken van deze module toe aan Mijn vakken",
+            "added": "De vakken van deze module zijn toegevoegd aan Mijn vakken.",
+            "already-added": "Alle vakken van deze module staan al in Mijn vakken.",
+            "error": "Deze module kon niet aan Mijn vakken worden toegevoegd. Probeer opnieuw."
         }
     },
     "account": {

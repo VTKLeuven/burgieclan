@@ -22,11 +22,13 @@ const mapCoursesToItems = (courses: Course[], locale: string) => {
     }));
 };
 
+// Modules and programmes have no detail page of their own, so both lead back to the curriculum
+// navigator rather than to /modules/{id} and /programs/{id}, which do not exist.
 const mapModulesToItems = (modules: Module[]) => {
     return modules.map(module => ({
         id: module.id,
         name: module.name,
-        redirectUrl: `/modules/${module.id}`,
+        redirectUrl: '/courses',
         type: 'module' as const
     }));
 };
@@ -35,7 +37,7 @@ const mapProgramsToItems = (programs: Program[]) => {
     return programs.map(program => ({
         id: program.id,
         name: program.name,
-        redirectUrl: `/programs/${program.id}`,
+        redirectUrl: '/courses',
         type: 'program' as const
     }));
 };

@@ -142,7 +142,11 @@
         "feedback_success_title": "Thank you for your feedback!",
         "feedback_success_description": "The VTK Didactic team will review your report as soon as possible.",
         "feedback_another": "Send another report",
-        "feedback_error": "Failed to send feedback. Please try again later."
+        "feedback_error": "Failed to send feedback. Please try again later.",
+        "favorite_curriculum": "Your favorites",
+        "favorite_curriculum_all": "View all favorites",
+        "favorite_program_label": "Programme",
+        "favorite_module_label": "Module"
     },
     "form": {
         "errors": {
@@ -277,13 +281,13 @@
         "no-courses-in-module": "No courses available in this module.",
         "meta-programs": "programs",
         "meta-courses": "courses",
-        "semester-favorites": {
-            "add-label": "Add semester",
+        "module-favorites": {
+            "add-label": "Add all to favorites",
             "added-label": "Added",
-            "add-title": "Add every course in this semester to My Courses",
-            "added": "The semester's courses were added to My Courses.",
-            "already-added": "Every course in this semester is already in My Courses.",
-            "error": "Could not add this semester to My Courses. Please try again."
+            "add-title": "Add every course in this module to My Courses",
+            "added": "The module's courses were added to My Courses.",
+            "already-added": "Every course in this module is already in My Courses.",
+            "error": "Could not add this module to My Courses. Please try again."
         }
     },
     "account": {

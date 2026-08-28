@@ -8,6 +8,9 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 
+/** The panel is a nudge back into recent work, not a history page: four rows is enough. */
+const MAX_ACTIVITIES = 4;
+
 export const RecentActivities = () => {
     const { t, i18n } = useTranslation();
     const { request, loading, error } = useApi<HydraCollection<unknown>>();
@@ -41,7 +44,7 @@ export const RecentActivities = () => {
 
         return (
             <div className="divide-y divide-vtk-line">
-                {documentViews.map(documentView => (
+                {documentViews.slice(0, MAX_ACTIVITIES).map(documentView => (
                     <Activity
                         key={documentView.id}
                         documentName={documentView.document?.name || ''}

@@ -1,8 +1,9 @@
 import { CourseRow } from '@/components/courses/CourseRow';
 import { CourseTableHeader } from '@/components/courses/CourseTableHeader';
 import { SearchFilters } from '@/components/courses/CurriculumSearchBar';
-import SemesterFavoriteButton from '@/components/courses/SemesterFavoriteButton';
+import AddModuleCoursesButton from '@/components/courses/AddModuleCoursesButton';
 import DownloadButton from '@/components/ui/DownloadButton';
+import FavoriteButton from '@/components/ui/FavoriteButton';
 import { useApi } from '@/hooks/useApi';
 import type { Course, Module } from '@/types/entities';
 import { convertToModule } from '@/utils/convertToEntity';
@@ -99,7 +100,7 @@ const ModuleNode = ({
     const { courses: matchingCourses, modules: matchingModules } = getChildMatches();
     const totalMatches = matchingCourses + matchingModules;
     const contentId = `module-content-${module.id}`;
-    const isSemester = /^Semester\s+\d+$/iu.test(module.name?.trim() ?? '');
+    const hasCourses = !!module.courses && module.courses.length > 0;
 
     return (
         <div className="module-node mb-1">
@@ -128,7 +129,7 @@ const ModuleNode = ({
                     )}
                 </button>
 
-                {isSemester && <SemesterFavoriteButton moduleId={module.id} />}
+                <FavoriteButton itemId={module.id} itemType="module" size={16} className="shrink-0" />
                 <DownloadButton modules={[module]} />
             </div>
 
@@ -147,18 +148,26 @@ const ModuleNode = ({
                             {/* Courses this module teaches itself come first: they belong to the module you
                                 just opened, whereas submodules are a level down. Putting the submodules
                                 first pushed a module's own courses below an arbitrarily deep subtree. */}
-                            {module.courses && module.courses.length > 0 && (
-                                <div className="border border-vtk-line rounded-md" role="table" aria-label={module.name}>
-                                    <CourseTableHeader />
-                                    {module.courses.map((course, index) => (
-                                        <CourseRow
-                                            key={course.id}
-                                            course={course}
-                                            highlightMatch={!!searchQuery && courseMatchesText(course, searchQuery)}
-                                            isFirstRow={index === 0}
-                                        />
-                                    ))}
-                                </div>
+                            {hasCourses && (
+                                <>
+                                    {/* Bulk-add sits directly above the table it fills, so it reads as an
+                                        action on these courses rather than on the module header. */}
+                                    <div className="flex justify-end">
+                                        <AddModuleCoursesButton moduleId={module.id} />
+                                    </div>
+
+                                    <div className="border border-vtk-line rounded-md" role="table" aria-label={module.name}>
+                                        <CourseTableHeader />
+                                        {module.courses?.map((course, index) => (
+                                            <CourseRow
+                                                key={course.id}
+                                                course={course}
+                                                highlightMatch={!!searchQuery && courseMatchesText(course, searchQuery)}
+                                                isFirstRow={index === 0}
+                                            />
+                                        ))}
+                                    </div>
+                                </>
                             )}
 
                             {/* Render submodules recursively */}

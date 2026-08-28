@@ -7,11 +7,16 @@ import { Check, LoaderCircle, Star } from 'lucide-react';
 import { useState, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
-interface SemesterFavoriteButtonProps {
+interface AddModuleCoursesButtonProps {
     moduleId: number;
 }
 
-export default function SemesterFavoriteButton({ moduleId }: SemesterFavoriteButtonProps) {
+/**
+ * Bulk-adds every course under one module — its own plus any submodule's — to My Courses in a
+ * single request. Rendered above a module's course table, so it only shows up where there is
+ * actually something to add.
+ */
+export default function AddModuleCoursesButton({ moduleId }: AddModuleCoursesButtonProps) {
     const { t } = useTranslation();
     const { user } = useUser();
     const { showToast } = useToast();
@@ -27,16 +32,16 @@ export default function SemesterFavoriteButton({ moduleId }: SemesterFavoriteBut
         if (loading) return;
 
         if (added) {
-            showToast(t('curriculum-navigator.semester-favorites.already-added'), 'success');
+            showToast(t('curriculum-navigator.module-favorites.already-added'), 'success');
             return;
         }
 
         try {
             await addModuleCourses(moduleId);
             setAdded(true);
-            showToast(t('curriculum-navigator.semester-favorites.added'), 'success');
+            showToast(t('curriculum-navigator.module-favorites.added'), 'success');
         } catch {
-            showToast(t('curriculum-navigator.semester-favorites.error'), 'error');
+            showToast(t('curriculum-navigator.module-favorites.error'), 'error');
         }
     };
 
@@ -45,8 +50,7 @@ export default function SemesterFavoriteButton({ moduleId }: SemesterFavoriteBut
             type="button"
             onClick={handleClick}
             aria-disabled={loading || added}
-            aria-label={t('curriculum-navigator.semester-favorites.add-title')}
-            title={t('curriculum-navigator.semester-favorites.add-title')}
+            title={t('curriculum-navigator.module-favorites.add-title')}
             className="vtk-button vtk-button-subtle vtk-button-sm shrink-0"
         >
             {loading ? (
@@ -56,11 +60,9 @@ export default function SemesterFavoriteButton({ moduleId }: SemesterFavoriteBut
             ) : (
                 <Star size={15} />
             )}
-            <span className="hidden lg:inline">
-                {added
-                    ? t('curriculum-navigator.semester-favorites.added-label')
-                    : t('curriculum-navigator.semester-favorites.add-label')}
-            </span>
+            {added
+                ? t('curriculum-navigator.module-favorites.added-label')
+                : t('curriculum-navigator.module-favorites.add-label')}
         </button>
     );
 }

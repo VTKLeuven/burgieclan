@@ -2,6 +2,7 @@
 
 import AnnouncementSlideShow from '@/components/announcement/AnnouncementSlideShow';
 import { DidacticFeedbackForm } from '@/components/homepage/DidacticFeedbackForm';
+import { FavoriteCurriculum } from '@/components/homepage/FavoriteCurriculum';
 import { QuickLinks } from '@/components/homepage/QuickLinks';
 import { RecentActivities } from "@/components/homepage/recent/RecentActivities";
 import { DragDropZone } from '@/components/upload/DragDropZone';
@@ -21,7 +22,10 @@ export default function HomePage() {
             <AnnouncementSlideShow />
 
             <div className="mt-4 grid items-start gap-4 lg:grid-cols-[1.3fr_1fr]">
-                <RecentActivities />
+                <div className="grid gap-4">
+                    <RecentActivities />
+                    <FavoriteCurriculum />
+                </div>
 
                 <div className="grid gap-4">
                     <DragDropZone onFileDrop={handleFileDrop} className="min-h-52" />
