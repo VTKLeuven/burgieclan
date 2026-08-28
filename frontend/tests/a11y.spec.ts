@@ -3,8 +3,8 @@ import AxeBuilder from '@axe-core/playwright';
 
 test.describe('Frontend Accessibility & Keyboard Navigation', () => {
 
-  test('skip link appears on first Tab and focuses main content', async ({ page }) => {
-    await page.goto('/');
+  test('skip link appears on first Tab and focuses main content on /courses', async ({ page }) => {
+    await page.goto('/courses');
 
     // First Tab press should focus the Skip to content link
     await page.keyboard.press('Tab');
@@ -54,7 +54,7 @@ test.describe('Frontend Accessibility & Keyboard Navigation', () => {
   });
 
   test('language switcher supports keyboard navigation and indicates active language', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/courses');
 
     const langGroup = page.locator('[role="group"][aria-label="Language"], [role="group"][aria-label="Taal"]');
     if (await langGroup.count() > 0) {
