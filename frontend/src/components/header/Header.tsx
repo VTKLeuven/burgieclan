@@ -1,6 +1,6 @@
 'use client'
 
-import React, { Suspense, useState } from 'react';
+import { Suspense, useState, type CSSProperties } from 'react';
 import { Dialog } from '@headlessui/react';
 import { Menu, X } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,8 +9,23 @@ import HeaderProfileButton from "@/components/header/HeaderProfileButton";
 import { useUser } from '@/components/UserContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/components/header/LanguageSwitcher';
-import Image from 'next/image';
 import Link from 'next/link';
+
+const vtkLogoMaskStyle: CSSProperties = {
+    backgroundColor: '#c8c9cd',
+    maskImage: "url('/images/logos/vtk-logo-white.png')",
+    maskPosition: 'left center',
+    maskRepeat: 'no-repeat',
+    maskSize: 'contain',
+    WebkitMaskImage: "url('/images/logos/vtk-logo-white.png')",
+    WebkitMaskPosition: 'left center',
+    WebkitMaskRepeat: 'no-repeat',
+    WebkitMaskSize: 'contain',
+};
+
+const HeaderLogo = ({ className }: { className: string }) => (
+    <span aria-hidden="true" className={className} style={vtkLogoMaskStyle} />
+);
 
 /**
  * Sticky navy header with light navigation: the same dark bookend as the
@@ -46,14 +61,7 @@ export default function Header() {
                 {/* Brand */}
                 <Link href={`/${i18n.language}`} className="flex shrink-0 items-center gap-4">
                     <span className="sr-only">Burgieclan</span>
-                    <Image
-                        src="/images/logos/vtk-logo-white.png"
-                        alt=""
-                        width={140}
-                        height={38}
-                        className="h-[34px] w-auto max-w-[150px] object-contain object-left"
-                        priority
-                    />
+                    <HeaderLogo className="block h-[34px] w-[60px] shrink-0" />
                     {/* Optical nudge: flex centring aligns the full line box, which
                         leaves the cap-height block sitting high against the mark. */}
                     <span className="hidden translate-y-[2px] text-xl font-bold tracking-tight lg:inline">Burgieclan</span>
@@ -125,13 +133,7 @@ export default function Header() {
                     <div className="flex items-center justify-between">
                         <Link href={`/${i18n.language}`} className="flex shrink-0 items-center gap-2.5">
                             <span className="sr-only">Burgieclan</span>
-                            <Image
-                                src="/images/logos/vtk-logo-white.png"
-                                alt=""
-                                width={140}
-                                height={38}
-                                className="h-[32px] w-auto object-contain object-left"
-                            />
+                            <HeaderLogo className="block h-[32px] w-[57px] shrink-0" />
                         </Link>
                         <button
                             type="button"
