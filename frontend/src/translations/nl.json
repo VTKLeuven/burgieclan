@@ -276,7 +276,15 @@
         "no-modules-in-program": "Deze richting bevat geen modules.",
         "no-courses-in-module": "Deze module bevat geen vakken.",
         "meta-programs": "richtingen",
-        "meta-courses": "vakken"
+        "meta-courses": "vakken",
+        "semester-favorites": {
+            "add-label": "Semester toevoegen",
+            "added-label": "Toegevoegd",
+            "add-title": "Voeg alle vakken van dit semester toe aan Mijn vakken",
+            "added": "De vakken van dit semester zijn toegevoegd aan Mijn vakken.",
+            "already-added": "Alle vakken van dit semester staan al in Mijn vakken.",
+            "error": "Dit semester kon niet aan Mijn vakken worden toegevoegd. Probeer opnieuw."
+        }
     },
     "account": {
         "menu": "Gebruikersmenu",
