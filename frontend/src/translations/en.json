@@ -276,7 +276,15 @@
         "no-modules-in-program": "No modules available in this program.",
         "no-courses-in-module": "No courses available in this module.",
         "meta-programs": "programs",
-        "meta-courses": "courses"
+        "meta-courses": "courses",
+        "semester-favorites": {
+            "add-label": "Add semester",
+            "added-label": "Added",
+            "add-title": "Add every course in this semester to My Courses",
+            "added": "The semester's courses were added to My Courses.",
+            "already-added": "Every course in this semester is already in My Courses.",
+            "error": "Could not add this semester to My Courses. Please try again."
+        }
     },
     "account": {
         "menu": "User menu",

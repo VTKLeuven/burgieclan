@@ -13,7 +13,7 @@ import { getSuggestedNameFromFilename } from '@/utils/documentNameSuggestion';
 import { documentSchema } from '@/utils/validation/documentSchema';
 import { localizedCourseName } from '@/utils/courseName';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useForm, useWatch, type FieldError } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -25,6 +25,7 @@ interface FormProps {
         course?: Course;
         category?: DocumentCategory;
     };
+    submitAction: ReactNode;
 }
 
 export default function UploadForm({
@@ -32,6 +33,7 @@ export default function UploadForm({
     isLoading = false,
     initialFile,
     initialData,
+    submitAction,
 }: FormProps) {
     const { t, i18n } = useTranslation();
     const { user } = useUser();
@@ -120,14 +122,14 @@ export default function UploadForm({
     };
 
     return (
-        <form id="upload-form" onSubmit={handleSubmit(onSubmit)} className="pt-6 space-y-6">
+        <form id="upload-form" onSubmit={handleSubmit(onSubmit)}>
             {error && (
                 <div className="mb-4">
                     <Text className="vtk-error-text">{error}</Text>
                 </div>
             )}
 
-            <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-4">
+            <div className="grid grid-cols-1 gap-x-6 gap-y-3 md:grid-cols-6">
                 <div className="col-span-full">
                     <FormField
                         label={t('upload.form.name.label')}
@@ -139,7 +141,7 @@ export default function UploadForm({
                     />
                 </div>
 
-                <div className="sm:col-span-3">
+                <div className="md:col-span-4">
                     <FormField
                         label={t('upload.form.course.label')}
                         type="combobox"
@@ -151,7 +153,7 @@ export default function UploadForm({
                     />
                 </div>
 
-                <div className="sm:col-span-1">
+                <div className="md:col-span-2">
                     <FormField
                         label={t('upload.form.year.label')}
                         type="combobox"
@@ -164,7 +166,7 @@ export default function UploadForm({
                     />
                 </div>
 
-                <div className="sm:col-span-2">
+                <div className="md:col-span-3">
                     <FormField
                         label={t('upload.form.category.label')}
                         type="combobox"
@@ -176,7 +178,7 @@ export default function UploadForm({
                     />
                 </div>
 
-                <div className="sm:col-span-2">
+                <div className="md:col-span-3">
                     <label className="block text-sm font-medium text-vtk-ink">
                         {t('upload.form.tags.label')}
                     </label>
@@ -195,13 +197,13 @@ export default function UploadForm({
                     />
                 </div>
 
-                <div className="col-span-full mt-4 gap-3 pb-2">
+                <div className="col-span-full mt-1 flex flex-col gap-4 border-t border-vtk-line pt-4 sm:flex-row sm:items-center sm:justify-between">
                     <Checkbox
                         label={t('upload.form.anonymous.label')}
                         {...register('anonymous')}
                         disabled={isLoading}
-                        className="justify-end"
                     />
+                    {submitAction}
                 </div>
             </div>
         </form>

@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
 use App\Constants\SerializationGroups;
 use App\Controller\Api\AddFavoriteToUserController;
+use App\Controller\Api\AddModuleCoursesToUserFavoritesController;
 use App\Controller\Api\RemoveFavoriteFromUserController;
 use App\Entity\User;
 use App\State\EntityClassDtoStateProcessor;
@@ -39,6 +40,11 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Patch(
             uriTemplate: 'users/{id}/favorites/add',
             controller: AddFavoriteToUserController::class,
+            normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::USER_FAVORITES]],
+        ),
+        new Patch(
+            uriTemplate: 'users/{id}/favorites/add-module-courses',
+            controller: AddModuleCoursesToUserFavoritesController::class,
             normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::USER_FAVORITES]],
         ),
         new Patch(

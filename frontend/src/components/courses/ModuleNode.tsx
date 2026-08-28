@@ -1,6 +1,7 @@
 import { CourseRow } from '@/components/courses/CourseRow';
 import { CourseTableHeader } from '@/components/courses/CourseTableHeader';
 import { SearchFilters } from '@/components/courses/CurriculumSearchBar';
+import SemesterFavoriteButton from '@/components/courses/SemesterFavoriteButton';
 import DownloadButton from '@/components/ui/DownloadButton';
 import { useApi } from '@/hooks/useApi';
 import type { Course, Module } from '@/types/entities';
@@ -98,6 +99,7 @@ const ModuleNode = ({
     const { courses: matchingCourses, modules: matchingModules } = getChildMatches();
     const totalMatches = matchingCourses + matchingModules;
     const contentId = `module-content-${module.id}`;
+    const isSemester = /^Semester\s+\d+$/iu.test(module.name?.trim() ?? '');
 
     return (
         <div className="module-node mb-1">
@@ -126,6 +128,7 @@ const ModuleNode = ({
                     )}
                 </button>
 
+                {isSemester && <SemesterFavoriteButton moduleId={module.id} />}
                 <DownloadButton modules={[module]} />
             </div>
 

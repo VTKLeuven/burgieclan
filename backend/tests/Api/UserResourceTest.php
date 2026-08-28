@@ -222,6 +222,90 @@ class UserResourceTest extends ApiTestCase
             ->assertStatus(403);
     }
 
+    public function testAddAllCoursesFromModuleTreeToFavorites(): void
+    {
+        $nestedOption = ModuleFactory::createOne(
+            [
+                'program' => null,
+                'name' => 'Nested option',
+                'modules' => [],
+            ]
+        );
+        $option = ModuleFactory::createOne(
+            [
+                'program' => null,
+                'name' => 'Elective option',
+                'modules' => [$nestedOption],
+            ]
+        );
+        $semester = ModuleFactory::createOne(
+            [
+                'name' => 'Semester 1',
+                'modules' => [$option],
+            ]
+        );
+
+        $directCourse = CourseFactory::createOne(['modules' => [$semester]]);
+        $optionCourse = CourseFactory::createOne(['modules' => [$option]]);
+        $nestedCourse = CourseFactory::createOne(['modules' => [$nestedOption]]);
+        $existingFavorite = CourseFactory::createOne();
+        $user = UserFactory::createOne(
+            [
+                'plainPassword' => 'password',
+                'favoriteCourses' => [$existingFavorite],
+            ]
+        );
+        $userToken = $this->getToken($user->getUsername(), 'password');
+
+        $expectedFavorites = [
+            '/api/courses/' . $directCourse->getId(),
+            '/api/courses/' . $optionCourse->getId(),
+            '/api/courses/' . $nestedCourse->getId(),
+            '/api/courses/' . $existingFavorite->getId(),
+        ];
+
+        foreach (range(1, 2) as $_attempt) {
+            $json = $this->browser()
+                ->patch(
+                    '/api/users/' . $user->getId() . '/favorites/add-module-courses',
+                    [
+                        'headers' => [
+                            'Content-Type' => 'application/merge-patch+json',
+                            'Authorization' => 'Bearer ' . $userToken,
+                        ],
+                        'json' => [
+                            'module' => '/api/modules/' . $semester->getId(),
+                        ],
+                    ]
+                )
+                ->assertStatus(200)
+                ->assertJson()
+                ->json()
+                ->decoded();
+
+            $this->assertEqualsCanonicalizing($expectedFavorites, $json['favoriteCourses']);
+        }
+
+        refresh($user);
+        self::assertCount(4, $user->getFavoriteCourses());
+
+        $otherUser = UserFactory::createOne();
+        $this->browser()
+            ->patch(
+                '/api/users/' . $otherUser->getId() . '/favorites/add-module-courses',
+                [
+                    'headers' => [
+                        'Content-Type' => 'application/merge-patch+json',
+                        'Authorization' => 'Bearer ' . $userToken,
+                    ],
+                    'json' => [
+                        'module' => '/api/modules/' . $semester->getId(),
+                    ],
+                ]
+            )
+            ->assertStatus(403);
+    }
+
     public function testRemoveFavorites(): void
     {
         $course1 = CourseFactory::createOne();

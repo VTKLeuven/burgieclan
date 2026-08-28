@@ -6,37 +6,34 @@ import { useState } from "react";
 
 type FavoriteType = "course" | "module" | "program" | "document";
 
+const favoriteBodyKeys: Record<FavoriteType, string> = {
+    course: 'favoriteCourses',
+    module: 'favoriteModules',
+    program: 'favoritePrograms',
+    document: 'favoriteDocuments',
+};
+
+const favoriteIriSegments: Record<FavoriteType, string> = {
+    course: 'courses',
+    module: 'modules',
+    program: 'programs',
+    document: 'documents',
+};
+
 export function useFavorites(userParam?: User | null) {
     const { request, loading } = useApi();
     const { user: contextUser, refreshUser } = useUser();
     const user = userParam !== undefined ? userParam : contextUser;
     const [error, setError] = useState<Error | null>(null);
 
-    const updateFavorite = async (id: number, type: FavoriteType, isFavorite: boolean) => {
+    const submitFavoriteUpdate = async (endpoint: string, body: Record<string, string | string[]>) => {
         if (!user) return null;
-
         setError(null);
 
         try {
-            let body;
-            switch (type) {
-                case "course":
-                    body = { favoriteCourses: [`/api/courses/${id}`] };
-                    break;
-                case "module":
-                    body = { favoriteModules: [`/api/modules/${id}`] };
-                    break;
-                case "program":
-                    body = { favoritePrograms: [`/api/programs/${id}`] };
-                    break;
-                case "document":
-                    body = { favoriteDocuments: [`/api/documents/${id}`] };
-                    break;
-            }
-
             const result = await request(
                 'PATCH',
-                `/api/users/${user.id}/favorites/${isFavorite ? 'add' : 'remove'}`,
+                `/api/users/${user.id}/favorites/${endpoint}`,
                 body
             );
 
@@ -61,8 +58,23 @@ export function useFavorites(userParam?: User | null) {
         }
     };
 
+    const updateFavorite = async (id: number, type: FavoriteType, isFavorite: boolean) => {
+        return submitFavoriteUpdate(
+            isFavorite ? 'add' : 'remove',
+            { [favoriteBodyKeys[type]]: [`/api/${favoriteIriSegments[type]}/${id}`] }
+        );
+    };
+
+    const addModuleCourses = async (moduleId: number) => {
+        return submitFavoriteUpdate(
+            'add-module-courses',
+            { module: `/api/modules/${moduleId}` }
+        );
+    };
+
     return {
         updateFavorite,
+        addModuleCourses,
         loading,
         error
     };

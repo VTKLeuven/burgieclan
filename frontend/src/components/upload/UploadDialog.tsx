@@ -1,4 +1,4 @@
-import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog';
+import { Dialog, DialogBody, DialogTitle } from '@/components/ui/Dialog';
 import { Text } from '@/components/ui/Text';
 import { useToast } from '@/components/ui/Toast';
 import UploadForm from '@/components/upload/UploadForm';
@@ -49,42 +49,44 @@ const UploadDialog = ({
             isOpen={isOpen}
             onClose={handleClose}
             size="3xl"
+            className="flex max-h-[calc(100dvh-2rem)] flex-col overflow-hidden p-0! sm:max-h-[calc(100dvh-4rem)] sm:p-0!"
         >
-            <DialogTitle>
-                {t('upload.dialog.title')}
-            </DialogTitle>
-            <DialogBody>
-                <Text className="max-w-[62ch] text-vtk-body">
+            <div className="shrink-0 border-b border-vtk-line px-5 py-5 pr-16 sm:px-8 sm:pr-16">
+                <DialogTitle className="m-0! px-0!">
+                    {t('upload.dialog.title')}
+                </DialogTitle>
+                <Text className="mt-2 text-sm leading-6! text-vtk-body">
                     {t('upload.dialog.description')}
                 </Text>
+            </div>
 
+            <DialogBody className="mt-0! min-h-0 overflow-y-auto overscroll-contain px-5! py-5 sm:px-8!">
                 <UploadForm
                     onSubmit={handleSubmit}
                     isLoading={isLoading}
                     initialFile={initialFile}
                     initialData={initialData}
+                    submitAction={(
+                        <button
+                            type="submit"
+                            disabled={isLoading || status.type === 'success'}
+                            className="primary-button w-full sm:w-auto"
+                        >
+                            {isLoading ? (
+                                <>
+                                    <span className="spinner mr-2" />
+                                    {t('upload.dialog.button.uploading')}
+                                </>
+                            ) : (
+                                <>
+                                    <Send className="h-4 w-4" />
+                                    {t('upload.dialog.button.send')}
+                                </>
+                            )}
+                        </button>
+                    )}
                 />
             </DialogBody>
-            <DialogActions className="mt-0!"> {/* mt-0! removes the top margin */}
-                <button
-                    type="submit"
-                    form="upload-form"
-                    disabled={isLoading || status.type === 'success'}
-                    className="primary-button inline-flex items-center"
-                >
-                    {isLoading ? (
-                        <>
-                            <span className="spinner mr-2" />
-                            {t('upload.dialog.button.uploading')}
-                        </>
-                    ) : (
-                        <>
-                            <Send className="mr-2 w-5 h-5" />
-                            {t('upload.dialog.button.send')}
-                        </>
-                    )}
-                </button>
-            </DialogActions>
         </Dialog>
     );
 };
