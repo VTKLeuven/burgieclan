@@ -65,6 +65,14 @@ export function useFavorites(userParam?: User | null) {
         );
     };
 
+    const bulkUpdateCourseFavorites = async (courseIds: number[], isFavorite: boolean) => {
+        if (courseIds.length === 0) return null;
+        return submitFavoriteUpdate(
+            isFavorite ? 'add' : 'remove',
+            { favoriteCourses: courseIds.map(id => `/api/courses/${id}`) }
+        );
+    };
+
     const addModuleCourses = async (moduleId: number) => {
         return submitFavoriteUpdate(
             'add-module-courses',
@@ -74,6 +82,7 @@ export function useFavorites(userParam?: User | null) {
 
     return {
         updateFavorite,
+        bulkUpdateCourseFavorites,
         addModuleCourses,
         loading,
         error

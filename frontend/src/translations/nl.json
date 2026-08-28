@@ -283,11 +283,14 @@
         "meta-courses": "vakken",
         "module-favorites": {
             "add-label": "Voeg alles toe aan favorieten",
+            "remove-label": "Verwijder alles uit favorieten",
             "added-label": "Toegevoegd",
             "add-title": "Voeg alle vakken van deze module toe aan Mijn vakken",
+            "remove-title": "Verwijder alle vakken van deze module uit Mijn vakken",
             "added": "De vakken van deze module zijn toegevoegd aan Mijn vakken.",
+            "removed": "De vakken van deze module zijn verwijderd uit Mijn vakken.",
             "already-added": "Alle vakken van deze module staan al in Mijn vakken.",
-            "error": "Deze module kon niet aan Mijn vakken worden toegevoegd. Probeer opnieuw."
+            "error": "Favorieten konden niet worden bijgewerkt. Probeer opnieuw."
         }
     },
     "account": {

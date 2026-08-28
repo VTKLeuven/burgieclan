@@ -179,7 +179,7 @@ const ModuleNode = ({
                                     {/* Bulk-add sits directly above the table it fills, so it reads as an
                                         action on these courses rather than on the module header. */}
                                     <div className="flex justify-end">
-                                        <AddModuleCoursesButton moduleId={module.id} />
+                                        <AddModuleCoursesButton module={module} moduleId={module.id} />
                                     </div>
 
                                     <div className="border border-vtk-line rounded-md" role="table" aria-label={module.name}>

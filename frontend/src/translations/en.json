@@ -283,11 +283,14 @@
         "meta-courses": "courses",
         "module-favorites": {
             "add-label": "Add all to favorites",
+            "remove-label": "Remove all from favorites",
             "added-label": "Added",
             "add-title": "Add every course in this module to My Courses",
+            "remove-title": "Remove every course in this module from My Courses",
             "added": "The module's courses were added to My Courses.",
+            "removed": "The module's courses were removed from My Courses.",
             "already-added": "Every course in this module is already in My Courses.",
-            "error": "Could not add this module to My Courses. Please try again."
+            "error": "Could not update favorites. Please try again."
         }
     },
     "account": {
