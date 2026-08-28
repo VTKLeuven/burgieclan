@@ -1,5 +1,32 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+
+/**
+ * Helper to log in as test fixture user 'john_user'
+ */
+async function loginAsUser(page: Page) {
+  await page.goto('/login');
+
+  // Accept cookies if banner is present
+  const cookieAcceptButton = page.locator('button', { hasText: /understand|begrijp/i });
+  if (await cookieAcceptButton.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await cookieAcceptButton.click();
+  }
+
+  // Click "Or log in manually" / "Of log handmatig in"
+  const manualLoginToggle = page.locator('button', { hasText: /manually|handmatig/i });
+  await manualLoginToggle.click();
+
+  // Fill in credentials
+  await page.locator('input#username').fill('john_user');
+  await page.locator('input#password').fill('kitten');
+
+  // Submit form
+  await page.locator('form button[type="submit"]').click();
+
+  // Wait for redirect away from /login
+  await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 10000 });
+}
 
 test.describe('Frontend Accessibility & Keyboard Navigation', () => {
 
@@ -18,22 +45,65 @@ test.describe('Frontend Accessibility & Keyboard Navigation', () => {
     await expect(mainContent).toBeFocused();
   });
 
-  test('automated WCAG 2.1 AA audit passes on /courses page', async ({ page }) => {
-    await page.goto('/courses');
+  test('login page meets full WCAG 2.1 AA criteria and supports keyboard toggles', async ({ page }) => {
+    await page.goto('/login');
 
-    // Run in-memory axe-core engine across the full rendered DOM
-    const accessibilityScanResults = await new AxeBuilder({ page })
+    // Scan login page with AxeBuilder
+    const scanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
-      .disableRules(['color-contrast']) // Optional: ignore external dynamic themes if any
       .analyze();
+    expect(scanResults.violations).toEqual([]);
 
-    expect(accessibilityScanResults.violations).toEqual([]);
+    // Test expanding manual login form with Enter
+    const manualToggle = page.locator('button', { hasText: /manually|handmatig/i });
+    await manualToggle.focus();
+    await expect(manualToggle).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('input#username')).toBeVisible();
+
+    // Test password show/hide button
+    const passwordToggle = page.locator('button[aria-controls="password"]');
+    await expect(passwordToggle).toBeVisible();
+    await passwordToggle.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('input#password')).toHaveAttribute('type', 'text');
+  });
+
+  test('authenticated user can navigate /courses, /account, and course details', async ({ page }) => {
+    await loginAsUser(page);
+
+    // 1. Audit /courses as authenticated user
+    await page.goto('/courses');
+    const coursesScan = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa'])
+      .analyze();
+    expect(coursesScan.violations).toEqual([]);
+
+    // 2. Audit /account (Favorites and user profile)
+    await page.goto('/account');
+    const accountScan = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa'])
+      .analyze();
+    expect(accountScan.violations).toEqual([]);
+
+    // 3. Audit /course/1 (Course page with documents, ratings, and comments)
+    await page.goto('/course/1');
+    const coursePageScan = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa'])
+      .analyze();
+    expect(coursePageScan.violations).toEqual([]);
+
+    // 4. Test accordion and star rating roving tabindex if star rating exists
+    const starRadiogroup = page.locator('[role="radiogroup"]');
+    if (await starRadiogroup.count() > 0) {
+      const activeStar = starRadiogroup.locator('[role="radio"][tabindex="0"]');
+      await expect(activeStar).toHaveCount(1);
+    }
   });
 
   test('curriculum accordion tree expands and collapses via Enter / Space', async ({ page }) => {
     await page.goto('/courses');
 
-    // Wait for the curriculum navigator or programs to load
     const firstAccordionButton = page.locator('button[aria-expanded]').first();
     if (await firstAccordionButton.count() > 0) {
       await firstAccordionButton.focus();
