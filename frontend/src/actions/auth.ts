@@ -1,7 +1,7 @@
 'use server'
 
 import { COOKIE_NAMES } from '@/utils/cookieNames';
-import { getUserIdFromJWT, getUserRolesFromJWT, isJWTExpired } from '@/utils/jwt';
+import { decodeJWT, getUserIdFromJWT, getUserRolesFromJWT, isJWTExpired } from '@/utils/jwt';
 import { captureException } from '@sentry/nextjs';
 import { cookies } from 'next/headers';
 
@@ -160,7 +160,10 @@ export const storeTokensInCookies = async (
     const cookieStore = await cookies();
 
     // Calculate JWT expiration from the token itself
-    const jwtPayload = JSON.parse(atob(jwt.split('.')[1]));
+    const jwtPayload = decodeJWT(jwt);
+    if (!jwtPayload || typeof jwtPayload.exp !== 'number') {
+        throw new Error('Failed to decode JWT or expiration is missing');
+    }
     const jwtExpiration = new Date(jwtPayload.exp * 1000);
 
     // Set JWT cookie

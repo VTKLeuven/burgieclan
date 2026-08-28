@@ -10,11 +10,23 @@ interface JWTPayload {
 }
 
 
+function base64UrlDecode(base64Url: string): string {
+    let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4 !== 0) {
+        base64 += '=';
+    }
+    const binary = atob(base64);
+    const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+}
+
 export function decodeJWT(token: string): JWTPayload | null {
     try {
-        const base64Url = token.split('.')[1];
-        const base64Str = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const decodedPayload = atob(base64Str);
+        const parts = token.split('.');
+        if (parts.length < 2) {
+            throw new Error("Invalid JWT format");
+        }
+        const decodedPayload = base64UrlDecode(parts[1]);
         const parsedPayload = JSON.parse(decodedPayload);
         if (typeof (parsedPayload.exp) !== 'number') {
             throw new Error("Failed to parse JWT: Expiration time is missing.");

@@ -6,6 +6,8 @@
     "or_log_in_manually": "Of log handmatig in",
     "login_invalid_credentials": "Ongeldige inloggegevens, controleer of je gebruikersnaam/wachtwoord correct zijn.",
     "login_failed": "Login gefaald, probeer opnieuw.",
+    "token_store_failed": "Opslaan van authenticatietokens mislukt, probeer opnieuw.",
+    "no_token_received": "Geen authenticatietoken ontvangen.",
     "login_success": "Succesvolle login!",
     "username": "Gebruikersnaam",
     "password": "Wachtwoord",
