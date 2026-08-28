@@ -23,7 +23,7 @@ const CommentActions: React.FC<CommentActionsProps> = ({ onEdit, onDelete, show,
             type="button"
             onClick={onEdit}
             aria-label={t('course-page.comments.dialog.button.edit')}
-            className="text-vtk-muted bg-vtk-paper-2 hover:text-vtk-ink hover:bg-vtk-paper-2 rounded transition-colors flex items-center justify-center p-1 cursor-pointer"
+            className="text-vtk-muted bg-vtk-paper-2 hover:text-vtk-ink hover:bg-vtk-paper-2 rounded transition-colors flex items-center justify-center p-1 cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
           >
             <Pencil size={13} aria-hidden="true" />
           </button>
@@ -34,7 +34,7 @@ const CommentActions: React.FC<CommentActionsProps> = ({ onEdit, onDelete, show,
             type="button"
             onClick={onDelete}
             aria-label={t('course-page.comments.dialog.button.delete')}
-            className="vtk-badge vtk-badge-danger transition-colors flex items-center justify-center p-1 cursor-pointer"
+            className="vtk-badge vtk-badge-danger transition-colors flex items-center justify-center p-1 cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
           >
             <Trash2 size={13} aria-hidden="true" />
           </button>
@@ -52,7 +52,7 @@ const CommentActions: React.FC<CommentActionsProps> = ({ onEdit, onDelete, show,
           type="button"
           onClick={onEdit}
           aria-label={t('course-page.comments.dialog.button.edit')}
-          className="text-vtk-muted bg-vtk-paper-2 hover:text-vtk-ink hover:bg-vtk-paper-2 rounded transition-colors flex items-center justify-center p-1 cursor-pointer"
+          className="text-vtk-muted bg-vtk-paper-2 hover:text-vtk-ink hover:bg-vtk-paper-2 rounded transition-colors flex items-center justify-center p-1 cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
         >
           <Pencil size={13} aria-hidden="true" />
         </button>
@@ -63,7 +63,7 @@ const CommentActions: React.FC<CommentActionsProps> = ({ onEdit, onDelete, show,
           type="button"
           onClick={onDelete}
           aria-label={t('course-page.comments.dialog.button.delete')}
-          className="vtk-badge vtk-badge-danger transition-colors flex items-center justify-center p-1 cursor-pointer"
+          className="vtk-badge vtk-badge-danger transition-colors flex items-center justify-center p-1 cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
         >
           <Trash2 size={13} aria-hidden="true" />
         </button>

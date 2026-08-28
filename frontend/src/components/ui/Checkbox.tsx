@@ -5,8 +5,8 @@ import React, { forwardRef, useId } from 'react';
  * Extends standard HTML input props (excluding 'type') and adds custom props.
  */
 interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
-    /** Text label to display next to the checkbox */
-    label: string;
+    /** Optional text label to display next to the checkbox */
+    label?: string;
     /** Optional CSS classes to apply to the container div */
     className?: string;
     /** Optional CSS classes to apply to the label element */
@@ -50,20 +50,22 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(({
     const id = propId || `checkbox-${generatedId}`;
 
     return (
-        <div className={`flex items-center ${className}`}>
+        <div className={`flex items-center ${className || ''}`}>
             <input
                 id={id}
                 type="checkbox"
                 ref={ref}
-                className="h-4 w-4 cursor-pointer rounded accent-vtk-ink"
+                className="h-4 w-4 cursor-pointer rounded accent-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-2"
                 {...props}
             />
-            <label
-                htmlFor={id}
-                className={`ml-2 block cursor-pointer ${labelClassName || 'text-sm font-medium text-vtk-ink'}`}
-            >
-                {label}
-            </label>
+            {label && (
+                <label
+                    htmlFor={id}
+                    className={`ml-2 block cursor-pointer ${labelClassName || 'text-sm font-medium text-vtk-ink'}`}
+                >
+                    {label}
+                </label>
+            )}
         </div>
     );
 });

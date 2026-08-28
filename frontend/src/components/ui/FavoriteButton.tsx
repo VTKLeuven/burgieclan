@@ -94,18 +94,24 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
         fillColor = isFavorite ? "fill-vtk-yellow" : "";
     }
 
+    const label = isFavorite
+        ? t('favorites.remove-favorite')
+        : t('favorites.add-favorite');
+
     return (
         <button
             type="button"
             onClick={handleToggleFavorite}
-            className={`${baseClasses} ${favoriteClasses} ${className}`}
-            title={isFavorite
-                ? t('favorites.remove-favorite')
-                : t('favorites.add-favorite')}
+            disabled={!user}
+            aria-label={label}
+            aria-pressed={isFavorite}
+            className={`${baseClasses} ${favoriteClasses} ${className} focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy disabled:opacity-50`}
+            title={label}
         >
             <Star
                 size={size}
                 className={fillColor}
+                aria-hidden="true"
             />
         </button>
     );

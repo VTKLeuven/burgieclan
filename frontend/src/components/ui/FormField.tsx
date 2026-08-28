@@ -42,19 +42,26 @@ export const FormField = <TFieldValues extends FieldValues = FieldValues>({
     disabled,
     visibleOptions,
 }: FormFieldProps<TFieldValues>) => {
+    const fieldId = `field-${String(name)}`;
+    const errorId = `error-${String(name)}`;
+
     // For text fields, use the registration props to bind RHF.
     if (type === 'text') {
         return (
             <div>
                 <div className="flex items-center justify-between">
-                    <label className="block text-sm font-medium text-vtk-ink">{label}</label>
-                    {error && <p className="vtk-error-text text-xs">{error?.message}</p>}
+                    <label htmlFor={fieldId} className="block text-sm font-medium text-vtk-ink">{label}</label>
+                    {error && <p id={errorId} role="alert" className="vtk-error-text text-xs">{error?.message}</p>}
                 </div>
                 <div className="mt-2">
                     <Input
+                        id={fieldId}
                         type="text"
                         placeholder={placeholder || ''}
+                        aria-invalid={!!error}
+                        aria-describedby={error ? errorId : undefined}
                         passive={!!error}
+                        disabled={disabled}
                         {...(registration || {})}
                     />
                 </div>
@@ -66,8 +73,8 @@ export const FormField = <TFieldValues extends FieldValues = FieldValues>({
     return (
         <div>
             <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-vtk-ink">{label}</label>
-                {error && <p className="vtk-error-text text-xs">{error?.message}</p>}
+                <label htmlFor={fieldId} className="block text-sm font-medium text-vtk-ink">{label}</label>
+                {error && <p id={errorId} role="alert" className="vtk-error-text text-xs">{error?.message}</p>}
             </div>
             <div className="mt-2">
                 <Controller

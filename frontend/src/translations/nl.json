@@ -9,6 +9,14 @@
     "login_success": "Succesvolle login!",
     "username": "Gebruikersnaam",
     "password": "Wachtwoord",
+    "show_password": "Toon wachtwoord",
+    "hide_password": "Verberg wachtwoord",
+    "language": "Taal",
+    "skip_to_content": "Ga naar hoofdinhoud",
+    "common": {
+        "upvote": "Omhoog stemmen",
+        "downvote": "Omlaag stemmen"
+    },
     "profile": "Profiel",
     "go_home": "Ga terug naar de startpagina",
     "contact_support": "Neem contact op met de ondersteuning",
@@ -271,6 +279,7 @@
         "meta-courses": "vakken"
     },
     "account": {
+        "menu": "Gebruikersmenu",
         "meta-courses": "vakken",
         "meta-documents": "documenten",
         "account": "Account",
@@ -363,6 +372,10 @@
         "my_courses": "Mijn Vakken",
         "my_favorite_documents": "Favoriete Documenten",
         "add_document": "Voeg document toe",
+        "expand": "Zijbalk uitklappen",
+        "collapse": "Zijbalk inklappen",
+        "toggle_courses": "Vakken in-/uitklappen",
+        "toggle_documents": "Documenten in-/uitklappen",
         "log_out": "Uitloggen",
         "go_to_vtk": "Ga naar VTK",
         "user_avatar": "Gebruikersavatar"

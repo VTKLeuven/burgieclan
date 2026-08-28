@@ -43,10 +43,14 @@ export default function RatingSummary({ rating, recentYearCount, compact = false
             return null;
         }
 
+        const count = rating.recent.average !== null ? rating.recent.count : rating.allTime.count;
+        const countText = countLabel(count);
+
         return (
             <span
                 className="flex shrink-0 items-center gap-1 text-sm font-medium text-vtk-body"
-                title={countLabel(rating.recent.average !== null ? rating.recent.count : rating.allTime.count)}
+                title={countText}
+                aria-label={`${headline} / 5, ${countText}`}
             >
                 <Star size={14} className="fill-vtk-yellow text-vtk-yellow" aria-hidden="true" />
                 {headline}

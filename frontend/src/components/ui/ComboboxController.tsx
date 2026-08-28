@@ -54,18 +54,19 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
             <Combobox value={selectedOption} onChange={(option: Option | null) => onChange(option?.id)} disabled={disabled}>
                 {({ open }) => (
                     <div className="relative">
-                        <Combobox.Button className="w-full">
-                            <Combobox.Input
-                                className={inputClassName}
-                                onChange={(e) => setQuery(e.target.value)}
-                                onBlur={onBlur}
-                                displayValue={(option: Option | null) => option?.name || ''}
-                                placeholder={placeholder || `${t('select')} ${name}`}
-                                autoComplete="off"
-                            />
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                <ChevronDown className="h-5 w-5 text-vtk-muted" aria-hidden="true" />
-                            </div>
+                        <Combobox.Input
+                            className={inputClassName}
+                            onChange={(e) => setQuery(e.target.value)}
+                            onBlur={onBlur}
+                            displayValue={(option: Option | null) => option?.name || ''}
+                            placeholder={placeholder || `${t('select')} ${name}`}
+                            autoComplete="off"
+                        />
+                        <Combobox.Button
+                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-vtk-muted hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy rounded-sm"
+                            aria-label={placeholder || `${t('select')} ${name}`}
+                        >
+                            <ChevronDown className="h-5 w-5" aria-hidden="true" />
                         </Combobox.Button>
                         {open && (
                             <Combobox.Options className="absolute z-10 mt-1.5 max-h-60 w-full overflow-auto text-base focus:outline-hidden sm:text-sm rounded-[14px] border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">

@@ -1,5 +1,6 @@
 'use client';
 
+import { Fragment } from 'react';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -69,7 +70,7 @@ export default function DynamicBreadcrumb({ course, category, document }: Dynami
         <Breadcrumb>
             <BreadcrumbList>
                 {breadcrumbItems.map((item, index) => (
-                    <div key={index} className="flex items-center">
+                    <Fragment key={index}>
                         <BreadcrumbItem>
                             {item.isCurrentPage ? (
                                 <BreadcrumbPage>{item.label}</BreadcrumbPage>
@@ -80,7 +81,7 @@ export default function DynamicBreadcrumb({ course, category, document }: Dynami
                             )}
                         </BreadcrumbItem>
                         {index < breadcrumbItems.length - 1 && <BreadcrumbSeparator />}
-                    </div>
+                    </Fragment>
                 ))}
             </BreadcrumbList>
         </Breadcrumb>

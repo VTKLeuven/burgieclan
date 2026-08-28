@@ -2,6 +2,7 @@ import { isErrorResponse, useApi } from "@/hooks/useApi";
 import { convertToVoteSummary } from "@/utils/convertToEntity";
 import { ArrowBigDownIcon, ArrowBigUpIcon } from "lucide-react";
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export enum VoteDirection {
     UP = 1,
@@ -24,6 +25,7 @@ export default function VoteButton({
     className = '',
     size = 'normal'
 }: VoteButtonProps) {
+    const { t } = useTranslation();
     const [voteState, setVoteState] = useState<VoteDirection>(VoteDirection.NONE);
     const [voteCount, setVoteCount] = useState(0);
     const [isUpvoteHovered, setIsUpvoteHovered] = useState(false);
@@ -138,13 +140,13 @@ export default function VoteButton({
         >
             <button
                 type="button"
-                aria-label="Upvote"
+                aria-label={t('common.upvote', { defaultValue: 'Upvote' })}
                 aria-pressed={voteState === VoteDirection.UP}
                 disabled={disabled}
                 onClick={() => handleVote(VoteDirection.UP)}
                 onMouseEnter={() => setIsUpvoteHovered(true)}
                 onMouseLeave={() => setIsUpvoteHovered(false)}
-                className={`focus:outline-hidden rounded-full transition-colors ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                className={`focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-1 rounded-full transition-colors ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
             >
                 <ArrowBigUpIcon
                     size={iconSize}
@@ -162,13 +164,13 @@ export default function VoteButton({
             </div>
             <button
                 type="button"
-                aria-label="Downvote"
+                aria-label={t('common.downvote', { defaultValue: 'Downvote' })}
                 aria-pressed={voteState === VoteDirection.DOWN}
                 disabled={disabled}
                 onClick={() => handleVote(VoteDirection.DOWN)}
                 onMouseEnter={() => setIsDownvoteHovered(true)}
                 onMouseLeave={() => setIsDownvoteHovered(false)}
-                className={`focus:outline-hidden rounded-full transition-colors ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                className={`focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-1 rounded-full transition-colors ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
             >
                 <ArrowBigDownIcon
                     size={iconSize}

@@ -35,25 +35,29 @@ export default function StarRating({
 }: StarRatingProps) {
     const { t } = useTranslation();
     const [hovered, setHovered] = useState<number | null>(null);
+    const [focusedStar, setFocusedStar] = useState<number | null>(null);
     const starRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-    // Hover previews the score you are about to give without committing to it.
-    const shown = hovered ?? value ?? 0;
+    // Preview score when hovered or keyboard-navigated without committing.
+    const activeStar = focusedStar ?? value ?? 1;
+    const shown = hovered ?? focusedStar ?? value ?? 0;
 
     const handleKeyDown = (event: React.KeyboardEvent, currentStar: number) => {
         if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
             event.preventDefault();
-            const next = Math.min(5, (value ?? currentStar) + 1);
-            onChange(next);
+            const next = Math.min(5, currentStar + 1);
+            setFocusedStar(next);
             starRefs.current[next - 1]?.focus();
         } else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
             event.preventDefault();
-            const prev = Math.max(1, (value ?? currentStar) - 1);
-            onChange(prev);
+            const prev = Math.max(1, currentStar - 1);
+            setFocusedStar(prev);
             starRefs.current[prev - 1]?.focus();
         } else if (event.key === ' ' || event.key === 'Enter') {
             event.preventDefault();
             onChange(currentStar);
+            setFocusedStar(null);
+            setHovered(null);
         }
     };
 
@@ -64,10 +68,18 @@ export default function StarRating({
                 aria-label={label}
                 className="flex items-center gap-0.5"
                 onMouseLeave={() => setHovered(null)}
+                onBlur={(e) => {
+                    // Reset preview if focus leaves the radio group
+                    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                        setFocusedStar(null);
+                        setHovered(null);
+                    }
+                }}
             >
                 {STARS.map((star) => {
                     const filled = star <= shown;
                     const isSelected = value === star;
+                    const isFocusable = star === activeStar;
                     return (
                         <button
                             key={star}
@@ -79,8 +91,15 @@ export default function StarRating({
                             aria-checked={isSelected}
                             aria-label={t('course-page.comments.rating-stars', { count: star })}
                             aria-disabled={disabled}
-                            tabIndex={isSelected || (value === null && star === 1) ? 0 : -1}
-                            onClick={() => !disabled && onChange(star)}
+                            tabIndex={isFocusable ? 0 : -1}
+                            onClick={() => {
+                                if (!disabled) {
+                                    onChange(star);
+                                    setFocusedStar(null);
+                                    setHovered(null);
+                                }
+                            }}
+                            onFocus={() => !disabled && setFocusedStar(star)}
                             onMouseEnter={() => !disabled && setHovered(star)}
                             onKeyDown={(e) => !disabled && handleKeyDown(e, star)}
                             className={`rounded-sm p-1 transition-all focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-2 focus-visible:scale-125 ${

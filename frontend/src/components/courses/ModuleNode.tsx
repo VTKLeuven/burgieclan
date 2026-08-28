@@ -97,31 +97,40 @@ const ModuleNode = ({
 
     const { courses: matchingCourses, modules: matchingModules } = getChildMatches();
     const totalMatches = matchingCourses + matchingModules;
+    const contentId = `module-content-${module.id}`;
 
     return (
         <div className="module-node mb-1">
             <div
-                className={`flex cursor-pointer items-center gap-2.5 py-2 px-3 border border-vtk-line bg-vtk-paper rounded-md hover:bg-vtk-paper-2 ${moduleMatches ? 'ring-1 ring-vtk-yellow' : ''
+                className={`flex items-center gap-2.5 py-1.5 px-3 border border-vtk-line bg-vtk-paper rounded-md hover:bg-vtk-paper-2 ${moduleMatches ? 'ring-1 ring-vtk-yellow' : ''
                     }`}
-                onClick={toggleExpanded}
             >
-                <ChevronRight
-                    size={16}
-                    className="shrink-0 transition-transform duration-200"
-                    style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
-                />
-                <span className="min-w-0 flex-1 truncate text-sm font-medium">{module.name}</span>
+                <button
+                    type="button"
+                    onClick={toggleExpanded}
+                    aria-expanded={expanded}
+                    aria-controls={contentId}
+                    className="flex min-w-0 flex-1 items-center gap-2.5 py-0.5 text-left rounded-sm focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy cursor-pointer"
+                >
+                    <ChevronRight
+                        size={16}
+                        aria-hidden="true"
+                        className="shrink-0 transition-transform duration-200"
+                        style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+                    />
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium">{module.name}</span>
 
-                {/* Show badge with match count if matches exist */}
-                {searchFilters && searchQuery && totalMatches > 0 && (
-                    <span className="vtk-badge vtk-badge-accent shrink-0">{totalMatches}</span>
-                )}
+                    {/* Show badge with match count if matches exist */}
+                    {searchFilters && searchQuery && totalMatches > 0 && (
+                        <span className="vtk-badge vtk-badge-accent shrink-0">{totalMatches}</span>
+                    )}
+                </button>
 
                 <DownloadButton modules={[module]} />
             </div>
 
             {expanded && (
-                <div className="pl-4 mt-1 space-y-1">
+                <div id={contentId} role="region" aria-label={module.name} className="pl-4 mt-1 space-y-1">
                     {loading && !loaded ? (
                         <div className="flex items-center justify-center py-5">
                             <LoaderCircle className="animate-spin text-vtk-navy" size={20} />
@@ -136,7 +145,7 @@ const ModuleNode = ({
                                 just opened, whereas submodules are a level down. Putting the submodules
                                 first pushed a module's own courses below an arbitrarily deep subtree. */}
                             {module.courses && module.courses.length > 0 && (
-                                <div className="border border-vtk-line rounded-md">
+                                <div className="border border-vtk-line rounded-md" role="table" aria-label={module.name}>
                                     <CourseTableHeader />
                                     {module.courses.map((course, index) => (
                                         <CourseRow

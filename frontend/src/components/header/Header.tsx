@@ -73,7 +73,7 @@ export default function Header() {
                             <button
                                 type="button"
                                 onClick={() => setMobileMenuOpen(true)}
-                                className="grid h-[38px] w-[38px] place-items-center rounded-full border border-vtk-paper/35 bg-white/12 text-vtk-paper transition hover:border-vtk-paper hover:bg-white/22"
+                                className="grid h-[38px] w-[38px] place-items-center rounded-full border border-vtk-paper/35 bg-white/12 text-vtk-paper transition hover:border-vtk-paper hover:bg-white/22 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white"
                             >
                                 <span className="sr-only">{t('open_menu')}</span>
                                 <Menu aria-hidden="true" className="h-5 w-5" />
@@ -98,7 +98,7 @@ export default function Header() {
                                     href={item.href}
                                     target={item.external ? '_blank' : undefined}
                                     rel={item.external ? 'noopener noreferrer' : undefined}
-                                    className="whitespace-nowrap text-sm font-medium text-vtk-paper/80 transition-colors hover:text-white"
+                                    className="whitespace-nowrap text-sm font-medium text-vtk-paper/80 transition-colors hover:text-white rounded-sm focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white"
                                 >
                                     {item.name}
                                 </Link>

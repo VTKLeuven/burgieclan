@@ -8,7 +8,7 @@ import { i18nConfig } from "../../../i18nConfig";
  * solid white. Mirrors `.vtk-site-header .lang-toggle` in vtk-website-new.
  */
 const LanguageSwitcher = () => {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const currentLocale = i18n.language;
@@ -35,15 +35,21 @@ const LanguageSwitcher = () => {
     };
 
     return (
-        <div className="flex items-center gap-0.5 text-[13px] text-vtk-paper/75">
+        <div
+            role="group"
+            aria-label={t('language', { defaultValue: 'Language' })}
+            className="flex items-center gap-0.5 text-[13px] text-vtk-paper/75"
+        >
             {i18nConfig.locales.map((locale, index) => (
                 <span key={locale} className="flex items-center">
-                    {index > 0 && <span className="text-vtk-paper/40">/</span>}
+                    {index > 0 && <span className="text-vtk-paper/40" aria-hidden="true">/</span>}
                     <button
+                        type="button"
                         onClick={() => !isTransitioning && switchLanguage(locale)}
                         aria-pressed={currentLocale === locale}
+                        aria-label={locale === 'nl' ? 'Nederlands' : 'English'}
                         disabled={isTransitioning}
-                        className={`p-1 uppercase transition-colors ${currentLocale === locale
+                        className={`p-1 uppercase transition-colors rounded-xs focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-hidden ${currentLocale === locale
                             ? 'font-semibold text-white'
                             : 'hover:text-white'
                             }`}

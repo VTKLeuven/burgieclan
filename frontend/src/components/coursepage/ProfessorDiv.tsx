@@ -85,7 +85,7 @@ export default function ProfessorDiv({
         <div
             className={`rounded-full overflow-hidden bg-vtk-paper-2 ${borderClass} shadow-xs
                 ${linkToProfile ? 'hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer' : ''}
-                relative z-10 group-hover:z-20`}
+                relative z-10 group-hover:z-20 group-focus-within:z-20`}
             style={{ width: size, height: size }}
         >
             <Image
@@ -102,7 +102,7 @@ export default function ProfessorDiv({
         <div
             className={`relative z-10 flex items-center justify-center rounded-full ${borderClass} font-semibold shadow-xs
                 ${linkToProfile ? 'cursor-pointer transition-all duration-200 hover:scale-110 hover:shadow-md' : ''}
-                group-hover:z-20 ${getAvatarColor(professorName)}`}
+                group-hover:z-20 group-focus-within:z-20 ${getAvatarColor(professorName)}`}
             style={{ width: size, height: size, fontSize: size * 0.28 }}
         >
             {getInitials(professorName)}
@@ -110,11 +110,11 @@ export default function ProfessorDiv({
     );
 
     const tooltip = (
-        <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-vtk-ink text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none">
+        <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-vtk-ink text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none" role="tooltip">
             <div className="font-medium">{professorName}</div>
             <div className="text-vtk-on-dark-muted">{roleText}</div>
             {/* Arrow pointing up */}
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-2 border-transparent border-b-vtk-ink"></div>
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-2 border-transparent border-b-vtk-ink" aria-hidden="true"></div>
         </div>
     );
 
@@ -128,7 +128,13 @@ export default function ProfessorDiv({
     if (linkToProfile) {
         return (
             <div className="relative group">
-                <Link href={`https://www.kuleuven.be/wieiswie/${locale}/person/0${sanitizedUnumber}`}>
+                <Link
+                    href={`https://www.kuleuven.be/wieiswie/${locale}/person/0${sanitizedUnumber}`}
+                    aria-label={`${professorName} (${roleText})`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block rounded-full focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-2"
+                >
                     {inner}
                 </Link>
             </div>

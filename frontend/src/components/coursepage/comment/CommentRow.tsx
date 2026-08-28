@@ -99,6 +99,13 @@ const CommentRow: React.FC<CommentRowProps> = ({
                             ref={editTextareaRef}
                             value={editContent}
                             onChange={handleEditContentChange}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Escape') {
+                                    e.preventDefault();
+                                    handleCancelEdit();
+                                }
+                            }}
+                            aria-label={t('course-page.comments.dialog.description')}
                             className="w-full p-2 text-sm border border-vtk-line rounded-md resize-none focus:ring-1 focus:ring-vtk-ink focus:border-vtk-line-2 placeholder-vtk-muted"
                             rows={Math.min(10, editContent.split('\n').length)}
                             required

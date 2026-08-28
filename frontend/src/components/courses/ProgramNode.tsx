@@ -79,33 +79,42 @@ const ProgramNode = ({
 
   // Get count of matching items for display
   const matchingItems = searchQuery ? countMatchesInProgram(program, searchQuery) : 0;
+  const contentId = `program-content-${program.id}`;
 
   return (
     <ProgramLanguageProvider language={program.language}>
       <div className="program-node">
         {/* A search hit is marked with a yellow accent rail, not a fill. */}
         <div
-          className={`flex cursor-pointer items-center gap-2.5 rounded-[18px] border border-vtk-line bg-vtk-surface px-4 py-3 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper ${programMatches ? 'shadow-[inset_3px_0_0_var(--yellow)]' : ''
+          className={`flex items-center gap-2.5 rounded-[18px] border border-vtk-line bg-vtk-surface px-4 py-2 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper ${programMatches ? 'shadow-[inset_3px_0_0_var(--yellow)]' : ''
             }`}
-          onClick={toggleExpanded}
         >
-          <ChevronRight
-            size={16}
-            className="shrink-0 text-vtk-muted transition-transform duration-200"
-            style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
-          />
-          <span className="min-w-0 flex-1 truncate text-[15px] font-medium text-vtk-ink">{program.name}</span>
+          <button
+            type="button"
+            onClick={toggleExpanded}
+            aria-expanded={expanded}
+            aria-controls={contentId}
+            className="flex min-w-0 flex-1 items-center gap-2.5 py-1 text-left rounded-lg focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy cursor-pointer"
+          >
+            <ChevronRight
+              size={16}
+              aria-hidden="true"
+              className="shrink-0 text-vtk-muted transition-transform duration-200"
+              style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+            />
+            <span className="min-w-0 flex-1 truncate text-[15px] font-medium text-vtk-ink">{program.name}</span>
 
-          {/* Match count when a search is active */}
-          {autoExpand && matchingItems > 0 && (
-            <span className="vtk-badge vtk-badge-accent shrink-0">{matchingItems}</span>
-          )}
+            {/* Match count when a search is active */}
+            {autoExpand && matchingItems > 0 && (
+              <span className="vtk-badge vtk-badge-accent shrink-0">{matchingItems}</span>
+            )}
+          </button>
 
           <DownloadButton programs={[program]} />
         </div>
 
         {expanded && (
-          <div>
+          <div id={contentId} role="region" aria-label={program.name}>
             {loading && !loaded ? (
               <div className="ml-5 flex items-center justify-center border-l border-vtk-line py-5 pl-4">
                 <LoaderCircle className="animate-spin text-vtk-navy" size={22} />
