@@ -197,11 +197,14 @@ const CourseCommentList = ({
         setFormAnonymous(false);
     };
 
-    const handleAddButtonClick = (e: React.MouseEvent) => {
+    const handleAddButtonClick = (e: React.MouseEvent | React.SyntheticEvent) => {
         e.stopPropagation();
         setFormAnonymous(user?.defaultAnonymous ?? false);
         setShowAddForm(true);
         setExpanded(true);
+        setTimeout(() => {
+            textareaRef.current?.focus();
+        }, 50);
     };
 
     // Comments arrive already ordered, so grouping is a scan rather than a sort.
@@ -251,7 +254,7 @@ const CourseCommentList = ({
                 className="relative z-20 flex cursor-pointer items-center gap-2.5 rounded-[18px] border border-vtk-line bg-vtk-surface px-4 py-3 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-2"
                 onClick={() => setExpanded(!expanded)}
                 onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
+                    if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
                         e.preventDefault();
                         setExpanded(!expanded);
                     }
@@ -271,7 +274,11 @@ const CourseCommentList = ({
                 {onCommentAdded && (
                     <Tooltip content={t('course-page.comments.add-new')}>
                         <button
+                            type="button"
                             onClick={handleAddButtonClick}
+                            onKeyDown={(e) => {
+                                e.stopPropagation();
+                            }}
                             className="vtk-icon-button h-8 w-8"
                             aria-label={t('course-page.comments.add-new')}
                         >
