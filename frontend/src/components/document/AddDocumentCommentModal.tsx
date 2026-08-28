@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 const PDFViewer = dynamic(() => import("@/components/document/pdf/PDFViewer"), { ssr: false });
 import Editor from "@/components/editor/Editor";
 import { Checkbox } from "@/components/ui/Checkbox";
-import { Dialog, DialogActions } from "@/components/ui/Dialog";
+import { Dialog, DialogActions, DialogTitle } from "@/components/ui/Dialog";
 import { useToast } from "@/components/ui/Toast";
 import { useApi } from "@/hooks/useApi";
 import type { DocumentComment } from "@/types/entities";
@@ -79,6 +79,9 @@ export default function AddDocumentCommentModal({ documentId, file, isModalOpen,
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
         >
+            <DialogTitle>
+                {t('document.comments.add', { defaultValue: 'Reactie toevoegen' })}
+            </DialogTitle>
             {file &&
                 <div
                     ref={containerRef}
@@ -99,8 +102,9 @@ export default function AddDocumentCommentModal({ documentId, file, isModalOpen,
             <div className="col-span-full mt-4 gap-3 pb-2 px-10">
                 <Checkbox
                     label={t('document.comments.anonymous')}
+                    checked={isAnonymous}
                     disabled={loading}
-                    onClick={() => setIsAnonymous(!isAnonymous)}
+                    onChange={(e) => setIsAnonymous(e.target.checked)}
                     className="justify-end"
                 />
             </div>

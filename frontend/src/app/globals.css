@@ -152,8 +152,13 @@
     @apply mt-1 mb-1;
   }
 
-  /* Remove default focus outline on form inputs; the design system draws its
-     own ring (see `.vtk-input:focus`). */
+  /* Focus-visible base indicator for keyboard accessibility */
+  :focus-visible {
+    outline: 2px solid var(--navy);
+    outline-offset: 2px;
+  }
+
+  /* Form inputs draw their own distinct border/ring on focus */
   input:focus,
   textarea:focus,
   select:focus,
@@ -325,6 +330,14 @@
   .white-button:hover:not(:disabled) {
     transform: translateY(-1px);
     border-color: var(--ink);
+  }
+
+  .vtk-button:focus-visible,
+  .primary-button:focus-visible,
+  .white-button:focus-visible,
+  .vtk-icon-button:focus-visible {
+    outline: 2px solid var(--navy);
+    outline-offset: 2px;
   }
 
   .vtk-button-primary,

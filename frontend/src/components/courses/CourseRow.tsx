@@ -108,9 +108,9 @@ export const CourseRow = memo(({
     };
 
     return (
-        <div className={`grid grid-cols-12 py-2 px-3 border-b leading-tight hover:bg-vtk-paper rounded-md ${highlightMatch ? 'ring-1 ring-vtk-yellow' : ''
+        <div role="row" className={`grid grid-cols-12 py-2 px-3 border-b leading-tight hover:bg-vtk-paper rounded-md ${highlightMatch ? 'ring-1 ring-vtk-yellow' : ''
             } ${marginClass}`}>
-            <div className="col-span-5 flex items-center">
+            <div role="cell" className="col-span-5 flex items-center">
                 {loading || !course ? (
                     <div className="mr-2 inline-block">
                         <Skeleton circle width={16} height={16} />
@@ -128,20 +128,20 @@ export const CourseRow = memo(({
                         {content.name}
                     </div>
                 ) : (
-                    <Link href={`/course/${course.id}`} className="hover:text-vtk-navy hover:underline text-sm text-vtk-body">
+                    <Link href={`/course/${course.id}`} className="hover:text-vtk-navy hover:underline text-sm text-vtk-body rounded-xs focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-1">
                         {content.name}
                     </Link>
                 )}
             </div>
-            <div className="col-span-1 flex items-center text-sm font-mono text-vtk-body">{content.code}</div>
-            <div className="col-span-1 flex items-center justify-center">{content.credits}</div>
-            <div className="col-span-2 flex justify-center items-center">
+            <div role="cell" className="col-span-1 flex items-center text-sm font-mono text-vtk-body">{content.code}</div>
+            <div role="cell" className="col-span-1 flex items-center justify-center">{content.credits}</div>
+            <div role="cell" className="col-span-2 flex justify-center items-center">
                 {content.semesters}
             </div>
-            <div className="col-span-2 flex justify-center items-center relative hover:z-50">
+            <div role="cell" className="col-span-2 flex justify-center items-center relative hover:z-50">
                 {content.professor}
             </div>
-            <div className="col-span-1 flex justify-end items-center">
+            <div role="cell" className="col-span-1 flex justify-end items-center">
                 {!loading && course && <DownloadButton courses={[course]} size={16} />}
             </div>
         </div>

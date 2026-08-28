@@ -189,9 +189,10 @@ export default function LoginForm() {
                                 />
                                 <button
                                     type="button"
-                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-vtk-muted transition-colors hover:text-vtk-ink"
+                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-vtk-muted transition-colors hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy rounded-xs"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                    aria-label={showPassword ? t('hide_password', { defaultValue: 'Hide password' }) : t('show_password', { defaultValue: 'Show password' })}
+                                    aria-controls="password"
                                 >
                                     {showPassword ? (
                                         <EyeOff className="h-4 w-4" aria-hidden="true" />
@@ -203,7 +204,7 @@ export default function LoginForm() {
                         </div>
 
                         {credentialsError && (
-                            <p className="vtk-error-text m-0">{credentialsError}</p>
+                            <p role="alert" aria-live="polite" className="vtk-error-text m-0">{credentialsError}</p>
                         )}
 
                         <button

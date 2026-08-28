@@ -64,18 +64,20 @@ const NavigationSidebar = () => {
       >
         {/* Collapse toggle */}
         <button
+          type="button"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3.5 top-5 z-10 grid h-7 w-7 place-items-center rounded-full border border-vtk-line-2 bg-vtk-surface text-vtk-body shadow-sm transition hover:border-vtk-ink hover:text-vtk-ink"
-          aria-label={'toggle'}
+          className="absolute -right-3.5 top-5 z-10 grid h-7 w-7 place-items-center rounded-full border border-vtk-line-2 bg-vtk-surface text-vtk-body shadow-sm transition hover:border-vtk-ink hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
+          aria-label={isCollapsed ? t('sidebar.expand', { defaultValue: 'Expand sidebar' }) : t('sidebar.collapse', { defaultValue: 'Collapse sidebar' })}
+          aria-expanded={!isCollapsed}
         >
-          {isCollapsed ? <PanelLeft size={14} /> : <PanelLeftClose size={14} />}
+          {isCollapsed ? <PanelLeft size={14} aria-hidden="true" /> : <PanelLeftClose size={14} aria-hidden="true" />}
         </button>
 
         <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3">
           {/* Home */}
           <Link
             href={`/${i18n.language}`}
-            className="flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-semibold text-vtk-ink transition-colors hover:bg-vtk-paper-2"
+            className="flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-semibold text-vtk-ink transition-colors hover:bg-vtk-paper-2 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
           >
             <Home size={18} className="shrink-0" />
             {!isCollapsed && <span>{t('sidebar.home')}</span>}
@@ -85,12 +87,14 @@ const NavigationSidebar = () => {
 
           {/* Favourite courses */}
           <button
+            type="button"
             className={sectionButton}
             onClick={() => {
               toggleSection('courses');
               setIsCollapsed(false);
             }}
-            aria-label={t('sidebar.toggle_courses')}
+            aria-expanded={expandedSections.courses}
+            aria-label={t('sidebar.my_courses')}
           >
             <span className="flex items-center gap-2.5">
               <FolderClosed size={18} className="shrink-0" />
@@ -115,12 +119,14 @@ const NavigationSidebar = () => {
 
           {/* Favourite documents */}
           <button
+            type="button"
             className={sectionButton}
             onClick={() => {
               toggleSection('documents');
               setIsCollapsed(false);
             }}
-            aria-label={t('sidebar.toggle_documents')}
+            aria-expanded={expandedSections.documents}
+            aria-label={t('sidebar.my_favorite_documents')}
           >
             <span className="flex items-center gap-2.5">
               <File size={18} className="shrink-0" />

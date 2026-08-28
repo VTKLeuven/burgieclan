@@ -346,6 +346,7 @@ const CourseCommentList = ({
                                     value={formContent}
                                     onChange={(e) => setFormContent(e.target.value)}
                                     placeholder={t('course-page.comments.dialog.description')}
+                                    aria-label={t('course-page.comments.dialog.description')}
                                     className="vtk-textarea min-h-20"
                                     rows={2}
                                     required
@@ -423,6 +424,7 @@ const CourseCommentList = ({
                                 <button
                                     type="button"
                                     onClick={() => setShowOlder((previous) => !previous)}
+                                    aria-expanded={showOlder}
                                     className="vtk-button vtk-button-sm vtk-button-ghost self-start"
                                 >
                                     {showOlder

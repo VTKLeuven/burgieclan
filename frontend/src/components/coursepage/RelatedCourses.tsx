@@ -54,7 +54,7 @@ export default function RelatedCourses({ course }: RelatedCoursesProps) {
                             // Yellow is the accent for an active/selected badge, so hover
                             // lifts the surface and darkens the text instead - the same
                             // treatment the rest of the app uses for a hovered control.
-                            className="vtk-badge vtk-badge-muted transition-colors hover:border-vtk-line-2 hover:bg-vtk-surface hover:text-vtk-ink"
+                            className="vtk-badge vtk-badge-muted transition-colors hover:border-vtk-line-2 hover:bg-vtk-surface hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-1"
                         >
                             <span className="font-mono">{related.code}</span>
                             {/* The name is absent when the API returned the course as a bare

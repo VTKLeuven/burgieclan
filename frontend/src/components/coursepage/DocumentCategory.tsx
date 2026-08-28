@@ -20,7 +20,7 @@ export default function DocumentCategory({ title, href, count = 0 }: DocumentCat
             : t('course-page.document-count.other', { count });
 
     return (
-        <Link href={href} className="group block">
+        <Link href={href} className="group block rounded-[18px] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-2">
             <div className="flex h-full flex-col justify-between gap-6 rounded-[18px] border border-vtk-line bg-vtk-surface p-5 transition-[transform,border-color] duration-200 group-hover:-translate-y-0.5 group-hover:border-vtk-line-2">
                 <div className="flex items-center justify-between gap-2.5">
                     <div className="flex items-center gap-2.5 min-w-0">

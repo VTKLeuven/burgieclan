@@ -40,7 +40,7 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage }) => {
                                         </span>
                                     </div>
                                 </Link>
-                                <div className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-100">
+                                <div className="ml-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-within:opacity-100 transition-opacity duration-100">
                                     <FavoriteButton
                                         itemId={item.id}
                                         itemType={item.type}

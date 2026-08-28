@@ -71,7 +71,7 @@ export default function Search() {
                 id="search"
                 type="button"
                 onClick={() => setSearchPopupOpen(true)}
-                className="flex h-[38px] w-full min-w-0 max-w-sm items-center gap-2 rounded-full border border-vtk-paper/25 bg-white/10 px-3.5 text-left text-sm text-vtk-paper/70 transition hover:border-vtk-paper/50 hover:bg-white/15"
+                className="flex h-[38px] w-full min-w-0 max-w-sm items-center gap-2 rounded-full border border-vtk-paper/25 bg-white/10 px-3.5 text-left text-sm text-vtk-paper/70 transition hover:border-vtk-paper/50 hover:bg-white/15 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white"
             >
                 <SearchIcon aria-hidden="true" className="h-4 w-4 shrink-0" />
                 <span className="truncate">{placeholder}</span>

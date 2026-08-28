@@ -90,6 +90,7 @@ export default function DocumentSections({ courseId, documentCounts }: DocumentS
                 <button
                     type="button"
                     onClick={() => setShowEmpty((previous) => !previous)}
+                    aria-expanded={showEmpty}
                     className="vtk-button vtk-button-sm vtk-button-ghost mt-4"
                 >
                     {showEmpty

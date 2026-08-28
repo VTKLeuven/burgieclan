@@ -177,6 +177,14 @@ export default function CurriculumNavigator() {
         />
       </div>
 
+      {/* Screen reader live status update */}
+      <div className="sr-only" role="status" aria-live="polite">
+        {hasActiveSearch &&
+          (programs.length > 0
+            ? `${matchCounts.programs} programs, ${matchCounts.modules} modules, ${matchCounts.courses} courses found`
+            : t('curriculum-navigator.no-search-results'))}
+      </div>
+
       {(programError || (showSearchError && searchError)) && (
         <div className="vtk-panel vtk-empty mt-5">
           {t('unexpected')}

@@ -47,6 +47,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
         // Repeated row action, so the compact form is an icon button; the
         // labelled form stays a normal pill button.
         <button
+            type="button"
             onClick={handleDownload}
             disabled={loading}
             title={showText ? undefined : t('download.download')}
