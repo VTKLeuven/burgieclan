@@ -1,8 +1,8 @@
 import { CourseRow } from '@/components/courses/CourseRow';
 import { CourseTableHeader } from '@/components/courses/CourseTableHeader';
 import { SearchFilters } from '@/components/courses/CurriculumSearchBar';
-import ModuleFavoriteButton from '@/components/courses/ModuleFavoriteButton';
 import DownloadButton from '@/components/ui/DownloadButton';
+import FavoriteButton from '@/components/ui/FavoriteButton';
 import { useApi } from '@/hooks/useApi';
 import type { CurriculumFocus } from '@/types/curriculum';
 import type { Course, Module } from '@/types/entities';
@@ -154,7 +154,7 @@ const ModuleNode = ({
                     )}
                 </button>
 
-                <ModuleFavoriteButton module={module} size={16} className="shrink-0" />
+                <FavoriteButton itemId={module.id} itemType="module" size={16} className="shrink-0" />
                 <DownloadButton modules={[module]} />
             </div>
 
@@ -175,7 +175,7 @@ const ModuleNode = ({
                                 first pushed a module's own courses below an arbitrarily deep subtree. */}
                             {hasCourses && (
                                 <div className="border border-vtk-line rounded-md" role="table" aria-label={module.name}>
-                                    <CourseTableHeader />
+                                    <CourseTableHeader courses={module.courses} />
                                     {module.courses?.map((course, index) => (
                                             <CourseRow
                                                 key={course.id}
