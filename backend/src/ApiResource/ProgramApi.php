@@ -53,6 +53,7 @@ class ProgramApi extends BaseEntityApi
         [
             SerializationGroups::PROGRAM_GET,
             SerializationGroups::PROGRAM_LIST,
+            SerializationGroups::MODULE_GET,
             SerializationGroups::SEARCH,
             SerializationGroups::USER
         ]
@@ -66,7 +67,7 @@ class ProgramApi extends BaseEntityApi
      * Read-only — it is set by the importer, not over the API.
      */
     #[ApiProperty(writable: false)]
-    #[Groups([SerializationGroups::PROGRAM_GET])]
+    #[Groups([SerializationGroups::PROGRAM_GET, SerializationGroups::MODULE_GET])]
     public string $language = 'nl';
 
     /**

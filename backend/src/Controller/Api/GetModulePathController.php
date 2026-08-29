@@ -2,9 +2,9 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\Module;
 use App\Repository\ModuleRepository;
 use App\Service\CurriculumPathResolver;
+use App\Serializer\CurriculumPathNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,8 +14,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * Where one module sits in the curriculum: the program it hangs under, plus the chain of modules
  * from that program's top level down to the module itself.
  *
- * The navigator loads one level at a time, so a link straight to a nested module has no way of
- * knowing which branches to open.
+ * A module page is a page like any other now, so it needs the same thing a course page needs -
+ * a breadcrumb naming every step above it. Names travel with the IRIs so drawing that trail
+ * costs no follow-up request per node.
  */
 class GetModulePathController extends AbstractController
 {
@@ -36,19 +37,10 @@ class GetModulePathController extends AbstractController
 
         $path = $this->pathResolver->resolveModule($module);
 
-        if ($path === null) {
-            return new JsonResponse(['program' => null, 'modules' => []]);
-        }
-
-        $moduleIris = array_map(
-            static fn(Module $ancestor): string => '/api/modules/' . $ancestor->getId(),
-            $path['modules']
-        );
-
+        // A module no program reaches is drawn nowhere, so there is no trail to give.
         return new JsonResponse(
             [
-            'program' => '/api/programs/' . $path['program']->getId(),
-            'modules' => array_values($moduleIris),
+            'path' => $path === null ? null : CurriculumPathNormalizer::normalize($path),
             ]
         );
     }

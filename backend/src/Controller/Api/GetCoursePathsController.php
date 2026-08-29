@@ -2,8 +2,8 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\Module;
 use App\Repository\CourseRepository;
+use App\Serializer\CurriculumPathNormalizer;
 use App\Service\CurriculumPathResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,8 +16,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * A course page is usually reached from a search, a favourite or a shared link, none of which
  * carry the branch the reader came through. Without it the page cannot say which programme and
- * semester the course belongs to, which is the orientation the folder tree used to give for
- * free. Names travel with the IRIs so a breadcrumb needs no follow-up request per node.
+ * semester the course belongs to, and the folder tree has no branch to open.
  */
 class GetCoursePathsController extends AbstractController
 {
@@ -37,19 +36,7 @@ class GetCoursePathsController extends AbstractController
         }
 
         $paths = array_map(
-            static fn(array $path): array => [
-                'program' => [
-                    '@id' => '/api/programs/' . $path['program']->getId(),
-                    'name' => $path['program']->getName(),
-                ],
-                'modules' => array_map(
-                    static fn(Module $module): array => [
-                        '@id' => '/api/modules/' . $module->getId(),
-                        'name' => $module->getName(),
-                    ],
-                    $path['modules']
-                ),
-            ],
+            CurriculumPathNormalizer::normalize(...),
             $this->pathResolver->resolveCourse($course)
         );
 

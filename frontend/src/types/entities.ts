@@ -51,16 +51,6 @@ export interface Program extends BaseEntity {
 }
 
 /**
- * Where a module sits in the curriculum: the program it hangs under and the chain of modules
- * from that program's top level down to the module itself. Both are null/empty for a module no
- * program reaches, which the navigator cannot draw anywhere.
- */
-export interface ModulePath {
-    programId: number | null;
-    moduleIds: number[];
-}
-
-/**
  * One place a course sits in the curriculum: the program, and the chain of modules from that
  * program's top level down to the module that teaches it. A course shared between programmes
  * has one of these per programme.

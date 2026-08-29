@@ -11,7 +11,6 @@ import {
     type FaqItem,
     type CurriculumPath,
     type Module,
-    type ModulePath,
     type Page,
     type RatingScore,
     type Program,
@@ -60,27 +59,28 @@ export function convertToUser(user: unknown): User {
     };
 }
 
-export function convertToModulePath(path: unknown): ModulePath {
-    const data = toRecord(path, 'ModulePath');
+/**
+ * One curriculum path as `{program, modules}` with IRI + name on each node - the shape both
+ * `/api/courses/{id}/paths` and `/api/modules/{id}/path` answer in.
+ */
+function convertToCurriculumPath(path: unknown): CurriculumPath {
+    const entry = toRecord(path, 'CurriculumPath');
     return {
-        programId: data.program ? parseId(data.program) : null,
-        moduleIds: asArray(data.modules)?.map(parseId) ?? []
+        program: convertToProgram(entry.program),
+        modules: (asArray(entry.modules) ?? []).map(convertToModule)
     };
 }
 
-/**
- * The curriculum placements returned by `/api/courses/{id}/paths`. Programs and modules come
- * back as IRI + name, which is exactly the shape convertToProgram/convertToModule already read.
- */
+/** The single path from `/api/modules/{id}/path`; null for a module no program reaches. */
+export function convertToModulePath(response: unknown): CurriculumPath | null {
+    const data = toRecord(response, 'ModulePath');
+    return data.path ? convertToCurriculumPath(data.path) : null;
+}
+
+/** Every curriculum placement of a course, from `/api/courses/{id}/paths`. */
 export function convertToCurriculumPaths(response: unknown): CurriculumPath[] {
     const data = toRecord(response, 'CurriculumPaths');
-    return (asArray(data.paths) ?? []).map((path) => {
-        const entry = toRecord(path, 'CurriculumPath');
-        return {
-            program: convertToProgram(entry.program),
-            modules: (asArray(entry.modules) ?? []).map(convertToModule)
-        };
-    });
+    return (asArray(data.paths) ?? []).map(convertToCurriculumPath);
 }
 
 export function convertToCourse(course: unknown): Course {

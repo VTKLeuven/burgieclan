@@ -250,7 +250,8 @@
         "hide-empty-categories": "Hide empty folders",
         "no-documents-yet": "This course has no documents yet.",
         "placement": {
-            "label": "This course sits in"
+            "other_one": "also in 1 other program",
+            "other_other": "also in {{count}} other programs"
         }
     },
     "download": {
@@ -286,8 +287,6 @@
         "matches-found": "Matches found",
         "no-modules-in-program": "No modules available in this program.",
         "no-courses-in-module": "No courses available in this module.",
-        "meta-programs": "programs",
-        "meta-courses": "courses",
         "module-favorites": {
             "add-label": "Add all to favorites",
             "remove-label": "Remove all from favorites",
@@ -298,7 +297,15 @@
             "removed": "The module's courses were removed from My Courses.",
             "already-added": "Every course in this module is already in My Courses.",
             "error": "Could not update favorites. Please try again."
-        }
+        },
+        "groups": "Groups",
+        "result-count": "{{count}} courses found",
+        "meta-programs_one": "program",
+        "meta-programs_other": "programs",
+        "meta-modules_one": "group",
+        "meta-modules_other": "groups",
+        "meta-courses_one": "course",
+        "meta-courses_other": "courses"
     },
     "account": {
         "menu": "User menu",
@@ -452,6 +459,6 @@
         "courses": "Browse all available courses on Burgieclan."
     },
     "curriculum-tree": {
-        "label": "Folders"
+        "label": "Curriculum"
     }
 }
