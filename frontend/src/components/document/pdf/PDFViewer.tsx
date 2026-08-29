@@ -43,9 +43,9 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
     const [pageAspect, setPageAspect] = useState<number>(1.414);
     const [baseWidth, setBaseWidth] = useState(0);
     const [availableHeight, setAvailableHeight] = useState(0);
-    const [stackHeight, setStackHeight] = useState(0);
+    const [isLoaded, setIsLoaded] = useState(false);
 
-    // Measure the available column width
+    // Measure the available column width. Uses a threshold to prevent scrollbar appearance/disappearance loops.
     useEffect(() => {
         const el = scrollRef.current;
         if (!el) return;
@@ -53,21 +53,10 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
         const observer = new ResizeObserver(([entry]) => {
             const width = Math.min(Math.floor(entry.contentRect.width), MAX_BASE_WIDTH);
             if (width > 0) {
-                setBaseWidth(width);
-            }
-        });
-        observer.observe(el);
-        return () => observer.disconnect();
-    }, []);
-
-    // Measure the unscaled height of the inner page stack
-    useEffect(() => {
-        const el = stackRef.current;
-        if (!el) return;
-
-        const observer = new ResizeObserver(([entry]) => {
-            if (entry.contentRect.height > 0) {
-                setStackHeight(entry.contentRect.height);
+                setBaseWidth((prev) => {
+                    if (prev > 0 && Math.abs(width - prev) < 20) return prev;
+                    return width;
+                });
             }
         });
         observer.observe(el);
@@ -210,6 +199,7 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
     }, [handleFitChange, handleZoomStep]);
 
     const onDocumentLoad = useCallback((pdf: PDFDocumentProxy) => {
+        setIsLoaded(true);
         pdf.getPage(1).then((page) => {
             const viewport = page.getViewport({ scale: 1 });
             if (viewport.width > 0) setPageAspect(viewport.height / viewport.width);
@@ -217,7 +207,6 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
     }, []);
 
     const sizerWidth = baseWidth > 0 ? Math.round(baseWidth * effectiveZoom) : undefined;
-    const sizerHeight = stackHeight > 0 ? Math.round(stackHeight * effectiveZoom) : undefined;
 
     return (
         <div
@@ -242,8 +231,7 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
                     ref={sizerRef}
                     className="mx-auto flex justify-center"
                     style={{
-                        width: sizerWidth ? `${sizerWidth}px` : '100%',
-                        height: sizerHeight ? `${sizerHeight}px` : undefined,
+                        width: sizerWidth && isLoaded ? `${sizerWidth}px` : '100%',
                     }}
                 >
                     {/* Inner stack is scaled via GPU transform origin-top */}
@@ -252,7 +240,7 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
                         className="flex flex-col items-center origin-top will-change-transform"
                         style={{
                             width: baseWidth > 0 ? `${baseWidth}px` : '100%',
-                            transform: `scale(${effectiveZoom})`,
+                            transform: isLoaded ? `scale(${effectiveZoom})` : 'none',
                             transformOrigin: 'top center',
                         }}
                     >
