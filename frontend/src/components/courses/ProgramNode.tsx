@@ -1,4 +1,5 @@
 import { SearchFilters } from '@/components/courses/CurriculumSearchBar';
+import { programKey, useCurriculumOpenState } from '@/components/courses/CurriculumOpenState';
 import ModuleNode from '@/components/courses/ModuleNode';
 import { ProgramLanguageProvider } from '@/components/courses/ProgramLanguageContext';
 import DownloadButton from '@/components/ui/DownloadButton';
@@ -33,7 +34,11 @@ const ProgramNode = ({
 }: ProgramNodeProps) => {
   const { t } = useTranslation();
   const { request, loading, error } = useApi<unknown>();
-  const [expanded, setExpanded] = useState(false);
+  // Seeded from the branches the URL says are open, so coming back from a course lands on the
+  // tree the reader left rather than on a collapsed one.
+  const openState = useCurriculumOpenState();
+  const nodeKey = programKey(initialProgram.id);
+  const [expanded, setExpanded] = useState(() => openState.isOpen(nodeKey));
   const [program, setProgram] = useState(initialProgram);
   const [loaded, setLoaded] = useState(() => Array.isArray(initialProgram.modules));
   const requestInFlight = useRef(false);
@@ -52,14 +57,22 @@ const ProgramNode = ({
   }, [initialProgram.id, loaded, request]);
 
   const toggleExpanded = () => {
-    if (expanded) {
-      setExpanded(false);
-      return;
-    }
-
-    setExpanded(true);
-    void loadProgram();
+    const next = !expanded;
+    setExpanded(next);
+    // Only a deliberate toggle is written to the URL. Search and deep links open branches on
+    // the reader's behalf; recording those too would fill the query string with state nobody
+    // chose and that the search or the link already reproduces.
+    openState.setOpen(nodeKey, next);
   };
+
+  // Whichever way the node ended up open - a click, a search, a deep link, or the branch
+  // restored from the URL - it needs its children. loadProgram is a no-op once loaded.
+  useEffect(() => {
+    if (expanded) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      void loadProgram();
+    }
+  }, [expanded, loadProgram]);
 
   // Get search query
   const searchQuery = searchFilters?.query?.toLowerCase();
@@ -77,9 +90,8 @@ const ProgramNode = ({
     if (autoExpand && hasChildMatches) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setExpanded(true);
-      void loadProgram();
     }
-  }, [autoExpand, hasChildMatches, loadProgram]);
+  }, [autoExpand, hasChildMatches]);
 
   // A deep link names this program, either as its destination or as the way down to a module.
   const onFocusPath = focus?.programId === program.id;
@@ -89,9 +101,8 @@ const ProgramNode = ({
     if (onFocusPath) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setExpanded(true);
-      void loadProgram();
     }
-  }, [onFocusPath, loadProgram]);
+  }, [onFocusPath]);
 
   // Once only: re-scrolling on every render would fight the reader for the viewport.
   const headerRef = useRef<HTMLDivElement>(null);
