@@ -1,6 +1,6 @@
 'use client';
 
-import Loading from '@/app/[locale]/loading';
+import Loading from '@/components/loading/LoadingPage';
 import CoursePlacement from "@/components/curriculum/CoursePlacement";
 import { usePublishCurriculumLocation } from "@/components/curriculum/CurriculumLocationContext";
 import CommentCategories from "@/components/coursepage/comment/CommentCategories";
@@ -13,7 +13,7 @@ import PageHead from "@/components/ui/PageHead";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import { useUser } from '@/components/UserContext';
-import { useApi } from "@/hooks/useApi";
+import { readPreloadedApi, useApi } from "@/hooks/useApi";
 import { Course, CourseComment } from "@/types/entities";
 import { convertToCourse } from "@/utils/convertToEntity";
 import { ChartPie, Link as LinkIcon } from "lucide-react";
@@ -25,14 +25,20 @@ import { localizedCourseName } from '@/utils/courseName';
 
 export default function CoursePage() {
     const { id: courseId } = useParams();
-    const [course, setCourse] = useState<Course | null>(null);
+    const endpoint = `/api/courses/${courseId}`;
+    const [course, setCourse] = useState<Course | null>(() => {
+        const preloaded = readPreloadedApi(endpoint);
+        return preloaded ? convertToCourse(preloaded) : null;
+    });
     const { loading: userLoading } = useUser();
     const { t, i18n } = useTranslation();
     const { request, loading, error } = useApi();
 
     useEffect(() => {
+        if (course?.id === Number(courseId)) return;
+
         async function getCourse() {
-            const courseData = await request('GET', `/api/courses/${courseId}`);
+            const courseData = await request('GET', endpoint);
 
             if (!courseData) {
                 return null;
@@ -46,7 +52,7 @@ export default function CoursePage() {
         if (!userLoading) {
             getCourse();
         }
-    }, [courseId, userLoading, request]);
+    }, [course?.id, courseId, endpoint, userLoading, request]);
 
     // Feeds the folder tree and the breadcrumb in the layout, which cannot read this route.
     usePublishCurriculumLocation({ course: course ?? undefined });

@@ -14,7 +14,7 @@ import PageHead from "@/components/ui/PageHead";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import { useUser } from "@/components/UserContext";
 import { logDocumentView } from "@/hooks/logDocumentView";
-import { useApi } from "@/hooks/useApi";
+import { readPreloadedApi, useApi } from "@/hooks/useApi";
 import type { Document } from "@/types/entities";
 import { convertToDocument } from "@/utils/convertToEntity";
 import { formatFileSize } from "@/utils/fileSize";
@@ -28,8 +28,13 @@ import { useTranslation } from "react-i18next";
 const PDFViewer = dynamic(() => import("@/components/document/pdf/PDFViewer"), { ssr: false });
 
 export default function DocumentPreview({ id }: { id: string }) {
-
-    const [document, setDocument] = useState<Document | null>(null);
+    const { t, i18n } = useTranslation();
+    const currentLocale = i18n.language;
+    const endpoint = `/api/documents/${id}?lang=${currentLocale}`;
+    const [document, setDocument] = useState<Document | null>(() => {
+        const preloaded = readPreloadedApi(endpoint);
+        return preloaded ? convertToDocument(preloaded) : null;
+    });
 
     // Used to scale pdf width to fit its parent container
     const [containerWidth, setContainerWidth] = useState<number>(0);
@@ -37,14 +42,13 @@ export default function DocumentPreview({ id }: { id: string }) {
 
     const { user } = useUser();
     const { request, loading, error } = useApi();
-    const { t } = useTranslation();
-    const { i18n } = useTranslation();
-    const currentLocale = i18n.language;
     const MAXWIDTH = 1000;
 
     useEffect(() => {
+        if (document?.id === Number(id)) return;
+
         const fetchDocumentData = async () => {
-            const documentData = await request('GET', `/api/documents/${id}?lang=${currentLocale}`);
+            const documentData = await request('GET', endpoint);
             if (!documentData) {
                 return null;
             }
@@ -52,7 +56,7 @@ export default function DocumentPreview({ id }: { id: string }) {
         };
 
         fetchDocumentData();
-    }, [id, request, currentLocale]);
+    }, [document?.id, endpoint, id, request]);
 
     useEffect(() => {
         logDocumentView(id);

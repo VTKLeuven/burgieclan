@@ -2,14 +2,14 @@
 
 import { useCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
-import { HydraCollection, useApi } from '@/hooks/useApi';
+import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
+import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import { useSiblingDocuments } from '@/hooks/useSiblingDocuments';
 import type { Course, DocumentCategory, Module, Program } from '@/types/entities';
 import { convertToDocumentCategory, convertToModule, convertToProgram } from '@/utils/convertToEntity';
 import { localizedCourseName } from '@/utils/courseName';
 import { treeProgramName } from '@/utils/curriculumLabels';
 import { ChevronRight, File, FileText, Folder, GraduationCap, LoaderCircle } from 'lucide-react';
-import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -42,7 +42,11 @@ export default function CurriculumTree() {
     const { request } = useApi<unknown>();
     const { program, module, course, category, document, activePath } = useCurriculumLocation();
 
-    const [programs, setPrograms] = useState<Program[]>([]);
+    const programsEndpoint = '/api/programs?pagination=false&order[name]=asc';
+    const [programs, setPrograms] = useState<Program[]>(() => {
+        const preloaded = readPreloadedApi(programsEndpoint) as HydraCollection<unknown> | undefined;
+        return preloaded?.['hydra:member'].map(convertToProgram) ?? [];
+    });
     const [programChildren, setProgramChildren] = useState<Record<number, Module[]>>({});
     const [moduleChildren, setModuleChildren] = useState<Record<number, ModuleChildren>>({});
     const [loadingKeys, setLoadingKeys] = useState<Set<NodeKey>>(new Set());
@@ -50,10 +54,12 @@ export default function CurriculumTree() {
     const inFlight = useRef<Set<NodeKey>>(new Set());
 
     useEffect(() => {
+        if (programs.length > 0) return;
+
         let cancelled = false;
 
         void (async () => {
-            const result = await request('GET', '/api/programs?pagination=false&order[name]=asc') as HydraCollection<unknown> | null;
+            const result = await request('GET', programsEndpoint) as HydraCollection<unknown> | null;
             if (cancelled) return;
 
             const members = result?.['hydra:member'];
@@ -61,7 +67,7 @@ export default function CurriculumTree() {
         })();
 
         return () => { cancelled = true; };
-    }, [request]);
+    }, [programs.length, programsEndpoint, request]);
 
     const markLoading = useCallback((key: NodeKey, loading: boolean) => {
         setLoadingKeys((previous) => {
@@ -191,6 +197,7 @@ export default function CurriculumTree() {
                 <TreeRow
                     label={node.name ?? ''}
                     href={curriculumHref.module(node)}
+                    apiEndpoints={`/api/modules/${node.id}`}
                     depth={depth}
                     icon={Folder}
                     open={isOpen}
@@ -222,6 +229,7 @@ export default function CurriculumTree() {
                 <TreeRow
                     label={localizedCourseName(node, i18n.language) ?? node.code ?? ''}
                     href={curriculumHref.course(node)}
+                    apiEndpoints={`/api/courses/${node.id}`}
                     depth={depth}
                     icon={FileText}
                     open={isOpen}
@@ -238,6 +246,10 @@ export default function CurriculumTree() {
                             <TreeRow
                                 label={item.name ?? ''}
                                 href={`/course/${node.id}/documents/category/${item.id}`}
+                                apiEndpoints={[
+                                    `/api/courses/${node.id}?summary=true`,
+                                    `/api/document_categories/${item.id}?lang=${i18n.language}`,
+                                ]}
                                 depth={depth + 1}
                                 icon={Folder}
                                 open={isCurrentCategory}
@@ -249,6 +261,7 @@ export default function CurriculumTree() {
                                     key={`d${file.id}`}
                                     label={file.name ?? file.filename ?? ''}
                                     href={`/document/${file.id}`}
+                                    apiEndpoints={`/api/documents/${file.id}?lang=${i18n.language}`}
                                     depth={depth + 2}
                                     icon={File}
                                     active={activeKey === `d${file.id}`}
@@ -274,6 +287,7 @@ export default function CurriculumTree() {
                             label={treeProgramName(node.name)}
                             title={node.name}
                             href={curriculumHref.program(node)}
+                            apiEndpoints={`/api/programs/${node.id}`}
                             depth={0}
                             icon={GraduationCap}
                             open={isOpen}
@@ -298,6 +312,7 @@ interface TreeRowProps {
     label: string;
     title?: string;
     href: string;
+    apiEndpoints?: string | string[];
     depth: number;
     icon: typeof Folder;
     open?: boolean;
@@ -316,7 +331,7 @@ interface TreeRowProps {
  * the other.
  */
 function TreeRow({
-    label, title, href, depth, icon: Icon, open = false,
+    label, title, href, apiEndpoints, depth, icon: Icon, open = false,
     expandable = false, active = false, loading = false, badge, onToggle,
 }: TreeRowProps) {
     const { t } = useTranslation();
@@ -356,8 +371,9 @@ function TreeRow({
                 <span className="h-8 w-8 shrink-0" aria-hidden="true" />
             )}
 
-            <Link
+            <ApiPrefetchLink
                 href={href}
+                apiEndpoints={apiEndpoints}
                 title={title ?? label}
                 aria-current={active ? 'page' : undefined}
                 className="flex min-w-0 self-stretch flex-1 items-center gap-1.5 pr-1 rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
@@ -369,7 +385,7 @@ function TreeRow({
                 {badge !== undefined && badge > 0 && (
                     <span className="shrink-0 text-[11px] tabular-nums text-vtk-muted">{badge}</span>
                 )}
-            </Link>
+            </ApiPrefetchLink>
         </div>
     );
 }

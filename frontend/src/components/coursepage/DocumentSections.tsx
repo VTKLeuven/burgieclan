@@ -1,9 +1,9 @@
 'use client'
-import Loading from '@/app/[locale]/loading';
+import Loading from '@/components/loading/LoadingPage';
 import DocumentCategoryPage from "@/components/coursepage/DocumentCategory";
 import CreateDocumentButton from '@/components/ui/CreateDocumentButton';
 import DownloadButton from "@/components/ui/DownloadButton";
-import { HydraCollection, useApi } from "@/hooks/useApi";
+import { HydraCollection, readPreloadedApi, useApi } from "@/hooks/useApi";
 import type { DocumentCategory } from "@/types/entities";
 import { convertToDocumentCategory } from "@/utils/convertToEntity";
 import { useEffect, useState } from "react";
@@ -15,17 +15,22 @@ interface DocumentSectionsProps {
 }
 
 export default function DocumentSections({ courseId, documentCounts }: DocumentSectionsProps) {
-    const [documentCategories, setDocumentCategories] = useState<DocumentCategory[]>([]);
-    const [showEmpty, setShowEmpty] = useState(false);
     const { t, i18n } = useTranslation();
+    const categoriesEndpoint = `/api/document_categories?lang=${i18n.language}`;
+    const [documentCategories, setDocumentCategories] = useState<DocumentCategory[]>(() => {
+        const preloaded = readPreloadedApi(categoriesEndpoint) as HydraCollection<unknown> | undefined;
+        return preloaded?.['hydra:member'].map(convertToDocumentCategory) ?? [];
+    });
+    const [showEmpty, setShowEmpty] = useState(false);
     const { request, loading } = useApi<HydraCollection<unknown>>();
 
     const countFor = (category: DocumentCategory) => documentCounts?.[category.id] ?? 0;
 
     useEffect(() => {
+        if (documentCategories.length > 0) return;
+
         async function fetchDocumentCategories() {
-            const lang = i18n.language;
-            const result = await request('GET', `/api/document_categories?lang=${lang}`);
+            const result = await request('GET', categoriesEndpoint);
             if (!result) {
                 return null;
             }
@@ -33,7 +38,7 @@ export default function DocumentSections({ courseId, documentCounts }: DocumentS
         }
 
         fetchDocumentCategories();
-    }, [request, i18n.language]);
+    }, [categoriesEndpoint, documentCategories.length, request]);
 
     // The counts exclude documents still under review, so a category holding nothing but
     // pending uploads reads as empty here. That is why hiding is reversible rather than
@@ -80,6 +85,10 @@ export default function DocumentSections({ courseId, documentCounts }: DocumentS
                             key={category.id}
                             title={category.name ?? ''}
                             href={`/course/${courseId}/documents/category/${category.id}`}
+                            apiEndpoints={[
+                                `/api/courses/${courseId}?summary=true`,
+                                `/api/document_categories/${category.id}?lang=${i18n.language}`,
+                            ]}
                             count={countFor(category)}
                         />
                     ))}

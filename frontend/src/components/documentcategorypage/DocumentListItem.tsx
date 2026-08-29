@@ -2,11 +2,11 @@ import Badge from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/Checkbox';
 import DownloadButton from '@/components/ui/DownloadButton';
 import FavoriteButton from '@/components/ui/FavoriteButton';
+import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import VoteButton from '@/components/ui/buttons/VoteButton';
 import type { Document } from '@/types/entities';
 import { inlineUrl, previewKindFor } from '@/utils/previewableFile';
 import { ExternalLink, Tag as TagIcon } from 'lucide-react';
-import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
 interface DocumentListItemProps {
@@ -16,7 +16,7 @@ interface DocumentListItemProps {
 }
 
 const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelected, onToggleSelect }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const uploader = document.anonymous
         ? t('course-page.documents.anonymous')
@@ -46,12 +46,13 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
             />
 
             <div className="min-w-0 flex-1 basis-[min(100%,16rem)]">
-                <Link
+                <ApiPrefetchLink
                     href={`/document/${document.id}`}
+                    apiEndpoints={`/api/documents/${document.id}?lang=${i18n.language}`}
                     className="block truncate text-[15px] font-semibold tracking-tight text-vtk-ink hover:underline"
                 >
                     {document.name}
-                </Link>
+                </ApiPrefetchLink>
                 {/* Display tags if they exist */}
                 {document.tags && document.tags.length > 0 && (
                     <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-vtk-muted">

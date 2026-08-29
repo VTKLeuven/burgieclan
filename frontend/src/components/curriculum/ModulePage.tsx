@@ -1,6 +1,6 @@
 'use client';
 
-import Loading from '@/app/[locale]/loading';
+import Loading from '@/components/loading/LoadingPage';
 import { ProgramLanguageProvider } from '@/components/courses/ProgramLanguageContext';
 import CurriculumLevel from '@/components/curriculum/CurriculumLevel';
 import { usePublishCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
@@ -9,7 +9,7 @@ import DownloadButton from '@/components/ui/DownloadButton';
 import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import PageHead from '@/components/ui/PageHead';
-import { useApi } from '@/hooks/useApi';
+import { readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { Module } from '@/types/entities';
 import { convertToModule } from '@/utils/convertToEntity';
 import { Folder } from 'lucide-react';
@@ -19,19 +19,25 @@ import { useTranslation } from 'react-i18next';
 export default function ModulePage({ id }: { id: number }) {
     const { t } = useTranslation();
     const { request, loading, error } = useApi<unknown>();
-    const [module, setModule] = useState<Module | null>(null);
+    const endpoint = `/api/modules/${id}`;
+    const [module, setModule] = useState<Module | null>(() => {
+        const preloaded = readPreloadedApi(endpoint);
+        return preloaded ? convertToModule(preloaded) : null;
+    });
 
     useEffect(() => {
+        if (module?.id === id) return;
+
         let cancelled = false;
 
         void (async () => {
-            const data = await request('GET', `/api/modules/${id}`);
+            const data = await request('GET', endpoint);
             if (cancelled || !data) return;
             setModule(convertToModule(data));
         })();
 
         return () => { cancelled = true; };
-    }, [id, request]);
+    }, [endpoint, id, module?.id, request]);
 
     usePublishCurriculumLocation({ module: module ?? undefined });
 
