@@ -1,4 +1,4 @@
-import Loading from '@/app/[locale]/loading';
+import Loading from '@/components/loading/LoadingPage';
 import { Activity } from '@/components/homepage/recent/Activity';
 import { HydraCollection, useApi } from '@/hooks/useApi';
 import type { DocumentView } from '@/types/entities';

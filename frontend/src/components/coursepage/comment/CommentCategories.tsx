@@ -1,4 +1,4 @@
-import Loading from '@/app/[locale]/loading';
+import Loading from '@/components/loading/LoadingPage';
 import CourseCommentList from '@/components/coursepage/comment/CourseCommentList';
 import { HydraCollection, useApi } from '@/hooks/useApi';
 import { CommentCategory, CourseComment, CourseRatingSummary, SectionRating } from '@/types/entities';
