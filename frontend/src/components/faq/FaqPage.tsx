@@ -3,26 +3,32 @@
 import FaqAccordion from '@/components/faq/FaqAccordion';
 import FaqQuestionForm from '@/components/faq/FaqQuestionForm';
 import PageHead from '@/components/ui/PageHead';
-import { HydraCollection, useApi } from '@/hooks/useApi';
+import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import { FaqItem } from '@/types/entities';
 import { convertToFaqItem } from '@/utils/convertToEntity';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function FaqPage() {
-    const { request, loading } = useApi<HydraCollection<unknown>>();
-    const [faqItems, setFaqItems] = useState<FaqItem[]>([]);
     const { t, i18n } = useTranslation();
     const currentLocale = i18n.language;
+    const params = new URLSearchParams({
+        'published': 'true',
+        'pagination': 'false',
+        'lang': currentLocale,
+    });
+    const endpoint = `/api/faq_items?${params.toString()}`;
+    const [faqItems, setFaqItems] = useState<FaqItem[]>(() => {
+        const preloaded = readPreloadedApi(endpoint) as HydraCollection<unknown> | undefined;
+        return preloaded?.['hydra:member']?.map(convertToFaqItem) || [];
+    });
+    const { request, loading } = useApi<HydraCollection<unknown>>();
 
     useEffect(() => {
+        if (faqItems.length > 0) return;
+
         const fetchFaqItems = async () => {
-            const params = new URLSearchParams({
-                'published': 'true',
-                'pagination': 'false',
-                'lang': currentLocale,
-            });
-            const response = await request('GET', `/api/faq_items?${params.toString()}`);
+            const response = await request('GET', endpoint);
 
             if (!response) {
                 return;
@@ -33,7 +39,7 @@ export default function FaqPage() {
         };
 
         fetchFaqItems();
-    }, [currentLocale, request]);
+    }, [endpoint, faqItems.length, request]);
 
     return (
         <main className="vtk-shell pb-10">

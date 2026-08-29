@@ -35,7 +35,10 @@ export default function DocumentSiblingNav({ document }: { document: Document })
             {previous ? (
                 <ApiPrefetchLink
                     href={`/document/${previous.id}`}
-                    apiEndpoints={`/api/documents/${previous.id}?lang=${i18n.language}`}
+                    apiEndpoints={[
+                        `/api/documents/${previous.id}?lang=${i18n.language}`,
+                        `/api/document_comments?document=/api/documents/${previous.id}`,
+                    ]}
                     className={arrow}
                     title={previous.name ?? t('document.siblings.previous')}
                     aria-label={t('document.siblings.previous')}
@@ -55,7 +58,10 @@ export default function DocumentSiblingNav({ document }: { document: Document })
             {next ? (
                 <ApiPrefetchLink
                     href={`/document/${next.id}`}
-                    apiEndpoints={`/api/documents/${next.id}?lang=${i18n.language}`}
+                    apiEndpoints={[
+                        `/api/documents/${next.id}?lang=${i18n.language}`,
+                        `/api/document_comments?document=/api/documents/${next.id}`,
+                    ]}
                     className={arrow}
                     title={next.name ?? t('document.siblings.next')}
                     aria-label={t('document.siblings.next')}

@@ -1,29 +1,40 @@
 import Announcement from '@/components/announcement/Announcement';
 import ErrorPage from '@/components/error/ErrorPage';
-import { HydraCollection, useApi } from '@/hooks/useApi';
+import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import { Announcement as AnnouncementEntity } from '@/types/entities';
 import { convertToAnnouncement } from '@/utils/convertToEntity';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+const getAnnouncementEndpoint = (locale: string) => {
+    const now = new Date();
+    // Bucket to 5-minute intervals so requests are deduplicated and cacheable
+    now.setSeconds(0, 0);
+    now.setMinutes(Math.floor(now.getMinutes() / 5) * 5);
+    const formattedNow = now.toLocaleString("sv-SE", { timeZone: "Europe/Brussels" }).replace("T", " ");
+    const params = new URLSearchParams({
+        "startTime[strictly_before]": formattedNow,
+        "endTime[after]": formattedNow,
+        "lang": locale
+    });
+    return `/api/announcements?${params.toString()}`;
+};
+
 export default function AnnouncementSlideShow() {
-    const { request, loading, error } = useApi<HydraCollection<unknown>>();
-    const [announcements, setAnnouncements] = useState<AnnouncementEntity[]>([]);
-    const [currentIndex, setCurrentIndex] = useState(0);
     const { i18n } = useTranslation();
     const currentLocale = i18n.language;
+    const endpoint = getAnnouncementEndpoint(currentLocale);
+    const [announcements, setAnnouncements] = useState<AnnouncementEntity[]>(() => {
+        const preloaded = readPreloadedApi(endpoint) as HydraCollection<unknown> | undefined;
+        return preloaded?.['hydra:member']?.map(convertToAnnouncement) || [];
+    });
+    const { request, loading, error } = useApi<HydraCollection<unknown>>();
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
         const fetchAnnouncements = async () => {
-            const now = new Date();
-            const formattedNow = now.toLocaleString("sv-SE", { timeZone: "Europe/Brussels" }).replace("T", " ");
-            const params = new URLSearchParams({
-                "startTime[strictly_before]": formattedNow,
-                "endTime[after]": formattedNow,
-                "lang": currentLocale
-            });
-            const response = await request('GET', `/api/announcements?${params.toString()}`);
+            const response = await request('GET', endpoint);
 
             if (!response) {
                 return;
@@ -34,7 +45,7 @@ export default function AnnouncementSlideShow() {
         };
 
         fetchAnnouncements();
-    }, [currentLocale, request]);
+    }, [endpoint, request]);
 
     useEffect(() => {
         const interval = setInterval(() => {

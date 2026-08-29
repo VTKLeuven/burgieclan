@@ -137,7 +137,12 @@ export const CourseRow = memo(({
                 ) : (
                     <ApiPrefetchLink
                         href={`/course/${course.id}`}
-                        apiEndpoints={`/api/courses/${course.id}`}
+                        apiEndpoints={[
+                            `/api/courses/${course.id}`,
+                            `/api/document_categories?lang=${i18n.language}`,
+                            `/api/comment_categories?lang=${i18n.language}`,
+                            `/api/courses/${course.id}/ratings`,
+                        ]}
                         // The branch the reader walked, so the course page's breadcrumb and
                         // folder tree name the programme they actually came from rather than
                         // whichever one the course happens to be listed under first.

@@ -1,6 +1,6 @@
 import Loading from '@/components/loading/LoadingPage';
 import CourseCommentList from '@/components/coursepage/comment/CourseCommentList';
-import { HydraCollection, useApi } from '@/hooks/useApi';
+import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import { CommentCategory, CourseComment, CourseRatingSummary, SectionRating } from '@/types/entities';
 import { convertToCommentCategory, convertToCourseRatingSummary } from '@/utils/convertToEntity';
 import { useCallback, useMemo, useState, useEffect } from 'react';
@@ -13,19 +13,28 @@ type CommentCategoriesProps = {
 };
 
 const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCategoriesProps) => {
-    const [allCategories, setAllCategories] = useState<CommentCategory[]>([]);
-    const [ratings, setRatings] = useState<CourseRatingSummary | null>(null);
-
     const { t, i18n } = useTranslation();
+    const lang = i18n.language;
+    const categoriesEndpoint = `/api/comment_categories?lang=${lang}`;
+    const ratingsEndpoint = `/api/courses/${courseId}/ratings`;
+
+    const [allCategories, setAllCategories] = useState<CommentCategory[]>(() => {
+        const preloaded = readPreloadedApi(categoriesEndpoint) as HydraCollection<unknown> | undefined;
+        return preloaded?.['hydra:member'] ? preloaded['hydra:member'].map(convertToCommentCategory) : [];
+    });
+    const [ratings, setRatings] = useState<CourseRatingSummary | null>(() => {
+        const preloaded = readPreloadedApi(ratingsEndpoint);
+        return preloaded ? convertToCourseRatingSummary(preloaded) : null;
+    });
+
     const { request, loading } = useApi<HydraCollection<unknown>>();
-
-
 
     // Fetch all categories from backend
     useEffect(() => {
+        if (allCategories.length > 0) return;
+
         const fetchCategories = async () => {
-            const lang = i18n.language;
-            const data = await request('GET', `/api/comment_categories?lang=${lang}`);
+            const data = await request('GET', categoriesEndpoint);
 
             if (!data) {
                 return null;
@@ -34,13 +43,13 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
         };
 
         fetchCategories();
-    }, [request, i18n.language]);
+    }, [allCategories.length, categoriesEndpoint, request]);
 
     // One request for every rated section on the course. Fetching per section would be a round
     // trip each, and the endpoint is built to answer them together for exactly that reason.
     useEffect(() => {
         const fetchRatings = async () => {
-            const data = await request('GET', `/api/courses/${courseId}/ratings`);
+            const data = await request('GET', ratingsEndpoint);
             if (!data) {
                 return;
             }
@@ -48,7 +57,7 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
         };
 
         fetchRatings();
-    }, [request, courseId]);
+    }, [ratingsEndpoint, request]);
 
     const ratingFor = useCallback(
         (categoryId: number): SectionRating | undefined =>
@@ -82,7 +91,7 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
         }
     }, [comments, onCommentsUpdate]);
 
-    if (loading) {
+    if (loading && allCategories.length === 0) {
         return (
             <div className="flex justify-center py-4">
                 <Loading />

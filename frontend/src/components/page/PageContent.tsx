@@ -3,7 +3,7 @@
 import Loading from "@/components/loading/LoadingPage";
 import ErrorPage from "@/components/error/ErrorPage";
 import PageHead from "@/components/ui/PageHead";
-import { useApi } from "@/hooks/useApi";
+import { readPreloadedApi, useApi } from "@/hooks/useApi";
 import { type Page } from "@/types/entities";
 import { convertToPage } from "@/utils/convertToEntity";
 import { useEffect, useState } from "react";
@@ -14,14 +14,20 @@ interface PageContentProps {
 }
 
 export default function PageContent({ url_key }: PageContentProps) {
-    const { request, loading, error } = useApi();
-    const [page, setPage] = useState<Page | null>(null);
     const { i18n } = useTranslation();
     const currentLocale = i18n.language;
+    const endpoint = `/api/pages/${url_key}?lang=${currentLocale}`;
+    const [page, setPage] = useState<Page | null>(() => {
+        const preloaded = readPreloadedApi(endpoint);
+        return preloaded ? convertToPage(preloaded) : null;
+    });
+    const { request, loading, error } = useApi();
 
     useEffect(() => {
+        if (page) return;
+
         const fetchPage = async () => {
-            const response = await request('GET', `/api/pages/${url_key}?lang=${currentLocale}`);
+            const response = await request('GET', endpoint);
 
             if (!response) {
                 return null;
@@ -31,7 +37,7 @@ export default function PageContent({ url_key }: PageContentProps) {
         };
 
         fetchPage();
-    }, [currentLocale, url_key, request]);
+    }, [endpoint, page, request]);
 
     useEffect(() => {
         if (page?.name) {

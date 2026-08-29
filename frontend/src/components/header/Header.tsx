@@ -56,7 +56,7 @@ export default function Header() {
         <header className="sticky top-0 z-50 border-b border-white/10 bg-vtk-navy text-vtk-paper antialiased">
             <nav
                 aria-label="Global"
-                className="mx-auto flex min-h-[72px] max-w-(--max) items-center gap-x-4 px-5 sm:px-9 md:gap-x-8"
+                className="flex min-h-[72px] w-full items-center gap-x-4 px-4 sm:px-6 md:gap-x-8"
             >
                 {/* Brand */}
                 <Link href={`/${i18n.language}`} className="flex shrink-0 items-center gap-4">

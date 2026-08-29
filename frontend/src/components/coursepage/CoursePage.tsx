@@ -12,7 +12,6 @@ import DynamicBreadcrumb from "@/components/ui/DynamicBreadcrumb";
 import PageHead from "@/components/ui/PageHead";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
-import { useUser } from '@/components/UserContext';
 import { readPreloadedApi, useApi } from "@/hooks/useApi";
 import { Course, CourseComment } from "@/types/entities";
 import { convertToCourse } from "@/utils/convertToEntity";
@@ -30,29 +29,29 @@ export default function CoursePage() {
         const preloaded = readPreloadedApi(endpoint);
         return preloaded ? convertToCourse(preloaded) : null;
     });
-    const { loading: userLoading } = useUser();
     const { t, i18n } = useTranslation();
     const { request, loading, error } = useApi();
 
     useEffect(() => {
         if (course?.id === Number(courseId)) return;
 
+        let cancelled = false;
+
         async function getCourse() {
             const courseData = await request('GET', endpoint);
 
-            if (!courseData) {
+            if (cancelled || !courseData) {
                 return null;
             }
 
-            const course = convertToCourse(courseData);
-            setCourse(course);
+            const fullCourse = convertToCourse(courseData);
+            setCourse(fullCourse);
         }
 
-        // Only fetch the course when user data is loaded
-        if (!userLoading) {
-            getCourse();
-        }
-    }, [course?.id, courseId, endpoint, userLoading, request]);
+        getCourse();
+
+        return () => { cancelled = true; };
+    }, [course?.id, courseId, endpoint, request]);
 
     // Feeds the folder tree and the breadcrumb in the layout, which cannot read this route.
     usePublishCurriculumLocation({ course: course ?? undefined });
@@ -74,17 +73,17 @@ export default function CoursePage() {
         }
     };
 
-    // Show loading state
-    if (!courseId || loading) {
+    if (error) {
+        return <ErrorPage status={error.status} detail={error.message} />;
+    }
+
+    // Show loading state only if we don't have course data yet
+    if (!courseId || !course || (loading && !course)) {
         return (
             <div className="flex items-center justify-center h-full w-full">
                 <Loading />
             </div>
         );
-    }
-
-    if (error) {
-        return <ErrorPage status={error.status} detail={error.message} />;
     }
 
     return (course &&

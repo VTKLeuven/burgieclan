@@ -48,7 +48,10 @@ export default function RelatedCourses({ course }: RelatedCoursesProps) {
                         <ApiPrefetchLink
                             key={related.id}
                             href={`/course/${related.id}`}
-                            apiEndpoints={`/api/courses/${related.id}`}
+                            apiEndpoints={[
+                                `/api/courses/${related.id}`,
+                                `/api/document_categories?lang=${i18n.language}`,
+                            ]}
                             // Tailwind utilities win over the vtk-* component layer, so the
                             // hover colours override vtk-badge-muted without a custom variant
                             // (component-layer classes get no hover: variant of their own).

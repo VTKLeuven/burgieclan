@@ -27,7 +27,12 @@ export default function ApiPrefetchLink({
     const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const warm = () => {
-        if (typeof href === 'string') router.prefetch(href);
+        if (typeof href === 'string') {
+            router.prefetch(href);
+            if (href.includes('/document/')) {
+                void import('@/components/document/pdf/PDFViewer');
+            }
+        }
 
         const endpoints = Array.isArray(apiEndpoints) ? apiEndpoints : [apiEndpoints];
         endpoints.forEach((endpoint) => {
@@ -36,7 +41,7 @@ export default function ApiPrefetchLink({
     };
 
     const handleMouseEnter = (event: MouseEvent<HTMLAnchorElement>) => {
-        hoverTimer.current = setTimeout(warm, 80);
+        hoverTimer.current = setTimeout(warm, 25);
         onMouseEnter?.(event);
     };
 
@@ -44,6 +49,12 @@ export default function ApiPrefetchLink({
         if (hoverTimer.current) clearTimeout(hoverTimer.current);
         hoverTimer.current = null;
         onMouseLeave?.(event);
+    };
+
+    const handleMouseDown = (event: MouseEvent<HTMLAnchorElement>) => {
+        if (hoverTimer.current) clearTimeout(hoverTimer.current);
+        warm();
+        props.onMouseDown?.(event);
     };
 
     const handleFocus = (event: FocusEvent<HTMLAnchorElement>) => {
@@ -68,6 +79,7 @@ export default function ApiPrefetchLink({
             href={href}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            onMouseDown={handleMouseDown}
             onFocus={handleFocus}
             onTouchStart={handleTouchStart}
         />

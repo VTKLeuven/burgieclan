@@ -3,12 +3,13 @@
 import { useCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
+import { useUser } from '@/components/UserContext';
 import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import { useSiblingDocuments } from '@/hooks/useSiblingDocuments';
 import type { Course, DocumentCategory, Module, Program } from '@/types/entities';
 import { convertToDocumentCategory, convertToModule, convertToProgram } from '@/utils/convertToEntity';
 import { localizedCourseName } from '@/utils/courseName';
-import { treeProgramName } from '@/utils/curriculumLabels';
+import { shortProgramName } from '@/utils/curriculumLabels';
 import { ChevronRight, File, FileText, Folder, GraduationCap, LoaderCircle } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,6 +40,7 @@ interface ModuleChildren {
  */
 export default function CurriculumTree() {
     const { t, i18n } = useTranslation();
+    const { user } = useUser();
     const { request } = useApi<unknown>();
     const { program, module, course, category, document, activePath } = useCurriculumLocation();
 
@@ -52,6 +54,15 @@ export default function CurriculumTree() {
     const [loadingKeys, setLoadingKeys] = useState<Set<NodeKey>>(new Set());
     const [expanded, setExpanded] = useState<Set<NodeKey>>(new Set());
     const inFlight = useRef<Set<NodeKey>>(new Set());
+
+    // The endpoint is already alphabetic. A stable favourite-first sort pins the reader's own
+    // programmes without disturbing the useful alphabetical order inside either group.
+    const orderedPrograms = useMemo(() => {
+        const favoriteIds = new Set(user?.favoritePrograms?.map((item) => item.id) ?? []);
+        return [...programs].sort((left, right) =>
+            Number(favoriteIds.has(right.id)) - Number(favoriteIds.has(left.id))
+        );
+    }, [programs, user?.favoritePrograms]);
 
     useEffect(() => {
         if (programs.length > 0) return;
@@ -229,7 +240,10 @@ export default function CurriculumTree() {
                 <TreeRow
                     label={localizedCourseName(node, i18n.language) ?? node.code ?? ''}
                     href={curriculumHref.course(node)}
-                    apiEndpoints={`/api/courses/${node.id}`}
+                    apiEndpoints={[
+                        `/api/courses/${node.id}`,
+                        `/api/document_categories?lang=${i18n.language}`,
+                    ]}
                     depth={depth}
                     icon={FileText}
                     open={isOpen}
@@ -261,7 +275,10 @@ export default function CurriculumTree() {
                                     key={`d${file.id}`}
                                     label={file.name ?? file.filename ?? ''}
                                     href={`/document/${file.id}`}
-                                    apiEndpoints={`/api/documents/${file.id}?lang=${i18n.language}`}
+                                    apiEndpoints={[
+                                        `/api/documents/${file.id}?lang=${i18n.language}`,
+                                        `/api/document_comments?document=/api/documents/${file.id}`,
+                                    ]}
                                     depth={depth + 2}
                                     icon={File}
                                     active={activeKey === `d${file.id}`}
@@ -276,7 +293,7 @@ export default function CurriculumTree() {
 
     return (
         <nav aria-label={t('curriculum-tree.label')} className="flex shrink-0 flex-col">
-            {programs.map((node) => {
+            {orderedPrograms.map((node) => {
                 const key = programKey(node.id);
                 const isOpen = expanded.has(key);
                 const modules = programChildren[node.id];
@@ -284,7 +301,7 @@ export default function CurriculumTree() {
                 return (
                     <div key={key} className="shrink-0">
                         <TreeRow
-                            label={treeProgramName(node.name)}
+                            label={shortProgramName(node.name)}
                             title={node.name}
                             href={curriculumHref.program(node)}
                             apiEndpoints={`/api/programs/${node.id}`}
@@ -361,7 +378,7 @@ function TreeRow({
                     onClick={onToggle}
                     aria-expanded={open}
                     aria-label={t(open ? 'curriculum-tree.collapse' : 'curriculum-tree.expand', { name: label })}
-                    className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-vtk-muted transition-colors hover:bg-vtk-surface hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
+                    className="grid h-8 w-8 shrink-0 place-items-center rounded text-vtk-muted hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-vtk-navy"
                 >
                     {loading
                         ? <LoaderCircle size={15} className="animate-spin" />

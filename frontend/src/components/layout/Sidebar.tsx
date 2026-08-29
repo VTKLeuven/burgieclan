@@ -5,8 +5,7 @@ import ItemList from '@/components/layout/ItemList';
 import CreateDocumentButton from '@/components/ui/CreateDocumentButton';
 import { useUser } from "@/components/UserContext";
 import type { Course, Document } from "@/types/entities";
-import { ChevronDown, File, FolderTree, Home, PanelLeft, PanelLeftClose, Star } from 'lucide-react';
-import Link from 'next/link';
+import { ChevronDown, File, FolderTree, PanelLeft, PanelLeftClose, Star } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,24 +37,35 @@ const mapDocumentsToItems = (documents: Document[]) => {
  * to a fraction of its height while its rows keep painting at full size - which is exactly how
  * the folder tree ended up printed on top of the favourites list.
  *
- * Favourites start collapsed. They are a second list of courses next to a tree that already
- * lists courses, and having both open at once was the "zoveel overlap" complaint as much as the
- * layout bug was.
+ * My Courses starts open on Home, where favourites are the rail's primary navigation. It stays
+ * collapsed next to the curriculum tree so both course lists do not compete for the same space.
  */
 const NavigationSidebar = () => {
   const { user } = useUser();
   const { t, i18n } = useTranslation();
   const pathname = usePathname();
+  const pathWithoutLocale = pathname.replace(/^\/(?:en|nl)(?=\/|$)/, '') || '/';
+  const isHome = pathWithoutLocale === '/';
+  const showCurriculumNavigator = pathWithoutLocale === '/courses'
+    || pathWithoutLocale.startsWith('/courses/')
+    || pathWithoutLocale.startsWith('/course/')
+    || pathWithoutLocale.startsWith('/document/');
+  const sidebarMode = isHome ? 'home' : showCurriculumNavigator ? 'curriculum' : 'standard';
+  const defaultExpandedSections = { courses: isHome, documents: false };
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [expandedSections, setExpandedSections] = useState({
-    courses: false,
-    documents: false
-  });
+  const [expandedSectionsByMode, setExpandedSectionsByMode] = useState<Partial<Record<
+    typeof sidebarMode,
+    typeof defaultExpandedSections
+  >>>({});
+  const expandedSections = expandedSectionsByMode[sidebarMode] ?? defaultExpandedSections;
 
   const toggleSection = (section: keyof typeof expandedSections) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section]
+    setExpandedSectionsByMode((previous) => ({
+      ...previous,
+      [sidebarMode]: {
+        ...(previous[sidebarMode] ?? defaultExpandedSections),
+        [section]: !(previous[sidebarMode] ?? defaultExpandedSections)[section]
+      }
     }));
   };
 
@@ -64,12 +74,6 @@ const NavigationSidebar = () => {
 
   // Home, FAQ, account and public content keep the original favourites sidebar. The curriculum
   // tree is added only while the reader is actually browsing curriculum content.
-  const pathWithoutLocale = pathname.replace(/^\/(?:en|nl)(?=\/|$)/, '') || '/';
-  const showCurriculumNavigator = pathWithoutLocale === '/courses'
-    || pathWithoutLocale.startsWith('/courses/')
-    || pathWithoutLocale.startsWith('/course/')
-    || pathWithoutLocale.startsWith('/document/');
-
   return (
     <aside className="sticky top-[72px] hidden shrink-0 self-start md:block">
       <div
@@ -88,17 +92,8 @@ const NavigationSidebar = () => {
         </button>
 
         <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3">
-          <Link
-            href={`/${i18n.language}`}
-            className="flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm font-semibold text-vtk-ink transition-colors hover:bg-vtk-paper-2 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
-          >
-            <Home size={18} className="shrink-0" />
-            {!isCollapsed && <span>{t('sidebar.home')}</span>}
-          </Link>
-
           {!isCollapsed && showCurriculumNavigator && (
             <>
-              <div className="my-1 shrink-0 border-t border-vtk-line" />
               <div className="vtk-label shrink-0 px-2.5 pb-1 flex items-center gap-2">
                 <FolderTree size={13} aria-hidden="true" />
                 {t('curriculum-tree.label')}
@@ -109,7 +104,7 @@ const NavigationSidebar = () => {
 
           {user && !isCollapsed && (
             <>
-              <div className="my-1 shrink-0 border-t border-vtk-line" />
+              {showCurriculumNavigator && <div className="my-1 shrink-0 border-t border-vtk-line" />}
 
               <button
                 type="button"

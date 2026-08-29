@@ -48,7 +48,10 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
             <div className="min-w-0 flex-1 basis-[min(100%,16rem)]">
                 <ApiPrefetchLink
                     href={`/document/${document.id}`}
-                    apiEndpoints={`/api/documents/${document.id}?lang=${i18n.language}`}
+                    apiEndpoints={[
+                        `/api/documents/${document.id}?lang=${i18n.language}`,
+                        `/api/document_comments?document=/api/documents/${document.id}`,
+                    ]}
                     className="block truncate text-[15px] font-semibold tracking-tight text-vtk-ink hover:underline"
                 >
                     {document.name}

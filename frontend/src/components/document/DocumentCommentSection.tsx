@@ -1,6 +1,6 @@
 import AddDocumentCommentBox from "@/components/document/AddDocumentCommentBox";
 import DocumentComment from "@/components/document/DocumentComment";
-import { HydraCollection, useApi } from "@/hooks/useApi";
+import { HydraCollection, readPreloadedApi, useApi } from "@/hooks/useApi";
 import type { DocumentComment as DocumentCommentEntity } from "@/types/entities";
 import { convertToDocumentComment } from "@/utils/convertToEntity";
 import { useCallback, useEffect, useState } from "react";
@@ -12,13 +12,19 @@ interface DocumentCommentSectionProps {
 }
 
 export default function DocumentCommentSection({ documentId, file }: DocumentCommentSectionProps) {
-    const [comments, setComments] = useState<DocumentCommentEntity[]>([]);
+    const commentsEndpoint = `/api/document_comments?document=/api/documents/${documentId}`;
+    const [comments, setComments] = useState<DocumentCommentEntity[]>(() => {
+        const preloaded = readPreloadedApi(commentsEndpoint) as HydraCollection<unknown> | undefined;
+        return preloaded?.['hydra:member'] ? preloaded['hydra:member'].map(convertToDocumentComment) : [];
+    });
     const { request } = useApi<HydraCollection<unknown>>();
     const { t } = useTranslation();
 
     useEffect(() => {
+        if (comments.length > 0) return;
+
         async function getComments() {
-            const commentsData = await request('GET', `/api/document_comments?document=/api/documents/${documentId}`);
+            const commentsData = await request('GET', commentsEndpoint);
 
             if (!commentsData) {
                 return null;
@@ -28,7 +34,7 @@ export default function DocumentCommentSection({ documentId, file }: DocumentCom
         }
 
         getComments();
-    }, [documentId, request]);
+    }, [comments.length, commentsEndpoint, request]);
 
     const handleCommentAdded = useCallback((newComment: DocumentCommentEntity) => {
         setComments(prevComments => [...prevComments, newComment]);

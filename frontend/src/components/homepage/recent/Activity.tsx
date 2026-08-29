@@ -1,6 +1,7 @@
+import ApiPrefetchLink from "@/components/ui/ApiPrefetchLink";
 import { Clock } from "lucide-react";
-import Link from "next/link";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { format, register } from 'timeago.js';
 
 // Register a custom 'minimal' locale for timeago.js that displays compact time units
@@ -13,6 +14,7 @@ register('minimal', (number: number, index: number): [string, string] => {
 });
 
 interface ActivityProps {
+    documentId?: number;
     documentName: string;
     courseName: string;
     timestamp: string;
@@ -20,13 +22,24 @@ interface ActivityProps {
 }
 
 export const Activity: React.FC<ActivityProps> = ({
+    documentId,
     documentName,
     courseName,
     timestamp,
     link
 }) => {
+    const { i18n } = useTranslation();
+    const apiEndpoints = documentId ? [
+        `/api/documents/${documentId}?lang=${i18n.language}`,
+        `/api/document_comments?document=/api/documents/${documentId}`,
+    ] : undefined;
+
     return (
-        <Link className="flex items-center gap-3.5 px-5 py-2.5 transition-colors hover:bg-vtk-paper-2" href={link}>
+        <ApiPrefetchLink
+            className="flex items-center gap-3.5 px-5 py-2.5 transition-colors hover:bg-vtk-paper-2"
+            href={link}
+            apiEndpoints={apiEndpoints}
+        >
             <Clock aria-hidden="true" className="h-4 w-4 shrink-0 text-vtk-muted" />
             <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium leading-snug text-vtk-ink">
@@ -40,6 +53,6 @@ export const Activity: React.FC<ActivityProps> = ({
             <span className="shrink-0 text-xs tabular-nums text-vtk-muted">
                 {format(timestamp, 'minimal')}
             </span>
-        </Link>
-    )
-}
+        </ApiPrefetchLink>
+    );
+};

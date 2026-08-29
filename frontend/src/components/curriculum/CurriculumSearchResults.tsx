@@ -50,7 +50,10 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
                         <div className="min-w-0 flex-1">
                             <ApiPrefetchLink
                                 href={curriculumHref.course(course)}
-                                apiEndpoints={`/api/courses/${course.id}`}
+                                apiEndpoints={[
+                                    `/api/courses/${course.id}`,
+                                    `/api/document_categories?lang=${i18n.language}`,
+                                ]}
                                 onClick={() => {
                                     const leaf = modules.at(-1);
                                     if (leaf) rememberBranch(course.id, leaf.id);

@@ -99,8 +99,15 @@ test('walk the curriculum', async ({ page, context }) => {
   await settle(page);
   await expect(page.locator('aside'), 'home should keep the favourites sidebar').toBeVisible();
   await expect(page.locator('aside nav'), 'home should not render the curriculum navigator').toHaveCount(0);
-  await expect(page.locator('aside').getByRole('button', { name: /My Courses|Mijn Vakken/i })).toBeVisible();
+  await expect(page.locator('aside').getByRole('button', { name: /My Courses|Mijn Vakken/i }))
+    .toHaveAttribute('aria-expanded', 'true');
   await expect(page.locator('aside').getByRole('button', { name: /Favorite Documents|Favoriete Documenten/i })).toBeVisible();
+
+  const headerLogo = await page.locator('header nav > a').first().boundingBox();
+  const accountButton = await page.locator('header').getByRole('button', { name: /User menu|Gebruikersmenu/i }).boundingBox();
+  expect(headerLogo?.x, 'logo should sit at the left screen edge').toBeLessThanOrEqual(24);
+  expect(1500 - (accountButton?.x ?? 0) - (accountButton?.width ?? 0), 'account should sit at the right screen edge')
+    .toBeLessThanOrEqual(24);
   await capture(page, '00-home');
 
   await page.goto('/faq');
@@ -122,6 +129,9 @@ test('walk the curriculum', async ({ page, context }) => {
   );
   expect(programmeRowHeights.length).toBeGreaterThan(0);
   expect(Math.max(...programmeRowHeights), 'programme names should stay on one row').toBeLessThanOrEqual(32);
+
+  const programmeLabels = await page.locator('aside nav a[title]').allTextContents();
+  expect(programmeLabels.length).toBeGreaterThan(0);
 
   // Selecting a global-search result must stay inside the Next app. A location assignment used
   // to reload the document, rebuild the complete sidebar and throw away every warmed response.
