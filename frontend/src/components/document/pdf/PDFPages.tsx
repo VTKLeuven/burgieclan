@@ -72,8 +72,8 @@ export default function PDFPages({ file, width, pageAspect, onDocumentLoad }: PD
                 options={options}
                 className="flex flex-col items-center"
                 loading={
-                    <div className="flex h-64 items-center justify-center p-8">
-                        <LoaderCircle className="animate-spin text-vtk-navy" size={36} aria-label={t('document.loading')} />
+                    <div className="flex h-96 w-full items-center justify-center p-8">
+                        <LoaderCircle className="animate-spin text-vtk-navy" size={40} strokeWidth={2.5} aria-label={t('document.loading')} />
                     </div>
                 }
             >
