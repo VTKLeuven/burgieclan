@@ -4,7 +4,8 @@ import DownloadButton from '@/components/ui/DownloadButton';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import VoteButton from '@/components/ui/buttons/VoteButton';
 import type { Document } from '@/types/entities';
-import { Tag as TagIcon } from 'lucide-react';
+import { inlineUrl, previewKindFor } from '@/utils/previewableFile';
+import { ExternalLink, Tag as TagIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
@@ -24,6 +25,12 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
     // `author` is only ever filled in by the Seafile import, but the API does accept it on
     // create, so anonymity wins the tie rather than trusting that it stays that way.
     const showAuthor = Boolean(document.author) && !document.anonymous;
+
+    // Collection responses carry no mimetype - resolving one means touching the file - but the
+    // content URL ends in the stored filename, which is what decides previewability anyway.
+    const inlineHref = document.contentUrl && previewKindFor(document.contentUrl)
+        ? inlineUrl(document.contentUrl)
+        : null;
 
     return (
         // Wraps on narrow screens: the title row keeps the checkbox, and the
@@ -98,6 +105,20 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
             <div className="ml-auto flex shrink-0 items-center gap-1.5">
                 <VoteButton type="document" objectId={document.id} size="small" />
                 <FavoriteButton itemId={document.id} itemType="document" size={16} />
+                {/* Opening a scan to check whether it is the right one should not mean putting a
+                    file on disk first, so the browser's own viewer sits next to the download. */}
+                {inlineHref && (
+                    <a
+                        href={inlineHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="vtk-icon-button h-8 w-8"
+                        title={t('document.open-in-browser')}
+                        aria-label={t('document.open-in-browser')}
+                    >
+                        <ExternalLink size={15} />
+                    </a>
+                )}
                 <DownloadButton documents={[document]} size={15} className="h-8 w-8" />
             </div>
         </div>

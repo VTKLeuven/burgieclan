@@ -67,9 +67,10 @@ class DocumentEntityToApiMapper extends BaseEntityToApiMapper
                 MicroMapperInterface::MAX_DEPTH => 1,
             ]
         );
-        if ($context[MappingContext::INCLUDE_FILE_METADATA] ?? true) {
-            $to->contentUrl = $this->storage->resolveUri($from, 'file');
-        }
+        // Always resolved, unlike the size and MIME type the provider fills in: this is a
+        // string built from the stored filename, with no filesystem access behind it, and a
+        // document row needs it to offer "open in the browser" next to its download button.
+        $to->contentUrl = $this->storage->resolveUri($from, 'file');
         $to->tags = array_map(
             function (Tag $tag) {
                 return $this->microMapper->map(
