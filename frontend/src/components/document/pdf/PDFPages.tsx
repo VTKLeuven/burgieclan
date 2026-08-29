@@ -80,7 +80,8 @@ export default function PDFPages({ file, width, onDocumentLoad }: PDFPagesProps)
                         key={`page_${index + 1}`}
                         pageNumber={index + 1}
                         width={width}
-                        className="my-4 shadow-md shadow-black/50"
+                        className="my-4 shadow-md shadow-black/50 bg-white"
+                        canvasBackground="white"
                         loading={null}
                     />
                 ))}
