@@ -79,11 +79,26 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
         effectiveZoomRef.current = effectiveZoom;
     }, [effectiveZoom]);
 
+    const updateTimerRef = useRef<number | null>(null);
+
+    // Throttled React state updater so UI controls stay synced without thrashing renders during 120fps gestures
+    const scheduleReactZoomUpdate = useCallback((zoom: number) => {
+        if (updateTimerRef.current !== null) {
+            window.cancelAnimationFrame(updateTimerRef.current);
+        }
+        updateTimerRef.current = window.requestAnimationFrame(() => {
+            setZoom(zoom);
+        });
+    }, [setZoom]);
+
     const applyZoom = useCallback((zoom: number) => {
         const next = clampPdfZoom(zoom);
         effectiveZoomRef.current = next;
-        setZoom(next);
-    }, [setZoom]);
+        if (stackRef.current) {
+            stackRef.current.style.zoom = String(next);
+        }
+        scheduleReactZoomUpdate(next);
+    }, [scheduleReactZoomUpdate]);
 
     const handleFitChange = useCallback((fit: PdfFitMode) => {
         setFit(fit);
@@ -124,6 +139,10 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
 
         effectiveZoomRef.current = next;
 
+        if (stack.style) {
+            stack.style.zoom = String(next);
+        }
+
         if (Math.abs(deltaScrollY) > 0.01) {
             window.scrollBy({ top: deltaScrollY, left: 0, behavior: 'instant' });
         }
@@ -131,13 +150,12 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
             container.scrollLeft += deltaScrollLeft;
         }
 
-        setZoom(next);
-    }, [setZoom]);
+        scheduleReactZoomUpdate(next);
+    }, [scheduleReactZoomUpdate]);
 
-    // A trackpad pinch arrives as a wheel event with ctrlKey set, which is also how ⌘/Ctrl +
-    // scrolling arrives, so one handler covers both. It has to be registered by hand because
-    // React's onWheel is passive and therefore cannot preventDefault — without that the browser
-    // zooms the whole page instead of the document.
+    // Handle trackpad pinch gestures across all browsers:
+    // - Safari uses native gesture events (gesturestart, gesturechange, gestureend)
+    // - Chrome & Firefox use wheel events with ctrlKey / metaKey
     useEffect(() => {
         const el = scrollRef.current;
         if (!el) return;
@@ -148,12 +166,45 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
             event.preventDefault();
             // Line-mode deltas (Firefox) are smaller than pixel ones.
             const delta = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
-            const factor = Math.exp(-Math.max(-30, Math.min(30, delta)) * 0.006);
+            const factor = Math.exp(-Math.max(-20, Math.min(20, delta)) * 0.003);
             zoomAround(event.clientX, event.clientY, factor);
         };
 
+        let gestureStartZoom = 1;
+        const onGestureStart = (event: Event) => {
+            event.preventDefault();
+            gestureStartZoom = effectiveZoomRef.current;
+        };
+
+        const onGestureChange = (event: Event) => {
+            event.preventDefault();
+            const e = event as Event & { scale?: number; clientX?: number; clientY?: number };
+            if (typeof e.scale === 'number' && e.scale > 0) {
+                const target = clampPdfZoom(gestureStartZoom * e.scale);
+                const current = effectiveZoomRef.current;
+                if (current > 0) {
+                    const clientX = e.clientX ?? (window.innerWidth / 2);
+                    const clientY = e.clientY ?? (window.innerHeight / 2);
+                    zoomAround(clientX, clientY, target / current);
+                }
+            }
+        };
+
+        const onGestureEnd = (event: Event) => {
+            event.preventDefault();
+        };
+
         el.addEventListener('wheel', onWheel, { passive: false });
-        return () => el.removeEventListener('wheel', onWheel);
+        el.addEventListener('gesturestart', onGestureStart, { passive: false });
+        el.addEventListener('gesturechange', onGestureChange, { passive: false });
+        el.addEventListener('gestureend', onGestureEnd, { passive: false });
+
+        return () => {
+            el.removeEventListener('wheel', onWheel);
+            el.removeEventListener('gesturestart', onGestureStart);
+            el.removeEventListener('gesturechange', onGestureChange);
+            el.removeEventListener('gestureend', onGestureEnd);
+        };
     }, [zoomAround]);
 
     // ⌘/Ctrl with +, - or 0, but only while the reader is actually pointed at the document —
