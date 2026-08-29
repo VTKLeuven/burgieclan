@@ -24,9 +24,6 @@ const MAX_BASE_WIDTH = 1000;
  */
 const VERTICAL_CHROME = 170;
 
-/** Re-rasterising pages while a gesture is actively moving is wasted work; let it settle, then commit. */
-const RENDER_COMMIT_MS = 300;
-
 /** One press of ⌘/Ctrl +/-, matching the notch the zoom bar's buttons take. */
 const KEYBOARD_ZOOM_STEP = 1.25;
 
@@ -37,8 +34,6 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
     const stackRef = useRef<HTMLDivElement>(null);
     const pointerInsideRef = useRef(false);
     const effectiveZoomRef = useRef(1);
-    const isGestureActiveRef = useRef(false);
-    const gestureTimeoutRef = useRef<number | null>(null);
 
     // Height / width of the first page, which is what "whole page" has to solve for. Default to standard A4 (1.414).
     const [pageAspect, setPageAspect] = useState<number>(1.414);
@@ -46,10 +41,6 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
     // rather than assumed: a collapsed sidebar, browser zoom or a second monitor all change them.
     const [baseWidth, setBaseWidth] = useState(0);
     const [availableHeight, setAvailableHeight] = useState(0);
-    // The width the pages are actually rasterised at, which trails the target during a gesture.
-    const [renderWidth, setRenderWidth] = useState(0);
-    // Local live zoom state during gestures so wheel events are instant and un-clobbered by async state
-    const [liveZoom, setLiveZoom] = useState<number | null>(null);
 
     useEffect(() => {
         const el = scrollRef.current;
@@ -77,77 +68,30 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
         return clampPdfZoom(availableHeight / pageAspect / baseWidth);
     }, [pageAspect, baseWidth, availableHeight]);
 
-    const baseEffectiveZoom = preference.fit === 'width'
+    const effectiveZoom = preference.fit === 'width'
         ? 1
         : preference.fit === 'page'
             ? fitPageZoom ?? 1
             : clampPdfZoom(preference.zoom);
 
-    // Keep effectiveZoomRef up to date with preference changes when no gesture is active
+    // Keep effectiveZoomRef up to date with preference changes
     useEffect(() => {
-        if (!isGestureActiveRef.current) {
-            effectiveZoomRef.current = baseEffectiveZoom;
-            setLiveZoom(null);
-        }
-    }, [baseEffectiveZoom]);
-
-    const currentZoom = liveZoom ?? baseEffectiveZoom;
-    const targetWidth = Math.round(baseWidth * currentZoom);
-
-    // Pages keep their last bitmap while a gesture is in flight and are scaled with CSS `zoom`.
-    // Once the gesture settles, the true width lands and PDF.js redraws them crisply at that size.
-    useEffect(() => {
-        if (targetWidth <= 0) return;
-
-        const timer = window.setTimeout(() => {
-            setRenderWidth(targetWidth);
-        }, isGestureActiveRef.current ? 300 : 0);
-
-        return () => window.clearTimeout(timer);
-    }, [targetWidth]);
-
-    const previewRatio = renderWidth > 0 ? targetWidth / renderWidth : 1;
+        effectiveZoomRef.current = effectiveZoom;
+    }, [effectiveZoom]);
 
     const applyZoom = useCallback((zoom: number) => {
         const next = clampPdfZoom(zoom);
         effectiveZoomRef.current = next;
-        setLiveZoom(next);
         setZoom(next);
     }, [setZoom]);
 
     const handleFitChange = useCallback((fit: PdfFitMode) => {
-        isGestureActiveRef.current = false;
-        if (gestureTimeoutRef.current !== null) {
-            window.clearTimeout(gestureTimeoutRef.current);
-            gestureTimeoutRef.current = null;
-        }
-        setLiveZoom(null);
         setFit(fit);
-
-        const nextZoom = fit === 'width' ? 1 : fit === 'page' ? (fitPageZoom ?? 1) : preference.zoom;
-        const nextWidth = Math.round(baseWidth * nextZoom);
-        if (nextWidth > 0) {
-            setRenderWidth(nextWidth);
-        }
-    }, [baseWidth, fitPageZoom, preference.zoom, setFit]);
+    }, [setFit]);
 
     const stepZoom = useCallback(
-        (factor: number) => {
-            isGestureActiveRef.current = false;
-            if (gestureTimeoutRef.current !== null) {
-                window.clearTimeout(gestureTimeoutRef.current);
-                gestureTimeoutRef.current = null;
-            }
-            const next = clampPdfZoom(effectiveZoomRef.current * factor);
-            effectiveZoomRef.current = next;
-            const nextWidth = Math.round(baseWidth * next);
-            if (nextWidth > 0) {
-                setRenderWidth(nextWidth);
-            }
-            setLiveZoom(null);
-            setZoom(next);
-        },
-        [baseWidth, setZoom],
+        (factor: number) => applyZoom(effectiveZoomRef.current * factor),
+        [applyZoom],
     );
 
     /**
@@ -179,7 +123,6 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
             : 0;
 
         effectiveZoomRef.current = next;
-        isGestureActiveRef.current = true;
 
         if (Math.abs(deltaScrollY) > 0.01) {
             window.scrollBy({ top: deltaScrollY, left: 0, behavior: 'instant' });
@@ -188,15 +131,7 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
             container.scrollLeft += deltaScrollLeft;
         }
 
-        setLiveZoom(next);
         setZoom(next);
-
-        if (gestureTimeoutRef.current !== null) {
-            window.clearTimeout(gestureTimeoutRef.current);
-        }
-        gestureTimeoutRef.current = window.setTimeout(() => {
-            isGestureActiveRef.current = false;
-        }, RENDER_COMMIT_MS);
     }, [setZoom]);
 
     // A trackpad pinch arrives as a wheel event with ctrlKey set, which is also how ⌘/Ctrl +
@@ -259,7 +194,7 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
         >
             <PDFZoomBar
                 fit={preference.fit}
-                zoom={currentZoom}
+                zoom={effectiveZoom}
                 onFitChange={handleFitChange}
                 onZoomChange={applyZoom}
                 onZoomStep={stepZoom}
@@ -268,8 +203,8 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
 
             <div ref={scrollRef} className="min-h-[70vh] overflow-x-auto bg-vtk-paper-2 p-4">
                 <div className="flex w-max min-w-full flex-col items-center">
-                    <div ref={stackRef} style={previewRatio !== 1 ? { zoom: previewRatio } : undefined}>
-                        <PDFPages file={file} width={renderWidth} pageAspect={pageAspect} onDocumentLoad={onDocumentLoad} />
+                    <div ref={stackRef} style={{ zoom: effectiveZoom }}>
+                        <PDFPages file={file} width={baseWidth} pageAspect={pageAspect} onDocumentLoad={onDocumentLoad} />
                     </div>
                 </div>
             </div>
