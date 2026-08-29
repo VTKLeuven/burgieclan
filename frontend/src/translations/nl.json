@@ -375,7 +375,10 @@
             "anonymous": "Anoniem",
             "success": "Opmerking succesvol toegevoegd",
             "error": "Opmerking toevoegen mislukt",
-            "title": "Opmerkingen"
+            "title": "Opmerkingen",
+            "open": "Opmerkingen openen ({{count}})",
+            "close": "Opmerkingen sluiten",
+            "loading": "Opmerkingen laden"
         },
         "under-review-warning": "Dit document is momenteel in behandeling, dus het is alleen zichtbaar voor jou.",
         "author": "Auteur",

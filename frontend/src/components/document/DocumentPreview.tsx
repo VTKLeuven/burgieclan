@@ -26,6 +26,7 @@ import { useTranslation } from "react-i18next";
 
 // Lazy-load PDFViewer so pdfjs-dist never runs on the server (no DOMMatrix in Node)
 const PDFViewer = dynamic(() => import("@/components/document/pdf/PDFViewer"), { ssr: false });
+const COMMENTS_INLINE_MIN_WIDTH = 1200;
 
 export default function DocumentPreview({ id }: { id: string }) {
     const { t, i18n } = useTranslation();
@@ -38,7 +39,9 @@ export default function DocumentPreview({ id }: { id: string }) {
 
     // Used to scale pdf width to fit its parent container
     const [containerWidth, setContainerWidth] = useState<number>(0);
+    const [showInlineComments, setShowInlineComments] = useState(false);
     const previewRef = useRef<HTMLDivElement>(null);
+    const previewLayoutRef = useRef<HTMLDivElement>(null);
 
     const { user } = useUser();
     const { request, loading, error } = useApi();
@@ -88,6 +91,20 @@ export default function DocumentPreview({ id }: { id: string }) {
         observer.observe(el);
         return () => observer.disconnect();
     }, [document]);
+
+    // Use the actual page area rather than a viewport breakpoint. A wide curriculum sidebar,
+    // browser zoom or OS scaling can make a nominally large laptop just as cramped as a smaller
+    // screen. The comments stay inline only when both columns have genuinely useful space.
+    useEffect(() => {
+        const el = previewLayoutRef.current;
+        if (!el) return;
+
+        const observer = new ResizeObserver(([entry]) => {
+            setShowInlineComments(entry.contentRect.width >= COMMENTS_INLINE_MIN_WIDTH);
+        });
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [document?.id]);
 
     if (loading) return <LoadingPage />;
 
@@ -147,7 +164,13 @@ export default function DocumentPreview({ id }: { id: string }) {
             )}
 
             {/* Document preview & comment section */}
-            <div className="mt-7 grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
+            <div
+                ref={previewLayoutRef}
+                className={`mt-7 grid items-start gap-4 ${showInlineComments
+                    ? 'grid-cols-[minmax(0,1fr)_360px]'
+                    : 'grid-cols-1'
+                    }`}
+            >
                 <div className="vtk-panel overflow-hidden">
                     <div className="flex items-center justify-between gap-3 border-b border-vtk-line px-4 py-3">
                         <VoteButton
@@ -203,7 +226,12 @@ export default function DocumentPreview({ id }: { id: string }) {
                     </div>
                 </div>
 
-                <DocumentCommentSection documentId={document.id} file={document.contentUrl} />
+                <DocumentCommentSection
+                    key={document.id}
+                    documentId={document.id}
+                    file={document.contentUrl}
+                    displayInline={showInlineComments}
+                />
             </div>
         </div>
     )
