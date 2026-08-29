@@ -413,17 +413,22 @@ class CourseResourceTest extends ApiTestCase
         $course = CourseFactory::createOne(['oldCourses' => [$predecessor]]);
         $category = DocumentCategoryFactory::createOne();
 
-        DocumentFactory::createMany(3, [
+        DocumentFactory::createMany(
+            3,
+            [
             'course' => $predecessor,
             'category' => $category,
             'under_review' => false,
-        ]);
+            ]
+        );
         // Pending uploads are invisible everywhere else, so they must not pad the count here.
-        DocumentFactory::createOne([
+        DocumentFactory::createOne(
+            [
             'course' => $predecessor,
             'category' => $category,
             'under_review' => true,
-        ]);
+            ]
+        );
 
         $this->browser()
             ->get(
