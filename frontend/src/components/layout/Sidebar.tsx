@@ -7,6 +7,7 @@ import { useUser } from "@/components/UserContext";
 import type { Course, Document } from "@/types/entities";
 import { ChevronDown, File, FolderTree, Home, PanelLeft, PanelLeftClose, Star } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { localizedCourseName } from '@/utils/courseName';
@@ -44,6 +45,7 @@ const mapDocumentsToItems = (documents: Document[]) => {
 const NavigationSidebar = () => {
   const { user } = useUser();
   const { t, i18n } = useTranslation();
+  const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     courses: false,
@@ -59,6 +61,11 @@ const NavigationSidebar = () => {
 
   const sectionButton =
     'flex w-full shrink-0 items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-sm font-semibold text-vtk-ink transition-colors hover:bg-vtk-paper-2';
+
+  // The rail exists to browse beside content. On the landing page it only competes with the
+  // dashboard, so omit it for both the unprefixed Dutch route and localized home routes.
+  const isHomePage = pathname === '/' || /^\/(?:en|nl)\/?$/.test(pathname);
+  if (isHomePage) return null;
 
   return (
     <aside className="sticky top-[72px] hidden shrink-0 self-start md:block">

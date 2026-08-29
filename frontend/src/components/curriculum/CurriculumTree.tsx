@@ -7,7 +7,7 @@ import { useSiblingDocuments } from '@/hooks/useSiblingDocuments';
 import type { Course, DocumentCategory, Module, Program } from '@/types/entities';
 import { convertToDocumentCategory, convertToModule, convertToProgram } from '@/utils/convertToEntity';
 import { localizedCourseName } from '@/utils/courseName';
-import { shortProgramName } from '@/utils/curriculumLabels';
+import { treeProgramName } from '@/utils/curriculumLabels';
 import { ChevronRight, File, FileText, Folder, GraduationCap, LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -271,7 +271,7 @@ export default function CurriculumTree() {
                 return (
                     <div key={key} className="shrink-0">
                         <TreeRow
-                            label={shortProgramName(node.name)}
+                            label={treeProgramName(node.name)}
                             title={node.name}
                             href={curriculumHref.program(node)}
                             depth={0}
@@ -319,6 +319,7 @@ function TreeRow({
     label, title, href, depth, icon: Icon, open = false,
     expandable = false, active = false, loading = false, badge, onToggle,
 }: TreeRowProps) {
+    const { t } = useTranslation();
     const rowRef = useRef<HTMLDivElement>(null);
     const scrolled = useRef(false);
 
@@ -333,7 +334,7 @@ function TreeRow({
     return (
         <div
             ref={rowRef}
-            className={`flex shrink-0 items-center rounded-md pr-1 text-[13px] leading-snug transition-colors ${active
+            className={`flex min-h-8 shrink-0 items-center rounded-md pr-1 text-[13px] leading-snug transition-colors ${active
                 ? 'bg-vtk-paper-2 font-semibold text-vtk-ink shadow-[inset_2px_0_0_var(--yellow)]'
                 : 'text-vtk-body hover:bg-vtk-paper-2'
                 }`}
@@ -344,28 +345,27 @@ function TreeRow({
                     type="button"
                     onClick={onToggle}
                     aria-expanded={open}
-                    aria-label={label}
-                    className="grid h-6 w-5 shrink-0 place-items-center rounded text-vtk-muted hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
+                    aria-label={t(open ? 'curriculum-tree.collapse' : 'curriculum-tree.expand', { name: label })}
+                    className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-vtk-muted transition-colors hover:bg-vtk-surface hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
                 >
                     {loading
-                        ? <LoaderCircle size={12} className="animate-spin" />
-                        : <ChevronRight size={13} className="transition-transform duration-150" style={{ transform: open ? 'rotate(90deg)' : 'none' }} />}
+                        ? <LoaderCircle size={15} className="animate-spin" />
+                        : <ChevronRight size={17} strokeWidth={2.25} className="transition-transform duration-150" style={{ transform: open ? 'rotate(90deg)' : 'none' }} />}
                 </button>
             ) : (
-                <span className="h-6 w-5 shrink-0" aria-hidden="true" />
+                <span className="h-8 w-8 shrink-0" aria-hidden="true" />
             )}
 
             <Link
                 href={href}
                 title={title ?? label}
                 aria-current={active ? 'page' : undefined}
-                className="flex min-w-0 flex-1 items-center gap-1.5 py-1 pr-1 rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
+                className="flex min-w-0 self-stretch flex-1 items-center gap-1.5 pr-1 rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
             >
-                <Icon size={13} className="shrink-0 text-vtk-muted" aria-hidden="true" />
-                {/* Programme names differ only in their tail ("...wetenschappen: bouwkunde"), so
-                    clipping them to one line makes every row read the same. They get the room to
-                    wrap; everything below them is short enough to truncate. */}
-                <span className={`min-w-0 flex-1 ${depth === 0 ? 'line-clamp-3' : 'truncate'}`}>{label}</span>
+                <Icon size={14} className="shrink-0 text-vtk-muted" aria-hidden="true" />
+                {/* A file tree is easiest to scan when every item owns exactly one row. The full
+                    name remains available through the link's title. */}
+                <span className="min-w-0 flex-1 truncate">{label}</span>
                 {badge !== undefined && badge > 0 && (
                     <span className="shrink-0 text-[11px] tabular-nums text-vtk-muted">{badge}</span>
                 )}

@@ -88,15 +88,32 @@ async function assertBreadcrumbOnOneLine(page: Page) {
 }
 
 test('walk the curriculum', async ({ page, context }) => {
+  test.setTimeout(60_000);
+
   // These captures need the dev stack with fixtures behind them; without it there is nothing
   // meaningful to assert, so skip rather than fail.
   test.skip(!(await authenticate(context)), 'backend not reachable');
   await page.setViewportSize({ width: 1500, height: 950 });
 
+  await page.goto('/');
+  await settle(page);
+  await expect(page.locator('aside'), 'home should not render the curriculum sidebar').toHaveCount(0);
+  await capture(page, '00-home');
+
   await page.goto('/courses');
   await settle(page);
   await capture(page, '01-courses');
   await assertNoSidebarOverlap(page);
+
+  const toggleBox = await page.locator('aside nav button[aria-expanded]').first().boundingBox();
+  expect(toggleBox?.width, 'tree toggle should be an easy click target').toBeGreaterThanOrEqual(32);
+  expect(toggleBox?.height, 'tree toggle should be an easy click target').toBeGreaterThanOrEqual(32);
+
+  const programmeRowHeights = await page.locator('aside nav > div > div > a').evaluateAll((links) =>
+    links.map((link) => link.getBoundingClientRect().height)
+  );
+  expect(programmeRowHeights.length).toBeGreaterThan(0);
+  expect(Math.max(...programmeRowHeights), 'programme names should stay on one row').toBeLessThanOrEqual(32);
 
   // A programme is one click and a real page, not an accordion.
   await page.locator('main').getByRole('link', { name: /Bachelor in de ingenieurswetenschappen/ }).click();

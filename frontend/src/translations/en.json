@@ -459,6 +459,8 @@
         "courses": "Browse all available courses on Burgieclan."
     },
     "curriculum-tree": {
-        "label": "Curriculum"
+        "label": "Curriculum",
+        "expand": "Expand {{name}}",
+        "collapse": "Collapse {{name}}"
     }
 }

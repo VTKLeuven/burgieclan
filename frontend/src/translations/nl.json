@@ -459,6 +459,8 @@
         "courses": "Blader door alle vakken op Burgieclan."
     },
     "curriculum-tree": {
-        "label": "Curriculum"
+        "label": "Curriculum",
+        "expand": "{{name}} uitklappen",
+        "collapse": "{{name}} inklappen"
     }
 }

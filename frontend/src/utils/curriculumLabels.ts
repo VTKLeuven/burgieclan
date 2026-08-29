@@ -13,6 +13,18 @@ export function shortProgramName(name?: string): string {
     return trimmed.trim() || name;
 }
 
+/**
+ * Keep the distinguishing part of a programme visible in the narrow curriculum tree.
+ * "Master in de ingenieurswetenschappen: bouwkunde" becomes "Master · bouwkunde"; the full
+ * imported name is still shown on hover and on the programme page.
+ */
+export function treeProgramName(name?: string): string {
+    const shortened = shortProgramName(name);
+    const specialized = shortened.match(/^(Bachelor|Master)\b[^:]*:\s*(.+)$/i);
+
+    return specialized ? `${specialized[1]} · ${specialized[2]}` : shortened;
+}
+
 /** The bracketed qualifier on its own, for pages with room to show it under the title. */
 export function programQualifier(name?: string): string | null {
     if (!name) return null;
