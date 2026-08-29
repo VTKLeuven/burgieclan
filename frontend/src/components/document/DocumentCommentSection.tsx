@@ -95,10 +95,12 @@ export default function DocumentCommentSection({
                     ? t('document.comments.loading')
                     : t('document.comments.open', { count: comments.length })}
                 title={t('document.comments.open', { count: comments.length })}
-                className="fixed right-0 top-1/2 z-[8] flex -translate-y-1/2 items-center gap-2 rounded-l-2xl border border-r-0 border-vtk-line-2 bg-vtk-navy px-3 py-3 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(10,15,31,0.22)] transition hover:pr-4 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-yellow"
+                className="fixed right-0 top-1/2 z-[8] flex w-12 -translate-y-1/2 flex-col items-center gap-2 rounded-l-2xl border border-r-0 border-vtk-line-2 bg-vtk-navy px-2 py-3 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(10,15,31,0.22)] transition-all hover:w-14 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-yellow"
             >
                 <MessageSquarePlus className="h-5 w-5 shrink-0" aria-hidden="true" />
-                <span className="hidden sm:inline">{t('document.comments.title')}</span>
+                <span className="rotate-180 leading-none tracking-wide [writing-mode:vertical-rl]">
+                    {t('document.comments.title')}
+                </span>
                 <span
                     aria-live="polite"
                     className={`grid min-h-6 min-w-6 place-items-center rounded-full px-1.5 text-xs font-bold ${comments.length > 0
