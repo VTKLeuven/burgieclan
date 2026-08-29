@@ -5,9 +5,9 @@ import { CourseTableHeader } from '@/components/courses/CourseTableHeader';
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import DownloadButton from '@/components/ui/DownloadButton';
 import FavoriteButton from '@/components/ui/FavoriteButton';
+import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import type { Course, Module } from '@/types/entities';
 import { ChevronRight, Folder } from 'lucide-react';
-import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
 interface CurriculumLevelProps {
@@ -48,14 +48,15 @@ export default function CurriculumLevel({ modules, courses, moduleId }: Curricul
                                 key={node.id}
                                 className="flex items-center gap-2 rounded-[14px] border border-vtk-line bg-vtk-surface px-4 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper"
                             >
-                                <Link
+                                <ApiPrefetchLink
                                     href={curriculumHref.module(node)}
+                                    apiEndpoints={`/api/modules/${node.id}`}
                                     className="flex min-w-0 flex-1 items-center gap-3 py-3 text-[15px] font-medium text-vtk-ink rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
                                 >
                                     <Folder size={16} className="shrink-0 text-vtk-muted" aria-hidden="true" />
                                     <span className="min-w-0 flex-1 truncate">{node.name}</span>
                                     <ChevronRight size={16} className="shrink-0 text-vtk-muted" aria-hidden="true" />
-                                </Link>
+                                </ApiPrefetchLink>
                                 <FavoriteButton itemId={node.id} itemType="module" size={16} className="shrink-0" />
                                 <DownloadButton modules={[node]} />
                             </div>

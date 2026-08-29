@@ -3,6 +3,7 @@
 import { useUser } from '@/components/UserContext';
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import FavoriteButton from '@/components/ui/FavoriteButton';
+import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import { GraduationCap, Layers } from 'lucide-react';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
@@ -23,16 +24,17 @@ const FavoriteRow = ({ id, name, typeLabel, type, icon: Icon }: FavoriteRowProps
     // The star has to sit outside the link — a button nested in an anchor is invalid markup —
     // so it is overlaid on the row instead, the same way the sidebar favourites do it.
     <div className="group relative">
-        <Link
+        <ApiPrefetchLink
             className="flex items-center gap-3.5 px-5 py-2.5 pr-12 transition-colors hover:bg-vtk-paper-2"
             href={type === 'program' ? curriculumHref.program({ id }) : curriculumHref.module({ id })}
+            apiEndpoints={type === 'program' ? `/api/programs/${id}` : `/api/modules/${id}`}
         >
             <Icon aria-hidden="true" className="h-4 w-4 shrink-0 text-vtk-muted" />
             <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium leading-snug text-vtk-ink">{name}</p>
                 <p className="truncate text-[13px] leading-snug text-vtk-muted">{typeLabel}</p>
             </div>
-        </Link>
+        </ApiPrefetchLink>
         <div className="absolute inset-y-0 right-4 flex items-center opacity-0 transition-opacity duration-100 focus-within:opacity-100 group-focus-within:opacity-100 group-hover:opacity-100">
             <FavoriteButton itemId={id} itemType={type} size={16} />
         </div>

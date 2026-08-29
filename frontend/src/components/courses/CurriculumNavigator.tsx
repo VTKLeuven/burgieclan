@@ -1,20 +1,20 @@
 'use client'
 
-import Loading from '@/app/[locale]/loading';
+import Loading from '@/components/loading/LoadingPage';
 import CurriculumSearchBar, { SearchFilters } from '@/components/courses/CurriculumSearchBar';
 import CurriculumSearchResults, { CourseHit } from '@/components/curriculum/CurriculumSearchResults';
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import DownloadButton from '@/components/ui/DownloadButton';
+import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import PageHead from '@/components/ui/PageHead';
 import { useUser } from "@/components/UserContext";
-import { HydraCollection, useApi } from '@/hooks/useApi';
+import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { Course, Module, Program } from '@/types/entities';
 import { convertToProgram } from "@/utils/convertToEntity";
 import { courseMatchesFilters, initializeFuseInstances } from '@/utils/curriculumSearchUtils';
 import { ChevronRight, GraduationCap } from 'lucide-react';
-import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -43,7 +43,11 @@ function flatten(programs: Program[]): CourseHit[] {
  * and opening one programme no longer pushes the other nine off the screen.
  */
 export default function CurriculumNavigator() {
-  const [programs, setPrograms] = useState<Program[]>([]);
+  const programsEndpoint = '/api/programs?pagination=false&order[name]=asc';
+  const [programs, setPrograms] = useState<Program[]>(() => {
+    const preloaded = readPreloadedApi(programsEndpoint) as HydraCollection<unknown> | undefined;
+    return preloaded?.['hydra:member'].map(convertToProgram) ?? [];
+  });
   const [allHits, setAllHits] = useState<CourseHit[] | null>(null);
   const [results, setResults] = useState<CourseHit[] | null>(null);
   const [searching, setSearching] = useState(false);
@@ -55,19 +59,23 @@ export default function CurriculumNavigator() {
   const { user } = useUser();
 
   useEffect(() => {
+    if (programs.length > 0) {
+      initializeFuseInstances([], [], programs);
+      return;
+    }
+
     let cancelled = false;
 
     void (async () => {
-      const result = await requestPrograms('GET', '/api/programs?pagination=false&order[name]=asc');
+      const result = await requestPrograms('GET', programsEndpoint);
       if (cancelled || !result) return;
 
       const fetched = result['hydra:member'].map(convertToProgram);
       setPrograms(fetched);
-      initializeFuseInstances([], [], fetched);
     })();
 
     return () => { cancelled = true; };
-  }, [requestPrograms]);
+  }, [programs, programsEndpoint, requestPrograms]);
 
   // The whole curriculum is only pulled once someone actually searches; browsing stays one
   // request per level.
@@ -141,14 +149,15 @@ export default function CurriculumNavigator() {
                 key={program.id}
                 className="flex items-center gap-2 rounded-[18px] border border-vtk-line bg-vtk-surface px-4 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper"
               >
-                <Link
+                <ApiPrefetchLink
                   href={curriculumHref.program(program)}
+                  apiEndpoints={`/api/programs/${program.id}`}
                   className="flex min-w-0 flex-1 items-center gap-3 py-3.5 text-[15px] font-medium text-vtk-ink rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
                 >
                   <GraduationCap size={17} className="shrink-0 text-vtk-muted" aria-hidden="true" />
                   <span className="min-w-0 flex-1 truncate">{program.name}</span>
                   <ChevronRight size={16} className="shrink-0 text-vtk-muted" aria-hidden="true" />
-                </Link>
+                </ApiPrefetchLink>
                 <FavoriteButton itemId={program.id} itemType="program" size={16} className="shrink-0" />
                 <DownloadButton programs={[program]} />
               </div>

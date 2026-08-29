@@ -123,6 +123,19 @@ test('walk the curriculum', async ({ page, context }) => {
   expect(programmeRowHeights.length).toBeGreaterThan(0);
   expect(Math.max(...programmeRowHeights), 'programme names should stay on one row').toBeLessThanOrEqual(32);
 
+  // Selecting a global-search result must stay inside the Next app. A location assignment used
+  // to reload the document, rebuild the complete sidebar and throw away every warmed response.
+  const initialTimeOrigin = await page.evaluate(() => performance.timeOrigin);
+  await page.locator('#search').click();
+  const searchDialog = page.getByRole('dialog');
+  await searchDialog.getByRole('combobox').fill('Polymer Composites A&B');
+  await searchDialog.getByText('Polymer Composites A&B', { exact: true }).first().click();
+  await page.waitForURL(/\/course\/\d+/);
+  expect(await page.evaluate(() => performance.timeOrigin), 'global search should not reload the document')
+    .toBe(initialTimeOrigin);
+  await page.goBack();
+  await settle(page);
+
   // A programme is one click and a real page, not an accordion.
   await page.locator('main').getByRole('link', { name: /Bachelor in de ingenieurswetenschappen/ }).click();
   await page.waitForURL(/\/courses\/program\/\d+/);

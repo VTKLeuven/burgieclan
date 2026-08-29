@@ -10,6 +10,7 @@ import type { Course, Document, Module, Program } from '@/types/entities';
 import { convertToCourse, convertToDocument, convertToModule, convertToProgram } from '@/utils/convertToEntity';
 import { Combobox, ComboboxInput, ComboboxOptions, Dialog, DialogBackdrop, DialogPanel, } from '@headlessui/react';
 import { Frown, Globe, Search as SearchIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -33,6 +34,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
     const [items, setItems] = useState<SearchResults>({ courses: [], modules: [], programs: [], documents: [] });
     const { error, loading, isRedirecting, request } = useApi<SearchApiResponse | null>();
     const { t } = useTranslation();
+    const router = useRouter();
 
     function convertToObjects(obj: SearchApiResponse): SearchResults {
         const items: SearchResults = { courses: [], modules: [], programs: [], documents: [] };
@@ -103,11 +105,11 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                     className="mx-auto max-w-xl transform overflow-hidden rounded-[22px] border border-vtk-line bg-vtk-surface shadow-[0_24px_70px_rgba(10,15,31,0.2)] transition-all data-closed:scale-95 data-closed:opacity-0 data-enter:duration-300 data-leave:duration-200 data-enter:ease-out data-leave:ease-in"
                 >
                     <Combobox
-                        onChange={(param: { redirect: Location | string } | null) => {
+                        onChange={(param: { redirect: string } | null) => {
                             if (param?.redirect) {
-                                window.location.href = typeof param.redirect === 'string'
-                                    ? param.redirect
-                                    : param.redirect.href;
+                                setOpen(false);
+                                setQuery('');
+                                router.push(param.redirect);
                             }
                         }}
                     >
@@ -122,7 +124,6 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                     className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-vtk-ink placeholder:text-vtk-muted focus:ring-0 sm:text-sm"
                                     placeholder={t('search.placeholder')}
                                     onChange={(event) => setQuery(event.target.value)}
-                                    onBlur={() => setQuery('')}
                                 />
                             </div>
 

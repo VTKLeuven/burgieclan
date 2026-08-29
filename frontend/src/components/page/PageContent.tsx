@@ -1,6 +1,6 @@
 "use client";
 
-import Loading from "@/app/[locale]/loading";
+import Loading from "@/components/loading/LoadingPage";
 import ErrorPage from "@/components/error/ErrorPage";
 import PageHead from "@/components/ui/PageHead";
 import { useApi } from "@/hooks/useApi";
