@@ -8,7 +8,6 @@ import { useFormFields } from '@/hooks/useFormFields';
 import { useYearOptions } from '@/hooks/useYearOptions';
 import { Course, DocumentCategory } from '@/types/entities';
 import { UploadFormData } from '@/types/upload';
-import { VISIBLE_YEARS } from "@/utils/constants/upload";
 import { getSuggestedNameFromFilename } from '@/utils/documentNameSuggestion';
 import { documentSchema } from '@/utils/validation/documentSchema';
 import { localizedCourseName } from '@/utils/courseName';
@@ -58,11 +57,16 @@ export default function UploadForm({
     const { courses, categories, isLoading: isLoadingFields, error } = useFormFields();
     const yearOptions = useYearOptions();
 
+    // Alphabetical: the API returns courses in insertion order, which is the order they were
+    // imported in and means nothing to whoever is scrolling the list looking for their course.
+    // localeCompare so accented titles sort where a reader expects them, not after Z.
     const courseOptions = useMemo(() => {
-        return courses.map(course => ({
-            id: course.id,
-            name: localizedCourseName(course, i18n.language) || course.name || course.code || `${t('upload.form.course.label')} #${course.id}`
-        }));
+        return courses
+            .map(course => ({
+                id: course.id,
+                name: localizedCourseName(course, i18n.language) || course.name || course.code || `${t('upload.form.course.label')} #${course.id}`
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name, i18n.language));
     }, [courses, i18n.language, t]);
 
     const categoryOptions = useMemo(() => {
@@ -154,6 +158,9 @@ export default function UploadForm({
                 </div>
 
                 <div className="md:col-span-2">
+                    {/* Every academic year the list offers is selectable: capping the dropdown at
+                        the five most recent hid the rest behind a search nobody knew to run, so
+                        an exam from 2015 could not be filed under the year it was taken. */}
                     <FormField
                         label={t('upload.form.year.label')}
                         type="combobox"
@@ -162,7 +169,6 @@ export default function UploadForm({
                         name="year"
                         control={control}
                         disabled={isLoading}
-                        visibleOptions={VISIBLE_YEARS}
                     />
                 </div>
 

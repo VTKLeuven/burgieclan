@@ -51,7 +51,15 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
 
     return (
         <div>
-            <Combobox value={selectedOption} onChange={(option: Option | null) => onChange(option?.id)} disabled={disabled}>
+            <Combobox
+                value={selectedOption}
+                onChange={(option: Option | null) => onChange(option?.id)}
+                // Without this the typed query outlives the dropdown: reopening the field to
+                // change an answer showed the list still filtered by whatever was typed the
+                // previous time, which read as "the other options are gone".
+                onClose={() => setQuery('')}
+                disabled={disabled}
+            >
                 {({ open }) => (
                     <div className="relative">
                         <Combobox.Input
