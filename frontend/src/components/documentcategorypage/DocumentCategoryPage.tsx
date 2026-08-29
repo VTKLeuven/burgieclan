@@ -19,7 +19,7 @@ export default function DocumentCategoryPage({ category, course }: DocumentCateg
     return (
         <div className="vtk-shell pb-16">
             <PageHead
-                kicker={<DynamicBreadcrumb course={course} category={category} />}
+                kicker={<DynamicBreadcrumb />}
                 title={category.name}
                 icon={FileText}
                 subtitle={localizedCourseName(course, i18n.language)}

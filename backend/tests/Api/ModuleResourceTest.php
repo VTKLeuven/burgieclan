@@ -242,9 +242,10 @@ class ModuleResourceTest extends ApiTestCase
             )
             ->assertStatus(200)
             ->assertJson()
-            ->assertJsonMatches('program', '/api/programs/' . $program->getId())
+            ->assertJsonMatches('path.program."@id"', '/api/programs/' . $program->getId())
+            ->assertJsonMatches('path.program.name', $program->getName())
             ->assertJsonMatches(
-                'modules',
+                'path.modules[*]."@id"',
                 [
                     '/api/modules/' . $top->getId(),
                     '/api/modules/' . $middle->getId(),
@@ -268,8 +269,8 @@ class ModuleResourceTest extends ApiTestCase
                 ]
             )
             ->assertStatus(200)
-            ->assertJsonMatches('program', '/api/programs/' . $program->getId())
-            ->assertJsonMatches('modules', ['/api/modules/' . $top->getId()]);
+            ->assertJsonMatches('path.program."@id"', '/api/programs/' . $program->getId())
+            ->assertJsonMatches('path.modules[*]."@id"', ['/api/modules/' . $top->getId()]);
     }
 
     /**
@@ -289,8 +290,7 @@ class ModuleResourceTest extends ApiTestCase
                 ]
             )
             ->assertStatus(200)
-            ->assertJsonMatches('program', null)
-            ->assertJsonMatches('modules', []);
+            ->assertJsonMatches('path', null);
     }
 
     public function testGetModulePathOfUnknownModule(): void

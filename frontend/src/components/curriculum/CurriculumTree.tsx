@@ -1,41 +1,328 @@
 'use client';
 
 import { useCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
+import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import { HydraCollection, useApi } from '@/hooks/useApi';
 import { useSiblingDocuments } from '@/hooks/useSiblingDocuments';
-import type { Course, DocumentCategory, Module } from '@/types/entities';
-import { convertToDocumentCategory, convertToModule } from '@/utils/convertToEntity';
+import type { Course, DocumentCategory, Module, Program } from '@/types/entities';
+import { convertToDocumentCategory, convertToModule, convertToProgram } from '@/utils/convertToEntity';
 import { localizedCourseName } from '@/utils/courseName';
-import { rememberBranch } from '@/utils/curriculumBranch';
-import { File, FolderClosed, FolderOpen, GraduationCap, LoaderCircle } from 'lucide-react';
+import { shortProgramName } from '@/utils/curriculumLabels';
+import { ChevronRight, File, FileText, Folder, GraduationCap, LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+type NodeKey = string;
+
+const programKey = (id: number): NodeKey => `p${id}`;
+const moduleKey = (id: number): NodeKey => `m${id}`;
+const courseKey = (id: number): NodeKey => `c${id}`;
+const categoryKey = (id: number): NodeKey => `k${id}`;
+
+/** Past this depth rows stop stepping right, or a deep branch runs out of rail to indent into. */
+const MAX_INDENT = 5;
+
+interface ModuleChildren {
+    modules: Module[];
+    courses: Course[];
+}
+
 /**
- * Indentation is capped so a deeply nested branch does not push its own leaves off a 288px
- * rail. Past the cap the rows sit at the same depth and the tree relies on the icons and the
- * highlight to say where the reader is.
+ * The whole curriculum as one folder tree, the way the old Burgieclan had it down the side.
+ *
+ * This is the navigator, not a decoration next to one: every programme, module and course is
+ * reachable from here without going back to a listing page first, which is what "je moet veel
+ * te veel doorklikken" was about. It opens itself to wherever the reader is, so the answer to
+ * "which branch am I in" is on screen rather than one click away, and stepping to the next
+ * course or the next semester is one click from anywhere.
  */
-const MAX_INDENT_LEVEL = 4;
+export default function CurriculumTree() {
+    const { t, i18n } = useTranslation();
+    const { request } = useApi<unknown>();
+    const { program, module, course, category, document, activePath } = useCurriculumLocation();
+
+    const [programs, setPrograms] = useState<Program[]>([]);
+    const [programChildren, setProgramChildren] = useState<Record<number, Module[]>>({});
+    const [moduleChildren, setModuleChildren] = useState<Record<number, ModuleChildren>>({});
+    const [loadingKeys, setLoadingKeys] = useState<Set<NodeKey>>(new Set());
+    const [expanded, setExpanded] = useState<Set<NodeKey>>(new Set());
+    const inFlight = useRef<Set<NodeKey>>(new Set());
+
+    useEffect(() => {
+        let cancelled = false;
+
+        void (async () => {
+            const result = await request('GET', '/api/programs?pagination=false&order[name]=asc') as HydraCollection<unknown> | null;
+            if (cancelled) return;
+
+            const members = result?.['hydra:member'];
+            setPrograms(Array.isArray(members) ? members.map(convertToProgram) : []);
+        })();
+
+        return () => { cancelled = true; };
+    }, [request]);
+
+    const markLoading = useCallback((key: NodeKey, loading: boolean) => {
+        setLoadingKeys((previous) => {
+            const next = new Set(previous);
+            if (loading) {
+                next.add(key);
+            } else {
+                next.delete(key);
+            }
+            return next;
+        });
+    }, []);
+
+    const loadProgram = useCallback(async (id: number) => {
+        const key = programKey(id);
+        if (inFlight.current.has(key)) return;
+
+        inFlight.current.add(key);
+        markLoading(key, true);
+        const data = await request('GET', `/api/programs/${id}`);
+        inFlight.current.delete(key);
+        markLoading(key, false);
+
+        if (data) {
+            setProgramChildren((previous) => ({ ...previous, [id]: convertToProgram(data).modules ?? [] }));
+        }
+    }, [request, markLoading]);
+
+    const loadModule = useCallback(async (id: number) => {
+        const key = moduleKey(id);
+        if (inFlight.current.has(key)) return;
+
+        inFlight.current.add(key);
+        markLoading(key, true);
+        const data = await request('GET', `/api/modules/${id}`);
+        inFlight.current.delete(key);
+        markLoading(key, false);
+
+        if (data) {
+            const loaded = convertToModule(data);
+            setModuleChildren((previous) => ({
+                ...previous,
+                [id]: { modules: loaded.modules ?? [], courses: loaded.courses ?? [] },
+            }));
+        }
+    }, [request, markLoading]);
+
+    // Everything above the reader's own node is opened for them: arriving at a course from a
+    // search should still show the semester it belongs to and the courses beside it.
+    const branchKeys = useMemo(() => {
+        const keys: NodeKey[] = [];
+        if (activePath) {
+            keys.push(programKey(activePath.program.id));
+            activePath.modules.forEach((node) => keys.push(moduleKey(node.id)));
+        }
+        if (course) keys.push(courseKey(course.id));
+        if (category) keys.push(categoryKey(category.id));
+        return keys;
+    }, [activePath, course, category]);
+
+    const branchSignature = branchKeys.join('|');
+    useEffect(() => {
+        if (branchKeys.length === 0) return;
+
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setExpanded((previous) => {
+            const next = new Set(previous);
+            branchKeys.forEach((key) => next.add(key));
+            return next;
+        });
+
+        if (activePath) {
+            void loadProgram(activePath.program.id);
+            activePath.modules.forEach((node) => void loadModule(node.id));
+        }
+        // branchSignature stands in for branchKeys: a new array each render would re-run this
+        // on every keystroke elsewhere in the app.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [branchSignature]);
+
+    const toggle = useCallback((key: NodeKey, load?: () => void) => {
+        setExpanded((previous) => {
+            const next = new Set(previous);
+            if (next.has(key)) {
+                next.delete(key);
+            } else {
+                next.add(key);
+                load?.();
+            }
+            return next;
+        });
+    }, []);
+
+    const categories = useDocumentCategories(course !== undefined);
+    const { documents } = useSiblingDocuments(
+        category ? course?.id : undefined,
+        category ? category.id : undefined
+    );
+
+    const activeKey = document
+        ? `d${document.id}`
+        : category
+            ? categoryKey(category.id)
+            : course
+                ? courseKey(course.id)
+                : module
+                    ? moduleKey(module.id)
+                    : program
+                        ? programKey(program.id)
+                        : null;
+
+    if (programs.length === 0) {
+        return (
+            <div className="flex shrink-0 justify-center py-6">
+                <LoaderCircle className="animate-spin text-vtk-muted" size={16} />
+            </div>
+        );
+    }
+
+    const renderModule = (node: Module, depth: number) => {
+        const key = moduleKey(node.id);
+        const isOpen = expanded.has(key);
+        const children = moduleChildren[node.id];
+
+        return (
+            <div key={key} className="shrink-0">
+                <TreeRow
+                    label={node.name ?? ''}
+                    href={curriculumHref.module(node)}
+                    depth={depth}
+                    icon={Folder}
+                    open={isOpen}
+                    expandable
+                    active={activeKey === key}
+                    loading={loadingKeys.has(key)}
+                    onToggle={() => toggle(key, () => void loadModule(node.id))}
+                />
+                {isOpen && children && (
+                    <>
+                        {children.modules.map((child) => renderModule(child, depth + 1))}
+                        {children.courses.map((child) => renderCourse(child, depth + 1))}
+                        {children.modules.length === 0 && children.courses.length === 0 && (
+                            <EmptyRow depth={depth + 1} label={t('curriculum-navigator.no-courses-in-module')} />
+                        )}
+                    </>
+                )}
+            </div>
+        );
+    };
+
+    const renderCourse = (node: Course, depth: number) => {
+        const key = courseKey(node.id);
+        const isCurrent = course?.id === node.id;
+        const isOpen = expanded.has(key) && isCurrent;
+
+        return (
+            <div key={key} className="shrink-0">
+                <TreeRow
+                    label={localizedCourseName(node, i18n.language) ?? node.code ?? ''}
+                    href={curriculumHref.course(node)}
+                    depth={depth}
+                    icon={FileText}
+                    open={isOpen}
+                    active={activeKey === key}
+                />
+                {/* Only the course being read opens into its folders: every course on screen
+                    unfolding its five categories would bury the tree it sits in. */}
+                {isOpen && categories.map((item) => {
+                    const itemKey = categoryKey(item.id);
+                    const isCurrentCategory = category?.id === item.id;
+
+                    return (
+                        <div key={itemKey} className="shrink-0">
+                            <TreeRow
+                                label={item.name ?? ''}
+                                href={`/course/${node.id}/documents/category/${item.id}`}
+                                depth={depth + 1}
+                                icon={Folder}
+                                open={isCurrentCategory}
+                                active={activeKey === itemKey}
+                                badge={course?.documentCounts?.[item.id]}
+                            />
+                            {isCurrentCategory && documents.map((file) => (
+                                <TreeRow
+                                    key={`d${file.id}`}
+                                    label={file.name ?? file.filename ?? ''}
+                                    href={`/document/${file.id}`}
+                                    depth={depth + 2}
+                                    icon={File}
+                                    active={activeKey === `d${file.id}`}
+                                />
+                            ))}
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
+
+    return (
+        <nav aria-label={t('curriculum-tree.label')} className="flex shrink-0 flex-col">
+            {programs.map((node) => {
+                const key = programKey(node.id);
+                const isOpen = expanded.has(key);
+                const modules = programChildren[node.id];
+
+                return (
+                    <div key={key} className="shrink-0">
+                        <TreeRow
+                            label={shortProgramName(node.name)}
+                            title={node.name}
+                            href={curriculumHref.program(node)}
+                            depth={0}
+                            icon={GraduationCap}
+                            open={isOpen}
+                            expandable
+                            active={activeKey === key}
+                            loading={loadingKeys.has(key)}
+                            onToggle={() => toggle(key, () => void loadProgram(node.id))}
+                        />
+                        {isOpen && modules && (
+                            modules.length > 0
+                                ? modules.map((child) => renderModule(child, 1))
+                                : <EmptyRow depth={1} label={t('curriculum-navigator.no-modules-in-program')} />
+                        )}
+                    </div>
+                );
+            })}
+        </nav>
+    );
+}
 
 interface TreeRowProps {
     label: string;
+    title?: string;
     href: string;
-    level: number;
-    icon: 'program' | 'folder' | 'course' | 'document';
+    depth: number;
+    icon: typeof Folder;
     open?: boolean;
+    expandable?: boolean;
     active?: boolean;
+    loading?: boolean;
     badge?: number;
-    onClick?: () => void;
+    onToggle?: () => void;
 }
 
-function TreeRow({ label, href, level, icon, open = false, active = false, badge, onClick }: TreeRowProps) {
-    const rowRef = useRef<HTMLAnchorElement>(null);
+/**
+ * One row: a chevron that only opens the branch, and a label that only navigates.
+ *
+ * Keeping them apart is the point. In the old accordion the name *was* the toggle, so looking
+ * inside a programme and going to it were the same gesture and neither could be done without
+ * the other.
+ */
+function TreeRow({
+    label, title, href, depth, icon: Icon, open = false,
+    expandable = false, active = false, loading = false, badge, onToggle,
+}: TreeRowProps) {
+    const rowRef = useRef<HTMLDivElement>(null);
     const scrolled = useRef(false);
 
-    // A course with many neighbours or a folder with a decade of scans puts the active row
-    // below the fold. Once only: re-scrolling on every render would fight the reader.
+    // Once only: re-scrolling on every render would fight the reader for the viewport.
     useEffect(() => {
         if (active && !scrolled.current) {
             scrolled.current = true;
@@ -43,202 +330,62 @@ function TreeRow({ label, href, level, icon, open = false, active = false, badge
         }
     }, [active]);
 
-    const Icon = icon === 'program'
-        ? GraduationCap
-        : icon === 'document'
-            ? File
-            : open ? FolderOpen : FolderClosed;
-
     return (
-        <Link
+        <div
             ref={rowRef}
-            href={href}
-            onClick={onClick}
-            aria-current={active ? 'page' : undefined}
-            title={label}
-            style={{ paddingLeft: `${0.5 + Math.min(level, MAX_INDENT_LEVEL) * 0.75}rem` }}
-            className={`flex items-center gap-2 rounded-lg py-1.5 pr-2 text-[13px] leading-snug transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy ${active
+            className={`flex shrink-0 items-center rounded-md pr-1 text-[13px] leading-snug transition-colors ${active
                 ? 'bg-vtk-paper-2 font-semibold text-vtk-ink shadow-[inset_2px_0_0_var(--yellow)]'
-                : 'text-vtk-body hover:bg-vtk-paper-2 hover:text-vtk-ink'
+                : 'text-vtk-body hover:bg-vtk-paper-2'
                 }`}
+            style={{ paddingLeft: `${Math.min(depth, MAX_INDENT) * 0.7}rem` }}
         >
-            <Icon size={14} className="shrink-0 text-vtk-muted" aria-hidden="true" />
-            <span className="min-w-0 flex-1 truncate">{label}</span>
-            {badge !== undefined && badge > 0 && (
-                <span className="shrink-0 text-[11px] tabular-nums text-vtk-muted">{badge}</span>
-            )}
-        </Link>
-    );
-}
-
-/**
- * The folder tree the old Burgieclan had down the side, rebuilt on top of the curriculum:
- * programme → modules → courses → categories → documents, opened to wherever the reader is
- * and showing the neighbours at every level.
- *
- * It answers the two things the tabbed navigator could not. Which branch am I in - a course
- * page reached from a search or a favourite carries no programme in its URL, so the page had
- * no way of saying whether this was the right "Beton" out of three. And where do I go next -
- * stepping from exercise session 1 to 2 meant walking back up through the folder every time.
- *
- * Everything below the programme is a link into a real page, so nothing here is a dead end:
- * a programme or module row opens the navigator on that node.
- */
-export default function CurriculumTree() {
-    const { t, i18n } = useTranslation();
-    const { course, category, document, paths, activePath, pathsLoading } = useCurriculumLocation();
-
-    // Sibling courses come from the module that teaches this one; sibling categories and
-    // documents only matter once the reader is inside a folder, so neither is fetched on a
-    // course page - the page body already lists the categories as cards there.
-    const leafModuleId = activePath?.modules.at(-1)?.id;
-    const siblingCourses = useModuleCourses(leafModuleId);
-    const categories = useDocumentCategories(category !== undefined);
-    const { documents: siblingDocuments } = useSiblingDocuments(
-        document ? course?.id : undefined,
-        document ? category?.id : undefined
-    );
-
-    if (!course) {
-        return null;
-    }
-
-    const countFor = (item: DocumentCategory) => course.documentCounts?.[item.id] ?? 0;
-
-    // Until the module answers, the reader's own course stands in for the list of neighbours -
-    // and it stays in it if the module somehow comes back without it, because a tree that does
-    // not contain where you are is worse than no tree.
-    const courseRows = siblingCourses?.some((sibling) => sibling.id === course.id)
-        ? siblingCourses
-        : [course];
-
-    return (
-        <nav aria-label={t('curriculum-tree.label')} className="flex min-h-0 flex-col">
-            <div className="vtk-label px-2.5 pb-1.5">{t('curriculum-tree.label')}</div>
-
-            {pathsLoading && paths.length === 0 ? (
-                <div className="flex justify-center py-4">
-                    <LoaderCircle className="animate-spin text-vtk-muted" size={16} />
-                </div>
+            {expandable ? (
+                <button
+                    type="button"
+                    onClick={onToggle}
+                    aria-expanded={open}
+                    aria-label={label}
+                    className="grid h-6 w-5 shrink-0 place-items-center rounded text-vtk-muted hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
+                >
+                    {loading
+                        ? <LoaderCircle size={12} className="animate-spin" />
+                        : <ChevronRight size={13} className="transition-transform duration-150" style={{ transform: open ? 'rotate(90deg)' : 'none' }} />}
+                </button>
             ) : (
-                <div className="flex flex-col">
-                    {activePath ? (
-                        <>
-                            <TreeRow
-                                label={activePath.program.name ?? ''}
-                                href={`/courses?program=${activePath.program.id}`}
-                                level={0}
-                                icon="program"
-                                open
-                            />
-                            {activePath.modules.map((module, index) => (
-                                <TreeRow
-                                    key={module.id}
-                                    label={module.name ?? ''}
-                                    href={`/courses?module=${module.id}`}
-                                    level={index + 1}
-                                    icon="folder"
-                                    open
-                                />
-                            ))}
-                        </>
-                    ) : (
-                        // A course no programme reaches still deserves a way back up.
-                        <TreeRow label={t('courses')} href="/courses" level={0} icon="folder" open />
-                    )}
-
-                    {courseRows.map((sibling) => {
-                        const isCurrent = sibling.id === course.id;
-                        const courseLevel = activePath ? activePath.modules.length + 1 : 1;
-
-                        return (
-                            <div key={sibling.id} className="contents">
-                                <TreeRow
-                                    label={localizedCourseName(sibling, i18n.language) ?? sibling.code ?? ''}
-                                    href={`/course/${sibling.id}`}
-                                    level={courseLevel}
-                                    icon="course"
-                                    open={isCurrent && categories.length > 0}
-                                    active={isCurrent && !category}
-                                    // Stepping sideways to a neighbour keeps the branch: without this the
-                                    // next page would fall back to that course's first placement, which
-                                    // for a shared course is a different programme than the one on screen.
-                                    onClick={leafModuleId ? () => rememberBranch(sibling.id, leafModuleId) : undefined}
-                                />
-
-                                {isCurrent && categories.map((item) => {
-                                    const isCurrentCategory = item.id === category?.id;
-
-                                    return (
-                                        <div key={item.id} className="contents">
-                                            <TreeRow
-                                                label={item.name ?? ''}
-                                                href={`/course/${course.id}/documents/category/${item.id}`}
-                                                level={courseLevel + 1}
-                                                icon="folder"
-                                                open={isCurrentCategory}
-                                                active={isCurrentCategory && !document}
-                                                badge={countFor(item)}
-                                            />
-
-                                            {isCurrentCategory && siblingDocuments.map((file) => (
-                                                <TreeRow
-                                                    key={file.id}
-                                                    label={file.name ?? file.filename ?? ''}
-                                                    href={`/document/${file.id}`}
-                                                    level={courseLevel + 2}
-                                                    icon="document"
-                                                    active={file.id === document?.id}
-                                                />
-                                            ))}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        );
-                    })}
-                </div>
+                <span className="h-6 w-5 shrink-0" aria-hidden="true" />
             )}
-        </nav>
+
+            <Link
+                href={href}
+                title={title ?? label}
+                aria-current={active ? 'page' : undefined}
+                className="flex min-w-0 flex-1 items-center gap-1.5 py-1 pr-1 rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
+            >
+                <Icon size={13} className="shrink-0 text-vtk-muted" aria-hidden="true" />
+                {/* Programme names differ only in their tail ("...wetenschappen: bouwkunde"), so
+                    clipping them to one line makes every row read the same. They get the room to
+                    wrap; everything below them is short enough to truncate. */}
+                <span className={`min-w-0 flex-1 ${depth === 0 ? 'line-clamp-3' : 'truncate'}`}>{label}</span>
+                {badge !== undefined && badge > 0 && (
+                    <span className="shrink-0 text-[11px] tabular-nums text-vtk-muted">{badge}</span>
+                )}
+            </Link>
+        </div>
     );
 }
 
-/** The courses taught by one module, or null while the module has not been loaded. */
-function useModuleCourses(moduleId?: number): Course[] | null {
-    const { request } = useApi<unknown>();
-    const [courses, setCourses] = useState<Course[] | null>(null);
-
-    useEffect(() => {
-        if (moduleId === undefined) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setCourses(null);
-            return;
-        }
-
-        let cancelled = false;
-
-        const fetchModule = async () => {
-            const data = await request('GET', `/api/modules/${moduleId}`);
-            if (cancelled) return;
-
-            const loaded: Module | null = data ? convertToModule(data) : null;
-            setCourses(loaded?.courses ?? null);
-        };
-
-        void fetchModule();
-
-        return () => {
-            cancelled = true;
-        };
-    }, [moduleId, request]);
-
-    return courses;
+function EmptyRow({ depth, label }: { depth: number; label: string }) {
+    return (
+        <div
+            className="shrink-0 py-1 text-[12px] italic text-vtk-muted"
+            style={{ paddingLeft: `${Math.min(depth, MAX_INDENT) * 0.7 + 1.25}rem` }}
+        >
+            {label}
+        </div>
+    );
 }
 
-/**
- * The document categories, in the reader's language. Fetched only when the tree actually
- * draws them - on a course page the page body already lists them as cards.
- */
+/** The document categories, in the reader's language, fetched only when the tree draws them. */
 function useDocumentCategories(enabled: boolean): DocumentCategory[] {
     const { request } = useApi<HydraCollection<unknown>>();
     const [categories, setCategories] = useState<DocumentCategory[]>([]);
@@ -250,19 +397,15 @@ function useDocumentCategories(enabled: boolean): DocumentCategory[] {
 
         let cancelled = false;
 
-        const fetchCategories = async () => {
+        void (async () => {
             const result = await request('GET', `/api/document_categories?lang=${language}`);
             if (cancelled) return;
 
             const members = result?.['hydra:member'];
             setCategories(Array.isArray(members) ? members.map(convertToDocumentCategory) : []);
-        };
+        })();
 
-        void fetchCategories();
-
-        return () => {
-            cancelled = true;
-        };
+        return () => { cancelled = true; };
     }, [enabled, language, request]);
 
     return categories;

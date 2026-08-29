@@ -1,6 +1,7 @@
 'use client';
 
 import { useUser } from '@/components/UserContext';
+import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import { GraduationCap, Layers } from 'lucide-react';
 import Link from 'next/link';
@@ -24,7 +25,7 @@ const FavoriteRow = ({ id, name, typeLabel, type, icon: Icon }: FavoriteRowProps
     <div className="group relative">
         <Link
             className="flex items-center gap-3.5 px-5 py-2.5 pr-12 transition-colors hover:bg-vtk-paper-2"
-            href={`/courses?${type}=${id}`}
+            href={type === 'program' ? curriculumHref.program({ id }) : curriculumHref.module({ id })}
         >
             <Icon aria-hidden="true" className="h-4 w-4 shrink-0 text-vtk-muted" />
             <div className="min-w-0 flex-1">

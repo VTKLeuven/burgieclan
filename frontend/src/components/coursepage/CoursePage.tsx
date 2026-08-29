@@ -87,7 +87,7 @@ export default function CoursePage() {
                 {/* Editorial page head: breadcrumb kicker, display title, and
                     the course facts as a right-aligned spec block. */}
                 <PageHead
-                    kicker={<DynamicBreadcrumb course={course} />}
+                    kicker={<DynamicBreadcrumb />}
                     title={courseName}
                     actions={
                         <FavoriteButton
@@ -137,11 +137,11 @@ export default function CoursePage() {
                             <LinkIcon size={14} />
                             ECTS
                         </Link>
+
+                        <CoursePlacement />
                     </div>
 
                     <RelatedCourses course={course} />
-
-                    <CoursePlacement />
                 </PageHead>
 
                 {/* Documents */}

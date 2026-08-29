@@ -250,7 +250,8 @@
         "hide-empty-categories": "Verberg lege mappen",
         "no-documents-yet": "Er staan nog geen documenten bij dit vak.",
         "placement": {
-            "label": "Dit vak zit in"
+            "other_one": "ook in 1 andere richting",
+            "other_other": "ook in {{count}} andere richtingen"
         }
     },
     "download": {
@@ -286,8 +287,6 @@
         "matches-found": "Gevonden overeenkomsten",
         "no-modules-in-program": "Deze richting bevat geen modules.",
         "no-courses-in-module": "Deze module bevat geen vakken.",
-        "meta-programs": "richtingen",
-        "meta-courses": "vakken",
         "module-favorites": {
             "add-label": "Voeg alles toe aan favorieten",
             "remove-label": "Verwijder alles uit favorieten",
@@ -298,7 +297,15 @@
             "removed": "De vakken van deze module zijn verwijderd uit Mijn vakken.",
             "already-added": "Alle vakken van deze module staan al in Mijn vakken.",
             "error": "Favorieten konden niet worden bijgewerkt. Probeer opnieuw."
-        }
+        },
+        "groups": "Onderdelen",
+        "result-count": "{{count}} vakken gevonden",
+        "meta-programs_one": "richting",
+        "meta-programs_other": "richtingen",
+        "meta-modules_one": "onderdeel",
+        "meta-modules_other": "onderdelen",
+        "meta-courses_one": "vak",
+        "meta-courses_other": "vakken"
     },
     "account": {
         "menu": "Gebruikersmenu",
@@ -452,6 +459,6 @@
         "courses": "Blader door alle vakken op Burgieclan."
     },
     "curriculum-tree": {
-        "label": "Mappen"
+        "label": "Curriculum"
     }
 }
