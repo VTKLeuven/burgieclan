@@ -128,4 +128,75 @@ test.describe('PDF Viewer Test', () => {
     await page.waitForTimeout(300);
     expect(await pageUnder(pointerY)).toBe(7);
   });
+
+  test('does not blink while re-rendering after a zoom', async ({ page }) => {
+    // 1. Log in
+    await page.goto('/login');
+    const cookieAcceptButton = page.locator('button', { hasText: /understand|begrijp/i });
+    if (await cookieAcceptButton.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await cookieAcceptButton.click();
+    }
+    const manualLoginToggle = page.locator('button', { hasText: /manually|handmatig/i });
+    await manualLoginToggle.click();
+    await page.locator('input#username').fill('john_user');
+    await page.locator('input#password').fill('kitten');
+    await page.locator('form button[type="submit"]').click();
+    await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 10000 });
+
+    await page.goto('/document/116');
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('canvas').first()).toBeVisible({ timeout: 10000 });
+    await page.locator('[data-pdf-page="3"]').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(1000);
+
+    // Sample every frame: is the page under the pointer showing nothing at all? react-pdf hides its
+    // canvas for the whole of a re-render, so without a stand-in the page blinks white on each zoom.
+    await page.evaluate(() => {
+      const state = { blank: 0, hidden: 0, covered: 0 };
+      (window as unknown as Record<string, unknown>).__paint = state;
+
+      const tick = () => {
+        const centre = window.innerHeight / 2;
+        for (const wrapper of document.querySelectorAll<HTMLElement>('[data-pdf-page]')) {
+          const box = wrapper.getBoundingClientRect();
+          if (centre < box.top || centre > box.bottom) continue;
+
+          const canvas = wrapper.querySelector<HTMLCanvasElement>('canvas.react-pdf__Page__canvas');
+          const standIn = wrapper.querySelector<HTMLCanvasElement>('canvas[data-pdf-snapshot]');
+          const canvasBlank = !canvas || canvas.width === 0 || getComputedStyle(canvas).visibility === 'hidden';
+          const covered = !!standIn && getComputedStyle(standIn).visibility !== 'hidden' && standIn.width > 0;
+
+          if (canvasBlank) state.hidden++;
+          if (covered) state.covered++;
+          if (canvasBlank && !covered) state.blank++;
+          break;
+        }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+
+    // 2. Zoom in and back out, leaving time for the debounced re-render to land each way
+    const viewport = page.viewportSize()!;
+    await page.mouse.move(Math.round(viewport.width / 2), Math.round(viewport.height / 2));
+    await page.keyboard.down('Control');
+    for (let step = 0; step < 5; step++) {
+      await page.mouse.wheel(0, -120);
+      await page.waitForTimeout(60);
+    }
+    await page.waitForTimeout(1500);
+    for (let step = 0; step < 5; step++) {
+      await page.mouse.wheel(0, 120);
+      await page.waitForTimeout(60);
+    }
+    await page.waitForTimeout(1500);
+    await page.keyboard.up('Control');
+
+    const paint = await page.evaluate(() => (window as unknown as Record<string, { blank: number; hidden: number; covered: number }>).__paint);
+
+    // The re-render window has to have happened, otherwise this proves nothing...
+    expect(paint.hidden).toBeGreaterThan(0);
+    // ...and every frame of it must have had the previous render standing in.
+    expect(paint.blank).toBe(0);
+  });
 });
