@@ -1,24 +1,27 @@
 'use client';
 
-import { useCoursePaths } from '@/hooks/useCoursePaths';
-import type { Course, CurriculumPath, Document, DocumentCategory } from '@/types/entities';
+import { useApi } from '@/hooks/useApi';
+import type { Course, CurriculumPath, Document, DocumentCategory, Module, Program } from '@/types/entities';
+import { convertToCurriculumPaths, convertToModulePath } from '@/utils/convertToEntity';
 import { rememberBranch, selectPath } from '@/utils/curriculumBranch';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 /**
- * Where in the curriculum the reader currently is: the course page they opened, and the
- * category and document below it once they go deeper.
+ * Where in the curriculum the reader currently is. A programme or module page names its own
+ * node; a course, category or document page names the course and lets the branch be resolved.
  */
 export interface CurriculumLocation {
+    program?: Program;
+    module?: Module;
     course?: Course;
     category?: DocumentCategory;
     document?: Document;
 }
 
 interface CurriculumLocationValue extends CurriculumLocation {
-    /** Every placement of the current course; empty while loading and for courses no program reaches. */
+    /** Every placement of the current course; empty on programme and module pages. */
     paths: CurriculumPath[];
-    /** The one placement the breadcrumb and the folder tree agree to show. */
+    /** The branch the breadcrumb and the folder tree agree to show. */
     activePath: CurriculumPath | null;
     pathsLoading: boolean;
     /** Switch the shown placement to the branch ending in this module. */
@@ -37,18 +40,66 @@ const EMPTY: CurriculumLocationValue = {
 };
 
 /**
- * Lets the folder tree and the breadcrumbs follow the page without each of them fetching the
- * same thing. The tree lives in the layout, above every route, so it cannot read a route's
- * params; the pages already hold the course, category and document and simply hand them over,
- * and the placement lookup that both need happens here, once.
+ * Resolves, once per page, the branch every part of the chrome needs: the breadcrumb above the
+ * title and the folder tree in the rail. Both live outside the route that knows the answer, and
+ * neither should pay for its own lookup.
  */
 export function CurriculumLocationProvider({ children }: { children: ReactNode }) {
     const [location, setLocation] = useState<CurriculumLocation>({});
-    const { paths, loading: pathsLoading } = useCoursePaths(location.course?.id);
-    const courseId = location.course?.id;
+    const { request } = useApi<unknown>();
 
-    // A course shared between programmes can be looked at from any of them; this is the one
-    // the reader picked on this page, which outranks the branch they walked to get here.
+    const courseId = location.course?.id;
+    const moduleId = location.module?.id;
+    const program = location.program;
+
+    const [paths, setPaths] = useState<CurriculumPath[]>([]);
+    const [modulePath, setModulePath] = useState<CurriculumPath | null>(null);
+    const [pathsLoading, setPathsLoading] = useState(false);
+
+    // A course can sit in several programmes and needs the full list; a module sits in exactly
+    // one place. A programme is its own branch and needs no lookup at all.
+    useEffect(() => {
+        if (courseId === undefined) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setPaths([]);
+            return;
+        }
+
+        let cancelled = false;
+        setPathsLoading(true);
+
+        void (async () => {
+            const result = await request('GET', `/api/courses/${courseId}/paths`);
+            if (cancelled) return;
+            setPaths(result ? convertToCurriculumPaths(result) : []);
+            setPathsLoading(false);
+        })();
+
+        return () => { cancelled = true; };
+    }, [courseId, request]);
+
+    useEffect(() => {
+        if (moduleId === undefined) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setModulePath(null);
+            return;
+        }
+
+        let cancelled = false;
+        setPathsLoading(true);
+
+        void (async () => {
+            const result = await request('GET', `/api/modules/${moduleId}/path`);
+            if (cancelled) return;
+            setModulePath(result ? convertToModulePath(result) : null);
+            setPathsLoading(false);
+        })();
+
+        return () => { cancelled = true; };
+    }, [moduleId, request]);
+
+    // A course shared between programmes can be looked at from any of them; this is the one the
+    // reader picked on this page, which outranks the branch they walked to get here.
     const [chosenBranch, setChosenBranch] = useState<number | null>(null);
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -56,15 +107,19 @@ export function CurriculumLocationProvider({ children }: { children: ReactNode }
     }, [courseId]);
 
     const activePath = useMemo(() => {
-        if (courseId === undefined) return null;
-
-        if (chosenBranch !== null) {
-            const chosen = paths.find((path) => path.modules.some((module) => module.id === chosenBranch));
-            if (chosen) return chosen;
+        if (courseId !== undefined) {
+            if (chosenBranch !== null) {
+                const chosen = paths.find((path) => path.modules.some((node) => node.id === chosenBranch));
+                if (chosen) return chosen;
+            }
+            return selectPath(paths, courseId);
         }
 
-        return selectPath(paths, courseId);
-    }, [paths, courseId, chosenBranch]);
+        if (moduleId !== undefined) return modulePath;
+        if (program) return { program, modules: [] };
+
+        return null;
+    }, [courseId, moduleId, program, paths, modulePath, chosenBranch]);
 
     const chooseBranch = useCallback((leafModuleId: number) => {
         if (courseId !== undefined) {
@@ -90,19 +145,19 @@ export function useCurriculumLocation(): CurriculumLocationValue {
 }
 
 /**
- * Publishes the page's position to the tree, and clears it on unmount so a page with no
+ * Publishes the page's position to the chrome, and clears it on unmount so a page with no
  * curriculum position (the FAQ, the account page) does not inherit the last one.
  */
 export function usePublishCurriculumLocation(location: CurriculumLocation): void {
     const context = useContext(CurriculumLocationContext);
     const setLocation = context?.setLocation;
-    const { course, category, document } = location;
+    const { program, module, course, category, document } = location;
 
     useEffect(() => {
         if (!setLocation) return;
 
-        setLocation({ course, category, document });
+        setLocation({ program, module, course, category, document });
 
         return () => setLocation({});
-    }, [setLocation, course, category, document]);
+    }, [setLocation, program, module, course, category, document]);
 }

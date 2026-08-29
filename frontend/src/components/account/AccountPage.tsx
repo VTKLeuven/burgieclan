@@ -8,6 +8,7 @@ import DocumentList from "@/components/account/DocumentList";
 import FavoriteList from "@/components/account/FavoriteList";
 import PageHead from "@/components/ui/PageHead";
 import type { Course, Document, Module, Program } from "@/types/entities";
+import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { localizedCourseName } from '@/utils/courseName';
@@ -22,12 +23,11 @@ const mapCoursesToItems = (courses: Course[], locale: string) => {
     }));
 };
 
-// Modules and programmes have no detail page of their own; the navigator opens them in place.
 const mapModulesToItems = (modules: Module[]) => {
     return modules.map(module => ({
         id: module.id,
         name: module.name,
-        redirectUrl: `/courses?module=${module.id}`,
+        redirectUrl: curriculumHref.module(module),
         type: 'module' as const
     }));
 };
@@ -36,7 +36,7 @@ const mapProgramsToItems = (programs: Program[]) => {
     return programs.map(program => ({
         id: program.id,
         name: program.name,
-        redirectUrl: `/courses?program=${program.id}`,
+        redirectUrl: curriculumHref.program(program),
         type: 'program' as const
     }));
 };

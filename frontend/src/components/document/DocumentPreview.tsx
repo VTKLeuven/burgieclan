@@ -108,11 +108,7 @@ export default function DocumentPreview({ id }: { id: string }) {
                 title, and the file facts as a right-aligned spec block. */}
             <PageHead
                 kicker={
-                    <DynamicBreadcrumb
-                        course={document.course}
-                        category={document.category}
-                        document={document}
-                    />
+                    <DynamicBreadcrumb />
                 }
                 title={document.name}
                 icon={File}
