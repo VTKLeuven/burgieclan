@@ -97,8 +97,16 @@ test('walk the curriculum', async ({ page, context }) => {
 
   await page.goto('/');
   await settle(page);
-  await expect(page.locator('aside'), 'home should not render the curriculum sidebar').toHaveCount(0);
+  await expect(page.locator('aside'), 'home should keep the favourites sidebar').toBeVisible();
+  await expect(page.locator('aside nav'), 'home should not render the curriculum navigator').toHaveCount(0);
+  await expect(page.locator('aside').getByRole('button', { name: /My Courses|Mijn Vakken/i })).toBeVisible();
+  await expect(page.locator('aside').getByRole('button', { name: /Favorite Documents|Favoriete Documenten/i })).toBeVisible();
   await capture(page, '00-home');
+
+  await page.goto('/faq');
+  await settle(page);
+  await expect(page.locator('aside'), 'FAQ should keep the favourites sidebar').toBeVisible();
+  await expect(page.locator('aside nav'), 'FAQ should not render the curriculum navigator').toHaveCount(0);
 
   await page.goto('/courses');
   await settle(page);

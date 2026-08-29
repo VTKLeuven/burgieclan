@@ -62,10 +62,13 @@ const NavigationSidebar = () => {
   const sectionButton =
     'flex w-full shrink-0 items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-sm font-semibold text-vtk-ink transition-colors hover:bg-vtk-paper-2';
 
-  // The rail exists to browse beside content. On the landing page it only competes with the
-  // dashboard, so omit it for both the unprefixed Dutch route and localized home routes.
-  const isHomePage = pathname === '/' || /^\/(?:en|nl)\/?$/.test(pathname);
-  if (isHomePage) return null;
+  // Home, FAQ, account and public content keep the original favourites sidebar. The curriculum
+  // tree is added only while the reader is actually browsing curriculum content.
+  const pathWithoutLocale = pathname.replace(/^\/(?:en|nl)(?=\/|$)/, '') || '/';
+  const showCurriculumNavigator = pathWithoutLocale === '/courses'
+    || pathWithoutLocale.startsWith('/courses/')
+    || pathWithoutLocale.startsWith('/course/')
+    || pathWithoutLocale.startsWith('/document/');
 
   return (
     <aside className="sticky top-[72px] hidden shrink-0 self-start md:block">
@@ -93,7 +96,7 @@ const NavigationSidebar = () => {
             {!isCollapsed && <span>{t('sidebar.home')}</span>}
           </Link>
 
-          {!isCollapsed && (
+          {!isCollapsed && showCurriculumNavigator && (
             <>
               <div className="my-1 shrink-0 border-t border-vtk-line" />
               <div className="vtk-label shrink-0 px-2.5 pb-1 flex items-center gap-2">
