@@ -38,7 +38,6 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
     const stackRef = useRef<HTMLDivElement>(null);
     const pointerInsideRef = useRef(false);
     const effectiveZoomRef = useRef(1);
-    const updateTimerRef = useRef<number | null>(null);
 
     // Height / width of the first page, which is what "whole page" has to solve for. Default to standard A4 (1.414).
     const [pageAspect, setPageAspect] = useState<number>(1.414);
@@ -99,31 +98,11 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
         effectiveZoomRef.current = effectiveZoom;
     }, [effectiveZoom]);
 
-    const scheduleReactZoomUpdate = useCallback((zoom: number) => {
-        if (updateTimerRef.current !== null) {
-            window.cancelAnimationFrame(updateTimerRef.current);
-        }
-        updateTimerRef.current = window.requestAnimationFrame(() => {
-            setZoom(zoom);
-        });
-    }, [setZoom]);
-
     const applyZoom = useCallback((zoom: number) => {
         const next = clampPdfZoom(zoom);
         effectiveZoomRef.current = next;
-
-        if (stackRef.current) {
-            stackRef.current.style.transform = `scale(${next})`;
-        }
-        if (sizerRef.current && baseWidth > 0) {
-            sizerRef.current.style.width = `${Math.round(baseWidth * next)}px`;
-            if (stackHeight > 0) {
-                sizerRef.current.style.height = `${Math.round(stackHeight * next)}px`;
-            }
-        }
-
-        scheduleReactZoomUpdate(next);
-    }, [baseWidth, stackHeight, scheduleReactZoomUpdate]);
+        setZoom(next);
+    }, [setZoom]);
 
     const handleFitChange = useCallback((fit: PdfFitMode) => {
         setFit(fit);
@@ -133,11 +112,9 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
         applyZoom(effectiveZoomRef.current * factor);
     }, [applyZoom]);
 
-    const zoomAround = useCallback((clientX: number, _clientY: number, factor: number) => {
+    const zoomAround = useCallback((clientX: number, factor: number) => {
         const container = scrollRef.current;
-        const stack = stackRef.current;
-        const sizer = sizerRef.current;
-        if (!container || !stack || !sizer || baseWidth <= 0) return;
+        if (!container || baseWidth <= 0) return;
 
         const current = effectiveZoomRef.current;
         const next = clampPdfZoom(current * factor);
@@ -152,20 +129,12 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
             : 0;
 
         effectiveZoomRef.current = next;
-
-        // Instant GPU transform update
-        stack.style.transform = `scale(${next})`;
-        sizer.style.width = `${Math.round(baseWidth * next)}px`;
-        if (stackHeight > 0) {
-            sizer.style.height = `${Math.round(stackHeight * next)}px`;
-        }
+        setZoom(next);
 
         if (overflows && Math.abs(deltaScrollLeft) > 0.01) {
             container.scrollLeft += deltaScrollLeft;
         }
-
-        scheduleReactZoomUpdate(next);
-    }, [baseWidth, stackHeight, scheduleReactZoomUpdate]);
+    }, [baseWidth, setZoom]);
 
     // Handle trackpad pinch gestures across all browsers:
     // - Safari uses native gesture events (gesturestart, gesturechange, gestureend)
@@ -180,7 +149,7 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
             event.preventDefault();
             const delta = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
             const factor = Math.exp(-Math.max(-20, Math.min(20, delta)) * 0.003);
-            zoomAround(event.clientX, event.clientY, factor);
+            zoomAround(event.clientX, factor);
         };
 
         let gestureStartZoom = 1;
@@ -191,14 +160,13 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
 
         const onGestureChange = (event: Event) => {
             event.preventDefault();
-            const e = event as Event & { scale?: number; clientX?: number; clientY?: number };
+            const e = event as Event & { scale?: number; clientX?: number };
             if (typeof e.scale === 'number' && e.scale > 0) {
                 const target = clampPdfZoom(gestureStartZoom * e.scale);
                 const current = effectiveZoomRef.current;
                 if (current > 0) {
                     const clientX = e.clientX ?? (window.innerWidth / 2);
-                    const clientY = e.clientY ?? (window.innerHeight / 2);
-                    zoomAround(clientX, clientY, target / current);
+                    zoomAround(clientX, target / current);
                 }
             }
         };
