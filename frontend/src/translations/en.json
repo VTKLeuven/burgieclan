@@ -79,7 +79,8 @@
                 "placeholder": "Choose a document name"
             },
             "course": {
-                "label": "Course"
+                "label": "Course",
+                "placeholder": "Search by course name or code (min. {{count}} characters)"
             },
             "category": {
                 "label": "Category"
@@ -155,7 +156,9 @@
             "fetch_failed": "Failed to load form data. Please try again."
         },
         "combo": {
-            "no_results": "No results found"
+            "no_results": "No results found",
+            "minimum_query": "Type at least {{count}} characters to search",
+            "loading": "Searching..."
         }
     },
     "course-page": {
@@ -409,6 +412,7 @@
         "add_document": "Add Document",
         "expand": "Expand sidebar",
         "collapse": "Collapse sidebar",
+        "resize": "Resize sidebar (double-click to reset)",
         "toggle_courses": "Toggle courses",
         "toggle_documents": "Toggle documents",
         "log_out": "Log Out",

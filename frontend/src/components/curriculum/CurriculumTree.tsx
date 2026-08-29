@@ -42,7 +42,7 @@ export default function CurriculumTree() {
     const { t, i18n } = useTranslation();
     const { user } = useUser();
     const { request } = useApi<unknown>();
-    const { program, module, course, category, document, activePath } = useCurriculumLocation();
+    const { program, module, course, category, document, paths, activePath } = useCurriculumLocation();
 
     const programsEndpoint = '/api/programs?pagination=false&order[name]=asc';
     const [programs, setPrograms] = useState<Program[]>(() => {
@@ -139,13 +139,40 @@ export default function CurriculumTree() {
         return keys;
     }, [activePath, course, category]);
 
+    // A shared course may occur in several programmes. Keep only its active placement open:
+    // otherwise an earlier/manual expansion shows the current course a second time and makes it
+    // look as if two curriculum branches are active at once.
+    const alternativeBranchKeys = useMemo(() => {
+        if (!activePath || paths.length < 2) return [];
+
+        const activeKeys = new Set<NodeKey>([
+            programKey(activePath.program.id),
+            ...activePath.modules.map((node) => moduleKey(node.id)),
+        ]);
+        const alternatives = new Set<NodeKey>();
+
+        paths.forEach((path) => {
+            const keys = [
+                programKey(path.program.id),
+                ...path.modules.map((node) => moduleKey(node.id)),
+            ];
+            keys.forEach((key) => {
+                if (!activeKeys.has(key)) alternatives.add(key);
+            });
+        });
+
+        return [...alternatives];
+    }, [activePath, paths]);
+
     const branchSignature = branchKeys.join('|');
+    const alternativeBranchSignature = alternativeBranchKeys.join('|');
     useEffect(() => {
         if (branchKeys.length === 0) return;
 
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setExpanded((previous) => {
             const next = new Set(previous);
+            alternativeBranchKeys.forEach((key) => next.delete(key));
             branchKeys.forEach((key) => next.add(key));
             return next;
         });
@@ -157,7 +184,7 @@ export default function CurriculumTree() {
         // branchSignature stands in for branchKeys: a new array each render would re-run this
         // on every keystroke elsewhere in the app.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [branchSignature]);
+    }, [branchSignature, alternativeBranchSignature]);
 
     const toggle = useCallback((key: NodeKey, load?: () => void) => {
         setExpanded((previous) => {

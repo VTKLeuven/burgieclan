@@ -10,6 +10,14 @@ import { useUser } from '@/components/UserContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/components/header/LanguageSwitcher';
 import Link from 'next/link';
+import { recordOldBurgieclanClick } from '@/actions/analytics';
+
+interface NavigationItem {
+    name: string;
+    href: string;
+    external?: boolean;
+    onClick?: () => void;
+}
 
 const vtkLogoMaskStyle: CSSProperties = {
     backgroundColor: '#c8c9cd',
@@ -40,10 +48,15 @@ export default function Header() {
     const { user } = useUser();
     const isAuthenticated = user !== null;
 
-    const navigation = [
+    const navigation: NavigationItem[] = [
         { name: t('courses'), href: '/courses' },
         { name: t('FAQ'), href: '/faq' },
-        { name: t('header.old_burgieclan'), href: 'https://burgieclan-backup.vtk.be', external: true },
+        {
+            name: t('header.old_burgieclan'),
+            href: 'https://burgieclan-backup.vtk.be',
+            external: true,
+            onClick: () => { void recordOldBurgieclanClick(); },
+        },
         {
             name: t('header.new_burgieclan_feedback'),
             href: 'https://docs.google.com/forms/d/e/1FAIpQLSdv8uIPyN9IMpCLNOzSKoiCbTqrdefb9uw-AfGtr0HjEG4REA/viewform?usp=publish-editor',
@@ -106,6 +119,7 @@ export default function Header() {
                                     href={item.href}
                                     target={item.external ? '_blank' : undefined}
                                     rel={item.external ? 'noopener noreferrer' : undefined}
+                                    onClick={item.onClick}
                                     className="whitespace-nowrap text-sm font-medium text-vtk-paper/80 transition-colors hover:text-white rounded-sm focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white"
                                 >
                                     {item.name}
@@ -152,7 +166,10 @@ export default function Header() {
                                 href={item.href}
                                 target={item.external ? '_blank' : undefined}
                                 rel={item.external ? 'noopener noreferrer' : undefined}
-                                onClick={() => setMobileMenuOpen(false)}
+                                onClick={() => {
+                                    item.onClick?.();
+                                    setMobileMenuOpen(false);
+                                }}
                                 className="rounded-xl px-3 py-2.5 text-base font-medium text-vtk-paper/80 transition-colors hover:bg-white/10 hover:text-white"
                             >
                                 {item.name}

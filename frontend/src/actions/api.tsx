@@ -4,6 +4,26 @@ import { getActiveJWT, logOut } from "@/actions/auth";
 import { headers } from 'next/headers';
 import { redirect } from "next/navigation";
 
+type SharedAnnouncementCacheEntry = {
+    value: unknown;
+    expiresAt: number;
+};
+
+// Announcements are identical for every authenticated reader. Keep one response per locale/time
+// bucket in the Next server process, so different users do not all repeat the same backend query.
+const SHARED_ANNOUNCEMENT_TTL_MS = 5 * 60_000;
+const sharedAnnouncementCache = new Map<string, SharedAnnouncementCacheEntry>();
+
+const readSharedAnnouncement = (endpoint: string): unknown | undefined => {
+    const now = Date.now();
+    const cached = sharedAnnouncementCache.get(endpoint);
+
+    if (cached && cached.expiresAt > now) return cached.value;
+
+    sharedAnnouncementCache.delete(endpoint);
+    return undefined;
+};
+
 /**
  * Encodes an API error response from the backend server into a structured serializable format for the frontend.
  */
@@ -49,6 +69,14 @@ export const ApiClient = async (method: string, endpoint: string, body?: unknown
         const url = backendBaseUrl + endpoint;
 
         const jwt = await getActiveJWT();
+        const usesSharedAnnouncementCache = method.toUpperCase() === 'GET'
+            && endpoint.startsWith('/api/announcements')
+            && Boolean(jwt);
+
+        if (usesSharedAnnouncementCache) {
+            const cached = readSharedAnnouncement(endpoint);
+            if (cached !== undefined) return cached;
+        }
 
         const requestHeaders = new Headers(customHeaders || {});
         // If body is FormData, don't set content-type (useful for file uploads)
@@ -81,7 +109,14 @@ export const ApiClient = async (method: string, endpoint: string, body?: unknown
             if (response.status === 204) {
                 return null; // No content response
             }
-            return await response.json();
+            const result = await response.json();
+            if (usesSharedAnnouncementCache) {
+                sharedAnnouncementCache.set(endpoint, {
+                    value: result,
+                    expiresAt: Date.now() + SHARED_ANNOUNCEMENT_TTL_MS,
+                });
+            }
+            return result;
         }
 
         // Handle 401 errors (except for login endpoint)

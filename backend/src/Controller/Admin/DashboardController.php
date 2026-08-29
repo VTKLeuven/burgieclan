@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\User;
 use App\Repository\DocumentRepository;
 use App\Repository\FaqQuestionRepository;
+use App\Repository\LegacySiteClickRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -22,6 +23,7 @@ class DashboardController extends AbstractDashboardController
     public function __construct(
         private readonly DocumentRepository $documentRepository,
         private readonly FaqQuestionRepository $faqQuestionRepository,
+        private readonly LegacySiteClickRepository $legacySiteClickRepository,
     ) {}
 
     public function index(): Response
@@ -70,6 +72,9 @@ class DashboardController extends AbstractDashboardController
             ->setPermission(User::ROLE_SUPER_ADMIN);
         yield MenuItem::linkTo(AnnouncementCrudController::class, 'Announcements', "fa-solid fa-bullhorn")
             ->setPermission(User::ROLE_ADMIN);
+        yield MenuItem::linkTo(LegacySiteClickCrudController::class, 'Old Burgieclan usage', 'fa-solid fa-chart-column')
+            ->setPermission(User::ROLE_ADMIN)
+            ->setBadge($this->legacySiteClickRepository->count([]), 'info');
         yield MenuItem::linkTo(ProgramCrudController::class, 'Programs', 'fa fa-briefcase')
             ->setPermission(User::ROLE_ADMIN);
         yield MenuItem::linkTo(ModuleCrudController::class, 'Modules', 'fa fa-folder')
@@ -85,7 +90,11 @@ class DashboardController extends AbstractDashboardController
                         ->setPermission(User::ROLE_ADMIN)
                 ]
             );
-        $pendingDocumentsMenu = MenuItem::linkTo(DocumentPendingCrudController::class, 'Pending Documents', 'fa-regular fa-file');
+        $pendingDocumentsMenu = MenuItem::linkTo(
+            DocumentPendingCrudController::class,
+            'Pending Documents',
+            'fa-regular fa-file'
+        );
         $documentsMenu = MenuItem::subMenu('Documents', 'fa-solid fa-file')
             ->setSubItems(
                 [

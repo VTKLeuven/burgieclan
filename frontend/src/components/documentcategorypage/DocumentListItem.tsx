@@ -5,7 +5,7 @@ import FavoriteButton from '@/components/ui/FavoriteButton';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import VoteButton from '@/components/ui/buttons/VoteButton';
 import type { Document } from '@/types/entities';
-import { inlineUrl, previewKindFor } from '@/utils/previewableFile';
+import { fileExtensionFor, inlineUrl, previewKindFor } from '@/utils/previewableFile';
 import { ExternalLink, Tag as TagIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -31,6 +31,9 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
     const inlineHref = document.contentUrl && previewKindFor(document.contentUrl)
         ? inlineUrl(document.contentUrl)
         : null;
+    const fileType = (
+        fileExtensionFor(document.filename) ?? fileExtensionFor(document.contentUrl)
+    )?.toUpperCase();
 
     return (
         // Wraps on narrow screens: the title row keeps the checkbox, and the
@@ -56,13 +59,17 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                 >
                     {document.name}
                 </ApiPrefetchLink>
-                {/* Display tags if they exist */}
-                {document.tags && document.tags.length > 0 && (
+                {(fileType || (document.tags && document.tags.length > 0)) && (
                     <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-vtk-muted">
                         <span className="flex items-center gap-1.5">
                             <TagIcon size={12} className="shrink-0" />
                             <span className="flex flex-wrap gap-1">
-                                {document.tags.map(tag => (
+                                {fileType && (
+                                    <span className="rounded-full bg-vtk-paper-2 px-2 py-0.5 text-[11px] font-medium text-vtk-body">
+                                        {fileType}
+                                    </span>
+                                )}
+                                {document.tags?.map(tag => (
                                     <span
                                         key={tag.id}
                                         className="rounded-full bg-vtk-paper-2 px-2 py-0.5 text-[11px] text-vtk-body"
@@ -123,6 +130,7 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                         <ExternalLink size={15} />
                     </a>
                 )}
+                {!inlineHref && <span className="h-8 w-8 shrink-0" aria-hidden="true" />}
                 <DownloadButton documents={[document]} size={15} className="h-8 w-8" />
             </div>
         </div>

@@ -5,6 +5,7 @@ import { UploadField } from '@/components/upload/UploadField';
 import UploadTagFilter from '@/components/upload/UploadTagFilter';
 import { useUser } from '@/components/UserContext';
 import { useFormFields } from '@/hooks/useFormFields';
+import { COURSE_SEARCH_MIN_LENGTH, useCourseSearch } from '@/hooks/useCourseSearch';
 import { useYearOptions } from '@/hooks/useYearOptions';
 import { Course, DocumentCategory } from '@/types/entities';
 import { UploadFormData } from '@/types/upload';
@@ -38,6 +39,7 @@ export default function UploadForm({
     const { user } = useUser();
     const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
     const [selectedTagQueries, setSelectedTagQueries] = useState<string[]>([]);
+    const [courseQuery, setCourseQuery] = useState('');
 
     const {
         register,
@@ -54,20 +56,33 @@ export default function UploadForm({
         }
     });
 
-    const { courses, categories, isLoading: isLoadingFields, error } = useFormFields();
+    const { categories, isLoading: isLoadingFields, error } = useFormFields();
+    const {
+        courses,
+        isSearching: isSearchingCourses,
+        error: courseSearchError,
+    } = useCourseSearch(courseQuery);
     const yearOptions = useYearOptions();
+    const initialCourse = initialData?.course;
 
-    // Alphabetical: the API returns courses in insertion order, which is the order they were
-    // imported in and means nothing to whoever is scrolling the list looking for their course.
-    // localeCompare so accented titles sort where a reader expects them, not after Z.
+    // Sort the small result set by its localized display label, including accents.
     const courseOptions = useMemo(() => {
-        return courses
+        const availableCourses = initialCourse
+            && !courses.some(course => course.id === initialCourse.id)
+            ? [initialCourse, ...courses]
+            : courses;
+
+        return availableCourses
             .map(course => ({
                 id: course.id,
-                name: localizedCourseName(course, i18n.language) || course.name || course.code || `${t('upload.form.course.label')} #${course.id}`
+                name: (() => {
+                    const title = localizedCourseName(course, i18n.language) || course.name;
+                    if (title && course.code) return `${title} (${course.code})`;
+                    return title || course.code || `${t('upload.form.course.label')} #${course.id}`;
+                })(),
             }))
             .sort((a, b) => a.name.localeCompare(b.name, i18n.language));
-    }, [courses, i18n.language, t]);
+    }, [courses, i18n.language, initialCourse, t]);
 
     const categoryOptions = useMemo(() => {
         return categories.map(cat => ({
@@ -95,15 +110,13 @@ export default function UploadForm({
         }
     }, [watchedFile, watchedName, setValue]);
 
-    // Set initial form values when initialData is provided and form fields are loaded
+    // Preset values already identify the selected API resources. They do not need the full
+    // course catalogue to be downloaded before React Hook Form can accept them.
     useEffect(() => {
-        if (initialData && initialData.course && initialData.course.id && courses.length > 0) {
-            const initialId = initialData.course.id;
-            if (courses.find(course => course.id === initialId)) {
-                setValue('course', initialData.course.id, { shouldValidate: true });
-            }
+        if (initialData?.course?.id) {
+            setValue('course', initialData.course.id, { shouldValidate: true });
         }
-    }, [initialData, courses, setValue]);
+    }, [initialData, setValue]);
 
     useEffect(() => {
         if (initialData && initialData.category && initialData.category.id && categories.length > 0) {
@@ -127,9 +140,9 @@ export default function UploadForm({
 
     return (
         <form id="upload-form" onSubmit={handleSubmit(onSubmit)}>
-            {error && (
+            {(error || courseSearchError) && (
                 <div className="mb-4">
-                    <Text className="vtk-error-text">{error}</Text>
+                    <Text className="vtk-error-text">{error || t('form.errors.fetch_failed')}</Text>
                 </div>
             )}
 
@@ -153,7 +166,11 @@ export default function UploadForm({
                         error={errors.course}
                         name="course"
                         control={control}
-                        disabled={isLoading || isLoadingFields}
+                        disabled={isLoading}
+                        placeholder={t('upload.form.course.placeholder', { count: COURSE_SEARCH_MIN_LENGTH })}
+                        onQueryChange={setCourseQuery}
+                        minimumQueryLength={COURSE_SEARCH_MIN_LENGTH}
+                        optionsLoading={isSearchingCourses}
                     />
                 </div>
 

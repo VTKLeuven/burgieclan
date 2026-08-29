@@ -151,7 +151,7 @@ export default function CoursePage() {
 
                 {/* Documents */}
                 <div className="mt-8">
-                    <DocumentSections courseId={course.id} documentCounts={course.documentCounts} />
+                    <DocumentSections course={course} documentCounts={course.documentCounts} />
                 </div>
 
 

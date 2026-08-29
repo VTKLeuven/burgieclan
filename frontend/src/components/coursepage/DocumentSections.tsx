@@ -4,17 +4,18 @@ import DocumentCategoryPage from "@/components/coursepage/DocumentCategory";
 import CreateDocumentButton from '@/components/ui/CreateDocumentButton';
 import DownloadButton from "@/components/ui/DownloadButton";
 import { HydraCollection, readPreloadedApi, useApi } from "@/hooks/useApi";
-import type { DocumentCategory } from "@/types/entities";
+import type { Course, DocumentCategory } from "@/types/entities";
 import { convertToDocumentCategory } from "@/utils/convertToEntity";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface DocumentSectionsProps {
-    courseId: number;
+    course: Course;
     documentCounts?: Record<number, number>;
 }
 
-export default function DocumentSections({ courseId, documentCounts }: DocumentSectionsProps) {
+export default function DocumentSections({ course, documentCounts }: DocumentSectionsProps) {
+    const courseId = course.id;
     const { t, i18n } = useTranslation();
     const categoriesEndpoint = `/api/document_categories?lang=${i18n.language}`;
     const [documentCategories, setDocumentCategories] = useState<DocumentCategory[]>(() => {
@@ -70,7 +71,7 @@ export default function DocumentSections({ courseId, documentCounts }: DocumentS
                 </h2>
                 <div className="flex items-center gap-2">
                     <CreateDocumentButton
-                        initialData={{ course: { id: courseId } }}
+                        initialData={{ course }}
                         size={16}
                     />
                     <DownloadButton courses={[{ id: courseId }]} size={16} />

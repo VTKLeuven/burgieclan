@@ -79,7 +79,8 @@
                 "placeholder": "Kies een documentnaam"
             },
             "course": {
-                "label": "Vak"
+                "label": "Vak",
+                "placeholder": "Zoek op vaknaam of vakcode (min. {{count}} tekens)"
             },
             "category": {
                 "label": "Categorie"
@@ -155,7 +156,9 @@
             "fetch_failed": "Gegevens laden mislukt. Probeer het opnieuw."
         },
         "combo": {
-            "no_results": "Geen resultaten gevonden"
+            "no_results": "Geen resultaten gevonden",
+            "minimum_query": "Typ minstens {{count}} tekens om te zoeken",
+            "loading": "Zoeken..."
         }
     },
     "course-page": {
@@ -409,6 +412,7 @@
         "add_document": "Voeg document toe",
         "expand": "Zijbalk uitklappen",
         "collapse": "Zijbalk inklappen",
+        "resize": "Breedte van zijbalk aanpassen (dubbelklik om te herstellen)",
         "toggle_courses": "Vakken in-/uitklappen",
         "toggle_documents": "Documenten in-/uitklappen",
         "log_out": "Uitloggen",

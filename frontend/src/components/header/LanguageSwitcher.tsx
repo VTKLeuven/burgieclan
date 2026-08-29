@@ -1,7 +1,8 @@
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { i18nConfig } from "../../../i18nConfig";
+import { persistLocale } from '@/actions/locale';
 
 /**
  * Subtle NL / EN toggle for the navy header: light text, the active locale in
@@ -10,6 +11,7 @@ import { i18nConfig } from "../../../i18nConfig";
 const LanguageSwitcher = () => {
     const { t, i18n } = useTranslation();
     const pathname = usePathname();
+    const router = useRouter();
     const searchParams = useSearchParams();
     const currentLocale = i18n.language;
     const [isTransitioning, setIsTransitioning] = useState(false);
@@ -23,11 +25,15 @@ const LanguageSwitcher = () => {
 
         setIsTransitioning(true);
 
-        const newPathname = `/${newLocale}${pathnameNoLocale}`;
+        const newPathname = newLocale === i18nConfig.defaultLocale
+            ? pathnameNoLocale
+            : `/${newLocale}${pathnameNoLocale}`;
         const newUrl = `${newPathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
 
+        await persistLocale(newLocale);
         await i18n.changeLanguage(newLocale);
-        window.history.replaceState(null, '', newUrl);
+        router.replace(newUrl);
+        router.refresh();
 
         setTimeout(() => {
             setIsTransitioning(false);

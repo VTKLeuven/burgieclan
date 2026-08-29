@@ -33,6 +33,19 @@ export default function AnnouncementSlideShow() {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
+        // State was initialized from this cache above. Avoid entering useApi's loading state at
+        // all: that used to hide the announcement for a frame on every homepage revisit.
+        const cached = readPreloadedApi(endpoint) as HydraCollection<unknown> | undefined;
+        if (cached !== undefined) {
+            // The endpoint also changes when the language or five-minute time bucket changes.
+            // In that case this component can stay mounted, so copy that endpoint's cached value
+            // into state instead of retaining the previous locale/bucket.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setAnnouncements(cached['hydra:member']?.map(convertToAnnouncement) || []);
+            setCurrentIndex(0);
+            return;
+        }
+
         const fetchAnnouncements = async () => {
             const response = await request('GET', endpoint);
 
@@ -42,12 +55,15 @@ export default function AnnouncementSlideShow() {
 
             const fetchedAnnouncements = response['hydra:member']?.map(convertToAnnouncement) || [];
             setAnnouncements(fetchedAnnouncements);
+            setCurrentIndex(0);
         };
 
         fetchAnnouncements();
     }, [endpoint, request]);
 
     useEffect(() => {
+        if (announcements.length <= 1) return;
+
         const interval = setInterval(() => {
             setCurrentIndex((prevIndex) => (prevIndex + 1) % announcements.length);
         }, 10000);

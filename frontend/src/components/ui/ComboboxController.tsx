@@ -12,6 +12,9 @@ interface ComboboxControllerProps {
     disabled?: boolean;
     visibleOptions?: number;
     name: string;
+    onQueryChange?: (query: string) => void;
+    minimumQueryLength?: number;
+    optionsLoading?: boolean;
 }
 
 const ComboboxController: React.FC<ComboboxControllerProps> = ({
@@ -23,24 +26,35 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
     disabled,
     visibleOptions,
     name,
+    onQueryChange,
+    minimumQueryLength = 0,
+    optionsLoading = false,
 }) => {
     const { t } = useTranslation();
     // Maintain a query for filtering the options.
     const [query, setQuery] = useState('');
+    const [rememberedOption, setRememberedOption] = useState<Option | null>(null);
 
     // Find the currently selected option based on its id.
     const selectedOption = useMemo(
-        () => options.find((option) => option && String(option.id) === String(value)) || null,
-        [options, value]
+        () => options.find((option) => option && String(option.id) === String(value))
+            || (String(rememberedOption?.id) === String(value) ? rememberedOption : null),
+        [options, rememberedOption, value]
     );
 
-    // Filter options based on the query.
+    const normalizedQuery = query.trim();
+    const usesRemoteOptions = onQueryChange !== undefined;
+
+    // Remote options have already been matched by the backend. Filtering them by their
+    // displayed label again would drop matches found through another translation or a code.
     const filteredOptions = useMemo(() => {
+        if (normalizedQuery.length < minimumQueryLength) return [];
+        if (usesRemoteOptions) return options;
         if (!query) return options;
         return options.filter((option) =>
             option?.name?.toLowerCase().includes(query.toLowerCase())
         );
-    }, [options, query]);
+    }, [minimumQueryLength, normalizedQuery.length, options, query, usesRemoteOptions]);
 
     // If a limit is provided, slice the options accordingly.
     const limitedOptions = visibleOptions
@@ -53,18 +67,27 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
         <div>
             <Combobox
                 value={selectedOption}
-                onChange={(option: Option | null) => onChange(option?.id)}
+                onChange={(option: Option | null) => {
+                    setRememberedOption(option);
+                    onChange(option?.id);
+                }}
                 // Without this the typed query outlives the dropdown: reopening the field to
                 // change an answer showed the list still filtered by whatever was typed the
                 // previous time, which read as "the other options are gone".
-                onClose={() => setQuery('')}
+                onClose={() => {
+                    setQuery('');
+                    onQueryChange?.('');
+                }}
                 disabled={disabled}
             >
                 {({ open }) => (
                     <div className="relative">
                         <Combobox.Input
                             className={inputClassName}
-                            onChange={(e) => setQuery(e.target.value)}
+                            onChange={(e) => {
+                                setQuery(e.target.value);
+                                onQueryChange?.(e.target.value);
+                            }}
                             onBlur={onBlur}
                             displayValue={(option: Option | null) => option?.name || ''}
                             placeholder={placeholder || `${t('select')} ${name}`}
@@ -78,7 +101,17 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
                         </Combobox.Button>
                         {open && (
                             <Combobox.Options className="absolute z-10 mt-1.5 max-h-60 w-full overflow-auto text-base focus:outline-hidden sm:text-sm rounded-[14px] border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
-                                {limitedOptions.map((option) => (
+                                {normalizedQuery.length < minimumQueryLength && (
+                                    <div className="px-4 py-2 text-sm text-vtk-muted">
+                                        {t('form.combo.minimum_query', { count: minimumQueryLength })}
+                                    </div>
+                                )}
+                                {optionsLoading && normalizedQuery.length >= minimumQueryLength && (
+                                    <div className="px-4 py-2 text-sm text-vtk-muted">
+                                        {t('form.combo.loading')}
+                                    </div>
+                                )}
+                                {!optionsLoading && limitedOptions.map((option) => (
                                     <Combobox.Option
                                         key={option.id}
                                         value={option}
@@ -90,7 +123,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
                                         {option?.name || ''}
                                     </Combobox.Option>
                                 ))}
-                                {limitedOptions.length === 0 && query !== '' && (
+                                {!optionsLoading && limitedOptions.length === 0 && normalizedQuery.length >= minimumQueryLength && query !== '' && (
                                     <div className="px-4 py-2 text-sm text-vtk-muted">
                                         {t('form.combo.no_results')}
                                     </div>
