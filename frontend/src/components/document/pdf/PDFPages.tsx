@@ -31,10 +31,11 @@ interface PDFPagesProps {
     file: PDFFile;
     /** Page width in CSS pixels. Pages wait rather than rasterise at zero while the caller measures. */
     width: number;
+    pageAspect?: number;
     onDocumentLoad?: (pdf: PDFDocumentProxy) => void;
 }
 
-export default function PDFPages({ file, width, onDocumentLoad }: PDFPagesProps): JSX.Element {
+export default function PDFPages({ file, width, pageAspect, onDocumentLoad }: PDFPagesProps): JSX.Element {
     const { t } = useTranslation();
 
     // Total number of pages in the PDF
@@ -76,14 +77,23 @@ export default function PDFPages({ file, width, onDocumentLoad }: PDFPagesProps)
                 }
             >
                 {width > 0 && Array.from(new Array(displayedPages), (_el, index) => (
-                    <Page
-                        key={`page_${index + 1}`}
-                        pageNumber={index + 1}
-                        width={width}
-                        className="my-4 shadow-md shadow-black/50 bg-white"
-                        canvasBackground="white"
-                        loading={null}
-                    />
+                    <div
+                        key={`page_wrapper_${index + 1}`}
+                        className="my-4 shadow-md shadow-black/50 bg-white overflow-hidden flex justify-center"
+                        style={{
+                            width: `${width}px`,
+                            minHeight: pageAspect ? `${Math.round(width * pageAspect)}px` : undefined,
+                            aspectRatio: pageAspect ? `1 / ${pageAspect}` : undefined,
+                        }}
+                    >
+                        <Page
+                            pageNumber={index + 1}
+                            width={width}
+                            className="bg-white"
+                            canvasBackground="white"
+                            loading={null}
+                        />
+                    </div>
                 ))}
             </Document>
 

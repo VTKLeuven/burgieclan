@@ -41,8 +41,8 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
     const isGestureActiveRef = useRef(false);
     const gestureTimeoutRef = useRef<number | null>(null);
 
-    // Height / width of the first page, which is what "whole page" has to solve for.
-    const [pageAspect, setPageAspect] = useState<number>();
+    // Height / width of the first page, which is what "whole page" has to solve for. Default to standard A4 (1.414).
+    const [pageAspect, setPageAspect] = useState<number>(1.414);
     // The column the pages sit in, and the window height they have to fit into. Both are measured
     // rather than assumed: a collapsed sidebar, browser zoom or a second monitor all change them.
     const [baseWidth, setBaseWidth] = useState(0);
@@ -106,9 +106,14 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
             return;
         }
 
-        const timer = window.setTimeout(() => setRenderWidth(Math.round(targetWidth)), RENDER_COMMIT_MS);
+        // Avoid re-rasterising if width difference is less than 10%
+        if (renderWidth > 0 && Math.abs(targetWidth - renderWidth) / renderWidth < 0.10) {
+            return;
+        }
+
+        const timer = window.setTimeout(() => setRenderWidth(Math.round(targetWidth)), 400);
         return () => window.clearTimeout(timer);
-    }, [targetWidth]);
+    }, [targetWidth, renderWidth]);
 
     const previewRatio = renderWidth > 0 ? targetWidth / renderWidth : 1;
 
@@ -246,10 +251,10 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
                 canFitPage={fitPageZoom !== null}
             />
 
-            <div ref={scrollRef} className="overflow-x-auto bg-vtk-paper-2 p-4">
+            <div ref={scrollRef} className="min-h-[70vh] overflow-x-auto bg-vtk-paper-2 p-4">
                 <div className="flex w-max min-w-full flex-col items-center">
                     <div ref={stackRef} style={{ zoom: previewRatio }}>
-                        <PDFPages file={file} width={renderWidth} onDocumentLoad={onDocumentLoad} />
+                        <PDFPages file={file} width={renderWidth} pageAspect={pageAspect} onDocumentLoad={onDocumentLoad} />
                     </div>
                 </div>
             </div>
