@@ -242,11 +242,16 @@
         "related": {
             "predecessors": "Previously taught as",
             "successors": "Now taught as",
-            "equivalents": "Equivalent to"
+            "equivalents": "Equivalent to",
+            "documents_one": "{{count}} document",
+            "documents_other": "{{count}} documents"
         },
         "show-empty-categories": "Show empty folders ({{count}})",
         "hide-empty-categories": "Hide empty folders",
-        "no-documents-yet": "This course has no documents yet."
+        "no-documents-yet": "This course has no documents yet.",
+        "placement": {
+            "label": "This course sits in"
+        }
     },
     "download": {
         "download": "Download",
@@ -364,7 +369,13 @@
         },
         "under-review-warning": "This document is currently under review, so it is only visible to you.",
         "author": "Author",
-        "uploaded-by": "Uploaded by"
+        "uploaded-by": "Uploaded by",
+        "open-in-browser": "Open in browser",
+        "siblings": {
+            "previous": "Previous document",
+            "next": "Next document",
+            "position": "{{index}} of {{total}}"
+        }
     },
     "pagination": {
         "previous": "Previous",
@@ -439,5 +450,8 @@
     },
     "metadata": {
         "courses": "Browse all available courses on Burgieclan."
+    },
+    "curriculum-tree": {
+        "label": "Folders"
     }
 }

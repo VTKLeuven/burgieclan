@@ -242,11 +242,16 @@
         "related": {
             "predecessors": "Vroeger gegeven als",
             "successors": "Nu gegeven als",
-            "equivalents": "Gelijkwaardig aan"
+            "equivalents": "Gelijkwaardig aan",
+            "documents_one": "{{count}} document",
+            "documents_other": "{{count}} documenten"
         },
         "show-empty-categories": "Toon lege mappen ({{count}})",
         "hide-empty-categories": "Verberg lege mappen",
-        "no-documents-yet": "Er staan nog geen documenten bij dit vak."
+        "no-documents-yet": "Er staan nog geen documenten bij dit vak.",
+        "placement": {
+            "label": "Dit vak zit in"
+        }
     },
     "download": {
         "download": "Download",
@@ -364,7 +369,13 @@
         },
         "under-review-warning": "Dit document is momenteel in behandeling, dus het is alleen zichtbaar voor jou.",
         "author": "Auteur",
-        "uploaded-by": "Geüpload door"
+        "uploaded-by": "Geüpload door",
+        "open-in-browser": "Openen in browser",
+        "siblings": {
+            "previous": "Vorig document",
+            "next": "Volgend document",
+            "position": "{{index}} van {{total}}"
+        }
     },
     "pagination": {
         "previous": "Vorige",
@@ -439,5 +450,8 @@
     },
     "metadata": {
         "courses": "Blader door alle vakken op Burgieclan."
+    },
+    "curriculum-tree": {
+        "label": "Mappen"
     }
 }

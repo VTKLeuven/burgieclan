@@ -28,6 +28,11 @@ export interface Course extends BaseEntity {
     /** Courses teaching the same subject under another code, e.g. a sister-faculty variant. */
     identicalCourses?: Course[];
     documentCounts?: Record<number, number>;
+    /**
+     * Published documents on this course as a single total. Only sent for the related courses
+     * on a course detail response, so it is undefined on a course fetched on its own.
+     */
+    documentCount?: number;
 }
 
 
@@ -53,6 +58,16 @@ export interface Program extends BaseEntity {
 export interface ModulePath {
     programId: number | null;
     moduleIds: number[];
+}
+
+/**
+ * One place a course sits in the curriculum: the program, and the chain of modules from that
+ * program's top level down to the module that teaches it. A course shared between programmes
+ * has one of these per programme.
+ */
+export interface CurriculumPath {
+    program: Program;
+    modules: Module[];
 }
 
 export interface AbstractComment extends NodeEntity {
