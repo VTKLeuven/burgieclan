@@ -2,6 +2,7 @@
 
 import { COOKIE_NAMES } from '@/utils/cookieNames';
 import { decodeJWT, getUserIdFromJWT, getUserRolesFromJWT, isJWTExpired } from '@/utils/jwt';
+import { refreshTokenExpiry, SESSION_COOKIE_SAME_SITE } from '@/utils/sessionCookies';
 import { captureException } from '@sentry/nextjs';
 import { cookies } from 'next/headers';
 
@@ -89,17 +90,15 @@ export const getActiveJWT = async (): Promise<string | null> => {
     const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
     const refreshToken = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
 
-    // If no JWT at all, return null
-    if (!jwt) {
-        return null;
-    }
-
-    // If JWT is not expired, return it
-    if (!isJWTExpired(jwt)) {
+    // If JWT is still good, return it
+    if (jwt && !isJWTExpired(jwt)) {
         return jwt;
     }
 
-    // JWT is expired, try to refresh if we have a refresh token
+    // Otherwise the refresh token decides, and it is the only thing that can. The JWT cookie
+    // expires with the token it holds, an hour after it was issued, so coming back the next
+    // day there is no JWT to look at - and bailing on that absence declared the session over
+    // while the refresh token still had weeks left.
     if (!refreshToken) {
         return null;
     }
@@ -173,24 +172,20 @@ export const storeTokensInCookies = async (
         path: '/',
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: SESSION_COOKIE_SAME_SITE,
         expires: jwtExpiration,
     });
 
     // Set refresh token cookie if provided
     if (refreshToken) {
-        const refreshExpiration = refreshTokenExpiration
-            ? new Date(refreshTokenExpiration * 1000)
-            : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Default 30 days fallback
-
         cookieStore.set({
             name: COOKIE_NAMES.REFRESH_TOKEN,
             value: refreshToken,
             path: '/',
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            expires: refreshExpiration,
+            sameSite: SESSION_COOKIE_SAME_SITE,
+            expires: refreshTokenExpiry(refreshTokenExpiration),
         });
     }
 };
