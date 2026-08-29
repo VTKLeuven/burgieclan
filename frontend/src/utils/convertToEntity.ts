@@ -9,6 +9,7 @@ import {
     type DocumentComment,
     type DocumentView,
     type FaqItem,
+    type CurriculumPath,
     type Module,
     type ModulePath,
     type Page,
@@ -67,6 +68,21 @@ export function convertToModulePath(path: unknown): ModulePath {
     };
 }
 
+/**
+ * The curriculum placements returned by `/api/courses/{id}/paths`. Programs and modules come
+ * back as IRI + name, which is exactly the shape convertToProgram/convertToModule already read.
+ */
+export function convertToCurriculumPaths(response: unknown): CurriculumPath[] {
+    const data = toRecord(response, 'CurriculumPaths');
+    return (asArray(data.paths) ?? []).map((path) => {
+        const entry = toRecord(path, 'CurriculumPath');
+        return {
+            program: convertToProgram(entry.program),
+            modules: (asArray(entry.modules) ?? []).map(convertToModule)
+        };
+    });
+}
+
 export function convertToCourse(course: unknown): Course {
     if (typeof course === 'string' || typeof course === 'number') {
         return { id: parseId(course) };
@@ -88,7 +104,8 @@ export function convertToCourse(course: unknown): Course {
         courseComments: asArray(data.courseComments)?.map(convertToCourseComment),
         documentCounts: (data.documentCounts && typeof data.documentCounts === 'object' && !Array.isArray(data.documentCounts))
             ? (data.documentCounts as Record<number, number>)
-            : (Array.isArray(data.documentCounts) && data.documentCounts.length === 0 ? {} : undefined)
+            : (Array.isArray(data.documentCounts) && data.documentCounts.length === 0 ? {} : undefined),
+        documentCount: typeof data.documentCount === 'number' ? data.documentCount : undefined
     };
 }
 

@@ -62,6 +62,15 @@ export default function RelatedCourses({ course }: RelatedCoursesProps) {
                             {localizedCourseName(related, i18n.language) && (
                                 <span className="ml-1.5">{localizedCourseName(related, i18n.language)}</span>
                             )}
+                            {/* How much is actually over there. A reform leaves the new code
+                                nearly empty while the old one holds a decade of exams, and
+                                without a number the link reads as a footnote rather than as
+                                the place the material still lives. */}
+                            {related.documentCount !== undefined && related.documentCount > 0 && (
+                                <span className="ml-1.5 text-vtk-muted">
+                                    {t('course-page.related.documents', { count: related.documentCount })}
+                                </span>
+                            )}
                         </Link>
                     ))}
                 </div>

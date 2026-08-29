@@ -51,58 +51,9 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
             return $to;
         }
 
-        $to->oldCourses = array_map(
-            function (Course $course) {
-                return $this->microMapper->map(
-                    $course,
-                    CourseApi::class,
-                    [
-                        // SUMMARY + depth 1, not depth 0: MicroMapper skips populate()
-                        // entirely at depth 0, which would leave a related course with an
-                        // IRI and no code or name to render. SUMMARY stops it there, so it
-                        // does not walk on into its own relations.
-                        MappingContext::SUMMARY => true,
-                        MicroMapperInterface::MAX_DEPTH => 1,
-                    ]
-                );
-            },
-            $from->getOldCourses()->getValues()
-        );
-        $to->newCourses = array_map(
-            function (Course $course) {
-                return $this->microMapper->map(
-                    $course,
-                    CourseApi::class,
-                    [
-                        // SUMMARY + depth 1, not depth 0: MicroMapper skips populate()
-                        // entirely at depth 0, which would leave a related course with an
-                        // IRI and no code or name to render. SUMMARY stops it there, so it
-                        // does not walk on into its own relations.
-                        MappingContext::SUMMARY => true,
-                        MicroMapperInterface::MAX_DEPTH => 1,
-                    ]
-                );
-            },
-            $from->getNewCourses()->getValues()
-        );
-
-        $to->identicalCourses = array_map(
-            function (Course $course) {
-                return $this->microMapper->map(
-                    $course,
-                    CourseApi::class,
-                    [
-                        // SUMMARY + depth 1, not depth 0: MicroMapper skips populate()
-                        // entirely at depth 0, which would leave a related course with an
-                        // IRI and no code or name to render. SUMMARY stops it there, so it
-                        // does not walk on into its own relations.
-                        MappingContext::SUMMARY => true,
-                        MicroMapperInterface::MAX_DEPTH => 1,
-                    ]
-                );
-            },
-            $from->getIdenticalCourses()->getValues()
-        );
+        $to->oldCourses = $this->mapRelatedCourses($from->getOldCourses()->getValues());
+        $to->newCourses = $this->mapRelatedCourses($from->getNewCourses()->getValues());
+        $to->identicalCourses = $this->mapRelatedCourses($from->getIdenticalCourses()->getValues());
 
         $to->modules = array_map(
             function (Module $module) {
@@ -133,6 +84,49 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
         $to->documentCounts = $this->documentRepository->countByCategoryForCourse($from);
 
         return $to;
+    }
+
+    /**
+     * The courses a reader can jump to from this one - predecessors, successors and equivalents -
+     * each carrying how many documents it holds.
+     *
+     * The count is the reason the link is worth following: after a curriculum reform the current
+     * course is often near-empty while its predecessor holds years of exams, and without a number
+     * on the badge there is nothing telling the reader that. Counting them together keeps it at
+     * one query no matter how many related courses there are.
+     *
+     * @param Course[] $courses
+     * @return CourseApi[]
+     */
+    private function mapRelatedCourses(array $courses): array
+    {
+        if ([] === $courses) {
+            return [];
+        }
+
+        $counts = $this->documentRepository->countPublishedForCourses($courses);
+
+        return array_map(
+            function (Course $course) use ($counts): CourseApi {
+                /** @var CourseApi $dto */
+                $dto = $this->microMapper->map(
+                    $course,
+                    CourseApi::class,
+                    [
+                        // SUMMARY + depth 1, not depth 0: MicroMapper skips populate()
+                        // entirely at depth 0, which would leave a related course with an
+                        // IRI and no code or name to render. SUMMARY stops it there, so it
+                        // does not walk on into its own relations.
+                        MappingContext::SUMMARY => true,
+                        MicroMapperInterface::MAX_DEPTH => 1,
+                    ]
+                );
+                $dto->documentCount = $counts[$course->getId()] ?? 0;
+
+                return $dto;
+            },
+            $courses
+        );
     }
 
     /**

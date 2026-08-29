@@ -1,5 +1,6 @@
 import { CourseRow } from '@/components/courses/CourseRow';
 import { CourseTableHeader } from '@/components/courses/CourseTableHeader';
+import { moduleKey, useCurriculumOpenState } from '@/components/courses/CurriculumOpenState';
 import { SearchFilters } from '@/components/courses/CurriculumSearchBar';
 import DownloadButton from '@/components/ui/DownloadButton';
 import FavoriteButton from '@/components/ui/FavoriteButton';
@@ -33,7 +34,11 @@ const ModuleNode = ({
 }: ModuleNodeProps) => {
     const { t } = useTranslation();
     const { request, loading, error } = useApi<unknown>();
-    const [expanded, setExpanded] = useState(false);
+    // Seeded from the branches the URL says are open, so coming back from a course lands on
+    // the tree the reader left rather than on a collapsed one.
+    const openState = useCurriculumOpenState();
+    const nodeKey = moduleKey(initialModule.id);
+    const [expanded, setExpanded] = useState(() => openState.isOpen(nodeKey));
     const [module, setModule] = useState<Module>(initialModule);
     const [loaded, setLoaded] = useState(
         () => Array.isArray(initialModule.courses) && Array.isArray(initialModule.modules)
@@ -54,14 +59,20 @@ const ModuleNode = ({
     }, [initialModule.id, loaded, request]);
 
     const toggleExpanded = () => {
-        if (expanded) {
-            setExpanded(false);
-            return;
-        }
-
-        setExpanded(true);
-        void loadModule();
+        const next = !expanded;
+        setExpanded(next);
+        // Only a deliberate toggle is written to the URL; see ProgramNode for why.
+        openState.setOpen(nodeKey, next);
     };
+
+    // Whichever way the node ended up open - a click, a search, a deep link, or the branch
+    // restored from the URL - it needs its children. loadModule is a no-op once loaded.
+    useEffect(() => {
+        if (expanded) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            void loadModule();
+        }
+    }, [expanded, loadModule]);
 
     // Get search query
     const searchQuery = searchFilters?.query?.toLowerCase();
@@ -79,9 +90,8 @@ const ModuleNode = ({
         if (autoExpand && hasChildMatches) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setExpanded(true);
-            void loadModule();
         }
-    }, [autoExpand, hasChildMatches, loadModule]);
+    }, [autoExpand, hasChildMatches]);
 
     // Calculate if any child items match
     const getChildMatches = (): {
@@ -107,9 +117,8 @@ const ModuleNode = ({
         if (onFocusPath) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setExpanded(true);
-            void loadModule();
         }
-    }, [onFocusPath, loadModule]);
+    }, [onFocusPath]);
 
     // Once only: re-scrolling on every render would fight the reader for the viewport.
     const headerRef = useRef<HTMLDivElement>(null);
@@ -182,6 +191,7 @@ const ModuleNode = ({
                                                 course={course}
                                                 highlightMatch={!!searchQuery && courseMatchesText(course, searchQuery)}
                                                 isFirstRow={index === 0}
+                                                moduleId={module.id}
                                             />
                                         ))}
                                     </div>

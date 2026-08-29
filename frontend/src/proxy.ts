@@ -2,6 +2,7 @@ import type { Page } from "@/types/entities";
 import { convertToPage } from "@/utils/convertToEntity";
 import { COOKIE_NAMES } from "@/utils/cookieNames";
 import { decodeJWT, isJWTExpired } from "@/utils/jwt";
+import { refreshTokenExpiry, SESSION_COOKIE_SAME_SITE } from "@/utils/sessionCookies";
 import { captureException } from "@sentry/nextjs";
 import { i18nRouter } from 'next-i18n-router';
 import { NextRequest, NextResponse } from "next/server";
@@ -76,7 +77,18 @@ const checkAuthentication = (request: NextRequest): boolean => {
  * Attempt to refresh tokens in middleware
  * This is a simplified version that doesn't store cookies (Edge Runtime limitation)
  */
-const tryRefreshToken = async (request: NextRequest): Promise<string | null> => {
+/**
+ * What a refresh hands back. The refresh token matters as much as the JWT: refresh tokens are
+ * single-use, so the backend replaces the one that was spent, and a client that keeps the old
+ * one is holding a token that has already been invalidated.
+ */
+interface RefreshedSession {
+    jwt: string;
+    refreshToken?: string;
+    refreshTokenExpiration?: number;
+}
+
+const tryRefreshToken = async (request: NextRequest): Promise<RefreshedSession | null> => {
     const refreshToken = request.cookies.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
 
     if (!refreshToken) {
@@ -96,7 +108,11 @@ const tryRefreshToken = async (request: NextRequest): Promise<string | null> => 
 
         if (response.ok) {
             const data = await response.json();
-            return data.token;
+            return {
+                jwt: data.token,
+                refreshToken: data.refresh_token,
+                refreshTokenExpiration: data.refresh_token_expiration,
+            };
         }
 
         return null;
@@ -139,26 +155,42 @@ export default async function proxy(request: NextRequest) {
         // 1. We have a refresh token AND
         // 2. Either no JWT OR an expired JWT
         if (refreshToken && (!jwt || isJWTExpired(jwt))) {
-            const newJwt = await tryRefreshToken(request);
+            const refreshed = await tryRefreshToken(request);
 
-            if (newJwt) {
+            if (refreshed) {
                 // Create response with new JWT cookie
                 const response = i18nRouter(request, i18nConfig);
 
                 // Calculate new JWT expiration
-                const jwtPayload = decodeJWT(newJwt);
+                const jwtPayload = decodeJWT(refreshed.jwt);
                 const jwtExpiration = jwtPayload?.exp ? new Date(jwtPayload.exp * 1000) : new Date(Date.now() + 15 * 60 * 1000); // 15 min fallback
 
                 // Set new JWT cookie
                 response.cookies.set({
                     name: COOKIE_NAMES.JWT,
-                    value: newJwt,
+                    value: refreshed.jwt,
                     path: '/',
                     httpOnly: true,
                     secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'strict',
+                    sameSite: SESSION_COOKIE_SAME_SITE,
                     expires: jwtExpiration,
                 });
+
+                // And the replacement refresh token. Spending one invalidates it server-side,
+                // so keeping the old one meant the session survived exactly one refresh: the
+                // hour after that, the next refresh was rejected and the reader was thrown
+                // back to the login page with a month of session life left unused.
+                if (refreshed.refreshToken) {
+                    response.cookies.set({
+                        name: COOKIE_NAMES.REFRESH_TOKEN,
+                        value: refreshed.refreshToken,
+                        path: '/',
+                        httpOnly: true,
+                        secure: process.env.NODE_ENV === 'production',
+                        sameSite: SESSION_COOKIE_SAME_SITE,
+                        expires: refreshTokenExpiry(refreshed.refreshTokenExpiration),
+                    });
+                }
 
                 // Mark as authenticated since we got a new token
                 isAuthenticated = true;

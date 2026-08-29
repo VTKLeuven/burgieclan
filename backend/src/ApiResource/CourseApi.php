@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use App\Constants\SerializationGroups;
+use App\Controller\Api\GetCoursePathsController;
 use App\Entity\Course;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityClassDtoStateProvider;
@@ -20,6 +21,13 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::COURSE_GET]]),
         new GetCollection(normalizationContext: ['groups' => [SerializationGroups::BASE_READ, SerializationGroups::COURSE_GET]]),
+        // Lets a course page name the branch it sits in without downloading the curriculum.
+        new Get(
+            uriTemplate: 'courses/{id}/paths',
+            controller: GetCoursePathsController::class,
+            read: false,
+            name: 'course_paths',
+        ),
     ],
     provider: EntityClassDtoStateProvider::class,
     processor: EntityClassDtoStateProcessor::class,
@@ -158,4 +166,15 @@ class CourseApi extends BaseEntityApi
      */
     #[Groups([SerializationGroups::COURSE_GET])]
     public array $documentCounts = [];
+
+    /**
+     * Published documents on this course, as a single total.
+     *
+     * Only filled in for the related courses hanging off a course detail response, where it is
+     * the whole point of the link: a reader has no way of knowing that the predecessor of a
+     * near-empty course holds a decade of exams. Null everywhere else - counting it for every
+     * row of an expanded module would cost a query per course for a number nothing renders.
+     */
+    #[Groups([SerializationGroups::COURSE_GET])]
+    public ?int $documentCount = null;
 }

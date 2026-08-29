@@ -1,6 +1,7 @@
 'use client'
 
 import Loading from '@/app/[locale]/loading';
+import { CurriculumOpenStateProvider } from '@/components/courses/CurriculumOpenState';
 import CurriculumSearchBar, { SearchFilters } from '@/components/courses/CurriculumSearchBar';
 import ProgramNode from '@/components/courses/ProgramNode';
 import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
@@ -246,16 +247,20 @@ export default function CurriculumNavigator() {
 
       {!programError && (programs.length > 0 ? (
         <div className="curriculum-tree mt-5 grid gap-2.5">
-          {programs.map((program) => (
-            <ProgramNode
-              key={`${program.id}:${hasActiveSearch ? JSON.stringify(searchFilters) : 'browse'}`}
-              program={program}
-              autoExpand={hasActiveSearch}
-              searchFilters={searchFilters}
-              favoriteCourses={user?.favoriteCourses}
-              focus={focus}
-            />
-          ))}
+          {/* The open branches live in the URL, so leaving for a course and pressing back
+              returns to the tree as it was rather than to a collapsed one. */}
+          <CurriculumOpenStateProvider>
+            {programs.map((program) => (
+              <ProgramNode
+                key={`${program.id}:${hasActiveSearch ? JSON.stringify(searchFilters) : 'browse'}`}
+                program={program}
+                autoExpand={hasActiveSearch}
+                searchFilters={searchFilters}
+                favoriteCourses={user?.favoriteCourses}
+                focus={focus}
+              />
+            ))}
+          </CurriculumOpenStateProvider>
         </div>
       ) : (
         <div className="vtk-panel vtk-empty mt-5">

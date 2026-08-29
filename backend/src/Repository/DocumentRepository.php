@@ -97,6 +97,39 @@ class DocumentRepository extends ServiceEntityRepository
         return $counts;
     }
 
+    /**
+     * Published document totals for a set of courses, as courseId => count.
+     *
+     * One query for the whole set: the related courses on a course page are counted together,
+     * so linking to a predecessor archive costs the same whether there is one or five.
+     *
+     * @param Course[] $courses
+     * @return array<int, int>
+     */
+    public function countPublishedForCourses(array $courses): array
+    {
+        if ([] === $courses) {
+            return [];
+        }
+
+        $rows = $this->createQueryBuilder('d')
+            ->select('IDENTITY(d.course) AS courseId, COUNT(d.id) AS docCount')
+            ->andWhere('d.course IN (:courses)')
+            ->andWhere('d.under_review = :under_review')
+            ->setParameter('courses', $courses)
+            ->setParameter('under_review', false)
+            ->groupBy('d.course')
+            ->getQuery()
+            ->getArrayResult();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(int) $row['courseId']] = (int) $row['docCount'];
+        }
+
+        return $counts;
+    }
+
 
     /**
      * @return Document[]

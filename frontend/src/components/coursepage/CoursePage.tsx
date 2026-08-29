@@ -1,6 +1,8 @@
 'use client';
 
 import Loading from '@/app/[locale]/loading';
+import CoursePlacement from "@/components/curriculum/CoursePlacement";
+import { usePublishCurriculumLocation } from "@/components/curriculum/CurriculumLocationContext";
 import CommentCategories from "@/components/coursepage/comment/CommentCategories";
 import DocumentSections from "@/components/coursepage/DocumentSections";
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
@@ -45,6 +47,9 @@ export default function CoursePage() {
             getCourse();
         }
     }, [courseId, userLoading, request]);
+
+    // Feeds the folder tree and the breadcrumb in the layout, which cannot read this route.
+    usePublishCurriculumLocation({ course: course ?? undefined });
 
     const courseName = localizedCourseName(course, i18n.language);
 
@@ -135,6 +140,8 @@ export default function CoursePage() {
                     </div>
 
                     <RelatedCourses course={course} />
+
+                    <CoursePlacement />
                 </PageHead>
 
                 {/* Documents */}

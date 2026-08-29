@@ -1,6 +1,7 @@
 "use client";
 
 import Loading from '@/app/[locale]/loading';
+import { usePublishCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import DocumentCategoryPage from '@/components/documentcategorypage/DocumentCategoryPage';
 import { useApi } from '@/hooks/useApi';
 import type { Course, DocumentCategory } from '@/types/entities';
@@ -52,6 +53,9 @@ export default function CourseDocumentsContent({ courseId, categoryId }: CourseD
 
         getCategory();
     }, [categoryId, request, currentLocale]);
+
+    // Feeds the folder tree and the breadcrumb in the layout, which cannot read this route.
+    usePublishCurriculumLocation({ course: course ?? undefined, category: category ?? undefined });
 
     useEffect(() => {
         const courseName = localizedCourseName(course, currentLocale);

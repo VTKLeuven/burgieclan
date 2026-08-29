@@ -6,6 +6,7 @@ import { useProgramLanguage } from '@/components/courses/ProgramLanguageContext'
 import { useApi } from "@/hooks/useApi";
 import type { Course } from '@/types/entities';
 import { convertToCourse } from "@/utils/convertToEntity";
+import { rememberBranch } from '@/utils/curriculumBranch';
 import { captureException } from '@sentry/nextjs';
 import Link from "next/link";
 import { memo, useEffect, useState } from 'react';
@@ -18,6 +19,11 @@ interface CourseRowProps {
     course: Course;
     highlightMatch?: boolean;
     isFirstRow?: boolean;
+    /**
+     * The module this row is listed under. Half the courses are shared between programmes, so
+     * without it the course page would have to guess which of them the reader came through.
+     */
+    moduleId?: number;
 }
 
 function hasCourseRowData(course: Course): boolean {
@@ -31,6 +37,7 @@ export const CourseRow = memo(({
     course: initialCourse,
     highlightMatch = false,
     isFirstRow = false,
+    moduleId,
 }: CourseRowProps) => {
     const { i18n } = useTranslation();
     // Inside the curriculum navigator the programme decides the title language; elsewhere there is
@@ -128,7 +135,14 @@ export const CourseRow = memo(({
                         {content.name}
                     </div>
                 ) : (
-                    <Link href={`/course/${course.id}`} className="hover:text-vtk-navy hover:underline text-sm text-vtk-body rounded-xs focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-1">
+                    <Link
+                        href={`/course/${course.id}`}
+                        // The branch the reader walked, so the course page's breadcrumb and
+                        // folder tree name the programme they actually came from rather than
+                        // whichever one the course happens to be listed under first.
+                        onClick={moduleId === undefined ? undefined : () => rememberBranch(course.id, moduleId)}
+                        className="hover:text-vtk-navy hover:underline text-sm text-vtk-body rounded-xs focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-1"
+                    >
                         {content.name}
                     </Link>
                 )}

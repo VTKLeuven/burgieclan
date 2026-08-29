@@ -1,7 +1,9 @@
 'use client';
 
+import { usePublishCurriculumLocation } from "@/components/curriculum/CurriculumLocationContext";
 import DocumentCommentSection from "@/components/document/DocumentCommentSection";
 import DocumentInfoField from "@/components/document/DocumentInfoField";
+import DocumentSiblingNav from "@/components/document/DocumentSiblingNav";
 import UnderReviewBox from "@/components/document/UnderReviewBox";
 import ErrorPage from "@/components/error/ErrorPage";
 import LoadingPage from "@/components/loading/LoadingPage";
@@ -16,6 +18,7 @@ import { useApi } from "@/hooks/useApi";
 import type { Document } from "@/types/entities";
 import { convertToDocument } from "@/utils/convertToEntity";
 import { formatFileSize } from "@/utils/fileSize";
+import { inlineUrl, previewKindFor } from "@/utils/previewableFile";
 import { Calendar, ChartPie, CircleUser, ExternalLink, File, Package, PenLine } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
@@ -55,6 +58,13 @@ export default function DocumentPreview({ id }: { id: string }) {
         logDocumentView(id);
     }, [id]);
 
+    // Feeds the folder tree and the breadcrumb in the layout, which cannot read this route.
+    usePublishCurriculumLocation({
+        course: document?.course,
+        category: document?.category,
+        document: document ?? undefined,
+    });
+
     // Set window title based on document name
     useEffect(() => {
         if (document?.name) {
@@ -83,15 +93,14 @@ export default function DocumentPreview({ id }: { id: string }) {
 
     if (!document) return null;
 
-    const isPdf = document.mimetype === "application/pdf" ||
-        document.filename?.toLowerCase().endsWith('.pdf') ||
-        document.contentUrl?.toLowerCase().endsWith('.pdf');
-    const isImage = document.mimetype?.startsWith("image/") ||
-        ['.png', '.jpg', '.jpeg', '.gif', '.webp'].some(ext =>
-            document.filename?.toLowerCase().endsWith(ext) ||
-            document.contentUrl?.toLowerCase().endsWith(ext)
-        );
-    const canPreview = document.contentUrl && (isPdf || isImage);
+    // Which types render in-browser lives in one place now, shared with the document rows
+    // and kept in step with the backend list that decides what ?inline=1 actually serves.
+    const previewKind = previewKindFor(document.filename ?? document.contentUrl, document.mimetype);
+    const isPdf = previewKind === 'pdf';
+    const isImage = previewKind === 'image';
+    // Null when the file is not one the browser can draw, which is also the only case where
+    // the "open in a new tab" control has nothing to point at.
+    const inlineHref = document.contentUrl && previewKind ? inlineUrl(document.contentUrl) : null;
 
     return (
         <div className="vtk-shell pb-16">
@@ -146,15 +155,16 @@ export default function DocumentPreview({ id }: { id: string }) {
                             objectId={Number(id)}
                             disabled={!user}
                         />
+                        <DocumentSiblingNav document={document} />
                         <div className="flex items-center gap-2">
                             <DownloadSingleDocumentButton
                                 document={document}
                                 fileSize={document.fileSize ? formatFileSize(document.fileSize) : undefined}
                                 disabled={!user}
                             />
-                            {canPreview && (
+                            {inlineHref && (
                                 <a
-                                    href={`${document.contentUrl}?inline=1`}
+                                    href={inlineHref}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="vtk-btn vtk-btn-ghost p-2"
@@ -181,7 +191,7 @@ export default function DocumentPreview({ id }: { id: string }) {
                             // and never a candidate for the optimizer's cache.
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
-                                src={`${document.contentUrl}?inline=1`}
+                                src={inlineUrl(document.contentUrl)}
                                 alt={document.name}
                                 className="max-h-[75vh] max-w-full rounded shadow-sm object-contain"
                             />

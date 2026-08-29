@@ -126,7 +126,11 @@ class DocumentResourceTest extends ApiTestCase
         $responseDocument = $matchingDocuments[0];
 
         $this->assertSame($document->getName(), $responseDocument['name']);
-        $this->assertNull($responseDocument['contentUrl'] ?? null);
+
+        // What deferring actually saves is the filesystem work: resolving a path, sniffing a
+        // MIME type and reading a size, once per row. The content URL is a string built from
+        // the stored filename, so it stays - a row needs it to offer "open in the browser".
+        $this->assertNotNull($responseDocument['contentUrl'] ?? null);
         $this->assertNull($responseDocument['mimetype'] ?? null);
         $this->assertNull($responseDocument['filename'] ?? null);
         $this->assertNull($responseDocument['fileSize'] ?? null);
