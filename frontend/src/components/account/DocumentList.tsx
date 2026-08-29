@@ -11,7 +11,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { localizedCourseName } from '@/utils/courseName';
 
-const PDFViewer = dynamic(() => import('@/components/document/pdf/PDFViewer'), { ssr: false });
+const PDFPages = dynamic(() => import('@/components/document/pdf/PDFPages'), { ssr: false });
 
 function AccountDocumentCard({ document }: { document: Document }) {
     const { t, i18n } = useTranslation();
@@ -106,7 +106,7 @@ function AccountDocumentCard({ document }: { document: Document }) {
 
             {expanded && isPdf && document.contentUrl && (
                 <div className="mt-3 pt-3 border-t border-vtk-line flex justify-center bg-vtk-paper-2 p-2 rounded-md">
-                    <PDFViewer file={document.contentUrl} width={Math.min(containerWidth - 32, 800)} />
+                    <PDFPages file={document.contentUrl} width={Math.min(containerWidth - 32, 800)} />
                 </div>
             )}
         </div>

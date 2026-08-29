@@ -368,6 +368,14 @@
         "no-preview": "Geen voorbeeld beschikbaar voor {{filename}}",
         "loading": "Uw document tot leven brengen...",
         "load-more": "Meer pagina's laden ({{displayedPages}} van {{numPages}})",
+        "zoom": {
+            "label": "Zoom",
+            "in": "Inzoomen",
+            "out": "Uitzoomen",
+            "fit-width": "Paginabreedte",
+            "fit-page": "Hele pagina",
+            "hint": "Knijp, of houd ⌘/Ctrl ingedrukt tijdens het scrollen, om te zoomen"
+        },
         "comments": {
             "add": "Voeg opmerking toe...",
             "submit": "Opmerking indienen",

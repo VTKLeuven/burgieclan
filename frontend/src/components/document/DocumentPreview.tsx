@@ -37,15 +37,11 @@ export default function DocumentPreview({ id }: { id: string }) {
         return preloaded ? convertToDocument(preloaded) : null;
     });
 
-    // Used to scale pdf width to fit its parent container
-    const [containerWidth, setContainerWidth] = useState<number>(0);
     const [showInlineComments, setShowInlineComments] = useState(false);
-    const previewRef = useRef<HTMLDivElement>(null);
     const previewLayoutRef = useRef<HTMLDivElement>(null);
 
     const { user } = useUser();
     const { request, loading, error } = useApi();
-    const MAXWIDTH = 1000;
 
     useEffect(() => {
         if (document?.id === Number(id)) return;
@@ -78,19 +74,6 @@ export default function DocumentPreview({ id }: { id: string }) {
             window.document.title = `${document.name} | Burgieclan`;
         }
     }, [document?.name]);
-
-    // Track the preview panel's own width (not the window's) so the PDF scales
-    // to the column it actually sits in.
-    useEffect(() => {
-        const el = previewRef.current;
-        if (!el) return;
-
-        const observer = new ResizeObserver(([entry]) => {
-            setContainerWidth(Math.min(entry.contentRect.width, MAXWIDTH));
-        });
-        observer.observe(el);
-        return () => observer.disconnect();
-    }, [document]);
 
     // Use the actual page area rather than a viewport breakpoint. A wide curriculum sidebar,
     // browser zoom or OS scaling can make a nominally large laptop just as cramped as a smaller
@@ -204,26 +187,31 @@ export default function DocumentPreview({ id }: { id: string }) {
                         </div>
                     </div>
 
-                    <div ref={previewRef} className="flex justify-center overflow-x-auto bg-vtk-paper-2 p-4">
-                        {document.contentUrl && isPdf ? (
-                            <PDFViewer file={document.contentUrl} width={containerWidth} />
-                        ) : document.contentUrl && isImage ? (
-                            // Not next/image: contentUrl points at the backend's download
-                            // route, which would need a remotePatterns entry per deployment
-                            // and gains nothing here — the file is authenticated, one-off,
-                            // and never a candidate for the optimizer's cache.
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                                src={inlineUrl(document.contentUrl)}
-                                alt={document.name}
-                                className="max-h-[75vh] max-w-full rounded shadow-sm object-contain"
-                            />
-                        ) : (
-                            <div className="vtk-empty flex h-96 w-full items-center justify-center">
-                                {t('document.no-preview', { filename: document.filename })}
-                            </div>
-                        )}
-                    </div>
+                    {/* The PDF viewer brings its own zoom bar and scroll area — it has to measure
+                        and scroll the column itself — so it sits outside the padded box the other
+                        preview kinds share. */}
+                    {document.contentUrl && isPdf ? (
+                        <PDFViewer file={document.contentUrl} />
+                    ) : (
+                        <div className="flex justify-center overflow-x-auto bg-vtk-paper-2 p-4">
+                            {document.contentUrl && isImage ? (
+                                // Not next/image: contentUrl points at the backend's download
+                                // route, which would need a remotePatterns entry per deployment
+                                // and gains nothing here — the file is authenticated, one-off,
+                                // and never a candidate for the optimizer's cache.
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                    src={inlineUrl(document.contentUrl)}
+                                    alt={document.name}
+                                    className="max-h-[75vh] max-w-full rounded shadow-sm object-contain"
+                                />
+                            ) : (
+                                <div className="vtk-empty flex h-96 w-full items-center justify-center">
+                                    {t('document.no-preview', { filename: document.filename })}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <DocumentCommentSection

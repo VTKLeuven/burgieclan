@@ -430,6 +430,54 @@
     cursor: not-allowed;
   }
 
+  /* Slider for continuous controls (the PDF zoom bar). Native range inputs pick up the OS accent
+     colour, which clashes with the navy palette on every platform, so both the track and the thumb
+     are drawn here for WebKit and Gecko alike. */
+  .vtk-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 18px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .vtk-range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--line-2);
+  }
+
+  .vtk-range::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--line-2);
+  }
+
+  .vtk-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: -5px;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--surface);
+    border-radius: 999px;
+    background: var(--ink);
+  }
+
+  .vtk-range::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--surface);
+    border-radius: 999px;
+    background: var(--ink);
+  }
+
+  .vtk-range:focus-visible {
+    outline: 2px solid var(--navy);
+    outline-offset: 2px;
+    border-radius: 999px;
+  }
+
   /* ---------------------------------------------------------------------
      Form controls
      --------------------------------------------------------------------- */

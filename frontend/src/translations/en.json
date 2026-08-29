@@ -368,6 +368,14 @@
         "no-preview": "No preview available for {{filename}}",
         "loading": "Bringing your document to life...",
         "load-more": "Load More Pages ({{displayedPages}} of {{numPages}})",
+        "zoom": {
+            "label": "Zoom",
+            "in": "Zoom in",
+            "out": "Zoom out",
+            "fit-width": "Fit width",
+            "fit-page": "Whole page",
+            "hint": "Pinch, or hold ⌘/Ctrl while scrolling, to zoom"
+        },
         "comments": {
             "add": "Add Comment...",
             "submit": "Submit",
