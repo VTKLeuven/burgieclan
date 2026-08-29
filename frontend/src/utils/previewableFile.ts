@@ -37,6 +37,19 @@ const MIME_KIND: [prefix: string, kind: PreviewKind][] = [
     ['image/', 'image'],
 ];
 
+/** Extract a normalized extension from either a filename or a document content URL. */
+export function fileExtensionFor(source?: string): string | null {
+    if (!source) return null;
+
+    const path = source.split(/[?#]/)[0];
+    const filename = path.slice(path.lastIndexOf('/') + 1);
+    const lastDot = filename.lastIndexOf('.');
+
+    if (lastDot <= 0 || lastDot === filename.length - 1) return null;
+
+    return filename.slice(lastDot + 1).toLowerCase();
+}
+
 /**
  * How a file should be drawn, or null when it cannot be drawn at all.
  *
@@ -55,11 +68,9 @@ export function previewKindFor(source?: string, mimetype?: string): PreviewKind 
 
     if (!source) return null;
 
-    // Strip a query string first: a content URL may already carry ?inline=1.
-    const path = source.split('?')[0];
-    const extension = path.slice(path.lastIndexOf('.') + 1).toLowerCase();
+    const extension = fileExtensionFor(source);
 
-    return KIND_BY_EXTENSION[extension] ?? null;
+    return extension ? KIND_BY_EXTENSION[extension] ?? null : null;
 }
 
 /** The URL that opens a document in the browser's own viewer rather than downloading it. */

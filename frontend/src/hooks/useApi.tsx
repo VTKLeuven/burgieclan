@@ -18,6 +18,11 @@ const getCache = new Map<string, CachedGet>();
 const pendingGets = new Map<string, Promise<unknown>>();
 
 const getTtlForEndpoint = (endpoint: string): number => {
+    if (endpoint.startsWith('/api/announcements')) {
+        // Announcement queries use five-minute time buckets. A new bucket has a new cache key,
+        // so the old response can safely outlive its bucket without hiding newly active notices.
+        return 10 * 60_000;
+    }
     if (
         endpoint.startsWith('/api/quick_links')
         || endpoint.startsWith('/api/document_categories')

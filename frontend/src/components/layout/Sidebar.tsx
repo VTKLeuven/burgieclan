@@ -7,9 +7,19 @@ import { useUser } from "@/components/UserContext";
 import type { Course, Document } from "@/types/entities";
 import { ChevronDown, File, FolderTree, PanelLeft, PanelLeftClose, Star } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { localizedCourseName } from '@/utils/courseName';
+
+const DEFAULT_SIDEBAR_WIDTH = 304;
+const MIN_SIDEBAR_WIDTH = 256;
+const MAX_SIDEBAR_WIDTH = 560;
+const SIDEBAR_WIDTH_STORAGE_KEY = 'burgieclan:sidebar-width';
+
+const clampSidebarWidth = (width: number) => Math.min(
+  MAX_SIDEBAR_WIDTH,
+  Math.max(MIN_SIDEBAR_WIDTH, Math.round(width))
+);
 
 const mapCoursesToItems = (courses: Course[], locale: string) => {
   return courses.map(course => ({
@@ -53,11 +63,68 @@ const NavigationSidebar = () => {
   const sidebarMode = isHome ? 'home' : showCurriculumNavigator ? 'curriculum' : 'standard';
   const defaultExpandedSections = { courses: isHome, documents: false };
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
+  const [isResizing, setIsResizing] = useState(false);
+  const sidebarWidthRef = useRef(DEFAULT_SIDEBAR_WIDTH);
+  const resizeStartRef = useRef<{ pointerX: number; width: number } | null>(null);
   const [expandedSectionsByMode, setExpandedSectionsByMode] = useState<Partial<Record<
     typeof sidebarMode,
     typeof defaultExpandedSections
   >>>({});
   const expandedSections = expandedSectionsByMode[sidebarMode] ?? defaultExpandedSections;
+
+  useEffect(() => {
+    const storedWidth = Number(window.localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY));
+    if (!Number.isFinite(storedWidth) || storedWidth < MIN_SIDEBAR_WIDTH) return;
+
+    const nextWidth = clampSidebarWidth(storedWidth);
+    sidebarWidthRef.current = nextWidth;
+    // Reading browser-only preferences after hydration intentionally updates the initial width.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSidebarWidth(nextWidth);
+  }, []);
+
+  const updateSidebarWidth = (width: number, persist = false) => {
+    const nextWidth = clampSidebarWidth(width);
+    sidebarWidthRef.current = nextWidth;
+    setSidebarWidth(nextWidth);
+    if (persist) {
+      window.localStorage.setItem(SIDEBAR_WIDTH_STORAGE_KEY, String(nextWidth));
+    }
+  };
+
+  const startResize = (event: PointerEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    resizeStartRef.current = { pointerX: event.clientX, width: sidebarWidthRef.current };
+    setIsResizing(true);
+  };
+
+  const resize = (event: PointerEvent<HTMLDivElement>) => {
+    if (!resizeStartRef.current) return;
+
+    updateSidebarWidth(
+      resizeStartRef.current.width + event.clientX - resizeStartRef.current.pointerX
+    );
+  };
+
+  const finishResize = (event: PointerEvent<HTMLDivElement>) => {
+    if (!resizeStartRef.current) return;
+
+    resizeStartRef.current = null;
+    setIsResizing(false);
+    window.localStorage.setItem(SIDEBAR_WIDTH_STORAGE_KEY, String(sidebarWidthRef.current));
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const resizeWithKeyboard = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+
+    event.preventDefault();
+    updateSidebarWidth(sidebarWidthRef.current + (event.key === 'ArrowRight' ? 16 : -16), true);
+  };
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSectionsByMode((previous) => ({
@@ -77,8 +144,12 @@ const NavigationSidebar = () => {
   return (
     <aside className="sticky top-[72px] hidden shrink-0 self-start md:block">
       <div
-        className={`relative flex h-[calc(100vh-72px)] flex-col border-r border-vtk-line bg-vtk-paper transition-[width] duration-300 ${isCollapsed ? 'w-16' : 'w-[19rem]'
-          }`}
+        className={`relative flex h-[calc(100vh-72px)] flex-col border-r border-vtk-line bg-vtk-paper transition-[width] ${isResizing ? 'duration-0' : 'duration-300'}`}
+        style={{
+          width: isCollapsed
+            ? '4rem'
+            : `clamp(${MIN_SIDEBAR_WIDTH}px, ${sidebarWidth}px, min(${MAX_SIDEBAR_WIDTH}px, calc(100vw - 30rem)))`,
+        }}
       >
         {/* Collapse toggle */}
         <button
@@ -90,6 +161,31 @@ const NavigationSidebar = () => {
         >
           {isCollapsed ? <PanelLeft size={14} aria-hidden="true" /> : <PanelLeftClose size={14} aria-hidden="true" />}
         </button>
+
+        {!isCollapsed && (
+          <div
+            role="separator"
+            aria-orientation="vertical"
+            aria-label={t('sidebar.resize')}
+            aria-valuemin={MIN_SIDEBAR_WIDTH}
+            aria-valuemax={MAX_SIDEBAR_WIDTH}
+            aria-valuenow={sidebarWidth}
+            tabIndex={0}
+            title={t('sidebar.resize')}
+            onPointerDown={startResize}
+            onPointerMove={resize}
+            onPointerUp={finishResize}
+            onPointerCancel={finishResize}
+            onKeyDown={resizeWithKeyboard}
+            onDoubleClick={() => updateSidebarWidth(DEFAULT_SIDEBAR_WIDTH, true)}
+            className="group absolute inset-y-0 -right-1 z-[5] hidden w-2 cursor-col-resize touch-none items-center justify-center focus:outline-hidden lg:flex"
+          >
+            <span
+              aria-hidden="true"
+              className={`h-full w-0.5 bg-vtk-navy transition-opacity ${isResizing ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus:opacity-100'}`}
+            />
+          </div>
+        )}
 
         <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3">
           {!isCollapsed && showCurriculumNavigator && (
