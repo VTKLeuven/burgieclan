@@ -3,9 +3,7 @@
 /**
  * The document page's PDF reader.
  *
- * Renders pages at a crisp base resolution and scales them with GPU-accelerated CSS `transform: scale()`.
- * This keeps the document perfectly centered, maintains natural vertical scrolling, and provides
- * silky-smooth 120 FPS zooming on all browsers (Safari, Chrome, Firefox).
+ * Renders PDF pages with continuous canvas scaling and smooth, responsive zooming across all browsers.
  */
 
 import PDFPages, { type PDFFile } from '@/components/document/pdf/PDFPages';
@@ -34,8 +32,6 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
     const { preference, setFit, setZoom } = usePdfZoomPreference();
 
     const scrollRef = useRef<HTMLDivElement>(null);
-    const sizerRef = useRef<HTMLDivElement>(null);
-    const stackRef = useRef<HTMLDivElement>(null);
     const pointerInsideRef = useRef(false);
     const effectiveZoomRef = useRef(1);
 
@@ -43,7 +39,6 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
     const [pageAspect, setPageAspect] = useState<number>(1.414);
     const [baseWidth, setBaseWidth] = useState(0);
     const [availableHeight, setAvailableHeight] = useState(0);
-    const [isLoaded, setIsLoaded] = useState(false);
 
     // Measure the available column width. Uses a threshold to prevent scrollbar appearance/disappearance loops.
     useEffect(() => {
@@ -199,14 +194,13 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
     }, [handleFitChange, handleZoomStep]);
 
     const onDocumentLoad = useCallback((pdf: PDFDocumentProxy) => {
-        setIsLoaded(true);
         pdf.getPage(1).then((page) => {
             const viewport = page.getViewport({ scale: 1 });
             if (viewport.width > 0) setPageAspect(viewport.height / viewport.width);
         }).catch(() => {});
     }, []);
 
-    const sizerWidth = baseWidth > 0 ? Math.round(baseWidth * effectiveZoom) : undefined;
+    const pageWidth = baseWidth > 0 ? Math.round(baseWidth * effectiveZoom) : 0;
 
     return (
         <div
@@ -224,34 +218,14 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
 
             <div
                 ref={scrollRef}
-                className="min-h-[70vh] overflow-x-auto bg-vtk-paper-2 p-4"
+                className="overflow-x-auto bg-vtk-paper-2 p-4 min-h-[300px]"
             >
-                {/* Sizer keeps the scroll container and layout perfectly sized and centered */}
-                <div
-                    ref={sizerRef}
-                    className="mx-auto flex justify-center"
-                    style={{
-                        width: sizerWidth && isLoaded ? `${sizerWidth}px` : '100%',
-                    }}
-                >
-                    {/* Inner stack is scaled via GPU transform origin-top */}
-                    <div
-                        ref={stackRef}
-                        className="flex flex-col items-center origin-top will-change-transform"
-                        style={{
-                            width: baseWidth > 0 ? `${baseWidth}px` : '100%',
-                            transform: isLoaded ? `scale(${effectiveZoom})` : 'none',
-                            transformOrigin: 'top center',
-                        }}
-                    >
-                        <PDFPages
-                            file={file}
-                            width={baseWidth}
-                            pageAspect={pageAspect}
-                            onDocumentLoad={onDocumentLoad}
-                        />
-                    </div>
-                </div>
+                <PDFPages
+                    file={file}
+                    width={pageWidth}
+                    pageAspect={pageAspect}
+                    onDocumentLoad={onDocumentLoad}
+                />
             </div>
         </div>
     );
