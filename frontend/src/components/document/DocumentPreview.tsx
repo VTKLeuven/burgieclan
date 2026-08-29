@@ -107,7 +107,7 @@ export default function DocumentPreview({ id }: { id: string }) {
     const inlineHref = document.contentUrl && previewKind ? inlineUrl(document.contentUrl) : null;
 
     return (
-        <div className="vtk-shell pb-16">
+        <div className={`vtk-shell pb-16 ${!showInlineComments ? 'pr-[calc(clamp(20px,3vw,36px)+3rem)]' : ''}`}>
             {/* Editorial page head: breadcrumb kicker, document name as the display
                 title, and the file facts as a right-aligned spec block. */}
             <PageHead

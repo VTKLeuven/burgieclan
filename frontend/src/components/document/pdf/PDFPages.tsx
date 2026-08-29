@@ -10,6 +10,7 @@
  * Based on sample: https://github.com/wojtekmaj/react-pdf/tree/main/sample/next-app/app
  */
 
+import { LoaderCircle } from 'lucide-react';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { useMemo, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -71,8 +72,8 @@ export default function PDFPages({ file, width, pageAspect, onDocumentLoad }: PD
                 options={options}
                 className="flex flex-col items-center"
                 loading={
-                    <div className="p-4 text-italic">
-                        {t('document.loading')}
+                    <div className="flex h-64 items-center justify-center p-8">
+                        <LoaderCircle className="animate-spin text-vtk-navy" size={36} aria-label={t('document.loading')} />
                     </div>
                 }
             >
