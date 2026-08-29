@@ -10,7 +10,7 @@ export const useFormFields = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { t, i18n } = useTranslation();
-    const { request } = useApi<HydraCollection<unknown>>();
+    const { request } = useApi<HydraCollection<unknown> | unknown[]>();
 
     const fetchData = useCallback(async () => {
         try {
@@ -20,11 +20,15 @@ export const useFormFields = () => {
                 `/api/document_categories?pagination=false&lang=${lang}`,
             );
 
-            if (!categoryResponse || categoryResponse.error) {
-                throw new Error(categoryResponse?.error?.message);
+            if (!categoryResponse || (typeof categoryResponse === 'object' && 'error' in categoryResponse && categoryResponse.error)) {
+                throw new Error('Failed to fetch document categories');
             }
 
-            setCategories(categoryResponse['hydra:member']?.map(convertToDocumentCategory) || []);
+            const members = Array.isArray(categoryResponse)
+                ? categoryResponse
+                : (categoryResponse as HydraCollection<unknown>)['hydra:member'];
+
+            setCategories(Array.isArray(members) ? members.map(convertToDocumentCategory) : []);
         } catch (err) {
             setError(t('form.errors.fetch_failed'));
             captureException(

@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 interface ComboboxControllerProps {
-    value: string | undefined;
+    value: string | number | undefined;
     onChange: (value: string | number | undefined) => void;
     onBlur: () => void;
     options: Option[];
@@ -67,6 +67,8 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
         <div>
             <Combobox
                 value={selectedOption}
+                by="id"
+                immediate
                 onChange={(option: Option | null) => {
                     setRememberedOption(option);
                     onChange(option?.id);
@@ -115,9 +117,9 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
                                     <Combobox.Option
                                         key={option.id}
                                         value={option}
-                                        className={({ active }) =>
-                                            `block w-full cursor-pointer px-4 py-2 text-sm ${active ? 'bg-vtk-ink text-vtk-paper' : 'text-vtk-ink hover:bg-vtk-paper-2'
-                                            }`
+                                        className={({ active, focus, selected }) =>
+                                            `block w-full cursor-pointer px-4 py-2 text-sm ${(active || focus) ? 'bg-vtk-ink text-vtk-paper' : 'text-vtk-ink hover:bg-vtk-paper-2'
+                                            } ${selected ? 'font-semibold' : ''}`
                                         }
                                     >
                                         {option?.name || ''}
