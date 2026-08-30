@@ -146,8 +146,9 @@ class DocumentRepository extends ServiceEntityRepository
 
         foreach ($searchTerms as $key => $term) {
             $queryBuilder
-                ->orWhere('LOWER(d.name) LIKE :t_' . $key)
-                ->orWhere('LOWER(d.file_name) LIKE :t_' . $key)
+                ->andWhere(
+                    '(LOWER(d.name) LIKE :t_' . $key . ' OR LOWER(d.file_name) LIKE :t_' . $key . ')'
+                )
                 ->setParameter('t_' . $key, '%' . mb_strtolower((string) $term) . '%');
         }
 

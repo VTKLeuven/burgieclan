@@ -4,13 +4,13 @@ import ProfessorDiv from '@/components/coursepage/ProfessorDiv';
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import DownloadButton from '@/components/ui/DownloadButton';
 import FavoriteButton from '@/components/ui/FavoriteButton';
+import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import type { Course, Module, Program } from '@/types/entities';
 import { localizedCourseName } from '@/utils/courseName';
 import { shortProgramName } from '@/utils/curriculumLabels';
 import { rememberBranch } from '@/utils/curriculumBranch';
 import { ChevronRight } from 'lucide-react';
-import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
 /** A course together with the one branch this result found it under. */
@@ -48,8 +48,12 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
                         <FavoriteButton itemId={course.id} itemType="course" size={16} className="shrink-0" />
 
                         <div className="min-w-0 flex-1">
-                            <Link
+                            <ApiPrefetchLink
                                 href={curriculumHref.course(course)}
+                                apiEndpoints={[
+                                    `/api/courses/${course.id}`,
+                                    `/api/document_categories?lang=${i18n.language}`,
+                                ]}
                                 onClick={() => {
                                     const leaf = modules.at(-1);
                                     if (leaf) rememberBranch(course.id, leaf.id);
@@ -57,7 +61,7 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
                                 className="block truncate text-[15px] font-semibold tracking-tight text-vtk-ink hover:underline"
                             >
                                 {localizedCourseName(course, language ?? i18n.language)}
-                            </Link>
+                            </ApiPrefetchLink>
 
                             {/* The branch, as breadcrumbs rather than a tree to hunt through. */}
                             <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-1 text-xs text-vtk-muted">

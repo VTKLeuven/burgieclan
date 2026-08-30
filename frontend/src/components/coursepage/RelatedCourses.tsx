@@ -1,9 +1,9 @@
 'use client';
 
 import type { Course } from '@/types/entities';
+import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import { localizedCourseName } from '@/utils/courseName';
 import { ArrowLeft, ArrowRight, Equal } from 'lucide-react';
-import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
 interface RelatedCoursesProps {
@@ -45,9 +45,13 @@ export default function RelatedCourses({ course }: RelatedCoursesProps) {
                         {t(`course-page.related.${key}`)}
                     </span>
                     {courses.map((related) => (
-                        <Link
+                        <ApiPrefetchLink
                             key={related.id}
                             href={`/course/${related.id}`}
+                            apiEndpoints={[
+                                `/api/courses/${related.id}`,
+                                `/api/document_categories?lang=${i18n.language}`,
+                            ]}
                             // Tailwind utilities win over the vtk-* component layer, so the
                             // hover colours override vtk-badge-muted without a custom variant
                             // (component-layer classes get no hover: variant of their own).
@@ -71,7 +75,7 @@ export default function RelatedCourses({ course }: RelatedCoursesProps) {
                                     {t('course-page.related.documents', { count: related.documentCount })}
                                 </span>
                             )}
-                        </Link>
+                        </ApiPrefetchLink>
                     ))}
                 </div>
             ))}

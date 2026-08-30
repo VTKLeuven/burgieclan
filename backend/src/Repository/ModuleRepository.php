@@ -85,7 +85,7 @@ class ModuleRepository extends ServiceEntityRepository
 
         foreach ($searchTerms as $key => $term) {
             $queryBuilder
-                ->orWhere('LOWER(m.name) LIKE :t_' . $key)
+                ->andWhere('LOWER(m.name) LIKE :t_' . $key)
                 ->setParameter('t_' . $key, '%' . mb_strtolower((string) $term) . '%');
         }
 

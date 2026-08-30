@@ -1,6 +1,6 @@
 'use client';
 
-import Loading from '@/app/[locale]/loading';
+import Loading from '@/components/loading/LoadingPage';
 import { ProgramLanguageProvider } from '@/components/courses/ProgramLanguageContext';
 import CurriculumLevel from '@/components/curriculum/CurriculumLevel';
 import { usePublishCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
@@ -8,7 +8,7 @@ import ErrorPage from '@/components/error/ErrorPage';
 import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import PageHead from '@/components/ui/PageHead';
-import { useApi } from '@/hooks/useApi';
+import { readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { Program } from '@/types/entities';
 import { convertToProgram } from '@/utils/convertToEntity';
 import { programQualifier, shortProgramName } from '@/utils/curriculumLabels';
@@ -18,19 +18,25 @@ import { useTranslation } from 'react-i18next';
 export default function ProgramPage({ id }: { id: number }) {
     const { t } = useTranslation();
     const { request, loading, error } = useApi<unknown>();
-    const [program, setProgram] = useState<Program | null>(null);
+    const endpoint = `/api/programs/${id}`;
+    const [program, setProgram] = useState<Program | null>(() => {
+        const preloaded = readPreloadedApi(endpoint);
+        return preloaded ? convertToProgram(preloaded) : null;
+    });
 
     useEffect(() => {
+        if (program?.id === id) return;
+
         let cancelled = false;
 
         void (async () => {
-            const data = await request('GET', `/api/programs/${id}`);
+            const data = await request('GET', endpoint);
             if (cancelled || !data) return;
             setProgram(convertToProgram(data));
         })();
 
         return () => { cancelled = true; };
-    }, [id, request]);
+    }, [endpoint, id, program?.id, request]);
 
     usePublishCurriculumLocation({ program: program ?? undefined });
 

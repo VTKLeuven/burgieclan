@@ -30,6 +30,7 @@ interface CurriculumLocationValue extends CurriculumLocation {
 }
 
 const CurriculumLocationContext = createContext<CurriculumLocationValue | null>(null);
+const NO_PATHS: CurriculumPath[] = [];
 
 const EMPTY: CurriculumLocationValue = {
     paths: [],
@@ -52,16 +53,24 @@ export function CurriculumLocationProvider({ children }: { children: ReactNode }
     const moduleId = location.module?.id;
     const program = location.program;
 
-    const [paths, setPaths] = useState<CurriculumPath[]>([]);
+    const [loadedCoursePaths, setLoadedCoursePaths] = useState<{
+        courseId: number;
+        paths: CurriculumPath[];
+    } | null>(null);
     const [modulePath, setModulePath] = useState<CurriculumPath | null>(null);
     const [pathsLoading, setPathsLoading] = useState(false);
+    // Never expose the previous course's placements while the next request is in flight. A stale
+    // path briefly opened the wrong programme, and the tree then kept both programmes expanded.
+    const paths = loadedCoursePaths && loadedCoursePaths.courseId === courseId
+        ? loadedCoursePaths.paths
+        : NO_PATHS;
 
     // A course can sit in several programmes and needs the full list; a module sits in exactly
     // one place. A programme is its own branch and needs no lookup at all.
     useEffect(() => {
         if (courseId === undefined) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
-            setPaths([]);
+            setPathsLoading(false);
             return;
         }
 
@@ -71,7 +80,10 @@ export function CurriculumLocationProvider({ children }: { children: ReactNode }
         void (async () => {
             const result = await request('GET', `/api/courses/${courseId}/paths`);
             if (cancelled) return;
-            setPaths(result ? convertToCurriculumPaths(result) : []);
+            setLoadedCoursePaths({
+                courseId,
+                paths: result ? convertToCurriculumPaths(result) : [],
+            });
             setPathsLoading(false);
         })();
 

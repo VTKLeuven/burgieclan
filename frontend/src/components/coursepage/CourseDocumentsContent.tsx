@@ -1,9 +1,9 @@
 "use client";
 
-import Loading from '@/app/[locale]/loading';
+import Loading from '@/components/loading/LoadingPage';
 import { usePublishCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import DocumentCategoryPage from '@/components/documentcategorypage/DocumentCategoryPage';
-import { useApi } from '@/hooks/useApi';
+import { readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { Course, DocumentCategory } from '@/types/entities';
 import { convertToCourse, convertToDocumentCategory } from '@/utils/convertToEntity';
 import { useEffect, useState } from 'react';
@@ -16,43 +16,55 @@ interface CourseDocumentsContentProps {
 }
 
 export default function CourseDocumentsContent({ courseId, categoryId }: CourseDocumentsContentProps) {
-    const [course, setCourse] = useState<Course | null>(null);
-    const [category, setCategory] = useState<DocumentCategory | null>(null);
-    const { request } = useApi();
     const { i18n } = useTranslation();
     const currentLocale = i18n.language;
+    const courseEndpoint = `/api/courses/${courseId}?summary=true`;
+    const categoryEndpoint = `/api/document_categories/${categoryId}?lang=${currentLocale}`;
+    const [course, setCourse] = useState<Course | null>(() => {
+        const preloaded = readPreloadedApi(courseEndpoint);
+        return preloaded ? convertToCourse(preloaded) : null;
+    });
+    const [category, setCategory] = useState<DocumentCategory | null>(() => {
+        const preloaded = readPreloadedApi(categoryEndpoint);
+        return preloaded ? convertToDocumentCategory(preloaded) : null;
+    });
+    const { request } = useApi();
 
     useEffect(() => {
         async function getCourse() {
+            if (course?.id === courseId) return;
+
             // The category page only renders course identity data in its heading/breadcrumb.
             // Avoid mapping comments, related courses, modules, and document counts again.
-            const courseData = await request('GET', `/api/courses/${courseId}?summary=true`);
+            const courseData = await request('GET', courseEndpoint);
 
             if (!courseData) {
                 return null;
             }
 
-            const course = convertToCourse(courseData);
-            setCourse(course);
+            const convertedCourse = convertToCourse(courseData);
+            setCourse(convertedCourse);
         }
 
         getCourse();
-    }, [courseId, request]);
+    }, [course?.id, courseEndpoint, courseId, request]);
 
     useEffect(() => {
         async function getCategory() {
-            const categoryData = await request('GET', `/api/document_categories/${categoryId}?lang=${currentLocale}`);
+            if (category?.id === categoryId) return;
+
+            const categoryData = await request('GET', categoryEndpoint);
 
             if (!categoryData) {
                 return null;
             }
 
-            const category = convertToDocumentCategory(categoryData);
-            setCategory(category);
+            const convertedCategory = convertToDocumentCategory(categoryData);
+            setCategory(convertedCategory);
         }
 
         getCategory();
-    }, [categoryId, request, currentLocale]);
+    }, [category?.id, categoryEndpoint, categoryId, request]);
 
     // Feeds the folder tree and the breadcrumb in the layout, which cannot read this route.
     usePublishCurriculumLocation({ course: course ?? undefined, category: category ?? undefined });

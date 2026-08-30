@@ -6,12 +6,12 @@ import useRetrieveDocuments from '@/hooks/useRetrieveDocuments';
 import type { Document } from '@/types/entities';
 import { ChevronDown, ChevronUp, ExternalLink, LoaderCircle } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
+import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { localizedCourseName } from '@/utils/courseName';
 
-const PDFViewer = dynamic(() => import('@/components/document/pdf/PDFViewer'), { ssr: false });
+const PDFPages = dynamic(() => import('@/components/document/pdf/PDFPages'), { ssr: false });
 
 function AccountDocumentCard({ document }: { document: Document }) {
     const { t, i18n } = useTranslation();
@@ -38,12 +38,21 @@ function AccountDocumentCard({ document }: { document: Document }) {
     // fallback `name` being set, and guarding on `name` would hide a title we can render.
     const courseName = localizedCourseName(document.course, i18n.language);
 
+    const docEndpoints = [
+        `/api/documents/${document.id}?lang=${i18n.language}`,
+        `/api/document_comments?document=/api/documents/${document.id}`,
+    ];
+
     return (
         <div ref={containerRef} className="border border-vtk-line p-4 rounded-md shadow-xs bg-vtk-paper hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start gap-2">
-                <Link href={`/document/${document.id}`} className="hover:underline flex-1 min-w-0">
+                <ApiPrefetchLink
+                    href={`/document/${document.id}`}
+                    apiEndpoints={docEndpoints}
+                    className="hover:underline flex-1 min-w-0"
+                >
                     <h3 className="text-lg font-semibold truncate text-vtk-ink">{document.name}</h3>
-                </Link>
+                </ApiPrefetchLink>
                 <div className="shrink-0 flex items-center gap-2">
                     {document.underReview ? (
                         <Badge text={t('document.under_review')} color="yellow" />
@@ -84,19 +93,20 @@ function AccountDocumentCard({ document }: { document: Document }) {
                         </button>
                     )}
 
-                    <Link
+                    <ApiPrefetchLink
                         href={`/document/${document.id}`}
+                        apiEndpoints={docEndpoints}
                         className="p-1 text-vtk-muted hover:text-vtk-ink transition-colors"
                         title={t('document.open', { defaultValue: 'Open Document' })}
                     >
                         <ExternalLink size={15} />
-                    </Link>
+                    </ApiPrefetchLink>
                 </div>
             </div>
 
             {expanded && isPdf && document.contentUrl && (
                 <div className="mt-3 pt-3 border-t border-vtk-line flex justify-center bg-vtk-paper-2 p-2 rounded-md">
-                    <PDFViewer file={document.contentUrl} width={Math.min(containerWidth - 32, 800)} />
+                    <PDFPages file={document.contentUrl} width={Math.min(containerWidth - 32, 800)} />
                 </div>
             )}
         </div>

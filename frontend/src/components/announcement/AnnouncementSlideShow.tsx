@@ -1,29 +1,53 @@
 import Announcement from '@/components/announcement/Announcement';
 import ErrorPage from '@/components/error/ErrorPage';
-import { HydraCollection, useApi } from '@/hooks/useApi';
+import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import { Announcement as AnnouncementEntity } from '@/types/entities';
 import { convertToAnnouncement } from '@/utils/convertToEntity';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+const getAnnouncementEndpoint = (locale: string) => {
+    const now = new Date();
+    // Bucket to 5-minute intervals so requests are deduplicated and cacheable
+    now.setSeconds(0, 0);
+    now.setMinutes(Math.floor(now.getMinutes() / 5) * 5);
+    const formattedNow = now.toLocaleString("sv-SE", { timeZone: "Europe/Brussels" }).replace("T", " ");
+    const params = new URLSearchParams({
+        "startTime[strictly_before]": formattedNow,
+        "endTime[after]": formattedNow,
+        "lang": locale
+    });
+    return `/api/announcements?${params.toString()}`;
+};
+
 export default function AnnouncementSlideShow() {
-    const { request, loading, error } = useApi<HydraCollection<unknown>>();
-    const [announcements, setAnnouncements] = useState<AnnouncementEntity[]>([]);
-    const [currentIndex, setCurrentIndex] = useState(0);
     const { i18n } = useTranslation();
     const currentLocale = i18n.language;
+    const endpoint = getAnnouncementEndpoint(currentLocale);
+    const [announcements, setAnnouncements] = useState<AnnouncementEntity[]>(() => {
+        const preloaded = readPreloadedApi(endpoint) as HydraCollection<unknown> | undefined;
+        return preloaded?.['hydra:member']?.map(convertToAnnouncement) || [];
+    });
+    const { request, loading, error } = useApi<HydraCollection<unknown>>();
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
+        // State was initialized from this cache above. Avoid entering useApi's loading state at
+        // all: that used to hide the announcement for a frame on every homepage revisit.
+        const cached = readPreloadedApi(endpoint) as HydraCollection<unknown> | undefined;
+        if (cached !== undefined) {
+            // The endpoint also changes when the language or five-minute time bucket changes.
+            // In that case this component can stay mounted, so copy that endpoint's cached value
+            // into state instead of retaining the previous locale/bucket.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setAnnouncements(cached['hydra:member']?.map(convertToAnnouncement) || []);
+            setCurrentIndex(0);
+            return;
+        }
+
         const fetchAnnouncements = async () => {
-            const now = new Date();
-            const formattedNow = now.toLocaleString("sv-SE", { timeZone: "Europe/Brussels" }).replace("T", " ");
-            const params = new URLSearchParams({
-                "startTime[strictly_before]": formattedNow,
-                "endTime[after]": formattedNow,
-                "lang": currentLocale
-            });
-            const response = await request('GET', `/api/announcements?${params.toString()}`);
+            const response = await request('GET', endpoint);
 
             if (!response) {
                 return;
@@ -31,12 +55,15 @@ export default function AnnouncementSlideShow() {
 
             const fetchedAnnouncements = response['hydra:member']?.map(convertToAnnouncement) || [];
             setAnnouncements(fetchedAnnouncements);
+            setCurrentIndex(0);
         };
 
         fetchAnnouncements();
-    }, [currentLocale, request]);
+    }, [endpoint, request]);
 
     useEffect(() => {
+        if (announcements.length <= 1) return;
+
         const interval = setInterval(() => {
             setCurrentIndex((prevIndex) => (prevIndex + 1) % announcements.length);
         }, 10000);

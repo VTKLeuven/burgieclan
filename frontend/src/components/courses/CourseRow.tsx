@@ -2,13 +2,13 @@ import ProfessorDiv from '@/components/coursepage/ProfessorDiv';
 import DownloadButton from '@/components/ui/DownloadButton';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import SemesterIndicator from "@/components/ui/SemesterIndicator";
+import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import { useProgramLanguage } from '@/components/courses/ProgramLanguageContext';
 import { useApi } from "@/hooks/useApi";
 import type { Course } from '@/types/entities';
 import { convertToCourse } from "@/utils/convertToEntity";
 import { rememberBranch } from '@/utils/curriculumBranch';
 import { captureException } from '@sentry/nextjs';
-import Link from "next/link";
 import { memo, useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useTranslation } from 'react-i18next';
@@ -135,8 +135,14 @@ export const CourseRow = memo(({
                         {content.name}
                     </div>
                 ) : (
-                    <Link
+                    <ApiPrefetchLink
                         href={`/course/${course.id}`}
+                        apiEndpoints={[
+                            `/api/courses/${course.id}`,
+                            `/api/document_categories?lang=${i18n.language}`,
+                            `/api/comment_categories?lang=${i18n.language}`,
+                            `/api/courses/${course.id}/ratings`,
+                        ]}
                         // The branch the reader walked, so the course page's breadcrumb and
                         // folder tree name the programme they actually came from rather than
                         // whichever one the course happens to be listed under first.
@@ -144,7 +150,7 @@ export const CourseRow = memo(({
                         className="hover:text-vtk-navy hover:underline text-sm text-vtk-body rounded-xs focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-1"
                     >
                         {content.name}
-                    </Link>
+                    </ApiPrefetchLink>
                 )}
             </div>
             <div role="cell" className="col-span-1 flex items-center text-sm font-mono text-vtk-body">{content.code}</div>
@@ -163,4 +169,3 @@ export const CourseRow = memo(({
 });
 
 CourseRow.displayName = "CourseRow";
-

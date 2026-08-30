@@ -14,7 +14,7 @@ import PageHead from "@/components/ui/PageHead";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import { useUser } from "@/components/UserContext";
 import { logDocumentView } from "@/hooks/logDocumentView";
-import { useApi } from "@/hooks/useApi";
+import { readPreloadedApi, useApi } from "@/hooks/useApi";
 import type { Document } from "@/types/entities";
 import { convertToDocument } from "@/utils/convertToEntity";
 import { formatFileSize } from "@/utils/fileSize";
@@ -26,25 +26,28 @@ import { useTranslation } from "react-i18next";
 
 // Lazy-load PDFViewer so pdfjs-dist never runs on the server (no DOMMatrix in Node)
 const PDFViewer = dynamic(() => import("@/components/document/pdf/PDFViewer"), { ssr: false });
+const COMMENTS_INLINE_MIN_WIDTH = 1200;
 
 export default function DocumentPreview({ id }: { id: string }) {
+    const { t, i18n } = useTranslation();
+    const currentLocale = i18n.language;
+    const endpoint = `/api/documents/${id}?lang=${currentLocale}`;
+    const [document, setDocument] = useState<Document | null>(() => {
+        const preloaded = readPreloadedApi(endpoint);
+        return preloaded ? convertToDocument(preloaded) : null;
+    });
 
-    const [document, setDocument] = useState<Document | null>(null);
-
-    // Used to scale pdf width to fit its parent container
-    const [containerWidth, setContainerWidth] = useState<number>(0);
-    const previewRef = useRef<HTMLDivElement>(null);
+    const [showInlineComments, setShowInlineComments] = useState(false);
+    const previewLayoutRef = useRef<HTMLDivElement>(null);
 
     const { user } = useUser();
     const { request, loading, error } = useApi();
-    const { t } = useTranslation();
-    const { i18n } = useTranslation();
-    const currentLocale = i18n.language;
-    const MAXWIDTH = 1000;
 
     useEffect(() => {
+        if (document?.id === Number(id)) return;
+
         const fetchDocumentData = async () => {
-            const documentData = await request('GET', `/api/documents/${id}?lang=${currentLocale}`);
+            const documentData = await request('GET', endpoint);
             if (!documentData) {
                 return null;
             }
@@ -52,7 +55,7 @@ export default function DocumentPreview({ id }: { id: string }) {
         };
 
         fetchDocumentData();
-    }, [id, request, currentLocale]);
+    }, [document?.id, endpoint, id, request]);
 
     useEffect(() => {
         logDocumentView(id);
@@ -72,18 +75,19 @@ export default function DocumentPreview({ id }: { id: string }) {
         }
     }, [document?.name]);
 
-    // Track the preview panel's own width (not the window's) so the PDF scales
-    // to the column it actually sits in.
+    // Use the actual page area rather than a viewport breakpoint. A wide curriculum sidebar,
+    // browser zoom or OS scaling can make a nominally large laptop just as cramped as a smaller
+    // screen. The comments stay inline only when both columns have genuinely useful space.
     useEffect(() => {
-        const el = previewRef.current;
+        const el = previewLayoutRef.current;
         if (!el) return;
 
         const observer = new ResizeObserver(([entry]) => {
-            setContainerWidth(Math.min(entry.contentRect.width, MAXWIDTH));
+            setShowInlineComments(entry.contentRect.width >= COMMENTS_INLINE_MIN_WIDTH);
         });
         observer.observe(el);
         return () => observer.disconnect();
-    }, [document]);
+    }, [document?.id]);
 
     if (loading) return <LoadingPage />;
 
@@ -103,7 +107,7 @@ export default function DocumentPreview({ id }: { id: string }) {
     const inlineHref = document.contentUrl && previewKind ? inlineUrl(document.contentUrl) : null;
 
     return (
-        <div className="vtk-shell pb-16">
+        <div className={`vtk-shell pb-16 ${!showInlineComments ? 'pr-[calc(clamp(20px,3vw,36px)+3rem)]' : ''}`}>
             {/* Editorial page head: breadcrumb kicker, document name as the display
                 title, and the file facts as a right-aligned spec block. */}
             <PageHead
@@ -143,7 +147,13 @@ export default function DocumentPreview({ id }: { id: string }) {
             )}
 
             {/* Document preview & comment section */}
-            <div className="mt-7 grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
+            <div
+                ref={previewLayoutRef}
+                className={`mt-7 grid items-start gap-4 ${showInlineComments
+                    ? 'grid-cols-[minmax(0,1fr)_360px]'
+                    : 'grid-cols-1'
+                    }`}
+            >
                 <div className="vtk-panel overflow-hidden">
                     <div className="flex items-center justify-between gap-3 border-b border-vtk-line px-4 py-3">
                         <VoteButton
@@ -177,29 +187,39 @@ export default function DocumentPreview({ id }: { id: string }) {
                         </div>
                     </div>
 
-                    <div ref={previewRef} className="flex justify-center overflow-x-auto bg-vtk-paper-2 p-4">
-                        {document.contentUrl && isPdf ? (
-                            <PDFViewer file={document.contentUrl} width={containerWidth} />
-                        ) : document.contentUrl && isImage ? (
-                            // Not next/image: contentUrl points at the backend's download
-                            // route, which would need a remotePatterns entry per deployment
-                            // and gains nothing here — the file is authenticated, one-off,
-                            // and never a candidate for the optimizer's cache.
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                                src={inlineUrl(document.contentUrl)}
-                                alt={document.name}
-                                className="max-h-[75vh] max-w-full rounded shadow-sm object-contain"
-                            />
-                        ) : (
-                            <div className="vtk-empty flex h-96 w-full items-center justify-center">
-                                {t('document.no-preview', { filename: document.filename })}
-                            </div>
-                        )}
-                    </div>
+                    {/* The PDF viewer brings its own zoom bar and scroll area — it has to measure
+                        and scroll the column itself — so it sits outside the padded box the other
+                        preview kinds share. */}
+                    {document.contentUrl && isPdf ? (
+                        <PDFViewer file={document.contentUrl} />
+                    ) : (
+                        <div className="flex justify-center overflow-x-auto bg-vtk-paper-2 p-4">
+                            {document.contentUrl && isImage ? (
+                                // Not next/image: contentUrl points at the backend's download
+                                // route, which would need a remotePatterns entry per deployment
+                                // and gains nothing here — the file is authenticated, one-off,
+                                // and never a candidate for the optimizer's cache.
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                    src={inlineUrl(document.contentUrl)}
+                                    alt={document.name}
+                                    className="max-h-[75vh] max-w-full rounded shadow-sm object-contain"
+                                />
+                            ) : (
+                                <div className="vtk-empty flex h-96 w-full items-center justify-center">
+                                    {t('document.no-preview', { filename: document.filename })}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
 
-                <DocumentCommentSection documentId={document.id} file={document.contentUrl} />
+                <DocumentCommentSection
+                    key={document.id}
+                    documentId={document.id}
+                    file={document.contentUrl}
+                    displayInline={showInlineComments}
+                />
             </div>
         </div>
     )

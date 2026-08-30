@@ -88,15 +88,63 @@ async function assertBreadcrumbOnOneLine(page: Page) {
 }
 
 test('walk the curriculum', async ({ page, context }) => {
+  test.setTimeout(60_000);
+
   // These captures need the dev stack with fixtures behind them; without it there is nothing
   // meaningful to assert, so skip rather than fail.
   test.skip(!(await authenticate(context)), 'backend not reachable');
   await page.setViewportSize({ width: 1500, height: 950 });
 
+  await page.goto('/');
+  await settle(page);
+  await expect(page.locator('aside'), 'home should keep the favourites sidebar').toBeVisible();
+  await expect(page.locator('aside nav'), 'home should not render the curriculum navigator').toHaveCount(0);
+  await expect(page.locator('aside').getByRole('button', { name: /My Courses|Mijn Vakken/i }))
+    .toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('aside').getByRole('button', { name: /Favorite Documents|Favoriete Documenten/i })).toBeVisible();
+
+  const headerLogo = await page.locator('header nav > a').first().boundingBox();
+  const accountButton = await page.locator('header').getByRole('button', { name: /User menu|Gebruikersmenu/i }).boundingBox();
+  expect(headerLogo?.x, 'logo should sit at the left screen edge').toBeLessThanOrEqual(24);
+  expect(1500 - (accountButton?.x ?? 0) - (accountButton?.width ?? 0), 'account should sit at the right screen edge')
+    .toBeLessThanOrEqual(24);
+  await capture(page, '00-home');
+
+  await page.goto('/faq');
+  await settle(page);
+  await expect(page.locator('aside'), 'FAQ should keep the favourites sidebar').toBeVisible();
+  await expect(page.locator('aside nav'), 'FAQ should not render the curriculum navigator').toHaveCount(0);
+
   await page.goto('/courses');
   await settle(page);
   await capture(page, '01-courses');
   await assertNoSidebarOverlap(page);
+
+  const toggleBox = await page.locator('aside nav button[aria-expanded]').first().boundingBox();
+  expect(toggleBox?.width, 'tree toggle should be an easy click target').toBeGreaterThanOrEqual(32);
+  expect(toggleBox?.height, 'tree toggle should be an easy click target').toBeGreaterThanOrEqual(32);
+
+  const programmeRowHeights = await page.locator('aside nav > div > div > a').evaluateAll((links) =>
+    links.map((link) => link.getBoundingClientRect().height)
+  );
+  expect(programmeRowHeights.length).toBeGreaterThan(0);
+  expect(Math.max(...programmeRowHeights), 'programme names should stay on one row').toBeLessThanOrEqual(32);
+
+  const programmeLabels = await page.locator('aside nav a[title]').allTextContents();
+  expect(programmeLabels.length).toBeGreaterThan(0);
+
+  // Selecting a global-search result must stay inside the Next app. A location assignment used
+  // to reload the document, rebuild the complete sidebar and throw away every warmed response.
+  const initialTimeOrigin = await page.evaluate(() => performance.timeOrigin);
+  await page.locator('#search').click();
+  const searchDialog = page.getByRole('dialog');
+  await searchDialog.getByRole('combobox').fill('Polymer Composites A&B');
+  await searchDialog.getByText('Polymer Composites A&B', { exact: true }).first().click();
+  await page.waitForURL(/\/course\/\d+/);
+  expect(await page.evaluate(() => performance.timeOrigin), 'global search should not reload the document')
+    .toBe(initialTimeOrigin);
+  await page.goBack();
+  await settle(page);
 
   // A programme is one click and a real page, not an accordion.
   await page.locator('main').getByRole('link', { name: /Bachelor in de ingenieurswetenschappen/ }).click();

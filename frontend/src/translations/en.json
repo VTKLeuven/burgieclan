@@ -79,7 +79,8 @@
                 "placeholder": "Choose a document name"
             },
             "course": {
-                "label": "Course"
+                "label": "Course",
+                "placeholder": "Search by course name or code (min. {{count}} characters)"
             },
             "category": {
                 "label": "Category"
@@ -155,7 +156,9 @@
             "fetch_failed": "Failed to load form data. Please try again."
         },
         "combo": {
-            "no_results": "No results found"
+            "no_results": "No results found",
+            "minimum_query": "Type at least {{count}} characters to search",
+            "loading": "Searching..."
         }
     },
     "course-page": {
@@ -365,6 +368,14 @@
         "no-preview": "No preview available for {{filename}}",
         "loading": "Bringing your document to life...",
         "load-more": "Load More Pages ({{displayedPages}} of {{numPages}})",
+        "zoom": {
+            "label": "Zoom",
+            "in": "Zoom in",
+            "out": "Zoom out",
+            "fit-width": "Fit width",
+            "fit-page": "Whole page",
+            "hint": "Pinch, or hold ⌘/Ctrl while scrolling, to zoom"
+        },
         "comments": {
             "add": "Add Comment...",
             "submit": "Submit",
@@ -372,7 +383,10 @@
             "anonymous": "Anonymous",
             "success": "Comment added successfully",
             "error": "Failed to add comment",
-            "title": "Comments"
+            "title": "Comments",
+            "open": "Open comments ({{count}})",
+            "close": "Close comments",
+            "loading": "Loading comments"
         },
         "under-review-warning": "This document is currently under review, so it is only visible to you.",
         "author": "Author",
@@ -409,6 +423,7 @@
         "add_document": "Add Document",
         "expand": "Expand sidebar",
         "collapse": "Collapse sidebar",
+        "resize": "Resize sidebar (double-click to reset)",
         "toggle_courses": "Toggle courses",
         "toggle_documents": "Toggle documents",
         "log_out": "Log Out",
@@ -459,6 +474,8 @@
         "courses": "Browse all available courses on Burgieclan."
     },
     "curriculum-tree": {
-        "label": "Curriculum"
+        "label": "Curriculum",
+        "expand": "Expand {{name}}",
+        "collapse": "Collapse {{name}}"
     }
 }

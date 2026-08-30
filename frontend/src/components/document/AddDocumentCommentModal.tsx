@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 
-const PDFViewer = dynamic(() => import("@/components/document/pdf/PDFViewer"), { ssr: false });
+const PDFPages = dynamic(() => import("@/components/document/pdf/PDFPages"), { ssr: false });
 import Editor from "@/components/editor/Editor";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Dialog, DialogActions, DialogTitle } from "@/components/ui/Dialog";
@@ -87,7 +87,7 @@ export default function AddDocumentCommentModal({ documentId, file, isModalOpen,
                     ref={containerRef}
                     className="flex-1 overflow-auto p-4 mt-5"
                 >
-                    <PDFViewer
+                    <PDFPages
                         file={file}
                         width={containerWidth}
                     />

@@ -28,6 +28,10 @@ export interface FormFieldProps<TFieldValues extends FieldValues = FieldValues> 
     disabled?: boolean;
     /** Optional: limit the number of visible options in the combobox */
     visibleOptions?: number;
+    /** When provided, options are supplied by a remote search instead of filtered locally. */
+    onQueryChange?: (query: string) => void;
+    minimumQueryLength?: number;
+    optionsLoading?: boolean;
 }
 
 export const FormField = <TFieldValues extends FieldValues = FieldValues>({
@@ -41,6 +45,9 @@ export const FormField = <TFieldValues extends FieldValues = FieldValues>({
     name,
     disabled,
     visibleOptions,
+    onQueryChange,
+    minimumQueryLength,
+    optionsLoading,
 }: FormFieldProps<TFieldValues>) => {
     const fieldId = `field-${String(name)}`;
     const errorId = `error-${String(name)}`;
@@ -90,6 +97,9 @@ export const FormField = <TFieldValues extends FieldValues = FieldValues>({
                             disabled={disabled}
                             visibleOptions={visibleOptions}
                             name={name}
+                            onQueryChange={onQueryChange}
+                            minimumQueryLength={minimumQueryLength}
+                            optionsLoading={optionsLoading}
                         />
                     )}
                 />

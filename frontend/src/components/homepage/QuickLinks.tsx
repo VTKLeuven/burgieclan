@@ -1,4 +1,4 @@
-import { HydraCollection, useApi } from '@/hooks/useApi';
+import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { QuickLink } from '@/types/entities';
 import { MAX_QUICK_LINKS } from '@/utils/constants/homepage';
 import { convertToQuickLink } from '@/utils/convertToEntity';
@@ -8,14 +8,18 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export function QuickLinks() {
-    const [links, setLinks] = useState<QuickLink[]>([]);
     const { t, i18n } = useTranslation();
     const currentLanguage = i18n.language;
+    const endpoint = `/api/quick_links?lang=${currentLanguage}`;
+    const [links, setLinks] = useState<QuickLink[]>(() => {
+        const preloaded = readPreloadedApi(endpoint) as HydraCollection<unknown> | undefined;
+        return preloaded?.['hydra:member'] ? preloaded['hydra:member'].map(convertToQuickLink).slice(0, MAX_QUICK_LINKS) : [];
+    });
     const { request, loading, error } = useApi<HydraCollection<unknown>>();
 
     useEffect(() => {
         const fetchQuickLinks = async () => {
-            const response = await request('GET', `/api/quick_links?lang=${currentLanguage}`);
+            const response = await request('GET', endpoint);
 
             if (!response) {
                 return null;
@@ -26,9 +30,9 @@ export function QuickLinks() {
         };
 
         fetchQuickLinks();
-    }, [currentLanguage, request]);
+    }, [endpoint, request]);
 
-    if (loading) {
+    if (loading && links.length === 0) {
         return (
             <div className="flex justify-center items-center py-8">
                 <div className="animate-spin h-6 w-6 border-2 border-vtk-line-2 rounded-full border-t-transparent"></div>

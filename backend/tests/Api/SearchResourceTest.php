@@ -207,7 +207,7 @@ class SearchResourceTest extends ApiTestCase
         // Regression: on PostgreSQL a plain LIKE is case-sensitive, so a lowercase query used to
         // miss differently-cased names. Searching "zzq..." (lowercase) must find "ZZQ..." (mixed).
         $program = ProgramFactory::createOne(['name' => 'ZZQUniqueProgramName']);
-        $course = CourseFactory::createOne(['name' => 'ZZQUniqueCourseName', 'code' => 'ZZQ99X']);
+        $course = CourseFactory::createOne(['name' => 'ZZQUniqueCourseName', 'code' => 'H0R12A']);
 
         $decoded_json = $this->browser()
             ->get(
@@ -225,7 +225,7 @@ class SearchResourceTest extends ApiTestCase
         // A lowercase query matching the (uppercase) course code must also hit case-insensitively.
         $decoded_json = $this->browser()
             ->get(
-                '/api/search?searchText=zzq99x',
+                '/api/search?searchText=h0r12a',
                 ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
             )
             ->assertStatus(200)
@@ -235,5 +235,46 @@ class SearchResourceTest extends ApiTestCase
 
         $this->assertSame(1, count($decoded_json['courses']));
         $this->assertSame('/api/courses/' . $course->getId(), $decoded_json['courses'][0]['@id']);
+    }
+
+    public function testAllSearchTermsMustMatch(): void
+    {
+        $course = CourseFactory::createOne(
+            [
+                'name' => 'Energy conversion machines and systems',
+                'nameNl' => 'Energieconversiemachines en -systemen',
+                'nameEn' => 'Energy conversion machines and systems',
+                'code' => 'H01N2A',
+            ]
+        );
+        CourseFactory::createOne(['name' => 'Algemene natuurkunde en toepassingen']);
+
+        $decodedJson = $this->browser()
+            ->get(
+                '/api/search?searchText=Energieconversiemachines%20en%20-systemen',
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->assertJson()
+            ->json()
+            ->decoded();
+
+        $this->assertCount(1, $decodedJson['courses']);
+        $this->assertSame('/api/courses/' . $course->getId(), $decodedJson['courses'][0]['@id']);
+
+        // The upload selector calls this same endpoint with partial input. Keep the concrete
+        // regression from the UI: "energiecon" must find the localized Dutch course title.
+        $decodedJson = $this->browser()
+            ->get(
+                '/api/search?searchText=energiecon',
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->assertJson()
+            ->json()
+            ->decoded();
+
+        $this->assertCount(1, $decodedJson['courses']);
+        $this->assertSame('/api/courses/' . $course->getId(), $decodedJson['courses'][0]['@id']);
     }
 }

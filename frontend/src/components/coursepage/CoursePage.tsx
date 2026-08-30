@@ -1,6 +1,6 @@
 'use client';
 
-import Loading from '@/app/[locale]/loading';
+import Loading from '@/components/loading/LoadingPage';
 import CoursePlacement from "@/components/curriculum/CoursePlacement";
 import { usePublishCurriculumLocation } from "@/components/curriculum/CurriculumLocationContext";
 import CommentCategories from "@/components/coursepage/comment/CommentCategories";
@@ -12,8 +12,7 @@ import DynamicBreadcrumb from "@/components/ui/DynamicBreadcrumb";
 import PageHead from "@/components/ui/PageHead";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
-import { useUser } from '@/components/UserContext';
-import { useApi } from "@/hooks/useApi";
+import { readPreloadedApi, useApi } from "@/hooks/useApi";
 import { Course, CourseComment } from "@/types/entities";
 import { convertToCourse } from "@/utils/convertToEntity";
 import { ChartPie, Link as LinkIcon } from "lucide-react";
@@ -25,28 +24,34 @@ import { localizedCourseName } from '@/utils/courseName';
 
 export default function CoursePage() {
     const { id: courseId } = useParams();
-    const [course, setCourse] = useState<Course | null>(null);
-    const { loading: userLoading } = useUser();
+    const endpoint = `/api/courses/${courseId}`;
+    const [course, setCourse] = useState<Course | null>(() => {
+        const preloaded = readPreloadedApi(endpoint);
+        return preloaded ? convertToCourse(preloaded) : null;
+    });
     const { t, i18n } = useTranslation();
     const { request, loading, error } = useApi();
 
     useEffect(() => {
-        async function getCourse() {
-            const courseData = await request('GET', `/api/courses/${courseId}`);
+        if (course?.id === Number(courseId)) return;
 
-            if (!courseData) {
+        let cancelled = false;
+
+        async function getCourse() {
+            const courseData = await request('GET', endpoint);
+
+            if (cancelled || !courseData) {
                 return null;
             }
 
-            const course = convertToCourse(courseData);
-            setCourse(course);
+            const fullCourse = convertToCourse(courseData);
+            setCourse(fullCourse);
         }
 
-        // Only fetch the course when user data is loaded
-        if (!userLoading) {
-            getCourse();
-        }
-    }, [courseId, userLoading, request]);
+        getCourse();
+
+        return () => { cancelled = true; };
+    }, [course?.id, courseId, endpoint, request]);
 
     // Feeds the folder tree and the breadcrumb in the layout, which cannot read this route.
     usePublishCurriculumLocation({ course: course ?? undefined });
@@ -68,17 +73,17 @@ export default function CoursePage() {
         }
     };
 
-    // Show loading state
-    if (!courseId || loading) {
+    if (error) {
+        return <ErrorPage status={error.status} detail={error.message} />;
+    }
+
+    // Show loading state only if we don't have course data yet
+    if (!courseId || !course || (loading && !course)) {
         return (
             <div className="flex items-center justify-center h-full w-full">
                 <Loading />
             </div>
         );
-    }
-
-    if (error) {
-        return <ErrorPage status={error.status} detail={error.message} />;
     }
 
     return (course &&
@@ -146,7 +151,7 @@ export default function CoursePage() {
 
                 {/* Documents */}
                 <div className="mt-8">
-                    <DocumentSections courseId={course.id} documentCounts={course.documentCounts} />
+                    <DocumentSections course={course} documentCounts={course.documentCounts} />
                 </div>
 
 

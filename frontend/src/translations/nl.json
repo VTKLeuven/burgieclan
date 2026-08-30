@@ -79,7 +79,8 @@
                 "placeholder": "Kies een documentnaam"
             },
             "course": {
-                "label": "Vak"
+                "label": "Vak",
+                "placeholder": "Zoek op vaknaam of vakcode (min. {{count}} tekens)"
             },
             "category": {
                 "label": "Categorie"
@@ -155,7 +156,9 @@
             "fetch_failed": "Gegevens laden mislukt. Probeer het opnieuw."
         },
         "combo": {
-            "no_results": "Geen resultaten gevonden"
+            "no_results": "Geen resultaten gevonden",
+            "minimum_query": "Typ minstens {{count}} tekens om te zoeken",
+            "loading": "Zoeken..."
         }
     },
     "course-page": {
@@ -365,6 +368,14 @@
         "no-preview": "Geen voorbeeld beschikbaar voor {{filename}}",
         "loading": "Uw document tot leven brengen...",
         "load-more": "Meer pagina's laden ({{displayedPages}} van {{numPages}})",
+        "zoom": {
+            "label": "Zoom",
+            "in": "Inzoomen",
+            "out": "Uitzoomen",
+            "fit-width": "Paginabreedte",
+            "fit-page": "Hele pagina",
+            "hint": "Knijp, of houd ⌘/Ctrl ingedrukt tijdens het scrollen, om te zoomen"
+        },
         "comments": {
             "add": "Voeg opmerking toe...",
             "submit": "Opmerking indienen",
@@ -372,7 +383,10 @@
             "anonymous": "Anoniem",
             "success": "Opmerking succesvol toegevoegd",
             "error": "Opmerking toevoegen mislukt",
-            "title": "Opmerkingen"
+            "title": "Opmerkingen",
+            "open": "Opmerkingen openen ({{count}})",
+            "close": "Opmerkingen sluiten",
+            "loading": "Opmerkingen laden"
         },
         "under-review-warning": "Dit document is momenteel in behandeling, dus het is alleen zichtbaar voor jou.",
         "author": "Auteur",
@@ -409,6 +423,7 @@
         "add_document": "Voeg document toe",
         "expand": "Zijbalk uitklappen",
         "collapse": "Zijbalk inklappen",
+        "resize": "Breedte van zijbalk aanpassen (dubbelklik om te herstellen)",
         "toggle_courses": "Vakken in-/uitklappen",
         "toggle_documents": "Documenten in-/uitklappen",
         "log_out": "Uitloggen",
@@ -459,6 +474,8 @@
         "courses": "Blader door alle vakken op Burgieclan."
     },
     "curriculum-tree": {
-        "label": "Curriculum"
+        "label": "Curriculum",
+        "expand": "{{name}} uitklappen",
+        "collapse": "{{name}} inklappen"
     }
 }
