@@ -9,6 +9,7 @@ import { useSiblingDocuments } from '@/hooks/useSiblingDocuments';
 import type { Course, DocumentCategory, Module, Program } from '@/types/entities';
 import { convertToDocumentCategory, convertToModule, convertToProgram } from '@/utils/convertToEntity';
 import { localizedCourseName } from '@/utils/courseName';
+import { rememberBranch } from '@/utils/curriculumBranch';
 import { shortProgramName } from '@/utils/curriculumLabels';
 import { ChevronRight, File, FileText, Folder, GraduationCap, LoaderCircle } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -247,7 +248,7 @@ export default function CurriculumTree() {
                 {isOpen && children && (
                     <>
                         {children.modules.map((child) => renderModule(child, depth + 1))}
-                        {children.courses.map((child) => renderCourse(child, depth + 1))}
+                        {children.courses.map((child) => renderCourse(child, depth + 1, node.id))}
                         {children.modules.length === 0 && children.courses.length === 0 && (
                             <EmptyRow depth={depth + 1} label={t('curriculum-navigator.no-courses-in-module')} />
                         )}
@@ -257,7 +258,7 @@ export default function CurriculumTree() {
         );
     };
 
-    const renderCourse = (node: Course, depth: number) => {
+    const renderCourse = (node: Course, depth: number, moduleId: number) => {
         const key = courseKey(node.id);
         const isCurrent = course?.id === node.id;
         const isOpen = expanded.has(key) && isCurrent;
@@ -275,6 +276,7 @@ export default function CurriculumTree() {
                     icon={FileText}
                     open={isOpen}
                     active={activeKey === key}
+                    onNavigate={() => rememberBranch(node.id, moduleId)}
                 />
                 {/* Only the course being read opens into its folders: every course on screen
                     unfolding its five categories would bury the tree it sits in. */}
@@ -365,6 +367,7 @@ interface TreeRowProps {
     loading?: boolean;
     badge?: number;
     onToggle?: () => void;
+    onNavigate?: () => void;
 }
 
 /**
@@ -376,7 +379,7 @@ interface TreeRowProps {
  */
 function TreeRow({
     label, title, href, apiEndpoints, depth, icon: Icon, open = false,
-    expandable = false, active = false, loading = false, badge, onToggle,
+    expandable = false, active = false, loading = false, badge, onToggle, onNavigate,
 }: TreeRowProps) {
     const { t } = useTranslation();
     const rowRef = useRef<HTMLDivElement>(null);
@@ -420,6 +423,7 @@ function TreeRow({
                 apiEndpoints={apiEndpoints}
                 title={title ?? label}
                 aria-current={active ? 'page' : undefined}
+                onClick={onNavigate}
                 className="flex min-w-0 self-stretch flex-1 items-center gap-1.5 pr-1 rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
             >
                 <Icon size={14} className="shrink-0 text-vtk-muted" aria-hidden="true" />
