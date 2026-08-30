@@ -31,15 +31,21 @@ const CreateDocumentButton: React.FC<CreateDocumentButtonProps> = ({
         setIsUploadDialogOpen(false);
     };
 
+    const label = t('upload.button.create_document');
+
+    const paddingClass = showText ? '' : 'px-0';
+
     return (<>
         <button
             onClick={handleCreateDocument}
-            className={`primary-button ${className}`}
+            className={`primary-button ${paddingClass} ${className}`}
+            aria-label={showText ? undefined : label}
+            title={showText ? undefined : label}
         >
-            <Plus size={size} />
+            <Plus size={size} className="shrink-0" />
             {showText && (
                 <span className="ml-1.5 text-sm">
-                    {t('upload.button.create_document')}
+                    {label}
                 </span>
             )}
         </button>
