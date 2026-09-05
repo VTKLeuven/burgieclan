@@ -91,3 +91,6 @@ when@test:
 
         App\Factory\:
             resource: '../src/Factory/'
+
+        App\Service\PresignedUrlGenerator:
+            public: true
