@@ -61,7 +61,7 @@ const NavigationSidebar = () => {
     || pathWithoutLocale.startsWith('/course/')
     || pathWithoutLocale.startsWith('/document/');
   const sidebarMode = isHome ? 'home' : showCurriculumNavigator ? 'curriculum' : 'standard';
-  const defaultExpandedSections = { courses: isHome, documents: false };
+  const defaultExpandedSections = { curriculum: true, courses: isHome, documents: false };
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
   const [isResizing, setIsResizing] = useState(false);
@@ -137,7 +137,7 @@ const NavigationSidebar = () => {
   };
 
   const sectionButton =
-    'flex w-full shrink-0 items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-sm font-semibold text-vtk-ink transition-colors hover:bg-vtk-paper-2';
+    'flex w-full shrink-0 items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-sm font-semibold text-vtk-ink transition-colors hover:bg-vtk-paper-2 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy';
 
   // Home, FAQ, account and public content keep the original favourites sidebar. The curriculum
   // tree is added only while the reader is actually browsing curriculum content.
@@ -190,11 +190,26 @@ const NavigationSidebar = () => {
         <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3">
           {!isCollapsed && showCurriculumNavigator && (
             <>
-              <div className="vtk-label shrink-0 px-2.5 pb-1 flex items-center gap-2">
-                <FolderTree size={13} aria-hidden="true" />
-                {t('curriculum-tree.label')}
+              <button
+                type="button"
+                className={sectionButton}
+                onClick={() => toggleSection('curriculum')}
+                aria-expanded={expandedSections.curriculum}
+              >
+                <span className="flex items-center gap-2.5">
+                  <FolderTree size={17} className="shrink-0" />
+                  <span>{t('curriculum-tree.label')}</span>
+                </span>
+                <ChevronDown
+                  size={15}
+                  className={`shrink-0 text-vtk-muted transition-transform duration-200 ${
+                    expandedSections.curriculum ? 'rotate-0' : '-rotate-90'
+                  }`}
+                />
+              </button>
+              <div className={expandedSections.curriculum ? 'shrink-0' : 'hidden'}>
+                <CurriculumTree />
               </div>
-              <CurriculumTree />
             </>
           )}
 
