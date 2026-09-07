@@ -40,8 +40,8 @@ final class DownloadController extends AbstractController
 
         // When S3 is active (production), redirect to a time-limited pre-signed S3 URL.
         // This offloads the file transfer from PHP workers entirely.
-        if ($presignedUrlGenerator->isEnabled()) {
-            $presignedUrl = $presignedUrlGenerator->generateUrl($document, $isInline);
+        if ($this->presignedUrlGenerator->isEnabled()) {
+            $presignedUrl = $this->presignedUrlGenerator->generateUrl($document, $isInline);
             $response = new RedirectResponse($presignedUrl, Response::HTTP_FOUND);
             $response->headers->set('Cache-Control', 'private, no-cache');
 
@@ -49,7 +49,7 @@ final class DownloadController extends AbstractController
         }
 
         try {
-            $response = $downloadHandler->downloadObject(
+            $response = $this->downloadHandler->downloadObject(
                 $document,
                 'file',
                 null,

@@ -133,11 +133,12 @@ class DownloadControllerTest extends ApiTestCase
         );
         $generator = new PresignedUrlGenerator($s3Client, 'burgieclan-bucket', 'documents', 10);
 
-        $browser = $this->browser(['follow_redirects' => false]);
+        $browser = $this->browser([], ['HTTPS' => 'on']);
+        $browser->interceptRedirects();
         $browser->client()->disableReboot();
         $browser->client()->getContainer()->set(PresignedUrlGenerator::class, $generator);
 
-        $response = $browser
+        $browser
             ->get(
                 '/files/download/' . $storedName,
                 [
@@ -147,10 +148,11 @@ class DownloadControllerTest extends ApiTestCase
                 ]
             )
             ->assertStatus(302)
-            ->assertHeaderContains('Cache-Control', 'private, no-cache');
+            ->assertHeaderContains('Cache-Control', 'no-cache')
+            ->assertHeaderContains('Cache-Control', 'private');
 
-        $location = $response->response()->headers()->get('location');
-        $this->assertNotNull($location);
+        $location = (string) $browser->client()->getResponse()->headers->get('location');
+        $this->assertNotEmpty($location);
         $this->assertStringStartsWith(
             'https://s3.leuven.vtk.be/burgieclan-bucket/documents/' . $storedName . '?',
             $location
