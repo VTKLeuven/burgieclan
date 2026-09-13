@@ -93,12 +93,12 @@ def query_pg(code):
                                 semesters = []
                                 for lang in m.get('moduleLanguageSet', []):
                                     for pat in lang.get('moduleSessionPatternSet', []):
-                                        p = pat.get('offerPeriod')
-                                        if p == 1 and 'Semester 1' not in semesters:
+                                        p = str(pat.get('offerPeriod', ''))
+                                        if p == '1' and 'Semester 1' not in semesters:
                                             semesters.append('Semester 1')
-                                        elif p == 2 and 'Semester 2' not in semesters:
+                                        elif p == '2' and 'Semester 2' not in semesters:
                                             semesters.append('Semester 2')
-                                        elif p == 3:
+                                        elif p == '3':
                                             if 'Semester 1' not in semesters: semesters.append('Semester 1')
                                             if 'Semester 2' not in semesters: semesters.append('Semester 2')
                                 return {
