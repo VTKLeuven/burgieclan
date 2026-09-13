@@ -105,7 +105,7 @@ const isCacheableGet = (endpoint: string): boolean => (
     || /^\/api\/users\/\d+(?:$|\?|\/favorites)/.test(endpoint)
 );
 
-const freshCachedValue = (endpoint: string): unknown | undefined => {
+const freshMemoryCachedValue = (endpoint: string): unknown | undefined => {
     const memoryCached = getCache.get(endpoint);
     if (memoryCached) {
         if (memoryCached.expiresAt > Date.now()) {
@@ -113,6 +113,12 @@ const freshCachedValue = (endpoint: string): unknown | undefined => {
         }
         getCache.delete(endpoint);
     }
+    return undefined;
+};
+
+const freshCachedValue = (endpoint: string): unknown | undefined => {
+    const memory = freshMemoryCachedValue(endpoint);
+    if (memory !== undefined) return memory;
 
     const storageCached = readStorageCache(endpoint);
     if (storageCached) {
@@ -149,14 +155,32 @@ const getWithDedupe = async (endpoint: string): Promise<unknown> => {
     }
 };
 
+/**
+ * Drops every cached GET response. `useApi().request` does this after any non-GET call;
+ * it is exported for mutations that talk to `ApiClient` directly because they need to tell
+ * a failure apart from a 204, which `request` collapses into the same `null`.
+ */
+export const invalidateApiCache = (): void => {
+    getCache.clear();
+    clearStorageCache();
+};
+
 /** Start a cacheable API request before the reader clicks. */
 export const preloadApi = (endpoint: string): void => {
     if (!isCacheableGet(endpoint)) return;
     void getWithDedupe(endpoint).catch(() => { });
 };
 
-/** Lets a destination render cached data on its very first frame instead of flashing a spinner. */
-export const readPreloadedApi = (endpoint: string): unknown | undefined => freshCachedValue(endpoint);
+/**
+ * Lets a destination render cached data on its very first frame during in-app navigation
+ * instead of flashing a spinner.
+ *
+ * Reads only the in-memory cache to prevent hydration mismatches (React error #418)
+ * on initial page loads or hard refreshes. On a fresh page load, both SSR and client
+ * start with an empty in-memory cache and hydrate synchronously without divergence;
+ * `getWithDedupe` inside `useEffect` then reads from `sessionStorage` without network overhead.
+ */
+export const readPreloadedApi = (endpoint: string): unknown | undefined => freshMemoryCachedValue(endpoint);
 
 export type HydraCollection<T> = {
     'hydra:member': T[];
@@ -215,8 +239,7 @@ export function useApi<T = unknown>() {
             }
 
             if (!isPlainGet) {
-                getCache.clear();
-                clearStorageCache();
+                invalidateApiCache();
             }
 
             // Success case
