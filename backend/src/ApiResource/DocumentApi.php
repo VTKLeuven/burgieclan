@@ -9,6 +9,7 @@ use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
@@ -118,7 +119,14 @@ use Symfony\Component\Validator\Constraints as Assert;
             read: false,
             deserialize: false,
             validate: false,
-        )
+        ),
+        new Delete(
+            // Withdrawing an upload that is still waiting on moderation. The security check
+            // is redirected to the voters; App\Security\Voter\DocumentVoter is the one that
+            // answers for DocumentApi, and it only grants this to the creator of a document
+            // that is still under review.
+            security: 'is_granted("DELETE", object)'
+        ),
     ],
     outputFormats: ['jsonld' => ['application/ld+json']],
     provider: EntityClassDtoStateProvider::class,
@@ -181,6 +189,19 @@ class DocumentApi extends NodeApi
     #[ApiFilter(BooleanFilter::class)]
     #[Groups([SerializationGroups::DOCUMENT_GET])]
     public bool $anonymous = false;
+
+    /**
+     * Whether the requesting user may withdraw this upload - see App\Security\Voter\DocumentVoter,
+     * which decides the same thing for the Delete operation itself.
+     *
+     * Filled in by App\State\DocumentApiProvider rather than the mapper, because it depends on who
+     * is asking. It exists because `creator` alone cannot answer the question: an anonymous document
+     * has its creator stripped from the response, and anonymous is the default for uploads, so the
+     * client would never be able to recognise its own pending files.
+     */
+    #[ApiProperty(writable: false)]
+    #[Groups([SerializationGroups::DOCUMENT_GET])]
+    public bool $canDelete = false;
 
     #[Groups([SerializationGroups::DOCUMENT_GET])]
     public ?string $contentUrl = null;

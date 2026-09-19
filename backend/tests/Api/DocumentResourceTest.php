@@ -8,6 +8,7 @@ use App\Factory\DocumentFactory;
 use App\Factory\TagFactory;
 use App\Factory\UserFactory;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Zenstruck\Browser\HttpOptions;
 
 use function Zenstruck\Foundry\Persistence\refresh;
 use function Zenstruck\Foundry\Persistence\save;
@@ -46,6 +47,7 @@ class DocumentResourceTest extends ApiTestCase
                 'year',
                 'under_review',
                 'anonymous',
+                'canDelete',
                 'contentUrl',
                 'mimetype',
                 'filename',
@@ -89,6 +91,7 @@ class DocumentResourceTest extends ApiTestCase
                 'year',
                 'under_review',
                 'anonymous',
+                'canDelete',
                 'contentUrl',
                 'mimetype',
                 'filename',
@@ -1271,5 +1274,277 @@ class DocumentResourceTest extends ApiTestCase
                 unlink($target);
             }
         }
+    }
+
+    /**
+     * Creates a throwaway file in the upload directory so a delete test can assert the file
+     * is cleaned up without touching one of the shared fixture files DocumentFactory picks
+     * from by default.
+     */
+    private function createUploadedFixtureFile(string $filename): string
+    {
+        $path = __DIR__ . '/../../data/documents/' . $filename;
+        file_put_contents($path, 'test content');
+
+        return $path;
+    }
+
+    private function loginAs(string $username): string
+    {
+        $response = $this->browser()
+            ->post(
+                '/api/auth/login',
+                HttpOptions::json(
+                    [
+                        'username' => $username,
+                        'password' => 'password',
+                    ]
+                )
+            )
+            ->json()
+            ->decoded();
+
+        return $response['token'];
+    }
+
+    public function testDeletePendingDocumentAsCreator(): void
+    {
+        $creator = UserFactory::createOne(
+            [
+                'username' => 'pending-doc-creator',
+                'plainPassword' => 'password',
+            ]
+        );
+        $creatorToken = $this->loginAs($creator->getUsername());
+
+        $filePath = $this->createUploadedFixtureFile('delete-pending-document-test.txt');
+        $document = DocumentFactory::createOne(
+            [
+                'creator' => $creator,
+                'under_review' => true,
+                'anonymous' => false,
+                'file_name' => basename($filePath),
+            ]
+        );
+        $documentId = $document->getId();
+
+        $this->browser()
+            ->delete(
+                '/api/documents/' . $documentId,
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
+                ]
+            )
+            ->assertStatus(204);
+
+        $this->browser()
+            ->get(
+                '/api/documents/' . $documentId,
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
+                ]
+            )
+            ->assertStatus(404);
+
+        $this->assertFileDoesNotExist($filePath);
+    }
+
+    public function testDeleteAnonymousPendingDocumentAsCreator(): void
+    {
+        $creator = UserFactory::createOne(
+            [
+                'username' => 'anonymous-doc-creator',
+                'plainPassword' => 'password',
+            ]
+        );
+        $creatorToken = $this->loginAs($creator->getUsername());
+
+        $filePath = $this->createUploadedFixtureFile('delete-anonymous-document-test.txt');
+        $document = DocumentFactory::createOne(
+            [
+                'creator' => $creator,
+                'under_review' => true,
+                'anonymous' => true,
+                'file_name' => basename($filePath),
+            ]
+        );
+
+        $this->browser()
+            ->delete(
+                '/api/documents/' . $document->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
+                ]
+            )
+            ->assertStatus(204);
+
+        $this->assertFileDoesNotExist($filePath);
+    }
+
+    public function testCannotDeletePendingDocumentOfAnotherUser(): void
+    {
+        $creator = UserFactory::createOne(
+            [
+                'username' => 'other-pending-doc-creator',
+                'plainPassword' => 'password',
+            ]
+        );
+        $otherUser = UserFactory::createOne(
+            [
+                'username' => 'unrelated-user',
+                'plainPassword' => 'password',
+            ]
+        );
+        $otherToken = $this->loginAs($otherUser->getUsername());
+
+        $filePath = $this->createUploadedFixtureFile('delete-foreign-document-test.txt');
+        $document = DocumentFactory::createOne(
+            [
+                'creator' => $creator,
+                'under_review' => true,
+                'anonymous' => false,
+                'file_name' => basename($filePath),
+            ]
+        );
+
+        $this->browser()
+            ->delete(
+                '/api/documents/' . $document->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $otherToken
+                    ]
+                ]
+            )
+            ->assertStatus(403);
+
+        $this->assertFileExists($filePath);
+        unlink($filePath);
+    }
+
+    public function testCannotDeleteApprovedDocument(): void
+    {
+        $creator = UserFactory::createOne(
+            [
+                'username' => 'approved-doc-creator',
+                'plainPassword' => 'password',
+            ]
+        );
+        $creatorToken = $this->loginAs($creator->getUsername());
+
+        $filePath = $this->createUploadedFixtureFile('delete-approved-document-test.txt');
+        $document = DocumentFactory::createOne(
+            [
+                'creator' => $creator,
+                'under_review' => false,
+                'anonymous' => false,
+                'file_name' => basename($filePath),
+            ]
+        );
+
+        $this->browser()
+            ->delete(
+                '/api/documents/' . $document->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
+                ]
+            )
+            ->assertStatus(403);
+
+        $this->assertFileExists($filePath);
+        unlink($filePath);
+    }
+
+    public function testDeleteDocumentRequiresAuthentication(): void
+    {
+        $filePath = $this->createUploadedFixtureFile('delete-unauthenticated-document-test.txt');
+        $document = DocumentFactory::createOne(
+            [
+                'under_review' => true,
+                'anonymous' => false,
+                'file_name' => basename($filePath),
+            ]
+        );
+
+        $this->browser()
+            ->delete('/api/documents/' . $document->getId())
+            ->assertStatus(401);
+
+        $this->assertFileExists($filePath);
+        unlink($filePath);
+    }
+
+    public function testCanDeleteFlagTracksOwnershipAndReviewState(): void
+    {
+        $creator = UserFactory::createOne(
+            [
+                'username' => 'can-delete-flag-creator',
+                'plainPassword' => 'password',
+            ]
+        );
+        $creatorToken = $this->loginAs($creator->getUsername());
+
+        // Anonymous on purpose: the response strips `creator` for those, which is exactly why
+        // the client needs a flag rather than comparing creator ids itself.
+        $ownPending = DocumentFactory::createOne(
+            [
+                'creator' => $creator,
+                'under_review' => true,
+                'anonymous' => true,
+            ]
+        );
+        $ownApproved = DocumentFactory::createOne(
+            [
+                'creator' => $creator,
+                'under_review' => false,
+                'anonymous' => false,
+            ]
+        );
+        // An explicit second user: DocumentFactory defaults its creator to a random existing
+        // one, which can well be $creator.
+        $foreignPending = DocumentFactory::createOne(
+            [
+                'creator' => UserFactory::createOne(['username' => 'can-delete-flag-other']),
+                'under_review' => true,
+                'anonymous' => false,
+            ]
+        );
+
+        $this->browser()
+            ->get(
+                '/api/documents/' . $ownPending->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
+                ]
+            )
+            ->assertJsonMatches('canDelete', true)
+            ->get(
+                '/api/documents/' . $ownApproved->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
+                ]
+            )
+            ->assertJsonMatches('canDelete', false)
+            ->get(
+                '/api/documents/' . $foreignPending->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $creatorToken
+                    ]
+                ]
+            )
+            ->assertJsonMatches('canDelete', false);
     }
 }

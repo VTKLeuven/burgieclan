@@ -1,6 +1,7 @@
 'use client';
 
 import { usePublishCurriculumLocation } from "@/components/curriculum/CurriculumLocationContext";
+import DeleteDocumentButton from "@/components/document/DeleteDocumentButton";
 import DocumentCommentSection from "@/components/document/DocumentCommentSection";
 import DocumentInfoField from "@/components/document/DocumentInfoField";
 import DocumentSiblingNav from "@/components/document/DocumentSiblingNav";
@@ -21,6 +22,7 @@ import { formatFileSize } from "@/utils/fileSize";
 import { inlineUrl, previewKindFor } from "@/utils/previewableFile";
 import { Calendar, ChartPie, CircleUser, ExternalLink, File, Package, PenLine } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -42,6 +44,7 @@ export default function DocumentPreview({ id }: { id: string }) {
 
     const { user } = useUser();
     const { request, loading, error } = useApi();
+    const router = useRouter();
 
     useEffect(() => {
         if (document?.id === Number(id)) return;
@@ -142,7 +145,21 @@ export default function DocumentPreview({ id }: { id: string }) {
             {/* Under review box */}
             {document.underReview && (
                 <div className="mt-6">
-                    <UnderReviewBox />
+                    <UnderReviewBox
+                        action={document.canDelete ? (
+                            <DeleteDocumentButton
+                                documentId={document.id}
+                                documentName={document.name}
+                                // The document is gone, so there is nothing left to show here.
+                                // Its category folder is the nearest page that still exists.
+                                onDeleted={() => router.push(
+                                    document.course && document.category
+                                        ? `/course/${document.course.id}/documents/category/${document.category.id}`
+                                        : '/account'
+                                )}
+                            />
+                        ) : undefined}
+                    />
                 </div>
             )}
 
