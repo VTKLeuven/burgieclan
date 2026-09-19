@@ -54,7 +54,7 @@
     "twig/markdown-extra": "3.28.0",
     "league/flysystem-aws-s3-v3": "^3.0",
     "league/flysystem-bundle": "^3.0",
-    "vich/uploader-bundle": "2.10.1"
+    "vich/uploader-bundle": "3.0.0"
   },
   "require-dev": {
     "dama/doctrine-test-bundle": "^8.6",
