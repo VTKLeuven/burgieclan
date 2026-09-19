@@ -217,6 +217,11 @@ export default function PDFPages({ file, width, pageAspect = 1.414, onDocumentLo
                 onLoadSuccess={onDocumentLoadSuccess}
                 options={options}
                 className="flex flex-col items-center w-full"
+                // react-pdf 11 suspends while loading and throws load failures at the nearest error
+                // boundary, which here is the route's error.tsx — one unreadable file would replace the
+                // whole page. Opting out keeps `loading` below (and the built-in error message) working;
+                // children inherit the setting, so the pages opt out with it.
+                suspense={false}
                 loading={
                     <div className="flex h-96 w-full items-center justify-center p-8">
                         <LoaderCircle className="animate-spin text-vtk-navy" size={40} strokeWidth={2.5} aria-label={t('document.loading')} />
