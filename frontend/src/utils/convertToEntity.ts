@@ -162,6 +162,7 @@ export function convertToDocument(doc: unknown): Document {
             ? data['under_review']
             : undefined,
         anonymous: typeof data.anonymous === 'boolean' ? data.anonymous : undefined,
+        canDelete: typeof data.canDelete === 'boolean' ? data.canDelete : undefined,
         contentUrl: contentUrl ? process.env.NEXT_PUBLIC_BACKEND_URL + contentUrl : undefined,
         mimetype: typeof data.mimetype === 'string' ? data.mimetype : undefined,
         filename: typeof data.filename === 'string' ? data.filename : undefined,

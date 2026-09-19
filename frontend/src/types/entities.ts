@@ -123,6 +123,10 @@ export interface Document extends NodeEntity {
     author?: string;
     underReview?: boolean;
     anonymous?: boolean;
+    // Answered by the backend per request: true only for the uploader of a document that is
+    // still under review. Ownership cannot be derived from `creator` here, since anonymous
+    // uploads - the default - come back without one.
+    canDelete?: boolean;
     contentUrl?: string;
     fileSize?: number;
     mimetype?: string;

@@ -351,6 +351,20 @@
         "anonymous": "Anoniem",
         "under_review": "In behandeling",
         "approved": "Goedgekeurd",
+        "delete": {
+            "action": "Verwijderen",
+            "confirm": {
+                "title": "Deze upload verwijderen?",
+                "description": "Deze upload is nog in behandeling. Verwijderen wist het bestand definitief.",
+                "description-named": "“{{name}}” is nog in behandeling. Verwijderen wist het bestand definitief.",
+                "cancel": "Annuleren",
+                "submit": "Verwijderen"
+            },
+            "toast": {
+                "success": "Upload verwijderd",
+                "error": "Deze upload kon niet verwijderd worden. Mogelijk is ze al goedgekeurd."
+            }
+        },
         "sort-by": "Sorteer op",
         "sort-ascending": "Oplopend",
         "sort-descending": "Aflopend",

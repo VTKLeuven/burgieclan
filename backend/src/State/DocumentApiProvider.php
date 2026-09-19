@@ -14,6 +14,7 @@ use App\ApiResource\DocumentApi;
 use App\Constants\MappingContext;
 use App\Entity\Document;
 use App\Entity\DocumentCategory;
+use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mime\MimeTypes;
@@ -142,6 +143,14 @@ class DocumentApiProvider implements ProviderInterface
     private function processDocument(Document $document, array $mapperContext)
     {
         $documentApi = $this->microMapper->map($document, DocumentApi::class, $mapperContext);
+
+        // Answered before the creator is stripped below, and kept in step with
+        // App\Security\Voter\DocumentVoter: only the uploader, and only while the document is
+        // still waiting on moderation.
+        $currentUser = $this->security->getUser();
+        $documentApi->canDelete = $currentUser instanceof User
+            && $document->isUnderReview()
+            && $document->getCreator()->getId() === $currentUser->getId();
 
         if ($document->isAnonymous()) {
             $documentApi->creator = null; // Remove author in GET-requests if document is anonymous

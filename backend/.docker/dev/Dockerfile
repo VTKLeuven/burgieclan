@@ -47,4 +47,14 @@ RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | b
 # Install dependencies
 RUN composer install --no-scripts
 
-CMD ["sh", "-c", "symfony server:stop || true && symfony server:start --port=8000 --no-tls --allow-all-ip"]
+# The symfony CLI records the running server in a state file under $HOME, which lives in this
+# container's writable layer and so survives a restart. Container PIDs restart from 1 on every
+# boot, so a leftover file pointing at a low PID reliably matches some unrelated process on the
+# next boot - often `server:start` itself - and the CLI then reports "the local web server is
+# already running", prints its info block and exits 0, taking the container with it.
+#
+# `server:stop` cannot clear that: it runs early enough that the recorded PID is not yet in use,
+# so it sees nothing to stop and leaves the file alone. Deleting the file is what makes a restart
+# deterministic. Nothing can legitimately be running at this point - the shell is PID 1. Both
+# state directories are covered because the CLI moved from ~/.symfony5 to ~/.config/symfony-cli.
+CMD ["sh", "-c", "rm -f \"$HOME\"/.config/symfony-cli/var/*.pid \"$HOME\"/.symfony5/var/*.pid; symfony server:start --port=8000 --no-tls --allow-all-ip"]

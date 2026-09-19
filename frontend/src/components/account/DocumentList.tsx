@@ -1,4 +1,5 @@
 import Badge from '@/components/ui/Badge';
+import DeleteDocumentButton from '@/components/document/DeleteDocumentButton';
 import VoteButton from '@/components/ui/buttons/VoteButton';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import Pagination from '@/components/ui/Pagination';
@@ -13,7 +14,7 @@ import { localizedCourseName } from '@/utils/courseName';
 
 const PDFPages = dynamic(() => import('@/components/document/pdf/PDFPages'), { ssr: false });
 
-function AccountDocumentCard({ document }: { document: Document }) {
+function AccountDocumentCard({ document, onDeleted }: { document: Document; onDeleted: (documentId: number) => void }) {
     const { t, i18n } = useTranslation();
     const [expanded, setExpanded] = useState(false);
     const [containerWidth, setContainerWidth] = useState(600);
@@ -58,6 +59,14 @@ function AccountDocumentCard({ document }: { document: Document }) {
                         <Badge text={t('document.under_review')} color="yellow" />
                     ) : (
                         <Badge text={t('document.approved')} color="green" />
+                    )}
+                    {document.canDelete && (
+                        <DeleteDocumentButton
+                            documentId={document.id}
+                            documentName={document.name}
+                            variant="icon"
+                            onDeleted={() => onDeleted(document.id)}
+                        />
                     )}
                 </div>
             </div>
@@ -118,6 +127,22 @@ const DocumentList: React.FC = () => {
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const { documents, loading, totalItems } = useRetrieveDocuments(page, itemsPerPage);
     const { t } = useTranslation();
+    // Deleted ids rather than a copy of the list: the fetch hook owns `documents` and replaces
+    // it on every page change, so a local copy would resurrect what was just removed.
+    //
+    // Tied to the array they were removed from, because a fresh fetch already leaves those rows
+    // out and carries a corrected total - carrying the ids over would subtract them twice.
+    const [deleted, setDeleted] = useState<{ from: Document[]; ids: number[] }>({ from: documents, ids: [] });
+    const deletedIds = deleted.from === documents ? deleted.ids : [];
+
+    const visibleDocuments = documents.filter((doc) => !deletedIds.includes(doc.id));
+
+    const handleDeleted = (documentId: number) => {
+        setDeleted((previous) => ({
+            from: documents,
+            ids: previous.from === documents ? [...previous.ids, documentId] : [documentId],
+        }));
+    };
 
     useEffect(() => {
         const updateItemsPerPage = () => {
@@ -137,22 +162,31 @@ const DocumentList: React.FC = () => {
     }, []);
 
     return (
-        <CollapsibleSection header={<h3 className="text-xl font-semibold">{t('account.documents.my')} <span className="text-sm">({totalItems})</span></h3>}>
+        <CollapsibleSection header={<h3 className="text-xl font-semibold">{t('account.documents.my')} <span className="text-sm">({Math.max(totalItems - deletedIds.length, 0)})</span></h3>}>
             <div className="rounded-lg shadow-xs">
                 {loading ?
                     <div className="flex justify-center items-center h-full py-8">
                         <LoaderCircle className="animate-spin text-vtk-navy" size={48} />
                     </div>
-                    : documents.length === 0 ? (
+                    : visibleDocuments.length === 0 ? (
                         <p className='p-4'>{t('account.documents.no_uploads')}</p>
                     ) : (
                         <div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-                                {documents.map((doc) => (
-                                    <AccountDocumentCard key={doc.id} document={doc} />
+                                {visibleDocuments.map((doc) => (
+                                    <AccountDocumentCard
+                                        key={doc.id}
+                                        document={doc}
+                                        onDeleted={handleDeleted}
+                                    />
                                 ))}
                             </div>
-                            <Pagination totalAmount={totalItems} currentPage={page} itemsPerPage={itemsPerPage} onPageChange={setPage} />
+                            <Pagination
+                                totalAmount={Math.max(totalItems - deletedIds.length, 0)}
+                                currentPage={page}
+                                itemsPerPage={itemsPerPage}
+                                onPageChange={setPage}
+                            />
                         </div>
                     )}
             </div>

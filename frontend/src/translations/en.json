@@ -351,6 +351,20 @@
         "anonymous": "Anonymous",
         "under_review": "Under review",
         "approved": "Approved",
+        "delete": {
+            "action": "Delete",
+            "confirm": {
+                "title": "Delete this upload?",
+                "description": "This upload is still under review. Deleting it removes the file permanently.",
+                "description-named": "“{{name}}” is still under review. Deleting it removes the file permanently.",
+                "cancel": "Cancel",
+                "submit": "Delete"
+            },
+            "toast": {
+                "success": "Upload deleted",
+                "error": "Could not delete this upload. It may already have been approved."
+            }
+        },
         "sort-by": "Sort by",
         "sort-ascending": "Ascending",
         "sort-descending": "Descending",
