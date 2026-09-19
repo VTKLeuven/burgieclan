@@ -125,6 +125,11 @@ export default function VoteButton({
         return newVote - oldVote;
     };
 
+    // Negative totals are demoralising for the uploader/author, so the score is
+    // never shown below zero. The underlying value is untouched; only the
+    // rendered number is clamped.
+    const displayedVoteCount = Math.max(0, voteCount);
+
     const iconSize = size === 'small' ? 16 : 20;
     const textSize = size === 'small' ? 'text-xs' : 'text-sm';
     const padding = size === 'small' ? 'p-0.5' : 'p-1';
@@ -160,7 +165,7 @@ export default function VoteButton({
             </button>
             <div className={`${textSize} min-w-4 text-center tabular-nums ${voteState === VoteDirection.NONE ? 'text-vtk-body' : 'font-semibold text-vtk-ink'
                 }`}>
-                {voteCount}
+                {displayedVoteCount}
             </div>
             <button
                 type="button"
