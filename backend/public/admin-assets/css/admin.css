@@ -186,3 +186,87 @@
 .bc-semester-icon {
     color: #74c0fc;
 }
+
+/* ---- Pending Documents Bulk Actions Bar ---- */
+
+.bc-pending-bulk-bar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1050;
+    min-width: 320px;
+    max-width: 90vw;
+    background: var(--content-bg, #ffffff);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 10px 18px;
+    animation: bc-slide-up 0.25s ease-out;
+}
+
+@keyframes bc-slide-up {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.bc-bulk-bar-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.bc-bulk-bar-info {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    font-weight: 500;
+    color: var(--text-color, #212529);
+}
+
+.bc-bulk-badge {
+    font-size: 0.85rem;
+    padding: 0.35em 0.65em;
+}
+
+.bc-bulk-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.bc-bulk-bar-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.bc-bulk-clear-btn {
+    color: var(--text-color-light, #6c757d);
+    cursor: pointer;
+    font-size: 0.8125rem;
+    padding: 0.4rem 0.5rem;
+}
+
+.bc-bulk-clear-btn:hover {
+    color: var(--text-color, #212529);
+}
+
+.ea-dark-scheme .bc-pending-bulk-bar {
+    background: var(--gray-900, #1e293b);
+    border-color: var(--gray-700, #334155);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+

@@ -8,6 +8,8 @@ use App\Entity\Document;
 use App\Entity\DocumentCategory;
 use App\Entity\Tag;
 use App\Entity\User;
+use App\Utils\DownloadFilename;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
@@ -18,6 +20,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -27,10 +30,17 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use LogicException;
+use RuntimeException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Vich\UploaderBundle\Form\Type\VichFileType;
+use Vich\UploaderBundle\Storage\StorageInterface;
+use ZipArchive;
 
 #[IsGranted(User::ROLE_MODERATOR)]
 class DocumentPendingCrudController extends DocumentCrudController
@@ -49,8 +59,41 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->setIcon('fa fa-check-circle')
             ->renderAsButton();
 
+        $batchApprove = Action::new('batchApprove', 'Approve Selected')
+            ->linkToCrudAction('batchApprove')
+            ->addCssClass('btn btn-success')
+            ->setIcon('fa fa-check-circle');
+
+        $batchDownload = Action::new('batchDownload', 'Download Selected')
+            ->linkToCrudAction('batchDownload')
+            ->addCssClass('btn btn-primary')
+            ->setIcon('fa fa-download')
+            ->setHtmlAttributes(['data-action-batch-no-confirm' => 'true']);
+
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $approveAction)
+            ->addBatchAction($batchApprove)
+            ->addBatchAction($batchDownload)
+            ->update(
+                Crud::PAGE_INDEX,
+                Action::BATCH_DELETE,
+                function (Action $action) {
+                    return $action
+                    ->setLabel('Delete Selected')
+                    ->setIcon('fa fa-trash-can');
+                }
+            )
+            ->reorder(
+                Crud::PAGE_INDEX,
+                [
+                'approve',
+                Action::EDIT,
+                Action::DELETE,
+                'batchApprove',
+                'batchDownload',
+                Action::BATCH_DELETE,
+                ]
+            )
             ->disable(Action::NEW);
     }
 
@@ -70,7 +113,8 @@ class DocumentPendingCrudController extends DocumentCrudController
         // The crud/edit override comes from the parent.
         return parent::configureCrud($crud)
             ->setPageTitle(Crud::PAGE_INDEX, 'Pending Documents')
-            ->showEntityActionsInlined();
+            ->showEntityActionsInlined()
+            ->overrideTemplate('crud/index', 'admin/document_pending_index.html.twig');
     }
 
     public function configureFields(string $pageName): iterable
@@ -171,6 +215,158 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->setEntityId($document->getId())
             ->generateUrl();
         return $this->redirect($targetUrl);
+    }
+
+    #[AdminRoute('/batch-approve', name: 'batch_approve')]
+    public function batchApprove(
+        AdminContext $adminContext,
+        BatchActionDto $batchActionDto,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $csrfTokenId = 'ea-batch-action-' . $batchActionDto->getName() . '-' . $batchActionDto->getEntityFqcn();
+        if (!$this->isCsrfTokenValid($csrfTokenId, $batchActionDto->getCsrfToken())) {
+            $this->addFlash('danger', 'Invalid CSRF token.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
+        if ($batchActionDto->getEntityFqcn() !== $adminContext->getEntity()->getFqcn()) {
+            throw new BadRequestHttpException();
+        }
+
+        $repository = $entityManager->getRepository(Document::class);
+        $approvedCount = 0;
+        foreach ($batchActionDto->getEntityIds() as $entityId) {
+            $document = $repository->find($entityId);
+            if ($document instanceof Document && $document->isUnderReview()) {
+                $document->setUnderReview(false);
+                $approvedCount++;
+            }
+        }
+
+        $entityManager->flush();
+
+        $this->addFlash(
+            'success',
+            sprintf(
+                '%d document%s approved.',
+                $approvedCount,
+                $approvedCount === 1 ? ' was' : 's were'
+            )
+        );
+
+        return $this->redirectToRoute('admin_document_pending_index');
+    }
+
+    #[AdminRoute('/batch-download', name: 'batch_download')]
+    public function batchDownload(
+        AdminContext $adminContext,
+        BatchActionDto $batchActionDto,
+        EntityManagerInterface $entityManager,
+        StorageInterface $storage
+    ): Response {
+        $csrfTokenId = 'ea-batch-action-' . $batchActionDto->getName() . '-' . $batchActionDto->getEntityFqcn();
+        if (!$this->isCsrfTokenValid($csrfTokenId, $batchActionDto->getCsrfToken())) {
+            $this->addFlash('danger', 'Invalid CSRF token.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
+        if ($batchActionDto->getEntityFqcn() !== $adminContext->getEntity()->getFqcn()) {
+            throw new BadRequestHttpException();
+        }
+
+        $repository = $entityManager->getRepository(Document::class);
+        /** @var Document[] $documents */
+        $documents = [];
+        foreach ($batchActionDto->getEntityIds() as $entityId) {
+            $document = $repository->find($entityId);
+            if ($document instanceof Document && $document->getFileName()) {
+                $documents[] = $document;
+            }
+        }
+
+        if (empty($documents)) {
+            $this->addFlash('warning', 'No downloadable documents were selected.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'pending_docs_');
+        if ($tempFile === false) {
+            throw new RuntimeException('Failed to create temporary file for ZIP export.');
+        }
+
+        $zip = new ZipArchive();
+        if ($zip->open($tempFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            throw new RuntimeException('Failed to open ZIP archive.');
+        }
+
+        $usedNames = [];
+        foreach ($documents as $document) {
+            $stream = $storage->resolveStream($document, 'file');
+            if ($stream === null) {
+                continue;
+            }
+
+            $baseName = DownloadFilename::forDocument($document);
+            $fileNameToUse = $this->getUniqueZipFilename($baseName, $usedNames);
+            $usedNames[] = $fileNameToUse;
+
+            $content = stream_get_contents($stream);
+            fclose($stream);
+
+            if ($content !== false) {
+                $zip->addFromString($fileNameToUse, $content);
+            }
+        }
+
+        if ($zip->numFiles === 0) {
+            $zip->close();
+            @unlink($tempFile);
+            $this->addFlash('warning', 'None of the selected documents contained downloadable files.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
+        $zip->close();
+
+        $zipFilename = sprintf('pending-documents-%s.zip', (new DateTimeImmutable())->format('Y-m-d-His'));
+
+        $zipContent = file_get_contents($tempFile);
+        @unlink($tempFile);
+
+        if ($zipContent === false) {
+            throw new RuntimeException('Failed to read generated ZIP archive.');
+        }
+
+        $response = new Response($zipContent);
+        $response->headers->set('Content-Type', 'application/zip');
+        $response->headers->set(
+            'Content-Disposition',
+            HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_ATTACHMENT, $zipFilename)
+        );
+
+        return $response;
+    }
+
+    /**
+     * @param list<string> $usedNames
+     */
+    private function getUniqueZipFilename(string $filename, array $usedNames): string
+    {
+        if (!in_array($filename, $usedNames, true)) {
+            return $filename;
+        }
+
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $base = pathinfo($filename, PATHINFO_FILENAME);
+        $counter = 1;
+
+        do {
+            $candidate = $extension !== ''
+                ? sprintf('%s (%d).%s', $base, $counter, $extension)
+                : sprintf('%s (%d)', $base, $counter);
+            $counter++;
+        } while (in_array($candidate, $usedNames, true));
+
+        return $candidate;
     }
 
     public function configureFilters(Filters $filters): Filters
