@@ -1,0 +1,82 @@
+{% extends '@EasyAdmin/crud/index.html.twig' %}
+
+{% block batch_actions %}
+    {% if has_batch_actions %}
+        <div class="bc-pending-bulk-bar batch-actions d-none" id="pending-bulk-action-bar">
+            <div class="bc-bulk-bar-content">
+                <div class="bc-bulk-bar-info">
+                    <span class="badge bg-primary rounded-pill me-2 bc-bulk-badge" id="bc-selected-count">0</span>
+                    <span class="bc-bulk-label">documents selected</span>
+                </div>
+                <div class="bc-bulk-bar-actions">
+                    {% for action in batch_actions %}
+                        {{ include(action.templatePath, {action: action}, with_context: false) }}
+                    {% endfor %}
+                    <button type="button" class="btn btn-link btn-sm text-decoration-none bc-bulk-clear-btn" id="bc-clear-selection">
+                        <i class="fa fa-times me-1"></i> Deselect
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock batch_actions %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    <script nonce="{{ csp_nonce('script') }}">
+        document.addEventListener('DOMContentLoaded', () => {
+            const updateSelection = () => {
+                const checked = document.querySelectorAll('input[type="checkbox"].form-batch-checkbox:checked');
+                const countSpan = document.getElementById('bc-selected-count');
+                const labelSpan = document.querySelector('.bc-bulk-label');
+                if (countSpan) {
+                    countSpan.textContent = checked.length.toString();
+                }
+                if (labelSpan) {
+                    labelSpan.textContent = checked.length === 1 ? 'document selected' : 'documents selected';
+                }
+                // Keep the page title in the header visible instead of letting EasyAdmin hide it
+                const contentTitle = document.querySelector('.content-header-title > .title');
+                if (contentTitle && contentTitle.classList.contains('d-none')) {
+                    contentTitle.classList.remove('d-none');
+                }
+            };
+
+            document.querySelectorAll('.form-batch-checkbox, .form-batch-checkbox-all').forEach((cb) => {
+                cb.addEventListener('change', () => {
+                    setTimeout(updateSelection, 10);
+                });
+            });
+
+            const titleEl = document.querySelector('.content-header-title > .title');
+            if (titleEl) {
+                const observer = new MutationObserver(() => {
+                    if (titleEl.classList.contains('d-none')) {
+                        titleEl.classList.remove('d-none');
+                    }
+                });
+                observer.observe(titleEl, { attributes: true, attributeFilter: ['class'] });
+            }
+
+            const clearBtn = document.getElementById('bc-clear-selection');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    document.querySelectorAll('.form-batch-checkbox, .form-batch-checkbox-all').forEach((cb) => {
+                        cb.checked = false;
+                        cb.dispatchEvent(new Event('change', { bubbles: true }));
+                    });
+                    updateSelection();
+                });
+            }
+
+            // Re-enable batch action buttons after non-navigating actions (like download)
+            document.querySelectorAll('[data-action-batch]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    setTimeout(() => {
+                        btn.removeAttribute('disabled');
+                    }, 1500);
+                });
+            });
+        });
+    </script>
+{% endblock body_javascript %}
