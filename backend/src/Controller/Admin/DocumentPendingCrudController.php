@@ -31,13 +31,14 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use LogicException;
 use RuntimeException;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Vich\UploaderBundle\FileAbstraction\ReplacingFile;
 use Vich\UploaderBundle\Form\Type\VichFileType;
 use Vich\UploaderBundle\Storage\StorageInterface;
 use ZipArchive;
@@ -70,10 +71,17 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->setIcon('fa fa-download')
             ->setHtmlAttributes(['data-action-batch-no-confirm' => 'true']);
 
+        $batchMerge = Action::new('batchMerge', 'Merge Selected')
+            ->linkToCrudAction('batchMerge')
+            ->addCssClass('btn btn-secondary')
+            ->setIcon('fa fa-file-zipper')
+            ->setHtmlAttributes(['data-action-batch-no-confirm' => 'true']);
+
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $approveAction)
             ->addBatchAction($batchApprove)
             ->addBatchAction($batchDownload)
+            ->addBatchAction($batchMerge)
             ->update(
                 Crud::PAGE_INDEX,
                 Action::BATCH_DELETE,
@@ -91,6 +99,7 @@ class DocumentPendingCrudController extends DocumentCrudController
                 Action::DELETE,
                 'batchApprove',
                 'batchDownload',
+                'batchMerge',
                 Action::BATCH_DELETE,
                 ]
             )
@@ -367,6 +376,235 @@ class DocumentPendingCrudController extends DocumentCrudController
         } while (in_array($candidate, $usedNames, true));
 
         return $candidate;
+    }
+
+    #[AdminRoute('/batch-merge', name: 'batch_merge')]
+    public function batchMerge(
+        Request $request,
+        AdminContext $adminContext,
+        BatchActionDto $batchActionDto,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $csrfTokenId = 'ea-batch-action-' . $batchActionDto->getName() . '-' . $batchActionDto->getEntityFqcn();
+        if (!$this->isCsrfTokenValid($csrfTokenId, $batchActionDto->getCsrfToken())) {
+            $this->addFlash('danger', 'Invalid CSRF token.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
+        if ($batchActionDto->getEntityFqcn() !== $adminContext->getEntity()->getFqcn()) {
+            throw new BadRequestHttpException();
+        }
+
+        $entityIds = $batchActionDto->getEntityIds();
+        if (count($entityIds) < 2) {
+            $this->addFlash('warning', 'Please select at least 2 documents to merge.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
+        $repository = $entityManager->getRepository(Document::class);
+        $validIds = [];
+        foreach ($entityIds as $entityId) {
+            $document = $repository->find($entityId);
+            if ($document instanceof Document && $document->isUnderReview()) {
+                $validIds[] = $document->getId();
+            }
+        }
+
+        if (count($validIds) < 2) {
+            $this->addFlash('warning', 'Please select at least 2 valid pending documents to merge.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
+        $request->getSession()->set('pending_merge_ids', $validIds);
+
+        return $this->redirectToRoute('admin_document_pending_merge_confirm');
+    }
+
+    #[AdminRoute('/merge-confirm', name: 'merge_confirm')]
+    public function mergeConfirm(
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $sessionIds = $request->getSession()->get('pending_merge_ids');
+        $queryIds = $request->query->all('ids');
+        $ids = !empty($queryIds) ? $queryIds : (is_array($sessionIds) ? $sessionIds : []);
+
+        if (count($ids) < 2) {
+            $this->addFlash('warning', 'Please select at least 2 documents to merge.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
+        $repository = $entityManager->getRepository(Document::class);
+        /** @var Document[] $documents */
+        $documents = [];
+        foreach ($ids as $id) {
+            $doc = $repository->find($id);
+            if ($doc instanceof Document && $doc->isUnderReview()) {
+                $documents[] = $doc;
+            }
+        }
+
+        if (count($documents) < 2) {
+            $this->addFlash('warning', 'Fewer than 2 valid pending documents were found to merge.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
+        $primaryDocument = $documents[0];
+        $courses = $entityManager->getRepository(Course::class)->findBy([], ['name' => 'ASC']);
+        $categories = $entityManager->getRepository(DocumentCategory::class)->findBy([], ['name_nl' => 'ASC']);
+        $years = Document::getAcademicYearChoices(amountOfYears: 40);
+
+        return $this->render(
+            'admin/document_pending_merge.html.twig',
+            [
+                'documents' => $documents,
+                'primaryDocument' => $primaryDocument,
+                'courses' => $courses,
+                'categories' => $categories,
+                'years' => $years,
+            ]
+        );
+    }
+
+    #[AdminRoute('/merge-process', name: 'merge_process')]
+    public function mergeProcess(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        StorageInterface $storage
+    ): Response {
+        if (!$this->isCsrfTokenValid('admin_document_pending_merge', (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Invalid CSRF token.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
+        $primaryId = $request->request->getInt('primary_id');
+        /** @var list<int|string> $mergeIds */
+        $mergeIds = $request->request->all('merge_ids');
+        $name = trim((string) $request->request->get('name'));
+        $courseId = $request->request->getInt('course_id');
+        $categoryId = $request->request->getInt('category_id');
+        $year = (string) $request->request->get('year');
+        $year = $year !== '' ? $year : null;
+        $approveImmediately = (bool) $request->request->get('approve_immediately');
+
+        if (empty($name)) {
+            $this->addFlash('danger', 'A document name is required.');
+            return $this->redirectToRoute('admin_document_pending_merge_confirm');
+        }
+
+        if (count($mergeIds) < 2 || !in_array((string) $primaryId, array_map('strval', $mergeIds), true)) {
+            $this->addFlash('danger', 'Invalid merge selection.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
+        $docRepo = $entityManager->getRepository(Document::class);
+        $primaryDoc = $docRepo->find($primaryId);
+        if (!$primaryDoc instanceof Document || !$primaryDoc->isUnderReview()) {
+            $this->addFlash('danger', 'Primary document is invalid or not pending.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
+        /** @var Document[] $allDocs */
+        $allDocs = [];
+        foreach ($mergeIds as $id) {
+            $doc = $docRepo->find($id);
+            if ($doc instanceof Document && $doc->isUnderReview()) {
+                $allDocs[] = $doc;
+            }
+        }
+
+        if (count($allDocs) < 2) {
+            $this->addFlash('danger', 'At least 2 valid pending documents are required to merge.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
+        $course = $entityManager->getRepository(Course::class)->find($courseId);
+        $category = $entityManager->getRepository(DocumentCategory::class)->find($categoryId);
+
+        if (!$course instanceof Course || !$category instanceof DocumentCategory) {
+            $this->addFlash('danger', 'Selected course or category is invalid.');
+            return $this->redirectToRoute('admin_document_pending_merge_confirm');
+        }
+
+        $tempZipPath = tempnam(sys_get_temp_dir(), 'merged_doc_') . '.zip';
+
+        $zip = new ZipArchive();
+        if ($zip->open($tempZipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            throw new RuntimeException('Failed to create ZIP archive.');
+        }
+
+        $usedNames = [];
+        $filesAdded = 0;
+        foreach ($allDocs as $doc) {
+            $stream = $storage->resolveStream($doc, 'file');
+            if ($stream === null) {
+                continue;
+            }
+
+            $baseName = DownloadFilename::forDocument($doc);
+            $uniqueName = $this->getUniqueZipFilename($baseName, $usedNames);
+            $usedNames[] = $uniqueName;
+
+            $content = stream_get_contents($stream);
+            fclose($stream);
+
+            if ($content !== false) {
+                $zip->addFromString($uniqueName, $content);
+                $filesAdded++;
+            }
+        }
+
+        if ($filesAdded === 0) {
+            $zip->close();
+            @unlink($tempZipPath);
+            $this->addFlash('danger', 'None of the selected documents contained downloadable files to merge.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
+        $zip->close();
+
+        // Attach the ZIP file to primaryDoc
+        $primaryDoc->setFile(new ReplacingFile($tempZipPath));
+        $primaryDoc->setName($name);
+        $primaryDoc->setCourse($course);
+        $primaryDoc->setCategory($category);
+        $primaryDoc->setYear($year);
+
+        if ($approveImmediately) {
+            $primaryDoc->setUnderReview(false);
+        }
+
+        // Merge tags from all companion documents
+        foreach ($allDocs as $doc) {
+            foreach ($doc->getTags() as $tag) {
+                if (!$primaryDoc->getTags()->contains($tag)) {
+                    $primaryDoc->addTag($tag);
+                }
+            }
+        }
+
+        // Remove the companion documents
+        foreach ($allDocs as $doc) {
+            if ($doc->getId() !== $primaryDoc->getId()) {
+                $entityManager->remove($doc);
+            }
+        }
+
+        $entityManager->flush();
+        @unlink($tempZipPath);
+        $request->getSession()->remove('pending_merge_ids');
+
+        $this->addFlash(
+            'success',
+            sprintf(
+                'Successfully merged %d documents into "%s" (%d files packaged into ZIP).',
+                count($allDocs),
+                $primaryDoc->getName(),
+                $filesAdded
+            )
+        );
+
+        return $this->redirectToRoute('admin_document_pending_index');
     }
 
     public function configureFilters(Filters $filters): Filters
