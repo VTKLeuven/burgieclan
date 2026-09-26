@@ -41,6 +41,16 @@ class PresignedUrlGeneratorTest extends TestCase
         $this->assertTrue($generator->isEnabled());
     }
 
+    public function testIsEnabledReturnsFalseWhenDocumentsAreStoredLocally(): void
+    {
+        $generator = new PresignedUrlGenerator(
+            $this->createStub(S3Client::class),
+            'my-bucket',
+            documentStorage: 'local'
+        );
+        $this->assertFalse($generator->isEnabled());
+    }
+
     public function testGenerateUrlThrowsExceptionWhenDisabled(): void
     {
         $generator = new PresignedUrlGenerator(null, null);

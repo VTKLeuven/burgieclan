@@ -1,0 +1,14 @@
+{
+  "identities": [
+    {
+      "name": "burgieclan",
+      "credentials": [
+        {
+          "accessKey": "burgieclan",
+          "secretKey": "burgieclan-dev-secret"
+        }
+      ],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    }
+  ]
+}

@@ -27,6 +27,7 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - s3
     environment:
       DATABASE_URL: "postgresql://burgieclan_db_user:burgieclan_db_pass@db:5432/burgieclan_db?serverVersion=18&charset=utf8"
       # The VTK website hosts VTK, the authorization server. Locally it runs on 3000,
@@ -35,6 +36,19 @@ services:
       FLUXUS_SSO_CLIENT_ID: ${FLUXUS_SSO_CLIENT_ID:?FLUXUS_SSO_CLIENT_ID is required}
       FLUXUS_SSO_CLIENT_SECRET: ${FLUXUS_SSO_CLIENT_SECRET:?FLUXUS_SSO_CLIENT_SECRET is required}
       FRONTEND_URL: "http://localhost:3002"
+      # Where uploaded documents live: `local` (backend/data/documents, the default) or
+      # `s3` to use the SeaweedFS bucket below, the same code path as production.
+      # Switch with `DOCUMENT_STORAGE=s3 docker compose up -d`, then run
+      # `docker compose exec backend php bin/console app:s3:setup-bucket` once.
+      DOCUMENT_STORAGE: ${DOCUMENT_STORAGE:-local}
+      S3_ENDPOINT: "http://s3:8333"
+      # The browser follows download redirects to the bucket, so pre-signed URLs are
+      # signed for the host-side address rather than the container name.
+      S3_PUBLIC_ENDPOINT: "http://localhost:8333"
+      S3_REGION: "us-east-1"
+      S3_BUCKET: "burgieclan"
+      S3_ACCESS_KEY: "burgieclan"
+      S3_SECRET_KEY: "burgieclan-dev-secret"
     networks:
       - burgieclan-network
     # The backend exchanges the code and fetches userinfo server to server, so
@@ -77,12 +91,30 @@ services:
     extra_hosts:
       - "localhost:host-gateway"
 
+  # Local S3-compatible object storage, standing in for the production bucket.
+  # Only used when the backend runs with DOCUMENT_STORAGE=s3.
+  s3:
+    image: chrislusf/seaweedfs:4.47
+    container_name: burgieclan-s3
+    command: >-
+      server -dir=/data -ip=s3 -ip.bind=0.0.0.0
+      -master.volumeSizeLimitMB=128 -volume.max=50
+      -s3 -s3.port=8333 -s3.config=/etc/seaweedfs/s3.json
+    volumes:
+      - burgieclan-s3:/data
+      - ./.docker/dev/seaweedfs-s3.json:/etc/seaweedfs/s3.json:ro
+    ports:
+      - "8333:8333"
+    networks:
+      - burgieclan-network
+
 networks:
   burgieclan-network:
     driver: bridge
 
 volumes:
   burgieclan-db: {}
+  burgieclan-s3: {}
   backend-vendor: {}
   backend-var: {}
   frontend-node-modules: {}

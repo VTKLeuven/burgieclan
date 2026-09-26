@@ -70,6 +70,17 @@ make up
 
 Then reopen in your chosen development container (Backend or Frontend).
 
+#### Testing with S3 Storage Locally
+
+By default, uploaded documents are stored in `backend/data/documents`. Production stores them in an S3 bucket and serves downloads through pre-signed URLs. To run that same code path locally against the bundled SeaweedFS container:
+
+```bash
+DOCUMENT_STORAGE=s3 docker compose up -d
+docker compose exec backend php bin/console app:s3:setup-bucket   # once: creates the bucket and its CORS rules
+```
+
+The bucket is reachable at `http://localhost:8333` (access key `burgieclan`, secret `burgieclan-dev-secret`). Documents already in `data/documents` are not copied over, so upload new ones to test.
+
 #### Additional Makefile Commands
 
 The `Makefile` contains many useful commands designed to be run from the host machine. If you are running commands directly inside the container, run the underlying command itself (e.g., `php bin/console` instead of `docker compose exec backend php bin/console`).

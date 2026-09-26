@@ -1,50 +1,75 @@
-# Flysystem configuration for S3 storage (Hetzner Object Storage)
-# Only active in production — dev/test use local filesystem via VichUploader default
+# Document storage.
+#
+# DOCUMENT_STORAGE picks where uploaded documents live, at runtime:
+#   local -> backend/data/documents (the default in dev and test)
+#   s3    -> an S3-compatible bucket: Hetzner Object Storage in production, the
+#            SeaweedFS container from docker-compose.yml in local development.
+#
+# Nothing below is Hetzner-specific: moving to another S3-compatible store (for
+# example a self-hosted bucket) only means changing the S3_* variables.
+#
+# S3_ENDPOINT is how the backend reaches the bucket; S3_PUBLIC_ENDPOINT is the
+# host browsers are redirected to for downloads (pre-signed URLs are signed for
+# that host). They differ when the bucket sits on an internal network, as the
+# SeaweedFS container does locally (http://s3:8333 vs http://localhost:8333).
 
 parameters:
-    env(S3_PUBLIC_ENDPOINT): ''
+    env(DOCUMENT_STORAGE): 'local'
+    env(S3_ENDPOINT): 'http://localhost:8333'
+    env(S3_PUBLIC_ENDPOINT): '%env(S3_ENDPOINT)%'
+    env(S3_REGION): 'us-east-1'
+    env(S3_BUCKET): ''
+    env(S3_ACCESS_KEY): ''
+    env(S3_SECRET_KEY): ''
+
+flysystem:
+    storages:
+        documents.local:
+            adapter: 'local'
+            options:
+                directory: '%kernel.project_dir%/data/documents'
+
+        documents.s3:
+            adapter: 'aws'
+            options:
+                client: 's3_client'
+                bucket: '%env(S3_BUCKET)%'
+                prefix: 'documents'
+
+        # The storage VichUploader writes to; resolved per request from DOCUMENT_STORAGE.
+        default.storage:
+            adapter: 'lazy'
+            options:
+                source: 'documents.%env(DOCUMENT_STORAGE)%'
+
+services:
+    s3_client:
+        class: Aws\S3\S3Client
+        arguments:
+            -
+                version: 'latest'
+                region: '%env(S3_REGION)%'
+                endpoint: '%env(S3_ENDPOINT)%'
+                use_path_style_endpoint: true
+                credentials:
+                    key: '%env(S3_ACCESS_KEY)%'
+                    secret: '%env(S3_SECRET_KEY)%'
+
+    # Only used to sign download URLs (see App\Service\PresignedUrlGenerator),
+    # so it must use the host browsers can reach.
+    s3_public_client:
+        class: Aws\S3\S3Client
+        arguments:
+            -
+                version: 'latest'
+                region: '%env(S3_REGION)%'
+                endpoint: '%env(S3_PUBLIC_ENDPOINT)%'
+                use_path_style_endpoint: true
+                credentials:
+                    key: '%env(S3_ACCESS_KEY)%'
+                    secret: '%env(S3_SECRET_KEY)%'
 
 when@prod:
     parameters:
-        env(S3_PUBLIC_ENDPOINT): '%env(S3_ENDPOINT)%'
-
-    flysystem:
-        storages:
-            default.storage:
-                adapter: 'aws'
-                options:
-                    client: 's3_client'
-                    bucket: '%env(S3_BUCKET)%'
-                    prefix: 'documents'
-
-    services:
-        s3_client:
-            class: Aws\S3\S3Client
-            arguments:
-                -
-                    version: 'latest'
-                    region: '%env(S3_REGION)%'
-                    endpoint: '%env(S3_ENDPOINT)%'
-                    use_path_style_endpoint: true
-                    credentials:
-                        key: '%env(S3_ACCESS_KEY)%'
-                        secret: '%env(S3_SECRET_KEY)%'
-
-        s3_public_client:
-            class: Aws\S3\S3Client
-            arguments:
-                -
-                    version: 'latest'
-                    region: '%env(S3_REGION)%'
-                    endpoint: '%env(S3_PUBLIC_ENDPOINT)%'
-                    use_path_style_endpoint: true
-                    credentials:
-                        key: '%env(S3_ACCESS_KEY)%'
-                        secret: '%env(S3_SECRET_KEY)%'
-
-        App\Service\PresignedUrlGenerator:
-            arguments:
-                $s3Client: '@s3_public_client'
-                $bucket: '%env(S3_BUCKET)%'
-                $prefix: 'documents'
-                $ttlMinutes: 10
+        # Production has always stored documents on S3; keep that the default.
+        env(DOCUMENT_STORAGE): 's3'

@@ -7,21 +7,30 @@ use App\Entity\Document;
 use App\Utils\DownloadFilename;
 use Aws\S3\S3Client;
 use LogicException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 
 class PresignedUrlGenerator
 {
     public function __construct(
+        #[Autowire(service: 's3_public_client')]
         private readonly ?S3Client $s3Client = null,
+        #[Autowire(env: 'S3_BUCKET')]
         private readonly ?string $bucket = null,
         private readonly string $prefix = 'documents',
         private readonly int $ttlMinutes = 10,
+        // The DOCUMENT_STORAGE value: pre-signed URLs only make sense when documents live on S3.
+        #[Autowire(env: 'DOCUMENT_STORAGE')]
+        private readonly string $documentStorage = 's3',
     ) {
     }
 
     public function isEnabled(): bool
     {
-        return null !== $this->s3Client && null !== $this->bucket && '' !== $this->bucket;
+        return 's3' === $this->documentStorage
+            && null !== $this->s3Client
+            && null !== $this->bucket
+            && '' !== $this->bucket;
     }
 
     public function generateUrl(Document $document, bool $inline = false): string
