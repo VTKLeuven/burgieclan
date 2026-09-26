@@ -76,10 +76,10 @@ By default, uploaded documents are stored in `backend/data/documents`. Productio
 
 ```bash
 DOCUMENT_STORAGE=s3 docker compose up -d
-docker compose exec backend php bin/console app:s3:setup-bucket   # once: creates the bucket and its CORS rules
+docker compose exec backend php bin/console app:s3:setup-bucket --sync-local   # once: bucket, CORS rules and the fixture files
 ```
 
-The bucket is reachable at `http://localhost:8333` (access key `burgieclan`, secret `burgieclan-dev-secret`). Documents already in `data/documents` are not copied over, so upload new ones to test.
+The bucket is reachable at `http://localhost:8333` (access key `burgieclan`, secret `burgieclan-dev-secret`). `--sync-local` copies the files in `backend/data/documents` that the bucket does not have yet, so the fixture documents from `make db` open in S3 mode too. It only adds to your local SeaweedFS bucket and refuses to run with `APP_ENV=prod`.
 
 #### Additional Makefile Commands
 
@@ -126,6 +126,7 @@ The application is automatically deployed via GitHub Actions. **No manual interv
 1. Docker and Docker Compose installed
 2. Directories created (see Manual Deployment section below)
 3. `.env` file configured (see Manual Deployment section below)
+4. The document bucket prepared once with `app:s3:setup-bucket` (see step 8 of the Manual Deployment section). The pipeline does not do this for you.
 
 #### Production Deployment
 
@@ -226,6 +227,13 @@ If you prefer manual deployment or GitHub Actions is not configured:
    ```bash
    docker compose -f docker-compose.prod.yml exec backend php bin/console lexik:jwt:generate-keypair
    ```
+
+8. **Prepare the document bucket** (first deploy, after switching buckets, or when the site's address changes):
+   ```bash
+   docker compose -f docker-compose.prod.yml exec backend php bin/console app:s3:setup-bucket \
+       --origin=https://burgieclan.vtk.be --origin=https://dev.burgieclan.vtk.be
+   ```
+   This creates the bucket if it is missing and sets the CORS rules that let the PDF viewer load files straight from it. Without them, previews fail with "Dit document kon niet geladen worden." It is safe to run again.
 
 ### Accessing the Application
 

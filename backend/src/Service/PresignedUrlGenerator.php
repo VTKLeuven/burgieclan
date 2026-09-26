@@ -35,15 +35,33 @@ class PresignedUrlGenerator
 
     public function generateUrl(Document $document, bool $inline = false): string
     {
-        if (!$this->isEnabled() || null === $this->s3Client || null === $this->bucket) {
-            throw new LogicException('PresignedUrlGenerator is not enabled or S3 is not configured.');
-        }
-
         $filename = (string) $document->getFileName();
         $prefix = trim($this->prefix, '/');
         $key = ('' !== $prefix ? $prefix . '/' : '') . $filename;
 
-        $displayName = DownloadFilename::forDocument($document);
+        return $this->generateForKey(
+            $key,
+            DownloadFilename::forDocument($document),
+            $inline,
+            $inline ? PreviewableFile::contentTypeFor($filename) : null,
+        );
+    }
+
+    /**
+     * Signs a download of any object in the bucket, saved under $displayName.
+     *
+     * @param string $key The full object key, prefix included (e.g. "exports/abc.zip")
+     */
+    public function generateForKey(
+        string $key,
+        string $displayName,
+        bool $inline = false,
+        ?string $contentType = null,
+    ): string {
+        if (!$this->isEnabled() || null === $this->s3Client || null === $this->bucket) {
+            throw new LogicException('PresignedUrlGenerator is not enabled or S3 is not configured.');
+        }
+
         $fallback = preg_replace('/[^A-Za-z0-9._-]/', '_', $displayName) ?: 'document';
 
         $dispositionType = $inline ? HeaderUtils::DISPOSITION_INLINE : HeaderUtils::DISPOSITION_ATTACHMENT;
@@ -55,11 +73,8 @@ class PresignedUrlGenerator
             'ResponseContentDisposition' => $contentDisposition,
         ];
 
-        if ($inline) {
-            $contentType = PreviewableFile::contentTypeFor($filename);
-            if (null !== $contentType) {
-                $params['ResponseContentType'] = $contentType;
-            }
+        if (null !== $contentType) {
+            $params['ResponseContentType'] = $contentType;
         }
 
         $command = $this->s3Client->getCommand('GetObject', $params);

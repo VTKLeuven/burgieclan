@@ -14,26 +14,19 @@ export interface DownloadOptions {
 }
 
 /**
- * Read the filename out of a Content-Disposition header.
+ * Hand a signed link to the browser's own download handling.
  *
- * The backend sends both forms: an ASCII-only `filename=` that high characters have
- * been stripped from, and an RFC 5987 `filename*=` that keeps them. Prefer the latter
- * so a document called "Résumé" does not download as "Rsum".
+ * The link answers with Content-Disposition: attachment, so following it saves the file
+ * under the name the backend chose and leaves the current page where it is. The file
+ * streams straight from storage to disk instead of through this page's memory.
  */
-const parseContentDispositionFilename = (contentDisposition: string): string | null => {
-    const extended = contentDisposition.match(/filename\*=\s*([^']*)'[^']*'([^;]+)/i);
-    if (extended && extended[2]) {
-        try {
-            return decodeURIComponent(extended[2].trim());
-        } catch {
-            // Malformed percent-encoding: fall through to the plain filename.
-        }
-    }
-
-    const plain = contentDisposition.match(/filename=\s*"([^"]+)"|filename=\s*([^;]+)/i);
-    const value = plain?.[1] ?? plain?.[2];
-
-    return value ? value.trim() : null;
+const startBrowserDownload = (url: string): void => {
+    const link = window.document.createElement('a');
+    link.href = url;
+    link.rel = 'noopener';
+    window.document.body.appendChild(link);
+    link.click();
+    window.document.body.removeChild(link);
 };
 
 /**
@@ -105,14 +98,7 @@ const useDownloadContent = () => {
                 throw new Error(result.error.detail ?? result.error.message ?? 'Download failed');
             }
 
-            // The link answers with Content-Disposition: attachment, so following it saves the
-            // file under the document's name and leaves this page where it is.
-            const link = window.document.createElement('a');
-            link.href = result.url;
-            link.rel = 'noopener';
-            window.document.body.appendChild(link);
-            link.click();
-            window.document.body.removeChild(link);
+            startBrowserDownload(result.url);
 
             showToast(t('download.download-success'), 'success');
         } catch (err) {
@@ -168,7 +154,7 @@ const useDownloadContent = () => {
                 courses: options.courseIds?.map(id => `/api/courses/${id}`) || [],
             };
 
-            // Request the zip file from the API
+            // The backend builds (or reuses) the zip and answers with a short-lived link to it.
             const response = await fetch(`${backendBaseUrl}/api/zip`, {
                 method: 'POST',
                 headers: {
@@ -187,30 +173,17 @@ const useDownloadContent = () => {
                 throw new Error(`Failed to download: ${response.status} ${response.statusText}`);
             }
 
-            // Get the filename from the Content-Disposition header or use a default
-            const contentDisposition = response.headers.get('Content-Disposition');
-            let filename = 'download.zip';
-            if (contentDisposition) {
-                const parsed = parseContentDispositionFilename(contentDisposition);
-                if (parsed) {
-                    filename = parsed;
-                }
+            if (response.status === 204) {
+                throw new Error('Nothing to download');
             }
 
-            // Create a blob from the response
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
+            const { url } = await response.json() as { url?: unknown };
+            if (typeof url !== 'string') {
+                throw new Error('Unexpected response from the server');
+            }
 
-            // Create a link element and trigger download
-            const link = window.document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            window.document.body.appendChild(link);
-            link.click();
-
-            // Clean up
-            window.URL.revokeObjectURL(url);
-            window.document.body.removeChild(link);
+            // Local storage answers with a path on the backend; S3 with an absolute bucket URL.
+            startBrowserDownload(new URL(url, backendBaseUrl).toString());
 
             showToast(t('download.download-success'), 'success');
 

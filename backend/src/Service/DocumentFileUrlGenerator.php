@@ -41,6 +41,34 @@ class DocumentFileUrlGenerator
             array_filter(['filename' => $document->getFileName(), 'inline' => $inline ? 1 : null]),
         );
 
+        return $this->sign($path);
+    }
+
+    /**
+     * A link to a generated zip in the exports storage, saved as $displayName.
+     *
+     * @param string $exportName The zip's name inside the exports storage, e.g. "<hash>.zip"
+     */
+    public function generateForExport(string $exportName, string $displayName): string
+    {
+        if ($this->presignedUrlGenerator->isEnabled()) {
+            return $this->presignedUrlGenerator->generateForKey(
+                'exports/' . $exportName,
+                $displayName,
+                contentType: 'application/zip',
+            );
+        }
+
+        return $this->sign(
+            $this->urlGenerator->generate(
+                'export_signed_download',
+                ['name' => $exportName, 'filename' => $displayName],
+            )
+        );
+    }
+
+    private function sign(string $path): string
+    {
         return $this->uriSigner->sign($path, new \DateInterval(sprintf('PT%dM', self::TTL_MINUTES)));
     }
 }

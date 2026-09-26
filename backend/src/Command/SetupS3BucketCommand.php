@@ -4,6 +4,8 @@ namespace App\Command;
 
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
+use League\Flysystem\FilesystemOperator;
+use League\Flysystem\StorageAttributes;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,18 +13,24 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 
 /**
  * Prepares the document bucket: creates it if it is missing and applies the CORS
  * rules the frontend needs to preview files straight from the bucket.
  *
- * Downloads redirect the browser to a pre-signed bucket URL, and the PDF viewer
- * fetches that URL from JavaScript (with range requests), so the bucket has to
- * allow the frontend's origin. Keeping those rules here instead of clicking them
- * together in a provider console makes them reproducible on any S3-compatible
- * store: the local SeaweedFS container, Hetzner, or a self-hosted bucket.
+ * The PDF viewer fetches pre-signed bucket URLs from JavaScript (with range
+ * requests), so the bucket has to allow the frontend's origin. Keeping those rules
+ * here instead of clicking them together in a provider console makes them
+ * reproducible on any S3-compatible store: the local SeaweedFS container, Hetzner,
+ * or a self-hosted bucket.
+ *
+ * --sync-local copies the files in backend/data/documents into the bucket, so the
+ * fixture documents from `make db` open when a development setup switches to
+ * DOCUMENT_STORAGE=s3. It only ever adds missing files and refuses to run in prod.
  *
  *     php bin/console app:s3:setup-bucket
+ *     php bin/console app:s3:setup-bucket --sync-local
  *     php bin/console app:s3:setup-bucket --origin=https://burgieclan.vtk.be --origin=https://dev.burgieclan.vtk.be
  */
 #[AsCommand(
@@ -34,10 +42,16 @@ final class SetupS3BucketCommand extends Command
     public function __construct(
         #[Autowire(service: 's3_client')]
         private readonly S3Client $s3Client,
+        #[Target('documents.local')]
+        private readonly FilesystemOperator $localDocuments,
+        #[Target('documents.s3')]
+        private readonly FilesystemOperator $bucketDocuments,
         #[Autowire(env: 'S3_BUCKET')]
         private readonly string $bucket,
         #[Autowire(env: 'FRONTEND_URL')]
         private readonly string $frontendUrl,
+        #[Autowire('%kernel.environment%')]
+        private readonly string $environment,
     ) {
         parent::__construct();
     }
@@ -51,7 +65,13 @@ final class SetupS3BucketCommand extends Command
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'Origin allowed to read from the bucket (repeatable). Defaults to FRONTEND_URL.'
             )
-            ->addOption('skip-cors', null, InputOption::VALUE_NONE, 'Only create the bucket');
+            ->addOption('skip-cors', null, InputOption::VALUE_NONE, 'Do not touch the CORS rules')
+            ->addOption(
+                'sync-local',
+                null,
+                InputOption::VALUE_NONE,
+                'Development only: upload files from data/documents that are missing in the bucket'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -64,6 +84,14 @@ final class SetupS3BucketCommand extends Command
             return Command::FAILURE;
         }
 
+        // Checked before touching anything: the production bucket is the source of truth,
+        // and whatever sits in a server's data/documents must never be pushed into it.
+        if ($input->getOption('sync-local') && 'prod' === $this->environment) {
+            $io->error('--sync-local is for development setups only and refuses to run with APP_ENV=prod.');
+
+            return Command::FAILURE;
+        }
+
         if ($this->s3Client->doesBucketExistV2($this->bucket, false)) {
             $io->writeln(sprintf('Bucket "%s" already exists.', $this->bucket));
         } else {
@@ -72,15 +100,30 @@ final class SetupS3BucketCommand extends Command
             $io->writeln(sprintf('Created bucket "%s".', $this->bucket));
         }
 
-        if ($input->getOption('skip-cors')) {
-            return Command::SUCCESS;
+        if (!$input->getOption('skip-cors')) {
+            /** @var string[] $origins */
+            $origins = $input->getOption('origin') ?: [rtrim($this->frontendUrl, '/')];
+
+            if (!$this->applyCors($io, $origins)) {
+                return Command::FAILURE;
+            }
         }
 
-        /** @var string[] $origins */
-        $origins = $input->getOption('origin') ?: [rtrim($this->frontendUrl, '/')];
+        if ($input->getOption('sync-local')) {
+            $this->syncLocalDocuments($io);
+        }
 
+        return Command::SUCCESS;
+    }
+
+    /**
+     * @param string[] $origins
+     */
+    private function applyCors(SymfonyStyle $io, array $origins): bool
+    {
         try {
-            $this->s3Client->putBucketCors([
+            $this->s3Client->putBucketCors(
+                [
                 'Bucket' => $this->bucket,
                 'CORSConfiguration' => [
                     'CORSRules' => [
@@ -99,15 +142,46 @@ final class SetupS3BucketCommand extends Command
                         ],
                     ],
                 ],
-            ]);
+                ]
+            );
         } catch (S3Exception $e) {
             $io->error(sprintf('Could not apply CORS rules: %s', $e->getAwsErrorMessage() ?? $e->getMessage()));
 
-            return Command::FAILURE;
+            return false;
         }
 
         $io->success(sprintf('CORS rules applied for: %s', implode(', ', $origins)));
 
-        return Command::SUCCESS;
+        return true;
+    }
+
+    private function syncLocalDocuments(SymfonyStyle $io): void
+    {
+        $uploaded = 0;
+        $skipped = 0;
+
+        $files = $this->localDocuments->listContents('', true)
+            ->filter(fn (StorageAttributes $item) => $item->isFile() && !str_starts_with(basename($item->path()), '.'));
+
+        foreach ($files as $file) {
+            $path = $file->path();
+
+            if ($this->bucketDocuments->fileExists($path)) {
+                ++$skipped;
+                continue;
+            }
+
+            $stream = $this->localDocuments->readStream($path);
+            try {
+                $this->bucketDocuments->writeStream($path, $stream);
+            } finally {
+                if (is_resource($stream)) {
+                    fclose($stream);
+                }
+            }
+            ++$uploaded;
+        }
+
+        $io->success(sprintf('Uploaded %d local document(s); %d were already in the bucket.', $uploaded, $skipped));
     }
 }

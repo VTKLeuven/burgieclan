@@ -19,13 +19,15 @@ use ArrayObject;
             openapi: new Operation(
                 responses: [
                     '200' => new Response(
-                        description: 'Download zip file',
+                        description: 'A link, valid for 10 minutes, to download the zip from',
                         content: new ArrayObject(
                             [
-                                'application/zip' => [
+                                'application/json' => [
                                     'schema' => [
-                                        'type' => 'string',
-                                        'format' => 'binary',
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'url' => ['type' => 'string', 'format' => 'uri'],
+                                        ],
                                     ],
                                 ],
                             ],

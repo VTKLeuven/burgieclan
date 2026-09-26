@@ -24,23 +24,37 @@ parameters:
 
 flysystem:
     storages:
+        # Uploaded documents.
         documents.local:
-            adapter: 'local'
-            options:
+            local:
                 directory: '%kernel.project_dir%/data/documents'
 
         documents.s3:
-            adapter: 'aws'
-            options:
+            aws:
                 client: 's3_client'
                 bucket: '%env(S3_BUCKET)%'
                 prefix: 'documents'
 
         # The storage VichUploader writes to; resolved per request from DOCUMENT_STORAGE.
         default.storage:
-            adapter: 'lazy'
-            options:
+            lazy:
                 source: 'documents.%env(DOCUMENT_STORAGE)%'
+
+        # Generated zip downloads: a cache that app:delete-old-zips prunes, kept next to
+        # the documents so they can be handed out through the same kind of signed link.
+        exports.local:
+            local:
+                directory: '%kernel.project_dir%/data/exports'
+
+        exports.s3:
+            aws:
+                client: 's3_client'
+                bucket: '%env(S3_BUCKET)%'
+                prefix: 'exports'
+
+        exports.storage:
+            lazy:
+                source: 'exports.%env(DOCUMENT_STORAGE)%'
 
 services:
     s3_client:

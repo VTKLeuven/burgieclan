@@ -9,10 +9,14 @@ use App\Security\Voter\DocumentFileVoter;
 use App\Service\PresignedUrlGenerator;
 use App\Utils\DownloadFilename;
 use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Target;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Attribute\Route;
 use Vich\UploaderBundle\Exception\NoFileFoundException;
@@ -29,6 +33,8 @@ use Vich\UploaderBundle\Handler\DownloadHandler;
  *    DocumentFileUrlController. Used by JavaScript, which loads files without the cookie.
  *    Only issued while documents are stored locally; on S3 the signed link points at the
  *    bucket instead.
+ *
+ * /files/export/{name} serves generated zips the same way (see DownloadZipController).
  */
 final class DownloadController extends AbstractController
 {
@@ -37,6 +43,8 @@ final class DownloadController extends AbstractController
         private readonly DownloadHandler $downloadHandler,
         private readonly PresignedUrlGenerator $presignedUrlGenerator,
         private readonly UriSigner $uriSigner,
+        #[Target('exports.storage')]
+        private readonly FilesystemOperator $exportsStorage,
     ) {
     }
 
@@ -80,6 +88,45 @@ final class DownloadController extends AbstractController
         }
 
         return $this->serve($document, (bool) $request->query->get('inline'));
+    }
+
+    #[Route(
+        '/files/export/{name}',
+        name: 'export_signed_download',
+        requirements: ['name' => '[A-Za-z0-9]+\.zip'],
+        methods: ['GET']
+    )]
+    public function signedExportDownload(string $name, Request $request): Response
+    {
+        if (!$this->uriSigner->check($request->getRequestUri())) {
+            return new Response('Link expired or invalid', Response::HTTP_FORBIDDEN);
+        }
+
+        try {
+            $size = $this->exportsStorage->fileSize($name);
+            $stream = $this->exportsStorage->readStream($name);
+        } catch (FilesystemException) {
+            return new Response('File not found', Response::HTTP_NOT_FOUND);
+        }
+
+        $response = new StreamedResponse(
+            static function () use ($stream): void {
+                $output = fopen('php://output', 'wb');
+                stream_copy_to_stream($stream, $output);
+                fclose($stream);
+            }
+        );
+
+        $displayName = (string) $request->query->get('filename', $name);
+        $fallback = preg_replace('/[^A-Za-z0-9._-]/', '_', $displayName) ?: 'download.zip';
+        $response->headers->set('Content-Type', 'application/zip');
+        $response->headers->set('Content-Length', (string) $size);
+        $response->headers->set(
+            'Content-Disposition',
+            HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_ATTACHMENT, $displayName, $fallback)
+        );
+
+        return $response;
     }
 
     private function serve(Document $document, bool $isInline): Response

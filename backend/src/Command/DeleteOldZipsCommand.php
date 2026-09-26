@@ -8,12 +8,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\KernelInterface;
+use League\Flysystem\FilesystemOperator;
+use League\Flysystem\StorageAttributes;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 
 /**
- * Command to delete zip files older than 7 days from the exports directory.
+ * Command to delete zip files older than 7 days from the exports storage: data/exports, or
+ * the exports/ prefix of the bucket when DOCUMENT_STORAGE=s3 (see flysystem.yaml).
  *
  * Usage:
  * 1. Open a terminal and navigate to the root directory of your Symfony project.
@@ -44,8 +45,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
 )]
 final class DeleteOldZipsCommand extends Command
 {
-    public function __construct(private readonly KernelInterface $kernel)
-    {
+    public function __construct(
+        #[Target('exports.storage')]
+        private readonly FilesystemOperator $exportsStorage,
+    ) {
         parent::__construct();
     }
 
@@ -58,21 +61,23 @@ final class DeleteOldZipsCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $zipDirectory = sprintf('%s/data/exports', $this->kernel->getProjectDir());
-        $filesystem = new Filesystem();
-        $finder = new Finder();
+        $cutoff = strtotime('-7 days');
 
-        $finder->files()->in($zipDirectory)->name('*.zip')->date('<= now - 7 days');
+        $oldZips = $this->exportsStorage->listContents('')
+            ->filter(
+                fn (StorageAttributes $item) => $item->isFile()
+                && str_ends_with($item->path(), '.zip')
+                && ($item->lastModified() ?? $this->exportsStorage->lastModified($item->path())) <= $cutoff
+            );
 
-        foreach ($finder as $file) {
+        foreach ($oldZips as $zip) {
             if ($input->getOption('dry-run')) {
-                $io->comment(sprintf('Would delete file: %s', $file->getFilename()));
+                $io->comment(sprintf('Would delete file: %s', $zip->path()));
                 continue;
             }
-            $io->comment(sprintf('Deleting file: %s', $file->getFilename()));
-            $filesystem->remove($file->getRealPath());
+            $io->comment(sprintf('Deleting file: %s', $zip->path()));
+            $this->exportsStorage->delete($zip->path());
         }
-
 
         $io->success('Old zips deleted successfully.');
 
