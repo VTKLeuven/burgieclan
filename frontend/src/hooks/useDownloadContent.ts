@@ -1,8 +1,7 @@
 import { captureException } from "@sentry/nextjs";
+import { fetchDocumentFileUrl } from '@/hooks/useDocumentFileUrl';
 import { useToast } from '@/components/ui/Toast';
-import { isErrorResponse, useApi } from '@/hooks/useApi';
 import type { Document } from '@/types/entities';
-import { convertToDocument } from '@/utils/convertToEntity';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +46,6 @@ const useDownloadContent = () => {
     const { showToast } = useToast();
     const { t } = useTranslation();
     const router = useRouter();
-    const { request } = useApi();
 
     // Handle download error notifications
     useEffect(() => {
@@ -88,54 +86,32 @@ const useDownloadContent = () => {
     };
 
     /**
-     * Download a single document directly using its contentUrl
-     * @param document The document with a contentUrl to download
+     * Download a single document.
+     *
+     * Asks the backend for a short-lived link first, which also answers "not found" or "no
+     * access" as a normal error for the toast. The browser then downloads from that link by
+     * itself, so the file streams straight from storage to disk instead of through memory.
      */
     const downloadSingleDocument = async (document: Document) => {
-        if (!document.contentUrl) {
-            setError('Document has no content URL');
-            return;
-        }
-
         try {
             setLoading(true);
             setError(null);
 
-            // Use fetch so we can gracefully handle 4xx/5xx (e.g., 404 when file was deleted)
-            const response = await fetch(document.contentUrl, {
-                method: 'GET',
-                credentials: 'include', // Include cookies (JWT) with the request
-            });
-
-            // Check for JWT expiration
-            if (await handleJwtExpiration(response)) {
-                return; // Do nothing because handleJwtExpiration already redirected to login
+            const result = await fetchDocumentFileUrl(document.id, false);
+            if (result === null) {
+                return; // The session expired; ApiClient is redirecting to the login page.
+            }
+            if ('error' in result) {
+                throw new Error(result.error.detail ?? result.error.message ?? 'Download failed');
             }
 
-            if (!response.ok) {
-                // Avoid navigating to backend error page; surface a nice toast instead
-                const statusText = `${response.status} ${response.statusText}`;
-                throw new Error(statusText);
-            }
-
-            // Derive filename from Content-Disposition if present, else fallback
-            const contentDisposition = response.headers.get('Content-Disposition');
-            let filename = document.name || `document-${document.id}.pdf`;
-            if (contentDisposition) {
-                const parsed = parseContentDispositionFilename(contentDisposition);
-                if (parsed) {
-                    filename = parsed;
-                }
-            }
-
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
+            // The link answers with Content-Disposition: attachment, so following it saves the
+            // file under the document's name and leaves this page where it is.
             const link = window.document.createElement('a');
-            link.href = url;
-            link.download = filename;
+            link.href = result.url;
+            link.rel = 'noopener';
             window.document.body.appendChild(link);
             link.click();
-            window.URL.revokeObjectURL(url);
             window.document.body.removeChild(link);
 
             showToast(t('download.download-success'), 'success');
@@ -172,29 +148,9 @@ const useDownloadContent = () => {
             return;
         }
 
-        // Category lists intentionally omit file metadata. Hydrate one document only when its
-        // download button is used; multi-document downloads need IDs only and go through ZIP.
+        // A single document goes straight to its file; only several need a ZIP.
         if (totalItems === 1 && options.documents?.length === 1) {
-            let document = options.documents[0];
-
-            if (!document.contentUrl) {
-                try {
-                    setLoading(true);
-                    setError(null);
-                    const response = await request('GET', `/api/documents/${document.id}`);
-                    if (!response) {
-                        throw new Error('Failed to load document details');
-                    }
-                    if (isErrorResponse(response)) {
-                        throw new Error(response.error.message ?? 'Failed to load document details');
-                    }
-                    document = convertToDocument(response);
-                } catch (err) {
-                    setError(err instanceof Error ? err.message : 'Unknown download error');
-                    setLoading(false);
-                    return;
-                }
-            }
+            const document = options.documents[0];
 
             await downloadSingleDocument(document);
             return;

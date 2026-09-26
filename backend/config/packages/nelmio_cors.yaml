@@ -3,8 +3,9 @@ nelmio_cors:
     origin_regex: true
     allow_origin: [ '%env(CORS_ALLOW_ORIGIN)%' ]
     allow_methods: [ 'GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE' ]
-    allow_headers: [ 'Content-Type', 'Authorization' ]
-    expose_headers: [ 'Link', 'Content-Disposition' ]
+    # Range: the PDF viewer loads files from /files/signed in chunks when storage is local.
+    allow_headers: [ 'Content-Type', 'Authorization', 'Range' ]
+    expose_headers: [ 'Link', 'Content-Disposition', 'Content-Length', 'Content-Range', 'Accept-Ranges' ]
     max_age: 3600
     allow_credentials: true
   paths:

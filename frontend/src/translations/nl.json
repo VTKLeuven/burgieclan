@@ -380,6 +380,7 @@
         "cancel": "Annuleren",
         "apply": "Toepassen",
         "no-preview": "Geen voorbeeld beschikbaar voor {{filename}}",
+        "preview-error": "Dit document kon niet geladen worden.",
         "loading": "Uw document tot leven brengen...",
         "load-more": "Meer pagina's laden ({{displayedPages}} van {{numPages}})",
         "zoom": {

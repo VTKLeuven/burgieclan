@@ -88,7 +88,7 @@ export default function AddDocumentCommentModal({ documentId, file, isModalOpen,
                     className="flex-1 overflow-auto p-4 mt-5"
                 >
                     <PDFPages
-                        file={file}
+                        documentId={documentId}
                         width={containerWidth}
                     />
                 </div>

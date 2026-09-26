@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use App\Factory\DocumentFactory;
+use App\Factory\UserFactory;
 use App\Service\PresignedUrlGenerator;
 use App\Tests\Api\ApiTestCase;
 use Aws\S3\S3Client;
@@ -159,5 +160,27 @@ class DownloadControllerTest extends ApiTestCase
         );
         $this->assertStringContainsString('X-Amz-Signature=', $location);
         $this->assertStringContainsString('response-content-disposition=', $location);
+    }
+    public function testDocumentUnderReviewIsHiddenFromOtherUsers(): void
+    {
+        $storedName = $this->storeFile('phpunit-download-test-review.pdf', "%PDF-1.7\nTest content");
+        DocumentFactory::createOne(
+            [
+            'file_name' => $storedName,
+            'under_review' => true,
+            'creator' => UserFactory::createOne(),
+            ]
+        );
+
+        $this->browser()
+            ->get(
+                '/files/download/' . $storedName,
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token,
+                    ],
+                ]
+            )
+            ->assertStatus(404);
     }
 }
