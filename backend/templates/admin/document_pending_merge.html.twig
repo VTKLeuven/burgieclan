@@ -1,0 +1,220 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}Merge Pending Documents{% endblock %}
+
+{% block content_title %}
+    <i class="fa fa-file-zipper me-2"></i>Merge Pending Documents
+{% endblock %}
+
+{% block page_actions %}
+    <a class="btn btn-secondary" href="{{ path('admin_document_pending_index') }}">
+        <i class="fa fa-arrow-left me-1"></i> Back to Pending Documents
+    </a>
+{% endblock %}
+
+{% block main %}
+    <div class="bc-merge-container">
+        <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+            <i class="fa fa-info-circle fa-lg me-3"></i>
+            <div>
+                Combine multiple pending documents into a single consolidated document. All attached files will be bundled into a <strong>.zip</strong> archive. Tags will be merged, and companion documents will be cleaned up.
+            </div>
+        </div>
+
+        <form action="{{ path('admin_document_pending_merge_process') }}" method="POST">
+            <input type="hidden" name="_token" value="{{ csrf_token('admin_document_pending_merge') }}">
+            {% for doc in documents %}
+                <input type="hidden" name="merge_ids[]" value="{{ doc.id }}">
+            {% endfor %}
+
+            <!-- Selected Documents Table -->
+            <div class="bc-merge-card">
+                <div class="bc-merge-card-header">
+                    <i class="fa fa-list-check"></i>
+                    <span>Selected Documents ({{ documents|length }})</span>
+                </div>
+                <div class="bc-merge-card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 bc-merge-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center bc-col-primary">Primary</th>
+                                    <th>Title</th>
+                                    <th>Original File</th>
+                                    <th>Course</th>
+                                    <th>Category</th>
+                                    <th>Year</th>
+                                    <th>Uploader</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for doc in documents %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <div class="form-check d-flex justify-content-center">
+                                                <input class="form-check-input"
+                                                       type="radio"
+                                                       name="primary_id"
+                                                       id="primary_doc_{{ doc.id }}"
+                                                       value="{{ doc.id }}"
+                                                       data-name="{{ doc.name }}"
+                                                       data-course-id="{{ doc.course.id }}"
+                                                       data-category-id="{{ doc.category.id }}"
+                                                       data-year="{{ doc.year ?? '' }}"
+                                                       {% if doc.id == primaryDocument.id %}checked{% endif %}
+                                                       required>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <strong>{{ doc.name }}</strong>
+                                            <div class="text-muted small">ID: #{{ doc.id }}</div>
+                                        </td>
+                                        <td>
+                                            {% if doc.fileName %}
+                                                <div><code>{{ doc.fileName }}</code></div>
+                                                <span class="text-muted small">
+                                                    {% if doc.fileSize %}
+                                                        {{ (doc.fileSize / 1024)|round(1) }} KB
+                                                    {% endif %}
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">No file</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span>{{ doc.course.name }}</span>
+                                            <div class="text-muted small">{{ doc.course.code }}</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ doc.category.nameNl }}</span>
+                                        </td>
+                                        <td>{{ doc.year ?? '-' }}</td>
+                                        <td>
+                                            {{ doc.creator.fullName }}
+                                            {% if doc.anonymous %}
+                                                <span class="badge bg-light text-dark ms-1">Anon</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Merged Metadata Configuration -->
+            <div class="bc-merge-card">
+                <div class="bc-merge-card-header">
+                    <i class="fa fa-sliders"></i>
+                    <span>Merged Document Configuration</span>
+                </div>
+                <div class="bc-merge-card-body">
+                    <div class="mb-3">
+                        <label for="merge_doc_name" class="form-label fw-bold">Resulting Document Title <span class="text-danger">*</span></label>
+                        <input type="text"
+                               name="name"
+                               id="merge_doc_name"
+                               class="form-control"
+                               value="{{ primaryDocument.name }}"
+                               required>
+                        <div class="form-text">The title students and moderators will see for this consolidated document.</div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <label for="merge_course_id" class="form-label fw-bold">Course <span class="text-danger">*</span></label>
+                            <select name="course_id" id="merge_course_id" class="form-select" required>
+                                {% for course in courses %}
+                                    <option value="{{ course.id }}" {% if course.id == primaryDocument.course.id %}selected{% endif %}>
+                                        {{ course.name }} ({{ course.code }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label for="merge_category_id" class="form-label fw-bold">Category <span class="text-danger">*</span></label>
+                            <select name="category_id" id="merge_category_id" class="form-select" required>
+                                {% for cat in categories %}
+                                    <option value="{{ cat.id }}" {% if cat.id == primaryDocument.category.id %}selected{% endif %}>
+                                        {{ cat.nameNl }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label for="merge_year" class="form-label fw-bold">Academic Year</label>
+                            <select name="year" id="merge_year" class="form-select">
+                                <option value="">(No year specified)</option>
+                                {% for yearOption in years %}
+                                    <option value="{{ yearOption }}" {% if yearOption == primaryDocument.year %}selected{% endif %}>
+                                        {{ yearOption }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-check form-switch mt-3">
+                        <input class="form-check-input" type="checkbox" name="approve_immediately" id="approve_immediately" value="1">
+                        <label class="form-check-label fw-semibold" for="approve_immediately">
+                            Approve immediately after merge
+                        </label>
+                        <div class="form-text">
+                            If unchecked (recommended), the merged document stays in the pending queue for final verification before approval.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="bc-merge-actions">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fa fa-file-zipper me-2"></i>Merge &amp; Create ZIP
+                </button>
+                <a href="{{ path('admin_document_pending_index') }}" class="btn btn-link text-decoration-none">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+{% endblock main %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    <script nonce="{{ csp_nonce('script') }}">
+        document.addEventListener('DOMContentLoaded', () => {
+            const primaryRadios = document.querySelectorAll('input[name="primary_id"]');
+            const nameInput = document.getElementById('merge_doc_name');
+            const courseSelect = document.getElementById('merge_course_id');
+            const categorySelect = document.getElementById('merge_category_id');
+            const yearSelect = document.getElementById('merge_year');
+
+            primaryRadios.forEach((radio) => {
+                radio.addEventListener('change', () => {
+                    if (radio.checked) {
+                        const defaultName = radio.dataset.name;
+                        const courseId = radio.dataset.courseId;
+                        const categoryId = radio.dataset.categoryId;
+                        const year = radio.dataset.year;
+
+                        if (defaultName && nameInput) {
+                            nameInput.value = defaultName;
+                        }
+                        if (courseId && courseSelect) {
+                            courseSelect.value = courseId;
+                        }
+                        if (categoryId && categorySelect) {
+                            categorySelect.value = categoryId;
+                        }
+                        if (yearSelect) {
+                            yearSelect.value = year || '';
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock body_javascript %}

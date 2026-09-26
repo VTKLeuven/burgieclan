@@ -15,6 +15,23 @@ const DEFAULT_SIDEBAR_WIDTH = 304;
 const MIN_SIDEBAR_WIDTH = 256;
 const MAX_SIDEBAR_WIDTH = 560;
 const SIDEBAR_WIDTH_STORAGE_KEY = 'burgieclan:sidebar-width';
+const SIDEBAR_SECTIONS_STORAGE_KEY = 'burgieclan:sidebar-sections';
+
+type SidebarMode = 'home' | 'curriculum' | 'standard';
+type ExpandedSections = { curriculum: boolean; courses: boolean; documents: boolean };
+
+const parseStoredSections = (
+  raw: string | null
+): Partial<Record<SidebarMode, ExpandedSections>> | null => {
+  if (!raw) return null;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (typeof parsed !== 'object' || parsed === null) return null;
+    return parsed as Partial<Record<SidebarMode, ExpandedSections>>;
+  } catch {
+    return null;
+  }
+};
 
 const clampSidebarWidth = (width: number) => Math.min(
   MAX_SIDEBAR_WIDTH,
@@ -60,28 +77,36 @@ const NavigationSidebar = () => {
     || pathWithoutLocale.startsWith('/courses/')
     || pathWithoutLocale.startsWith('/course/')
     || pathWithoutLocale.startsWith('/document/');
-  const sidebarMode = isHome ? 'home' : showCurriculumNavigator ? 'curriculum' : 'standard';
-  const defaultExpandedSections = { curriculum: true, courses: isHome, documents: false };
+  const sidebarMode = (isHome ? 'home' : showCurriculumNavigator ? 'curriculum' : 'standard') as SidebarMode;
+  const defaultExpandedSections: ExpandedSections = { curriculum: false, courses: isHome, documents: false };
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
   const [isResizing, setIsResizing] = useState(false);
   const sidebarWidthRef = useRef(DEFAULT_SIDEBAR_WIDTH);
   const resizeStartRef = useRef<{ pointerX: number; width: number } | null>(null);
   const [expandedSectionsByMode, setExpandedSectionsByMode] = useState<Partial<Record<
-    typeof sidebarMode,
-    typeof defaultExpandedSections
+    SidebarMode,
+    ExpandedSections
   >>>({});
-  const expandedSections = expandedSectionsByMode[sidebarMode] ?? defaultExpandedSections;
+  const expandedSections = {
+    ...defaultExpandedSections,
+    ...expandedSectionsByMode[sidebarMode],
+  };
 
   useEffect(() => {
     const storedWidth = Number(window.localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY));
-    if (!Number.isFinite(storedWidth) || storedWidth < MIN_SIDEBAR_WIDTH) return;
+    if (Number.isFinite(storedWidth) && storedWidth >= MIN_SIDEBAR_WIDTH) {
+      const nextWidth = clampSidebarWidth(storedWidth);
+      sidebarWidthRef.current = nextWidth;
+      // Reading browser-only preferences after hydration intentionally updates the initial width.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSidebarWidth(nextWidth);
+    }
 
-    const nextWidth = clampSidebarWidth(storedWidth);
-    sidebarWidthRef.current = nextWidth;
-    // Reading browser-only preferences after hydration intentionally updates the initial width.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSidebarWidth(nextWidth);
+    const storedSections = parseStoredSections(window.localStorage.getItem(SIDEBAR_SECTIONS_STORAGE_KEY));
+    if (storedSections) {
+      setExpandedSectionsByMode(storedSections);
+    }
   }, []);
 
   const updateSidebarWidth = (width: number, persist = false) => {
@@ -126,14 +151,27 @@ const NavigationSidebar = () => {
     updateSidebarWidth(sidebarWidthRef.current + (event.key === 'ArrowRight' ? 16 : -16), true);
   };
 
-  const toggleSection = (section: keyof typeof expandedSections) => {
-    setExpandedSectionsByMode((previous) => ({
-      ...previous,
-      [sidebarMode]: {
-        ...(previous[sidebarMode] ?? defaultExpandedSections),
-        [section]: !(previous[sidebarMode] ?? defaultExpandedSections)[section]
+  const toggleSection = (section: keyof ExpandedSections) => {
+    setExpandedSectionsByMode((previous) => {
+      const currentSections = {
+        ...defaultExpandedSections,
+        ...previous[sidebarMode],
+      };
+      const nextModeSections = {
+        ...currentSections,
+        [section]: !currentSections[section],
+      };
+      const next = {
+        ...previous,
+        [sidebarMode]: nextModeSections,
+      };
+      try {
+        window.localStorage.setItem(SIDEBAR_SECTIONS_STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // Ignore localStorage quota or access errors
       }
-    }));
+      return next;
+    });
   };
 
   const sectionButton =

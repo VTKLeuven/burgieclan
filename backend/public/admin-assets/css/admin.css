@@ -270,3 +270,64 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* ---- Document Pending Merge ---- */
+.bc-merge-container {
+    max-width: 1050px;
+    margin: 0 auto;
+}
+
+.bc-merge-card {
+    background: var(--content-bg, #ffffff);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.bc-merge-card-header {
+    padding: 14px 20px;
+    background: var(--gray-100, #f8f9fa);
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-color, #212529);
+}
+
+.ea-dark-scheme .bc-merge-card-header {
+    background: var(--gray-800, #1e293b);
+}
+
+.bc-merge-card-body {
+    padding: 20px;
+}
+
+.bc-merge-table th {
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-color-light, #6c757d);
+    font-weight: 600;
+}
+
+.bc-merge-table td {
+    vertical-align: middle;
+    font-size: 0.875rem;
+}
+
+.bc-col-primary {
+    width: 80px;
+}
+
+.bc-merge-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+    margin-bottom: 36px;
+}
+
+
