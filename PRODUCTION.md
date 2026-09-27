@@ -585,7 +585,7 @@ docker compose -f docker-compose.prod.yml exec -T backend console app:backup --d
 **What it deliberately excludes**
 
 - Generated zips (`exports/` in the bucket, or `data/exports` with local storage) —
-  a cache that `app:delete-old-zips` prunes after seven days. Derived from the
+  a cache that expires after 30 days (see `ZipExport`). Derived from the
   database and the documents; restoring it would at best do nothing and at worst
   reinstate stale downloads. Only the `documents/` prefix is copied.
 - `data/temp-uploads` — uploads still in flight. Half a file is not worth keeping.
@@ -880,7 +880,7 @@ File uploads are restricted by:
   - `GET /api/documents/{id}/file-url[?inline=1]` (used by the PDF viewer and the download button) checks access and returns `{"url": ...}`: a pre-signed S3 URL valid for 10 minutes, with response header overrides for the human-friendly filename and MIME type. The frontend loads it *without* cookies, so the bucket never has to accept credentials. With `DOCUMENT_STORAGE=local` the same endpoint returns a signed, expiring `/files/signed/{filename}` URL on the backend instead.
   - `GET /files/download/{filename}` (used by image previews and "open in new tab") authenticates with the login cookie and answers with a 302 redirect to the pre-signed URL.
   - Both only serve a document still under review to its uploader and to moderators (`DocumentFileVoter`); everyone else gets a 404.
-  - `POST /api/zip` builds the zip on disk (never in memory), stores it under `exports/` in the same bucket, and answers with a signed link in the same way. Zips are cached by content, contain only approved documents (plus selected ones the user may open), and are pruned by `app:delete-old-zips` after seven days. Schedule that command (e.g. daily via cron) so the bucket does not keep growing.
+  - `POST /api/zip` builds the zip on disk (never in memory), stores it under `exports/` in the same bucket, and answers with a signed link in the same way. Zips are cached by content (any change to a document, course, module or program name gives a new zip), contain only approved documents (plus selected ones the user may open), and expire after 30 days (`App\Constants\ZipExport`). On the bucket, `app:s3:setup-bucket` installs a lifecycle rule that deletes `exports/` objects after 30 days, so nothing needs scheduling. With local storage, or on a store without lifecycle rules (the command warns), schedule `app:delete-old-zips` daily instead. A zip older than 29 days is rebuilt rather than reused, so a link is never handed out for a zip about to be deleted.
 - **S3 Bucket CORS Policy**: The bucket must allow the frontend's origin, because the PDF viewer fetches the pre-signed URL from JavaScript (without cookies, with HTTP Range requests). Apply the rules with the console command, which also creates the bucket if it is missing and works against any S3-compatible store:
 
   ```bash

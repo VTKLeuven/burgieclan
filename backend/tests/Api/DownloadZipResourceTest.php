@@ -2,12 +2,16 @@
 
 namespace App\Tests\Api;
 
+use App\Constants\ZipExport;
 use App\Factory\CourseFactory;
+use App\Factory\DocumentCategoryFactory;
 use App\Factory\DocumentFactory;
 use App\Factory\ModuleFactory;
 use App\Factory\ProgramFactory;
 use App\Factory\UserFactory;
 use ZipArchive;
+
+use function Zenstruck\Foundry\Persistence\save;
 
 class DownloadZipResourceTest extends ApiTestCase
 {
@@ -40,6 +44,37 @@ class DownloadZipResourceTest extends ApiTestCase
     /**
      * Requests a zip, follows the returned link without credentials and opens the result.
      */
+    /**
+     * Requests a zip and returns the name it is stored under in data/exports.
+     */
+    private function requestExport(array $payload): string
+    {
+        $url = $this->browser()
+            ->post(
+                '/api/zip',
+                [
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json',
+                        'Authorization' => 'Bearer ' . $this->token
+                    ],
+                    'json' => $payload + ['programs' => [], 'modules' => [], 'courses' => [], 'documents' => []],
+                ]
+            )
+            ->assertStatus(200)
+            ->json()
+            ->decoded()['url'];
+
+        preg_match('#/files/export/([A-Za-z0-9]+\.zip)#', $url, $matches);
+        $this->createdFiles[] = $this->exportPath($matches[1]);
+
+        return $matches[1];
+    }
+
+    private function exportPath(string $name): string
+    {
+        return \dirname(__DIR__, 2) . '/data/exports/' . $name;
+    }
+
     private function downloadZip(array $payload): ZipArchive
     {
         $url = $this->browser()
@@ -174,6 +209,58 @@ class DownloadZipResourceTest extends ApiTestCase
         }
 
         return '';
+    }
+
+    public function testMovingADocumentToAnotherCategoryGivesTheZipANewName()
+    {
+        $course = CourseFactory::createOne();
+        $document = DocumentFactory::createOne(
+            [
+            'name' => 'Before',
+            'course' => $course,
+            'file_name' => $this->storeFile('zip-test-rename.pdf', "%PDF-1.7\nrename"),
+            'under_review' => false,
+            ]
+        );
+        $payload = ['courses' => ['/api/courses/' . $course->getId()]];
+
+        $first = $this->requestExport($payload);
+        $this->assertSame($first, $this->requestExport($payload), 'Unchanged content reuses the zip');
+
+        // The browser rebooted the kernel, so work on a freshly loaded copy.
+        $fresh = DocumentFactory::repository()->find($document->getId());
+        // The category is a folder inside the zip, so the old zip no longer matches.
+        $fresh->setCategory(DocumentCategoryFactory::createOne());
+        save($fresh);
+
+        $this->assertNotSame($first, $this->requestExport($payload), 'A moved document needs a new zip');
+    }
+
+    public function testZipCloseToExpiryIsRebuilt()
+    {
+        $course = CourseFactory::createOne();
+        DocumentFactory::createOne(
+            [
+            'course' => $course,
+            'file_name' => $this->storeFile('zip-test-stale.pdf', "%PDF-1.7\nstale"),
+            'under_review' => false,
+            ]
+        );
+        $payload = ['courses' => ['/api/courses/' . $course->getId()]];
+
+        $path = $this->exportPath($this->requestExport($payload));
+
+        // Fresh enough: reused as is.
+        touch($path, strtotime(sprintf('-%d days', ZipExport::REBUILD_AFTER_DAYS - 1)));
+        $this->requestExport($payload);
+        clearstatcache();
+        $this->assertLessThan(time() - 86400, filemtime($path));
+
+        // About to be deleted: rebuilt, which restarts its clock.
+        touch($path, strtotime(sprintf('-%d days', ZipExport::REBUILD_AFTER_DAYS + 1)));
+        $this->requestExport($payload);
+        clearstatcache();
+        $this->assertGreaterThan(time() - 60, filemtime($path));
     }
 
     public function testExpiredOrForgedExportLinksAreRefused()

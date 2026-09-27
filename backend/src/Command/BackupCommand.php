@@ -23,7 +23,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *    in object storage (see flysystem.yaml, DOCUMENT_STORAGE).
  *
  * Server-local files are deliberately not backed up. `data/exports` is a cache of
- * generated zips that DeleteOldZipsCommand prunes after seven days, and
+ * generated zips that expire after 30 days (see ZipExport), and
  * `data/temp-uploads` holds uploads still in flight. Both are derived or
  * transient, so restoring them would at best do nothing.
  *

@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Constants\ZipExport;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use League\Flysystem\FilesystemOperator;
@@ -16,8 +17,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 
 /**
- * Prepares the document bucket: creates it if it is missing and applies the CORS
- * rules the frontend needs to preview files straight from the bucket.
+ * Prepares the document bucket: creates it if it is missing, applies the CORS rules
+ * the frontend needs to preview files straight from the bucket, and adds a lifecycle
+ * rule that deletes generated zips (exports/) after ZipExport::MAX_AGE_DAYS.
  *
  * The PDF viewer fetches pre-signed bucket URLs from JavaScript (with range
  * requests), so the bucket has to allow the frontend's origin. Keeping those rules
@@ -109,6 +111,8 @@ final class SetupS3BucketCommand extends Command
             }
         }
 
+        $this->applyZipExpiry($io);
+
         if ($input->getOption('sync-local')) {
             $this->syncLocalDocuments($io);
         }
@@ -153,6 +157,62 @@ final class SetupS3BucketCommand extends Command
         $io->success(sprintf('CORS rules applied for: %s', implode(', ', $origins)));
 
         return true;
+    }
+
+    /**
+     * Lets the bucket delete old zips by itself, so no cron job has to run app:delete-old-zips.
+     *
+     * A bucket has a single lifecycle configuration, so the existing rules are read first and
+     * only the rule with our ID is replaced; rules set up by hand survive. Not every S3
+     * implementation supports lifecycle rules: then this warns and app:delete-old-zips has to
+     * be scheduled instead.
+     */
+    private function applyZipExpiry(SymfonyStyle $io): void
+    {
+        $ruleId = 'burgieclan-expire-zip-exports';
+
+        try {
+            try {
+                $rules = $this->s3Client->getBucketLifecycleConfiguration(['Bucket' => $this->bucket])['Rules'] ?? [];
+            } catch (S3Exception $e) {
+                if ('NoSuchLifecycleConfiguration' !== $e->getAwsErrorCode()) {
+                    throw $e;
+                }
+                $rules = [];
+            }
+
+            $rules = array_values(array_filter($rules, fn (array $rule) => ($rule['ID'] ?? null) !== $ruleId));
+            $rules[] = [
+                'ID' => $ruleId,
+                'Status' => 'Enabled',
+                'Filter' => ['Prefix' => ZipExport::BUCKET_PREFIX],
+                'Expiration' => ['Days' => ZipExport::MAX_AGE_DAYS],
+            ];
+
+            $this->s3Client->putBucketLifecycleConfiguration(
+                [
+                'Bucket' => $this->bucket,
+                'LifecycleConfiguration' => ['Rules' => $rules],
+                ]
+            );
+        } catch (S3Exception $e) {
+            $io->warning(
+                sprintf(
+                    'Could not set the lifecycle rule for old zips (%s). Schedule app:delete-old-zips instead.',
+                    $e->getAwsErrorMessage() ?? $e->getMessage()
+                )
+            );
+
+            return;
+        }
+
+        $io->success(
+            sprintf(
+                'Zips under %s expire after %d days.',
+                ZipExport::BUCKET_PREFIX,
+                ZipExport::MAX_AGE_DAYS
+            )
+        );
     }
 
     private function syncLocalDocuments(SymfonyStyle $io): void

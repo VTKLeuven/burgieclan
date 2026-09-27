@@ -233,7 +233,7 @@ If you prefer manual deployment or GitHub Actions is not configured:
    docker compose -f docker-compose.prod.yml exec backend php bin/console app:s3:setup-bucket \
        --origin=https://burgieclan.vtk.be --origin=https://dev.burgieclan.vtk.be
    ```
-   This creates the bucket if it is missing and sets the CORS rules that let the PDF viewer load files straight from it. Without them, previews fail with "Dit document kon niet geladen worden." It is safe to run again.
+   This creates the bucket if it is missing, sets the CORS rules that let the PDF viewer load files straight from it, and adds a lifecycle rule that deletes generated zips after 30 days. Without them, previews fail with "Dit document kon niet geladen worden." It is safe to run again.
 
 ### Accessing the Application
 

@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\ApiResource\ZipApi;
+use App\Constants\ZipExport;
 use App\Entity\Course;
 use App\Entity\Document;
 use App\Entity\Module;
@@ -85,7 +86,7 @@ final class DownloadZipController extends AbstractController
         }
 
         $exportName = $contentHash . '.zip';
-        if (!$this->exportsStorage->fileExists($exportName)) {
+        if ($this->needsBuild($exportName)) {
             $this->buildZip($exportName, $programs, $modules, $courses, $documents);
         }
 
@@ -100,6 +101,25 @@ final class DownloadZipController extends AbstractController
         $response->headers->set('Cache-Control', 'no-store, private');
 
         return $response;
+    }
+
+    /**
+     * A zip is reused unless it is missing or close to the age at which it gets deleted
+     * (see ZipExport); rebuilding it overwrites the old one and restarts its clock.
+     */
+    private function needsBuild(string $exportName): bool
+    {
+        try {
+            if (!$this->exportsStorage->fileExists($exportName)) {
+                return true;
+            }
+
+            $staleBefore = strtotime(sprintf('-%d days', ZipExport::REBUILD_AFTER_DAYS));
+
+            return $this->exportsStorage->lastModified($exportName) < $staleBefore;
+        } catch (FilesystemException) {
+            return true;
+        }
     }
 
     private function mapEntities(array $entities, string $class): array
@@ -126,6 +146,8 @@ final class DownloadZipController extends AbstractController
         $content = '';
 
         foreach ($programs as $program) {
+            // The program's own name is the top folder of its zip.
+            $content .= $program->getName();
             $content .= $this->getModuleContent($program->getModules()->toArray());
         }
 
@@ -186,9 +208,30 @@ final class DownloadZipController extends AbstractController
      * in means renaming a document invalidates the cached archive instead of handing
      * out one that still carries the old name.
      */
+    /**
+     * Everything about a document that ends up in the zip: its file, its name and folder
+     * inside the zip, and what the HTML index shows about it. Any change here gives the zip
+     * a new hash, so it is rebuilt instead of an outdated copy being served.
+     */
     private function getDocumentContent(Document $document): string
     {
-        return $document->getFileName() . DownloadFilename::forDocument($document);
+        $tags = array_map(fn ($tag) => $tag->getName(), $document->getTags()->toArray());
+        sort($tags);
+
+        return json_encode(
+            [
+            $document->getId(),
+            // A replaced file gets a new stored name (the namer appends a uniqid).
+            $document->getFileName(),
+            DownloadFilename::forDocument($document),
+            $document->getCategory()->getNameEn(),
+            $document->getYear(),
+            $document->getUpdatedAt()->format(DATE_ATOM),
+            // A tag change alone need not touch updatedAt, so tags count on their own.
+            $tags,
+            ],
+            JSON_THROW_ON_ERROR
+        );
     }
 
     /**

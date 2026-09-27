@@ -8,12 +8,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use App\Constants\ZipExport;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\StorageAttributes;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 
 /**
- * Command to delete zip files older than 7 days from the exports storage: data/exports, or
+ * Command to delete zip files older than ZipExport::MAX_AGE_DAYS (30 days) from the exports storage: data/exports, or
  * the exports/ prefix of the bucket when DOCUMENT_STORAGE=s3 (see flysystem.yaml).
  *
  * Usage:
@@ -61,7 +62,7 @@ final class DeleteOldZipsCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $cutoff = strtotime('-7 days');
+        $cutoff = strtotime(sprintf('-%d days', ZipExport::MAX_AGE_DAYS));
 
         $oldZips = $this->exportsStorage->listContents('')
             ->filter(
