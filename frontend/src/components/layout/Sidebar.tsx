@@ -1,11 +1,14 @@
 'use client';
 
+import { useCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import CurriculumTree from '@/components/curriculum/CurriculumTree';
 import ItemList from '@/components/layout/ItemList';
+import SidebarFolderDocuments from '@/components/layout/SidebarFolderDocuments';
 import CreateDocumentButton from '@/components/ui/CreateDocumentButton';
 import { useUser } from "@/components/UserContext";
+import { useSiblingDocuments } from '@/hooks/useSiblingDocuments';
 import type { Course, Document } from "@/types/entities";
-import { ChevronDown, File, FolderTree, PanelLeft, PanelLeftClose, Star } from 'lucide-react';
+import { ChevronDown, File, FolderOpen, FolderTree, PanelLeft, PanelLeftClose, Star } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -92,6 +95,22 @@ const NavigationSidebar = () => {
     ...defaultExpandedSections,
     ...expandedSectionsByMode[sidebarMode],
   };
+  const { course, category, document } = useCurriculumLocation();
+  const hasFolderContext = Boolean(course && category);
+  const { documents: siblingDocuments, loading: siblingsLoading } = useSiblingDocuments(
+    hasFolderContext ? course?.id : undefined,
+    hasFolderContext ? category?.id : undefined
+  );
+
+  const [activeTab, setActiveTab] = useState<'folder' | 'curriculum'>('folder');
+  const lastCategoryIdRef = useRef<number | undefined>(undefined);
+
+  useEffect(() => {
+    if (category?.id !== undefined && category.id !== lastCategoryIdRef.current) {
+      lastCategoryIdRef.current = category.id;
+      setActiveTab('folder');
+    }
+  }, [category?.id]);
 
   useEffect(() => {
     const storedWidth = Number(window.localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY));
@@ -193,7 +212,7 @@ const NavigationSidebar = () => {
         <button
           type="button"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3.5 top-5 z-10 grid h-7 w-7 place-items-center rounded-full border border-vtk-line-2 bg-vtk-surface text-vtk-body shadow-sm transition hover:border-vtk-ink hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
+          className="absolute -right-3.5 top-3.5 z-10 grid h-7 w-7 place-items-center rounded-full border border-vtk-line-2 bg-vtk-surface text-vtk-body shadow-sm transition hover:border-vtk-ink hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
           aria-label={isCollapsed ? t('sidebar.expand') : t('sidebar.collapse')}
           aria-expanded={!isCollapsed}
         >
@@ -227,28 +246,77 @@ const NavigationSidebar = () => {
 
         <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3">
           {!isCollapsed && showCurriculumNavigator && (
-            <>
-              <button
-                type="button"
-                className={sectionButton}
-                onClick={() => toggleSection('curriculum')}
-                aria-expanded={expandedSections.curriculum}
-              >
-                <span className="flex items-center gap-2.5">
-                  <FolderTree size={17} className="shrink-0" />
-                  <span>{t('curriculum-tree.label')}</span>
-                </span>
-                <ChevronDown
-                  size={15}
-                  className={`shrink-0 text-vtk-muted transition-transform duration-200 ${
-                    expandedSections.curriculum ? 'rotate-0' : '-rotate-90'
-                  }`}
-                />
-              </button>
-              <div className={expandedSections.curriculum ? 'shrink-0' : 'hidden'}>
-                <CurriculumTree />
+            hasFolderContext ? (
+              <div className="flex flex-col shrink-0 mb-1">
+                {/* Tab selector at the very top, with mr-6 so it stays clear of the collapse toggle */}
+                <div className="grid grid-cols-2 p-0.5 bg-vtk-paper-2 rounded-xl text-xs font-semibold text-vtk-muted mb-2.5 gap-0.5 border border-vtk-line mr-6">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('folder')}
+                    className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg transition-colors ${
+                      activeTab === 'folder'
+                        ? 'bg-vtk-surface text-vtk-ink font-semibold shadow-xs'
+                        : 'hover:text-vtk-ink'
+                    }`}
+                  >
+                    <FolderOpen size={14} className="shrink-0" />
+                    <span className="truncate">{t('sidebar.in_this_folder')}</span>
+                    {siblingDocuments.length > 0 && (
+                      <span className="rounded-full bg-vtk-paper px-1.5 py-0.5 text-[10px] tabular-nums font-semibold text-vtk-muted">
+                        {siblingDocuments.length}
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('curriculum')}
+                    className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg transition-colors ${
+                      activeTab === 'curriculum'
+                        ? 'bg-vtk-surface text-vtk-ink font-semibold shadow-xs'
+                        : 'hover:text-vtk-ink'
+                    }`}
+                  >
+                    <FolderTree size={14} className="shrink-0" />
+                    <span className="truncate">{t('curriculum-tree.label')}</span>
+                  </button>
+                </div>
+
+                {activeTab === 'folder' ? (
+                  <SidebarFolderDocuments
+                    course={course!}
+                    category={category!}
+                    currentDocument={document}
+                    documents={siblingDocuments}
+                    loading={siblingsLoading}
+                  />
+                ) : (
+                  <CurriculumTree />
+                )}
               </div>
-            </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className={`${sectionButton} pr-8`}
+                  onClick={() => toggleSection('curriculum')}
+                  aria-expanded={expandedSections.curriculum}
+                >
+                  <span className="flex items-center gap-2.5">
+                    <FolderTree size={17} className="shrink-0" />
+                    <span>{t('curriculum-tree.label')}</span>
+                  </span>
+                  <ChevronDown
+                    size={15}
+                    className={`shrink-0 text-vtk-muted transition-transform duration-200 ${
+                      expandedSections.curriculum ? 'rotate-0' : '-rotate-90'
+                    }`}
+                  />
+                </button>
+                <div className={expandedSections.curriculum ? 'shrink-0' : 'hidden'}>
+                  <CurriculumTree />
+                </div>
+              </>
+            )
           )}
 
           {user && !isCollapsed && (
