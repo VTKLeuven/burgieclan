@@ -47,7 +47,7 @@
     "symfony/twig-bundle": "8.1.7",
     "symfony/type-info": "8.1.5",
     "symfony/validator": "8.1.7",
-    "symfony/webpack-encore-bundle": "2.4.1",
+    "symfony/webpack-encore-bundle": "2.4.2",
     "symfonycasts/micro-mapper": "0.3",
     "twig/extra-bundle": "3.24",
     "twig/intl-extra": "3.26.0",
