@@ -1,0 +1,67 @@
+name: "Build Collab Docker Container"
+
+# The live-editing server for exam reconstructions (collab/). No build args: it only needs
+# BACKEND_URL and COLLAB_SECRET, which come from docker-compose.prod.yml at runtime.
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+
+jobs:
+  build_and_push:
+    name: Build and push collab image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    environment:
+      name: ${{ inputs.environment }}
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+      image_digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
+
+      - name: Convert repository name to lowercase
+        id: repo_name
+        run: echo "lowercase=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
+        with:
+          images: ghcr.io/${{ steps.repo_name.outputs.lowercase }}/collab
+          tags: |
+            # Tag with 'latest' for production environment
+            type=raw,value=latest,enable=${{ inputs.environment == 'production' }}
+            # Tag with environment
+            type=raw,value=${{ inputs.environment }}
+            # Tag with commit SHA
+            type=sha,prefix=sha-
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
+        with:
+          context: ./collab
+          file: ./collab/.docker/production/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=ghcr.io/${{ steps.repo_name.outputs.lowercase }}/collab:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ steps.repo_name.outputs.lowercase }}/collab:buildcache,mode=max

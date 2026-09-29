@@ -2,7 +2,9 @@
 
 namespace App\Tests\Controller\Internal;
 
+use App\Factory\ExamFactory;
 use App\Repository\CollabDocumentRepository;
+use App\Repository\CollabDocumentRevisionRepository;
 use App\Service\Collab\CollabRequestSignature;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Browser\KernelBrowser;
@@ -66,12 +68,66 @@ class CollabDocumentControllerTest extends KernelTestCase
         $this->assertNull($repository->findOneByName('collab-test')?->getContent());
     }
 
+    public function testStoresFieldsAndCollectsContributors(): void
+    {
+        $fields = ['sittings' => [['id' => 'd1', 'label' => 'ma 20 jan']]];
+
+        $this->signedPut(
+            self::PATH,
+            [
+            'state' => base64_encode('one'),
+            'content' => null,
+            'fields' => $fields,
+            'contributors' => ['12', '5'],
+            ]
+        )->assertStatus(204);
+        $this->signedPut(
+            self::PATH,
+            [
+            'state' => base64_encode('two'),
+            'content' => null,
+            'fields' => $fields,
+            // Junk is dropped, not fatal: the document itself must still be stored.
+            'contributors' => ['5', '7', 'x', -3, '0', null],
+            ]
+        )->assertStatus(204);
+
+        $document = self::getContainer()->get(CollabDocumentRepository::class)->findOneByName('collab-test');
+        $this->assertSame($fields, $document?->getFields());
+
+        // The second store kept the first version as a revision, with the first store's editors ...
+        $revision = self::getContainer()->get(CollabDocumentRevisionRepository::class)->findLatest($document);
+        $this->assertSame('one', $revision?->getState());
+        $this->assertSame([5, 12], $revision->getContributors());
+        // ... and the second store's editors wait for the next one.
+        $this->assertSame([5, 7], $document->getPendingContributors());
+    }
+
+    public function testADocumentWhoseExamWasDeletedIsNotStoredAgain(): void
+    {
+        $this->signedPut('/internal/collab/documents/exam-999999', ['state' => base64_encode('x')])
+            ->assertStatus(410);
+
+        $this->assertNull(self::getContainer()->get(CollabDocumentRepository::class)->findOneByName('exam-999999'));
+    }
+
+    public function testAnExistingExamIsStored(): void
+    {
+        $exam = ExamFactory::createOne();
+        $path = '/internal/collab/documents/' . $exam->getDocumentName();
+
+        $this->signedPut($path, ['state' => base64_encode('x')])->assertStatus(204);
+        $this->assertSame('x', $this->rawBody($this->signedGet($path)->assertStatus(200)));
+    }
+
     public function testMalformedBodiesAreRejected(): void
     {
         $this->signedPut(self::PATH, ['content' => null])->assertStatus(400);
         $this->signedPut(self::PATH, ['state' => 'not base64!!'])->assertStatus(400);
         $this->signedPut(self::PATH, ['state' => ''])->assertStatus(400);
         $this->signedPut(self::PATH, ['state' => base64_encode('x'), 'content' => 'text'])->assertStatus(400);
+        $this->signedPut(self::PATH, ['state' => base64_encode('x'), 'fields' => 'text'])->assertStatus(400);
+        $this->signedPut(self::PATH, ['state' => base64_encode('x'), 'contributors' => '12'])->assertStatus(400);
     }
 
     public function testInvalidNamesDoNotRoute(): void

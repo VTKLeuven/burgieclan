@@ -5,10 +5,12 @@ server that lets several people edit the same TipTap document at once.
 
 ```
 browser ── TipTap + Collaboration ── websocket ──▶ collab (this app)
-   │                                                  │  load / store, HMAC-signed
-   └── POST /api/collab/token ──▶ backend (Symfony) ◀─┘  /internal/collab/documents/{name}
+   │                                                ▲   │  load / store, HMAC-signed
+   │                                   restore,     │   │  /internal/collab/documents/{name}
+   │                                   disconnect   │   ▼
+   └── POST /api/collab/token ──▶ backend (Symfony) ────┘
                                         │
-                                       db  (collab_document table)
+                                       db  (collab_document, collab_document_revision, exam)
 ```
 
 ## How it fits together
@@ -24,7 +26,19 @@ browser ── TipTap + Collaboration ── websocket ──▶ collab (this ap
    opening an empty document that would later be stored over the real one.
 4. A moment after edits stop (`STORE_DEBOUNCE_MS`), at least every `STORE_MAX_DEBOUNCE_MS`, and when
    the last person leaves, the document goes back to Symfony (`PUT`): the Yjs state, which is the
-   source of truth, plus a TipTap JSON copy for rendering and search.
+   source of truth, plus a JSON copy for rendering and search (`content`: the editor as TipTap
+   JSON; `fields`: the other shared types listed in `JSON_FIELDS`, like an exam's `sittings`)
+   and the ids of the users who changed it since the previous store (`contributors`). Symfony
+   keeps a revision at most every 10 minutes of editing (`CollabDocumentStore`).
+5. Symfony calls back for the things it starts itself (`src/internal.ts`, signed the same way):
+   - `POST /internal/documents/{name}/restore` with `{"state": "<base64>"}`: a moderator rolls
+     back to a revision. The live content and `JSON_FIELDS` are replaced with clones of the old
+     ones, as one normal edit that reaches everyone who has it open.
+   - `POST /internal/documents/{name}/disconnect`: a moderator locked or reopened it. Every
+     websocket on the document is closed, so browsers reconnect with a fresh token.
+
+   A token can also say when its document locks (`until`): a connection opened before that stops
+   editing once it passes, and is sent away to fetch a read-only token.
 
 Two rules that are easy to break:
 
@@ -32,12 +46,20 @@ Two rules that are easy to break:
   their own copy back in and text would duplicate. Changes to a live document (seeding, rollback)
   go through this server so they reach everyone as a normal edit.
 - **The signature scheme exists twice**: `src/backend.ts` and
-  `backend/src/Service/Collab/CollabRequestSignature.php`. Both tests share one test vector.
+  `backend/src/Service/Collab/CollabRequestSignature.php`. Both tests share one test vector. It
+  is used in both directions: this server signs its load/store calls, and checks Symfony's
+  restore/disconnect calls the same way (`src/internal.ts`).
+- **This server has no editor schema.** It copies the editor field and `JSON_FIELDS` as plain Yjs
+  structures, and only the frontend knows what an `examQuestion` is
+  (`frontend/src/components/exam`). A new top-level shared type that should be kept and rolled
+  back goes into `JSON_FIELDS`.
 
 ## Running it
 
 It starts with the rest of the stack (`make up`) and listens on `localhost:1234`.
-Try it at http://localhost:3002/collab-test (moderators only, local development only) in two browsers.
+Try it on any course page under "Examens" (start a reconstruction and open it in two browsers), or
+at http://localhost:3002/collab-test (moderators only, local development only). Moderators see the
+history, roll back, lock and reopen under "Exam reconstructions" in `/admin`.
 
 ```bash
 make collab-shell   # shell in the container
@@ -58,3 +80,7 @@ TypeScript only type-checks.
 | `STORE_MAX_DEBOUNCE_MS` | `10000` | |
 
 `GET /health` answers `{"status": "ok"}` for container health checks.
+
+In production it runs as its own container (`collab/.docker/production/Dockerfile`, image
+`ghcr.io/vtkleuven/burgieclan/collab`), behind nginx at `/collab`; nginx refuses `/collab/internal`.
+The backend reaches it at `COLLAB_INTERNAL_URL` (default `http://collab:1234`).

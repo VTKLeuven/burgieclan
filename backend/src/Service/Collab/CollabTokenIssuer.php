@@ -46,11 +46,20 @@ class CollabTokenIssuer
 
     /**
      * @param self::MODE_* $mode
+     * @param string $name shown on this user's cursor (CollabDisplayName)
+     * @param DateTimeImmutable|null $editableUntil for an edit token on a document that locks at
+     *     some point: the collab server drops the connection to read-only once this passes, even
+     *     if it was opened before.
      *
      * @return array{token: string, expiresAt: DateTimeImmutable}
      */
-    public function issue(User $user, string $documentName, string $mode): array
-    {
+    public function issue(
+        User $user,
+        string $documentName,
+        string $mode,
+        string $name,
+        ?DateTimeImmutable $editableUntil = null
+    ): array {
         if (!$this->isConfigured()) {
             throw new CollabNotConfiguredException();
         }
@@ -58,17 +67,27 @@ class CollabTokenIssuer
         $secret = $this->secret;
         assert('' !== $secret);
 
+        $claims = ['doc' => $documentName, 'mode' => $mode, 'name' => $name];
+        if (self::MODE_EDIT === $mode && null !== $editableUntil) {
+            $claims['until'] = $editableUntil->getTimestamp();
+        }
+
         $token = (new JwtFacade())->issue(
             new Sha256(),
             InMemory::plainText($secret),
-            static fn (Builder $builder, DateTimeImmutable $issuedAt): Builder => $builder
-                ->issuedBy(self::ISSUER)
-                ->permittedFor(self::AUDIENCE)
-                ->relatedTo((string) $user->getId())
-                ->expiresAt($issuedAt->modify(self::TTL))
-                ->withClaim('doc', $documentName)
-                ->withClaim('mode', $mode)
-                ->withClaim('name', $user->getFullName())
+            static function (Builder $builder, DateTimeImmutable $issuedAt) use ($user, $claims): Builder {
+                $builder = $builder
+                    ->issuedBy(self::ISSUER)
+                    ->permittedFor(self::AUDIENCE)
+                    ->relatedTo((string) $user->getId())
+                    ->expiresAt($issuedAt->modify(self::TTL));
+
+                foreach ($claims as $claim => $value) {
+                    $builder = $builder->withClaim($claim, $value);
+                }
+
+                return $builder;
+            }
         );
 
         $expiresAt = $token->claims()->get('exp');

@@ -3,12 +3,14 @@
 namespace App\Tests\Api;
 
 use App\Entity\User;
+use App\Factory\ExamFactory;
 use App\Factory\UserFactory;
 use App\Service\Collab\CollabTokenIssuer;
 use DateTimeImmutable;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Token\DataSet;
 use Lcobucci\JWT\Token\Parser;
 use Lcobucci\JWT\UnencryptedToken;
 use Lcobucci\JWT\Validation\Constraint\PermittedFor;
@@ -83,9 +85,97 @@ class CollabTokenTest extends ApiTestCase
     public function testUnknownDocumentIsDenied(): void
     {
         $moderator = UserFactory::createOne(['plainPassword' => 'password', 'roles' => [User::ROLE_MODERATOR]]);
+        $jwt = $this->getToken($moderator->getUsername(), 'password');
 
-        $this->requestToken($this->getToken($moderator->getUsername(), 'password'), 'exam-1')
-            ->assertStatus(403);
+        $this->requestToken($jwt, 'exam-999999')->assertStatus(403);
+        $this->requestToken($jwt, 'something-else')->assertStatus(403);
+    }
+
+    public function testEveryoneMayEditAnOpenExam(): void
+    {
+        $exam = ExamFactory::createOne(['editableUntil' => new DateTimeImmutable('+3 days')]);
+
+        $response = $this->requestToken($this->token, $exam->getDocumentName())
+            ->assertStatus(200)
+            ->json()
+            ->decoded();
+
+        $this->assertSame('edit', $response['mode']);
+
+        // The lock moment travels along, so a connection opened before it cannot keep editing.
+        $claims = $this->claims($response['token']);
+        $this->assertSame('edit', $claims->get('mode'));
+        $this->assertSame($exam->getEditableUntil()->getTimestamp(), $claims->get('until'));
+    }
+
+    public function testALockedExamCanOnlyBeViewed(): void
+    {
+        $exam = ExamFactory::createOne(['editableUntil' => new DateTimeImmutable('-1 minute')]);
+
+        $response = $this->requestToken($this->token, $exam->getDocumentName())
+            ->assertStatus(200)
+            ->json()
+            ->decoded();
+
+        $this->assertSame('view', $response['mode']);
+        $this->assertFalse($this->claims($response['token'])->has('until'));
+    }
+
+    public function testAnonymousStudentsGetAPseudonymPerExam(): void
+    {
+        $student = UserFactory::createOne(
+            [
+            'plainPassword' => 'password',
+            'fullName' => 'Sam Student',
+            'defaultAnonymous' => true,
+            ]
+        );
+        $jwt = $this->getToken($student->getUsername(), 'password');
+
+        $first = ExamFactory::createOne();
+        $name = $this->nameIn($jwt, $first->getDocumentName());
+
+        $this->assertStringStartsWith('Anonieme ', $name);
+        $this->assertStringNotContainsString('Sam', $name);
+        // Stable: the same pseudonym every time this student opens this exam.
+        $this->assertSame($name, $this->nameIn($jwt, $first->getDocumentName()));
+
+        $pseudonyms = [];
+        foreach (ExamFactory::createMany(6) as $exam) {
+            $pseudonyms[] = $this->nameIn($jwt, $exam->getDocumentName());
+        }
+        // Different exams, different animals (six equal ones by chance is 1 in 70^5).
+        $this->assertGreaterThan(1, count(array_unique($pseudonyms)));
+    }
+
+    public function testStudentsWhoAreNotAnonymousShowUnderTheirName(): void
+    {
+        $student = UserFactory::createOne(
+            [
+            'plainPassword' => 'password',
+            'fullName' => 'Sam Student',
+            'defaultAnonymous' => false,
+            ]
+        );
+
+        $jwt = $this->getToken($student->getUsername(), 'password');
+
+        $this->assertSame('Sam Student', $this->nameIn($jwt, ExamFactory::createOne()->getDocumentName()));
+    }
+
+    private function nameIn(string $jwt, string $document): string
+    {
+        $response = $this->requestToken($jwt, $document)->assertStatus(200)->json()->decoded();
+
+        return (string) $this->claims($response['token'])->get('name');
+    }
+
+    private function claims(string $token): DataSet
+    {
+        $parsed = (new Parser(new JoseEncoder()))->parse($token);
+        $this->assertInstanceOf(UnencryptedToken::class, $parsed);
+
+        return $parsed->claims();
     }
 
     public function testInvalidDocumentNameIsRejected(): void

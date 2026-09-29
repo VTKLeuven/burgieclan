@@ -4,7 +4,9 @@ namespace App\Controller\Api;
 
 use App\Entity\CollabDocument;
 use App\Entity\User;
+use App\Repository\ExamRepository;
 use App\Security\Voter\CollabDocumentVoter;
+use App\Service\Collab\CollabDisplayName;
 use App\Service\Collab\CollabTokenIssuer;
 use DateTimeInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,13 +21,21 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  *
  * Body: {"document": "<name>"}. Answers {"token", "mode", "expiresAt"}, where mode is "edit" or
  * "view". The frontend calls this again on every websocket (re)connect.
+ *
+ * The name in the token is the one on the user's cursor: their full name, or in an exam
+ * reconstruction a per-exam pseudonym when their account is anonymous by default
+ * (CollabDisplayName).
  */
 #[IsGranted(User::ROLE_USER)]
 class CollabTokenController extends AbstractController
 {
     #[Route('/api/collab/token', name: 'api_collab_token', methods: ['POST'])]
-    public function __invoke(Request $request, CollabTokenIssuer $issuer): JsonResponse
-    {
+    public function __invoke(
+        Request $request,
+        CollabTokenIssuer $issuer,
+        CollabDisplayName $displayName,
+        ExamRepository $exams,
+    ): JsonResponse {
         $payload = json_decode($request->getContent(), true);
         $document = is_array($payload) ? ($payload['document'] ?? null) : null;
 
@@ -54,7 +64,13 @@ class CollabTokenController extends AbstractController
         $user = $this->getUser();
         assert($user instanceof User);
 
-        $issued = $issuer->issue($user, $document, $mode);
+        $issued = $issuer->issue(
+            $user,
+            $document,
+            $mode,
+            $displayName->for($user, $document),
+            $exams->findByDocumentName($document)?->getEditableUntil()
+        );
 
         $body = [
             'token' => $issued['token'],

@@ -16,6 +16,11 @@ export interface CollabIdentity {
     mode: CollabMode;
     /** Name shown on this user's cursor. */
     name: string;
+    /**
+     * For an edit token on a document that locks: when it locks, in seconds since the epoch.
+     * A connection opened before then turns read-only once it passes (see server.ts).
+     */
+    editableUntil?: number;
 }
 
 /**
@@ -33,13 +38,16 @@ export async function verifyCollabToken(token: string, secret: string): Promise<
         requiredClaims: ['sub', 'exp', 'doc', 'mode', 'name'],
     });
 
-    const { sub, doc, mode, name } = payload;
+    const { sub, doc, mode, name, until } = payload;
     if (typeof sub !== 'string' || typeof doc !== 'string' || typeof name !== 'string') {
         throw new Error('Collab token has malformed claims');
     }
     if (mode !== 'edit' && mode !== 'view') {
         throw new Error('Collab token has an unknown mode');
     }
+    if (until !== undefined && typeof until !== 'number') {
+        throw new Error('Collab token has a malformed "until" claim');
+    }
 
-    return { userId: sub, document: doc, mode, name };
+    return { userId: sub, document: doc, mode, name, ...(until === undefined ? {} : { editableUntil: until }) };
 }

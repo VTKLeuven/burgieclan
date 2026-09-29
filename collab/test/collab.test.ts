@@ -24,11 +24,14 @@ const SECRET = 'test-collab-secret-0123456789abcdef0123456789';
 interface StoredDocument {
     state: Buffer;
     content: unknown;
+    fields: Record<string, unknown>;
+    contributors: string[];
 }
 
 interface FakeBackend {
     url: string;
     documents: Map<string, StoredDocument>;
+    stores: { name: string; contributors: string[] }[];
     requests: { method: string; path: string }[];
     failLoadsFor: Set<string>;
     close(): Promise<void>;
@@ -45,6 +48,7 @@ async function readBody(request: IncomingMessage): Promise<string> {
 
 async function startFakeBackend(): Promise<FakeBackend> {
     const documents = new Map<string, StoredDocument>();
+    const stores: { name: string; contributors: string[] }[] = [];
     const requests: { method: string; path: string }[] = [];
     const failLoadsFor = new Set<string>();
 
@@ -83,8 +87,9 @@ async function startFakeBackend(): Promise<FakeBackend> {
         }
 
         if (method === 'PUT') {
-            const payload = JSON.parse(body) as { state: string; content: unknown };
-            documents.set(name, { state: Buffer.from(payload.state, 'base64'), content: payload.content });
+            const payload = JSON.parse(body) as Omit<StoredDocument, 'state'> & { state: string };
+            documents.set(name, { ...payload, state: Buffer.from(payload.state, 'base64') });
+            stores.push({ name, contributors: payload.contributors });
             response.writeHead(204).end();
             return;
         }
@@ -98,6 +103,7 @@ async function startFakeBackend(): Promise<FakeBackend> {
     return {
         url: `http://127.0.0.1:${port}`,
         documents,
+        stores,
         requests,
         failLoadsFor,
         close: () => new Promise((resolve) => server.close(() => resolve())),
@@ -113,13 +119,14 @@ interface TokenClaims {
     mode: 'edit' | 'view';
     name: string;
     sub: string;
+    until: number;
 }
 
 /** Mints a token the way CollabTokenIssuer does. */
 async function mintToken(claims: Partial<TokenClaims> = {}, options: { secret?: string; expiresIn?: string } = {}) {
-    const { doc = 'collab-test', mode = 'edit', name = 'Alice', sub = '1' } = claims;
+    const { doc = 'collab-test', mode = 'edit', name = 'Alice', sub = '1', until } = claims;
 
-    return new SignJWT({ doc, mode, name })
+    return new SignJWT({ doc, mode, name, ...(until === undefined ? {} : { until }) })
         .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
         .setIssuer(TOKEN_ISSUER)
         .setAudience(TOKEN_AUDIENCE)
@@ -184,6 +191,22 @@ function connect(name: string, token: string | (() => Promise<string>)): Promise
     });
 }
 
+/** Calls an internal route the way CollabServerClient in Symfony does. */
+function internalRequest(path: string, body: unknown, secret = SECRET): Promise<Response> {
+    const raw = typeof body === 'string' ? body : JSON.stringify(body);
+    const timestamp = Math.floor(Date.now() / 1000);
+
+    return fetch(collabUrl.replace('ws://', 'http://') + path, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            [HEADER_TIMESTAMP]: String(timestamp),
+            [HEADER_SIGNATURE]: signRequest(secret, 'POST', path, timestamp, raw),
+        },
+        body: raw,
+    });
+}
+
 // ---------------------------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------------------------
@@ -192,6 +215,8 @@ describe('collab server', () => {
     let backend: FakeBackend;
     let server: Server<ConnectionContext>;
     const warnings: string[] = [];
+    /** Added to the server's clock, to get past a lock without waiting for it. */
+    let clockOffset = 0;
 
     before(async () => {
         backend = await startFakeBackend();
@@ -203,6 +228,7 @@ describe('collab server', () => {
             stopOnSignals: false,
             backend: createBackend({ baseUrl: backend.url, secret: SECRET, retryDelay: 10 }),
             log: { info: () => {}, warn: (message: string) => warnings.push(message), error: () => {} },
+            now: () => Date.now() + clockOffset,
         });
         await server.listen();
         collabUrl = `ws://127.0.0.1:${server.address.port}`;
@@ -212,6 +238,7 @@ describe('collab server', () => {
         for (const provider of openProviders.splice(0)) {
             provider.destroy();
         }
+        clockOffset = 0;
     });
 
     after(async () => {
@@ -357,5 +384,140 @@ describe('collab server', () => {
         assert.equal(synced, false);
         assert.equal(backend.documents.has('broken-doc'), false);
         assert.equal(backend.requests.some((r) => r.method === 'PUT' && r.path.endsWith('/broken-doc')), false);
+    });
+    it('sends who changed the document, and the days, along with each store', async () => {
+        const alice = await connect('contrib-doc', await mintToken({ doc: 'contrib-doc', sub: '11' }));
+        const bob = await connect('contrib-doc', await mintToken({ doc: 'contrib-doc', name: 'Bob', sub: '12' }));
+        await connect('contrib-doc', await mintToken({ doc: 'contrib-doc', mode: 'view', name: 'Viewer', sub: '13' }));
+
+        addParagraph(alice.doc, 'from alice');
+        addParagraph(bob.doc, 'from bob');
+        const day = new Y.Map<string>();
+        day.set('id', 'd1');
+        day.set('label', 'ma 20 jan');
+        alice.doc.getArray('sittings').push([day]);
+
+        await waitFor(() => JSON.stringify(backend.documents.get('contrib-doc')?.fields ?? {}).includes('ma 20 jan')
+            && backend.stores.filter((s) => s.name === 'contrib-doc').flatMap((s) => s.contributors).includes('12'),
+            'a store with both editors and the day');
+
+        const everyone = new Set(backend.stores.filter((s) => s.name === 'contrib-doc').flatMap((s) => s.contributors));
+        assert.deepEqual([...everyone].sort(), ['11', '12']);
+        assert.deepEqual(backend.documents.get('contrib-doc')?.fields, { sittings: [{ id: 'd1', label: 'ma 20 jan' }] });
+
+        // Each store only lists the editors since the one before.
+        const storesBefore = backend.stores.length;
+        addParagraph(bob.doc, 'bob again');
+        await waitFor(() => backend.stores.length > storesBefore, 'the next store');
+        assert.deepEqual(backend.stores.at(-1)?.contributors, ['12']);
+    });
+
+    it('rolls a live document back when Symfony asks, for everyone who has it open', async () => {
+        const alice = await connect('restore-doc', await mintToken({ doc: 'restore-doc' }));
+        addParagraph(alice.doc, 'good question');
+        const day = new Y.Map<string>();
+        day.set('id', 'd1');
+        day.set('label', 'ma 20 jan');
+        alice.doc.getArray('sittings').push([day]);
+        await waitFor(() => JSON.stringify(backend.documents.get('restore-doc')?.content ?? {}).includes('good question'), 'the store');
+        const goodState = backend.documents.get('restore-doc')!.state;
+
+        // Vandalised: content and days gone, something else in their place.
+        const fragment = alice.doc.getXmlFragment(EDITOR_FIELD);
+        fragment.delete(0, fragment.length);
+        alice.doc.getArray('sittings').delete(0, 1);
+        addParagraph(alice.doc, 'spam');
+        const bob = await connect('restore-doc', await mintToken({ doc: 'restore-doc', name: 'Bob', sub: '2' }));
+        assert.deepEqual(paragraphs(bob.doc), ['spam']);
+
+        const response = await internalRequest('/internal/documents/restore-doc/restore', { state: goodState.toString('base64') });
+        assert.equal(response.status, 204);
+
+        await waitFor(() => paragraphs(bob.doc).join() === 'good question', 'Bob to see the restored content');
+        assert.deepEqual(paragraphs(alice.doc), ['good question']);
+        assert.deepEqual(bob.doc.getArray('sittings').toJSON(), [{ id: 'd1', label: 'ma 20 jan' }]);
+
+        // And the result is stored like any edit.
+        await waitFor(() => !JSON.stringify(backend.documents.get('restore-doc')?.content).includes('spam'), 'the store');
+    });
+
+    it('restores a document nobody has open by loading it first', async () => {
+        const source = new Y.Doc();
+        addParagraph(source, 'old version');
+        const current = new Y.Doc();
+        addParagraph(current, 'current version');
+        backend.documents.set('closed-doc', {
+            state: Buffer.from(Y.encodeStateAsUpdate(current)),
+            content: null,
+            fields: {},
+            contributors: [],
+        });
+
+        const response = await internalRequest('/internal/documents/closed-doc/restore', {
+            state: Buffer.from(Y.encodeStateAsUpdate(source)).toString('base64'),
+        });
+        assert.equal(response.status, 204);
+
+        await waitFor(() => JSON.stringify(backend.documents.get('closed-doc')?.content ?? {}).includes('old version'), 'the store');
+        const reloaded = new Y.Doc();
+        Y.applyUpdate(reloaded, backend.documents.get('closed-doc')!.state);
+        assert.deepEqual(paragraphs(reloaded), ['old version']);
+    });
+
+    it('refuses internal requests that are unsigned, malformed or unknown', async () => {
+        const unsigned = await fetch(`http://127.0.0.1:${server.address.port}/internal/documents/x/disconnect`, { method: 'POST' });
+        assert.equal(unsigned.status, 401);
+
+        const forged = await internalRequest('/internal/documents/x/disconnect', '', 'y'.repeat(40));
+        assert.equal(forged.status, 401);
+
+        assert.equal((await internalRequest('/internal/documents/x/restore', { state: '' })).status, 400);
+        assert.equal((await internalRequest('/internal/documents/x/restore', 'not json')).status, 400);
+        // Not a Yjs update: fails before anything is touched.
+        const garbage = Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f]).toString('base64');
+        assert.equal((await internalRequest('/internal/documents/garbage-doc/restore', { state: garbage })).status, 500);
+        assert.equal((await internalRequest('/internal/documents/Bad_Name/disconnect', '')).status, 404);
+        assert.equal((await internalRequest('/internal/documents/x/explode', '')).status, 404);
+        assert.equal(backend.documents.has('garbage-doc'), false);
+    });
+
+    it('reconnects everyone when Symfony asks, so a lock takes effect at once', async () => {
+        let mode: 'edit' | 'view' = 'edit';
+        let tokens = 0;
+        const client = await connect('lock-doc', async () => {
+            tokens++;
+            return mintToken({ doc: 'lock-doc', mode });
+        });
+        assert.equal(client.scope, 'read-write');
+
+        mode = 'view';
+        const response = await internalRequest('/internal/documents/lock-doc/disconnect', '');
+        assert.equal(response.status, 204);
+
+        await waitFor(() => tokens === 2 && client.provider.isAuthenticated, 'the client to reconnect with a new token', 5000);
+        assert.equal(client.provider.authorizedScope, 'readonly');
+        addParagraph(client.doc, 'typed after the lock');
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        assert.equal(JSON.stringify(backend.documents.get('lock-doc')?.content ?? {}).includes('after the lock'), false);
+    });
+
+    it('stops a connection from editing once its document locks, even if it was opened before', async () => {
+        let tokens = 0;
+        const until = Math.floor(Date.now() / 1000) + 60;
+        const client = await connect('until-doc', async () => {
+            tokens++;
+            return mintToken({ doc: 'until-doc', until, mode: tokens === 1 ? 'edit' : 'view' });
+        });
+
+        addParagraph(client.doc, 'before the lock');
+        await waitFor(() => JSON.stringify(backend.documents.get('until-doc')?.content ?? {}).includes('before the lock'), 'the store');
+
+        clockOffset = 120_000;
+        addParagraph(client.doc, 'after the lock');
+
+        await waitFor(() => tokens === 2 && client.provider.isAuthenticated, 'the client to come back for a new token', 5000);
+        assert.equal(client.provider.authorizedScope, 'readonly');
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        assert.equal(JSON.stringify(backend.documents.get('until-doc')?.content).includes('after the lock'), false);
     });
 });

@@ -4,6 +4,7 @@ namespace App\Security\Voter;
 
 use App\Entity\CollabDocument;
 use App\Entity\User;
+use App\Repository\ExamRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -16,8 +17,11 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  * decides this itself: Symfony decides when it issues the collab token, and the token carries the
  * outcome.
  *
- * Phase 0 knows a single document, the "collab-test" page, open to moderators only. Exam
- * documents ("exam-{id}") are added in phase 1.
+ * - "exam-{id}", an exam reconstruction: every logged-in user may view it, and edit it until its
+ *   `editableUntil`. After that it is read-only until a moderator reopens it.
+ * - "collab-test", the phase 0 test page: moderators only.
+ *
+ * Any other name is denied.
  *
  * @extends Voter<string, string>
  */
@@ -30,6 +34,7 @@ class CollabDocumentVoter extends Voter
 
     public function __construct(
         private readonly AccessDecisionManagerInterface $accessDecisionManager,
+        private readonly ExamRepository $exams,
     ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -55,6 +60,11 @@ class CollabDocumentVoter extends Voter
             return $this->accessDecisionManager->decide($token, [User::ROLE_MODERATOR]);
         }
 
-        return false;
+        $exam = $this->exams->findByDocumentName($subject);
+        if (null === $exam) {
+            return false;
+        }
+
+        return self::VIEW === $attribute || $exam->isEditable();
     }
 }

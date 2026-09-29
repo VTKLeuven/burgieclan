@@ -2,10 +2,10 @@
 
 namespace App\Controller\Internal;
 
-use App\Entity\CollabDocument;
 use App\Repository\CollabDocumentRepository;
+use App\Service\Collab\CollabDocumentOwners;
+use App\Service\Collab\CollabDocumentStore;
 use App\Service\Collab\CollabRequestSignature;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,7 +34,8 @@ final class CollabDocumentController extends AbstractController
     public function __construct(
         private readonly CollabRequestSignature $signature,
         private readonly CollabDocumentRepository $repository,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly CollabDocumentStore $store,
+        private readonly CollabDocumentOwners $owners,
     ) {}
 
     /**
@@ -61,7 +62,17 @@ final class CollabDocumentController extends AbstractController
     }
 
     /**
-     * Stores the document. Body: {"state": "<base64 Yjs update>", "content": <TipTap JSON>|null}.
+     * Stores the document. Body:
+     *
+     *     {
+     *       "state": "<base64 Yjs update>",
+     *       "content": <TipTap JSON> | null,
+     *       "fields": {"sittings": [...]} | null,
+     *       "contributors": ["12", "15"]
+     *     }
+     *
+     * `contributors` are the ids of the users who changed the document since the previous store;
+     * they end up on the next revision (CollabDocumentStore).
      */
     #[Route('', name: 'internal_collab_document_store', methods: ['PUT'])]
     public function store(string $name, Request $request): Response
@@ -94,17 +105,43 @@ final class CollabDocumentController extends AbstractController
             return new JsonResponse(['detail' => 'content must be an object or null.'], 400);
         }
 
-        $document = $this->repository->findOneByName($name);
-        if (null === $document) {
-            $document = new CollabDocument($name, $state);
-            $this->entityManager->persist($document);
-        } else {
-            $document->setState($state);
+        $fields = $payload['fields'] ?? null;
+        if (null !== $fields && !is_array($fields)) {
+            return new JsonResponse(['detail' => 'fields must be an object or null.'], 400);
         }
-        $document->setContent($content);
 
-        $this->entityManager->flush();
+        $contributors = $payload['contributors'] ?? [];
+        if (!is_array($contributors)) {
+            return new JsonResponse(['detail' => 'contributors must be a list of user ids.'], 400);
+        }
+
+        // The owner (an exam) was deleted while people still had the document open.
+        if (!$this->owners->exists($name)) {
+            return new JsonResponse(['detail' => 'This document no longer exists.'], Response::HTTP_GONE);
+        }
+
+        $this->store->store($name, $state, $content, $fields, self::userIds($contributors));
 
         return new Response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * User ids as the collab server sends them (token subjects, so strings), as integers.
+     * Anything that is not an id is dropped rather than failing the whole store.
+     *
+     * @param array<mixed> $values
+     *
+     * @return list<int>
+     */
+    private static function userIds(array $values): array
+    {
+        $ids = [];
+        foreach ($values as $value) {
+            if ((is_string($value) || is_int($value)) && 1 === preg_match('/^[1-9]\d{0,17}$/', (string) $value)) {
+                $ids[] = (int) $value;
+            }
+        }
+
+        return array_values(array_unique($ids));
     }
 }

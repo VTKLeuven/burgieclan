@@ -28,10 +28,20 @@ export class BackendError extends Error {
     }
 }
 
+/** What goes to Symfony on every store, next to the Yjs state. */
+export interface StoredCopy {
+    /** The editor content as TipTap JSON: a read-only copy for rendering and search. */
+    content: unknown;
+    /** The other top-level shared types as JSON, e.g. {"sittings": [...]}. Same caveat. */
+    fields: Record<string, unknown>;
+    /** Ids of the users who changed the document since the previous store. */
+    contributors: string[];
+}
+
 export interface Backend {
     /** The stored Yjs state, or null when the document has never been stored. */
     load(documentName: string): Promise<Uint8Array | null>;
-    store(documentName: string, state: Uint8Array, content: unknown): Promise<void>;
+    store(documentName: string, state: Uint8Array, copy: StoredCopy): Promise<void>;
 }
 
 export interface BackendOptions {
@@ -86,8 +96,8 @@ export function createBackend(options: BackendOptions): Backend {
             return new Uint8Array(await response.arrayBuffer());
         },
 
-        async store(documentName, state, content) {
-            const body = JSON.stringify({ state: Buffer.from(state).toString('base64'), content });
+        async store(documentName, state, copy) {
+            const body = JSON.stringify({ state: Buffer.from(state).toString('base64'), ...copy });
 
             for (let attempt = 1; ; attempt++) {
                 try {
