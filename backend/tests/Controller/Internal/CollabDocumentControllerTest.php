@@ -12,9 +12,21 @@ use Zenstruck\Browser\Test\HasBrowser;
 
 class CollabDocumentControllerTest extends KernelTestCase
 {
-    use HasBrowser;
+    use HasBrowser {
+        browser as baseKernelBrowser;
+    }
 
     private const PATH = '/internal/collab/documents/collab-test';
+
+    /**
+     * The collab server calls these routes over plain HTTP and cannot follow a redirect the way
+     * the test client can: a redirect to HTTPS lands on a port that only speaks HTTP. So a
+     * redirect has to fail these tests rather than be followed.
+     */
+    protected function browser(array $options = [], array $server = []): KernelBrowser
+    {
+        return $this->baseKernelBrowser($options, $server)->interceptRedirects();
+    }
 
     public function testUnsignedRequestsAreRejected(): void
     {
