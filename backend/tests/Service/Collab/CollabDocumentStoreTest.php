@@ -22,6 +22,7 @@ class CollabDocumentStoreTest extends KernelTestCase
 
     /**
      * @return list<string>
+     * @phpstan-impure
      */
     private function revisionStates(CollabDocument $document): array
     {
