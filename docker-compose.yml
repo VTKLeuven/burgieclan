@@ -35,6 +35,8 @@ services:
       FLUXUS_SSO_CLIENT_ID: ${FLUXUS_SSO_CLIENT_ID:?FLUXUS_SSO_CLIENT_ID is required}
       FLUXUS_SSO_CLIENT_SECRET: ${FLUXUS_SSO_CLIENT_SECRET:?FLUXUS_SSO_CLIENT_SECRET is required}
       FRONTEND_URL: "http://localhost:3002"
+      # Shared with the collab service below. A development-only value; production sets its own.
+      COLLAB_SECRET: &collab-secret "dev-only-collab-secret-not-for-production-0000"
     networks:
       - burgieclan-network
     # The backend exchanges the code and fetches userinfo server to server, so
@@ -67,6 +69,8 @@ services:
       - PORT=3002
       - NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
       - NEXT_PUBLIC_FRONTEND_URL=http://localhost:3002
+      # The browser opens this websocket itself, so it is the host port, not the service name.
+      - NEXT_PUBLIC_COLLAB_URL=ws://localhost:1234
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
 
@@ -76,6 +80,27 @@ services:
       - burgieclan-network
     extra_hosts:
       - "localhost:host-gateway"
+
+  # Live collaborative editing (Hocuspocus). Browsers connect to it over a websocket; it loads
+  # and stores documents through Symfony's internal routes. See collab/README.md.
+  collab:
+    container_name: burgieclan-collab
+    build:
+      context: .
+      dockerfile: ./collab/.docker/dev/Dockerfile
+    volumes:
+      - .:/app
+      - collab-node-modules:/app/collab/node_modules
+    ports:
+      - "1234:1234"
+    environment:
+      PORT: 1234
+      BACKEND_URL: "http://backend:8000"
+      COLLAB_SECRET: *collab-secret
+    depends_on:
+      - backend
+    networks:
+      - burgieclan-network
 
 networks:
   burgieclan-network:
@@ -87,3 +112,4 @@ volumes:
   backend-var: {}
   frontend-node-modules: {}
   frontend-next: {}
+  collab-node-modules: {}

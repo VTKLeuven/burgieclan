@@ -491,5 +491,20 @@
         "label": "Curriculum",
         "expand": "Expand {{name}}",
         "collapse": "Collapse {{name}}"
+    },
+    "collab": {
+        "title": "Live editor test",
+        "kicker": "Developer tools",
+        "subtitle": "Open this page in two browsers and type in both. Only moderators can use it, and it only exists in local development.",
+        "status": {
+            "connecting": "Connecting…",
+            "connected": "Connected",
+            "disconnected": "Connection lost. Your changes are sent as soon as it's back; don't close this tab.",
+            "denied": "You don't have access to this document.",
+            "unavailable": "Live editing isn't available right now."
+        },
+        "people_here_one": "Just you here",
+        "people_here_other": "{{count}} people here",
+        "read_only": "Read only"
     }
 }

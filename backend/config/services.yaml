@@ -9,6 +9,9 @@ parameters:
     app_locales: en|nl
     # Add your frontend URL
     app.frontend_url: '%env(FRONTEND_URL)%'
+    # Shared with the collab server. Empty switches live editing off instead of breaking the
+    # container, so deploys that do not run the collab server need nothing extra.
+    env(COLLAB_SECRET): ''
 
 services:
     # default configuration for services in *this* file

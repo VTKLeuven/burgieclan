@@ -815,5 +815,16 @@
     .Tiptap-mathematics-render {
       @apply rounded-md inline-block;
     }
+
+    /* Other people's cursors in the live editor (CollaborationCaret). The colour is set inline
+       per person; these rules only shape the caret and its name tag. */
+    .collaboration-carets__caret {
+      @apply relative -mx-px border-x pointer-events-none;
+      word-break: normal;
+    }
+
+    .collaboration-carets__label {
+      @apply absolute -left-px -top-[1.4em] rounded-sm rounded-bl-none px-1 py-px text-xs font-semibold leading-normal text-white whitespace-nowrap select-none;
+    }
   }
 }

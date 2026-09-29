@@ -491,5 +491,20 @@
         "label": "Curriculum",
         "expand": "{{name}} uitklappen",
         "collapse": "{{name}} inklappen"
+    },
+    "collab": {
+        "title": "Test live editor",
+        "kicker": "Ontwikkeltools",
+        "subtitle": "Open deze pagina in twee browsers en typ in beide. Enkel moderators kunnen ze gebruiken, en ze bestaat alleen in lokale ontwikkeling.",
+        "status": {
+            "connecting": "Verbinden…",
+            "connected": "Verbonden",
+            "disconnected": "Verbinding verbroken. Je wijzigingen worden verstuurd zodra ze terug is; sluit dit tabblad niet.",
+            "denied": "Je hebt geen toegang tot dit document.",
+            "unavailable": "Live bewerken is momenteel niet beschikbaar."
+        },
+        "people_here_one": "Enkel jij bent hier",
+        "people_here_other": "{{count}} mensen hier",
+        "read_only": "Alleen lezen"
     }
 }
