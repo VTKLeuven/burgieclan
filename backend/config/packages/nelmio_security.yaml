@@ -62,6 +62,11 @@ nelmio_security:
         hsts_max_age: 31536000  # 1 year in seconds
         hsts_subdomains: true  # Apply to all subdomains
         hsts_preload: false  # Set to true only if you want to be included in browser HSTS preload lists
+        # The collab server calls these over plain HTTP on the Docker network, and cannot follow a
+        # redirect to HTTPS: the backend's port only speaks HTTP. Every request is HMAC-signed
+        # (App\Service\Collab\CollabRequestSignature), and the public nginx does not route them.
+        allow_list:
+            - '^/internal/collab/'
 
 when@dev:
     nelmio_security:
