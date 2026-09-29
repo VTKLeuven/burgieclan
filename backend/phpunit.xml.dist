@@ -14,6 +14,8 @@
 		<server name="APP_ENV" value="test" force="true"/>
 		<server name="KERNEL_CLASS" value="App\Kernel" force="true"/>
 	    <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak" force="true" />
+	    <!-- Forced: docker-compose.yml sets a dev COLLAB_SECRET on the container, which .env.test cannot override. -->
+	    <env name="COLLAB_SECRET" value="test-collab-secret-0123456789abcdef0123456789" force="true" />
 	</php>
 
 

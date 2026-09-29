@@ -1,0 +1,132 @@
+'use client'
+
+import { getCollabToken } from '@/actions/collab';
+import { HocuspocusProvider, WebSocketStatus } from '@hocuspocus/provider';
+import { useEffect, useState } from 'react';
+import * as Y from 'yjs';
+
+/**
+ * The Yjs field the editor writes to. The collab server reads the same field when it turns the
+ * document into TipTap JSON (EDITOR_FIELD in collab/src/server.ts).
+ */
+export const EDITOR_FIELD = 'default';
+
+/** Distinct, readable on white, and none of them the brand yellow used for highlights. */
+const CARET_COLORS = ['#2563eb', '#db2777', '#059669', '#d97706', '#7c3aed', '#dc2626', '#0891b2', '#4d7c0f'];
+
+export type ConnectionStatus =
+    | 'connecting'
+    | 'connected'
+    | 'disconnected'
+    /** Symfony said no: not logged in or no access to this document. */
+    | 'denied'
+    /** Live editing is switched off on the server (no COLLAB_SECRET). */
+    | 'unavailable';
+
+/** An open socket only counts as connected once the server accepted the token (onAuthenticated). */
+const SOCKET_STATUS: Record<WebSocketStatus, ConnectionStatus> = {
+    [WebSocketStatus.Connecting]: 'connecting',
+    [WebSocketStatus.Connected]: 'connecting',
+    [WebSocketStatus.Disconnected]: 'disconnected',
+};
+
+export interface CollabSession {
+    doc: Y.Doc;
+    provider: HocuspocusProvider;
+}
+
+export interface CollabSessionState {
+    session: CollabSession | null;
+    status: ConnectionStatus;
+    /** The server only lets this connection watch (a view token, or the document is locked). */
+    readOnly: boolean;
+    /** The document has been loaded from the server at least once since the page opened. */
+    synced: boolean;
+    /** Names on everyone's cursor who has the document open, yourself included. */
+    people: string[];
+}
+
+function collabUrl(): string {
+    if (process.env.NEXT_PUBLIC_COLLAB_URL) {
+        return process.env.NEXT_PUBLIC_COLLAB_URL;
+    }
+
+    // Deployed behind nginx on the same host as the site itself.
+    const { protocol, host } = window.location;
+    return `${protocol === 'https:' ? 'wss' : 'ws'}://${host}/collab`;
+}
+
+export function caretColor(userId: number | undefined): string {
+    return CARET_COLORS[(userId ?? 0) % CARET_COLORS.length];
+}
+
+function namesOf(states: ReadonlyArray<Record<string, unknown>>): string[] {
+    return states
+        .map((state) => state.user)
+        .map((user) => (typeof user === 'object' && user !== null && 'name' in user ? String(user.name) : ''))
+        .filter((name) => name !== '');
+}
+
+/**
+ * Opens a live document on the collab server for as long as the component is mounted.
+ *
+ * Access can change while it is open: when a moderator locks or reopens a document, or when it
+ * locks by itself, the server closes the connection. The provider then reconnects on its own and
+ * asks Symfony for a new token, so `readOnly` follows without a reload.
+ */
+export function useCollabSession(documentName: string): CollabSessionState {
+    const [session, setSession] = useState<CollabSession | null>(null);
+    const [status, setStatus] = useState<ConnectionStatus>('connecting');
+    const [readOnly, setReadOnly] = useState(false);
+    const [synced, setSynced] = useState(false);
+    const [people, setPeople] = useState<string[]>([]);
+
+    useEffect(() => {
+        const doc = new Y.Doc();
+        let refused: ConnectionStatus | null = null;
+
+        const provider = new HocuspocusProvider({
+            url: collabUrl(),
+            name: documentName,
+            document: doc,
+            // A function, so every reconnect asks Symfony for a fresh token.
+            token: async () => {
+                const result = await getCollabToken(documentName);
+                if ('error' in result) {
+                    refused = result.error.status === 503 ? 'unavailable' : 'denied';
+                    setStatus(refused);
+                    // An empty token makes the collab server refuse the connection.
+                    return '';
+                }
+                refused = null;
+                return result.token;
+            },
+            onStatus: ({ status: next }) => {
+                if (!refused) {
+                    setStatus(SOCKET_STATUS[next]);
+                }
+            },
+            onAuthenticated: ({ scope }) => {
+                setReadOnly(scope === 'readonly');
+                setStatus('connected');
+            },
+            onAuthenticationFailed: () => setStatus(refused ?? 'denied'),
+            onSynced: () => setSynced(true),
+            onAwarenessChange: ({ states }) => setPeople(namesOf(states)),
+        });
+
+        // The provider opens a websocket, so it can only be created in an effect (and must be
+        // destroyed when the effect is cleaned up); the editor needs it as state.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setSession({ doc, provider });
+
+        return () => {
+            provider.destroy();
+            doc.destroy();
+            setSession(null);
+            setSynced(false);
+        };
+    }, [documentName]);
+
+    return { session, status, readOnly, synced, people };
+}

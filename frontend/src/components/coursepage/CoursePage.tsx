@@ -5,6 +5,7 @@ import CoursePlacement from "@/components/curriculum/CoursePlacement";
 import { usePublishCurriculumLocation } from "@/components/curriculum/CurriculumLocationContext";
 import CommentCategories from "@/components/coursepage/comment/CommentCategories";
 import DocumentSections from "@/components/coursepage/DocumentSections";
+import ExamSection from "@/components/coursepage/exam/ExamSection";
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import RelatedCourses from "@/components/coursepage/RelatedCourses";
 import ErrorPage from "@/components/error/ErrorPage";
@@ -154,6 +155,11 @@ export default function CoursePage() {
                     <DocumentSections course={course} documentCounts={course.documentCounts} />
                 </div>
 
+
+                {/* Exam reconstructions */}
+                <div className="mt-10 border-t border-vtk-line pt-8">
+                    <ExamSection courseId={course.id} />
+                </div>
 
                 {/* Comments */}
                 <div className="mt-10 border-t border-vtk-line pt-8">

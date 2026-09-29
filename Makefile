@@ -1,4 +1,4 @@
-.PHONY: up down test prod clean build rebuild db admin reset-password cache-clear phpstan phpunit phpcs phpcbf
+.PHONY: up down test prod clean build rebuild db admin reset-password cache-clear phpstan phpunit phpcs phpcbf collab-shell collab-test
 
 # Development (default)
 up:
@@ -34,6 +34,10 @@ backend-shell:
 # Frontend shell
 frontend-shell:
 	docker compose exec frontend sh
+
+# Collab server shell
+collab-shell:
+	docker compose exec collab sh
 
 # Database setup
 db:
@@ -73,3 +77,8 @@ phpcs:
 # Run PHP CodeSniffer fix
 phpcbf:
 	docker compose exec backend vendor/bin/phpcbf
+
+# Run the collab server tests (typecheck + integration tests)
+collab-test:
+	docker compose exec collab npm run typecheck
+	docker compose exec collab npm test

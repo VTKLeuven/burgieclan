@@ -41,6 +41,13 @@ security:
             stateless: true
             jwt: ~
 
+        # Server-to-server routes for the collab server (Hocuspocus). No user logs in here:
+        # every request is checked against an HMAC signature in the controller instead
+        # (see App\Service\Collab\CollabRequestSignature).
+        collab_internal:
+            pattern: ^/internal/collab/
+            security: false
+
         main:
             # this firewall does not have a 'pattern' option because it applies to all URLs
             lazy: true

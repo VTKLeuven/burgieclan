@@ -9,6 +9,11 @@ Monorepo with two independent apps: `backend/` (Symfony 8 + API Platform 4, PHP 
 (Next.js 16 App Router, React 19, TypeScript). Postgres 18. Local development runs in Docker Compose,
 optionally through VS Code Dev Containers.
 
+A third, small service, `collab/`, is the live-editing server (Hocuspocus, Node, TypeScript run directly by
+Node). Browsers edit documents together over a websocket; it loads and stores them through Symfony's
+internal routes and never touches the database itself. See `collab/README.md` before changing anything on
+either side of that boundary.
+
 ## Commands
 
 Makefile targets run from the repo root and wrap `docker compose exec`. Inside a dev container, run the
@@ -23,7 +28,8 @@ underlying command instead (`vendor/bin/phpunit`, not `make phpunit`).
 | PHP code style | `make phpcs` / `make phpcbf` to autofix |
 | Admin user | `make admin`, `make reset-password` |
 | Rebuild metadata cache | `make cache-clear` — after any `*Api.php` change, see below |
-| Shells | `make backend-shell`, `make frontend-shell` |
+| Shells | `make backend-shell`, `make frontend-shell`, `make collab-shell` |
+| Collab server tests | `make collab-test` (typecheck + integration tests) |
 
 A single backend test or file:
 
@@ -51,7 +57,7 @@ new property can be live in the app and still invisible to PHPUnit — the sympt
 asserting `null` on a field that works fine against `localhost:8000`. Clear it with
 `docker compose exec backend php bin/console cache:clear --env=test`.
 
-**Ports**: frontend `3002`, backend `8000`, db `5432`. The frontend deliberately avoids 3000 — locally that
+**Ports**: frontend `3002`, backend `8000`, collab `1234`, db `5432`. The frontend deliberately avoids 3000 — locally that
 port belongs to the VTK website, which is the SSO issuer the login flow redirects to.
 
 ## Backend architecture
@@ -84,6 +90,12 @@ Other subsystems:
   JWTs carry stored roles, not hierarchy-expanded ones — `ROLE_ADMIN` does not imply `ROLE_MODERATOR` in a token.
 - **KU Leuven course import**: `src/Service/Onderwijsaanbod/`, driven by `ImportOnderwijsaanbodCommand` or the
   admin `OnderwijsaanbodImportController`
+- **Exam reconstructions**: `Exam` (one per course + academic year + `ExamPeriod`) owns the live document
+  `exam-{id}`. The questions never pass through the API: they live on the collab server (see `collab/README.md`),
+  Symfony only keeps the stored copy (`CollabDocument`) and its history (`CollabDocumentRevision`,
+  `CollabDocumentStore`). Access is `CollabDocumentVoter`; moderators roll back, lock and reopen in the admin
+  (`ExamCrudController`). The editor schema (`examQuestion` nodes, the `sittings` array) exists only in the
+  frontend, in `components/exam/`.
 
 Tests: Zenstruck Foundry factories live in `src/Factory/` (not under `tests/`). API tests extend
 `tests/Api/ApiTestCase`, whose `setUp()` creates a user and logs in to obtain `$this->token`; requests use

@@ -18,18 +18,20 @@ This document provides a comprehensive technical overview of the production depl
 
 ### Service Topology
 
-The production deployment uses a 4-container architecture orchestrated by Docker Compose:
+The production deployment uses a 5-container architecture orchestrated by Docker Compose:
 
 ```
 Internet → External Reverse Proxy (HTTPS)
-              ↓
-         nginx (port 8000)
-         /              \
-        /                \
-  backend (8080)      frontend (3000)
-       |
-       |
-    db (5432)
+                    ↓
+               nginx (port 8000)
+         ┌──────────┼──────────┐
+         ↓          ↓          ↓
+  backend (8080)  frontend   collab (1234)
+     ↑   │         (3000)      │
+     │   ↓                     │
+     │ db (5432)               │
+     └─────────────────────────┘
+       load/store, internal network, signed
 ```
 
 ### Port Mappings
@@ -39,6 +41,7 @@ Internet → External Reverse Proxy (HTTPS)
 | nginx     | 80            | 8000          | Main entry point (HTTP only)     |
 | backend   | 8080          | -             | Symfony API (internal only)      |
 | frontend  | 3000          | -             | Next.js app (internal only)      |
+| collab    | 1234          | -             | Live editing, websocket (internal only) |
 | db        | 5432          | -             | PostgreSQL (internal only)       |
 
 **Note**: Only nginx exposes an external port. The external reverse proxy (e.g., Caddy) should handle HTTPS termination and forward to port 8000.
@@ -50,14 +53,19 @@ Internet → External Reverse Proxy (HTTPS)
 3. **nginx** routes based on path:
    - `/admin`, `/api`, `/uploads`, `/files`, `/build`, `/bundles` → **backend** (Symfony)
    - `/api/frontend` → **frontend** (Next.js Server Actions)
+   - `/collab` → **collab** (websocket for live editing of exam reconstructions; `/collab/internal` is refused)
    - All other routes → **frontend** (Next.js pages)
 4. **backend** connects to **db** for data persistence
+5. **collab** never touches the database: it loads and stores documents through the backend's
+   `/internal/collab/...` routes, and the backend calls its `/internal/documents/...` routes for
+   rollbacks and locks. Both directions are HMAC-signed with `COLLAB_SECRET` (see `collab/README.md`).
 
 ### Health Checks
 
 - **db**: `pg_isready` every 10s (5 retries, 30s start period)
 - **backend**: HTTP check to `/api/healthcheck` every 30s (3 retries, 40s start period)
 - **frontend**: Depends on backend health
+- **collab**: HTTP check to `/health` every 30s; starts after the backend is healthy
 
 ### Logging
 
@@ -392,6 +400,7 @@ These variables **must** be set in the `.env` file. The application will fail to
 | `S3_ACCESS_KEY` | Object storage access key | From Hetzner Object Storage credentials |
 | `S3_SECRET_KEY` | Object storage secret key | From Hetzner Object Storage credentials |
 | `S3_REGION` | Object storage region | `nbg1` |
+| `COLLAB_SECRET` | Shared by backend and collab: signs collab tokens and their server-to-server calls. At least 32 bytes | `openssl rand -hex 32` |
 
 > **Note**: The `S3_*` variables are only consumed in production (`when@prod` in `flysystem.yaml`). They are read from the server's `.env` by `docker-compose.prod.yml`, **not** from GitHub Actions secrets. Because the compose file uses the fail-fast form (`${S3_ACCESS_KEY:?...}`), a deploy will abort at `docker compose up` if any of them are missing.
 
