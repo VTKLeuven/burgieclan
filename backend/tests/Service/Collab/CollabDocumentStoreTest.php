@@ -22,7 +22,6 @@ class CollabDocumentStoreTest extends KernelTestCase
 
     /**
      * @return list<string>
-     * @phpstan-impure
      */
     private function revisionStates(CollabDocument $document): array
     {
@@ -48,7 +47,9 @@ class CollabDocumentStoreTest extends KernelTestCase
         // Stores within the interval replace the document without adding revisions.
         $this->store->store('collab-test', 'v3', null, null, [2], $start->modify('+5 minutes'));
         $this->store->store('collab-test', 'v4', null, null, [3], $start->modify('+9 minutes'));
-        $this->assertSame(['v1'], $this->revisionStates($document));
+        // Through a variable: PHPStan would carry the narrowing of the identical call above over to this one.
+        $states = $this->revisionStates($document);
+        $this->assertSame(['v1'], $states);
 
         // Once the interval has passed, the version from before this store is kept, with
         // everyone who edited since the previous revision.
