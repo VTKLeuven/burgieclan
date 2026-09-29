@@ -8,6 +8,8 @@ import {
     type DocumentCategory,
     type DocumentComment,
     type DocumentView,
+    type Exam,
+    type ExamSitting,
     type FaqItem,
     type CurriculumPath,
     type Module,
@@ -216,6 +218,53 @@ export function convertToCourseRatingSummary(summary: unknown): CourseRatingSumm
                     : null,
             };
         }),
+    };
+}
+
+const EXAM_PERIODS = ['january', 'june', 'august'] as const;
+
+function convertToExamSitting(sitting: unknown): ExamSitting | null {
+    if (sitting === null || typeof sitting !== 'object') {
+        return null;
+    }
+    const { id, label } = sitting as ApiRecord;
+    return typeof id === 'string' && typeof label === 'string' ? { id, label } : null;
+}
+
+/** Related resources arrive as an IRI string or as an object with an "@id". */
+function relatedId(value: unknown): number | undefined {
+    if (typeof value === 'string' || typeof value === 'number') {
+        return parseId(value);
+    }
+    if (value !== null && typeof value === 'object' && '@id' in value) {
+        return parseId((value as ApiRecord)['@id']);
+    }
+    return undefined;
+}
+
+export function convertToExam(exam: unknown): Exam {
+    const data = toRecord(exam, 'Exam');
+    const period = EXAM_PERIODS.find((candidate) => candidate === data.period);
+    if (!period || typeof data.academicYear !== 'string' || typeof data.documentName !== 'string') {
+        throw new Error('Exam: expected academicYear, period and documentName');
+    }
+
+    return {
+        id: parseId(data['@id']),
+        courseId: relatedId(data.course),
+        academicYear: data.academicYear,
+        period,
+        editableUntil: parseDate(data.editableUntil),
+        editable: data.editable === true,
+        documentName: data.documentName,
+        questionCount: typeof data.questionCount === 'number' ? data.questionCount : 0,
+        copiedFromId: relatedId(data.copiedFrom),
+        content: data.content !== null && typeof data.content === 'object' ? data.content as Exam['content'] : null,
+        sittings: (asArray(data.sittings) ?? [])
+            .map(convertToExamSitting)
+            .filter((sitting): sitting is ExamSitting => sitting !== null),
+        createdAt: parseDate(data.createdAt),
+        updatedAt: parseDate(data.updatedAt),
     };
 }
 

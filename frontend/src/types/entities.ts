@@ -1,4 +1,5 @@
 import { VoteDirection } from "@/components/ui/buttons/VoteButton";
+import type { JSONContent } from "@tiptap/react";
 interface BaseEntity {
     id: number;
     createdAt?: Date;
@@ -35,6 +36,32 @@ export interface Course extends BaseEntity {
     documentCount?: number;
 }
 
+
+export type ExamPeriod = 'january' | 'june' | 'august';
+
+/** A day an exam was given on, e.g. "ma 20 jan" or "mondeling dag 2". */
+export interface ExamSitting {
+    id: string;
+    label: string;
+}
+
+/** An exam reconstruction. The questions themselves are edited live (components/exam). */
+export interface Exam extends BaseEntity {
+    courseId?: number;
+    /** E.g. "2025 - 2026". */
+    academicYear: string;
+    period: ExamPeriod;
+    /** Everyone may edit it until then; after that it is read-only. */
+    editableUntil?: Date;
+    editable: boolean;
+    /** The live document on the collab server, e.g. "exam-12". */
+    documentName: string;
+    questionCount: number;
+    copiedFromId?: number;
+    /** The last stored copy of the questions as TipTap JSON (single exam only). */
+    content?: JSONContent | null;
+    sittings: ExamSitting[];
+}
 
 export interface Module extends BaseEntity {
     name?: string;

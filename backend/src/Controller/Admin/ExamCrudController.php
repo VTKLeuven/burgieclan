@@ -26,8 +26,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -123,8 +123,8 @@ class ExamCrudController extends AbstractCrudController
         yield TextField::new('period.value', 'Period')
             ->setSortable(false)
             ->hideOnForm();
-        yield BooleanField::new('editable', 'Open')
-            ->renderAsSwitch(false)
+        yield Field::new('editable', 'Status')
+            ->formatValue(static fn($value): string => $value ? 'Open' : 'Locked')
             ->setSortable(false)
             ->hideOnForm();
         yield DateTimeField::new('editableUntil', 'Editable until')

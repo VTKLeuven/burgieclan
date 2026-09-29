@@ -21,6 +21,7 @@
     "@tiptap/extension-collaboration": "^3.31.3",
     "@tiptap/extension-collaboration-caret": "^3.31.3",
     "@tiptap/extension-mathematics": "^3.0.8",
+    "@tiptap/extension-unique-id": "^3.31.3",
     "@tiptap/pm": "^3.0.8",
     "@tiptap/react": "^3.0.8",
     "@tiptap/starter-kit": "^3.0.8",

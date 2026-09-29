@@ -827,4 +827,70 @@
       @apply absolute -left-px -top-[1.4em] rounded-sm rounded-bl-none px-1 py-px text-xs font-semibold leading-normal text-white whitespace-nowrap select-none;
     }
   }
+
+  /* Exam reconstructions (components/exam). Questions are numbered by a CSS counter, so the
+     numbers follow every reorder without being stored anywhere. Nested under .exam-editor so
+     these beat the generic `.tiptap button` rule above. */
+  .exam-editor {
+    counter-reset: exam-question;
+
+    .exam-question {
+      counter-increment: exam-question;
+      @apply my-4 rounded-xl border border-vtk-line bg-vtk-surface;
+    }
+
+    .exam-question.ProseMirror-selectednode {
+      @apply outline-2 outline-vtk-navy;
+    }
+
+    .exam-question__head {
+      @apply flex flex-wrap items-center gap-2 border-b border-vtk-line px-3 py-2 select-none;
+    }
+
+    .exam-question__number::before {
+      content: attr(data-label) " " counter(exam-question);
+      @apply text-sm font-semibold text-vtk-ink;
+    }
+
+    .exam-question__handle {
+      @apply m-0 cursor-grab rounded-md p-1 text-vtk-muted hover:bg-vtk-paper-2 active:cursor-grabbing;
+    }
+
+    .exam-question__actions {
+      @apply ml-auto flex items-center gap-1;
+    }
+
+    .exam-question__actions button {
+      @apply m-0 rounded-md p-1 text-vtk-muted hover:bg-vtk-paper-2 hover:text-vtk-ink;
+    }
+
+    .exam-question__body {
+      @apply px-4 py-3;
+    }
+
+    .exam-chip {
+      @apply m-0;
+    }
+  }
+
+  /* A day an exam was given on: a tag in the days bar, a toggle on each question. */
+  .exam-chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-vtk-line-2 bg-vtk-surface px-2.5 py-0.5 text-xs font-semibold text-vtk-muted transition-colors;
+  }
+
+  button.exam-chip:hover {
+    @apply border-vtk-ink text-vtk-ink;
+  }
+
+  .exam-chip--active {
+    @apply border-vtk-navy bg-vtk-navy text-vtk-paper;
+  }
+
+  button.exam-chip--active:hover {
+    @apply bg-vtk-blue-light text-vtk-paper;
+  }
+
+  .exam-chip--day {
+    @apply border-vtk-blue-soft bg-vtk-blue-soft text-vtk-ink;
+  }
 }

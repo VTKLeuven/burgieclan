@@ -506,5 +506,81 @@
         "people_here_one": "Just you here",
         "people_here_other": "{{count}} people here",
         "read_only": "Read only"
+    },
+    "exam": {
+        "cancel": "Cancel",
+        "you": "You",
+        "period": {
+            "january": "January",
+            "june": "June",
+            "august": "August"
+        },
+        "name": {
+            "january": "January {{year}} exam",
+            "june": "June {{year}} exam",
+            "august": "August {{year}} resit"
+        },
+        "section": {
+            "title": "Exams",
+            "description": "Reconstructions of past exams, rebuilt together by the students who took them. Just had an exam? Add the questions while they are fresh.",
+            "start": "Start a reconstruction",
+            "empty": "No reconstructions for this course yet.",
+            "error": "The reconstructions could not be loaded.",
+            "open": "Open",
+            "locked": "Locked",
+            "questions_one": "1 question",
+            "questions_other": "{{count}} questions"
+        },
+        "start": {
+            "title": "Start a reconstruction",
+            "description": "There is one reconstruction per exam. All days of the same exam (oral exams spread over several days, for instance) belong in the same reconstruction: you add the days yourself afterwards.",
+            "year": "Academic year",
+            "period": "Exam period",
+            "hint": {
+                "january": "First semester",
+                "june": "Second semester",
+                "august": "Resits Aug/Sept"
+            },
+            "not-started": "Not started yet",
+            "exists": "Already exists",
+            "exists-long": "This exam already has a reconstruction.",
+            "open-existing": "Open it",
+            "copy": "Start from",
+            "copy-none": "An empty exam",
+            "copy-help": "Useful when the exam was mostly the same as an earlier exam of this course.",
+            "submit": "Start",
+            "submitting": "Starting…"
+        },
+        "page": {
+            "editable-until": "Anyone can edit this until {{date}}",
+            "locked": "Locked: read only. A moderator can reopen it.",
+            "copied-from": "Started as a copy of another exam",
+            "intro": "Everyone who took this exam can rebuild its questions here at the same time. Add the days the exam was held on, and mark on each question which days it came up.",
+            "privacy": "If your account is set to anonymous, others see you here under a pseudonym such as \"Anonieme Pinguïn\". Every change is kept; moderators can restore earlier versions."
+        },
+        "editor": {
+            "label": "Exam questions",
+            "empty": "No questions yet.",
+            "add-question": "Add a question",
+            "shortcut": "Or Ctrl/⌘ + Shift + Enter to insert a question after the one you are typing in.",
+            "stored-copy": "You are seeing the last saved version."
+        },
+        "question": {
+            "label": "Question",
+            "sittings": "Came up on",
+            "drag": "Drag to move",
+            "up": "Move question up",
+            "down": "Move question down",
+            "delete": "Delete question"
+        },
+        "sittings": {
+            "title": "Exam days",
+            "new": "New exam day",
+            "placeholder": "e.g. Mon 20 Jan or oral day 2",
+            "add": "Add day",
+            "add-first": "Add an exam day",
+            "rename": "Rename {{label}}",
+            "remove": "Remove {{label}}"
+        }
     }
 }

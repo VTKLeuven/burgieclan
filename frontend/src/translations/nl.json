@@ -506,5 +506,81 @@
         "people_here_one": "Enkel jij bent hier",
         "people_here_other": "{{count}} mensen hier",
         "read_only": "Alleen lezen"
+    },
+    "exam": {
+        "cancel": "Annuleren",
+        "you": "Jij",
+        "period": {
+            "january": "Januari",
+            "june": "Juni",
+            "august": "Augustus"
+        },
+        "name": {
+            "january": "Examen januari {{year}}",
+            "june": "Examen juni {{year}}",
+            "august": "Herexamen augustus {{year}}"
+        },
+        "section": {
+            "title": "Examens",
+            "description": "Reconstructies van examens, samen opgebouwd door wie ze aflegde. Net een examen gehad? Vul de vragen aan terwijl ze nog vers zijn.",
+            "start": "Reconstructie starten",
+            "empty": "Nog geen reconstructies voor dit vak.",
+            "error": "De reconstructies konden niet geladen worden.",
+            "open": "Open",
+            "locked": "Vergrendeld",
+            "questions_one": "1 vraag",
+            "questions_other": "{{count}} vragen"
+        },
+        "start": {
+            "title": "Reconstructie starten",
+            "description": "Er is één reconstructie per examen. Alle dagen van hetzelfde examen (bijvoorbeeld mondelinge examens over meerdere dagen) horen in dezelfde reconstructie: je voegt de dagen daarna zelf toe.",
+            "year": "Academiejaar",
+            "period": "Examenperiode",
+            "hint": {
+                "january": "Eerste semester",
+                "june": "Tweede semester",
+                "august": "Herexamens aug./sept."
+            },
+            "not-started": "Nog niet begonnen",
+            "exists": "Bestaat al",
+            "exists-long": "Voor dit examen bestaat al een reconstructie.",
+            "open-existing": "Open ze",
+            "copy": "Beginnen vanuit",
+            "copy-none": "Een leeg examen",
+            "copy-help": "Handig als het examen grotendeels hetzelfde was als een eerder examen van dit vak.",
+            "submit": "Starten",
+            "submitting": "Starten…"
+        },
+        "page": {
+            "editable-until": "Iedereen kan dit bewerken tot {{date}}",
+            "locked": "Vergrendeld: alleen lezen. Een moderator kan het heropenen.",
+            "copied-from": "Begonnen als kopie van een ander examen",
+            "intro": "Iedereen die het examen aflegde, kan hier tegelijk de vragen reconstrueren. Voeg de dagen toe waarop het examen doorging en duid bij elke vraag aan op welke dagen ze gevraagd werd.",
+            "privacy": "Is je account anoniem ingesteld, dan zien anderen je hier onder een schuilnaam zoals \"Anonieme Pinguïn\". Elke wijziging wordt bijgehouden; moderatoren kunnen eerdere versies terugzetten."
+        },
+        "editor": {
+            "label": "Examenvragen",
+            "empty": "Nog geen vragen.",
+            "add-question": "Vraag toevoegen",
+            "shortcut": "Of Ctrl/⌘ + Shift + Enter om een vraag in te voegen na de vraag waarin je typt.",
+            "stored-copy": "Je ziet de laatst opgeslagen versie."
+        },
+        "question": {
+            "label": "Vraag",
+            "sittings": "Gevraagd op",
+            "drag": "Sleep om te verplaatsen",
+            "up": "Vraag omhoog",
+            "down": "Vraag omlaag",
+            "delete": "Vraag verwijderen"
+        },
+        "sittings": {
+            "title": "Examendagen",
+            "new": "Nieuwe examendag",
+            "placeholder": "bv. ma 20 jan of mondeling dag 2",
+            "add": "Dag toevoegen",
+            "add-first": "Examendag toevoegen",
+            "rename": "{{label}} hernoemen",
+            "remove": "{{label}} verwijderen"
+        }
     }
 }

@@ -90,6 +90,12 @@ Other subsystems:
   JWTs carry stored roles, not hierarchy-expanded ones — `ROLE_ADMIN` does not imply `ROLE_MODERATOR` in a token.
 - **KU Leuven course import**: `src/Service/Onderwijsaanbod/`, driven by `ImportOnderwijsaanbodCommand` or the
   admin `OnderwijsaanbodImportController`
+- **Exam reconstructions**: `Exam` (one per course + academic year + `ExamPeriod`) owns the live document
+  `exam-{id}`. The questions never pass through the API: they live on the collab server (see `collab/README.md`),
+  Symfony only keeps the stored copy (`CollabDocument`) and its history (`CollabDocumentRevision`,
+  `CollabDocumentStore`). Access is `CollabDocumentVoter`; moderators roll back, lock and reopen in the admin
+  (`ExamCrudController`). The editor schema (`examQuestion` nodes, the `sittings` array) exists only in the
+  frontend, in `components/exam/`.
 
 Tests: Zenstruck Foundry factories live in `src/Factory/` (not under `tests/`). API tests extend
 `tests/Api/ApiTestCase`, whose `setUp()` creates a user and logs in to obtain `$this->token`; requests use
