@@ -5,13 +5,12 @@ import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import { useUser } from '@/components/UserContext';
 import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
-import { useSiblingDocuments } from '@/hooks/useSiblingDocuments';
 import type { Course, DocumentCategory, Module, Program } from '@/types/entities';
 import { convertToDocumentCategory, convertToModule, convertToProgram } from '@/utils/convertToEntity';
 import { localizedCourseName } from '@/utils/courseName';
 import { rememberBranch } from '@/utils/curriculumBranch';
 import { shortProgramName } from '@/utils/curriculumLabels';
-import { ChevronRight, File, FileText, Folder, GraduationCap, LoaderCircle } from 'lucide-react';
+import { ChevronRight, FileText, Folder, GraduationCap, LoaderCircle } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -43,7 +42,7 @@ export default function CurriculumTree() {
     const { t, i18n } = useTranslation();
     const { user } = useUser();
     const { request } = useApi<unknown>();
-    const { program, module, course, category, document, paths, activePath } = useCurriculumLocation();
+    const { program, module, course, category, paths, activePath } = useCurriculumLocation();
 
     const programsEndpoint = '/api/programs?pagination=false&order[name]=asc';
     const [programs, setPrograms] = useState<Program[]>(() => {
@@ -201,22 +200,16 @@ export default function CurriculumTree() {
     }, []);
 
     const categories = useDocumentCategories(course !== undefined);
-    const { documents } = useSiblingDocuments(
-        category ? course?.id : undefined,
-        category ? category.id : undefined
-    );
 
-    const activeKey = document
-        ? `d${document.id}`
-        : category
-            ? categoryKey(category.id)
-            : course
-                ? courseKey(course.id)
-                : module
-                    ? moduleKey(module.id)
-                    : program
-                        ? programKey(program.id)
-                        : null;
+    const activeKey = category
+        ? categoryKey(category.id)
+        : course
+            ? courseKey(course.id)
+            : module
+                ? moduleKey(module.id)
+                : program
+                    ? programKey(program.id)
+                    : null;
 
     if (programs.length === 0) {
         return (
@@ -299,20 +292,6 @@ export default function CurriculumTree() {
                                 active={activeKey === itemKey}
                                 badge={course?.documentCounts?.[item.id]}
                             />
-                            {isCurrentCategory && documents.map((file) => (
-                                <TreeRow
-                                    key={`d${file.id}`}
-                                    label={file.name ?? file.filename ?? ''}
-                                    href={`/document/${file.id}`}
-                                    apiEndpoints={[
-                                        `/api/documents/${file.id}?lang=${i18n.language}`,
-                                        `/api/document_comments?document=/api/documents/${file.id}`,
-                                    ]}
-                                    depth={depth + 2}
-                                    icon={File}
-                                    active={activeKey === `d${file.id}`}
-                                />
-                            ))}
                         </div>
                     );
                 })}

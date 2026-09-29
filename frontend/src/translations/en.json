@@ -442,7 +442,9 @@
         "toggle_documents": "Toggle documents",
         "log_out": "Log Out",
         "go_to_vtk": "Go to VTK",
-        "user_avatar": "User avatar"
+        "user_avatar": "User avatar",
+        "in_this_folder": "In this folder",
+        "no_documents_in_folder": "No documents in this folder"
     },
     "editor": {
         "info_dialog": {

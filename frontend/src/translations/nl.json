@@ -442,7 +442,9 @@
         "toggle_documents": "Documenten in-/uitklappen",
         "log_out": "Uitloggen",
         "go_to_vtk": "Ga naar VTK",
-        "user_avatar": "Gebruikersavatar"
+        "user_avatar": "Gebruikersavatar",
+        "in_this_folder": "In deze map",
+        "no_documents_in_folder": "Geen documenten in deze map"
     },
     "editor": {
         "info_dialog": {
