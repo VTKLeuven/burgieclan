@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\AdminActionCsrf;
 use App\Entity\FaqItem;
 use App\Entity\FaqQuestion;
 use App\Entity\User;
@@ -150,8 +151,9 @@ class FaqQuestionCrudController extends AbstractCrudController
      * Turn a question into a published FAQ item: mark it handled, then hand the admin a new
      * FaqItem form with the question already filled in for the language it was asked in.
      *
-     * POST-only: this changes state, and the session cookie is SameSite=lax, so refusing GET is
-     * what stops another site from driving it with an admin's cookie. @see approve_action.html.twig
+     * POST-only with a CSRF token, since this changes state. Refusing GET keeps another site from
+     * driving it with a bare link, but the SameSite=lax session cookie still rides along on a POST
+     * from any *.vtk.be subdomain; the token is what stops those. @see AdminActionCsrf
      */
     #[AdminRoute('/promote', name: 'promote', options: ['methods' => ['POST']])]
     public function promote(
@@ -159,6 +161,10 @@ class FaqQuestionCrudController extends AbstractCrudController
         EntityManagerInterface $entityManager,
         AdminUrlGenerator $adminUrlGenerator,
     ): RedirectResponse {
+        if ($invalid = $this->assertCsrf($adminContext, $adminUrlGenerator)) {
+            return $invalid;
+        }
+
         $question = $this->loadQuestion($adminContext, $entityManager);
 
         $question->setStatus(FaqQuestion::STATUS_HANDLED);
@@ -183,13 +189,17 @@ class FaqQuestionCrudController extends AbstractCrudController
         return $this->redirect($targetUrl);
     }
 
-    /** POST-only for the same reason as promote(). */
+    /** POST-only with a CSRF token, for the same reasons as promote(). */
     #[AdminRoute('/mark-handled', name: 'markHandled', options: ['methods' => ['POST']])]
     public function markHandled(
         AdminContext $adminContext,
         EntityManagerInterface $entityManager,
         AdminUrlGenerator $adminUrlGenerator,
     ): RedirectResponse {
+        if ($invalid = $this->assertCsrf($adminContext, $adminUrlGenerator)) {
+            return $invalid;
+        }
+
         $question = $this->loadQuestion($adminContext, $entityManager);
 
         $question->setStatus(FaqQuestion::STATUS_HANDLED);
@@ -201,6 +211,28 @@ class FaqQuestionCrudController extends AbstractCrudController
             ->generateUrl();
 
         return $this->redirect($targetUrl);
+    }
+
+    /**
+     * Refuses a POST that did not come from a button on this admin. Returns the redirect back to
+     * the inbox to send instead, or null when the token is good.
+     */
+    private function assertCsrf(AdminContext $adminContext, AdminUrlGenerator $adminUrlGenerator): ?RedirectResponse
+    {
+        $token = (string) $adminContext->getRequest()->request->get('_token');
+        if ($this->isCsrfTokenValid(AdminActionCsrf::INTENTION, $token)) {
+            return null;
+        }
+
+        $this->addFlash('danger', 'Invalid CSRF token, nothing was changed.');
+
+        return $this->redirect(
+            $adminUrlGenerator
+                ->setController(self::class)
+                ->setAction(Crud::PAGE_INDEX)
+                ->unset(EA::ENTITY_ID)
+                ->generateUrl()
+        );
     }
 
     /**
