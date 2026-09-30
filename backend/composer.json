@@ -50,9 +50,9 @@
     "symfony/validator": "8.1.7",
     "symfony/webpack-encore-bundle": "2.4.2",
     "symfonycasts/micro-mapper": "0.3",
-    "twig/extra-bundle": "3.24",
-    "twig/intl-extra": "3.26.0",
-    "twig/markdown-extra": "3.28.0",
+    "twig/extra-bundle": "3.29.0",
+    "twig/intl-extra": "3.30.0",
+    "twig/markdown-extra": "3.29.0",
     "league/flysystem-aws-s3-v3": "^3.0",
     "league/flysystem-bundle": "^3.0",
     "vich/uploader-bundle": "3.0.0"
