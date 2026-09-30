@@ -207,7 +207,7 @@ The deployment pipeline consists of 4 workflows in `.github/workflows/`:
 2. **Deploy Phase** (after builds complete):
    - Set up SSH access to production server
    - Connect via SSH and execute deployment script:
-     - Set `IMAGE_TAG` environment variable based on environment (`prod` or `dev`)
+     - Set `IMAGE_TAG` environment variable based on environment (`production` or `dev`)
      - Download latest docker-compose.prod.yml and nginx.conf
      - Log in to GHCR
      - Pull latest images (using the appropriate tag)
@@ -232,24 +232,21 @@ The deployment pipeline consists of 4 workflows in `.github/workflows/`:
 
 ### Image Tagging Strategy
 
-Images are tagged based on the deployment environment:
+Images are tagged with the name of the environment they were built for. The same tags apply to
+all three images (`backend`, `frontend` and `collab`):
 
 **Production Environment** (when release is published):
 - `ghcr.io/vtkleuven/burgieclan/backend:latest`
-- `ghcr.io/vtkleuven/burgieclan/backend:prod`
-- `ghcr.io/vtkleuven/burgieclan/frontend:latest`
-- `ghcr.io/vtkleuven/burgieclan/frontend:prod`
+- `ghcr.io/vtkleuven/burgieclan/backend:production`
 
 **Development Environment** (when pushed to `main` branch):
 - `ghcr.io/vtkleuven/burgieclan/backend:dev`
-- `ghcr.io/vtkleuven/burgieclan/frontend:dev`
 
 **Additional Tags** (all environments):
-- **Branch name**: `ghcr.io/vtkleuven/burgieclan/backend:main`
-- **Commit SHA**: `ghcr.io/vtkleuven/burgieclan/backend:main-abc1234`
+- **Commit SHA**: `ghcr.io/vtkleuven/burgieclan/backend:sha-abc1234`
 
 The docker-compose.prod.yml uses the `IMAGE_TAG` environment variable to pull the correct image tag:
-- Set to `prod` for production deployments
+- Set to `production` for production deployments
 - Set to `dev` for development deployments
 - Defaults to `dev` if not specified
 
@@ -266,7 +263,7 @@ The docker-compose.prod.yml uses the `IMAGE_TAG` environment variable to pull th
 **Key Configuration**:
 
 - **Image Tags**: Uses `${IMAGE_TAG:-dev}` for dynamic tag selection
-  - Set `IMAGE_TAG=prod` for production deployments
+  - Set `IMAGE_TAG=production` for production deployments
   - Set `IMAGE_TAG=dev` for development deployments
   - Defaults to `dev` if not specified
 - **Restart Policy**: `unless-stopped` (auto-restart on crash, but not if manually stopped)
@@ -685,10 +682,10 @@ logging every user out and invalidating stored refresh tokens.
 
 Updates are deployed automatically via GitHub Actions when a release is published. To manually update:
 
-**Production Update** (using `prod` tag):
+**Production Update** (using `production` tag):
 ```bash
 # Set image tag for production
-export IMAGE_TAG=prod
+export IMAGE_TAG=production
 
 # Pull latest images
 docker compose -f docker-compose.prod.yml pull
