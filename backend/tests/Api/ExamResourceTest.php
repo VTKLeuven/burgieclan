@@ -135,6 +135,17 @@ class ExamResourceTest extends ApiTestCase
         $this->start(['academicYear' => self::lastYear(), 'period' => 'june'])->assertStatus(422);
     }
 
+    public function testAnAcademicYearSpansConsecutiveYears(): void
+    {
+        $course = CourseFactory::createOne();
+        $json = ['course' => '/api/courses/' . $course->getId(), 'academicYear' => '2023 - 2025', 'period' => 'june'];
+
+        $this->start($json)
+            ->assertStatus(422)
+            ->assertJsonMatches('length(violations)', 1)
+            ->assertJsonMatches('violations[0].propertyPath', 'academicYear');
+    }
+
     public function testListingTheReconstructionsOfACourse(): void
     {
         $course = CourseFactory::createOne();
