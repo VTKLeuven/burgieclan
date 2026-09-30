@@ -582,7 +582,14 @@
             "add": "Add day",
             "add-first": "Add an exam day",
             "rename": "Rename {{label}}",
-            "remove": "Remove {{label}}"
+            "remove": "Remove {{label}}",
+            "remove-confirm": {
+                "title": "Remove {{label}}?",
+                "body-one": "{{label}} is marked on 1 question. Removing the day also removes it from that question.",
+                "body-other": "{{label}} is marked on {{count}} questions. Removing the day also removes it from those questions.",
+                "undo": "Changed your mind afterwards? Ctrl/⌘ + Z in the questions brings it back.",
+                "submit": "Remove day"
+            }
         }
     }
 }

@@ -582,7 +582,14 @@
             "add": "Dag toevoegen",
             "add-first": "Examendag toevoegen",
             "rename": "{{label}} hernoemen",
-            "remove": "{{label}} verwijderen"
+            "remove": "{{label}} verwijderen",
+            "remove-confirm": {
+                "title": "{{label}} verwijderen?",
+                "body-one": "{{label}} is aangeduid bij 1 vraag. Als je de dag verwijdert, verdwijnt hij ook bij die vraag.",
+                "body-other": "{{label}} is aangeduid bij {{count}} vragen. Als je de dag verwijdert, verdwijnt hij ook bij die vragen.",
+                "undo": "Toch niet? Met Ctrl/⌘ + Z in de vragen zet je hem terug.",
+                "submit": "Dag verwijderen"
+            }
         }
     }
 }
