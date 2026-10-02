@@ -6,15 +6,13 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\ExamApi;
 use App\Entity\Exam;
-use App\Entity\User;
 use App\Service\Collab\CollabDocumentStore;
+use App\Service\RateLimit\UserRateLimiter;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
-use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
@@ -40,14 +38,17 @@ class ExamCreateProcessor implements ProcessorInterface
         private readonly CollabDocumentStore $store,
         private readonly EntityManagerInterface $entityManager,
         private readonly MicroMapperInterface $microMapper,
-        private readonly Security $security,
+        private readonly UserRateLimiter $rateLimiter,
         #[Target('exam_start')]
         private readonly RateLimiterFactoryInterface $examStartLimiter,
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ExamApi
     {
-        $this->consumeRateLimit();
+        $this->rateLimiter->consume(
+            $this->examStartLimiter,
+            'You have started a lot of reconstructions today. Try again later.'
+        );
 
         try {
             $created = $this->inner->process($data, $operation, $uriVariables, $context);
@@ -69,21 +70,5 @@ class ExamCreateProcessor implements ProcessorInterface
         $this->entityManager->flush();
 
         return $this->microMapper->map($exam, ExamApi::class);
-    }
-
-    private function consumeRateLimit(): void
-    {
-        $user = $this->security->getUser();
-        if (!$user instanceof User || $this->security->isGranted(User::ROLE_MODERATOR)) {
-            return;
-        }
-
-        $limit = $this->examStartLimiter->create((string) $user->getId())->consume();
-        if (!$limit->isAccepted()) {
-            throw new TooManyRequestsHttpException(
-                max(1, $limit->getRetryAfter()->getTimestamp() - time()),
-                'You have started a lot of reconstructions today. Try again later.'
-            );
-        }
     }
 }

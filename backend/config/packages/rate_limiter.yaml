@@ -10,3 +10,15 @@ framework:
             policy: sliding_window
             limit: 5
             interval: '1 day'
+
+        # Commenting on exam questions (ExamQuestionCommentProcessor).
+        exam_comment:
+            policy: sliding_window
+            limit: 20
+            interval: '10 minutes'
+
+        # "Ik had deze ook" on exam questions, on and off (ExamQuestionConfirmationProcessor).
+        exam_confirmation:
+            policy: sliding_window
+            limit: 120
+            interval: '1 minute'

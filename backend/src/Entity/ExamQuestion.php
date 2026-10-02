@@ -51,7 +51,11 @@ class ExamQuestion extends BaseEntity
     #[ORM\Column(type: Types::JSON)]
     private array $sittings = [];
 
-    /** When it disappeared from the document; null while it is there. */
+    /**
+     * When it disappeared from the document; null while it is there. A row made on demand before
+     * the collab server stored the question also starts out removed (ExamQuestionRepository::
+     * findOrCreate), until a store shows the question is real.
+     */
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?DateTimeImmutable $removedAt = null;
 

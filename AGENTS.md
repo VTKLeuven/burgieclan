@@ -95,7 +95,10 @@ Other subsystems:
   Symfony only keeps the stored copy (`CollabDocument`) and its history (`CollabDocumentRevision`,
   `CollabDocumentStore`). Every store also copies the questions into `exam_question` rows by their permanent
   `uid` (`ExamQuestionSync`); removed ones are only marked removed, so a rollback brings back what hangs off
-  them. `app:exam-questions:sync` rebuilds those rows. Access is `CollabDocumentVoter`; moderators roll back,
+  them. `app:exam-questions:sync` rebuilds those rows. Comments (`ExamQuestionComment`) and "Ik had deze ook"
+  (`ExamQuestionConfirmation`) hang off those rows and are addressed by exam + uid; after each change Symfony
+  asks the collab server to broadcast a `question-activity` message (`ExamQuestionActivity`), so open pages
+  refetch instead of polling. Access is `CollabDocumentVoter`; moderators roll back,
   lock and reopen in the admin (`ExamCrudController`). The editor schema (`examQuestion` nodes, the `sittings`
   array) exists only in the frontend, in `components/exam/`. Per-user rate limits are in
   `config/packages/rate_limiter.yaml`.
