@@ -144,7 +144,7 @@ export default function ExamEditor({ exam, onAccessChange }: {
     onAccessChange?: (readOnly: boolean) => void;
 }) {
     const { t } = useTranslation();
-    const { session, status, readOnly, synced, people } = useCollabSession(exam.documentName);
+    const { session, status, readOnly, synced, people, tooLarge } = useCollabSession(exam.documentName);
 
     const accessKnown = status === 'connected';
     useEffect(() => {
@@ -162,6 +162,9 @@ export default function ExamEditor({ exam, onAccessChange }: {
 
             {refused && (
                 <p className="vtk-help m-0">{t('exam.editor.stored-copy')}</p>
+            )}
+            {tooLarge && (
+                <p className="vtk-error-text m-0">{t('exam.editor.too-large')}</p>
             )}
 
             {session && !refused && <LiveExam session={session} readOnly={readOnly} hidden={!synced} />}

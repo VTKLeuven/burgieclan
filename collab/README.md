@@ -39,6 +39,11 @@ browser ── TipTap + Collaboration ── websocket ──▶ collab (this ap
 
    A token can also say when its document locks (`until`): a connection opened before that stops
    editing once it passes, and is sent away to fetch a read-only token.
+6. A document whose stored state grows past `MAX_DOCUMENT_BYTES` (2 MB, in `src/server.ts`) stops
+   taking edits: everyone is reconnected read-only and gets a stateless `{"type": "too-large"}`
+   message, which the exam page shows. Symfony refuses states over 5 MB, so without this a document
+   past that would keep taking edits that are never stored. Rolling it back to a smaller version
+   reopens it.
 
 Two rules that are easy to break:
 

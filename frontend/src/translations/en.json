@@ -566,7 +566,8 @@
             "empty": "No questions yet.",
             "add-question": "Add a question",
             "shortcut": "Or Ctrl/⌘ + Shift + Enter to insert a question after the one you are typing in.",
-            "stored-copy": "You are seeing the last saved version."
+            "stored-copy": "You are seeing the last saved version.",
+            "too-large": "This reconstruction has grown too large to edit further. A moderator can restore an earlier version."
         },
         "question": {
             "label": "Question",

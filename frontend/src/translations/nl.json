@@ -566,7 +566,8 @@
             "empty": "Nog geen vragen.",
             "add-question": "Vraag toevoegen",
             "shortcut": "Of Ctrl/⌘ + Shift + Enter om een vraag in te voegen na de vraag waarin je typt.",
-            "stored-copy": "Je ziet de laatst opgeslagen versie."
+            "stored-copy": "Je ziet de laatst opgeslagen versie.",
+            "too-large": "Deze reconstructie is te groot geworden om nog te bewerken. Een moderator kan een eerdere versie terugzetten."
         },
         "question": {
             "label": "Vraag",
