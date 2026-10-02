@@ -551,7 +551,8 @@
             "copy-none": "Een leeg examen",
             "copy-help": "Handig als het examen grotendeels hetzelfde was als een eerder examen van dit vak.",
             "submit": "Starten",
-            "submitting": "Starten…"
+            "submitting": "Starten…",
+            "rate-limited": "Je hebt vandaag al veel reconstructies gestart. Probeer het later opnieuw, of vraag het aan een moderator."
         },
         "page": {
             "editable-until": "Iedereen kan dit bewerken tot {{date}}",
@@ -565,7 +566,8 @@
             "empty": "Nog geen vragen.",
             "add-question": "Vraag toevoegen",
             "shortcut": "Of Ctrl/⌘ + Shift + Enter om een vraag in te voegen na de vraag waarin je typt.",
-            "stored-copy": "Je ziet de laatst opgeslagen versie."
+            "stored-copy": "Je ziet de laatst opgeslagen versie.",
+            "too-large": "Deze reconstructie is te groot geworden om nog te bewerken. Een moderator kan een eerdere versie terugzetten."
         },
         "question": {
             "label": "Vraag",
@@ -582,7 +584,14 @@
             "add": "Dag toevoegen",
             "add-first": "Examendag toevoegen",
             "rename": "{{label}} hernoemen",
-            "remove": "{{label}} verwijderen"
+            "remove": "{{label}} verwijderen",
+            "remove-confirm": {
+                "title": "{{label}} verwijderen?",
+                "body-one": "{{label}} is aangeduid bij 1 vraag. Als je de dag verwijdert, verdwijnt hij ook bij die vraag.",
+                "body-other": "{{label}} is aangeduid bij {{count}} vragen. Als je de dag verwijdert, verdwijnt hij ook bij die vragen.",
+                "undo": "Toch niet? Met Ctrl/⌘ + Z in de vragen zet je hem terug.",
+                "submit": "Dag verwijderen"
+            }
         }
     }
 }

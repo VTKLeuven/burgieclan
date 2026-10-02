@@ -551,7 +551,8 @@
             "copy-none": "An empty exam",
             "copy-help": "Useful when the exam was mostly the same as an earlier exam of this course.",
             "submit": "Start",
-            "submitting": "Starting…"
+            "submitting": "Starting…",
+            "rate-limited": "You have started a lot of reconstructions today. Try again later, or ask a moderator."
         },
         "page": {
             "editable-until": "Anyone can edit this until {{date}}",
@@ -565,7 +566,8 @@
             "empty": "No questions yet.",
             "add-question": "Add a question",
             "shortcut": "Or Ctrl/⌘ + Shift + Enter to insert a question after the one you are typing in.",
-            "stored-copy": "You are seeing the last saved version."
+            "stored-copy": "You are seeing the last saved version.",
+            "too-large": "This reconstruction has grown too large to edit further. A moderator can restore an earlier version."
         },
         "question": {
             "label": "Question",
@@ -582,7 +584,14 @@
             "add": "Add day",
             "add-first": "Add an exam day",
             "rename": "Rename {{label}}",
-            "remove": "Remove {{label}}"
+            "remove": "Remove {{label}}",
+            "remove-confirm": {
+                "title": "Remove {{label}}?",
+                "body-one": "{{label}} is marked on 1 question. Removing the day also removes it from that question.",
+                "body-other": "{{label}} is marked on {{count}} questions. Removing the day also removes it from those questions.",
+                "undo": "Changed your mind afterwards? Ctrl/⌘ + Z in the questions brings it back.",
+                "submit": "Remove day"
+            }
         }
     }
 }

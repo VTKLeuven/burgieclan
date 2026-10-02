@@ -40,7 +40,8 @@ class FaqQuestionPromoteTest extends WebTestCase
             ]
         );
 
-        $client->request('POST', 'https://localhost/admin/faq-question/promote?entityId=' . $question->getId());
+        $crawler = $client->request('GET', 'https://localhost/admin/faq-question');
+        $client->submit($crawler->selectButton('Promote')->form());
         self::assertResponseRedirects();
 
         $location = $client->getResponse()->headers->get('Location');
@@ -76,7 +77,9 @@ class FaqQuestionPromoteTest extends WebTestCase
             ]
         );
 
-        $client->request('POST', 'https://localhost/admin/faq-question/promote?entityId=' . $question->getId());
+        // From the detail page this time, which renders the same button.
+        $crawler = $client->request('GET', 'https://localhost/admin/faq-question/' . $question->getId());
+        $client->submit($crawler->selectButton('Promote')->form());
         $crawler = $client->followRedirect();
         self::assertResponseIsSuccessful();
 
@@ -95,7 +98,8 @@ class FaqQuestionPromoteTest extends WebTestCase
 
         $question = FaqQuestionFactory::createOne();
 
-        $client->request('POST', 'https://localhost/admin/faq-question/mark-handled?entityId=' . $question->getId());
+        $crawler = $client->request('GET', 'https://localhost/admin/faq-question');
+        $client->submit($crawler->selectButton('Mark handled')->form());
         self::assertResponseRedirects();
         self::assertStringContainsString('/admin/faq-question', $client->getResponse()->headers->get('Location'));
 
@@ -103,10 +107,39 @@ class FaqQuestionPromoteTest extends WebTestCase
     }
 
     /**
-     * Both actions change state, so neither may be reachable by GET. Combined with the
-     * SameSite=lax session cookie, refusing GET is what keeps another site from driving these
-     * with a logged-in admin's cookie — a bare <img src="...promote?entityId=1"> would otherwise
-     * do it. Losing the method restriction reopens that, hence the test.
+     * Another site, or another *.vtk.be subdomain, can make an admin's browser post here, but it
+     * cannot read the token off the page.
+     */
+    #[DataProvider('stateChangingActionPaths')]
+    public function testActionsWithoutAValidTokenChangeNothing(string $path): void
+    {
+        $client = static::createClient();
+        $client->loginUser($this->admin());
+
+        $question = FaqQuestionFactory::createOne();
+        $url = sprintf('https://localhost/admin/faq-question/%s?entityId=%d', $path, $question->getId());
+
+        $client->request('POST', $url);
+        self::assertResponseRedirects();
+        $client->request('POST', $url, ['_token' => 'forged']);
+        self::assertResponseRedirects();
+        self::assertStringNotContainsString('/admin/faq-item', $client->getResponse()->headers->get('Location'));
+        $crawler = $client->followRedirect();
+
+        self::assertStringContainsString('Invalid CSRF token', $crawler->filter('.alert-danger')->text());
+        self::assertSame(FaqQuestion::STATUS_NEW, $this->statusOf($question->getId()));
+    }
+
+    public static function stateChangingActionPaths(): iterable
+    {
+        yield 'promote' => ['promote'];
+        yield 'mark handled' => ['mark-handled'];
+    }
+
+    /**
+     * Both actions change state, so neither may be reachable by GET. The token check would also
+     * stop a bare <img src="...promote?entityId=1">, since it only reads the POST body, but the
+     * method restriction does not depend on each action remembering to check.
      *
      * Asserted against the route collection rather than by firing a GET: once the POST-only route
      * stops matching, the request falls through to admin_faq_question_detail (GET /{entityId},

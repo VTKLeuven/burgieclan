@@ -93,9 +93,12 @@ Other subsystems:
 - **Exam reconstructions**: `Exam` (one per course + academic year + `ExamPeriod`) owns the live document
   `exam-{id}`. The questions never pass through the API: they live on the collab server (see `collab/README.md`),
   Symfony only keeps the stored copy (`CollabDocument`) and its history (`CollabDocumentRevision`,
-  `CollabDocumentStore`). Access is `CollabDocumentVoter`; moderators roll back, lock and reopen in the admin
-  (`ExamCrudController`). The editor schema (`examQuestion` nodes, the `sittings` array) exists only in the
-  frontend, in `components/exam/`.
+  `CollabDocumentStore`). Every store also copies the questions into `exam_question` rows by their permanent
+  `uid` (`ExamQuestionSync`); removed ones are only marked removed, so a rollback brings back what hangs off
+  them. `app:exam-questions:sync` rebuilds those rows. Access is `CollabDocumentVoter`; moderators roll back,
+  lock and reopen in the admin (`ExamCrudController`). The editor schema (`examQuestion` nodes, the `sittings`
+  array) exists only in the frontend, in `components/exam/`. Per-user rate limits are in
+  `config/packages/rate_limiter.yaml`.
 
 Tests: Zenstruck Foundry factories live in `src/Factory/` (not under `tests/`). API tests extend
 `tests/Api/ApiTestCase`, whose `setUp()` creates a user and logs in to obtain `$this->token`; requests use

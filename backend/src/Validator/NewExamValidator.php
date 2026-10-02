@@ -35,9 +35,17 @@ class NewExamValidator extends ConstraintValidator
             return;
         }
 
+        // The field's own Regex reports anything that is not "#### - ####" at all.
         try {
             $started = $period->hasStarted($value->academicYear);
         } catch (InvalidArgumentException) {
+            if (1 === preg_match('/^\d{4} - \d{4}$/', $value->academicYear)) {
+                $this->context->buildViolation($constraint->notConsecutiveMessage)
+                    ->atPath('academicYear')
+                    ->setCode(NewExam::NOT_CONSECUTIVE)
+                    ->addViolation();
+            }
+
             return;
         }
 

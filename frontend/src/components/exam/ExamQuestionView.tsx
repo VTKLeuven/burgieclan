@@ -12,6 +12,9 @@ import { useTranslation } from 'react-i18next';
  *
  * The number is not stored anywhere: a CSS counter over the questions draws it (the label comes
  * from data-label), so it follows every reorder.
+ *
+ * Each question carries the anchor `q-{id}`, its permanent id, so a link such as a search result
+ * can point at it: /course/{id}/exams/{examId}#q-{id}.
  */
 export default function ExamQuestionView({ node, editor, getPos, deleteNode }: ReactNodeViewProps) {
     const { t } = useTranslation();
@@ -40,8 +43,10 @@ export default function ExamQuestionView({ node, editor, getPos, deleteNode }: R
         }
     };
 
+    const uid: unknown = node.attrs.id;
+
     return (
-        <NodeViewWrapper className="exam-question__inner">
+        <NodeViewWrapper className="exam-question__inner" id={typeof uid === 'string' ? `q-${uid}` : undefined}>
             <div className="exam-question__head" contentEditable={false}>
                 {editable && (
                     <button

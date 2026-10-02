@@ -12,9 +12,11 @@ use App\Repository\CollabDocumentRevisionRepository;
 use App\Service\Collab\CollabRequestSignature;
 use App\Service\Collab\CollabServerClient;
 use DateTimeImmutable;
+use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -73,6 +75,23 @@ class ExamCrudControllerTest extends WebTestCase
         return static::getContainer()->get(EntityManagerInterface::class);
     }
 
+    private function detailPage(Exam|int $exam): Crawler
+    {
+        $id = $exam instanceof Exam ? $exam->getId() : $exam;
+        $crawler = $this->client->request('GET', 'https://localhost/admin/exam/' . $id);
+        self::assertResponseIsSuccessful();
+
+        return $crawler;
+    }
+
+    /**
+     * Presses a button on the detail page the way a moderator would, CSRF token included.
+     */
+    private function press(Exam|int $exam, string $button): void
+    {
+        $this->client->submit($this->detailPage($exam)->selectButton($button)->form());
+    }
+
     private function examWithHistory(): Exam
     {
         $exam = ExamFactory::createOne();
@@ -125,6 +144,35 @@ class ExamCrudControllerTest extends WebTestCase
         self::assertCount(0, $history->filter('li b'));
     }
 
+    public function testTheHistoryLooksUpEveryoneInOneQuery(): void
+    {
+        $this->loginAs(User::ROLE_MODERATOR);
+        $exam = ExamFactory::createOne();
+        $document = new CollabDocument($exam->getDocumentName(), 'state');
+        $this->entityManager()->persist($document);
+        foreach (range(1, 5) as $i) {
+            $editor = UserFactory::createOne(['fullName' => 'Editor ' . $i]);
+            $this->entityManager()->persist(new CollabDocumentRevision($document, [(int) $editor->getId()]));
+        }
+        $this->entityManager()->flush();
+
+        $this->client->enableProfiler();
+        $crawler = $this->detailPage($exam);
+
+        foreach (range(1, 5) as $i) {
+            self::assertStringContainsString('Editor ' . $i, $crawler->filter('section')->text());
+        }
+        // Lookups of several users at once; the logged-in moderator and "Started by" are one each.
+        $collector = $this->client->getProfile()->getCollector('db');
+        self::assertInstanceOf(DoctrineDataCollector::class, $collector);
+        $lookups = array_filter(
+            $collector->getQueries()['default'],
+            static fn(array $query): bool => str_contains($query['sql'], 'FROM burgieclan_user')
+                && str_contains($query['sql'], ' IN (')
+        );
+        self::assertCount(1, $lookups);
+    }
+
     public function testRestoringGoesThroughTheCollabServerAndKeepsTheCurrentVersion(): void
     {
         $this->loginAs(User::ROLE_MODERATOR);
@@ -132,10 +180,7 @@ class ExamCrudControllerTest extends WebTestCase
         $revisions = static::getContainer()->get(CollabDocumentRevisionRepository::class);
         $oldRevision = $revisions->findOneBy([]);
 
-        $this->client->request(
-            'POST',
-            sprintf('https://localhost/admin/exam/history/restore?entityId=%d&revisionId=%d', $exam->getId(), $oldRevision?->getId())
-        );
+        $this->press($exam, 'Restore this version');
         self::assertResponseRedirects();
 
         self::assertCount(1, $this->collabRequests);
@@ -167,13 +212,9 @@ class ExamCrudControllerTest extends WebTestCase
     {
         $this->loginAs(User::ROLE_MODERATOR);
         $exam = $this->examWithHistory();
-        $revision = static::getContainer()->get(CollabDocumentRevisionRepository::class)->findOneBy([]);
         $this->collabStatus = 503;
 
-        $this->client->request(
-            'POST',
-            sprintf('https://localhost/admin/exam/history/restore?entityId=%d&revisionId=%d', $exam->getId(), $revision?->getId())
-        );
+        $this->press($exam, 'Restore this version');
         $crawler = $this->client->followRedirect();
 
         self::assertStringContainsString('Nothing was restored', $crawler->filter('.alert-danger')->text());
@@ -185,12 +226,12 @@ class ExamCrudControllerTest extends WebTestCase
         $exam = ExamFactory::createOne(['editableUntil' => new DateTimeImmutable('+5 days')]);
         $id = $exam->getId();
 
-        $this->client->request('POST', 'https://localhost/admin/exam/access/lock?entityId=' . $id);
+        $this->press($id, 'Lock now');
         self::assertResponseRedirects();
         $this->entityManager()->clear();
         self::assertFalse($this->entityManager()->find(Exam::class, $id)?->isEditable());
 
-        $this->client->request('POST', 'https://localhost/admin/exam/access/reopen?entityId=' . $id);
+        $this->press($id, 'Reopen for two weeks');
         $this->entityManager()->clear();
         $reopened = $this->entityManager()->find(Exam::class, $id);
         self::assertTrue($reopened?->isEditable());
@@ -199,6 +240,52 @@ class ExamCrudControllerTest extends WebTestCase
         // Both times everyone who had it open was reconnected, to pick up the new access.
         self::assertSame(
             array_fill(0, 2, 'http://collab.test/internal/documents/exam-' . $id . '/disconnect'),
+            array_column($this->collabRequests, 'url')
+        );
+    }
+
+    /**
+     * Another site, or another *.vtk.be subdomain, can make a moderator's browser post here, but
+     * it cannot read the token off the page.
+     */
+    public function testActionsWithoutAValidTokenChangeNothing(): void
+    {
+        $this->loginAs(User::ROLE_MODERATOR);
+        $exam = $this->examWithHistory();
+        $id = $exam->getId();
+        $revisions = static::getContainer()->get(CollabDocumentRevisionRepository::class);
+        $revision = $revisions->findOneBy([]);
+
+        $this->client->request('POST', 'https://localhost/admin/exam/access/lock?entityId=' . $id);
+        self::assertResponseRedirects();
+        $this->client->request(
+            'POST',
+            sprintf('https://localhost/admin/exam/history/restore?entityId=%d&revisionId=%d', $id, $revision?->getId()),
+            ['_token' => 'forged']
+        );
+        $crawler = $this->client->followRedirect();
+
+        self::assertStringContainsString('Invalid CSRF token', $crawler->filter('.alert-danger')->text());
+        $this->entityManager()->clear();
+        self::assertTrue($this->entityManager()->find(Exam::class, $id)?->isEditable());
+        self::assertCount(1, $revisions->findAll());
+        self::assertSame([], $this->collabRequests);
+    }
+
+    public function testDeletingDropsEveryoneWhoHasItOpen(): void
+    {
+        $this->loginAs(User::ROLE_ADMIN);
+        $exam = $this->examWithHistory();
+        $id = $exam->getId();
+
+        $token = $this->detailPage($exam)->filter('input[name="token"]')->attr('value');
+        $this->client->request('POST', sprintf('https://localhost/admin/exam/%d/delete', $id), ['token' => $token]);
+        self::assertResponseRedirects();
+
+        $this->entityManager()->clear();
+        self::assertNull($this->entityManager()->find(Exam::class, $id));
+        self::assertSame(
+            ['http://collab.test/internal/documents/exam-' . $id . '/disconnect'],
             array_column($this->collabRequests, 'url')
         );
     }
