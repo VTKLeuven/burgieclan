@@ -78,9 +78,12 @@ class Module extends BaseEntity
     private ?Program $program = null;
 
     /**
+     * Child modules. Unidirectional: there is no parent-side collection, so parents are looked
+     * up with a query instead (ModuleRepository::findParentModules).
+     *
      * @var Collection<int, Module>
      */
-    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'modules')]
+    #[ORM\ManyToMany(targetEntity: self::class)]
     #[ORM\OrderBy(['position' => 'ASC', 'name' => 'ASC'])]
     private Collection $modules;
 
