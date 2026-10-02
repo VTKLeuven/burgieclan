@@ -856,8 +856,13 @@
       @apply m-0 cursor-grab rounded-md p-1 text-vtk-muted hover:bg-vtk-paper-2 active:cursor-grabbing;
     }
 
+    /* Comments, "Ik had deze ook" and, while editing, the move and delete buttons. */
+    .exam-question__tools {
+      @apply ml-auto flex flex-wrap items-center gap-2;
+    }
+
     .exam-question__actions {
-      @apply ml-auto flex items-center gap-1;
+      @apply flex items-center gap-1;
     }
 
     .exam-question__actions button {
@@ -866,6 +871,15 @@
 
     .exam-question__body {
       @apply px-4 py-3;
+    }
+
+    /* The comments below a question: outside the document, so not editable text. */
+    .exam-question__thread {
+      @apply grid gap-3 rounded-b-xl border-t border-vtk-line bg-vtk-paper-2 px-4 py-3 select-text;
+    }
+
+    .exam-thread__link {
+      @apply m-0 cursor-pointer p-0 text-vtk-muted underline-offset-2 hover:text-vtk-ink hover:underline;
     }
 
     .exam-chip {

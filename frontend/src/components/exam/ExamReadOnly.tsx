@@ -1,6 +1,7 @@
 'use client'
 
 import { ExamEditorContext } from '@/components/exam/ExamContext';
+import type { QuestionDiscussion } from '@/components/exam/useQuestionDiscussion';
 import { examExtensions } from '@/components/exam/extensions';
 import SittingsBar from '@/components/exam/SittingsBar';
 import type { Exam } from '@/types/entities';
@@ -14,7 +15,7 @@ import { useTranslation } from 'react-i18next';
  * so only known nodes and marks ever reach the page. Shown until the live document has loaded,
  * and instead of it when the collab server cannot be reached.
  */
-export default function ExamReadOnly({ exam }: { exam: Exam }) {
+export default function ExamReadOnly({ exam, discussion = null }: { exam: Exam; discussion?: QuestionDiscussion | null }) {
     const { t } = useTranslation();
     const hasContent = (exam.content?.content?.length ?? 0) > 0;
 
@@ -28,7 +29,10 @@ export default function ExamReadOnly({ exam }: { exam: Exam }) {
         },
     }, [exam.content]);
 
-    const context = useMemo(() => ({ sittings: exam.sittings, editable: false }), [exam.sittings]);
+    const context = useMemo(
+        () => ({ sittings: exam.sittings, editable: false, discussion }),
+        [exam.sittings, discussion],
+    );
 
     return (
         <ExamEditorContext.Provider value={context}>

@@ -49,16 +49,44 @@ export interface CollabSessionState {
      * collab/src/server.ts), so the connection is read-only until a moderator rolls it back.
      */
     tooLarge: boolean;
+    /**
+     * Comments and confirmations on questions, as announced by Symfony (ExamQuestionActivity):
+     * null until the first announcement.
+     */
+    activity: QuestionActivity | null;
 }
 
-/** Stateless message from the collab server (TOO_LARGE_MESSAGE in collab/src/server.ts). */
-function isTooLargeNotice(payload: string): boolean {
+export interface QuestionActivity {
+    /** Grows with every announcement, so the same question twice in a row still reads as new. */
+    seq: number;
+    /** Per question uid, how many announcements it had: a thread reloads when its own count moves. */
+    byQuestion: Record<string, number>;
+}
+
+type Notice = { type: 'too-large' } | { type: 'question-activity'; uid: string };
+
+/**
+ * Stateless messages from the collab server: TOO_LARGE_MESSAGE in collab/src/server.ts, and the
+ * question-activity messages Symfony sends through it. Anything else is ignored.
+ */
+function parseNotice(payload: string): Notice | null {
+    let message: unknown;
     try {
-        const message: unknown = JSON.parse(payload);
-        return typeof message === 'object' && message !== null && 'type' in message && message.type === 'too-large';
+        message = JSON.parse(payload);
     } catch {
-        return false;
+        return null;
     }
+    if (typeof message !== 'object' || message === null || !('type' in message)) {
+        return null;
+    }
+    if (message.type === 'too-large') {
+        return { type: 'too-large' };
+    }
+    if (message.type === 'question-activity' && 'uid' in message && typeof message.uid === 'string') {
+        return { type: 'question-activity', uid: message.uid };
+    }
+
+    return null;
 }
 
 function collabUrl(): string {
@@ -96,6 +124,7 @@ export function useCollabSession(documentName: string): CollabSessionState {
     const [synced, setSynced] = useState(false);
     const [people, setPeople] = useState<string[]>([]);
     const [tooLarge, setTooLarge] = useState(false);
+    const [activity, setActivity] = useState<QuestionActivity | null>(null);
 
     useEffect(() => {
         const doc = new Y.Doc();
@@ -129,8 +158,14 @@ export function useCollabSession(documentName: string): CollabSessionState {
                 setTooLarge(false);
             },
             onStateless: ({ payload }) => {
-                if (isTooLargeNotice(payload)) {
+                const notice = parseNotice(payload);
+                if (notice?.type === 'too-large') {
                     setTooLarge(true);
+                } else if (notice?.type === 'question-activity') {
+                    setActivity((previous) => ({
+                        seq: (previous?.seq ?? 0) + 1,
+                        byQuestion: { ...previous?.byQuestion, [notice.uid]: (previous?.byQuestion[notice.uid] ?? 0) + 1 },
+                    }));
                 }
             },
             onAuthenticationFailed: () => setStatus(refused ?? 'denied'),
@@ -151,5 +186,5 @@ export function useCollabSession(documentName: string): CollabSessionState {
         };
     }, [documentName]);
 
-    return { session, status, readOnly, synced, people, tooLarge };
+    return { session, status, readOnly, synced, people, tooLarge, activity };
 }
