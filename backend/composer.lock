@@ -15208,16 +15208,16 @@
         },
         {
             "name": "zenstruck/foundry",
-            "version": "v2.12.1",
+            "version": "v2.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zenstruck/foundry.git",
-                "reference": "13a11c7652bcbf926efaec50ec8d1a9edb2af392"
+                "reference": "e49a9b71668852f54d381b6dee73df8394118bef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zenstruck/foundry/zipball/13a11c7652bcbf926efaec50ec8d1a9edb2af392",
-                "reference": "13a11c7652bcbf926efaec50ec8d1a9edb2af392",
+                "url": "https://api.github.com/repos/zenstruck/foundry/zipball/e49a9b71668852f54d381b6dee73df8394118bef",
+                "reference": "e49a9b71668852f54d381b6dee73df8394118bef",
                 "shasum": ""
             },
             "require": {
@@ -15242,7 +15242,7 @@
                 "doctrine/collections": "^1.7|^2.0",
                 "doctrine/common": "^3.2.2",
                 "doctrine/doctrine-bundle": "^2.10|^3.0",
-                "doctrine/doctrine-migrations-bundle": "^2.2|^3.0",
+                "doctrine/doctrine-migrations-bundle": "^2.2|^3.0|^4.0",
                 "doctrine/mongodb-odm": "^2.4",
                 "doctrine/mongodb-odm-bundle": "^4.6|^5.0",
                 "doctrine/orm": "^2.16|^3.0",
@@ -15320,7 +15320,7 @@
             ],
             "support": {
                 "issues": "https://github.com/zenstruck/foundry/issues",
-                "source": "https://github.com/zenstruck/foundry/tree/v2.12.1"
+                "source": "https://github.com/zenstruck/foundry/tree/v2.13.0"
             },
             "funding": [
                 {
@@ -15332,7 +15332,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-26T05:55:50+00:00"
+            "time": "2026-09-17T06:03:50+00:00"
         }
     ],
     "aliases": [],
