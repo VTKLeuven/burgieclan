@@ -25,6 +25,8 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      # To start the checks on the pull request, see the last step.
+      actions: write
 
     defaults:
       run:
@@ -47,7 +49,9 @@ jobs:
             exit 0
           fi
 
-          npm audit fix
+          # Only rewrite the lockfile: installing would run the install scripts of the new
+          # versions here, with a token that can push and open pull requests.
+          npm audit fix --package-lock-only
 
           if git diff --quiet package-lock.json; then
             echo "npm audit fix made no changes."
@@ -67,7 +71,8 @@ jobs:
             Automated `npm audit fix` for high/critical severity vulnerabilities
             detected in `frontend/package-lock.json`.
 
-            This PR was created automatically by the **Auto Audit Fix** workflow.
+            This PR was created automatically by the **Auto Audit Fix** workflow, which also
+            starts the CI and Security checks on it. It merges itself once they pass.
           branch: auto/npm-audit-fix
           labels: dependencies, security
           delete-branch: true
@@ -77,3 +82,19 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh pr merge ${{ steps.create-pr.outputs.pull-request-number }} --auto --squash
+
+      # Runs that a pull request opened with GITHUB_TOKEN would trigger are held until a
+      # maintainer approves them, so the required checks never report and auto-merge waits
+      # forever. Starting the workflows by hand is allowed with GITHUB_TOKEN; their results land
+      # on the branch's head commit, which is what the required checks look at. Branch protection
+      # requires the branch to be up to date with main, and this job rebuilds it from main on
+      # every run, so the checks test what would be merged.
+      - name: Run the checks on the pull request
+        if: >-
+          steps.create-pr.outputs.pull-request-operation == 'created' ||
+          steps.create-pr.outputs.pull-request-operation == 'updated'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run ci.yaml --ref auto/npm-audit-fix
+          gh workflow run security-audit.yaml --ref auto/npm-audit-fix
