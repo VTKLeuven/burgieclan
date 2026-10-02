@@ -53,9 +53,36 @@ final class ExamContent
     {
         return array_map(
             static function (array $question) use ($maxLength): string {
-                $text = trim((string) preg_replace('/\s+/u', ' ', self::text($question)));
+                $text = self::plainText($question);
 
                 return mb_strlen($text) > $maxLength ? mb_substr($text, 0, $maxLength - 1) . '…' : $text;
+            },
+            self::questionNodes($content)
+        );
+    }
+
+    /**
+     * Each question in order with its permanent id (`uid`, null when it has none), its whole text
+     * and the ids of the days it is marked with.
+     *
+     * @param array<string, mixed>|null $content
+     *
+     * @return list<array{uid: string|null, text: string, sittings: list<string>}>
+     */
+    public static function questions(?array $content): array
+    {
+        return array_map(
+            static function (array $question): array {
+                $uid = $question['attrs']['id'] ?? null;
+                $sittings = $question['attrs']['sittings'] ?? [];
+
+                return [
+                    'uid' => is_string($uid) && '' !== $uid ? $uid : null,
+                    'text' => self::plainText($question),
+                    'sittings' => is_array($sittings)
+                        ? array_values(array_unique(array_filter($sittings, 'is_string')))
+                        : [],
+                ];
             },
             self::questionNodes($content)
         );
@@ -76,6 +103,14 @@ final class ExamContent
         }
 
         return $questions;
+    }
+
+    /**
+     * @param array<mixed> $node
+     */
+    private static function plainText(array $node): string
+    {
+        return trim((string) preg_replace('/\s+/u', ' ', self::text($node)));
     }
 
     /**

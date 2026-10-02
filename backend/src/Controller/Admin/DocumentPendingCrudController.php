@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\AdminActionCsrf;
 use App\Controller\Admin\Filter\EntityContainsFilter;
 use App\Entity\Course;
 use App\Entity\Document;
@@ -195,12 +196,22 @@ class DocumentPendingCrudController extends DocumentCrudController
             ->onlyOnIndex();
     }
 
+    /**
+     * The route also answers GET, but only a POST can carry the token, so a link or an <img> that
+     * points here approves nothing. @see AdminActionCsrf
+     */
     #[AdminRoute('/approve', name: 'approve')]
     public function approve(
         AdminContext $adminContext,
         EntityManagerInterface $entityManagerInterface,
         AdminUrlGenerator $adminUrlGenerator
     ): RedirectResponse {
+        $token = (string) $adminContext->getRequest()->request->get('_token');
+        if (!$this->isCsrfTokenValid(AdminActionCsrf::INTENTION, $token)) {
+            $this->addFlash('danger', 'Invalid CSRF token, nothing was changed.');
+            return $this->redirectToRoute('admin_document_pending_index');
+        }
+
         // In EasyAdmin 4.26+, when POSTing to a custom action, the entity might not be in the context
         // We need to retrieve the entity ID from the request and load it manually
         $entityId = $adminContext->getRequest()->query->get('entityId');

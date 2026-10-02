@@ -14,6 +14,13 @@ import * as Y from 'yjs';
  */
 export const SITTINGS_FIELD = 'sittings';
 
+/**
+ * The origin of every change made to the days here. The editor's undo history tracks it next to
+ * its own, so Ctrl/Cmd+Z in the questions also takes back adding, renaming or removing a day
+ * (see LiveExam in ExamEditor.tsx). Other people's changes have another origin and stay.
+ */
+export const SITTINGS_ORIGIN = 'exam-sittings';
+
 export const MAX_SITTING_LABEL = 40;
 
 function read(array: Y.Array<unknown>): ExamSitting[] {
@@ -58,7 +65,7 @@ export function useSittings(doc: Y.Doc | null) {
         const sitting = new Y.Map<string>();
         sitting.set('id', newId());
         sitting.set('label', trimmed);
-        doc.getArray<unknown>(SITTINGS_FIELD).push([sitting]);
+        doc.transact(() => doc.getArray<unknown>(SITTINGS_FIELD).push([sitting]), SITTINGS_ORIGIN);
     }, [doc]);
 
     const rename = useCallback((id: string, label: string) => {
@@ -70,7 +77,7 @@ export function useSittings(doc: Y.Doc | null) {
         const item = doc.getArray<unknown>(SITTINGS_FIELD).toArray()
             .find((candidate) => candidate instanceof Y.Map && candidate.get('id') === id);
         if (item instanceof Y.Map) {
-            item.set('label', trimmed);
+            doc.transact(() => item.set('label', trimmed), SITTINGS_ORIGIN);
         }
     }, [doc]);
 
@@ -82,7 +89,7 @@ export function useSittings(doc: Y.Doc | null) {
         const array = doc.getArray<unknown>(SITTINGS_FIELD);
         const index = array.toArray().findIndex((candidate) => candidate instanceof Y.Map && candidate.get('id') === id);
         if (index >= 0) {
-            array.delete(index, 1);
+            doc.transact(() => array.delete(index, 1), SITTINGS_ORIGIN);
         }
     }, [doc]);
 

@@ -55,6 +55,30 @@ class ExamContentTest extends TestCase
         $this->assertSame(['Bereken $\\int…'], ExamContent::questionTexts(['content' => [self::CONTENT['content'][1]]], 14));
     }
 
+    public function testQuestionsKeepTheirIdWholeTextAndDays(): void
+    {
+        $this->assertSame(
+            [
+                ['uid' => 'q1', 'text' => 'Bereken $\\int_0^1 x\\,dx$ deel a deel b', 'sittings' => ['a']],
+                ['uid' => 'q2', 'text' => '', 'sittings' => []],
+            ],
+            ExamContent::questions(self::CONTENT)
+        );
+
+        // Written by browsers, so never trusted: no id, or days that are not a list of strings.
+        $malformed = ['content' => [
+            ['type' => 'examQuestion', 'attrs' => ['sittings' => 'a'], 'content' => []],
+            ['type' => 'examQuestion', 'attrs' => ['id' => '', 'sittings' => ['a', 3, 'a', 'b']]],
+        ]];
+        $this->assertSame(
+            [
+                ['uid' => null, 'text' => '', 'sittings' => []],
+                ['uid' => null, 'text' => '', 'sittings' => ['a', 'b']],
+            ],
+            ExamContent::questions($malformed)
+        );
+    }
+
     public function testSittingsSkipsMalformedEntries(): void
     {
         $fields = ['sittings' => [

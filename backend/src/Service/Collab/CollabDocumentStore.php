@@ -6,6 +6,8 @@ use App\Entity\CollabDocument;
 use App\Entity\CollabDocumentRevision;
 use App\Repository\CollabDocumentRepository;
 use App\Repository\CollabDocumentRevisionRepository;
+use App\Repository\ExamRepository;
+use App\Service\Exam\ExamQuestionSync;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
@@ -18,6 +20,9 @@ use LogicException;
  * revision holds the state as it was *before* the store that triggered it: that is the end of the
  * previous stretch of editing. So when a vandal opens a document that was quiet for a day, the
  * version from before their first edit is kept, not their result.
+ *
+ * Every JSON copy that reaches the database passes through here, so this is also where the
+ * questions of an exam are copied into their own rows (ExamQuestionSync).
  */
 class CollabDocumentStore
 {
@@ -27,6 +32,8 @@ class CollabDocumentStore
         private readonly CollabDocumentRepository $documents,
         private readonly CollabDocumentRevisionRepository $revisions,
         private readonly EntityManagerInterface $entityManager,
+        private readonly ExamRepository $exams,
+        private readonly ExamQuestionSync $questionSync,
     ) {}
 
     /**
@@ -60,6 +67,7 @@ class CollabDocumentStore
         $document->setContent($content);
         $document->setFields($fields);
         $document->addPendingContributors($contributors);
+        $this->syncQuestions($name, $content);
 
         $this->entityManager->flush();
 
@@ -105,6 +113,7 @@ class CollabDocumentStore
         $copy->setContent($source->getContent());
         $copy->setFields($source->getFields());
         $this->entityManager->persist($copy);
+        $this->syncQuestions($toName, $copy->getContent());
 
         return $copy;
     }
@@ -123,6 +132,17 @@ class CollabDocumentStore
             $this->entityManager->remove($revision);
         }
         $this->entityManager->remove($document);
+    }
+
+    /**
+     * @param array<string, mixed>|null $content
+     */
+    private function syncQuestions(string $name, ?array $content): void
+    {
+        $exam = $this->exams->findByDocumentName($name);
+        if (null !== $exam) {
+            $this->questionSync->sync($exam, $content);
+        }
     }
 
     private function isSnapshotDue(CollabDocument $document, DateTimeImmutable $now): bool
