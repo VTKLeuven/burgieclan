@@ -551,7 +551,8 @@
             "copy-none": "Een leeg examen",
             "copy-help": "Handig als het examen grotendeels hetzelfde was als een eerder examen van dit vak.",
             "submit": "Starten",
-            "submitting": "Starten…"
+            "submitting": "Starten…",
+            "rate-limited": "Je hebt vandaag al veel reconstructies gestart. Probeer het later opnieuw, of vraag het aan een moderator."
         },
         "page": {
             "editable-until": "Iedereen kan dit bewerken tot {{date}}",

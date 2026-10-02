@@ -6,8 +6,10 @@ use App\Constants\AcademicYear;
 use App\Constants\ExamPeriod;
 use App\Entity\CollabDocument;
 use App\Entity\Exam;
+use App\Entity\User;
 use App\Factory\CourseFactory;
 use App\Factory\ExamFactory;
+use App\Factory\UserFactory;
 use App\Repository\CollabDocumentRepository;
 use App\Repository\ExamRepository;
 use DateTimeImmutable;
@@ -39,10 +41,21 @@ class ExamResourceTest extends ApiTestCase
      */
     private function start(array $json): KernelBrowser
     {
-        return $this->browser()->post(
+        return $this->startWith($this->browser(), $json);
+    }
+
+    /**
+     * @param array<string, mixed> $json
+     */
+    private function startWith(KernelBrowser $browser, array $json, ?string $token = null): KernelBrowser
+    {
+        return $browser->post(
             '/api/exams',
             [
-            'headers' => ['Authorization' => 'Bearer ' . $this->token, 'Content-Type' => 'application/ld+json'],
+            'headers' => [
+                'Authorization' => 'Bearer ' . ($token ?? $this->token),
+                'Content-Type' => 'application/ld+json',
+            ],
             'json' => $json,
             ]
         );
@@ -144,6 +157,41 @@ class ExamResourceTest extends ApiTestCase
             ->assertStatus(422)
             ->assertJsonMatches('length(violations)', 1)
             ->assertJsonMatches('violations[0].propertyPath', 'academicYear');
+    }
+
+    public function testStartingIsLimitedPerUserExceptForModerators(): void
+    {
+        $exams = [];
+        foreach (CourseFactory::createMany(2) as $course) {
+            foreach (ExamPeriod::cases() as $period) {
+                $exams[] = [
+                    'course' => '/api/courses/' . $course->getId(),
+                    'academicYear' => self::lastYear(),
+                    'period' => $period->value,
+                ];
+            }
+        }
+
+        UserFactory::createOne(
+            ['username' => 'mona', 'plainPassword' => 'password', 'roles' => [User::ROLE_MODERATOR]]
+        );
+        $moderatorToken = $this->getToken('mona', 'password');
+
+        // One kernel for every request: the test environment counts in memory (services.yaml),
+        // and browser() would start each request on a fresh one.
+        $browser = $this->browser();
+        $browser->client()->disableReboot();
+
+        // A refused attempt does not count.
+        $this->startWith($browser, ['period' => 'march'] + $exams[0])->assertStatus(422);
+        foreach (array_slice($exams, 0, 5) as $json) {
+            $this->startWith($browser, $json)->assertStatus(201);
+        }
+
+        $response = $this->startWith($browser, $exams[5])->assertStatus(429)->client()->getResponse();
+        $this->assertGreaterThan(0, (int) $response->headers->get('Retry-After'));
+
+        $this->startWith($browser, $exams[5], $moderatorToken)->assertStatus(201);
     }
 
     public function testListingTheReconstructionsOfACourse(): void

@@ -26,6 +26,8 @@
     "gesdinet/jwt-refresh-token-bundle": "3.0.0",
     "knpuniversity/oauth2-client-bundle": "^2.20",
     "lcobucci/jwt": "^5.6",
+    "league/flysystem-aws-s3-v3": "^3.0",
+    "league/flysystem-bundle": "^3.0",
     "lexik/jwt-authentication-bundle": "^3.2",
     "nelmio/cors-bundle": "^2.6",
     "nelmio/security-bundle": "^3.9",
@@ -42,6 +44,7 @@
     "symfony/html-sanitizer": "8.1.7",
     "symfony/http-client": "8.1.7",
     "symfony/monolog-bundle": "4.1.0",
+    "symfony/rate-limiter": "8.1.6",
     "symfony/runtime": "8.1",
     "symfony/security-bundle": "8.1.7",
     "symfony/stimulus-bundle": "3.4.0",
@@ -53,8 +56,6 @@
     "twig/extra-bundle": "3.29.0",
     "twig/intl-extra": "3.30.0",
     "twig/markdown-extra": "3.29.0",
-    "league/flysystem-aws-s3-v3": "^3.0",
-    "league/flysystem-bundle": "^3.0",
     "vich/uploader-bundle": "3.0.0"
   },
   "require-dev": {

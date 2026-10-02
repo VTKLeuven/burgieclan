@@ -551,7 +551,8 @@
             "copy-none": "An empty exam",
             "copy-help": "Useful when the exam was mostly the same as an earlier exam of this course.",
             "submit": "Start",
-            "submitting": "Starting…"
+            "submitting": "Starting…",
+            "rate-limited": "You have started a lot of reconstructions today. Try again later, or ask a moderator."
         },
         "page": {
             "editable-until": "Anyone can edit this until {{date}}",
