@@ -44,6 +44,21 @@ export interface CollabSessionState {
     synced: boolean;
     /** Names on everyone's cursor who has the document open, yourself included. */
     people: string[];
+    /**
+     * The document grew past what the collab server lets anyone edit (MAX_DOCUMENT_BYTES in
+     * collab/src/server.ts), so the connection is read-only until a moderator rolls it back.
+     */
+    tooLarge: boolean;
+}
+
+/** Stateless message from the collab server (TOO_LARGE_MESSAGE in collab/src/server.ts). */
+function isTooLargeNotice(payload: string): boolean {
+    try {
+        const message: unknown = JSON.parse(payload);
+        return typeof message === 'object' && message !== null && 'type' in message && message.type === 'too-large';
+    } catch {
+        return false;
+    }
 }
 
 function collabUrl(): string {
@@ -80,6 +95,7 @@ export function useCollabSession(documentName: string): CollabSessionState {
     const [readOnly, setReadOnly] = useState(false);
     const [synced, setSynced] = useState(false);
     const [people, setPeople] = useState<string[]>([]);
+    const [tooLarge, setTooLarge] = useState(false);
 
     useEffect(() => {
         const doc = new Y.Doc();
@@ -109,6 +125,13 @@ export function useCollabSession(documentName: string): CollabSessionState {
             onAuthenticated: ({ scope }) => {
                 setReadOnly(scope === 'readonly');
                 setStatus('connected');
+                // Sent again right after this when it still applies.
+                setTooLarge(false);
+            },
+            onStateless: ({ payload }) => {
+                if (isTooLargeNotice(payload)) {
+                    setTooLarge(true);
+                }
             },
             onAuthenticationFailed: () => setStatus(refused ?? 'denied'),
             onSynced: () => setSynced(true),
@@ -128,5 +151,5 @@ export function useCollabSession(documentName: string): CollabSessionState {
         };
     }, [documentName]);
 
-    return { session, status, readOnly, synced, people };
+    return { session, status, readOnly, synced, people, tooLarge };
 }

@@ -28,6 +28,21 @@ export const JSON_FIELDS = ['sittings'] as const;
 export const CLOSE_ACCESS_CHANGED = { code: 4000, reason: 'Access changed, reconnect' };
 
 /**
+ * Above this size, in bytes of stored Yjs state, a document stops taking edits: everyone is
+ * reconnected read-only and told why (TOO_LARGE_MESSAGE). Symfony refuses to store anything over
+ * 5 MB (CollabDocumentController::MAX_STATE_BYTES); without this, a document past that would go on
+ * taking edits that are never stored, and lose them all when this server restarts. The margin
+ * between the two covers what can be typed before the next store measures it again.
+ *
+ * Questions are text, so a real exam stays far below this. A moderator rolling the document back
+ * to a smaller version reopens it for editing.
+ */
+export const MAX_DOCUMENT_BYTES = 2 * 1024 * 1024;
+
+/** Stateless message sent to everyone who opens a document over MAX_DOCUMENT_BYTES. */
+export const TOO_LARGE_MESSAGE = JSON.stringify({ type: 'too-large' });
+
+/**
  * Closes the websockets of everyone who has the document open. Closing only their document
  * connection is not enough: the provider then waits, unauthenticated, instead of asking for a
  * new token. A closed socket makes it reconnect and start over.
@@ -53,6 +68,8 @@ export interface CollabServerOptions {
     log?: Pick<Console, 'info' | 'warn' | 'error'>;
     /** Current time in ms; tests move it forward. */
     now?: () => number;
+    /** Defaults to MAX_DOCUMENT_BYTES; tests lower it. */
+    maxDocumentBytes?: number;
 }
 
 const CARET_COLOR = /^#[0-9a-f]{6}$/i;
@@ -120,6 +137,15 @@ export function createCollabServer(options: CollabServerOptions): Server<Connect
     const isPastLock = (identity: CollabIdentity): boolean =>
         identity.editableUntil !== undefined && now() / 1000 >= identity.editableUntil;
 
+    /**
+     * Per document: the size of its state when it was last loaded or stored. Kept after the
+     * document is unloaded, so a browser reconnecting to an oversized one is read-only from the
+     * start instead of being let in and closed again, over and over. One number per document.
+     */
+    const sizes = new Map<string, number>();
+    const maxDocumentBytes = options.maxDocumentBytes ?? MAX_DOCUMENT_BYTES;
+    const isTooLarge = (documentName: string): boolean => (sizes.get(documentName) ?? 0) > maxDocumentBytes;
+
     return new Server<ConnectionContext>({
         name: 'burgieclan-collab',
         port: options.port,
@@ -149,7 +175,7 @@ export function createCollabServer(options: CollabServerOptions): Server<Connect
 
             // Hocuspocus drops document updates from read-only connections; awareness (the
             // cursor) still goes through.
-            connectionConfig.readOnly = identity.mode !== 'edit' || isPastLock(identity);
+            connectionConfig.readOnly = identity.mode !== 'edit' || isPastLock(identity) || isTooLarge(documentName);
 
             return { identity } satisfies ConnectionContext;
         },
@@ -159,15 +185,29 @@ export function createCollabServer(options: CollabServerOptions): Server<Connect
          * says when the lock is; from then on its changes are dropped and it is closed, so the
          * browser reconnects and gets a read-only token. (When a moderator locks early, Symfony
          * asks us to close the connections instead, see internal.ts.)
+         *
+         * The same goes for a document that turns out to be too large once it is loaded: the
+         * first connection to it was let in before its size was known.
          */
-        async beforeHandleMessage({ connection, context }) {
+        async beforeHandleMessage({ connection, context, documentName }) {
+            if (connection.readOnly) {
+                return;
+            }
             const identity = (context as Partial<ConnectionContext> | undefined)?.identity;
-            if (!identity || connection.readOnly || !isPastLock(identity)) {
+            const pastLock = identity !== undefined && isPastLock(identity);
+            if (!pastLock && !isTooLarge(documentName)) {
                 return;
             }
 
             connection.readOnly = true;
             setTimeout(() => connection.webSocket.close(CLOSE_ACCESS_CHANGED.code, CLOSE_ACCESS_CHANGED.reason), 0);
+        },
+
+        /** Says why editing is closed, to everyone who opens a document that grew too large. */
+        async connected({ connection, documentName }) {
+            if (isTooLarge(documentName)) {
+                connection.sendStateless(TOO_LARGE_MESSAGE);
+            }
         },
 
         /**
@@ -176,7 +216,10 @@ export function createCollabServer(options: CollabServerOptions): Server<Connect
          */
         async onLoadDocument({ documentName, document }) {
             try {
-                return (await options.backend.load(documentName)) ?? undefined;
+                const state = await options.backend.load(documentName);
+                sizes.set(documentName, state?.byteLength ?? 0);
+
+                return state ?? undefined;
             } catch (error) {
                 log.error(`Could not load "${documentName}":`, error);
                 // Hocuspocus never destroys a document that failed to load, which would keep its
@@ -203,8 +246,20 @@ export function createCollabServer(options: CollabServerOptions): Server<Connect
          * coming, and when the last person leaves. Sends the Yjs state, which is the source of
          * truth, together with a JSON copy for rendering and search, and who changed it.
          */
-        async onStoreDocument({ documentName, document }) {
+        async onStoreDocument({ documentName, document, instance }) {
             const state = Y.encodeStateAsUpdate(document);
+
+            const wasTooLarge = isTooLarge(documentName);
+            sizes.set(documentName, state.byteLength);
+            if (isTooLarge(documentName) !== wasTooLarge) {
+                if (wasTooLarge) {
+                    log.info(`"${documentName}" is back under ${maxDocumentBytes} bytes; editing is open again`);
+                } else {
+                    log.warn(`"${documentName}" grew to ${state.byteLength} bytes; editing is closed until it is rolled back`);
+                }
+                // Everyone reconnects and gets the access that fits the new size.
+                reconnectEveryone(instance, documentName);
+            }
             const changedBy = contributors.get(documentName) ?? new Set<string>();
             contributors.delete(documentName);
 

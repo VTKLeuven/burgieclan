@@ -133,7 +133,11 @@ export default function StartExamDialog({ isOpen, onClose, courseId, exams }: St
                         </label>
                     )}
 
-                    {error && <p className="vtk-error-text m-0">{error.message}</p>}
+                    {error && (
+                        <p className="vtk-error-text m-0">
+                            {error.status === 429 ? t('exam.start.rate-limited') : error.message}
+                        </p>
+                    )}
                 </DialogBody>
                 <DialogActions className="mt-6">
                     <button type="button" className="vtk-button vtk-button-ghost" onClick={onClose}>

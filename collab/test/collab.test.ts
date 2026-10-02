@@ -7,7 +7,7 @@ import type { Server } from '@hocuspocus/server';
 import { SignJWT } from 'jose';
 import * as Y from 'yjs';
 import { createBackend, HEADER_SIGNATURE, HEADER_TIMESTAMP, signRequest } from '../src/backend.ts';
-import { createCollabServer, EDITOR_FIELD, type ConnectionContext } from '../src/server.ts';
+import { createCollabServer, EDITOR_FIELD, TOO_LARGE_MESSAGE, type ConnectionContext } from '../src/server.ts';
 import { TOKEN_AUDIENCE, TOKEN_ISSUER } from '../src/token.ts';
 
 /**
@@ -229,6 +229,8 @@ describe('collab server', () => {
             backend: createBackend({ baseUrl: backend.url, secret: SECRET, retryDelay: 10 }),
             log: { info: () => {}, warn: (message: string) => warnings.push(message), error: () => {} },
             now: () => Date.now() + clockOffset,
+            // Far above what the other tests write, easy to reach on purpose.
+            maxDocumentBytes: 20_000,
         });
         await server.listen();
         collabUrl = `ws://127.0.0.1:${server.address.port}`;
@@ -519,5 +521,38 @@ describe('collab server', () => {
         assert.equal(client.provider.authorizedScope, 'readonly');
         await new Promise((resolve) => setTimeout(resolve, 200));
         assert.equal(JSON.stringify(backend.documents.get('until-doc')?.content).includes('after the lock'), false);
+    });
+
+    it('closes editing on a document that grew too large, says why, and reopens it once rolled back', async () => {
+        let tokens = 0;
+        const client = await connect('big-doc', async () => {
+            tokens++;
+            return mintToken({ doc: 'big-doc' });
+        });
+        const notices: string[] = [];
+        client.provider.on('stateless', ({ payload }: { payload: string }) => notices.push(payload));
+
+        addParagraph(client.doc, 'a normal question');
+        await waitFor(() => JSON.stringify(backend.documents.get('big-doc')?.content ?? {}).includes('a normal question'), 'the store');
+        const beforePaste = Buffer.from(backend.documents.get('big-doc')!.state);
+
+        addParagraph(client.doc, 'x'.repeat(30_000));
+        await waitFor(() => tokens === 2 && client.provider.isAuthenticated, 'the client to reconnect', 5000);
+        assert.equal(client.provider.authorizedScope, 'readonly');
+        await waitFor(() => notices.includes(TOO_LARGE_MESSAGE), 'the notice');
+        assert.ok(warnings.some((warning) => warning.includes('"big-doc" grew to')));
+
+        // Someone opening it now is read-only from the start.
+        const latecomer = await connect('big-doc', await mintToken({ doc: 'big-doc', sub: '2' }));
+        assert.equal(latecomer.provider.authorizedScope, 'readonly');
+
+        // A moderator rolls it back to before the paste: editing opens again for everyone.
+        const response = await internalRequest('/internal/documents/big-doc/restore', { state: beforePaste.toString('base64') });
+        assert.equal(response.status, 204);
+        await waitFor(
+            () => tokens === 3 && client.provider.isAuthenticated && client.provider.authorizedScope === 'read-write',
+            'editing to reopen',
+            5000,
+        );
     });
 });
