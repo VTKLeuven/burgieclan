@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\AdminActionCsrf;
 use App\Controller\Admin\Filter\EntityContainsFilter;
 use App\Entity\CollabDocument;
 use App\Entity\CollabDocumentRevision;
@@ -47,20 +48,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * Locking and reopening only move `editableUntil`. Everyone who has the exam open is then
  * reconnected, which hands them a token for the new situation.
  *
- * The state-changing actions are POST-only and check a CSRF token. SameSite=lax alone is not
- * enough: it treats every *.vtk.be subdomain as the same site, so any of them could still post
- * here with a moderator's cookie. Their paths have two segments so a GET is answered 405
- * instead of reaching the detail route (/admin/exam/{entityId}) with "lock" as an id.
+ * The state-changing actions are POST-only and check a CSRF token (AdminActionCsrf). Their paths
+ * have two segments so a GET is answered 405 instead of reaching the detail route
+ * (/admin/exam/{entityId}) with "lock" as an id.
  */
 #[IsGranted(User::ROLE_MODERATOR)]
 class ExamCrudController extends AbstractCrudController
 {
-    /**
-     * The intention of the token that admin/approve_action.html.twig puts in every action button,
-     * and that the restore buttons in admin/exam_detail.html.twig carry too.
-     */
-    public const CSRF_INTENTION = 'admin_action';
-
     public function __construct(
         private readonly CollabDocumentRepository $documents,
         private readonly CollabDocumentRevisionRepository $revisions,
@@ -412,7 +406,7 @@ class ExamCrudController extends AbstractCrudController
     private function assertCsrf(AdminContext $context, Exam $exam): ?RedirectResponse
     {
         $token = (string) $context->getRequest()->request->get('_token');
-        if ($this->isCsrfTokenValid(self::CSRF_INTENTION, $token)) {
+        if ($this->isCsrfTokenValid(AdminActionCsrf::INTENTION, $token)) {
             return null;
         }
 
