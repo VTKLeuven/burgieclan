@@ -5,6 +5,8 @@ on:
     branches:
       - main
   pull_request:
+  # Started by Auto Audit Fix on its own pull requests, whose pull_request runs wait for approval.
+  workflow_dispatch:
 
 # Cancel superseded runs on the same ref (e.g. rapid pushes to a PR branch).
 concurrency:
