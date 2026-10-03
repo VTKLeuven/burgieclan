@@ -15,6 +15,7 @@ use App\Utils\DownloadFilename;
 use DateTime;
 use DateTimeZone;
 use RuntimeException;
+use League\Flysystem\Config;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -81,7 +82,7 @@ final class DownloadZipController extends AbstractController
 
         $contentHash = $this->generateContentHash($programs, $modules, $courses, $documents);
 
-        if ($contentHash === md5('')) {
+        if (null === $contentHash) {
             return new Response('No content to zip', Response::HTTP_NO_CONTENT);
         }
 
@@ -137,89 +138,92 @@ final class DownloadZipController extends AbstractController
     }
 
     /**
+     * The key the zip is cached under, or null when there is nothing to zip.
+     *
+     * The content is json-encoded as a tree with a type tag on every level, so two different
+     * selections never share a key (plain concatenation made courses "Analyse" and "I"
+     * collide with a single course "AnalyseI").
+     *
      * @param Program[] $programs
      * @param Module[] $modules
      * @param Course[] $courses
      */
-    private function generateContentHash(array $programs, array $modules, array $courses, array $documents): string
+    private function generateContentHash(array $programs, array $modules, array $courses, array $documents): ?string
     {
-        $content = '';
+        $content = [];
 
         foreach ($programs as $program) {
             // The program's own name is the top folder of its zip.
-            $content .= $program->getName();
-            $content .= $this->getModuleContent($program->getModules()->toArray());
+            $content[] = ['program', $program->getName(), $this->getModuleContent($program->getModules()->toArray())];
         }
 
         foreach ($modules as $module) {
-            $content .= $this->getModuleContent([$module]);
+            $content[] = $this->getModuleContent([$module]);
         }
 
         foreach ($courses as $course) {
-            $content .= $this->getCourseContent($course);
+            $content[] = $this->getCourseContent($course);
         }
 
         foreach ($documents as $document) {
-            $content .= $this->getDocumentContent($document);
+            $content[] = $this->getDocumentContent($document);
         }
 
-        return md5($content);
+        if ([] === $content) {
+            return null;
+        }
+
+        return md5(json_encode($content, JSON_THROW_ON_ERROR));
     }
 
     /**
      * @param Module[] $modules
-     * @return string
      */
-    private function getModuleContent(array $modules): string
+    private function getModuleContent(array $modules): array
     {
-        $content = '';
+        $content = [];
 
         foreach ($modules as $module) {
-            $content .= $module->getName();
-            $content .= $this->getModuleContent($module->getModules()->toArray());
-            foreach ($module->getCourses()->toArray() as $course) {
-                $content .= $this->getCourseContent($course);
-            }
+            $content[] = [
+                'module',
+                $module->getName(),
+                $this->getModuleContent($module->getModules()->toArray()),
+                array_map(
+                    fn (Course $course) => $this->getCourseContent($course),
+                    array_values($module->getCourses()->toArray())
+                ),
+            ];
         }
 
         return $content;
     }
 
-    /**
-     * @param Course $course
-     * @return string
-     */
-    private function getCourseContent(Course $course): string
+    private function getCourseContent(Course $course): array
     {
-        $content = $course->getName();
-
-        foreach ($this->documentRepository->findApprovedByCourseWithFile($course) as $document) {
-            $content .= $this->getDocumentContent($document);
-        }
-
-        return $content;
+        return [
+            'course',
+            $course->getName(),
+            // The HTML index shows the code next to the name.
+            $course->getCode(),
+            array_map(
+                fn (Document $document) => $this->getDocumentContent($document),
+                $this->documentRepository->findApprovedByCourseWithFile($course)
+            ),
+        ];
     }
 
-    /**
-     * What identifies a document for zip-caching purposes.
-     *
-     * The stored filename alone is not enough: it is unique per upload, but it no
-     * longer decides what the file is called inside the zip. Mixing the served name
-     * in means renaming a document invalidates the cached archive instead of handing
-     * out one that still carries the old name.
-     */
     /**
      * Everything about a document that ends up in the zip: its file, its name and folder
      * inside the zip, and what the HTML index shows about it. Any change here gives the zip
      * a new hash, so it is rebuilt instead of an outdated copy being served.
      */
-    private function getDocumentContent(Document $document): string
+    private function getDocumentContent(Document $document): array
     {
         $tags = array_map(fn ($tag) => $tag->getName(), $document->getTags()->toArray());
         sort($tags);
 
-        return json_encode(
-            [
+        return [
+            'document',
             $document->getId(),
             // A replaced file gets a new stored name (the namer appends a uniqid).
             $document->getFileName(),
@@ -229,9 +233,7 @@ final class DownloadZipController extends AbstractController
             $document->getUpdatedAt()->format(DATE_ATOM),
             // A tag change alone need not touch updatedAt, so tags count on their own.
             $tags,
-            ],
-            JSON_THROW_ON_ERROR
-        );
+        ];
     }
 
     /**
@@ -278,13 +280,20 @@ final class DownloadZipController extends AbstractController
             if ($handle === false) {
                 throw new RuntimeException('Could not read back the zip.');
             }
+            // Written under a temporary name and then moved into place, so a request that finds
+            // the zip never gets it half-written: writing to local storage is not atomic. A
+            // leftover from a failed build still ends in .zip, so it expires like any other.
+            $partialName = sprintf('partial-%s-%s', bin2hex(random_bytes(8)), $exportName);
             try {
-                $this->exportsStorage->writeStream($exportName, $handle);
+                $this->exportsStorage->writeStream($partialName, $handle);
             } finally {
                 if (is_resource($handle)) {
                     fclose($handle);
                 }
             }
+            // Not retaining visibility spares the bucket a GetObjectAcl call, which not every
+            // S3-compatible store implements; the zip stays private either way.
+            $this->exportsStorage->move($partialName, $exportName, [Config::OPTION_RETAIN_VISIBILITY => false]);
         } finally {
             foreach ([...$this->tempFiles, $zipPath] as $file) {
                 if (is_file($file)) {

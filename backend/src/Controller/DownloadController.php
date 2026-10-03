@@ -11,6 +11,7 @@ use App\Utils\DownloadFilename;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -45,6 +46,8 @@ final class DownloadController extends AbstractController
         private readonly UriSigner $uriSigner,
         #[Target('exports.storage')]
         private readonly FilesystemOperator $exportsStorage,
+        #[Autowire(service: 'default.storage')]
+        private readonly FilesystemOperator $documentStorage,
     ) {
     }
 
@@ -63,6 +66,15 @@ final class DownloadController extends AbstractController
         // When documents live on S3, redirect to a time-limited pre-signed URL.
         // This offloads the file transfer from PHP workers entirely.
         if ($this->presignedUrlGenerator->isEnabled()) {
+            // Checked here because after the redirect a missing file shows the bucket's own error page.
+            try {
+                if (!$this->documentStorage->fileExists($filename)) {
+                    return new Response('File not found', Response::HTTP_NOT_FOUND);
+                }
+            } catch (FilesystemException) {
+                return new Response('File not found', Response::HTTP_NOT_FOUND);
+            }
+
             $presignedUrl = $this->presignedUrlGenerator->generateUrl($document, $isInline);
             $response = new RedirectResponse($presignedUrl, Response::HTTP_FOUND);
             $response->headers->set('Cache-Control', 'private, no-cache');

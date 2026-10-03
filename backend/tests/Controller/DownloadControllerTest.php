@@ -108,18 +108,12 @@ class DownloadControllerTest extends ApiTestCase
             ->assertHeaderContains('Content-Type', 'application/pdf');
     }
 
-    public function testPresignedUrlRedirectsWhenS3IsEnabled(): void
+    /**
+     * A browser whose PresignedUrlGenerator is active, backed by a real in-memory SigV4 S3Client.
+     * The existence check still reads the local test storage.
+     */
+    private function s3Browser(): \Zenstruck\Browser\KernelBrowser
     {
-        $storedName = 's3-download-test.pdf';
-        DocumentFactory::createOne(
-            [
-            'name' => 'Physics Lecture Notes',
-            'file_name' => $storedName,
-            'under_review' => false,
-            ]
-        );
-
-        // Inject an active PresignedUrlGenerator backed by real in-memory SigV4 S3Client
         $s3Client = new S3Client(
             [
             'version' => 'latest',
@@ -139,6 +133,21 @@ class DownloadControllerTest extends ApiTestCase
         $browser->client()->disableReboot();
         $browser->client()->getContainer()->set(PresignedUrlGenerator::class, $generator);
 
+        return $browser;
+    }
+
+    public function testPresignedUrlRedirectsWhenS3IsEnabled(): void
+    {
+        $storedName = $this->storeFile('s3-download-test.pdf', "%PDF-1.7\nTest content");
+        DocumentFactory::createOne(
+            [
+            'name' => 'Physics Lecture Notes',
+            'file_name' => $storedName,
+            'under_review' => false,
+            ]
+        );
+
+        $browser = $this->s3Browser();
         $browser
             ->get(
                 '/files/download/' . $storedName,
@@ -161,6 +170,24 @@ class DownloadControllerTest extends ApiTestCase
         $this->assertStringContainsString('X-Amz-Signature=', $location);
         $this->assertStringContainsString('response-content-disposition=', $location);
     }
+
+    public function testMissingFileReturns404InsteadOfRedirectingWhenS3IsEnabled(): void
+    {
+        $storedName = 's3-missing-test.pdf';
+        DocumentFactory::createOne(['file_name' => $storedName, 'under_review' => false]);
+
+        $this->s3Browser()
+            ->get(
+                '/files/download/' . $storedName,
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token,
+                    ],
+                ]
+            )
+            ->assertStatus(404);
+    }
+
     public function testDocumentUnderReviewIsHiddenFromOtherUsers(): void
     {
         $storedName = $this->storeFile('phpunit-download-test-review.pdf', "%PDF-1.7\nTest content");

@@ -18,7 +18,7 @@ class PresignedUrlGenerator
         #[Autowire(env: 'S3_BUCKET')]
         private readonly ?string $bucket = null,
         private readonly string $prefix = 'documents',
-        private readonly int $ttlMinutes = 10,
+        private readonly int $ttlMinutes = DocumentFileUrlGenerator::TTL_MINUTES,
         // The DOCUMENT_STORAGE value: pre-signed URLs only make sense when documents live on S3.
         #[Autowire(env: 'DOCUMENT_STORAGE')]
         private readonly string $documentStorage = 's3',

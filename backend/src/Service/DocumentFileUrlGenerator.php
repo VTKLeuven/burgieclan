@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Constants\ZipExport;
 use App\Entity\Document;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -53,7 +54,7 @@ class DocumentFileUrlGenerator
     {
         if ($this->presignedUrlGenerator->isEnabled()) {
             return $this->presignedUrlGenerator->generateForKey(
-                'exports/' . $exportName,
+                ZipExport::BUCKET_PREFIX . $exportName,
                 $displayName,
                 contentType: 'application/zip',
             );

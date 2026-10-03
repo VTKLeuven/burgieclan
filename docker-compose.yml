@@ -27,7 +27,6 @@ services:
       - "8000:8000"
     depends_on:
       - db
-      - s3
     environment:
       DATABASE_URL: "postgresql://burgieclan_db_user:burgieclan_db_pass@db:5432/burgieclan_db?serverVersion=18&charset=utf8"
       # The VTK website hosts VTK, the authorization server. Locally it runs on 3000,
@@ -38,7 +37,7 @@ services:
       FRONTEND_URL: "http://localhost:3002"
       # Where uploaded documents live: `local` (backend/data/documents, the default) or
       # `s3` to use the SeaweedFS bucket below, the same code path as production.
-      # Switch with `DOCUMENT_STORAGE=s3 docker compose up -d`, then run
+      # Switch with `COMPOSE_PROFILES=s3 DOCUMENT_STORAGE=s3 docker compose up -d`, then run
       # `docker compose exec backend php bin/console app:s3:setup-bucket` once.
       DOCUMENT_STORAGE: ${DOCUMENT_STORAGE:-local}
       S3_ENDPOINT: "http://s3:8333"
@@ -92,9 +91,10 @@ services:
       - "localhost:host-gateway"
 
   # Local S3-compatible object storage, standing in for the production bucket.
-  # Only used when the backend runs with DOCUMENT_STORAGE=s3.
+  # Only used when the backend runs with DOCUMENT_STORAGE=s3, so it only starts with the s3 profile.
   s3:
     image: chrislusf/seaweedfs:4.47
+    profiles: [ s3 ]
     container_name: burgieclan-s3
     command: >-
       server -dir=/data -ip=s3 -ip.bind=0.0.0.0

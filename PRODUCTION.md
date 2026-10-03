@@ -880,29 +880,25 @@ File uploads are restricted by:
   - `GET /api/documents/{id}/file-url[?inline=1]` (used by the PDF viewer and the download button) checks access and returns `{"url": ...}`: a pre-signed S3 URL valid for 10 minutes, with response header overrides for the human-friendly filename and MIME type. The frontend loads it *without* cookies, so the bucket never has to accept credentials. With `DOCUMENT_STORAGE=local` the same endpoint returns a signed, expiring `/files/signed/{filename}` URL on the backend instead.
   - `GET /files/download/{filename}` (used by image previews and "open in new tab") authenticates with the login cookie and answers with a 302 redirect to the pre-signed URL.
   - Both only serve a document still under review to its uploader and to moderators (`DocumentFileVoter`); everyone else gets a 404.
-  - `POST /api/zip` builds the zip on disk (never in memory), stores it under `exports/` in the same bucket, and answers with a signed link in the same way. Zips are cached by content (any change to a document, course, module or program name gives a new zip), contain only approved documents (plus selected ones the user may open), and expire after 30 days (`App\Constants\ZipExport`). On the bucket, `app:s3:setup-bucket` installs a lifecycle rule that deletes `exports/` objects after 30 days, so nothing needs scheduling. With local storage, or on a store without lifecycle rules (the command warns), schedule `app:delete-old-zips` daily instead. A zip older than 29 days is rebuilt rather than reused, so a link is never handed out for a zip about to be deleted.
-- **S3 Bucket CORS Policy**: The bucket must allow the frontend's origin, because the PDF viewer fetches the pre-signed URL from JavaScript (without cookies, with HTTP Range requests). Apply the rules with the console command, which also creates the bucket if it is missing and works against any S3-compatible store:
+  - `POST /api/zip` builds the zip on disk (never in memory), stores it under `exports/` in the same bucket, and answers with a signed link in the same way. Zips are cached by content (any change to a document, a course's name or code, or a module or program name gives a new zip), contain only approved documents (plus selected ones the user may open), and expire after 30 days (`App\Constants\ZipExport`). On the bucket, `app:s3:setup-bucket` installs a lifecycle rule that deletes `exports/` objects after 30 days, so nothing needs scheduling. With local storage, or on a store without lifecycle rules (the command warns), schedule `app:delete-old-zips` daily instead. A zip older than 29 days is rebuilt rather than reused, so a link is never handed out for a zip about to be deleted.
+- **S3 Bucket CORS Policy**: The bucket must allow the frontend's origin, because the PDF viewer fetches the pre-signed URL from JavaScript (without cookies). Every deploy (`deploy.yaml`, `deploy_dev.yml`) runs the console command after the migrations, which adds that environment's `FRONTEND_URL`; it also creates the bucket if it is missing and works against any S3-compatible store. To add origins by hand:
 
   ```bash
   docker compose exec backend php bin/console app:s3:setup-bucket \
       --origin=https://burgieclan.vtk.be --origin=https://dev.burgieclan.vtk.be
   ```
 
-  The resulting configuration is equivalent to:
+  Origins are only ever added to the command's own rule (`burgieclan-frontend`), and other CORS rules on the bucket are kept, so re-running it never locks an environment out. To drop an origin, edit the rule in the provider's console. With the two origins above, the rule is:
 
   ```json
-  [
-    {
-      "AllowedOrigins": [
-        "https://burgieclan.vtk.be",
-        "https://dev.burgieclan.vtk.be",
-        "http://localhost:3002"
-      ],
-      "AllowedMethods": ["GET", "HEAD"],
-      "AllowedHeaders": ["*", "Range"],
-      "ExposeHeaders": ["Content-Disposition", "Content-Length", "Content-Type", "Accept-Ranges", "Content-Range"]
-    }
-  ]
+  {
+    "ID": "burgieclan-frontend",
+    "AllowedOrigins": ["https://burgieclan.vtk.be", "https://dev.burgieclan.vtk.be"],
+    "AllowedMethods": ["GET", "HEAD"],
+    "AllowedHeaders": ["*"],
+    "ExposeHeaders": ["Content-Disposition", "Content-Length", "Content-Type", "Accept-Ranges", "Content-Range"],
+    "MaxAgeSeconds": 3600
+  }
   ```
 
 **Allowed types by default**:

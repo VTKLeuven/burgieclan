@@ -70,9 +70,11 @@ services:
                     secret: '%env(S3_SECRET_KEY)%'
 
     # Only used to sign download URLs (see App\Service\PresignedUrlGenerator),
-    # so it must use the host browsers can reach.
+    # so it must use the host browsers can reach. Lazy: with local storage it is
+    # injected on every download but never used, so it is never built either.
     s3_public_client:
         class: Aws\S3\S3Client
+        lazy: true
         arguments:
             -
                 version: 'latest'

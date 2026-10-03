@@ -21,8 +21,9 @@ use Symfony\Component\DependencyInjection\Attribute\Target;
  * the frontend needs to preview files straight from the bucket, and adds a lifecycle
  * rule that deletes generated zips (exports/) after ZipExport::MAX_AGE_DAYS.
  *
- * The PDF viewer fetches pre-signed bucket URLs from JavaScript (with range
- * requests), so the bucket has to allow the frontend's origin. Keeping those rules
+ * The PDF viewer fetches pre-signed bucket URLs from JavaScript, so the bucket has
+ * to allow the frontend's origin. Every deploy runs this command, which adds that
+ * environment's FRONTEND_URL. Keeping those rules
  * here instead of clicking them together in a provider console makes them
  * reproducible on any S3-compatible store: the local SeaweedFS container, Hetzner,
  * or a self-hosted bucket.
@@ -121,17 +122,47 @@ final class SetupS3BucketCommand extends Command
     }
 
     /**
+     * Adds the origins to our CORS rule.
+     *
+     * Like the lifecycle rules below, a bucket has a single CORS configuration, so the existing
+     * rules are read first: rules set up by hand survive, and the origins our rule already allows
+     * are kept, so a run for one environment never locks out another. Removing an origin is
+     * left to the provider's console.
+     *
      * @param string[] $origins
      */
     private function applyCors(SymfonyStyle $io, array $origins): bool
     {
+        $ruleId = 'burgieclan-frontend';
+
         try {
+            try {
+                $rules = $this->s3Client->getBucketCors(['Bucket' => $this->bucket])['CORSRules'] ?? [];
+            } catch (S3Exception $e) {
+                if ('NoSuchCORSConfiguration' !== $e->getAwsErrorCode()) {
+                    throw $e;
+                }
+                $rules = [];
+            }
+
+            $otherRules = [];
+            foreach ($rules as $rule) {
+                if (($rule['ID'] ?? null) === $ruleId) {
+                    $origins = [...$rule['AllowedOrigins'] ?? [], ...$origins];
+                } else {
+                    $otherRules[] = $rule;
+                }
+            }
+            $origins = array_values(array_unique($origins));
+
             $this->s3Client->putBucketCors(
                 [
                 'Bucket' => $this->bucket,
                 'CORSConfiguration' => [
                     'CORSRules' => [
+                        ...$otherRules,
                         [
+                            'ID' => $ruleId,
                             'AllowedOrigins' => $origins,
                             'AllowedMethods' => ['GET', 'HEAD'],
                             'AllowedHeaders' => ['*'],
@@ -154,7 +185,7 @@ final class SetupS3BucketCommand extends Command
             return false;
         }
 
-        $io->success(sprintf('CORS rules applied for: %s', implode(', ', $origins)));
+        $io->success(sprintf('CORS rules allow: %s', implode(', ', $origins)));
 
         return true;
     }

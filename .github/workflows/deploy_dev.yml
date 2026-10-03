@@ -117,6 +117,11 @@ jobs:
           echo "Running database migrations..."
           docker compose -f "$COMPOSE_FILE" exec -T -u www-data backend php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration < /dev/null
 
+          # Let this environment's frontend read the bucket: the PDF viewer loads files
+          # straight from it, so previews fail without the CORS rule. Only adds origins.
+          echo "Preparing the document bucket..."
+          docker compose -f "$COMPOSE_FILE" exec -T -u www-data backend php bin/console app:s3:setup-bucket < /dev/null
+
           # Generate JWT keys
           echo "Generating JWT keys..."
           docker compose -f "$COMPOSE_FILE" exec -T -u www-data backend php bin/console lexik:jwt:generate-keypair --skip-if-exists < /dev/null

@@ -199,6 +199,10 @@ export default function PDFPages({ documentId, width, pageAspect = 1.414, onDocu
         // The signed link is its own authorisation. Sending the cookie as well would make the
         // bucket's CORS answer unacceptable to the browser (see useDocumentFileUrl).
         withCredentials: false,
+        // One request for the whole file. The link expires after ten minutes, and storage only
+        // checks that when a request starts: range requests made later, while a large PDF is still
+        // loading, would be refused, but a single download that started in time runs to the end.
+        disableRange: true,
     }), []);
 
     const onDocumentLoadSuccess = useCallback((pdf: PDFDocumentProxy): void => {
