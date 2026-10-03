@@ -12,6 +12,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use LogicException;
 
+use function Symfony\Component\String\u;
+
 /**
  * @extends ServiceEntityRepository<ExamQuestion>
  */
@@ -105,6 +107,75 @@ class ExamQuestionRepository extends ServiceEntityRepository
         }
 
         return $stats;
+    }
+
+    /**
+     * Questions that match a search, newest exams first. Every term has to match the question or
+     * its course (code or one of its names), and at least one has to match the question itself:
+     * a search for only a course lists the course, not all of its questions.
+     *
+     * Case-insensitive, like the rest of the search. LOWER(q.text) LIKE is served by the trigram
+     * index from Version20261003105945.
+     *
+     * @return ExamQuestion[]
+     */
+    public function findBySearchQuery(string $query, int $limit = 20): array
+    {
+        $terms = $this->extractSearchTerms($query);
+        if ([] === $terms) {
+            return [];
+        }
+
+        $queryBuilder = $this->createQueryBuilder('q')
+            ->addSelect('e', 'c')
+            ->join('q.exam', 'e')
+            ->join('e.course', 'c')
+            ->where('q.removedAt IS NULL');
+
+        $inQuestion = [];
+        foreach ($terms as $key => $term) {
+            $parameter = 't_' . $key;
+            $inQuestion[] = 'LOWER(q.text) LIKE :' . $parameter;
+            $queryBuilder
+                ->andWhere(
+                    sprintf(
+                        '(LOWER(q.text) LIKE :%1$s OR LOWER(c.code) LIKE :%1$s OR LOWER(c.name) LIKE :%1$s'
+                        . ' OR LOWER(c.nameNl) LIKE :%1$s OR LOWER(c.nameEn) LIKE :%1$s)',
+                        $parameter
+                    )
+                )
+                ->setParameter($parameter, '%' . mb_strtolower($term) . '%');
+        }
+        $queryBuilder->andWhere('(' . implode(' OR ', $inQuestion) . ')');
+
+        /** @var ExamQuestion[] $result */
+        $result = $queryBuilder
+            ->orderBy('e.academicYear', 'DESC')
+            ->addOrderBy('e.id', 'DESC')
+            ->addOrderBy('q.position', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+    }
+
+    /**
+     * The search terms in a query, like the other repositories: split on whitespace, without
+     * duplicates or terms shorter than two characters.
+     *
+     * @return list<string>
+     */
+    private function extractSearchTerms(string $query): array
+    {
+        $terms = array_unique(u($query)->replaceMatches('/[[:space:]]+/', ' ')->trim()->split(' '));
+
+        return array_values(
+            array_map(
+                static fn($term): string => $term->toString(),
+                array_filter($terms, static fn($term): bool => 2 <= $term->length())
+            )
+        );
     }
 
     /**

@@ -2,10 +2,13 @@
 
 namespace App\Tests\Api;
 
+use App\Entity\Exam;
 use App\Factory\CourseFactory;
 use App\Factory\DocumentFactory;
+use App\Factory\ExamFactory;
 use App\Factory\ModuleFactory;
 use App\Factory\ProgramFactory;
+use App\Service\Collab\CollabDocumentStore;
 
 class SearchResourceTest extends ApiTestCase
 {
@@ -62,6 +65,7 @@ class SearchResourceTest extends ApiTestCase
                 'modules',
                 'programs',
                 'documents',
+                'examQuestions',
             ]
         );
         $courses = $decoded_json['courses'];
@@ -94,6 +98,7 @@ class SearchResourceTest extends ApiTestCase
                 'modules',
                 'programs',
                 'documents',
+                'examQuestions',
             ]
         );
         $modules = $decoded_json['modules'];
@@ -126,6 +131,7 @@ class SearchResourceTest extends ApiTestCase
                 'modules',
                 'programs',
                 'documents',
+                'examQuestions',
             ]
         );
         $programs = $decoded_json['programs'];
@@ -158,6 +164,7 @@ class SearchResourceTest extends ApiTestCase
                 'modules',
                 'programs',
                 'documents',
+                'examQuestions',
             ]
         );
         $documents = $decoded_json['documents'];
@@ -190,6 +197,7 @@ class SearchResourceTest extends ApiTestCase
                 'modules',
                 'programs',
                 'documents',
+                'examQuestions',
             ]
         );
         $courses = $decoded_json['courses'];
@@ -276,5 +284,75 @@ class SearchResourceTest extends ApiTestCase
 
         $this->assertCount(1, $decodedJson['courses']);
         $this->assertSame('/api/courses/' . $course->getId(), $decodedJson['courses'][0]['@id']);
+    }
+
+    /**
+     * Stores the exam's document as the collab server would, with one question per uid => text.
+     *
+     * @param array<string, string> $questions
+     */
+    private static function storeQuestions(Exam $exam, array $questions): void
+    {
+        $content = ['type' => 'doc', 'content' => []];
+        foreach ($questions as $uid => $text) {
+            $content['content'][] = [
+                'type' => 'examQuestion',
+                'attrs' => ['id' => $uid],
+                'content' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => $text]]]],
+            ];
+        }
+        self::getContainer()->get(CollabDocumentStore::class)
+            ->store($exam->getDocumentName(), 'state', $content, null, []);
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function searchExamQuestions(string $text): array
+    {
+        return $this->browser()
+            ->get(
+                '/api/search?searchText=' . rawurlencode($text),
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->json()
+            ->decoded()['examQuestions'];
+    }
+
+    public function testSearchFindsExamQuestions(): void
+    {
+        $analysis = CourseFactory::createOne(
+            ['name' => 'Analyse I', 'nameNl' => 'Analyse I', 'nameEn' => 'Analysis I', 'code' => 'H01A0B']
+        );
+        $chemistry = CourseFactory::createOne(['name' => 'Algemene chemie', 'code' => 'H01C0A']);
+        $exam = ExamFactory::createOne(['course' => $analysis]);
+        self::storeQuestions(
+            $exam,
+            ['q1' => 'Bewijs de stelling van Rolle met een tekening.', 'q2' => 'Bereken de limiet.']
+        );
+        $otherExam = ExamFactory::createOne(['course' => $chemistry]);
+        self::storeQuestions($otherExam, ['c1' => 'Leg de reactie volgens Rolle uit.']);
+
+        // A term in the question finds it in any course, case-insensitively.
+        $this->assertEqualsCanonicalizing(['q1', 'c1'], array_column($this->searchExamQuestions('ROLLE'), 'uid'));
+
+        // A term in the course narrows it down, and the hit has what the page needs to link to it.
+        $hits = $this->searchExamQuestions('analyse rolle');
+        $this->assertCount(1, $hits);
+        $this->assertSame('q1', $hits[0]['uid']);
+        $this->assertSame('Bewijs de stelling van Rolle met een tekening.', $hits[0]['snippet']);
+        $this->assertSame($exam->getId(), $hits[0]['examId']);
+        $this->assertSame($exam->getAcademicYear(), $hits[0]['academicYear']);
+        $this->assertSame('january', $hits[0]['period']);
+        $this->assertSame('/api/courses/' . $analysis->getId(), $hits[0]['course']['@id']);
+        $this->assertSame('H01A0B', $hits[0]['course']['code']);
+
+        // Only the course: that lists the course, not every question of it.
+        $this->assertSame([], $this->searchExamQuestions('analyse'));
+
+        // A question that was removed from the document is no longer found.
+        self::storeQuestions($exam, ['q2' => 'Bereken de limiet.']);
+        $this->assertSame(['c1'], array_column($this->searchExamQuestions('rolle'), 'uid'));
     }
 }

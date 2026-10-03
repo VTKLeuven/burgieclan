@@ -98,7 +98,9 @@ Other subsystems:
   them. `app:exam-questions:sync` rebuilds those rows. Comments (`ExamQuestionComment`) and "Ik had deze ook"
   (`ExamQuestionConfirmation`) hang off those rows and are addressed by exam + uid; after each change Symfony
   asks the collab server to broadcast a `question-activity` message (`ExamQuestionActivity`), so open pages
-  refetch instead of polling. Access is `CollabDocumentVoter`; moderators roll back,
+  refetch instead of polling. The site search also covers question text (`ExamQuestionRepository::
+  findBySearchQuery`, served by a hand-written trigram index on `lower(text)` that Doctrine cannot map, nor
+  sees). Access is `CollabDocumentVoter`; moderators roll back,
   lock and reopen in the admin (`ExamCrudController`). The editor schema (`examQuestion` nodes, the `sittings`
   array) exists only in the frontend, in `components/exam/`. Per-user rate limits are in
   `config/packages/rate_limiter.yaml`.
