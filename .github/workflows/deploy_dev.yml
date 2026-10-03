@@ -1,4 +1,4 @@
-name: "Deploy Dev Stack (Frontend + Backend)"
+name: "Deploy Dev Stack (Frontend + Backend + Collab)"
 
 on:
   push:
@@ -41,10 +41,19 @@ jobs:
       url: https://dev.burgieclan.vtk.be
     secrets: inherit
 
+  build_collab:
+    name: Build Collab
+    uses: ./.github/workflows/build-collab.yaml
+    permissions:
+      contents: read
+      packages: write
+    with:
+      environment: dev
+
   deploy:
     name: Deploy
     runs-on: self-hosted
-    needs: [build_backend, build_frontend]
+    needs: [build_backend, build_frontend, build_collab]
     environment:
       name: dev
       url: https://dev.burgieclan.vtk.be

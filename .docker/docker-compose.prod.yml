@@ -17,10 +17,11 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
 
-    # Depends on backend and frontend services
+    # Depends on backend, frontend and collab services
     depends_on:
       - backend
       - frontend
+      - collab
 
     # Logging configuration - automatic rotation to prevent disk space issues
     # View logs: docker logs burgieclan-nginx or docker compose -f docker-compose.prod.yml logs nginx
@@ -35,7 +36,7 @@ services:
 
   backend:
     # Image from GitHub Container Registry
-    # Use IMAGE_TAG environment variable to specify tag (dev for development, prod for production)
+    # Use IMAGE_TAG environment variable to specify tag (dev for development, production for production)
     image: ghcr.io/vtkleuven/burgieclan/backend:${IMAGE_TAG:-dev}
     container_name: burgieclan-backend
 
@@ -84,6 +85,11 @@ services:
       S3_SECRET_KEY: ${S3_SECRET_KEY:?S3_SECRET_KEY is required}
       S3_REGION: ${S3_REGION:?S3_REGION is required}
 
+      # Live editing (exam reconstructions). Shared with the collab service below: Symfony signs
+      # collab tokens with it, and both sign their server-to-server calls with it.
+      COLLAB_SECRET: ${COLLAB_SECRET:?COLLAB_SECRET is required (openssl rand -hex 32)}
+      COLLAB_INTERNAL_URL: "http://collab:1234"
+
       # S3 Backup Storage
       S3_BACKUP_BUCKET: ${S3_BACKUP_BUCKET:-}
       S3_BACKUP_ENDPOINT: ${S3_BACKUP_ENDPOINT:-}
@@ -124,7 +130,7 @@ services:
 
   frontend:
     # Image from GitHub Container Registry
-    # Use IMAGE_TAG environment variable to specify tag (dev for dev, prod for production)
+    # Use IMAGE_TAG environment variable to specify tag (dev for dev, production for production)
     image: ghcr.io/vtkleuven/burgieclan/frontend:${IMAGE_TAG:-dev}
     container_name: burgieclan-frontend
 
@@ -150,9 +156,49 @@ services:
         max-file: "5" # Keep 5 rotated files (250MB total per service)
         compress: "true" # Compress rotated logs to save space
 
+  collab:
+    # Live editing server (Hocuspocus) for exam reconstructions, see collab/README.md.
+    # Browsers reach it through nginx at /collab (a websocket); it loads and stores documents
+    # through the backend's internal routes and never touches the database itself.
+    image: ghcr.io/vtkleuven/burgieclan/collab:${IMAGE_TAG:-dev}
+    container_name: burgieclan-collab
+
+    restart: unless-stopped
+
+    # Only exposed internally, to nginx and to the backend
+    expose:
+      - "1234"
+
+    environment:
+      PORT: 1234
+      BACKEND_URL: "http://backend:8080"
+      COLLAB_SECRET: ${COLLAB_SECRET:?COLLAB_SECRET is required (openssl rand -hex 32)}
+
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:1234/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    # It cannot open a document without the backend
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    # On SIGTERM it stores every open document before exiting; give it time to.
+    stop_grace_period: 30s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+        compress: "true"
+
   db:
     # Official PostgreSQL latest image
-    image: postgres:18@sha256:86c951e05bf56c93d95d397747fb8820ac76cc3bedb78f43abd83eedbe3666ae
+    image: postgres:18@sha256:5a5a84b19854a9ffaa54082c166ff4ec27473a361e496e5ea167f298f2da9722
     container_name: burgieclan-db
 
     # Restart policy

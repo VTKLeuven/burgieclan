@@ -108,6 +108,8 @@ class DashboardController extends AbstractDashboardController
                     MenuItem::linkTo(TagCrudController::class, 'Tags', 'fa-solid fa-tags')
                 ]
             );
+        // Moderators handle these: students start and edit them, moderators roll back and lock.
+        yield MenuItem::linkTo(ExamCrudController::class, 'Exam reconstructions', 'fa-solid fa-pen-ruler');
         $amountPending = $this->documentRepository->getAmountPending();
         if ($amountPending > 0) {
             $documentsMenu->setBadge($amountPending, 'danger');

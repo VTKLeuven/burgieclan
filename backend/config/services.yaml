@@ -9,6 +9,11 @@ parameters:
     app_locales: en|nl
     # Add your frontend URL
     app.frontend_url: '%env(FRONTEND_URL)%'
+    # Shared with the collab server. Empty switches live editing off instead of breaking the
+    # container, so deploys that do not run the collab server need nothing extra.
+    env(COLLAB_SECRET): ''
+    # Where Symfony reaches the collab server itself, for rollbacks and locks (CollabServerClient).
+    env(COLLAB_INTERNAL_URL): 'http://collab:1234'
 
 services:
     # default configuration for services in *this* file
@@ -94,3 +99,10 @@ when@test:
 
         App\Service\PresignedUrlGenerator:
             public: true
+
+        # Rate limit counts in memory, so they never carry over from one test (or test run) to the
+        # next. Not autoconfigured: as a resettable service it would be emptied between requests
+        # too, and a test that checks a limit needs the count to add up across its requests.
+        cache.rate_limiter:
+            class: Symfony\Component\Cache\Adapter\ArrayAdapter
+            autoconfigure: false

@@ -1,4 +1,5 @@
 import { VoteDirection } from "@/components/ui/buttons/VoteButton";
+import type { JSONContent } from "@tiptap/react";
 interface BaseEntity {
     id: number;
     createdAt?: Date;
@@ -35,6 +36,67 @@ export interface Course extends BaseEntity {
     documentCount?: number;
 }
 
+
+export type ExamPeriod = 'january' | 'june' | 'august';
+
+/** A day an exam was given on, e.g. "ma 20 jan" or "mondeling dag 2". */
+export interface ExamSitting {
+    id: string;
+    label: string;
+}
+
+/** An exam reconstruction. The questions themselves are edited live (components/exam). */
+export interface Exam extends BaseEntity {
+    courseId?: number;
+    /** E.g. "2025 - 2026". */
+    academicYear: string;
+    period: ExamPeriod;
+    /** Everyone may edit it until then; after that it is read-only. */
+    editableUntil?: Date;
+    editable: boolean;
+    /** The live document on the collab server, e.g. "exam-12". */
+    documentName: string;
+    questionCount: number;
+    copiedFromId?: number;
+    /** The last stored copy of the questions as TipTap JSON (single exam only). */
+    content?: JSONContent | null;
+    sittings: ExamSitting[];
+}
+
+/**
+ * A comment on one question of an exam reconstruction. The author is never sent, only the name
+ * to show: their full name, or their pseudonym for this exam when the comment is anonymous.
+ */
+export interface ExamQuestionComment extends BaseEntity {
+    /** The question's permanent id in the editor (the examQuestion node's `id`). */
+    questionUid: string;
+    /** Plain text; show it as text, never as HTML. */
+    content: string;
+    authorName: string;
+    anonymous: boolean;
+    /** Written by whoever is looking, who may edit and delete it. */
+    mine: boolean;
+}
+
+/** A question of an exam reconstruction in the search results. */
+export interface ExamQuestionSearchHit {
+    /** The question's permanent id: the page links to it as #q-{uid}. */
+    uid: string;
+    /** A short piece of the question around what matched; plain text. */
+    snippet: string;
+    examId: number;
+    academicYear: string;
+    period: ExamPeriod;
+    course: Course;
+}
+
+/** Per question: comments, "Ik had deze ook", and whether you said so yourself. */
+export interface ExamQuestionStats {
+    uid: string;
+    comments: number;
+    confirmations: number;
+    confirmed: boolean;
+}
 
 export interface Module extends BaseEntity {
     name?: string;

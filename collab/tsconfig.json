@@ -1,0 +1,20 @@
+{
+  // Node runs the .ts files directly (type stripping, Node >= 22.18), so TypeScript only
+  // type-checks. That is why imports carry their .ts extension and only erasable syntax is
+  // allowed: no enums, no namespaces, no constructor parameter properties.
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"],
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true
+  },
+  "include": ["src", "test"]
+}

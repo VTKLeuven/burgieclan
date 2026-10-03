@@ -815,5 +815,107 @@
     .Tiptap-mathematics-render {
       @apply rounded-md inline-block;
     }
+
+    /* Other people's cursors in the live editor (CollaborationCaret). The colour is set inline
+       per person; these rules only shape the caret and its name tag. */
+    .collaboration-carets__caret {
+      @apply relative -mx-px border-x pointer-events-none;
+      word-break: normal;
+    }
+
+    .collaboration-carets__label {
+      @apply absolute -left-px -top-[1.4em] rounded-sm rounded-bl-none px-1 py-px text-xs font-semibold leading-normal text-white whitespace-nowrap select-none;
+    }
+  }
+
+  /* Exam reconstructions (components/exam). Questions are numbered by a CSS counter, so the
+     numbers follow every reorder without being stored anywhere. Nested under .exam-editor so
+     these beat the generic `.tiptap button` rule above. */
+  .exam-editor {
+    counter-reset: exam-question;
+
+    .exam-question {
+      counter-increment: exam-question;
+      @apply my-4 rounded-xl border border-vtk-line bg-vtk-surface;
+    }
+
+    .exam-question.ProseMirror-selectednode {
+      @apply outline-2 outline-vtk-navy;
+    }
+
+    .exam-question__head {
+      @apply flex flex-wrap items-center gap-2 border-b border-vtk-line px-3 py-2 select-none;
+    }
+
+    .exam-question__number::before {
+      content: attr(data-label) " " counter(exam-question);
+      @apply text-sm font-semibold text-vtk-ink;
+    }
+
+    .exam-question__handle {
+      @apply m-0 cursor-grab rounded-md p-1 text-vtk-muted hover:bg-vtk-paper-2 active:cursor-grabbing;
+    }
+
+    /* Comments, "Ik had deze ook" and, while editing, the move and delete buttons. */
+    .exam-question__tools {
+      @apply ml-auto flex flex-wrap items-center gap-2;
+    }
+
+    .exam-question__actions {
+      @apply flex items-center gap-1;
+    }
+
+    .exam-question__actions button {
+      @apply m-0 rounded-md p-1 text-vtk-muted hover:bg-vtk-paper-2 hover:text-vtk-ink;
+    }
+
+    .exam-question__body {
+      @apply px-4 py-3;
+    }
+
+    /* A question opened from a link (#q-{uid}, e.g. a search result) lights up for a moment. */
+    .exam-question__inner--linked {
+      @apply rounded-xl;
+      animation: exam-question-linked 2.5s ease-out;
+    }
+
+    /* The comments below a question: outside the document, so not editable text. */
+    .exam-question__thread {
+      @apply grid gap-3 rounded-b-xl border-t border-vtk-line bg-vtk-paper-2 px-4 py-3 select-text;
+    }
+
+    .exam-thread__link {
+      @apply m-0 cursor-pointer p-0 text-vtk-muted underline-offset-2 hover:text-vtk-ink hover:underline;
+    }
+
+    .exam-chip {
+      @apply m-0;
+    }
+  }
+
+  @keyframes exam-question-linked {
+    0%, 60% { box-shadow: 0 0 0 3px var(--color-vtk-yellow); }
+    100% { box-shadow: 0 0 0 3px transparent; }
+  }
+
+  /* A day an exam was given on: a tag in the days bar, a toggle on each question. */
+  .exam-chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-vtk-line-2 bg-vtk-surface px-2.5 py-0.5 text-xs font-semibold text-vtk-muted transition-colors;
+  }
+
+  button.exam-chip:hover {
+    @apply border-vtk-ink text-vtk-ink;
+  }
+
+  .exam-chip--active {
+    @apply border-vtk-navy bg-vtk-navy text-vtk-paper;
+  }
+
+  button.exam-chip--active:hover {
+    @apply bg-vtk-blue-light text-vtk-paper;
+  }
+
+  .exam-chip--day {
+    @apply border-vtk-blue-soft bg-vtk-blue-soft text-vtk-ink;
   }
 }

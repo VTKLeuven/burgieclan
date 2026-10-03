@@ -1,0 +1,24 @@
+# Per-user limits on what can be done in bulk. Moderators are exempt; going over answers
+# 429 Too Many Requests with a Retry-After header.
+#
+# The counts live in the cache.rate_limiter pool, which is the filesystem cache (cache.app).
+# That is fine as long as there is a single backend container.
+framework:
+    rate_limiter:
+        # Starting an exam reconstruction (ExamCreateProcessor).
+        exam_start:
+            policy: sliding_window
+            limit: 5
+            interval: '1 day'
+
+        # Commenting on exam questions (ExamQuestionCommentProcessor).
+        exam_comment:
+            policy: sliding_window
+            limit: 20
+            interval: '10 minutes'
+
+        # "Ik had deze ook" on exam questions, on and off (ExamQuestionConfirmationProcessor).
+        exam_confirmation:
+            policy: sliding_window
+            limit: 120
+            interval: '1 minute'

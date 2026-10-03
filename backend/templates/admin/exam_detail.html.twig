@@ -1,0 +1,115 @@
+{# The usual detail page, plus the questions as they are now and every earlier version with a
+   restore button. Everything shown is student-written text: it is only ever printed escaped.
+   No style="" attributes here, see public/admin-assets/css/admin.css. #}
+{% extends '@EasyAdmin/crud/detail.html.twig' %}
+{% import _self as exam %}
+
+{% macro questions(questions, sittings) %}
+    {% if sittings is not empty %}
+        <p class="mb-2">
+            <span class="text-muted">Days:</span>
+            {% for sitting in sittings %}<span class="badge bg-secondary me-1">{{ sitting.label }}</span>{% endfor %}
+        </p>
+    {% endif %}
+    {% if questions is empty %}
+        <p class="text-muted mb-0">No questions.</p>
+    {% else %}
+        <ol class="mb-0">
+            {% for question in questions %}
+                <li>{{ question is empty ? '(empty)' : question }}</li>
+            {% endfor %}
+        </ol>
+    {% endif %}
+{% endmacro %}
+
+{% block main %}
+    {{ parent() }}
+
+    <section class="mt-4">
+        <h2 class="h4">Now</h2>
+        {% if exam_current is null %}
+            <p class="text-muted">Nobody has written anything yet.</p>
+        {% else %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <p class="text-muted small mb-2">
+                        Last stored {{ exam_current.updatedAt|date('j M Y H:i') }}.
+                        {% if exam_current.contributors is not empty %}
+                            Changed since the latest version below by: {{ exam_current.contributors|join(', ') }}.
+                        {% endif %}
+                    </p>
+                    {{ exam.questions(exam_current.questions, exam_current.sittings) }}
+                </div>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="mt-4">
+        <h2 class="h4">Comments</h2>
+        {% if exam_comments is empty %}
+            <p class="text-muted">No comments yet.</p>
+        {% endif %}
+        {% for group in exam_comments %}
+            <div class="card mb-2">
+                <div class="card-header">
+                    <strong>{{ group.question }}</strong>
+                    {% if group.removed %}<span class="badge bg-secondary ms-1">Question removed</span>{% endif %}
+                </div>
+                <div class="card-body">
+                    {% for comment in group.comments %}
+                        <div class="d-flex justify-content-between align-items-start gap-3{{ not loop.last ? ' mb-3' }}">
+                            <div>
+                                <p class="text-muted small mb-1">
+                                    {{ comment.author }}, {{ comment.createdAt|date('j M Y H:i') }}
+                                    {% if comment.anonymous %}<span class="badge bg-info text-dark ms-1">Shown anonymously</span>{% endif %}
+                                </p>
+                                <p class="mb-0">{{ comment.content|nl2br }}</p>
+                            </div>
+                            <form action="{{ comment.deleteUrl }}" method="POST">
+                                <input type="hidden" name="_token" value="{{ csrf_token(constant('App\\Constants\\AdminActionCsrf::INTENTION')) }}">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fa fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </section>
+
+    <section class="mt-4">
+        <h2 class="h4">Earlier versions</h2>
+        <p class="text-muted small">
+            A version is kept at most every {{ constant('App\\Service\\Collab\\CollabDocumentStore::SNAPSHOT_INTERVAL') }}
+            of editing, and right before every restore. Restoring replaces the content for everyone
+            who has the exam open; the version it replaces is kept, so it can be undone.
+        </p>
+
+        {% if exam_revisions is empty %}
+            <p class="text-muted">No earlier versions yet.</p>
+        {% endif %}
+
+        {% for revision in exam_revisions %}
+            <details class="card mb-2">
+                <summary class="card-header d-flex flex-wrap align-items-center gap-2">
+                    <strong>{{ revision.createdAt|date('j M Y H:i') }}</strong>
+                    <span class="text-muted">{{ revision.questions|length }} {{ revision.questions|length == 1 ? 'question' : 'questions' }}</span>
+                    {% if revision.note %}<span class="badge bg-info text-dark">{{ revision.note }}</span>{% endif %}
+                    <span class="text-muted small">
+                        {{ revision.contributors is empty ? 'No recorded editors' : 'By ' ~ revision.contributors|join(', ') }}
+                    </span>
+                </summary>
+                <div class="card-body">
+                    {{ exam.questions(revision.questions, revision.sittings) }}
+                    <form action="{{ revision.restoreUrl }}" method="POST" class="mt-3">
+                        <input type="hidden" name="_token" value="{{ csrf_token(constant('App\\Constants\\AdminActionCsrf::INTENTION')) }}">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="fa fa-clock-rotate-left"></i> Restore this version
+                        </button>
+                    </form>
+                </div>
+            </details>
+        {% endfor %}
+    </section>
+{% endblock %}

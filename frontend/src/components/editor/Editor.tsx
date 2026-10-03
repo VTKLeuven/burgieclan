@@ -75,7 +75,11 @@ const InfoDialog = ({ isOpen, setIsOpen, parentDialogOpen }: InfoDialogProps) =>
     )
 }
 
-const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
+/**
+ * Formatting buttons for a TipTap editor. Exported so the live editor (components/collab) shares
+ * it; undo and redo work there too, because the Collaboration extension provides both commands.
+ */
+export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
     const [isInfoOpen, setIsInfoOpen] = useState(false);
 
     if (!editor) {

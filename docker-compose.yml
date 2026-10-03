@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:18@sha256:86c951e05bf56c93d95d397747fb8820ac76cc3bedb78f43abd83eedbe3666ae
+    image: postgres:18@sha256:5a5a84b19854a9ffaa54082c166ff4ec27473a361e496e5ea167f298f2da9722
     container_name: burgieclan-db
     volumes:
       - burgieclan-db:/var/lib/postgresql
@@ -35,6 +35,8 @@ services:
       FLUXUS_SSO_CLIENT_ID: ${FLUXUS_SSO_CLIENT_ID:?FLUXUS_SSO_CLIENT_ID is required}
       FLUXUS_SSO_CLIENT_SECRET: ${FLUXUS_SSO_CLIENT_SECRET:?FLUXUS_SSO_CLIENT_SECRET is required}
       FRONTEND_URL: "http://localhost:3002"
+      # Shared with the collab service below. A development-only value; production sets its own.
+      COLLAB_SECRET: &collab-secret "dev-only-collab-secret-not-for-production-0000"
       # Where uploaded documents live: `local` (backend/data/documents, the default) or
       # `s3` to use the SeaweedFS bucket below, the same code path as production.
       # Switch with `COMPOSE_PROFILES=s3 DOCUMENT_STORAGE=s3 docker compose up -d`, then run
@@ -80,6 +82,8 @@ services:
       - PORT=3002
       - NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
       - NEXT_PUBLIC_FRONTEND_URL=http://localhost:3002
+      # The browser opens this websocket itself, so it is the host port, not the service name.
+      - NEXT_PUBLIC_COLLAB_URL=ws://localhost:1234
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
 
@@ -89,6 +93,27 @@ services:
       - burgieclan-network
     extra_hosts:
       - "localhost:host-gateway"
+
+  # Live collaborative editing (Hocuspocus). Browsers connect to it over a websocket; it loads
+  # and stores documents through Symfony's internal routes. See collab/README.md.
+  collab:
+    container_name: burgieclan-collab
+    build:
+      context: .
+      dockerfile: ./collab/.docker/dev/Dockerfile
+    volumes:
+      - .:/app
+      - collab-node-modules:/app/collab/node_modules
+    ports:
+      - "1234:1234"
+    environment:
+      PORT: 1234
+      BACKEND_URL: "http://backend:8000"
+      COLLAB_SECRET: *collab-secret
+    depends_on:
+      - backend
+    networks:
+      - burgieclan-network
 
   # Local S3-compatible object storage, standing in for the production bucket.
   # Only used when the backend runs with DOCUMENT_STORAGE=s3, so it only starts with the s3 profile.
@@ -119,3 +144,4 @@ volumes:
   backend-var: {}
   frontend-node-modules: {}
   frontend-next: {}
+  collab-node-modules: {}

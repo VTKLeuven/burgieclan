@@ -420,10 +420,11 @@
     },
     "search": {
         "placeholder": "Zoeken...",
-        "info": "Zoek naar vakken, modules, opleidingen, documenten...",
+        "info": "Zoek naar vakken, modules, opleidingen, documenten, examenvragen...",
         "info_sub": "Krijg snel toegang tot elke pagina door een globale zoekopdracht uit te voeren.",
         "no_results": "Geen resultaten gevonden",
-        "no_results_sub": "Probeer een andere zoekopdracht of navigeer naar een andere pagina."
+        "no_results_sub": "Probeer een andere zoekopdracht of navigeer naar een andere pagina.",
+        "exam_questions": "Examenvragen"
     },
     "header": {
         "admin": "Beheer",
@@ -443,7 +444,9 @@
         "toggle_documents": "Documenten in-/uitklappen",
         "log_out": "Uitloggen",
         "go_to_vtk": "Ga naar VTK",
-        "user_avatar": "Gebruikersavatar"
+        "user_avatar": "Gebruikersavatar",
+        "in_this_folder": "In deze map",
+        "no_documents_in_folder": "Geen documenten in deze map"
     },
     "editor": {
         "info_dialog": {
@@ -492,5 +495,125 @@
         "label": "Curriculum",
         "expand": "{{name}} uitklappen",
         "collapse": "{{name}} inklappen"
+    },
+    "collab": {
+        "title": "Test live editor",
+        "kicker": "Ontwikkeltools",
+        "subtitle": "Open deze pagina in twee browsers en typ in beide. Enkel moderators kunnen ze gebruiken, en ze bestaat alleen in lokale ontwikkeling.",
+        "status": {
+            "connecting": "Verbinden…",
+            "connected": "Verbonden",
+            "disconnected": "Verbinding verbroken. Je wijzigingen worden verstuurd zodra ze terug is; sluit dit tabblad niet.",
+            "denied": "Je hebt geen toegang tot dit document.",
+            "unavailable": "Live bewerken is momenteel niet beschikbaar."
+        },
+        "people_here_one": "Enkel jij bent hier",
+        "people_here_other": "{{count}} mensen hier",
+        "read_only": "Alleen lezen"
+    },
+    "exam": {
+        "cancel": "Annuleren",
+        "you": "Jij",
+        "period": {
+            "january": "Januari",
+            "june": "Juni",
+            "august": "Augustus"
+        },
+        "name": {
+            "january": "Examen januari {{year}}",
+            "june": "Examen juni {{year}}",
+            "august": "Herexamen augustus {{year}}"
+        },
+        "section": {
+            "title": "Examens",
+            "description": "Reconstructies van examens, samen opgebouwd door wie ze aflegde. Net een examen gehad? Vul de vragen aan terwijl ze nog vers zijn.",
+            "start": "Reconstructie starten",
+            "empty": "Nog geen reconstructies voor dit vak.",
+            "error": "De reconstructies konden niet geladen worden.",
+            "open": "Open",
+            "locked": "Vergrendeld",
+            "questions_one": "1 vraag",
+            "questions_other": "{{count}} vragen"
+        },
+        "start": {
+            "title": "Reconstructie starten",
+            "description": "Er is één reconstructie per examen. Alle dagen van hetzelfde examen (bijvoorbeeld mondelinge examens over meerdere dagen) horen in dezelfde reconstructie: je voegt de dagen daarna zelf toe.",
+            "year": "Academiejaar",
+            "period": "Examenperiode",
+            "hint": {
+                "january": "Eerste semester",
+                "june": "Tweede semester",
+                "august": "Herexamens aug./sept."
+            },
+            "not-started": "Nog niet begonnen",
+            "exists": "Bestaat al",
+            "exists-long": "Voor dit examen bestaat al een reconstructie.",
+            "open-existing": "Open ze",
+            "copy": "Beginnen vanuit",
+            "copy-none": "Een leeg examen",
+            "copy-help": "Handig als het examen grotendeels hetzelfde was als een eerder examen van dit vak.",
+            "submit": "Starten",
+            "submitting": "Starten…",
+            "rate-limited": "Je hebt vandaag al veel reconstructies gestart. Probeer het later opnieuw, of vraag het aan een moderator."
+        },
+        "page": {
+            "editable-until": "Iedereen kan dit bewerken tot {{date}}",
+            "locked": "Vergrendeld: alleen lezen. Een moderator kan het heropenen.",
+            "copied-from": "Begonnen als kopie van een ander examen",
+            "intro": "Iedereen die het examen aflegde, kan hier tegelijk de vragen reconstrueren. Voeg de dagen toe waarop het examen doorging en duid bij elke vraag aan op welke dagen ze gevraagd werd.",
+            "privacy": "Is je account anoniem ingesteld, dan zien anderen je hier onder een schuilnaam zoals \"Anonieme Pinguïn\". Elke wijziging wordt bijgehouden; moderatoren kunnen eerdere versies terugzetten."
+        },
+        "editor": {
+            "label": "Examenvragen",
+            "empty": "Nog geen vragen.",
+            "add-question": "Vraag toevoegen",
+            "shortcut": "Of Ctrl/⌘ + Shift + Enter om een vraag in te voegen na de vraag waarin je typt.",
+            "stored-copy": "Je ziet de laatst opgeslagen versie.",
+            "too-large": "Deze reconstructie is te groot geworden om nog te bewerken. Een moderator kan een eerdere versie terugzetten."
+        },
+        "question": {
+            "label": "Vraag",
+            "sittings": "Gevraagd op",
+            "drag": "Sleep om te verplaatsen",
+            "up": "Vraag omhoog",
+            "down": "Vraag omlaag",
+            "delete": "Vraag verwijderen"
+        },
+        "discussion": {
+            "comments_one": "{{count}} reactie",
+            "comments_other": "{{count}} reacties",
+            "had-this-too": "Ik had deze ook",
+            "had-this-too-help_one": "{{count}} persoon had deze vraag ook",
+            "had-this-too-help_other": "{{count}} mensen hadden deze vraag ook",
+            "loading": "Reacties laden…",
+            "empty": "Nog geen reacties. Vraag naar het antwoord, of vul aan wat je nog weet.",
+            "placeholder": "Bespreek het antwoord, of vul aan wat je nog weet",
+            "new": "Nieuwe reactie",
+            "as-anonymous": "Je reageert anoniem, onder dezelfde naam als je cursor in dit examen.",
+            "as-named": "Je reageert onder je eigen naam. Dat pas je aan bij je accountinstellingen.",
+            "post": "Plaatsen",
+            "edit": "Bewerken",
+            "save": "Opslaan",
+            "delete": "Verwijderen",
+            "delete-confirm": "Deze reactie verwijderen?",
+            "rate-limited": "Je gaat wat snel. Probeer het over een paar minuten opnieuw.",
+            "error": "Dat lukte niet. Probeer het opnieuw."
+        },
+        "sittings": {
+            "title": "Examendagen",
+            "new": "Nieuwe examendag",
+            "placeholder": "bv. ma 20 jan of mondeling dag 2",
+            "add": "Dag toevoegen",
+            "add-first": "Examendag toevoegen",
+            "rename": "{{label}} hernoemen",
+            "remove": "{{label}} verwijderen",
+            "remove-confirm": {
+                "title": "{{label}} verwijderen?",
+                "body-one": "{{label}} is aangeduid bij 1 vraag. Als je de dag verwijdert, verdwijnt hij ook bij die vraag.",
+                "body-other": "{{label}} is aangeduid bij {{count}} vragen. Als je de dag verwijdert, verdwijnt hij ook bij die vragen.",
+                "undo": "Toch niet? Met Ctrl/⌘ + Z in de vragen zet je hem terug.",
+                "submit": "Dag verwijderen"
+            }
+        }
     }
 }
