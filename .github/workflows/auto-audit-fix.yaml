@@ -51,7 +51,9 @@ jobs:
 
           # Only rewrite the lockfile: installing would run the install scripts of the new
           # versions here, with a token that can push and open pull requests.
-          npm audit fix --package-lock-only
+          # It exits 1 whenever any vulnerability is left, including ones with no patched
+          # version yet; the diff below decides whether there is anything to propose.
+          npm audit fix --package-lock-only || true
 
           if git diff --quiet package-lock.json; then
             echo "npm audit fix made no changes."
