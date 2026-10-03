@@ -419,10 +419,11 @@
     },
     "search": {
         "placeholder": "Search...",
-        "info": "Search for courses, modules, programs, documents...",
+        "info": "Search for courses, modules, programs, documents, exam questions...",
         "info_sub": "Quickly access any page by running a global search.",
         "no_results": "No results found",
-        "no_results_sub": "Try searching for something else or check your spelling."
+        "no_results_sub": "Try searching for something else or check your spelling.",
+        "exam_questions": "Exam questions"
     },
     "header": {
         "admin": "Admin",

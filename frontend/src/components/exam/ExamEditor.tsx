@@ -20,7 +20,7 @@ import { yUndoPluginKey } from '@tiptap/y-tiptap';
 import clsx from 'clsx';
 import 'katex/dist/katex.min.css';
 import { Plus } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 function LiveExam({ session, readOnly, hidden, discussion }: {
@@ -137,6 +137,48 @@ function LiveExam({ session, readOnly, hidden, discussion }: {
     );
 }
 
+/** How long a linked question stays highlighted, in ms; matches the animation in globals.css. */
+const LINKED_HIGHLIGHT_MS = 2500;
+
+/**
+ * A link like a search result opens the exam at one question: …/exams/{id}#q-{uid}. The questions
+ * only exist once the document has rendered, so the browser cannot scroll there by itself. This
+ * does, once `ready`, and highlights the question for a moment.
+ */
+function useScrollToLinkedQuestion(ready: boolean) {
+    const done = useRef(false);
+
+    useEffect(() => {
+        if (!ready || done.current) {
+            return;
+        }
+        const id = decodeURIComponent(window.location.hash.slice(1));
+        if (!id.startsWith('q-')) {
+            return;
+        }
+        done.current = true;
+
+        // Node views mount a moment after the editor; look again for up to two seconds.
+        let tries = 0;
+        let retry: number | undefined;
+        const find = () => {
+            const question = document.getElementById(id);
+            if (!question) {
+                if (++tries < 20) {
+                    retry = window.setTimeout(find, 100);
+                }
+                return;
+            }
+            question.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            question.classList.add('exam-question__inner--linked');
+            window.setTimeout(() => question.classList.remove('exam-question__inner--linked'), LINKED_HIGHLIGHT_MS);
+        };
+        find();
+
+        return () => window.clearTimeout(retry);
+    }, [ready]);
+}
+
 /**
  * An exam reconstruction, edited live by everyone who has it open.
  *
@@ -162,6 +204,9 @@ export default function ExamEditor({ exam, onAccessChange }: {
 
     const refused = status === 'denied' || status === 'unavailable';
     const live = session !== null && !refused && synced;
+    // Wait for the live document, or for the stored copy when live editing is unavailable: the
+    // copy shown while connecting is swapped out and would scroll to the wrong place.
+    useScrollToLinkedQuestion(live || refused);
 
     return (
         <div className="grid gap-4">

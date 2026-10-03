@@ -10,6 +10,7 @@ import {
     type DocumentView,
     type Exam,
     type ExamQuestionComment,
+    type ExamQuestionSearchHit,
     type ExamQuestionStats,
     type ExamSitting,
     type FaqItem,
@@ -248,6 +249,24 @@ export function convertToExamQuestionComment(comment: unknown): ExamQuestionComm
         mine: data.mine === true,
         createdAt: parseDate(data.createdAt),
         updatedAt: parseDate(data.updatedAt),
+    };
+}
+
+export function convertToExamQuestionSearchHit(hit: unknown): ExamQuestionSearchHit {
+    const data = toRecord(hit, 'ExamQuestionSearchHit');
+    const period = EXAM_PERIODS.find((candidate) => candidate === data.period);
+    if (!period || typeof data.uid !== 'string' || typeof data.snippet !== 'string'
+        || typeof data.examId !== 'number' || typeof data.academicYear !== 'string') {
+        throw new Error('ExamQuestionSearchHit: expected uid, snippet, examId, academicYear and period');
+    }
+
+    return {
+        uid: data.uid,
+        snippet: data.snippet,
+        examId: data.examId,
+        academicYear: data.academicYear,
+        period,
+        course: convertToCourse(data.course),
     };
 }
 

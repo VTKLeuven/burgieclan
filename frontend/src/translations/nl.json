@@ -419,10 +419,11 @@
     },
     "search": {
         "placeholder": "Zoeken...",
-        "info": "Zoek naar vakken, modules, opleidingen, documenten...",
+        "info": "Zoek naar vakken, modules, opleidingen, documenten, examenvragen...",
         "info_sub": "Krijg snel toegang tot elke pagina door een globale zoekopdracht uit te voeren.",
         "no_results": "Geen resultaten gevonden",
-        "no_results_sub": "Probeer een andere zoekopdracht of navigeer naar een andere pagina."
+        "no_results_sub": "Probeer een andere zoekopdracht of navigeer naar een andere pagina.",
+        "exam_questions": "Examenvragen"
     },
     "header": {
         "admin": "Beheer",

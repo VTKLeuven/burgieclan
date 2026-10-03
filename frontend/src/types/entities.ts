@@ -78,6 +78,18 @@ export interface ExamQuestionComment extends BaseEntity {
     mine: boolean;
 }
 
+/** A question of an exam reconstruction in the search results. */
+export interface ExamQuestionSearchHit {
+    /** The question's permanent id: the page links to it as #q-{uid}. */
+    uid: string;
+    /** A short piece of the question around what matched; plain text. */
+    snippet: string;
+    examId: number;
+    academicYear: string;
+    period: ExamPeriod;
+    course: Course;
+}
+
 /** Per question: comments, "Ik had deze ook", and whether you said so yourself. */
 export interface ExamQuestionStats {
     uid: string;

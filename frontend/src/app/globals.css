@@ -873,6 +873,12 @@
       @apply px-4 py-3;
     }
 
+    /* A question opened from a link (#q-{uid}, e.g. a search result) lights up for a moment. */
+    .exam-question__inner--linked {
+      @apply rounded-xl;
+      animation: exam-question-linked 2.5s ease-out;
+    }
+
     /* The comments below a question: outside the document, so not editable text. */
     .exam-question__thread {
       @apply grid gap-3 rounded-b-xl border-t border-vtk-line bg-vtk-paper-2 px-4 py-3 select-text;
@@ -885,6 +891,11 @@
     .exam-chip {
       @apply m-0;
     }
+  }
+
+  @keyframes exam-question-linked {
+    0%, 60% { box-shadow: 0 0 0 3px var(--color-vtk-yellow); }
+    100% { box-shadow: 0 0 0 3px transparent; }
   }
 
   /* A day an exam was given on: a tag in the days bar, a toggle on each question. */
