@@ -9,6 +9,8 @@ import {
     type DocumentComment,
     type DocumentView,
     type Exam,
+    type ExamQuestionComment,
+    type ExamQuestionStats,
     type ExamSitting,
     type FaqItem,
     type CurriculumPath,
@@ -229,6 +231,40 @@ function convertToExamSitting(sitting: unknown): ExamSitting | null {
     }
     const { id, label } = sitting as ApiRecord;
     return typeof id === 'string' && typeof label === 'string' ? { id, label } : null;
+}
+
+export function convertToExamQuestionComment(comment: unknown): ExamQuestionComment {
+    const data = toRecord(comment, 'ExamQuestionComment');
+    if (typeof data.questionUid !== 'string' || typeof data.content !== 'string' || typeof data.authorName !== 'string') {
+        throw new Error('ExamQuestionComment: expected questionUid, content and authorName');
+    }
+
+    return {
+        id: parseId(data['@id']),
+        questionUid: data.questionUid,
+        content: data.content,
+        authorName: data.authorName,
+        anonymous: data.anonymous === true,
+        mine: data.mine === true,
+        createdAt: parseDate(data.createdAt),
+        updatedAt: parseDate(data.updatedAt),
+    };
+}
+
+/** GET /api/exams/{id}/question_stats, by question uid. Malformed entries are skipped. */
+export function convertToExamQuestionStats(stats: unknown): Record<string, ExamQuestionStats> {
+    const byUid: Record<string, ExamQuestionStats> = {};
+    for (const entry of asArray(toRecord(stats, 'ExamQuestionStats').questions) ?? []) {
+        if (entry === null || typeof entry !== 'object') {
+            continue;
+        }
+        const { uid, comments, confirmations, confirmed } = entry as ApiRecord;
+        if (typeof uid === 'string' && typeof comments === 'number' && typeof confirmations === 'number') {
+            byUid[uid] = { uid, comments, confirmations, confirmed: confirmed === true };
+        }
+    }
+
+    return byUid;
 }
 
 /** Related resources arrive as an IRI string or as an object with an "@id". */

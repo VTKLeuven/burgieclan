@@ -21,6 +21,8 @@ final class SerializationGroups
     public const EXAM_GET = 'exam:get';
     /** Only on a single exam: the stored content, too heavy for the list on a course page. */
     public const EXAM_DETAIL = 'exam:detail';
+    public const EXAM_QUESTION_COMMENT_GET = 'exam_question_comment:get';
+    public const EXAM_QUESTION_STATS_GET = 'exam_question_stats:get';
     public const MODULE_GET = 'module:get';
     public const PAGE_GET = 'page:get';
     public const PROGRAM_GET = 'program:get';
@@ -34,6 +36,8 @@ final class SerializationGroups
     public const DOCUMENT_CREATE = 'document:create';
     public const COURSE_RATING_WRITE = 'course_rating:write';
     public const EXAM_CREATE = 'exam:create';
+    public const EXAM_QUESTION_COMMENT_CREATE = 'exam_question_comment:create';
+    public const EXAM_QUESTION_COMMENT_EDIT = 'exam_question_comment:edit';
 
     // User-related groups
     public const USER = 'user';

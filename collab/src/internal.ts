@@ -8,6 +8,7 @@ import { HEADER_SIGNATURE, HEADER_TIMESTAMP, signRequest } from './backend.ts';
  *
  *   POST /internal/documents/{name}/restore      {"state": "<base64 Yjs update>"}
  *   POST /internal/documents/{name}/disconnect
+ *   POST /internal/documents/{name}/broadcast    {...}, any small JSON object
  *
  * Requests are signed exactly like the ones this server sends to Symfony (backend.ts), and
  * checked like Symfony checks those (CollabRequestSignature): same secret, same clock skew.
@@ -23,14 +24,22 @@ export const MAX_SKEW_SECONDS = 300;
 /** A restore carries a whole document; CollabDocumentController::MAX_STATE_BYTES is 5 MB, base64 adds a third. */
 export const MAX_BODY_BYTES = 8 * 1024 * 1024;
 
+/** A broadcast is a notification, like {"type": "question-activity", "uid": "…"}, never content. */
+export const MAX_BROADCAST_BYTES = 4096;
+
 const DOCUMENT_NAME = /^[a-z0-9][a-z0-9-]{0,99}$/;
-const ROUTE = /^\/internal\/documents\/([^/]+)\/(restore|disconnect)$/;
+const ROUTE = /^\/internal\/documents\/([^/]+)\/(restore|disconnect|broadcast)$/;
 
 export interface InternalActions {
     /** Replace the content of a live document with an earlier state. */
     restore(documentName: string, state: Uint8Array): Promise<void>;
     /** Close every connection to a document so clients reconnect with a fresh token. */
     disconnect(documentName: string): Promise<void>;
+    /**
+     * Send `message` (JSON text) as a stateless message to everyone who has the document open.
+     * Does nothing when nobody does; never loads a document just for this.
+     */
+    broadcast(documentName: string, message: string): void;
 }
 
 export function isValidSignature(
@@ -135,6 +144,16 @@ export async function handleInternalRequest(
             payload = JSON.parse(body);
         } catch {
             payload = null;
+        }
+
+        if (match[2] === 'broadcast') {
+            if (typeof payload !== 'object' || payload === null || Array.isArray(payload) || body.length > MAX_BROADCAST_BYTES) {
+                reply(response, 400, `Expected a JSON object of at most ${MAX_BROADCAST_BYTES} bytes.`);
+                return true;
+            }
+            actions.broadcast(documentName, JSON.stringify(payload));
+            reply(response, 204);
+            return true;
         }
         const state = typeof payload === 'object' && payload !== null && 'state' in payload ? payload.state : null;
         if (typeof state !== 'string' || state === '') {

@@ -36,6 +36,10 @@ browser ── TipTap + Collaboration ── websocket ──▶ collab (this ap
      ones, as one normal edit that reaches everyone who has it open.
    - `POST /internal/documents/{name}/disconnect`: a moderator locked or reopened it. Every
      websocket on the document is closed, so browsers reconnect with a fresh token.
+   - `POST /internal/documents/{name}/broadcast` with a small JSON object: something around the
+     document changed, e.g. a comment on a question (`{"type": "question-activity", "uid": "…"}`).
+     It goes out as a stateless message to everyone who has the document open, and is dropped
+     when nobody does. A document is never loaded just for this.
 
    A token can also say when its document locks (`until`): a connection opened before that stops
    editing once it passes, and is sent away to fetch a read-only token.

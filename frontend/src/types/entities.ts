@@ -63,6 +63,29 @@ export interface Exam extends BaseEntity {
     sittings: ExamSitting[];
 }
 
+/**
+ * A comment on one question of an exam reconstruction. The author is never sent, only the name
+ * to show: their full name, or their pseudonym for this exam when the comment is anonymous.
+ */
+export interface ExamQuestionComment extends BaseEntity {
+    /** The question's permanent id in the editor (the examQuestion node's `id`). */
+    questionUid: string;
+    /** Plain text; show it as text, never as HTML. */
+    content: string;
+    authorName: string;
+    anonymous: boolean;
+    /** Written by whoever is looking, who may edit and delete it. */
+    mine: boolean;
+}
+
+/** Per question: comments, "Ik had deze ook", and whether you said so yourself. */
+export interface ExamQuestionStats {
+    uid: string;
+    comments: number;
+    confirmations: number;
+    confirmed: boolean;
+}
+
 export interface Module extends BaseEntity {
     name?: string;
     isElective?: boolean;

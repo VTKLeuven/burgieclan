@@ -5,6 +5,8 @@ namespace App\Tests\Controller\Admin;
 use App\Entity\CollabDocument;
 use App\Entity\CollabDocumentRevision;
 use App\Entity\Exam;
+use App\Entity\ExamQuestion;
+use App\Entity\ExamQuestionComment;
 use App\Entity\User;
 use App\Factory\ExamFactory;
 use App\Factory\UserFactory;
@@ -286,6 +288,42 @@ class ExamCrudControllerTest extends WebTestCase
         self::assertNull($this->entityManager()->find(Exam::class, $id));
         self::assertSame(
             ['http://collab.test/internal/documents/exam-' . $id . '/disconnect'],
+            array_column($this->collabRequests, 'url')
+        );
+    }
+
+    public function testModeratorsSeeCommentsWithTheirAuthorsAndDeleteThem(): void
+    {
+        $this->loginAs(User::ROLE_MODERATOR);
+        $exam = ExamFactory::createOne();
+        $author = UserFactory::createOne(['fullName' => 'Anna Auteur', 'username' => 'r0654321']);
+        $question = new ExamQuestion($exam, 'q1');
+        $question->setText('Bewijs de stelling.');
+        $comment = new ExamQuestionComment($author, $question);
+        $comment->setContent('Zie <b>slide 12</b>.')->setAnonymous(true);
+        $this->entityManager()->persist($question);
+        $this->entityManager()->persist($comment);
+        $this->entityManager()->flush();
+        $commentId = $comment->getId();
+
+        $crawler = $this->detailPage($exam);
+        $section = $crawler->filter('section')->reduce(
+            static fn(Crawler $node): bool => str_contains($node->filter('h2')->text(''), 'Comments')
+        );
+        self::assertStringContainsString('Bewijs de stelling.', $section->text());
+        // Moderators see who wrote an anonymous comment; the text is printed, never interpreted.
+        self::assertStringContainsString('Anna Auteur (r0654321)', $section->text());
+        self::assertStringContainsString('Shown anonymously', $section->text());
+        self::assertStringContainsString('Zie <b>slide 12</b>.', $section->text());
+        self::assertCount(0, $section->filter('p b'));
+
+        $this->client->submit($section->filter('form')->form());
+        self::assertResponseRedirects();
+
+        $this->entityManager()->clear();
+        self::assertNull($this->entityManager()->find(ExamQuestionComment::class, $commentId));
+        self::assertSame(
+            ['http://collab.test/internal/documents/exam-' . $exam->getId() . '/broadcast'],
             array_column($this->collabRequests, 'url')
         );
     }

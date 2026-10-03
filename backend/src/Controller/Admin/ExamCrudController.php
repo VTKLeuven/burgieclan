@@ -8,13 +8,16 @@ use App\Entity\CollabDocument;
 use App\Entity\CollabDocumentRevision;
 use App\Entity\Course;
 use App\Entity\Exam;
+use App\Entity\ExamQuestionComment;
 use App\Entity\User;
 use App\Repository\CollabDocumentRepository;
 use App\Repository\CollabDocumentRevisionRepository;
+use App\Repository\ExamQuestionCommentRepository;
 use App\Repository\UserRepository;
 use App\Service\Collab\CollabDocumentStore;
 use App\Service\Collab\CollabServerClient;
 use App\Service\Collab\CollabServerException;
+use App\Service\Exam\ExamQuestionActivity;
 use App\Utils\ExamContent;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,7 +41,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Exam reconstructions for moderators: see who changed what, roll back, lock and reopen.
+ * Exam reconstructions for moderators: see who changed what, roll back, lock and reopen, and
+ * remove comments on questions.
  *
  * Students start and edit reconstructions on the site; nothing here edits content directly. A
  * rollback goes through the collab server (CollabServerClient::restore) so everyone who has the
@@ -62,6 +66,8 @@ class ExamCrudController extends AbstractCrudController
         private readonly CollabDocumentStore $store,
         private readonly CollabServerClient $collab,
         private readonly AdminUrlGenerator $adminUrlGenerator,
+        private readonly ExamQuestionCommentRepository $comments,
+        private readonly ExamQuestionActivity $activity,
     ) {}
 
     public static function getEntityFqcn(): string
@@ -207,6 +213,7 @@ class ExamCrudController extends AbstractCrudController
                 $revisions
             )
         );
+        $responseParameters->set('exam_comments', $this->commentsByQuestion($exam));
 
         return $responseParameters;
     }
@@ -331,6 +338,83 @@ class ExamCrudController extends AbstractCrudController
         );
 
         return $this->redirectToDetail($exam);
+    }
+
+    /**
+     * Removes a comment on one of the exam's questions, e.g. one that is abusive or leaks
+     * something. Everyone who has the exam open sees it disappear.
+     */
+    // Not ".../delete": EasyAdmin's own /{entityId}/delete would catch it, with "comments" as the id.
+    #[AdminRoute('/comments/remove', name: 'deleteComment', options: ['methods' => ['POST']])]
+    public function deleteComment(AdminContext $context, EntityManagerInterface $entityManager): RedirectResponse
+    {
+        $exam = $this->loadExam($context, $entityManager);
+        if ($invalid = $this->assertCsrf($context, $exam)) {
+            return $invalid;
+        }
+
+        $comment = $this->comments->find((int) $context->getRequest()->query->get('commentId'));
+        if (null === $comment || $comment->getQuestion()->getExam()->getId() !== $exam->getId()) {
+            throw $this->createNotFoundException('This comment does not belong to this exam.');
+        }
+
+        $uid = $comment->getQuestion()->getUid();
+        $entityManager->remove($comment);
+        $entityManager->flush();
+        $this->activity->questionChanged((int) $exam->getId(), $uid);
+
+        $this->addFlash('success', 'Comment deleted.');
+
+        return $this->redirectToDetail($exam);
+    }
+
+    /**
+     * The comments for the detail page, grouped by question, with their real authors.
+     *
+     * @return list<array{question: string, removed: bool, comments: list<array<string, mixed>>}>
+     */
+    private function commentsByQuestion(Exam $exam): array
+    {
+        $groups = [];
+        foreach ($this->comments->findForExam($exam) as $comment) {
+            $question = $comment->getQuestion();
+            $key = (int) $question->getId();
+            $text = $question->getText();
+            $groups[$key] ??= [
+                'question' => match (true) {
+                    '' === $text => '(no text yet)',
+                    mb_strlen($text) > 160 => mb_substr($text, 0, 159) . '…',
+                    default => $text,
+                },
+                'removed' => $question->isRemoved(),
+                'comments' => [],
+            ];
+            $groups[$key]['comments'][] = $this->commentRow($exam, $comment);
+        }
+
+        return array_values($groups);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function commentRow(Exam $exam, ExamQuestionComment $comment): array
+    {
+        $author = $comment->getCreator();
+
+        return [
+            'author' => sprintf('%s (%s)', $author->getFullName(), $author->getUsername()),
+            'anonymous' => $comment->isAnonymous(),
+            'createdAt' => $comment->getCreatedAt(),
+            'content' => $comment->getContent(),
+            'deleteUrl' => $this->adminUrlGenerator
+                ->unsetAll()
+                ->setController(self::class)
+                ->setAction('deleteComment')
+                ->setEntityId($exam->getId())
+                ->set('commentId', $comment->getId())
+                ->generateUrl(),
+        ];
     }
 
     private function reconnectEveryone(Exam $exam): void

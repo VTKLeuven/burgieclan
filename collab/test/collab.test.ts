@@ -523,6 +523,29 @@ describe('collab server', () => {
         assert.equal(JSON.stringify(backend.documents.get('until-doc')?.content).includes('after the lock'), false);
     });
 
+    it('passes a notification from Symfony to everyone who has the document open, without loading others', async () => {
+        const client = await connect('notify-doc', await mintToken({ doc: 'notify-doc' }));
+        const received: string[] = [];
+        client.provider.on('stateless', ({ payload }: { payload: string }) => received.push(payload));
+
+        const message = { type: 'question-activity', uid: 'q1' };
+        const response = await internalRequest('/internal/documents/notify-doc/broadcast', message);
+        assert.equal(response.status, 204);
+        await waitFor(() => received.length === 1, 'the notification');
+        assert.deepEqual(JSON.parse(received[0] ?? ''), message);
+
+        // Nobody has this one open: nothing to tell, and nothing is loaded for it.
+        const idle = await internalRequest('/internal/documents/idle-doc/broadcast', message);
+        assert.equal(idle.status, 204);
+        assert.equal(backend.requests.some((request) => request.path.endsWith('/idle-doc')), false);
+
+        // Only a small JSON object, never content.
+        assert.equal((await internalRequest('/internal/documents/notify-doc/broadcast', [1, 2])).status, 400);
+        assert.equal((await internalRequest('/internal/documents/notify-doc/broadcast', { text: 'x'.repeat(5000) })).status, 400);
+        assert.equal((await internalRequest('/internal/documents/notify-doc/broadcast', message, 'wrong-secret-0123456789abcdef0123456789')).status, 401);
+        assert.equal(received.length, 1);
+    });
+
     it('closes editing on a document that grew too large, says why, and reopens it once rolled back', async () => {
         let tokens = 0;
         const client = await connect('big-doc', async () => {

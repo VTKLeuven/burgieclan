@@ -577,6 +577,26 @@
             "down": "Move question down",
             "delete": "Delete question"
         },
+        "discussion": {
+            "comments_one": "{{count}} comment",
+            "comments_other": "{{count}} comments",
+            "had-this-too": "I had this too",
+            "had-this-too-help_one": "{{count}} person had this question too",
+            "had-this-too-help_other": "{{count}} people had this question too",
+            "loading": "Loading comments…",
+            "empty": "No comments yet. Ask about the answer, or add what you remember.",
+            "placeholder": "Discuss the answer, or add what you remember",
+            "new": "New comment",
+            "as-anonymous": "You comment anonymously, under the same name as your cursor in this exam.",
+            "as-named": "You comment under your own name. You can change this in your account settings.",
+            "post": "Post",
+            "edit": "Edit",
+            "save": "Save",
+            "delete": "Delete",
+            "delete-confirm": "Delete this comment?",
+            "rate-limited": "You are going a little fast. Try again in a few minutes.",
+            "error": "That did not work. Try again."
+        },
         "sittings": {
             "title": "Exam days",
             "new": "New exam day",

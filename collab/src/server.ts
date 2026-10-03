@@ -314,6 +314,7 @@ export function createCollabServer(options: CollabServerOptions): Server<Connect
             const handled = await handleInternalRequest(request, response, options.secret, {
                 restore: (documentName, state) => restoreDocument(instance, documentName, state),
                 disconnect: async (documentName) => reconnectEveryone(instance, documentName),
+                broadcast: (documentName, message) => instance.documents.get(documentName)?.broadcastStateless(message),
             }, log);
 
             return handled ? Promise.reject() : undefined;

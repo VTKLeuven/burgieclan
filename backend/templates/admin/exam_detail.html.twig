@@ -45,6 +45,40 @@
     </section>
 
     <section class="mt-4">
+        <h2 class="h4">Comments</h2>
+        {% if exam_comments is empty %}
+            <p class="text-muted">No comments yet.</p>
+        {% endif %}
+        {% for group in exam_comments %}
+            <div class="card mb-2">
+                <div class="card-header">
+                    <strong>{{ group.question }}</strong>
+                    {% if group.removed %}<span class="badge bg-secondary ms-1">Question removed</span>{% endif %}
+                </div>
+                <div class="card-body">
+                    {% for comment in group.comments %}
+                        <div class="d-flex justify-content-between align-items-start gap-3{{ not loop.last ? ' mb-3' }}">
+                            <div>
+                                <p class="text-muted small mb-1">
+                                    {{ comment.author }}, {{ comment.createdAt|date('j M Y H:i') }}
+                                    {% if comment.anonymous %}<span class="badge bg-info text-dark ms-1">Shown anonymously</span>{% endif %}
+                                </p>
+                                <p class="mb-0">{{ comment.content|nl2br }}</p>
+                            </div>
+                            <form action="{{ comment.deleteUrl }}" method="POST">
+                                <input type="hidden" name="_token" value="{{ csrf_token(constant('App\\Constants\\AdminActionCsrf::INTENTION')) }}">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fa fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </section>
+
+    <section class="mt-4">
         <h2 class="h4">Earlier versions</h2>
         <p class="text-muted small">
             A version is kept at most every {{ constant('App\\Service\\Collab\\CollabDocumentStore::SNAPSHOT_INTERVAL') }}

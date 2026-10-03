@@ -9,6 +9,7 @@ import ExamReadOnly from '@/components/exam/ExamReadOnly';
 import { examExtensions } from '@/components/exam/extensions';
 import RemoveSittingDialog, { type SittingRemoval } from '@/components/exam/RemoveSittingDialog';
 import SittingsBar from '@/components/exam/SittingsBar';
+import { useQuestionDiscussion, type QuestionDiscussion } from '@/components/exam/useQuestionDiscussion';
 import { SITTINGS_FIELD, SITTINGS_ORIGIN, useSittings } from '@/components/exam/useSittings';
 import { useUser } from '@/components/UserContext';
 import type { Exam } from '@/types/entities';
@@ -22,7 +23,12 @@ import { Plus } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-function LiveExam({ session, readOnly, hidden }: { session: CollabSession; readOnly: boolean; hidden: boolean }) {
+function LiveExam({ session, readOnly, hidden, discussion }: {
+    session: CollabSession;
+    readOnly: boolean;
+    hidden: boolean;
+    discussion: QuestionDiscussion;
+}) {
     const { t } = useTranslation();
     const { user } = useUser();
     const { sittings, add, rename, remove } = useSittings(session.doc);
@@ -94,7 +100,7 @@ function LiveExam({ session, readOnly, hidden }: { session: CollabSession; readO
         editor?.chain().focus().insertExamQuestion({ atEnd: true }).run();
     };
 
-    const context = useMemo(() => ({ sittings, editable }), [sittings, editable]);
+    const context = useMemo(() => ({ sittings, editable, discussion }), [sittings, editable, discussion]);
 
     return (
         <ExamEditorContext.Provider value={context}>
@@ -144,7 +150,8 @@ export default function ExamEditor({ exam, onAccessChange }: {
     onAccessChange?: (readOnly: boolean) => void;
 }) {
     const { t } = useTranslation();
-    const { session, status, readOnly, synced, people, tooLarge } = useCollabSession(exam.documentName);
+    const { session, status, readOnly, synced, people, tooLarge, activity } = useCollabSession(exam.documentName);
+    const discussion = useQuestionDiscussion(exam.id, activity);
 
     const accessKnown = status === 'connected';
     useEffect(() => {
@@ -167,8 +174,10 @@ export default function ExamEditor({ exam, onAccessChange }: {
                 <p className="vtk-error-text m-0">{t('exam.editor.too-large')}</p>
             )}
 
-            {session && !refused && <LiveExam session={session} readOnly={readOnly} hidden={!synced} />}
-            {!live && <ExamReadOnly exam={exam} />}
+            {session && !refused && (
+                <LiveExam session={session} readOnly={readOnly} hidden={!synced} discussion={discussion} />
+            )}
+            {!live && <ExamReadOnly exam={exam} discussion={discussion} />}
         </div>
     );
 }

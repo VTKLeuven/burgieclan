@@ -577,6 +577,26 @@
             "down": "Vraag omlaag",
             "delete": "Vraag verwijderen"
         },
+        "discussion": {
+            "comments_one": "{{count}} reactie",
+            "comments_other": "{{count}} reacties",
+            "had-this-too": "Ik had deze ook",
+            "had-this-too-help_one": "{{count}} persoon had deze vraag ook",
+            "had-this-too-help_other": "{{count}} mensen hadden deze vraag ook",
+            "loading": "Reacties laden…",
+            "empty": "Nog geen reacties. Vraag naar het antwoord, of vul aan wat je nog weet.",
+            "placeholder": "Bespreek het antwoord, of vul aan wat je nog weet",
+            "new": "Nieuwe reactie",
+            "as-anonymous": "Je reageert anoniem, onder dezelfde naam als je cursor in dit examen.",
+            "as-named": "Je reageert onder je eigen naam. Dat pas je aan bij je accountinstellingen.",
+            "post": "Plaatsen",
+            "edit": "Bewerken",
+            "save": "Opslaan",
+            "delete": "Verwijderen",
+            "delete-confirm": "Deze reactie verwijderen?",
+            "rate-limited": "Je gaat wat snel. Probeer het over een paar minuten opnieuw.",
+            "error": "Dat lukte niet. Probeer het opnieuw."
+        },
         "sittings": {
             "title": "Examendagen",
             "new": "Nieuwe examendag",
