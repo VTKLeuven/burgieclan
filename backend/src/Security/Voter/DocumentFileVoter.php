@@ -44,8 +44,6 @@ class DocumentFileVoter extends Voter
             return false;
         }
 
-        assert($subject instanceof Document);
-
         if (!$subject->isUnderReview()) {
             return true;
         }
