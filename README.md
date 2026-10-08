@@ -70,6 +70,17 @@ make up
 
 Then reopen in your chosen development container (Backend or Frontend).
 
+#### Testing with S3 Storage Locally
+
+By default, uploaded documents are stored in `backend/data/documents`. Production stores them in an S3 bucket and serves downloads through pre-signed URLs. To run that same code path locally against the bundled SeaweedFS container (the `s3` compose profile, which a plain `make up` leaves off):
+
+```bash
+COMPOSE_PROFILES=s3 DOCUMENT_STORAGE=s3 docker compose up -d
+docker compose exec backend php bin/console app:s3:setup-bucket --sync-local   # once: bucket, CORS rules and the fixture files
+```
+
+The bucket is reachable at `http://localhost:8333` (access key `burgieclan`, secret `burgieclan-dev-secret`). `--sync-local` copies the files in `backend/data/documents` that the bucket does not have yet, so the fixture documents from `make db` open in S3 mode too. It only adds to your local SeaweedFS bucket and refuses to run with `APP_ENV=prod`.
+
 #### Additional Makefile Commands
 
 The `Makefile` contains many useful commands designed to be run from the host machine. If you are running commands directly inside the container, run the underlying command itself (e.g., `php bin/console` instead of `docker compose exec backend php bin/console`).
@@ -115,6 +126,7 @@ The application is automatically deployed via GitHub Actions. **No manual interv
 1. Docker and Docker Compose installed
 2. Directories created (see Manual Deployment section below)
 3. `.env` file configured (see Manual Deployment section below)
+4. S3 credentials that may set the bucket's CORS and lifecycle rules: every deploy runs `app:s3:setup-bucket` after the migrations (see step 8 of the Manual Deployment section), and a failure there fails the deploy.
 
 #### Production Deployment
 
@@ -215,6 +227,13 @@ If you prefer manual deployment or GitHub Actions is not configured:
    ```bash
    docker compose -f docker-compose.prod.yml exec backend php bin/console lexik:jwt:generate-keypair
    ```
+
+8. **Prepare the document bucket** (the GitHub Actions deploy does this on every run, with the environment's `FRONTEND_URL` as origin):
+   ```bash
+   docker compose -f docker-compose.prod.yml exec backend php bin/console app:s3:setup-bucket \
+       --origin=https://burgieclan.vtk.be --origin=https://dev.burgieclan.vtk.be
+   ```
+   This creates the bucket if it is missing, adds the origins to the CORS rule that lets the PDF viewer load files straight from it, and adds a lifecycle rule that deletes generated zips after 30 days. Without them, previews fail with "Dit document kon niet geladen worden." It is safe to run again: origins are only added, and rules it does not own are kept.
 
 ### Accessing the Application
 

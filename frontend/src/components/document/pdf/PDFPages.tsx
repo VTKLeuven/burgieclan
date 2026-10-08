@@ -4,6 +4,7 @@
  * The bare page renderer: a PDF drawn at whatever width the caller asks for, a chunk at a time.
  */
 
+import { useDocumentFileUrl } from '@/hooks/useDocumentFileUrl';
 import { LoaderCircle } from 'lucide-react';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type JSX } from 'react';
@@ -19,8 +20,6 @@ const STALE_PICTURE_TIMEOUT_MS = 3000;
 
 /** How far outside the window a page still counts as worth keeping a picture of. */
 const NEARBY_MARGIN = '200px';
-
-export type PDFFile = string | File | null;
 
 // Configure PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -180,14 +179,16 @@ function PDFPage({ pageNumber, width, pageAspect }: PDFPageProps): JSX.Element {
 }
 
 interface PDFPagesProps {
-    file: PDFFile;
+    /** The document whose file to show; PDFPages fetches a signed link for it. */
+    documentId: number;
     width: number;
     pageAspect?: number;
     onDocumentLoad?: (pdf: PDFDocumentProxy) => void;
 }
 
-export default function PDFPages({ file, width, pageAspect = 1.414, onDocumentLoad }: PDFPagesProps): JSX.Element {
+export default function PDFPages({ documentId, width, pageAspect = 1.414, onDocumentLoad }: PDFPagesProps): JSX.Element {
     const { t } = useTranslation();
+    const { url: file, failed } = useDocumentFileUrl(documentId, { inline: true });
 
     const [numPages, setNumPages] = useState<number>();
     const [displayedPages, setDisplayedPages] = useState<number>(PAGES_PER_LOAD);
@@ -195,7 +196,13 @@ export default function PDFPages({ file, width, pageAspect = 1.414, onDocumentLo
     const options = useMemo(() => ({
         cMapUrl: '/cmaps/',
         standardFontDataUrl: '/standard_fonts/',
-        withCredentials: true,
+        // The signed link is its own authorisation. Sending the cookie as well would make the
+        // bucket's CORS answer unacceptable to the browser (see useDocumentFileUrl).
+        withCredentials: false,
+        // One request for the whole file. The link expires after ten minutes, and storage only
+        // checks that when a request starts: range requests made later, while a large PDF is still
+        // loading, would be refused, but a single download that started in time runs to the end.
+        disableRange: true,
     }), []);
 
     const onDocumentLoadSuccess = useCallback((pdf: PDFDocumentProxy): void => {
@@ -210,6 +217,17 @@ export default function PDFPages({ file, width, pageAspect = 1.414, onDocumentLo
         }
     }
 
+    const spinner = (
+        <div className="flex h-96 w-full items-center justify-center p-8">
+            <LoaderCircle className="animate-spin text-vtk-navy" size={40} strokeWidth={2.5} aria-label={t('document.loading')} />
+        </div>
+    );
+    const errorMessage = (
+        <div className="vtk-empty flex h-96 w-full items-center justify-center p-8">
+            {t('document.preview-error')}
+        </div>
+    );
+
     return (
         <div className="w-full flex flex-col items-center">
             <Document
@@ -219,14 +237,13 @@ export default function PDFPages({ file, width, pageAspect = 1.414, onDocumentLo
                 className="flex flex-col items-center w-full"
                 // react-pdf 11 suspends while loading and throws load failures at the nearest error
                 // boundary, which here is the route's error.tsx — one unreadable file would replace the
-                // whole page. Opting out keeps `loading` below (and the built-in error message) working;
+                // whole page. Opting out keeps `loading` and `error` below working;
                 // children inherit the setting, so the pages opt out with it.
                 suspense={false}
-                loading={
-                    <div className="flex h-96 w-full items-center justify-center p-8">
-                        <LoaderCircle className="animate-spin text-vtk-navy" size={40} strokeWidth={2.5} aria-label={t('document.loading')} />
-                    </div>
-                }
+                loading={spinner}
+                // Shown while the signed link is still on its way, or when there is none.
+                noData={failed ? errorMessage : spinner}
+                error={errorMessage}
             >
                 {width > 0 && Array.from(new Array(displayedPages), (_el, index) => (
                     <PDFPage

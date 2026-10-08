@@ -380,6 +380,7 @@
         "cancel": "Cancel",
         "apply": "Apply",
         "no-preview": "No preview available for {{filename}}",
+        "preview-error": "This document could not be loaded.",
         "loading": "Bringing your document to life...",
         "load-more": "Load More Pages ({{displayedPages}} of {{numPages}})",
         "zoom": {

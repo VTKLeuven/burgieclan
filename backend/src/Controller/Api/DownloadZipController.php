@@ -3,31 +3,51 @@
 namespace App\Controller\Api;
 
 use App\ApiResource\ZipApi;
+use App\Constants\ZipExport;
 use App\Entity\Course;
 use App\Entity\Document;
 use App\Entity\Module;
 use App\Entity\Program;
 use App\Repository\DocumentRepository;
+use App\Security\Voter\DocumentFileVoter;
+use App\Service\DocumentFileUrlGenerator;
 use App\Utils\DownloadFilename;
 use DateTime;
 use DateTimeZone;
 use RuntimeException;
+use League\Flysystem\Config;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\Attribute\Target;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 use Vich\UploaderBundle\Storage\StorageInterface;
 use ZipArchive;
 
+/**
+ * Builds a zip of programs, modules, courses and/or documents and answers with a short-lived
+ * link to it: {"url": "..."}.
+ *
+ * Zips are cached by content in the exports storage (next to the documents: the bucket when
+ * DOCUMENT_STORAGE=s3, data/exports otherwise), so a second request for the same content
+ * only signs a new link. The browser then downloads the zip straight from storage, the same
+ * way single documents are served (see DocumentFileUrlGenerator). app:delete-old-zips prunes
+ * the cache.
+ *
+ * Only approved documents are included, plus explicitly selected ones the user may open.
+ * That keeps every cached zip safe to hand to anyone who asks for the same content.
+ */
 final class DownloadZipController extends AbstractController
 {
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
         private readonly DocumentRepository $documentRepository,
         private readonly StorageInterface $storage,
-        private readonly KernelInterface $kernel,
+        private readonly DocumentFileUrlGenerator $fileUrlGenerator,
+        #[Target('exports.storage')]
+        private readonly FilesystemOperator $exportsStorage,
     ) {}
 
     /**
@@ -40,25 +60,67 @@ final class DownloadZipController extends AbstractController
      */
     private array $zipEntryNames = [];
 
+    /**
+     * Local copies of the documents in the zip being built. ZipArchive reads added files
+     * only when the archive is closed, so they must live until then.
+     *
+     * @var string[]
+     */
+    private array $tempFiles = [];
+
     public function __invoke(ZipApi $zipApi): Response
     {
         $programs = $this->mapEntities($zipApi->programs, Program::class);
         $modules = $this->mapEntities($zipApi->modules, Module::class);
         $courses = $this->mapEntities($zipApi->courses, Course::class);
-        $documents = $this->mapEntities($zipApi->documents, Document::class);
+        $documents = array_values(
+            array_filter(
+                $this->mapEntities($zipApi->documents, Document::class),
+                fn (Document $document) => $this->isGranted(DocumentFileVoter::VIEW_FILE, $document),
+            )
+        );
 
         $contentHash = $this->generateContentHash($programs, $modules, $courses, $documents);
 
-        if ($contentHash !== md5('')) {
-            $fileName = $this->createZipFile($contentHash, $programs, $modules, $courses, $documents);
-
-            // Generate descriptive filename for the download
-            $displayFilename = $this->generateDescriptiveFilename($programs, $modules, $courses, $documents);
-
-            return $this->createFileResponse($fileName, $displayFilename);
+        if (null === $contentHash) {
+            return new Response('No content to zip', Response::HTTP_NO_CONTENT);
         }
 
-        return new Response('No content to zip', Response::HTTP_NO_CONTENT);
+        $exportName = $contentHash . '.zip';
+        if ($this->needsBuild($exportName)) {
+            $this->buildZip($exportName, $programs, $modules, $courses, $documents);
+        }
+
+        $displayFilename = $this->generateDescriptiveFilename($programs, $modules, $courses, $documents);
+
+        $response = new JsonResponse(
+            [
+            'url' => $this->fileUrlGenerator->generateForExport($exportName, $displayFilename),
+            ]
+        );
+        // Every response is a fresh credential; nothing may keep or share it.
+        $response->headers->set('Cache-Control', 'no-store, private');
+
+        return $response;
+    }
+
+    /**
+     * A zip is reused unless it is missing or close to the age at which it gets deleted
+     * (see ZipExport); rebuilding it overwrites the old one and restarts its clock.
+     */
+    private function needsBuild(string $exportName): bool
+    {
+        try {
+            if (!$this->exportsStorage->fileExists($exportName)) {
+                return true;
+            }
+
+            $staleBefore = strtotime(sprintf('-%d days', ZipExport::REBUILD_AFTER_DAYS));
+
+            return $this->exportsStorage->lastModified($exportName) < $staleBefore;
+        } catch (FilesystemException) {
+            return true;
+        }
     }
 
     private function mapEntities(array $entities, string $class): array
@@ -76,98 +138,129 @@ final class DownloadZipController extends AbstractController
     }
 
     /**
+     * The key the zip is cached under, or null when there is nothing to zip.
+     *
+     * The content is json-encoded as a tree with a type tag on every level, so two different
+     * selections never share a key (plain concatenation made courses "Analyse" and "I"
+     * collide with a single course "AnalyseI").
+     *
      * @param Program[] $programs
      * @param Module[] $modules
      * @param Course[] $courses
      */
-    private function generateContentHash(array $programs, array $modules, array $courses, array $documents): string
+    private function generateContentHash(array $programs, array $modules, array $courses, array $documents): ?string
     {
-        $content = '';
+        $content = [];
 
         foreach ($programs as $program) {
-            $content .= $this->getModuleContent($program->getModules()->toArray());
+            // The program's own name is the top folder of its zip.
+            $content[] = ['program', $program->getName(), $this->getModuleContent($program->getModules()->toArray())];
         }
 
         foreach ($modules as $module) {
-            $content .= $this->getModuleContent([$module]);
+            $content[] = $this->getModuleContent([$module]);
         }
 
         foreach ($courses as $course) {
-            $content .= $this->getCourseContent($course);
+            $content[] = $this->getCourseContent($course);
         }
 
         foreach ($documents as $document) {
-            $content .= $this->getDocumentContent($document);
+            $content[] = $this->getDocumentContent($document);
         }
 
-        return md5($content);
+        if ([] === $content) {
+            return null;
+        }
+
+        return md5(json_encode($content, JSON_THROW_ON_ERROR));
     }
 
     /**
      * @param Module[] $modules
-     * @return string
      */
-    private function getModuleContent(array $modules): string
+    private function getModuleContent(array $modules): array
     {
-        $content = '';
+        $content = [];
 
         foreach ($modules as $module) {
-            $content .= $module->getName();
-            $content .= $this->getModuleContent($module->getModules()->toArray());
-            foreach ($module->getCourses()->toArray() as $course) {
-                $content .= $this->getCourseContent($course);
-            }
+            $content[] = [
+                'module',
+                $module->getName(),
+                $this->getModuleContent($module->getModules()->toArray()),
+                array_map(
+                    fn (Course $course) => $this->getCourseContent($course),
+                    array_values($module->getCourses()->toArray())
+                ),
+            ];
         }
 
         return $content;
     }
 
-    /**
-     * @param Course $course
-     * @return string
-     */
-    private function getCourseContent(Course $course): string
+    private function getCourseContent(Course $course): array
     {
-        $content = $course->getName();
-
-        foreach ($this->documentRepository->findByCourseAndHasFile($course) as $document) {
-            $content .= $this->getDocumentContent($document);
-        }
-
-        return $content;
+        return [
+            'course',
+            $course->getName(),
+            // The HTML index shows the code next to the name.
+            $course->getCode(),
+            array_map(
+                fn (Document $document) => $this->getDocumentContent($document),
+                $this->documentRepository->findApprovedByCourseWithFile($course)
+            ),
+        ];
     }
 
     /**
-     * What identifies a document for zip-caching purposes.
+     * Everything about a document that ends up in the zip: its file, its name and folder
+     * inside the zip, and what the HTML index shows about it. Any change here gives the zip
+     * a new hash, so it is rebuilt instead of an outdated copy being served.
+     */
+    private function getDocumentContent(Document $document): array
+    {
+        $tags = array_map(fn ($tag) => $tag->getName(), $document->getTags()->toArray());
+        sort($tags);
+
+        return [
+            'document',
+            $document->getId(),
+            // A replaced file gets a new stored name (the namer appends a uniqid).
+            $document->getFileName(),
+            DownloadFilename::forDocument($document),
+            $document->getCategory()->getNameEn(),
+            $document->getYear(),
+            $document->getUpdatedAt()->format(DATE_ATOM),
+            // A tag change alone need not touch updatedAt, so tags count on their own.
+            $tags,
+        ];
+    }
+
+    /**
+     * Writes the zip to a temporary file, then moves it into the exports storage.
      *
-     * The stored filename alone is not enough: it is unique per upload, but it no
-     * longer decides what the file is called inside the zip. Mixing the served name
-     * in means renaming a document invalidates the cached archive instead of handing
-     * out one that still carries the old name.
+     * Files are copied to disk one by one rather than held in memory, so the size of a zip
+     * is bounded by free disk space (about twice the zip while it is built), not by PHP's
+     * memory_limit.
      */
-    private function getDocumentContent(Document $document): string
-    {
-        return $document->getFileName() . DownloadFilename::forDocument($document);
-    }
-
-    private function createZipFile(
-        string $contentHash,
+    private function buildZip(
+        string $exportName,
         array $programs,
         array $modules,
         array $courses,
         array $documents
-    ): string {
-        $fileName = sprintf('%s/data/exports/%s.zip', $this->kernel->getProjectDir(), $contentHash);
-
-        // Ensure export directory exists
-        $exportDir = dirname($fileName);
-        if (!is_dir($exportDir)) {
-            // Use 0775 to match the permissions of the data directory (owner/group writeable)
-            mkdir($exportDir, 0775, true);
+    ): void {
+        $zipPath = tempnam(sys_get_temp_dir(), 'burgieclan_zip_');
+        if ($zipPath === false) {
+            throw new RuntimeException('Could not create a temporary file for the zip.');
         }
 
-        $zip = new ZipArchive();
-        if (!file_exists($fileName) && $zip->open($fileName, ZipArchive::CREATE) === true) {
+        try {
+            $zip = new ZipArchive();
+            if ($zip->open($zipPath, ZipArchive::OVERWRITE) !== true) {
+                throw new RuntimeException('Could not open the zip for writing.');
+            }
+
             $this->addProgramsToZip($zip, $programs);
             $this->addModulesToZip($zip, $modules, '');
             $this->addCoursesToZip($zip, $courses, '');
@@ -175,17 +268,40 @@ final class DownloadZipController extends AbstractController
 
             // Generate and add HTML structure file
             $htmlContent = $this->generateHtmlStructure($programs, $modules, $courses, $documents);
-            $result = $zip->addFromString('burgieclan-documents-index.html', $htmlContent);
-
-            if (!$result) {
-                // Log the error or take appropriate action if the HTML file couldn't be added
+            if (!$zip->addFromString('burgieclan-documents-index.html', $htmlContent)) {
                 error_log('Failed to add HTML structure to ZIP file');
             }
 
-            $zip->close();
-        }
+            if (!$zip->close()) {
+                throw new RuntimeException('Could not write the zip: ' . $zip->getStatusString());
+            }
 
-        return $fileName;
+            $handle = fopen($zipPath, 'rb');
+            if ($handle === false) {
+                throw new RuntimeException('Could not read back the zip.');
+            }
+            // Written under a temporary name and then moved into place, so a request that finds
+            // the zip never gets it half-written: writing to local storage is not atomic. A
+            // leftover from a failed build still ends in .zip, so it expires like any other.
+            $partialName = sprintf('partial-%s-%s', bin2hex(random_bytes(8)), $exportName);
+            try {
+                $this->exportsStorage->writeStream($partialName, $handle);
+            } finally {
+                if (is_resource($handle)) {
+                    fclose($handle);
+                }
+            }
+            // Not retaining visibility spares the bucket a GetObjectAcl call, which not every
+            // S3-compatible store implements; the zip stays private either way.
+            $this->exportsStorage->move($partialName, $exportName, [Config::OPTION_RETAIN_VISIBILITY => false]);
+        } finally {
+            foreach ([...$this->tempFiles, $zipPath] as $file) {
+                if (is_file($file)) {
+                    unlink($file);
+                }
+            }
+            $this->tempFiles = [];
+        }
     }
 
     private function addProgramsToZip(ZipArchive $zip, array $programs): void
@@ -212,7 +328,7 @@ final class DownloadZipController extends AbstractController
         foreach ($courses as $course) {
             $courseName = $parentDir ? $parentDir . '/' . $course->getName() : $course->getName();
             $zip->addEmptyDir($courseName);
-            $documents = $this->documentRepository->findByCourseAndHasFile($course);
+            $documents = $this->documentRepository->findApprovedByCourseWithFile($course);
             $this->addDocumentsToZip($zip, $documents, $courseName);
         }
     }
@@ -239,8 +355,8 @@ final class DownloadZipController extends AbstractController
 
             foreach ($categoryDocuments as $document) {
                 if ($document->getFileName()) {
-                    $fileStream = $this->storage->resolveStream($document, 'file');
-                    if ($fileStream !== null) {
+                    $tempFile = $this->copyToTempFile($document);
+                    if ($tempFile !== null) {
                         // The stored name carries the uniqid the SmartUniqueNamer appended
                         // on upload; inside the zip we want the document's own name.
                         $originalFileName = DownloadFilename::forDocument($document);
@@ -248,11 +364,49 @@ final class DownloadZipController extends AbstractController
                         $usedFilenames[$category][] = $fileNameToUse;
                         $this->zipEntryNames[$document->getId()] = $fileNameToUse;
 
-                        $zip->addFromString($categoryDir . '/' . $fileNameToUse, stream_get_contents($fileStream));
+                        $entryName = $categoryDir . '/' . $fileNameToUse;
+                        $zip->addFile($tempFile, $entryName);
+                        // Stored, not deflated: PDFs, images and Office files are compressed
+                        // already, so deflating costs CPU time and saves next to nothing.
+                        $zip->setCompressionName($entryName, ZipArchive::CM_STORE);
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Copies a document's file from storage (local disk or the bucket) to a temporary file.
+     * Returns null when the file is missing, so one lost file does not fail the whole zip.
+     */
+    private function copyToTempFile(Document $document): ?string
+    {
+        try {
+            $source = $this->storage->resolveStream($document, 'file');
+        } catch (FilesystemException) {
+            return null;
+        }
+        if ($source === null) {
+            return null;
+        }
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'burgieclan_doc_');
+        if ($tempFile === false) {
+            fclose($source);
+            throw new RuntimeException('Could not create a temporary file for the zip.');
+        }
+        $this->tempFiles[] = $tempFile;
+
+        $target = fopen($tempFile, 'wb');
+        if ($target === false) {
+            fclose($source);
+            throw new RuntimeException('Could not write a temporary file for the zip.');
+        }
+        stream_copy_to_stream($source, $target);
+        fclose($target);
+        fclose($source);
+
+        return $tempFile;
     }
 
     /**
@@ -563,7 +717,7 @@ final class DownloadZipController extends AbstractController
 
             // Count documents in module courses
             foreach ($module->getCourses() as $course) {
-                $docs = $this->documentRepository->findByCourseAndHasFile($course);
+                $docs = $this->documentRepository->findApprovedByCourseWithFile($course);
                 $totalDocuments += count($docs);
             }
         }
@@ -575,7 +729,7 @@ final class DownloadZipController extends AbstractController
 
         // Count standalone course documents
         foreach ($courses as $course) {
-            $docs = $this->documentRepository->findByCourseAndHasFile($course);
+            $docs = $this->documentRepository->findApprovedByCourseWithFile($course);
             $totalDocuments += count($docs);
         }
 
@@ -700,7 +854,7 @@ final class DownloadZipController extends AbstractController
 
             // Count documents in courses
             foreach ($module->getCourses() as $course) {
-                $docs = $this->documentRepository->findByCourseAndHasFile($course);
+                $docs = $this->documentRepository->findApprovedByCourseWithFile($course);
                 $documentCount += count($docs);
             }
 
@@ -721,7 +875,7 @@ final class DownloadZipController extends AbstractController
 
         // Count documents in courses
         foreach ($module->getCourses() as $course) {
-            $docs = $this->documentRepository->findByCourseAndHasFile($course);
+            $docs = $this->documentRepository->findApprovedByCourseWithFile($course);
             $documentCount += count($docs);
         }
 
@@ -865,7 +1019,7 @@ final class DownloadZipController extends AbstractController
     private function renderCourseHTML(Course $course, string $parentPath = ''): string
     {
         $courseId = 'course-' . $course->getId();
-        $documents = $this->documentRepository->findByCourseAndHasFile($course);
+        $documents = $this->documentRepository->findApprovedByCourseWithFile($course);
         $documentCount = count($documents);
 
         // Construct the full path for this course
@@ -1032,74 +1186,5 @@ final class DownloadZipController extends AbstractController
         $name = substr($name, 0, 50);
 
         return $name;
-    }
-
-    private function createFileResponse(string $fileName, string $displayFilename = 'documents.zip'): Response
-    {
-        if (!file_exists($fileName)) {
-            throw new RuntimeException('File not found: ' . $fileName);
-        }
-
-        $fileSize = filesize($fileName);
-        // TODO check if this works on a proper production server. With big files (5GB) it fills up the memory.
-        // This could be because of the symfony development server
-        $response = new StreamedResponse(
-            function () use ($fileName, $fileSize) {
-                $handle = fopen($fileName, 'rb');
-
-                if ($handle === false) {
-                    throw new RuntimeException('Could not open file for reading');
-                }
-
-                $length = $fileSize;
-                $request = Request::createFromGlobals();
-
-                // Handle range requests
-                if ($request->headers->has('Range')) {
-                    $range = $request->headers->get('Range');
-                    if (preg_match('/bytes=(\d+)-(\d+)?/', $range, $matches)) {
-                        $start = intval($matches[1]);
-                        $length = isset($matches[2]) ? (intval($matches[2]) - $start + 1) : ($fileSize - $start);
-                        fseek($handle, $start);
-                    }
-                }
-
-                $remaining = $length;
-                $chunkSize = 8192; // 8KB chunks
-
-                while ($remaining > 0 && !feof($handle)) {
-                    $readSize = min($chunkSize, $remaining);
-                    $buffer = fread($handle, $readSize);
-                    if ($buffer === false) {
-                        break;
-                    }
-                    echo $buffer;
-                    flush();
-                    $remaining -= strlen($buffer);
-                }
-
-                fclose($handle);
-            }
-        );
-
-        $response->headers->set('Content-Type', 'application/zip');
-        $response->headers->set('Content-Disposition', 'attachment;filename="' . $displayFilename . '"');
-        $response->headers->set('Accept-Ranges', 'bytes');
-        $response->headers->set('Content-Length', (string) $fileSize);
-        // disables FastCGI buffering in nginx only for this response
-        $response->headers->set('X-Accel-Buffering', 'no');
-
-        $request = Request::createFromGlobals();
-        if ($request->headers->has('Range')) {
-            $response->setStatusCode(Response::HTTP_PARTIAL_CONTENT);
-            $range = $request->headers->get('Range');
-            if (preg_match('/bytes=(\d+)-(\d+)?/', $range, $matches)) {
-                $start = intval($matches[1]);
-                $end = isset($matches[2]) ? intval($matches[2]) : ($fileSize - 1);
-                $response->headers->set('Content-Range', sprintf('bytes %d-%d/%d', $start, $end, $fileSize));
-                $response->headers->set('Content-Length', (string) ($end - $start + 1));
-            }
-        }
-        return $response;
     }
 }

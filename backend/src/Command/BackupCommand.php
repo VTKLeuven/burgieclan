@@ -20,10 +20,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *  - the database, which holds every program, module, course, document row,
  *    comment, vote and user, and
  *  - the document *files*, which in production are not on the server at all but
- *    in object storage (see flysystem.yaml, when@prod).
+ *    in object storage (see flysystem.yaml, DOCUMENT_STORAGE).
  *
  * Server-local files are deliberately not backed up. `data/exports` is a cache of
- * generated zips that DeleteOldZipsCommand prunes after seven days, and
+ * generated zips that expire after 30 days (see ZipExport), and
  * `data/temp-uploads` holds uploads still in flight. Both are derived or
  * transient, so restoring them would at best do nothing.
  *
@@ -142,7 +142,7 @@ class BackupCommand extends Command
      * Reads and validates the environment.
      *
      * Deliberately read at runtime rather than injected: these variables only
-     * exist in production (see flysystem.yaml, when@prod), and autowiring them
+     * exist where documents are on S3 (see flysystem.yaml), and autowiring them
      * would make the service container fail to build in dev and test.
      *
      * The backup store falls back to the documents store for every setting

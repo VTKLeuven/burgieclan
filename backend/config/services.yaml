@@ -97,6 +97,9 @@ when@test:
         App\Factory\:
             resource: '../src/Factory/'
 
+        App\Service\PresignedUrlGenerator:
+            public: true
+
         # Rate limit counts in memory, so they never carry over from one test (or test run) to the
         # next. Not autoconfigured: as a resettable service it would be emptied between requests
         # too, and a test that checks a limit needs the count to add up across its requests.

@@ -65,11 +65,14 @@ class DocumentRepository extends ServiceEntityRepository
      * @param Course $course
      * @return Document[]
      */
-    public function findByCourseAndHasFile(Course $course): array
+    public function findApprovedByCourseWithFile(Course $course): array
     {
+        // Documents under review stay out: zips are shared between everyone who asks for the same
+        // content, and only an uploader and moderators may see a document before it is approved.
         return $this->createQueryBuilder('d')
             ->andWhere('d.course = :course')
             ->andWhere('d.file_name IS NOT NULL')
+            ->andWhere('d.under_review = false')
             ->setParameter('course', $course)
             ->getQuery()
             ->getResult();
