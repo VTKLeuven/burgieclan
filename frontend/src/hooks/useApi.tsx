@@ -5,7 +5,7 @@ import { ApiError } from '@/utils/error/apiError';
 import { captureException } from "@sentry/nextjs";
 import { useCallback, useState } from 'react';
 
-type ApiErrorBody = { message?: string; detail?: string; status?: number };
+type ApiErrorBody = { message?: string; detail?: string; status?: number; reason?: string };
 
 type CachedGet = {
     value: unknown;

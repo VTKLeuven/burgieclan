@@ -79,6 +79,43 @@
     </section>
 
     <section class="mt-4">
+        <h2 class="h4">Images</h2>
+        {% if exam_images is empty %}
+            <p class="text-muted">No images.</p>
+        {% else %}
+            <p class="text-muted small">
+                Uploaded images are visible at once. Removing one deletes the file; the reconstruction
+                then shows a placeholder where it was.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                {% for image in exam_images %}
+                    <div class="card bc-exam-image">
+                        {% if image.removed %}
+                            <div class="card-body text-muted small">Removed</div>
+                        {% else %}
+                            <a href="{{ image.url }}" target="_blank" rel="noopener"><img src="{{ image.url }}" alt=""></a>
+                        {% endif %}
+                        <div class="card-body small">
+                            <p class="mb-1">{{ image.uploader }}</p>
+                            <p class="text-muted mb-2">
+                                {{ image.createdAt|date('j M Y H:i') }} · {{ image.width }}×{{ image.height }} · {{ (image.size / 1024)|round }} KB
+                            </p>
+                            {% if not image.removed %}
+                                <form action="{{ image.removeUrl }}" method="POST">
+                                    <input type="hidden" name="_token" value="{{ csrf_token(constant('App\\Constants\\AdminActionCsrf::INTENTION')) }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fa fa-trash"></i> Remove
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="mt-4">
         <h2 class="h4">Earlier versions</h2>
         <p class="text-muted small">
             A version is kept at most every {{ constant('App\\Service\\Collab\\CollabDocumentStore::SNAPSHOT_INTERVAL') }}

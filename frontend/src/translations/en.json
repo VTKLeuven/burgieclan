@@ -579,6 +579,23 @@
             "down": "Move question down",
             "delete": "Delete question"
         },
+        "images": {
+            "add": "Add image",
+            "uploading": "Uploading image…",
+            "removed": "Image removed by a moderator",
+            "unavailable": "This image cannot be shown",
+            "hint": "PNG, JPG or WebP up to 8 MB, also by pasting or dragging it into a question. Only your own drawings, schemas and figures: no photos of the exam sheet itself.",
+            "errors": {
+                "type": "Only PNG, JPG and WebP images can be added.",
+                "unreadable": "This image could not be read.",
+                "pixels": "This image is too large. Make it smaller first.",
+                "size": "Images can be at most 8 MB.",
+                "limit": "This reconstruction already holds the maximum number of images.",
+                "locked": "This reconstruction is locked.",
+                "rate": "You have uploaded a lot of images. Try again later.",
+                "failed": "The image could not be uploaded. Try again."
+            }
+        },
         "discussion": {
             "comments_one": "{{count}} comment",
             "comments_other": "{{count}} comments",

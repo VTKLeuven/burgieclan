@@ -8,15 +8,18 @@ use App\Entity\CollabDocument;
 use App\Entity\CollabDocumentRevision;
 use App\Entity\Course;
 use App\Entity\Exam;
+use App\Entity\ExamImage;
 use App\Entity\ExamQuestionComment;
 use App\Entity\User;
 use App\Repository\CollabDocumentRepository;
 use App\Repository\CollabDocumentRevisionRepository;
+use App\Repository\ExamImageRepository;
 use App\Repository\ExamQuestionCommentRepository;
 use App\Repository\UserRepository;
 use App\Service\Collab\CollabDocumentStore;
 use App\Service\Collab\CollabServerClient;
 use App\Service\Collab\CollabServerException;
+use App\Service\Exam\ExamImageStore;
 use App\Service\Exam\ExamQuestionActivity;
 use App\Utils\ExamContent;
 use DateTimeImmutable;
@@ -42,7 +45,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Exam reconstructions for moderators: see who changed what, roll back, lock and reopen, and
- * remove comments on questions.
+ * remove comments on questions and uploaded images.
  *
  * Students start and edit reconstructions on the site; nothing here edits content directly. A
  * rollback goes through the collab server (CollabServerClient::restore) so everyone who has the
@@ -68,6 +71,8 @@ class ExamCrudController extends AbstractCrudController
         private readonly AdminUrlGenerator $adminUrlGenerator,
         private readonly ExamQuestionCommentRepository $comments,
         private readonly ExamQuestionActivity $activity,
+        private readonly ExamImageRepository $images,
+        private readonly ExamImageStore $imageStore,
     ) {}
 
     public static function getEntityFqcn(): string
@@ -214,6 +219,10 @@ class ExamCrudController extends AbstractCrudController
             )
         );
         $responseParameters->set('exam_comments', $this->commentsByQuestion($exam));
+        $responseParameters->set(
+            'exam_images',
+            array_map(fn(ExamImage $image): array => $this->imageRow($exam, $image), $this->images->findForExam($exam))
+        );
 
         return $responseParameters;
     }
@@ -366,6 +375,62 @@ class ExamCrudController extends AbstractCrudController
         $this->addFlash('success', 'Comment deleted.');
 
         return $this->redirectToDetail($exam);
+    }
+
+    /**
+     * Takes an uploaded image down, e.g. a photo of the exam sheet. Its file is deleted, and the
+     * page, which only knows its UUID, shows a placeholder in its place. A page that already
+     * shows it keeps doing so until it is reloaded.
+     */
+    // Not ".../delete": EasyAdmin's own /{entityId}/delete would catch it, with "images" as the id.
+    #[AdminRoute('/images/remove', name: 'removeImage', options: ['methods' => ['POST']])]
+    public function removeImage(AdminContext $context, EntityManagerInterface $entityManager): RedirectResponse
+    {
+        $exam = $this->loadExam($context, $entityManager);
+        if ($invalid = $this->assertCsrf($context, $exam)) {
+            return $invalid;
+        }
+
+        $image = $this->images->find((int) $context->getRequest()->query->get('imageId'));
+        if (null === $image || $image->getExam()->getId() !== $exam->getId()) {
+            throw $this->createNotFoundException('This image does not belong to this exam.');
+        }
+
+        if (!$image->isRemoved()) {
+            $this->imageStore->remove($image);
+            $entityManager->flush();
+        }
+        $this->addFlash('success', 'Image removed.');
+
+        return $this->redirectToDetail($exam);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function imageRow(Exam $exam, ExamImage $image): array
+    {
+        $uploader = $image->getUploader();
+
+        return [
+            // Removed images have no file left to link to.
+            'url' => $image->isRemoved() ? null : $this->generateUrl('admin_exam_image', ['fileName' => $image->getFileName()]),
+            'uploader' => null === $uploader
+                ? '(deleted account)'
+                : sprintf('%s (%s)', $uploader->getFullName(), $uploader->getUsername()),
+            'createdAt' => $image->getCreatedAt(),
+            'size' => $image->getSize(),
+            'width' => $image->getWidth(),
+            'height' => $image->getHeight(),
+            'removed' => $image->isRemoved(),
+            'removeUrl' => $this->adminUrlGenerator
+                ->unsetAll()
+                ->setController(self::class)
+                ->setAction('removeImage')
+                ->setEntityId($exam->getId())
+                ->set('imageId', $image->getId())
+                ->generateUrl(),
+        ];
     }
 
     /**

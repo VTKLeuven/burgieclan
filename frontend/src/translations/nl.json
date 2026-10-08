@@ -579,6 +579,23 @@
             "down": "Vraag omlaag",
             "delete": "Vraag verwijderen"
         },
+        "images": {
+            "add": "Afbeelding toevoegen",
+            "uploading": "Afbeelding uploaden…",
+            "removed": "Afbeelding verwijderd door een moderator",
+            "unavailable": "Deze afbeelding kan niet getoond worden",
+            "hint": "PNG, JPG of WebP tot 8 MB, ook door ze te plakken of in een vraag te slepen. Enkel eigen tekeningen, schema's en figuren: geen foto's van het examenblad zelf.",
+            "errors": {
+                "type": "Alleen PNG-, JPG- en WebP-afbeeldingen kunnen toegevoegd worden.",
+                "unreadable": "Deze afbeelding kon niet gelezen worden.",
+                "pixels": "Deze afbeelding is te groot. Maak ze eerst kleiner.",
+                "size": "Afbeeldingen mogen maximaal 8 MB zijn.",
+                "limit": "Deze reconstructie bevat al het maximale aantal afbeeldingen.",
+                "locked": "Deze reconstructie is vergrendeld.",
+                "rate": "Je hebt veel afbeeldingen geüpload. Probeer het later opnieuw.",
+                "failed": "De afbeelding kon niet geüpload worden. Probeer het opnieuw."
+            }
+        },
         "discussion": {
             "comments_one": "{{count}} reactie",
             "comments_other": "{{count}} reacties",

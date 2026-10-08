@@ -1,3 +1,4 @@
+import { ExamImage } from '@/components/exam/ExamImage';
 import { EXAM_QUESTION, ExamQuestion } from '@/components/exam/ExamQuestion';
 import { Mathematics } from '@tiptap/extension-mathematics';
 import { UniqueID } from '@tiptap/extension-unique-id';
@@ -35,6 +36,7 @@ export function examExtensions({ collaborative }: { collaborative: boolean }): E
         }),
         ExamDocument,
         ExamQuestion,
+        ExamImage,
         Mathematics,
         UniqueID.configure({
             types: [EXAM_QUESTION],

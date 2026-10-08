@@ -32,7 +32,9 @@ const handleError = async (response: Response) => {
     // emits a plain-text warning when a request body exceeds post_max_size. Parsing those
     // as JSON throws, which used to collapse the real status into a generic 500 and hide
     // the cause from the user entirely.
-    let errorData: { message?: string; title?: string; detail?: string } = {};
+    // `reason` is a short machine-readable cause some endpoints add, for a translated message
+    // (e.g. POST /api/exams/{id}/images).
+    let errorData: { message?: string; title?: string; detail?: string; reason?: string } = {};
     try {
         errorData = await response.json();
     } catch {
@@ -47,7 +49,7 @@ const handleError = async (response: Response) => {
         case 500:
             return { error: { message: errorData.message || errorData.title || 'Internal Server Error. Please try again later.', detail: errorData.detail, status: 500 } };
         default:
-            return { error: { message: errorData.message || errorData.title || 'Unexpected Error.', detail: errorData.detail, status: response.status || 500 } };
+            return { error: { message: errorData.message || errorData.title || 'Unexpected Error.', detail: errorData.detail, status: response.status || 500, reason: errorData.reason } };
     }
 };
 
