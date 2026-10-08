@@ -59,7 +59,7 @@ export default function Header() {
         },
         {
             name: t('header.new_burgieclan_feedback'),
-            href: 'https://docs.google.com/forms/d/e/1FAIpQLSdv8uIPyN9IMpCLNOzSKoiCbTqrdefb9uw-AfGtr0HjEG4REA/viewform?usp=publish-editor',
+            href: 'https://dopl.vtk.be/f/burgieclan-burgieclan-feedback',
             external: true,
         },
         //{ name: t('overview'), href: '#' },
