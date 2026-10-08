@@ -26,6 +26,11 @@
       "description": "Backend stack is standardized on PHP 8.4. Do not bump Docker images or Composer platform to PHP 8.5/8.6.",
       "matchPackageNames": ["php"],
       "allowedVersions": "~8.4"
+    },
+    {
+      "description": "Hold katex below 0.19 until @tiptap/extension-mathematics widens its katex peer range (3.31.4 allows only ^0.16.4 || ^0.17.0 || ^0.18.0); a 0.19 bump makes npm install fail with ERESOLVE. Remove this rule once tiptap supports 0.19.",
+      "matchPackageNames": ["katex"],
+      "allowedVersions": "<0.19.0"
     }
   ]
 }
