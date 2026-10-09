@@ -23,11 +23,37 @@ export function formatAcademicYear(startYear: number): string {
     return `${startYear} - ${startYear + 1}`;
 }
 
-export function periodHasStarted(period: ExamPeriod, academicYear: string, now = new Date()): boolean {
-    const { yearOffset, month, day } = STARTS[period];
-    const start = new Date(examCalendarYear(academicYear) + yearOffset, month - 1, day);
+/** Roughly when each period is over, the same way; App\Constants\ExamPeriod::endsOn(). */
+const ENDS: Record<ExamPeriod, { yearOffset: number; month: number; day: number }> = {
+    january: { yearOffset: 0, month: 2, day: 7 },
+    june: { yearOffset: 0, month: 7, day: 7 },
+    august: { yearOffset: 0, month: 9, day: 15 },
+};
 
-    return now >= start;
+function periodDate(when: { yearOffset: number; month: number; day: number }, academicYear: string): Date {
+    return new Date(examCalendarYear(academicYear) + when.yearOffset, when.month - 1, when.day);
+}
+
+/**
+ * The exam period running right now, from its start up to its end date, or null between
+ * periods. The weeks after a period, while its reconstructions are still open, do not count.
+ */
+export function currentExamPeriod(now = new Date()): { period: ExamPeriod; academicYear: string } | null {
+    // January's exams of "2025 - 2026" start in December 2025, so try both academic years.
+    for (const startYear of [now.getFullYear() - 1, now.getFullYear()]) {
+        const academicYear = formatAcademicYear(startYear);
+        for (const period of EXAM_PERIODS) {
+            if (now >= periodDate(STARTS[period], academicYear) && now < periodDate(ENDS[period], academicYear)) {
+                return { period, academicYear };
+            }
+        }
+    }
+
+    return null;
+}
+
+export function periodHasStarted(period: ExamPeriod, academicYear: string, now = new Date()): boolean {
+    return now >= periodDate(STARTS[period], academicYear);
 }
 
 /**

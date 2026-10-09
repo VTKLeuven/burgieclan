@@ -15,6 +15,7 @@ export const COOKIE_NAMES = {
 export const STORAGE_KEYS = {
     COOKIE_CONSENT: isDev ? 'BUR_DEV_cookie_consent' : 'BUR_cookie_consent',
     PDF_ZOOM: isDev ? 'BUR_DEV_pdf_zoom' : 'BUR_pdf_zoom',
+    EXAM_PROMPTS_DISMISSED: isDev ? 'BUR_DEV_exam_prompts_dismissed' : 'BUR_exam_prompts_dismissed',
 } as const;
 
 // SessionStorage keys (if needed in the future)

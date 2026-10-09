@@ -2,6 +2,7 @@
 
 import AnnouncementSlideShow from '@/components/announcement/AnnouncementSlideShow';
 import { DidacticFeedbackForm } from '@/components/homepage/DidacticFeedbackForm';
+import { ExamPrompt } from '@/components/homepage/ExamPrompt';
 import { FavoriteCurriculum } from '@/components/homepage/FavoriteCurriculum';
 import { QuickLinks } from '@/components/homepage/QuickLinks';
 import { RecentActivities } from "@/components/homepage/recent/RecentActivities";
@@ -23,6 +24,7 @@ export default function HomePage() {
 
             <div className="mt-4 grid items-start gap-4 lg:grid-cols-[1.3fr_1fr]">
                 <div className="grid gap-4">
+                    <ExamPrompt />
                     <RecentActivities />
                     <FavoriteCurriculum />
                 </div>
