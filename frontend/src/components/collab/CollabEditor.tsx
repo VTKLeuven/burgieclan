@@ -9,9 +9,9 @@ import {
     useCollabSession,
     type CollabSession,
 } from '@/components/collab/useCollabSession';
+import { LatexMath } from '@/components/editor/math/latexMath';
 import { Collaboration } from '@tiptap/extension-collaboration';
 import { CollaborationCaret } from '@tiptap/extension-collaboration-caret';
-import { Mathematics } from '@tiptap/extension-mathematics';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { StarterKit } from '@tiptap/starter-kit';
 import 'katex/dist/katex.min.css';
@@ -24,7 +24,7 @@ function LiveEditor({ session, readOnly }: { session: CollabSession; readOnly: b
         extensions: [
             // Collaboration brings its own undo/redo that only undoes your own changes.
             StarterKit.configure({ undoRedo: false }),
-            Mathematics,
+            LatexMath,
             Collaboration.configure({ document: session.doc, field: EDITOR_FIELD }),
             CollaborationCaret.configure({
                 provider: session.provider,

@@ -453,14 +453,24 @@
             "title": "Text Editor",
             "description": "The editor allows you to write and display mathematical formulas using LaTeX syntax.",
             "inline": "Wrap your math expressions in",
-            "inline_end": "for inline formulas",
+            "inline_end": "for a formula within a sentence,",
             "block": " or ",
-            "block_end": "for block formulas.",
+            "block_end": "on a line of its own for a block formula.",
+            "edit": "Click a formula to change it, or use the Σ button to insert one.",
             "katex_overview": "For an overview of the supported functions, refer to the ",
             "katex_doc": "documentation of KaTeX",
             "katex_end": " the underlying LaTeX interpreter."
         },
-        "info_button": "Info"
+        "info_button": "Info",
+        "math": {
+            "insert": "Insert formula",
+            "edit": "Edit formula",
+            "label": "LaTeX",
+            "preview_empty": "Type a formula, e.g. \\frac{a}{b}",
+            "keys": "Enter to save, Esc to cancel. Saving it empty removes the formula.",
+            "cancel": "Cancel",
+            "save": "Save"
+        }
     },
     "footer": {
         "navigate": "Navigate",
