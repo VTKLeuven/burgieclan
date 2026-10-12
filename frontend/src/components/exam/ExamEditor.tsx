@@ -4,6 +4,13 @@ import CollabStatus from '@/components/collab/CollabStatus';
 import { caretColor, EDITOR_FIELD, useCollabSession, type CollabSession } from '@/components/collab/useCollabSession';
 import { Toolbar } from '@/components/editor/Editor';
 import { ExamEditorContext } from '@/components/exam/ExamContext';
+import {
+    ExamImageUpload,
+    insertExamImages,
+    setExamImageUploadOptions,
+    uploadExamImage,
+    type ExamImageUploadOptions,
+} from '@/components/exam/ExamImageUpload';
 import { countQuestionsWithSitting } from '@/components/exam/ExamQuestion';
 import ExamReadOnly from '@/components/exam/ExamReadOnly';
 import { examExtensions } from '@/components/exam/extensions';
@@ -11,6 +18,7 @@ import RemoveSittingDialog, { type SittingRemoval } from '@/components/exam/Remo
 import SittingsBar from '@/components/exam/SittingsBar';
 import { useQuestionDiscussion, type QuestionDiscussion } from '@/components/exam/useQuestionDiscussion';
 import { SITTINGS_FIELD, SITTINGS_ORIGIN, useSittings } from '@/components/exam/useSittings';
+import { useToast } from '@/components/ui/Toast';
 import { useUser } from '@/components/UserContext';
 import type { Exam } from '@/types/entities';
 import { Collaboration } from '@tiptap/extension-collaboration';
@@ -19,7 +27,7 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import { yUndoPluginKey } from '@tiptap/y-tiptap';
 import clsx from 'clsx';
 import 'katex/dist/katex.min.css';
-import { Plus } from 'lucide-react';
+import { ImagePlus, Plus } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -35,10 +43,13 @@ function LiveExam({ session, readOnly, hidden, discussion }: {
     const editable = !readOnly;
     const [removal, setRemoval] = useState<SittingRemoval | null>(null);
     const [confirmingRemoval, setConfirmingRemoval] = useState(false);
+    const { showToast } = useToast();
+    const imageInput = useRef<HTMLInputElement>(null);
 
     const editor = useEditor({
         extensions: [
             ...examExtensions({ collaborative: true }),
+            ExamImageUpload,
             Collaboration.configure({
                 document: session.doc,
                 field: EDITOR_FIELD,
@@ -64,6 +75,26 @@ function LiveExam({ session, readOnly, hidden, discussion }: {
     useEffect(() => {
         editor?.setEditable(editable);
     }, [editor, editable]);
+
+    // Read by the editor's upload plugin whenever an image comes in, so the editor does not have
+    // to be rebuilt when these change. Null while you cannot edit.
+    const uploadOptions = useMemo<ExamImageUploadOptions | null>(() => (editable ? {
+        uploadingLabel: t('exam.images.uploading'),
+        upload: async (file) => {
+            const result = await uploadExamImage(discussion.examId, file);
+            if ('problem' in result) {
+                showToast(t(`exam.images.errors.${result.problem}`), 'error');
+                return null;
+            }
+            return result.image;
+        },
+    } : null), [editable, discussion.examId, showToast, t]);
+
+    useEffect(() => {
+        if (editor) {
+            setExamImageUploadOptions(editor, uploadOptions);
+        }
+    }, [editor, uploadOptions]);
 
     // The days live next to the questions in the Y.Doc, not in them, so the undo history only
     // covers them once told to. Removing a day and unmarking it on the questions happen within
@@ -100,7 +131,18 @@ function LiveExam({ session, readOnly, hidden, discussion }: {
         editor?.chain().focus().insertExamQuestion({ atEnd: true }).run();
     };
 
-    const context = useMemo(() => ({ sittings, editable, discussion }), [sittings, editable, discussion]);
+    /** The image button: where the cursor last was, as with pasting. */
+    const addImages = (files: FileList | null) => {
+        if (!editor || !uploadOptions || !files || files.length === 0) {
+            return;
+        }
+        insertExamImages(editor.view, Array.from(files), editor.state.selection.from, uploadOptions);
+    };
+
+    const context = useMemo(
+        () => ({ examId: discussion.examId, sittings, editable, discussion }),
+        [sittings, editable, discussion],
+    );
 
     return (
         <ExamEditorContext.Provider value={context}>
@@ -128,7 +170,27 @@ function LiveExam({ session, readOnly, hidden, discussion }: {
                                 <Plus className="h-4 w-4" aria-hidden="true" />
                                 {t('exam.editor.add-question')}
                             </button>
+                            <button
+                                type="button"
+                                className="vtk-button vtk-button-sm vtk-button-ghost"
+                                onClick={() => imageInput.current?.click()}
+                            >
+                                <ImagePlus className="h-4 w-4" aria-hidden="true" />
+                                {t('exam.images.add')}
+                            </button>
+                            <input
+                                ref={imageInput}
+                                type="file"
+                                accept="image/png,image/jpeg,image/webp"
+                                multiple
+                                hidden
+                                onChange={(event) => {
+                                    addImages(event.target.files);
+                                    event.target.value = '';
+                                }}
+                            />
                             <span className="vtk-help">{t('exam.editor.shortcut')}</span>
+                            <span className="vtk-help basis-full">{t('exam.images.hint')}</span>
                         </div>
                     )}
                 </div>

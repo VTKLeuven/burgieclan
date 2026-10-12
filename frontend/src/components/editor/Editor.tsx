@@ -2,8 +2,8 @@
 
 import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog';
 import { Code, Text } from '@/components/ui/Text';
-import { Mathematics } from '@tiptap/extension-mathematics';
-import { TextSelection } from '@tiptap/pm/state';
+import { LatexMath } from '@/components/editor/math/latexMath';
+import MathEditPopover from '@/components/editor/math/MathEditPopover';
 import { EditorContent, useEditor, type Editor as TipTapEditor } from '@tiptap/react';
 import { StarterKit } from "@tiptap/starter-kit";
 import 'katex/dist/katex.min.css';
@@ -17,7 +17,7 @@ import {
     List,
     ListOrdered,
     Redo2,
-    SquareFunction,
+    Sigma,
     Strikethrough,
     Undo2
 } from "lucide-react";
@@ -58,6 +58,8 @@ const InfoDialog = ({ isOpen, setIsOpen, parentDialogOpen }: InfoDialogProps) =>
                     {t('editor.info_dialog.inline')} <Code>$...$</Code> {t('editor.info_dialog.inline_end')}
                     {t('editor.info_dialog.block')} <Code>$$...$$</Code> {t('editor.info_dialog.block_end')}
                     <br /><br />
+                    {t('editor.info_dialog.edit')}
+                    <br /><br />
                     {t('editor.info_dialog.katex_overview')}
                     <a href="https://katex.org/docs/supported" target="_blank">{t('editor.info_dialog.katex_doc')}</a>,
                     {t('editor.info_dialog.katex_end')}
@@ -80,6 +82,7 @@ const InfoDialog = ({ isOpen, setIsOpen, parentDialogOpen }: InfoDialogProps) =>
  * it; undo and redo work there too, because the Collaboration extension provides both commands.
  */
 export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
+    const { t } = useTranslation();
     const [isInfoOpen, setIsInfoOpen] = useState(false);
 
     if (!editor) {
@@ -192,23 +195,16 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                     <Redo2 className="icon" />
                 </button>
                 <button
-                    // Clicking inserts a math block
-                    onClick={() => {
-                        // Insert two dollar signs at the current cursor position
-                        editor.chain().focus().insertContent('$$').run();
-
-                        // Move the cursor between the dollar signs
-                        const { tr } = editor.state;
-                        const position = tr.selection.from - 1; // One character back (to move between the dollar signs)
-                        const newSelection = TextSelection.create(tr.doc, position);
-
-                        // Dispatch the transaction with the new cursor position
-                        editor.view.dispatch(tr.setSelection(newSelection));
-                    }}
+                    type="button"
+                    // Opens the formula editor (MathEditPopover) for a new formula at the cursor.
+                    onClick={() => editor.commands.openMathEditor()}
                     className="p-1 mx-2 clickable"
+                    title={t('editor.math.insert')}
+                    aria-label={t('editor.math.insert')}
                 >
-                    <SquareFunction className="icon" />
+                    <Sigma className="icon" />
                 </button>
+                <MathEditPopover editor={editor} />
             </div>
             <div>
                 <button className="clickable" onClick={() => setIsInfoOpen(true)}>
@@ -239,7 +235,7 @@ const Editor = ({ className = '', onEditorReady }: EditorProps) => {    // Creat
                 code: {},
             }),
             // TextStyle.configure({types: [ListItem.name]}), // TODO check if this does anything
-            Mathematics,
+            LatexMath,
         ],
         autofocus: true,
         immediatelyRender: false, // Prevents hydration errors in Next.js
@@ -251,7 +247,9 @@ const Editor = ({ className = '', onEditorReady }: EditorProps) => {    // Creat
             handlePaste(view, event) {
                 event.preventDefault();
                 const text = event.clipboardData?.getData('text/plain');
-                view.dispatch(view.state.tr.insertText(text ?? '')); // Insert plain text as a new paragraph in the editor
+                // Insert plain text as a new paragraph in the editor. Marked as a paste, so the
+                // paste rules still run and turn $…$ in the pasted text into formulas (LatexMath).
+                view.dispatch(view.state.tr.insertText(text ?? '').setMeta('uiEvent', 'paste'));
                 return true;
             }
         },

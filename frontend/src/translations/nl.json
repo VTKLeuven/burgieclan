@@ -125,6 +125,14 @@
         "title": "Home",
         "description": "Welkom bij Burgieclan! Je beste vriend bij het studeren voor examens. We bieden een platform waar studenten hun studiemateriaal met elkaar kunnen delen. Op deze manier kunnen jullie elkaar helpen en wordt studeren een stuk makkelijker. Dus waar wacht je nog op? Duik in de wereld van Burgieclan en begin met het delen van je kennis!",
         "recent_activities": "Ga verder waar je gebleven was",
+        "exam_prompt": {
+            "title": "Had je net een van deze examens?",
+            "description": "Vul de reconstructie aan met de vragen die je kreeg, nu je ze nog weet.",
+            "questions_one": "{{count}} vraag",
+            "questions_other": "{{count}} vragen",
+            "dismiss": "Niet meer tonen voor {{course}}",
+            "course_fallback": "Vak"
+        },
         "no_recent_activities": "Nog geen recente activiteiten gevonden",
         "news": "Nieuws",
         "navigate_to": "Navigeer naar",
@@ -453,14 +461,24 @@
             "title": "Teksteditor",
             "description": "De editor laat je wiskundige formules schrijven en weergeven met LaTeX-syntaxis.",
             "inline": "Plaats je wiskundige expressies tussen",
-            "inline_end": "voor inline formules",
+            "inline_end": "voor een formule in de zin,",
             "block": " of ",
-            "block_end": "voor blokformules.",
+            "block_end": "alleen op een regel voor een blokformule.",
+            "edit": "Klik op een formule om ze aan te passen, of gebruik de Σ-knop om er een in te voegen.",
             "katex_overview": "Voor een overzicht van de ondersteunde functies, zie de ",
             "katex_doc": "documentatie van KaTeX",
             "katex_end": " de onderliggende LaTeX-interpreter."
         },
-        "info_button": "Info"
+        "info_button": "Info",
+        "math": {
+            "insert": "Formule invoegen",
+            "edit": "Formule aanpassen",
+            "label": "LaTeX",
+            "preview_empty": "Typ een formule, bv. \\frac{a}{b}",
+            "keys": "Enter om te bewaren, Esc om te annuleren. Leegmaken en bewaren verwijdert de formule.",
+            "cancel": "Annuleren",
+            "save": "Bewaren"
+        }
     },
     "footer": {
         "navigate": "Navigeren",
@@ -578,6 +596,23 @@
             "up": "Vraag omhoog",
             "down": "Vraag omlaag",
             "delete": "Vraag verwijderen"
+        },
+        "images": {
+            "add": "Afbeelding toevoegen",
+            "uploading": "Afbeelding uploaden…",
+            "removed": "Afbeelding verwijderd door een moderator",
+            "unavailable": "Deze afbeelding kan niet getoond worden",
+            "hint": "PNG, JPG of WebP tot 8 MB, ook door ze te plakken of in een vraag te slepen. Enkel eigen tekeningen, schema's en figuren: geen foto's van het examenblad zelf.",
+            "errors": {
+                "type": "Alleen PNG-, JPG- en WebP-afbeeldingen kunnen toegevoegd worden.",
+                "unreadable": "Deze afbeelding kon niet gelezen worden.",
+                "pixels": "Deze afbeelding is te groot. Maak ze eerst kleiner.",
+                "size": "Afbeeldingen mogen maximaal 8 MB zijn.",
+                "limit": "Deze reconstructie bevat al het maximale aantal afbeeldingen.",
+                "locked": "Deze reconstructie is vergrendeld.",
+                "rate": "Je hebt veel afbeeldingen geüpload. Probeer het later opnieuw.",
+                "failed": "De afbeelding kon niet geüpload worden. Probeer het opnieuw."
+            }
         },
         "discussion": {
             "comments_one": "{{count}} reactie",

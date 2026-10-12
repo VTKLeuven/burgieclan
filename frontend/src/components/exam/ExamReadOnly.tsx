@@ -30,8 +30,8 @@ export default function ExamReadOnly({ exam, discussion = null }: { exam: Exam; 
     }, [exam.content]);
 
     const context = useMemo(
-        () => ({ sittings: exam.sittings, editable: false, discussion }),
-        [exam.sittings, discussion],
+        () => ({ examId: exam.id, sittings: exam.sittings, editable: false, discussion }),
+        [exam.id, exam.sittings, discussion],
     );
 
     return (
