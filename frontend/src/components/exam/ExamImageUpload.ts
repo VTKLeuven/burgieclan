@@ -3,8 +3,10 @@ import { EXAM_IMAGE } from '@/components/exam/ExamImage';
 import { examImageLinks } from '@/components/exam/examImageLinks';
 import { isErrorResponse } from '@/hooks/useApi';
 import { Extension, type Editor } from '@tiptap/react';
-import { Plugin, PluginKey, type EditorState } from '@tiptap/pm/state';
+import { Plugin, PluginKey, type EditorState, type Transaction } from '@tiptap/pm/state';
 import { Decoration, DecorationSet, type EditorView } from '@tiptap/pm/view';
+import { absolutePositionToRelativePosition, relativePositionToAbsolutePosition, ySyncPluginKey } from '@tiptap/y-tiptap';
+import type * as Y from 'yjs';
 
 /** ExamImageStore::TYPES and ExamImage::MAX_BYTES in the backend. */
 export const ACCEPTED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
@@ -69,13 +71,61 @@ export interface ExamImageUploadOptions {
     uploadingLabel: string;
 }
 
-const placeholders = new PluginKey<DecorationSet>('examImageUpload');
+/**
+ * An image on its way up, at the spot it goes. Your own edits move `pos` through the
+ * transaction's mapping. Everyone else's edits cannot: y-tiptap applies them by replacing the
+ * whole ProseMirror document, which a mapping can only report as deleted. `anchor` finds the spot
+ * again then: a position in the shared Y.Doc, the same kind collaborators' cursors use.
+ */
+interface Placeholder {
+    id: object;
+    pos: number;
+    anchor: Y.RelativePosition | null;
+    widget: HTMLElement;
+}
 
-type PlaceholderAction = { add: { id: object; pos: number; widget: HTMLElement } } | { remove: { id: object } };
+interface PlaceholderState {
+    placeholders: Placeholder[];
+    decorations: DecorationSet;
+}
+
+const placeholders = new PluginKey<PlaceholderState>('examImageUpload');
+
+type PlaceholderAction = { add: Placeholder } | { remove: { id: object } };
+
+/** What the Collaboration extension's sync plugin keeps: the shared document and its node mapping. */
+interface SyncState {
+    doc: Y.Doc;
+    type: Y.XmlFragment;
+    binding: { mapping: Parameters<typeof relativePositionToAbsolutePosition>[3] } | null;
+}
+
+function syncState(state: EditorState): SyncState | undefined {
+    return ySyncPluginKey.getState(state) as SyncState | undefined;
+}
 
 function placeholderPosition(state: EditorState, id: object): number | null {
-    const found = placeholders.getState(state)?.find(undefined, undefined, (spec) => spec.id === id) ?? [];
-    return found.length > 0 ? found[0].from : null;
+    return placeholders.getState(state)?.placeholders.find((placeholder) => placeholder.id === id)?.pos ?? null;
+}
+
+/**
+ * Where each placeholder is after `tr`. After someone else's edit (or an undo, which y-tiptap
+ * applies the same way) the binding's mapping already describes the new document. A spot that
+ * cannot be found any more, e.g. because its question was deleted, ends up where the mapping puts
+ * it, the end of the document: the image is kept rather than lost.
+ */
+function moved(list: Placeholder[], tr: Transaction, oldState: EditorState): Placeholder[] {
+    const remote = (tr.getMeta(ySyncPluginKey) as { isChangeOrigin?: boolean } | undefined)?.isChangeOrigin === true;
+    const sync = remote ? syncState(oldState) : undefined;
+    const size = tr.doc.content.size;
+
+    return list.map((placeholder) => {
+        const anchored = sync?.binding && placeholder.anchor
+            ? relativePositionToAbsolutePosition(sync.doc, sync.type, placeholder.anchor, sync.binding.mapping)
+            : null;
+        const pos = anchored ?? tr.mapping.map(placeholder.pos);
+        return { ...placeholder, pos: Math.min(Math.max(pos, 0), size) };
+    });
 }
 
 /**
@@ -85,12 +135,16 @@ function placeholderPosition(state: EditorState, id: object): number | null {
  * document never holds anything but finished images.
  */
 export function insertExamImages(view: EditorView, files: File[], pos: number, options: ExamImageUploadOptions) {
+    const sync = syncState(view.state);
+    // The document and the Y.Doc agree here: the sync plugin copies every change across as it is made.
+    const anchor = sync?.binding ? absolutePositionToRelativePosition(pos, sync.type, sync.binding.mapping) : null;
+
     for (const file of files) {
         const id = {};
         const widget = document.createElement('span');
         widget.className = 'exam-image-placeholder';
         widget.textContent = options.uploadingLabel;
-        const add: PlaceholderAction = { add: { id, pos, widget } };
+        const add: PlaceholderAction = { add: { id, pos, anchor, widget } };
         view.dispatch(view.state.tr.setMeta(placeholders, add));
 
         void options.upload(file).then((uploaded) => {
@@ -101,7 +155,6 @@ export function insertExamImages(view: EditorView, files: File[], pos: number, o
             const remove: PlaceholderAction = { remove: { id } };
             const tr = view.state.tr.setMeta(placeholders, remove);
             const image = view.state.schema.nodes[EXAM_IMAGE];
-            // Gone when the text around it was deleted in the meantime: then the image is not wanted there either.
             if (uploaded !== null && at !== null && image) {
                 tr.replaceRangeWith(at, at, image.create(uploaded));
             }
@@ -139,24 +192,35 @@ export const ExamImageUpload = Extension.create<object, ExamImageUploadStorage>(
         const current = () => this.storage.options;
 
         return [
-            new Plugin<DecorationSet>({
+            new Plugin<PlaceholderState>({
                 key: placeholders,
                 state: {
-                    init: () => DecorationSet.empty,
-                    apply(tr, set) {
-                        let next = set.map(tr.mapping, tr.doc);
+                    init: () => ({ placeholders: [], decorations: DecorationSet.empty }),
+                    apply(tr, value, oldState) {
+                        let list = tr.docChanged && value.placeholders.length > 0
+                            ? moved(value.placeholders, tr, oldState)
+                            : value.placeholders;
                         const action = tr.getMeta(placeholders) as PlaceholderAction | undefined;
                         if (action && 'add' in action) {
-                            next = next.add(tr.doc, [Decoration.widget(action.add.pos, action.add.widget, { id: action.add.id })]);
+                            list = [...list, action.add];
                         } else if (action && 'remove' in action) {
-                            next = next.remove(next.find(undefined, undefined, (spec) => spec.id === action.remove.id));
+                            list = list.filter((placeholder) => placeholder.id !== action.remove.id);
                         }
-                        return next;
+                        if (list === value.placeholders) {
+                            return value;
+                        }
+                        return {
+                            placeholders: list,
+                            decorations: DecorationSet.create(
+                                tr.doc,
+                                list.map((placeholder) => Decoration.widget(placeholder.pos, placeholder.widget, { id: placeholder.id })),
+                            ),
+                        };
                     },
                 },
                 props: {
                     decorations(state) {
-                        return placeholders.getState(state);
+                        return placeholders.getState(state)?.decorations;
                     },
                     handlePaste(view, event) {
                         const options = current();

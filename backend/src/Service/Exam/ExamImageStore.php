@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  *
  * Re-encoding does three things: it proves the upload really is an image, it scales it down to
  * ExamImage::MAX_SIDE, and it drops every bit of metadata, the GPS position of a phone photo
- * included. A JPEG is turned upright first by its EXIF orientation, which is lost with the rest.
+ * included. A JPEG is also turned upright by its EXIF orientation, which is lost with the rest.
  */
 class ExamImageStore
 {
@@ -68,10 +68,12 @@ class ExamImageStore
         if (false === $image) {
             throw new InvalidExamImageException('This image cannot be read.', 'unreadable');
         }
+        // Scaled down before it is turned upright: rotating makes a second copy, which at full size
+        // would take as much memory again as the decoded photo (a 24 MP one, ~100 MB, of 256 MB).
+        $image = $this->scaledDown($image);
         if ('image/jpeg' === $mimeType) {
             $image = $this->upright($image, $bytes);
         }
-        $image = $this->scaledDown($image);
         $encoded = $this->encode($image, $mimeType);
 
         $examImage = new ExamImage(

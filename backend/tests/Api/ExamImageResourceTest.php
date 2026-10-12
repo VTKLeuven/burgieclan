@@ -125,6 +125,13 @@ class ExamImageResourceTest extends ApiTestCase
 
         $served = $this->serve($photo['url'])->assertStatus(200)->client()->getInternalResponse()->getContent();
         $this->assertStringNotContainsString('Exif', $served);
+
+        // A large phone photo is both: scaled down (first, to spare memory) and turned upright.
+        $large = $this->upload($exam, self::sidewaysJpeg(3000, 1500), 'groot.jpg')
+            ->assertStatus(201)
+            ->json()
+            ->decoded();
+        $this->assertSame([1000, 2000], [$large['width'], $large['height']]);
     }
 
     public function testOnlyImagesWeAcceptAreStored(): void

@@ -21,6 +21,10 @@ const UNAVAILABLE: ExamImageLink = { status: 'unavailable' };
 /** An image that failed to load asks for a fresh link at most this often. */
 const RETRY_AFTER_MS = 60_000;
 
+/** After a failed request for links, its images ask again this much later, doubling up to the maximum. */
+const RETRY_FAILED_MS = 10_000;
+const RETRY_FAILED_MAX_MS = 5 * 60_000;
+
 type ApiImages = Record<string, { url?: unknown; removed?: unknown }>;
 
 /**
@@ -31,12 +35,19 @@ type ApiImages = Record<string, { url?: unknown; removed?: unknown }>;
  * would load a long reconstruction image by image. A link expires after ten minutes, but an
  * image that has loaded stays on screen; only when it has to load again and fails does it ask
  * for a fresh link (`retry`). A link that still works is kept, so nothing downloads twice.
+ *
+ * A request that fails (a deploy, a lost connection) is not the final word: its images say they
+ * cannot be shown, and ask again a while later and whenever they mount again.
  */
 class ExamImageLinks {
     private readonly links = new Map<string, ExamImageLink>();
     private readonly wanted = new Set<string>();
     private readonly lastRetry = new Map<string, number>();
     private readonly listeners = new Set<() => void>();
+    /** Images whose last request for a link failed. */
+    private readonly failed = new Set<string>();
+    private failedDelay = RETRY_FAILED_MS;
+    private failedTimer: ReturnType<typeof setTimeout> | null = null;
     private scheduled = false;
     private loading = false;
 
@@ -53,9 +64,9 @@ class ExamImageLinks {
         return this.links.get(uuid) ?? LOADING;
     }
 
-    /** Asks for a link to an image this page has none for yet. */
+    /** Asks for a link to an image this page has none for yet, or whose request failed. */
     want(uuid: string) {
-        if (!this.links.has(uuid)) {
+        if (!this.links.has(uuid) || this.failed.has(uuid)) {
             this.wanted.add(uuid);
             this.schedule();
         }
@@ -113,18 +124,26 @@ class ExamImageLinks {
             // A redirect to the login page surfaces here; Next.js carries it out.
         }
 
-        for (const uuid of asked) {
-            const image = images?.[uuid];
-            if (images === null) {
-                // The request failed; the images that asked stay without a link.
+        if (images === null) {
+            for (const uuid of asked) {
                 this.links.set(uuid, UNAVAILABLE);
-            } else if (image?.removed === true) {
-                this.links.set(uuid, REMOVED);
-            } else if (typeof image?.url === 'string') {
-                // Local storage answers with a path on the backend, S3 with an absolute link.
-                this.links.set(uuid, { status: 'ready', url: new URL(image.url, process.env.NEXT_PUBLIC_BACKEND_URL).toString() });
-            } else {
-                this.links.set(uuid, UNAVAILABLE);
+                this.failed.add(uuid);
+            }
+            this.retryFailedLater();
+        } else {
+            this.failedDelay = RETRY_FAILED_MS;
+            for (const uuid of asked) {
+                const image = images[uuid];
+                this.failed.delete(uuid);
+                if (image?.removed === true) {
+                    this.links.set(uuid, REMOVED);
+                } else if (typeof image?.url === 'string') {
+                    // Local storage answers with a path on the backend, S3 with an absolute link.
+                    this.links.set(uuid, { status: 'ready', url: new URL(image.url, process.env.NEXT_PUBLIC_BACKEND_URL).toString() });
+                } else {
+                    // Not one of this exam's images, e.g. pasted from another reconstruction.
+                    this.links.set(uuid, UNAVAILABLE);
+                }
             }
         }
 
@@ -133,6 +152,22 @@ class ExamImageLinks {
         if (this.wanted.size > 0) {
             this.schedule();
         }
+    }
+
+    private retryFailedLater() {
+        if (this.failedTimer !== null) {
+            return;
+        }
+        const delay = this.failedDelay;
+        this.failedDelay = Math.min(delay * 2, RETRY_FAILED_MAX_MS);
+        this.failedTimer = setTimeout(() => {
+            this.failedTimer = null;
+            // Only while images are on screen; one that mounts later asks by itself (want).
+            if (this.listeners.size > 0) {
+                this.failed.forEach((uuid) => this.wanted.add(uuid));
+                this.schedule();
+            }
+        }, delay);
     }
 
     private notify() {
