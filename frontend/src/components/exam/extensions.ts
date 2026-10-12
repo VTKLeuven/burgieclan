@@ -1,6 +1,6 @@
+import { LatexMath } from '@/components/editor/math/latexMath';
 import { ExamImage } from '@/components/exam/ExamImage';
 import { EXAM_QUESTION, ExamQuestion } from '@/components/exam/ExamQuestion';
-import { Mathematics } from '@tiptap/extension-mathematics';
 import { UniqueID } from '@tiptap/extension-unique-id';
 import { isChangeOrigin } from '@tiptap/extension-collaboration';
 import { Node, type Extensions } from '@tiptap/react';
@@ -37,7 +37,7 @@ export function examExtensions({ collaborative }: { collaborative: boolean }): E
         ExamDocument,
         ExamQuestion,
         ExamImage,
-        Mathematics,
+        LatexMath,
         UniqueID.configure({
             types: [EXAM_QUESTION],
             filterTransaction: collaborative ? (transaction) => !isChangeOrigin(transaction) : null,

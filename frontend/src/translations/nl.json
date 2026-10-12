@@ -461,14 +461,24 @@
             "title": "Teksteditor",
             "description": "De editor laat je wiskundige formules schrijven en weergeven met LaTeX-syntaxis.",
             "inline": "Plaats je wiskundige expressies tussen",
-            "inline_end": "voor inline formules",
+            "inline_end": "voor een formule in de zin,",
             "block": " of ",
-            "block_end": "voor blokformules.",
+            "block_end": "alleen op een regel voor een blokformule.",
+            "edit": "Klik op een formule om ze aan te passen, of gebruik de Σ-knop om er een in te voegen.",
             "katex_overview": "Voor een overzicht van de ondersteunde functies, zie de ",
             "katex_doc": "documentatie van KaTeX",
             "katex_end": " de onderliggende LaTeX-interpreter."
         },
-        "info_button": "Info"
+        "info_button": "Info",
+        "math": {
+            "insert": "Formule invoegen",
+            "edit": "Formule aanpassen",
+            "label": "LaTeX",
+            "preview_empty": "Typ een formule, bv. \\frac{a}{b}",
+            "keys": "Enter om te bewaren, Esc om te annuleren. Leegmaken en bewaren verwijdert de formule.",
+            "cancel": "Annuleren",
+            "save": "Bewaren"
+        }
     },
     "footer": {
         "navigate": "Navigeren",
