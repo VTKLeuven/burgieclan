@@ -3,3 +3,40 @@ framework:
         sanitizers:
             default:
                 allow_safe_elements: true
+
+            # Document comments are HTML from the TipTap editor (frontend/src/components/editor/Editor.tsx:
+            # StarterKit + Mathematics) and are rendered as HTML, so only what that editor can produce is
+            # kept. Applied on every write by App\EventListener\DocumentCommentSanitizer.
+            document_comment:
+                allow_elements:
+                    p: []
+                    br: []
+                    strong: []
+                    em: []
+                    s: []
+                    u: []
+                    code: []
+                    pre: []
+                    blockquote: []
+                    hr: []
+                    h1: []
+                    h2: []
+                    h3: []
+                    h4: []
+                    h5: []
+                    h6: []
+                    ul: []
+                    ol: []
+                    li: []
+                    # As the editor writes links: <a target="_blank" rel="noopener noreferrer nofollow" href="…">
+                    a: ['target', 'rel', 'href']
+                    # Formulas: span[data-type="inline-math"] and div[data-type="block-math"], the
+                    # formula itself in data-latex
+                    span: ['data-type', 'data-latex']
+                    div: ['data-type', 'data-latex']
+                allowed_link_schemes: ['http', 'https', 'mailto']
+                force_attributes:
+                    a:
+                        rel: 'noopener noreferrer nofollow'
+                # Comments have no length limit, and the default (20 000 bytes) silently truncates
+                max_input_length: -1
