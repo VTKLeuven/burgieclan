@@ -299,6 +299,97 @@ class DocumentCommentResourceTest extends ApiTestCase
             ->assertJsonMatches('content', 'The content of this comment');
     }
 
+    /**
+     * Comments are rendered as HTML, so anything the editor cannot produce is stripped on write:
+     * otherwise anyone could post a script straight to the API and run it in every reader's browser.
+     */
+    public function testPostStripsScriptsFromDocumentComment(): void
+    {
+        $document = DocumentFactory::createOne();
+
+        $json = $this->browser()
+            ->post(
+                '/api/document_comments',
+                [
+                    'json' => [
+                        'content' => '<p>test</p><img src=x onerror="console.log(\'xss\')">'
+                            . '<p onclick="alert(1)">a <a href="javascript:alert(1)" rel="opener">link</a></p>'
+                            . '<script>alert(1)</script>',
+                        'document' => '/api/documents/' . $document->getId(),
+                    ],
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json',
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(201)
+            ->json()
+            ->decoded();
+
+        $this->assertSame('<p>test</p><p>a <a rel="noopener noreferrer nofollow">link</a></p>', $json['content']);
+        $this->assertSame(
+            $json['content'],
+            DocumentCommentFactory::repository()->find(basename($json['@id']))?->getContent()
+        );
+    }
+
+    /**
+     * What the editor produces survives the sanitizer, formulas included.
+     */
+    public function testPostKeepsEditorOutputOfDocumentComment(): void
+    {
+        $document = DocumentFactory::createOne();
+        $content = '<h1>Titel</h1><p><strong>vet</strong> <em>schuin</em> <s>weg</s> <u>onder</u> <code>x</code>'
+            . ' en <span data-type="inline-math" data-latex="\\frac{a}{b}"></span><br />volgende regel</p>'
+            . '<ul><li><p>een</p></li></ul><ol><li><p>twee</p></li></ol>'
+            . '<div data-type="block-math" data-latex="\\sum_i x_i"></div>'
+            . '<blockquote><p>citaat</p></blockquote><pre><code>code</code></pre><hr />'
+            . '<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://vtk.be">vtk.be</a></p>';
+
+        $this->browser()
+            ->post(
+                '/api/document_comments',
+                [
+                    'json' => [
+                        'content' => $content,
+                        'document' => '/api/documents/' . $document->getId(),
+                    ],
+                    'headers' => [
+                        'Content-Type' => 'application/ld+json',
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(201)
+            ->assertJsonMatches('content', $content);
+    }
+
+    public function testPatchStripsScriptsFromDocumentComment(): void
+    {
+        $author = UserFactory::createOne(['plainPassword' => 'password']);
+        $token = $this->getToken($author->getUsername(), 'password');
+        $comment = DocumentCommentFactory::createOne(['creator' => $author]);
+
+        $this->browser()
+            ->patch(
+                '/api/document_comments/' . $comment->getId(),
+                [
+                    'json' => [
+                        'content' => '<p>test</p><img src=x onerror="console.log(\'xss\')">',
+                    ],
+                    'headers' => [
+                        'Content-Type' => 'application/merge-patch+json',
+                        'Authorization' => 'Bearer ' . $token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('content', '<p>test</p>');
+
+        $this->assertSame('<p>test</p>', DocumentCommentFactory::repository()->find($comment->getId())?->getContent());
+    }
+
     public function testPatchToUpdateDocumentComment()
     {
         $creator = UserFactory::createOne(
