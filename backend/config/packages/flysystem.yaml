@@ -56,6 +56,22 @@ flysystem:
             lazy:
                 source: 'exports.%env(DOCUMENT_STORAGE)%'
 
+        # Images in exam reconstructions (App\Service\Exam\ExamImageStore), re-encoded before
+        # they are written, and handed out through the same kind of signed link.
+        exam_images.local:
+            local:
+                directory: '%kernel.project_dir%/data/exam-images'
+
+        exam_images.s3:
+            aws:
+                client: 's3_client'
+                bucket: '%env(S3_BUCKET)%'
+                prefix: 'exam-images'
+
+        exam_images.storage:
+            lazy:
+                source: 'exam_images.%env(DOCUMENT_STORAGE)%'
+
 services:
     s3_client:
         class: Aws\S3\S3Client
@@ -89,3 +105,11 @@ when@prod:
     parameters:
         # Production has always stored documents on S3; keep that the default.
         env(DOCUMENT_STORAGE): 's3'
+
+when@test:
+    flysystem:
+        storages:
+            # Kept apart from the images uploaded while developing.
+            exam_images.local:
+                local:
+                    directory: '%kernel.project_dir%/var/test-exam-images'

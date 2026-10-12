@@ -331,3 +331,15 @@
 }
 
 
+
+/* Thumbnails of the images in an exam reconstruction (admin/exam_detail.html.twig). */
+.bc-exam-image {
+    width: 220px;
+}
+
+.bc-exam-image img {
+    display: block;
+    width: 100%;
+    height: 140px;
+    object-fit: contain;
+}

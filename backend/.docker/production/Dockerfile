@@ -20,20 +20,32 @@ RUN apk update && \
     icu \
     icu-data-full \
     postgresql18-client \
+    libpng \
+    libjpeg-turbo \
+    libwebp \
     su-exec && \
     rm -rf /var/cache/apk/*
 
 # Install required PHP extensions and immediately clean up the *-dev packages
+#
+# gd (with JPEG and WebP) re-encodes images uploaded to exam reconstructions: resize, strip
+# metadata. exif reads a photo's orientation first. Their runtime libraries are installed above.
 RUN apk add --no-cache --virtual .build-deps \
     postgresql-dev \
     libzip-dev \
     icu-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    libwebp-dev \
+    && docker-php-ext-configure gd --with-jpeg --with-webp \
     && docker-php-ext-install \
     pdo \
     pdo_pgsql \
     zip \
     intl \
     opcache \
+    gd \
+    exif \
     # Remove the build dependencies to keep the image lean
     && apk del .build-deps \
     && rm -rf /var/cache/apk/*

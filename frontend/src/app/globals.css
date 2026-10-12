@@ -891,6 +891,29 @@
     .exam-chip {
       @apply m-0;
     }
+
+    /* Uploaded images (ExamImageView): never wider than the question they sit in. */
+    .exam-image {
+      @apply my-3;
+    }
+
+    .exam-image img {
+      @apply block h-auto max-w-full rounded-lg border border-vtk-line;
+    }
+
+    .exam-image.is-selected img,
+    .exam-image.is-selected .exam-image-placeholder {
+      @apply outline-2 outline-offset-2 outline-vtk-yellow;
+    }
+
+    /* While an image uploads (ExamImageUpload, only you see it), loads, or cannot be shown. */
+    .exam-image-placeholder {
+      @apply my-3 flex w-full items-center justify-center rounded-lg border border-dashed border-vtk-line bg-vtk-paper-2 px-4 py-6 text-center text-sm text-vtk-muted;
+    }
+
+    .exam-image .exam-image-placeholder {
+      @apply my-0;
+    }
   }
 
   @keyframes exam-question-linked {
