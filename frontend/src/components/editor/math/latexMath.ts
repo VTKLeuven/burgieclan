@@ -1,7 +1,7 @@
 import { BlockMath, InlineMath } from '@tiptap/extension-mathematics';
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
-import { Plugin, PluginKey, TextSelection, type EditorState } from '@tiptap/pm/state';
-import { Extension, InputRule, PasteRule, type Editor } from '@tiptap/react';
+import { Plugin, PluginKey, TextSelection, type EditorState, type Transaction } from '@tiptap/pm/state';
+import { Extension, InputRule, PasteRule, type Editor, type MappablePosition } from '@tiptap/react';
 
 /*
  * Formulas written the way LaTeX users already write them: `$1+1=2$` inside a sentence, and
@@ -123,6 +123,15 @@ export type MathEditTarget = {
     /** Changing the formula at `pos`, or writing a new one to put at `pos` once saved. */
     mode: 'edit' | 'insert';
     pos: number;
+    /**
+     * Where `pos` is kept, as Tiptap's mappable positions. In a collaborative editor these follow
+     * other people's edits too: y-tiptap applies those by replacing the whole document, which a
+     * plain mapping can only report as deleted, so the Collaboration extension anchors them in the
+     * shared Y.Doc instead. A formula being edited also keeps the spot right after it (`after`):
+     * someone typing right against one side of it can move one spot off the formula, not both.
+     */
+    before: MappablePosition;
+    after: MappablePosition | null;
     /** Stays the same while `pos` moves, so the popover keeps what you typed. */
     id: number;
 };
@@ -133,6 +142,10 @@ export const mathEditKey = new PluginKey<MathEditTarget | null>('mathEdit');
 
 function isMath(node: ProseMirrorNode | null | undefined): boolean {
     return node?.type.name === 'inlineMath' || node?.type.name === 'blockMath';
+}
+
+function isMathAt(doc: ProseMirrorNode, pos: number): boolean {
+    return pos >= 0 && pos < doc.content.size && isMath(doc.nodeAt(pos));
 }
 
 declare module '@tiptap/core' {
@@ -155,9 +168,17 @@ const MathEditing = Extension.create({
 
     addCommands() {
         return {
-            openMathEditor: () => ({ state, dispatch }) => {
+            openMathEditor: () => ({ editor, state, dispatch }) => {
                 if (dispatch) {
-                    dispatch(state.tr.setMeta(mathEditKey, { mode: 'insert', pos: state.selection.from, id: nextId++ }));
+                    const pos = state.selection.from;
+                    const target: MathEditTarget = {
+                        mode: 'insert',
+                        pos,
+                        before: editor.utils.createMappablePosition(pos),
+                        after: null,
+                        id: nextId++,
+                    };
+                    dispatch(state.tr.setMeta(mathEditKey, target));
                 }
                 return true;
             },
@@ -171,6 +192,13 @@ const MathEditing = Extension.create({
     },
 
     addProseMirrorPlugins() {
+        const { editor } = this;
+        /** Where `position` is after `tr`, or null when `tr` deleted it. */
+        const kept = (position: MappablePosition, tr: Transaction): MappablePosition | null => {
+            const { position: next, mapResult } = editor.utils.getUpdatedPosition(position, tr);
+            return mapResult?.deleted ? null : next;
+        };
+
         return [new Plugin<MathEditTarget | null>({
             key: mathEditKey,
             state: {
@@ -183,11 +211,19 @@ const MathEditing = Extension.create({
                     if (!target || !tr.docChanged) {
                         return target;
                     }
-                    const mapped = tr.mapping.mapResult(target.pos, target.mode === 'edit' ? 1 : -1);
-                    if (target.mode === 'edit' && (mapped.deleted || !isMath(tr.doc.nodeAt(mapped.pos)))) {
+                    if (target.mode === 'insert') {
+                        const { position: before } = editor.utils.getUpdatedPosition(target.before, tr);
+                        return { ...target, pos: before.position, before };
+                    }
+
+                    const before = kept(target.before, tr);
+                    const after = target.after ? kept(target.after, tr) : null;
+                    // Formulas are leaf nodes: one ends a single position after it starts.
+                    const pos = [before?.position ?? -1, (after?.position ?? 0) - 1].find((at) => isMathAt(tr.doc, at));
+                    if (!before || pos === undefined) {
                         return null;
                     }
-                    return { ...target, pos: mapped.pos };
+                    return { ...target, pos, before, after };
                 },
             },
             props: {
@@ -195,7 +231,14 @@ const MathEditing = Extension.create({
                     if (!view.editable || !isMath(node)) {
                         return false;
                     }
-                    view.dispatch(view.state.tr.setMeta(mathEditKey, { mode: 'edit', pos: nodePos, id: nextId++ }));
+                    const target: MathEditTarget = {
+                        mode: 'edit',
+                        pos: nodePos,
+                        before: editor.utils.createMappablePosition(nodePos),
+                        after: editor.utils.createMappablePosition(nodePos + node.nodeSize),
+                        id: nextId++,
+                    };
+                    view.dispatch(view.state.tr.setMeta(mathEditKey, target));
                     return true;
                 },
             },
