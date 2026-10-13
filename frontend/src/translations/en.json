@@ -473,6 +473,8 @@
         "math": {
             "insert": "Insert formula",
             "edit": "Edit formula",
+            "mode_inline": "Inline ($…$)",
+            "mode_block": "Whole line ($$…$$)",
             "label": "LaTeX",
             "preview_empty": "Type a formula, e.g. \\frac{a}{b}",
             "keys": "Enter to save, Esc to cancel. Saving it empty removes the formula.",

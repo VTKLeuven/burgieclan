@@ -10,6 +10,7 @@ import { useUser } from '@/components/UserContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/components/header/LanguageSwitcher';
 import Link from 'next/link';
+import Image from 'next/image';
 import { recordOldBurgieclanClick } from '@/actions/analytics';
 
 interface NavigationItem {
@@ -19,20 +20,20 @@ interface NavigationItem {
     onClick?: () => void;
 }
 
-const vtkLogoMaskStyle: CSSProperties = {
+const logoMaskStyle: CSSProperties = {
     backgroundColor: '#c8c9cd',
-    maskImage: "url('/images/logos/vtk-logo-white.png')",
+    maskImage: "url('/images/logos/burgieclan-cloud-mask.png')",
     maskPosition: 'left center',
     maskRepeat: 'no-repeat',
     maskSize: 'contain',
-    WebkitMaskImage: "url('/images/logos/vtk-logo-white.png')",
+    WebkitMaskImage: "url('/images/logos/burgieclan-cloud-mask.png')",
     WebkitMaskPosition: 'left center',
     WebkitMaskRepeat: 'no-repeat',
     WebkitMaskSize: 'contain',
 };
 
 const HeaderLogo = ({ className }: { className: string }) => (
-    <span aria-hidden="true" className={className} style={vtkLogoMaskStyle} />
+    <span aria-hidden="true" className={className} style={logoMaskStyle} />
 );
 
 /**
@@ -75,9 +76,14 @@ export default function Header() {
                 <Link href={`/${i18n.language}`} className="flex shrink-0 items-center gap-4">
                     <span className="sr-only">Burgieclan</span>
                     <HeaderLogo className="block h-[34px] w-[60px] shrink-0" />
-                    {/* Optical nudge: flex centring aligns the full line box, which
-                        leaves the cap-height block sitting high against the mark. */}
-                    <span className="hidden translate-y-[2px] text-xl font-bold tracking-tight lg:inline">Burgieclan</span>
+                    <Image
+                        src="/images/logos/burgieclan-wordmark-white.png"
+                        alt="Burgieclan"
+                        width={140}
+                        height={18}
+                        className="hidden h-[18px] w-auto object-contain lg:block"
+                        priority
+                    />
                 </Link>
 
                 {/* Search */}
@@ -145,9 +151,16 @@ export default function Header() {
                 <div className="fixed inset-0 z-40 bg-vtk-ink/40" aria-hidden="true" />
                 <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-vtk-navy px-6 py-5 text-vtk-paper sm:max-w-sm">
                     <div className="flex items-center justify-between">
-                        <Link href={`/${i18n.language}`} className="flex shrink-0 items-center gap-2.5">
+                        <Link href={`/${i18n.language}`} className="flex shrink-0 items-center gap-3">
                             <span className="sr-only">Burgieclan</span>
                             <HeaderLogo className="block h-[32px] w-[57px] shrink-0" />
+                            <Image
+                                src="/images/logos/burgieclan-wordmark-white.png"
+                                alt="Burgieclan"
+                                width={124}
+                                height={16}
+                                className="h-4 w-auto object-contain"
+                            />
                         </Link>
                         <button
                             type="button"

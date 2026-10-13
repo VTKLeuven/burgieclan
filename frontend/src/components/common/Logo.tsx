@@ -3,10 +3,10 @@ import React from "react";
 
 export default function Logo({ width, height }: { width: number; height: number }) {
     return (
-        // Navy VTK mark for light surfaces; the header/footer use the white
-        // variant directly since they sit on the navy band.
+        // Navy Burgieclan cloud mark for light surfaces; header uses the mask
+        // variant and footer uses the white variant since they sit on the navy band.
         <Image
-            src="/images/logos/vtk-logo-blue.png"
+            src="/images/logos/burgieclan-cloud-navy.png"
             alt="Burgieclan Logo"
             width={width}
             height={height}
