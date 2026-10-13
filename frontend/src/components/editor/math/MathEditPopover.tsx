@@ -96,10 +96,11 @@ function Popover({ editor, target }: { editor: Editor; target: MathEditTarget })
     };
 
     const handleLatexChange = (val: string) => {
-        if (val.startsWith('$$') && val.endsWith('$$') && val.length >= 4) {
+        // Only dollars around something, so typing "$$x$$" one key at a time is not cut short at "$$".
+        if (val.startsWith('$$') && val.endsWith('$$') && val.length > 4) {
             setIsBlock(true);
             setLatex(val.slice(2, -2).trim());
-        } else if (val.startsWith('$') && val.endsWith('$') && val.length >= 2) {
+        } else if (val.startsWith('$') && !val.startsWith('$$') && val.endsWith('$') && val.length > 2) {
             setLatex(val.slice(1, -1).trim());
         } else {
             setLatex(val);

@@ -1,6 +1,6 @@
 import { BlockMath, InlineMath } from '@tiptap/extension-mathematics';
 import { Fragment, Slice, type Node as ProseMirrorNode, type Schema } from '@tiptap/pm/model';
-import { Plugin, PluginKey, TextSelection, type EditorState, type Transaction } from '@tiptap/pm/state';
+import { NodeSelection, Plugin, PluginKey, TextSelection, type EditorState, type Transaction } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
 import { Extension, InputRule, PasteRule, type Editor, type MappablePosition } from '@tiptap/react';
 
@@ -56,7 +56,8 @@ function findPastedMath(text: string) {
     const found: { index: number; text: string; data: { latex: string; display: boolean } }[] = [];
     const taken = (from: number, to: number) => found.some((match) => from < match.index + match.text.length && to > match.index);
 
-    for (const [source, display] of [[DISPLAY, true], [INLINE, false]] as const) {
+    // The spaced form last, as when typing, so `$x$` is never read as part of a wider `$ … $`.
+    for (const [source, display] of [[DISPLAY, true], [INLINE, false], [INLINE_SPACED, false]] as const) {
         const pattern = new RegExp(source, 'g');
         for (let match = pattern.exec(text); match !== null; match = pattern.exec(text)) {
             const end = match.index + match[0].length;
@@ -70,10 +71,26 @@ function findPastedMath(text: string) {
 }
 
 /**
+ * Whether a textblock holds anything but blank text between two offsets within it. Formulas and
+ * other inline nodes count: they have no text, but a line holding one is not empty.
+ */
+function hasContent(textblock: ProseMirrorNode, from: number, to: number): boolean {
+    if (textblock.textBetween(from, to).trim() !== '') {
+        return true;
+    }
+    let found = false;
+    textblock.nodesBetween(from, to, (node) => {
+        found ||= !node.isText;
+        return !found;
+    });
+    return found;
+}
+
+/**
  * Inserts a block formula node into the document.
  * - If the paragraph only holds the formula (and optional whitespace), the whole paragraph is replaced.
- * - If the formula is preceded or followed by text, the textblock is split so the block formula
- *   gets its own line between them.
+ * - If the formula is preceded or followed by anything else, text or another formula, the
+ *   textblock is split so the block formula gets its own line between them.
  * - When typed, the cursor advances into a new paragraph right below the formula.
  */
 function insertBlockFormula(
@@ -95,11 +112,11 @@ function insertBlockFormula(
         return false;
     }
 
-    const textBefore = $from.parent.textBetween(0, $from.parentOffset).trim();
-    const textAfter = $from.parent.textBetween(state.doc.resolve(to).parentOffset, $from.parent.content.size).trim();
+    const contentBefore = hasContent($from.parent, 0, $from.parentOffset);
+    const contentAfter = hasContent($from.parent, state.doc.resolve(to).parentOffset, $from.parent.content.size);
     const paragraph = state.schema.nodes.paragraph;
 
-    if (textBefore === '' && textAfter === '') {
+    if (!contentBefore && !contentAfter) {
         const start = $from.before();
         const end = $from.after();
         tr.replaceWith(start, end, block);
@@ -119,7 +136,7 @@ function insertBlockFormula(
 
     tr.delete(from, to);
 
-    if (textBefore !== '' && textAfter === '') {
+    if (contentBefore && !contentAfter) {
         const $pos = tr.doc.resolve(from);
         const afterPos = $pos.after();
         tr.insert(afterPos, block);
@@ -134,7 +151,7 @@ function insertBlockFormula(
         return true;
     }
 
-    if (textBefore === '' && textAfter !== '') {
+    if (!contentBefore && contentAfter) {
         const $pos = tr.doc.resolve(from);
         const beforePos = $pos.before();
         tr.insert(beforePos, block);
@@ -199,24 +216,17 @@ const LatexBlockMath = BlockMath.extend({
             Enter: () => {
                 const { editor } = this;
                 const { state } = editor;
-                const { $from } = state.selection;
-                // Typing "$$" on an empty line and pressing Enter turns it into a block formula and opens the editor!
-                if ($from.parent.isTextblock && $from.parent.textContent.trim() === '$$') {
-                    const blockMath = state.schema.nodes.blockMath;
-                    if (blockMath) {
-                        const from = $from.start();
-                        const to = $from.end();
-                        const tr = state.tr;
-                        const block = blockMath.create({ latex: '' });
-                        if (insertBlockFormula(tr, state, from, to, block, false)) {
-                            editor.view.dispatch(tr);
-                            const pos = $from.before();
-                            editor.commands.openMathEditor({ pos, mode: 'edit' });
-                            return true;
-                        }
-                    }
+                const { $from, empty } = state.selection;
+                const line = $from.parent;
+                // "$$" alone on a line, then Enter: the formula editor opens there for a block formula.
+                // Nothing goes into the document before it is saved, so cancelling leaves an empty line
+                // rather than an empty formula nobody can see.
+                if (!empty || !line.isTextblock || line.childCount !== 1 || !line.firstChild?.isText || line.textContent.trim() !== '$$') {
+                    return false;
                 }
-                return false;
+                const start = $from.start();
+                editor.view.dispatch(state.tr.delete(start, $from.end()));
+                return editor.commands.openMathEditor({ pos: start, mode: 'insert' });
             },
         };
     },
@@ -275,8 +285,11 @@ const MathEditing = Extension.create({
                 if (dispatch) {
                     const pos = options?.pos ?? state.selection.from;
                     const nodeAtPos = state.doc.nodeAt(pos);
-                    const isEditing = options?.mode === 'edit' || (!options?.mode && isMath(nodeAtPos));
-                    const mode = isEditing ? 'edit' : 'insert';
+                    // Without a mode, only a selected formula is edited (e.g. reached with the arrow
+                    // keys); a cursor merely next to one gets a new formula.
+                    const selected = options?.pos === undefined && state.selection instanceof NodeSelection;
+                    const wantsEdit = options?.mode ? options.mode === 'edit' : selected;
+                    const mode = wantsEdit && isMath(nodeAtPos) ? 'edit' : 'insert';
                     const node = mode === 'edit' ? nodeAtPos : null;
                     const nodeSize = node?.nodeSize ?? 0;
                     const target: MathEditTarget = {
@@ -455,6 +468,13 @@ export const LatexMath = Extension.create({
                         if (!text || !text.includes('$')) {
                             return false;
                         }
+                        // Formatted content (bold, lists, a copied question) keeps its formatting: the
+                        // paste rules turn the formulas in it into math. Only plain text is rebuilt
+                        // here, or a $$ block spread over lines, which the paste rules never see whole.
+                        const formatted = event.clipboardData?.types.includes('text/html') ?? false;
+                        if (formatted && !/\$\$[^$]*\n[^$]*\$\$/.test(text)) {
+                            return false;
+                        }
                         const hasMath = /\$\$[\s\S]+?\$\$|\$[^$\n]+\$/.test(text);
                         if (!hasMath) {
                             return false;
@@ -483,10 +503,11 @@ export function mathEditLatex(editor: Editor, target: MathEditTarget): string {
 /** Saves what was typed in the popover: changes, inserts or (when emptied) removes the formula. */
 export function saveMath(editor: Editor, target: MathEditTarget, latex: string, asBlock: boolean = false) {
     let value = latex.trim();
-    if (value.startsWith('$$') && value.endsWith('$$') && value.length >= 4) {
+    // Only dollars around something: "$$" alone is not an empty formula.
+    if (value.startsWith('$$') && value.endsWith('$$') && value.length > 4) {
         value = value.slice(2, -2).trim();
         asBlock = true;
-    } else if (value.startsWith('$') && value.endsWith('$') && value.length >= 2) {
+    } else if (value.startsWith('$') && !value.startsWith('$$') && value.endsWith('$') && value.length > 2) {
         value = value.slice(1, -1).trim();
     }
 
@@ -497,7 +518,8 @@ export function saveMath(editor: Editor, target: MathEditTarget, latex: string, 
             if (asBlock && editor.schema.nodes.blockMath) {
                 chain.command(({ tr, state }) => {
                     const block = editor.schema.nodes.blockMath.create({ latex: value });
-                    insertBlockFormula(tr, state, target.pos, target.pos, block, false);
+                    // As if typed: you carry on writing on the line below it.
+                    insertBlockFormula(tr, state, target.pos, target.pos, block, true);
                     return true;
                 });
             } else {
