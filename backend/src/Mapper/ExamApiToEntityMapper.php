@@ -39,7 +39,7 @@ class ExamApiToEntityMapper implements MapperInterface
         $user = $this->security->getUser();
         assert($user instanceof User);
 
-        if (null === $from->course || null === $from->academicYear || null === $from->period) {
+        if (null === $from->course?->id || null === $from->academicYear || null === $from->period) {
             throw new LogicException('A new exam needs a course, an academic year and a period.');
         }
 
@@ -57,7 +57,7 @@ class ExamApiToEntityMapper implements MapperInterface
         assert($to instanceof Exam);
 
         // Only a new exam takes a source; an existing one keeps where it came from.
-        if (null === $to->getId() && null !== $from->copiedFrom) {
+        if (null === $to->getId() && null !== $from->copiedFrom?->id) {
             $to->setCopiedFrom(
                 $this->microMapper->map($from->copiedFrom, Exam::class, [MicroMapperInterface::MAX_DEPTH => 0])
             );

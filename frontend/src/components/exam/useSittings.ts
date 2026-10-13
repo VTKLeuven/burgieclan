@@ -76,7 +76,7 @@ export function useSittings(doc: Y.Doc | null) {
 
         const item = doc.getArray<unknown>(SITTINGS_FIELD).toArray()
             .find((candidate) => candidate instanceof Y.Map && candidate.get('id') === id);
-        if (item instanceof Y.Map) {
+        if (item instanceof Y.Map && item.get('label') !== trimmed) {
             doc.transact(() => item.set('label', trimmed), SITTINGS_ORIGIN);
         }
     }, [doc]);

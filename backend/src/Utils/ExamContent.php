@@ -2,6 +2,8 @@
 
 namespace App\Utils;
 
+use App\Entity\ExamQuestion;
+
 /**
  * Reads the stored JSON copy of an exam reconstruction (CollabDocument content and fields).
  *
@@ -77,7 +79,7 @@ final class ExamContent
                 $sittings = $question['attrs']['sittings'] ?? [];
 
                 return [
-                    'uid' => is_string($uid) && '' !== $uid ? $uid : null,
+                    'uid' => is_string($uid) && ExamQuestion::isValidUid($uid) ? $uid : null,
                     'text' => self::plainText($question),
                     'sittings' => is_array($sittings)
                         ? array_values(array_unique(array_filter($sittings, 'is_string')))

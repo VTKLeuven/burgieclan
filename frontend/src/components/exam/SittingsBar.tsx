@@ -47,9 +47,10 @@ export default function SittingsBar({ sittings, editable, onAdd, onRename, onRem
         setEditing(null);
     };
 
-    const cancelOnEscape = (cancel: () => void) => (event: KeyboardEvent) => {
+    const cancelOnEscape = (cancel: () => void) => (event: KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Escape') {
             event.preventDefault();
+            event.currentTarget.dataset.cancelled = 'true';
             cancel();
         }
     };
@@ -69,7 +70,11 @@ export default function SittingsBar({ sittings, editable, onAdd, onRename, onRem
                             value={editDraft}
                             maxLength={MAX_SITTING_LABEL}
                             onChange={(event) => setEditDraft(event.target.value)}
-                            onBlur={() => submitRename()}
+                            onBlur={(event) => {
+                                if (!event.currentTarget.dataset.cancelled) {
+                                    submitRename();
+                                }
+                            }}
                             onKeyDown={cancelOnEscape(() => setEditing(null))}
                             aria-label={t('exam.sittings.rename', { label: sitting.label })}
                             className="vtk-input min-h-8! w-40 rounded-full! px-3! py-1! text-sm"

@@ -207,38 +207,69 @@ const LINKED_HIGHLIGHT_MS = 2500;
  * only exist once the document has rendered, so the browser cannot scroll there by itself. This
  * does, once `ready`, and highlights the question for a moment.
  */
-function useScrollToLinkedQuestion(ready: boolean) {
-    const done = useRef(false);
+function useScrollToLinkedQuestion(ready: boolean, documentName: string) {
+    const lastScrolled = useRef<string | null>(null);
 
     useEffect(() => {
-        if (!ready || done.current) {
-            return;
-        }
-        const id = decodeURIComponent(window.location.hash.slice(1));
-        if (!id.startsWith('q-')) {
-            return;
-        }
-        done.current = true;
+        lastScrolled.current = null;
+    }, [documentName]);
 
-        // Node views mount a moment after the editor; look again for up to two seconds.
-        let tries = 0;
+    useEffect(() => {
+        if (!ready) {
+            return;
+        }
+
         let retry: number | undefined;
-        const find = () => {
-            const question = document.getElementById(id);
-            if (!question) {
-                if (++tries < 20) {
-                    retry = window.setTimeout(find, 100);
-                }
+        let removeHighlight: number | undefined;
+
+        const scrollToHash = (force: boolean) => {
+            window.clearTimeout(retry);
+            let id = '';
+            try {
+                id = decodeURIComponent(window.location.hash.slice(1));
+            } catch {
                 return;
             }
-            question.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            question.classList.add('exam-question__inner--linked');
-            window.setTimeout(() => question.classList.remove('exam-question__inner--linked'), LINKED_HIGHLIGHT_MS);
-        };
-        find();
+            if (!id.startsWith('q-')) {
+                return;
+            }
+            const targetKey = `${documentName}#${id}`;
+            if (!force && lastScrolled.current === targetKey) {
+                return;
+            }
+            lastScrolled.current = targetKey;
 
-        return () => window.clearTimeout(retry);
-    }, [ready]);
+            // Node views mount a moment after the editor; look again for up to two seconds.
+            let tries = 0;
+            const find = () => {
+                const question = document.getElementById(id);
+                if (!question) {
+                    if (++tries < 20) {
+                        retry = window.setTimeout(find, 100);
+                    }
+                    return;
+                }
+                question.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                question.classList.add('exam-question__inner--linked');
+                window.clearTimeout(removeHighlight);
+                removeHighlight = window.setTimeout(
+                    () => question.classList.remove('exam-question__inner--linked'),
+                    LINKED_HIGHLIGHT_MS,
+                );
+            };
+            find();
+        };
+
+        scrollToHash(false);
+        const onHashChange = () => scrollToHash(true);
+        window.addEventListener('hashchange', onHashChange);
+
+        return () => {
+            window.removeEventListener('hashchange', onHashChange);
+            window.clearTimeout(retry);
+            window.clearTimeout(removeHighlight);
+        };
+    }, [ready, documentName]);
 }
 
 /**
@@ -268,7 +299,7 @@ export default function ExamEditor({ exam, onAccessChange }: {
     const live = session !== null && !refused && synced;
     // Wait for the live document, or for the stored copy when live editing is unavailable: the
     // copy shown while connecting is swapped out and would scroll to the wrong place.
-    useScrollToLinkedQuestion(live || refused);
+    useScrollToLinkedQuestion(live || refused, exam.documentName);
 
     return (
         <div className="grid gap-4">

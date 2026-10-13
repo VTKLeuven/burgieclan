@@ -42,7 +42,7 @@ function LiveEditor({ session, readOnly }: { session: CollabSession; readOnly: b
             handlePaste(view, event) {
                 event.preventDefault();
                 const text = event.clipboardData?.getData('text/plain');
-                view.dispatch(view.state.tr.insertText(text ?? ''));
+                view.dispatch(view.state.tr.insertText(text ?? '').setMeta('uiEvent', 'paste'));
                 return true;
             },
         },

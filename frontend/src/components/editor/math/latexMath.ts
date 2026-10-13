@@ -369,18 +369,18 @@ const MathEditing = Extension.create({
 
 function parseInlines(text: string, schema: Schema): ProseMirrorNode[] {
     const inlines: ProseMirrorNode[] = [];
-    const inlineRegex = /\$([^\s$](?:[^$\n]*[^\s$\\])?)\$|\$\s*([^$\n]+?)\s*\$/g;
     let last = 0;
-    let m: RegExpExecArray | null;
-    while ((m = inlineRegex.exec(text)) !== null) {
-        if (m.index > last) {
-            inlines.push(schema.text(text.slice(last, m.index)));
+    for (const match of findPastedMath(text)) {
+        if (match.data.display) {
+            continue;
         }
-        const latex = (m[1] || m[2]).trim();
-        if (latex && schema.nodes.inlineMath) {
-            inlines.push(schema.nodes.inlineMath.create({ latex }));
+        if (match.index > last) {
+            inlines.push(schema.text(text.slice(last, match.index)));
         }
-        last = m.index + m[0].length;
+        if (match.data.latex && schema.nodes.inlineMath) {
+            inlines.push(schema.nodes.inlineMath.create({ latex: match.data.latex }));
+        }
+        last = match.index + match.text.length;
     }
     if (last < text.length) {
         inlines.push(schema.text(text.slice(last)));
@@ -437,13 +437,13 @@ function pasteMathText(view: EditorView, text: string, schema: Schema): boolean 
     // Single line with only inline content: insert inline content directly into current paragraph
     if (nodes.length === 1 && nodes[0].type.name === 'paragraph' && !text.includes('\n')) {
         const slice = new Slice(nodes[0].content, 0, 0);
-        dispatch(state.tr.replaceSelection(slice).scrollIntoView());
+        dispatch(state.tr.replaceSelection(slice).setMeta('uiEvent', 'paste').scrollIntoView());
         return true;
     }
 
     // Contains blockMath or multiple lines: insert block slice
     const slice = new Slice(Fragment.from(nodes), 0, 0);
-    dispatch(state.tr.replaceSelection(slice).scrollIntoView());
+    dispatch(state.tr.replaceSelection(slice).setMeta('uiEvent', 'paste').scrollIntoView());
     return true;
 }
 
@@ -475,8 +475,7 @@ export const LatexMath = Extension.create({
                         if (formatted && !/\$\$[^$]*\n[^$]*\$\$/.test(text)) {
                             return false;
                         }
-                        const hasMath = /\$\$[\s\S]+?\$\$|\$[^$\n]+\$/.test(text);
-                        if (!hasMath) {
+                        if (findPastedMath(text).length === 0) {
                             return false;
                         }
                         return pasteMathText(view, text, editor.schema);

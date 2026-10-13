@@ -29,6 +29,7 @@ export const MAX_BROADCAST_BYTES = 4096;
 
 const DOCUMENT_NAME = /^[a-z0-9][a-z0-9-]{0,99}$/;
 const ROUTE = /^\/internal\/documents\/([^/]+)\/(restore|disconnect|broadcast)$/;
+const BASE64_STATE = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 
 export interface InternalActions {
     /** Replace the content of a live document with an earlier state. */
@@ -42,6 +43,17 @@ export interface InternalActions {
     broadcast(documentName: string, message: string): void;
 }
 
+function hasFreshSignatureHeaders(headers: IncomingMessage['headers'], now = Date.now()): boolean {
+    const signature = headers[HEADER_SIGNATURE.toLowerCase()];
+    const timestamp = headers[HEADER_TIMESTAMP.toLowerCase()];
+
+    if (typeof signature !== 'string' || typeof timestamp !== 'string' || !/^\d{1,12}$/.test(timestamp)) {
+        return false;
+    }
+
+    return Math.abs(Math.floor(now / 1000) - Number(timestamp)) <= MAX_SKEW_SECONDS;
+}
+
 export function isValidSignature(
     secret: string,
     method: string,
@@ -50,16 +62,12 @@ export function isValidSignature(
     body: string,
     now = Date.now(),
 ): boolean {
-    const signature = headers[HEADER_SIGNATURE.toLowerCase()];
-    const timestamp = headers[HEADER_TIMESTAMP.toLowerCase()];
-
-    if (typeof signature !== 'string' || typeof timestamp !== 'string' || !/^\d{1,12}$/.test(timestamp)) {
-        return false;
-    }
-    if (Math.abs(Math.floor(now / 1000) - Number(timestamp)) > MAX_SKEW_SECONDS) {
+    if (!hasFreshSignatureHeaders(headers, now)) {
         return false;
     }
 
+    const signature = headers[HEADER_SIGNATURE.toLowerCase()] as string;
+    const timestamp = headers[HEADER_TIMESTAMP.toLowerCase()] as string;
     const expected = Buffer.from(signRequest(secret, method, path, Number(timestamp), body));
     const given = Buffer.from(signature);
 
@@ -74,6 +82,7 @@ async function readBody(request: IncomingMessage): Promise<string> {
     for await (const chunk of request) {
         size += (chunk as Buffer).length;
         if (size > MAX_BODY_BYTES) {
+            request.destroy();
             throw new BodyTooLargeError();
         }
         chunks.push(chunk as Buffer);
@@ -112,6 +121,12 @@ export async function handleInternalRequest(
         return true;
     }
 
+    if (!hasFreshSignatureHeaders(request.headers)) {
+        log.warn(`Rejected unsigned or badly signed request to ${path}`);
+        reply(response, 401);
+        return true;
+    }
+
     let body: string;
     try {
         body = await readBody(request);
@@ -126,7 +141,13 @@ export async function handleInternalRequest(
         return true;
     }
 
-    const documentName = decodeURIComponent(match[1] ?? '');
+    let documentName = '';
+    try {
+        documentName = decodeURIComponent(match[1] ?? '');
+    } catch {
+        reply(response, 404);
+        return true;
+    }
     if (!DOCUMENT_NAME.test(documentName)) {
         reply(response, 404);
         return true;
@@ -139,6 +160,11 @@ export async function handleInternalRequest(
             return true;
         }
 
+        if (match[2] === 'broadcast' && Buffer.byteLength(body, 'utf8') > MAX_BROADCAST_BYTES) {
+            reply(response, 400, `Expected a JSON object of at most ${MAX_BROADCAST_BYTES} bytes.`);
+            return true;
+        }
+
         let payload: unknown;
         try {
             payload = JSON.parse(body);
@@ -147,7 +173,7 @@ export async function handleInternalRequest(
         }
 
         if (match[2] === 'broadcast') {
-            if (typeof payload !== 'object' || payload === null || Array.isArray(payload) || body.length > MAX_BROADCAST_BYTES) {
+            if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
                 reply(response, 400, `Expected a JSON object of at most ${MAX_BROADCAST_BYTES} bytes.`);
                 return true;
             }
@@ -156,7 +182,7 @@ export async function handleInternalRequest(
             return true;
         }
         const state = typeof payload === 'object' && payload !== null && 'state' in payload ? payload.state : null;
-        if (typeof state !== 'string' || state === '') {
+        if (typeof state !== 'string' || state === '' || !BASE64_STATE.test(state)) {
             reply(response, 400, 'Expected {"state": "<base64 Yjs update>"}.');
             return true;
         }

@@ -65,15 +65,17 @@ class ExamContentTest extends TestCase
             ExamContent::questions(self::CONTENT)
         );
 
-        // Written by browsers, so never trusted: no id, or days that are not a list of strings.
+        // Written by browsers, so never trusted: no id, invalid id, or days that are not a list of strings.
         $malformed = ['content' => [
             ['type' => 'examQuestion', 'attrs' => ['sittings' => 'a'], 'content' => []],
             ['type' => 'examQuestion', 'attrs' => ['id' => '', 'sittings' => ['a', 3, 'a', 'b']]],
+            ['type' => 'examQuestion', 'attrs' => ['id' => 'q1/../x', 'sittings' => []]],
         ]];
         $this->assertSame(
             [
                 ['uid' => null, 'text' => '', 'sittings' => []],
                 ['uid' => null, 'text' => '', 'sittings' => ['a', 'b']],
+                ['uid' => null, 'text' => '', 'sittings' => []],
             ],
             ExamContent::questions($malformed)
         );

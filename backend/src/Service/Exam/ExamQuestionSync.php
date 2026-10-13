@@ -39,7 +39,7 @@ class ExamQuestionSync
 
         foreach (ExamContent::questions($content) as $question) {
             $uid = $question['uid'];
-            if (null === $uid || mb_strlen($uid) > ExamQuestion::MAX_UID_LENGTH || isset($seen[$uid])) {
+            if (null === $uid || !ExamQuestion::isValidUid($uid) || isset($seen[$uid])) {
                 continue;
             }
             $seen[$uid] = true;
