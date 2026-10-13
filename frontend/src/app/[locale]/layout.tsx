@@ -20,7 +20,8 @@ export const metadata: Metadata = {
   title: "VTK Burgieclan",
   description: "Vlaamse Technische Kring Leuven Burgieclan",
   icons: {
-    icon: "/favicon.ico",          // default favicon
+    icon: "/favicon.ico",
+    apple: "/apple-icon.png",
   },
 };
 
