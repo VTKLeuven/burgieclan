@@ -473,6 +473,8 @@
         "math": {
             "insert": "Formule invoegen",
             "edit": "Formule aanpassen",
+            "mode_inline": "In de tekst ($…$)",
+            "mode_block": "Hele regel ($$…$$)",
             "label": "LaTeX",
             "preview_empty": "Typ een formule, bv. \\frac{a}{b}",
             "keys": "Enter om te bewaren, Esc om te annuleren. Leegmaken en bewaren verwijdert de formule.",
