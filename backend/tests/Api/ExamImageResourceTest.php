@@ -2,6 +2,7 @@
 
 namespace App\Tests\Api;
 
+use App\Constants\ExamPeriod;
 use App\Entity\Course;
 use App\Entity\Exam;
 use App\Entity\ExamImage;
@@ -262,7 +263,7 @@ class ExamImageResourceTest extends ApiTestCase
     {
         $source = ExamFactory::createOne();
         $uploaded = $this->upload($source, self::png(10, 10))->assertStatus(201)->json()->decoded();
-        $copy = ExamFactory::createOne(['course' => $source->getCourse(), 'copiedFrom' => $source]);
+        $copy = ExamFactory::createOne(['course' => $source->getCourse(), 'period' => ExamPeriod::JUNE, 'copiedFrom' => $source]);
 
         $links = $this->links($copy);
         $this->assertSame([$uploaded['uuid']], array_keys($links));

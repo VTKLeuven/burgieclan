@@ -320,7 +320,7 @@ class ExamCrudController extends AbstractCrudController
         $moderator = $this->getUser();
         assert($moderator instanceof User);
 
-        $this->store->snapshot(
+        $snapshot = $this->store->snapshot(
             $document,
             sprintf(
                 'Before %s restored the version of %s',
@@ -333,6 +333,11 @@ class ExamCrudController extends AbstractCrudController
         try {
             $this->collab->restore($exam->getDocumentName(), $revision->getState());
         } catch (CollabServerException $exception) {
+            if (null !== $snapshot) {
+                $document->addPendingContributors($snapshot->getContributors());
+                $entityManager->remove($snapshot);
+                $entityManager->flush();
+            }
             $this->addFlash('danger', 'Nothing was restored: ' . $exception->getMessage());
 
             return $this->redirectToDetail($exam);

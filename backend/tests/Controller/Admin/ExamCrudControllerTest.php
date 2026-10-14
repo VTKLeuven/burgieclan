@@ -223,6 +223,8 @@ class ExamCrudControllerTest extends WebTestCase
         $crawler = $this->client->followRedirect();
 
         self::assertStringContainsString('Nothing was restored', $crawler->filter('.alert-danger')->text());
+        // A failed restore cleans up its safety snapshot so no phantom version is left behind.
+        self::assertSame(1, $this->entityManager()->getRepository(CollabDocumentRevision::class)->count([]));
     }
 
     public function testLockingAndReopening(): void
