@@ -392,7 +392,7 @@ class ExamCrudController extends AbstractCrudController
         }
 
         $image = $this->images->find((int) $context->getRequest()->query->get('imageId'));
-        if (null === $image || $image->getExam()->getId() !== $exam->getId()) {
+        if (null === $image || !in_array($image->getExam(), $this->images->examChain($exam), true)) {
             throw $this->createNotFoundException('This image does not belong to this exam.');
         }
 

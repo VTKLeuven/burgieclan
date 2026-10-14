@@ -147,7 +147,7 @@ export function insertExamImages(view: EditorView, files: File[], pos: number, o
         const add: PlaceholderAction = { add: { id, pos, anchor, widget } };
         view.dispatch(view.state.tr.setMeta(placeholders, add));
 
-        void options.upload(file).then((uploaded) => {
+        void options.upload(file).catch(() => null).then((uploaded) => {
             if (view.isDestroyed) {
                 return;
             }

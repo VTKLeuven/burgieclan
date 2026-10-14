@@ -257,4 +257,15 @@ class ExamImageResourceTest extends ApiTestCase
 
         $this->assertFalse($storage->fileExists($fileName));
     }
+
+    public function testCopiedExamInheritsImageLinksFromSource(): void
+    {
+        $source = ExamFactory::createOne();
+        $uploaded = $this->upload($source, self::png(10, 10))->assertStatus(201)->json()->decoded();
+        $copy = ExamFactory::createOne(['course' => $source->getCourse(), 'copiedFrom' => $source]);
+
+        $links = $this->links($copy);
+        $this->assertSame([$uploaded['uuid']], array_keys($links));
+        $this->serve($links[$uploaded['uuid']]['url'])->assertStatus(200);
+    }
 }
