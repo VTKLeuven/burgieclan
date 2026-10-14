@@ -41,14 +41,19 @@ export default function ExamQuestionThread({ examId, uid, reloadKey, onChange }:
         let cancelled = false;
         const query = new URLSearchParams({ 'question.exam': String(examId), 'question.uid': uid, pagination: 'false' });
         request('GET', `/api/exam_question_comments?${query}`).then((data) => {
-            if (cancelled || !data || isErrorResponse(data)) {
+            if (cancelled) {
+                return;
+            }
+            if (!data || isErrorResponse(data)) {
+                setProblem(t('exam.discussion.error'));
+                setComments((previous) => previous ?? []);
                 return;
             }
             const members = (data as { 'hydra:member'?: unknown[] })['hydra:member'] ?? [];
             setComments(members.map(convertToExamQuestionComment));
         });
         return () => { cancelled = true; };
-    }, [examId, uid, request, version, reloadKey]);
+    }, [examId, uid, request, version, reloadKey, t]);
 
     /** Runs a change, then reloads the thread and the counts. Returns whether it worked. */
     const change = useCallback(async (method: string, endpoint: string, body?: unknown): Promise<boolean> => {

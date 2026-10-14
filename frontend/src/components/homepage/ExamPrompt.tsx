@@ -86,7 +86,7 @@ export const ExamPrompt = () => {
     }
 
     const dismiss = (examId: number) => {
-        const next = [...readDismissed(), examId];
+        const next = Array.from(new Set([...readDismissed(), examId]));
         writeDismissed(next);
         setDismissed(next);
     };

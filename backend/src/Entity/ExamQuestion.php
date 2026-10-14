@@ -25,8 +25,14 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\UniqueConstraint(name: 'uniq_exam_question_exam_uid', columns: ['exam_id', 'uid'])]
 class ExamQuestion extends BaseEntity
 {
-    /** UniqueID makes UUIDs; anything longer is not one of ours. */
+    /** UniqueID makes UUIDs; anything longer or with other characters is not one of ours. */
     public const MAX_UID_LENGTH = 64;
+    public const UID_PATTERN = '/^[A-Za-z0-9_-]{1,64}$/';
+
+    public static function isValidUid(string $uid): bool
+    {
+        return 1 === preg_match(self::UID_PATTERN, $uid);
+    }
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]

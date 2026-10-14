@@ -4,7 +4,7 @@ import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/
 import { Code, Text } from '@/components/ui/Text';
 import { LatexMath } from '@/components/editor/math/latexMath';
 import MathEditPopover from '@/components/editor/math/MathEditPopover';
-import { EditorContent, useEditor, type Editor as TipTapEditor } from '@tiptap/react';
+import { EditorContent, useEditor, useEditorState, type Editor as TipTapEditor } from '@tiptap/react';
 import { StarterKit } from "@tiptap/starter-kit";
 import 'katex/dist/katex.min.css';
 import {
@@ -85,6 +85,11 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
     const { t } = useTranslation();
     const [isInfoOpen, setIsInfoOpen] = useState(false);
 
+    useEditorState({
+        editor,
+        selector: ({ transactionNumber }) => transactionNumber,
+    });
+
     if (!editor) {
         return null
     }
@@ -93,6 +98,7 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
         <div className="tiptap flex justify-between p-2 items-center border-b border-vtk-ink/10">
             <div>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleBold().run()}
                     disabled={
                         !editor.can()
@@ -101,11 +107,14 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .toggleBold()
                             .run()
                     }
+                    title={t('editor.toolbar.bold')}
+                    aria-label={t('editor.toolbar.bold')}
                     className={`${editor.isActive('bold') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <Bold className="icon" />
+                    <Bold className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleItalic().run()}
                     disabled={
                         !editor.can()
@@ -114,11 +123,14 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .toggleItalic()
                             .run()
                     }
+                    title={t('editor.toolbar.italic')}
+                    aria-label={t('editor.toolbar.italic')}
                     className={`${editor.isActive('italic') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <Italic className="icon" />
+                    <Italic className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleStrike().run()}
                     disabled={
                         !editor.can()
@@ -127,11 +139,14 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .toggleStrike()
                             .run()
                     }
+                    title={t('editor.toolbar.strike')}
+                    aria-label={t('editor.toolbar.strike')}
                     className={`${editor.isActive('strike') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <Strikethrough className="icon" />
+                    <Strikethrough className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleCode().run()}
                     disabled={
                         !editor.can()
@@ -140,35 +155,50 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .toggleCode()
                             .run()
                     }
+                    title={t('editor.toolbar.code')}
+                    aria-label={t('editor.toolbar.code')}
                     className={`${editor.isActive('code') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <CodeIcon className="icon" />
+                    <CodeIcon className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
+                    title={t('editor.toolbar.heading1')}
+                    aria-label={t('editor.toolbar.heading1')}
                     className={`${editor.isActive('heading', { level: 1 }) ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <Heading1 className="icon" />
+                    <Heading1 className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+                    title={t('editor.toolbar.heading2')}
+                    aria-label={t('editor.toolbar.heading2')}
                     className={`${editor.isActive('heading', { level: 2 }) ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <Heading2 className="icon" />
+                    <Heading2 className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleBulletList().run()}
+                    title={t('editor.toolbar.bullet_list')}
+                    aria-label={t('editor.toolbar.bullet_list')}
                     className={`${editor.isActive('bulletList') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <List className="icon" />
+                    <List className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+                    title={t('editor.toolbar.ordered_list')}
+                    aria-label={t('editor.toolbar.ordered_list')}
                     className={`${editor.isActive('orderedList') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <ListOrdered className="icon" />
+                    <ListOrdered className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().undo().run()}
                     disabled={
                         !editor.can()
@@ -177,11 +207,14 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .undo()
                             .run()
                     }
+                    title={t('editor.toolbar.undo')}
+                    aria-label={t('editor.toolbar.undo')}
                     className="p-1 mx-2 clickable"
                 >
-                    <Undo2 className="icon" />
+                    <Undo2 className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().redo().run()}
                     disabled={
                         !editor.can()
@@ -190,9 +223,11 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .redo()
                             .run()
                     }
+                    title={t('editor.toolbar.redo')}
+                    aria-label={t('editor.toolbar.redo')}
                     className="p-1 mx-2 clickable"
                 >
-                    <Redo2 className="icon" />
+                    <Redo2 className="icon" aria-hidden="true" />
                 </button>
                 <button
                     type="button"
@@ -202,13 +237,19 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                     title={t('editor.math.insert')}
                     aria-label={t('editor.math.insert')}
                 >
-                    <Sigma className="icon" />
+                    <Sigma className="icon" aria-hidden="true" />
                 </button>
                 <MathEditPopover editor={editor} />
             </div>
             <div>
-                <button className="clickable" onClick={() => setIsInfoOpen(true)}>
-                    <Info className="icon" />
+                <button
+                    type="button"
+                    className="clickable"
+                    onClick={() => setIsInfoOpen(true)}
+                    title={t('editor.info_button')}
+                    aria-label={t('editor.info_button')}
+                >
+                    <Info className="icon" aria-hidden="true" />
                 </button>
                 <InfoDialog isOpen={isInfoOpen} setIsOpen={setIsInfoOpen} />
             </div>

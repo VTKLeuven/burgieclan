@@ -12,6 +12,7 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Throwable;
 
 /**
  * Stores the images of exam reconstructions, always re-encoded.
@@ -86,8 +87,14 @@ class ExamImageStore
             imagesy($image)
         );
         $this->storage->write($examImage->getFileName(), $encoded);
-        $this->entityManager->persist($examImage);
-        $this->entityManager->flush();
+        try {
+            $this->entityManager->persist($examImage);
+            $this->entityManager->flush();
+        } catch (Throwable $exception) {
+            $this->deleteFile($examImage->getFileName());
+
+            throw $exception;
+        }
 
         return $examImage;
     }

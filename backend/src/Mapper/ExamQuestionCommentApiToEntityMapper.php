@@ -41,7 +41,7 @@ class ExamQuestionCommentApiToEntityMapper implements MapperInterface
         $user = $this->security->getUser();
         assert($user instanceof User);
 
-        if (null === $from->exam || null === $from->questionUid) {
+        if (null === $from->exam?->id || null === $from->questionUid) {
             throw new LogicException('A new comment needs an exam and a question.');
         }
 

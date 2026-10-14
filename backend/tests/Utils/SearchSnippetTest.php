@@ -39,4 +39,15 @@ class SearchSnippetTest extends TestCase
 
         $this->assertStringEndsWith('tekst slot', SearchSnippet::around($text, 'slot', 50));
     }
+
+    public function testSingleCharacterTermsAreIgnored(): void
+    {
+        $text = 'Bewijs eerst het hulpresultaat. '
+            . str_repeat('uitwerking ', 25)
+            . 'Pas nu de stelling van Rolle toe.';
+
+        $snippet = SearchSnippet::around($text, 'Analyse I rolle', 80);
+
+        $this->assertStringContainsString('stelling van Rolle', $snippet);
+    }
 }

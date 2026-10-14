@@ -470,6 +470,18 @@
             "katex_end": " de onderliggende LaTeX-interpreter."
         },
         "info_button": "Info",
+        "toolbar": {
+            "bold": "Vet",
+            "italic": "Cursief",
+            "strike": "Doorhalen",
+            "code": "Code",
+            "heading1": "Kop 1",
+            "heading2": "Kop 2",
+            "bullet_list": "Opsommingslijst",
+            "ordered_list": "Genummerde lijst",
+            "undo": "Ongedaan maken",
+            "redo": "Opnieuw uitvoeren"
+        },
         "math": {
             "insert": "Formule invoegen",
             "edit": "Formule aanpassen",
