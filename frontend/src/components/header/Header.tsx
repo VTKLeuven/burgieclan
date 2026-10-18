@@ -11,12 +11,15 @@ import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/components/header/LanguageSwitcher';
 import Link from 'next/link';
 import { recordOldBurgieclanClick } from '@/actions/analytics';
+import FeedbackDialog from '@/components/header/FeedbackDialog';
 
 interface NavigationItem {
     name: string;
     href: string;
     external?: boolean;
     onClick?: () => void;
+    /** A button that opens a dialog instead of a link to `href`. */
+    dialog?: boolean;
 }
 
 const vtkLogoMaskStyle: CSSProperties = {
@@ -42,6 +45,7 @@ const HeaderLogo = ({ className }: { className: string }) => (
  */
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [feedbackOpen, setFeedbackOpen] = useState(false);
 
     const { t, i18n } = useTranslation();
 
@@ -58,9 +62,12 @@ export default function Header() {
             onClick: () => { void recordOldBurgieclanClick(); },
         },
         {
+            // Dopl's feedback form, opened in FeedbackDialog rather than a new
+            // tab; the dialog carries its own "open in a new tab" link.
             name: t('header.new_burgieclan_feedback'),
             href: 'https://dopl.vtk.be/f/burgieclan-burgieclan-feedback',
-            external: true,
+            dialog: true,
+            onClick: () => setFeedbackOpen(true),
         },
         //{ name: t('overview'), href: '#' },
     ];
@@ -113,7 +120,16 @@ export default function Header() {
                 <div className="ml-auto hidden items-center gap-x-6 xl:flex">
                     <Suspense fallback={<Skeleton style={{ width: 100, height: 20 }} />}>
                         {isAuthenticated &&
-                            navigation.map((item) => (
+                            navigation.map((item) => item.dialog ? (
+                                <button
+                                    key={item.name}
+                                    type="button"
+                                    onClick={item.onClick}
+                                    className="whitespace-nowrap text-sm font-medium text-vtk-paper/80 transition-colors hover:text-white rounded-sm focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white"
+                                >
+                                    {item.name}
+                                </button>
+                            ) : (
                                 <Link
                                     key={item.name}
                                     href={item.href}
@@ -160,7 +176,19 @@ export default function Header() {
                     </div>
 
                     <div className="mt-8 flex flex-col">
-                        {navigation.map((item) => (
+                        {navigation.map((item) => item.dialog ? (
+                            <button
+                                key={item.name}
+                                type="button"
+                                onClick={() => {
+                                    setMobileMenuOpen(false);
+                                    item.onClick?.();
+                                }}
+                                className="rounded-xl px-3 py-2.5 text-left text-base font-medium text-vtk-paper/80 transition-colors hover:bg-white/10 hover:text-white"
+                            >
+                                {item.name}
+                            </button>
+                        ) : (
                             <Link
                                 key={item.name}
                                 href={item.href}
@@ -186,6 +214,8 @@ export default function Header() {
                     </div>
                 </div>
             </Dialog>
+
+            <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} user={user} />
         </header>
     );
 }
