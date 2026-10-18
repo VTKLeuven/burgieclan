@@ -125,6 +125,14 @@
         "title": "Home",
         "description": "Welcome to Burgieclan! Your best friend in studying for exams. We provide a platform where students can share their study materials with each other. This way, you can help each other out and make studying a lot easier. So, what are you waiting for? Dive into the world of Burgieclan and start sharing your knowledge!",
         "recent_activities": "Pick up where you left off",
+        "exam_prompt": {
+            "title": "Did you just take one of these exams?",
+            "description": "Add the questions you got to the reconstruction while you still remember them.",
+            "questions_one": "{{count}} question",
+            "questions_other": "{{count}} questions",
+            "dismiss": "Stop showing this for {{course}}",
+            "course_fallback": "Course"
+        },
         "no_recent_activities": "No recent activities found yet",
         "news": "News",
         "navigate_to": "Navigate to",
@@ -380,6 +388,7 @@
         "cancel": "Cancel",
         "apply": "Apply",
         "no-preview": "No preview available for {{filename}}",
+        "preview-error": "This document could not be loaded.",
         "loading": "Bringing your document to life...",
         "load-more": "Load More Pages ({{displayedPages}} of {{numPages}})",
         "zoom": {
@@ -429,7 +438,10 @@
         "admin": "Admin",
         "my_vtk": "My VTK",
         "old_burgieclan": "Old Burgieclan",
-        "new_burgieclan_feedback": "Feedback New Burgieclan"
+        "new_burgieclan_feedback": "Feedback New Burgieclan",
+        "feedback_loading": "Loading the form…",
+        "feedback_open_in_tab": "Open in a new tab",
+        "feedback_close": "Close"
     },
     "sidebar": {
         "home": "Home",
@@ -452,14 +464,26 @@
             "title": "Text Editor",
             "description": "The editor allows you to write and display mathematical formulas using LaTeX syntax.",
             "inline": "Wrap your math expressions in",
-            "inline_end": "for inline formulas",
+            "inline_end": "for a formula within a sentence,",
             "block": " or ",
-            "block_end": "for block formulas.",
+            "block_end": "on a line of its own for a block formula.",
+            "edit": "Click a formula to change it, or use the Σ button to insert one.",
             "katex_overview": "For an overview of the supported functions, refer to the ",
             "katex_doc": "documentation of KaTeX",
             "katex_end": " the underlying LaTeX interpreter."
         },
-        "info_button": "Info"
+        "info_button": "Info",
+        "math": {
+            "insert": "Insert formula",
+            "edit": "Edit formula",
+            "mode_inline": "Inline ($…$)",
+            "mode_block": "Whole line ($$…$$)",
+            "label": "LaTeX",
+            "preview_empty": "Type a formula, e.g. \\frac{a}{b}",
+            "keys": "Enter to save, Esc to cancel. Saving it empty removes the formula.",
+            "cancel": "Cancel",
+            "save": "Save"
+        }
     },
     "footer": {
         "navigate": "Navigate",
@@ -577,6 +601,23 @@
             "up": "Move question up",
             "down": "Move question down",
             "delete": "Delete question"
+        },
+        "images": {
+            "add": "Add image",
+            "uploading": "Uploading image…",
+            "removed": "Image removed by a moderator",
+            "unavailable": "This image cannot be shown",
+            "hint": "PNG, JPG or WebP up to 8 MB, also by pasting or dragging it into a question. Only your own drawings, schemas and figures: no photos of the exam sheet itself.",
+            "errors": {
+                "type": "Only PNG, JPG and WebP images can be added.",
+                "unreadable": "This image could not be read.",
+                "pixels": "This image is too large. Make it smaller first.",
+                "size": "Images can be at most 8 MB.",
+                "limit": "This reconstruction already holds the maximum number of images.",
+                "locked": "This reconstruction is locked.",
+                "rate": "You have uploaded a lot of images. Try again later.",
+                "failed": "The image could not be uploaded. Try again."
+            }
         },
         "discussion": {
             "comments_one": "{{count}} comment",

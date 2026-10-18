@@ -5,6 +5,7 @@ namespace App\Tests\Controller\Admin;
 use App\Entity\CollabDocument;
 use App\Entity\CollabDocumentRevision;
 use App\Entity\Exam;
+use App\Entity\ExamImage;
 use App\Entity\ExamQuestion;
 use App\Entity\ExamQuestionComment;
 use App\Entity\User;
@@ -13,9 +14,11 @@ use App\Factory\UserFactory;
 use App\Repository\CollabDocumentRevisionRepository;
 use App\Service\Collab\CollabRequestSignature;
 use App\Service\Collab\CollabServerClient;
+use App\Service\Exam\ExamImageStore;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector;
 use Doctrine\ORM\EntityManagerInterface;
+use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Crawler;
@@ -326,5 +329,65 @@ class ExamCrudControllerTest extends WebTestCase
             ['http://collab.test/internal/documents/exam-' . $exam->getId() . '/broadcast'],
             array_column($this->collabRequests, 'url')
         );
+    }
+
+    private function storedImage(Exam $exam): ExamImage
+    {
+        $png = imagecreatetruecolor(40, 20);
+        ob_start();
+        imagepng($png);
+
+        return static::getContainer()->get(ExamImageStore::class)
+            ->upload($exam, UserFactory::createOne(['fullName' => 'Ivo Image']), (string) ob_get_clean());
+    }
+
+    private function storage(): FilesystemOperator
+    {
+        $storage = static::getContainer()->get('exam_images.storage');
+        assert($storage instanceof FilesystemOperator);
+
+        return $storage;
+    }
+
+    public function testModeratorsSeeImagesWithTheirUploaderAndRemoveThem(): void
+    {
+        $this->loginAs(User::ROLE_MODERATOR);
+        $exam = ExamFactory::createOne();
+        $image = $this->storedImage($exam);
+        $imageId = $image->getId();
+        $fileName = $image->getFileName();
+        self::assertTrue($this->storage()->fileExists($fileName));
+
+        $crawler = $this->detailPage($exam);
+        $section = $crawler->filter('section')->reduce(
+            static fn(Crawler $node): bool => str_contains($node->filter('h2')->text(''), 'Images')
+        );
+        self::assertStringContainsString('Ivo Image', $section->text());
+        // Behind the admin session, never the public bucket.
+        $src = (string) $section->filter('img')->attr('src');
+        self::assertSame('/admin/exam-image/' . $fileName, $src);
+        $this->client->request('GET', $src);
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('Content-Type', 'image/png');
+
+        $this->client->submit($section->filter('form')->form());
+        self::assertResponseRedirects();
+
+        $this->entityManager()->clear();
+        self::assertTrue($this->entityManager()->find(ExamImage::class, $imageId)?->isRemoved());
+        self::assertFalse($this->storage()->fileExists($fileName));
+    }
+
+    public function testDeletingAnExamDeletesItsImageFiles(): void
+    {
+        $this->loginAs(User::ROLE_ADMIN);
+        $exam = ExamFactory::createOne();
+        $fileName = $this->storedImage($exam)->getFileName();
+
+        $token = $this->detailPage($exam)->filter('input[name="token"]')->attr('value');
+        $this->client->request('POST', sprintf('https://localhost/admin/exam/%d/delete', $exam->getId()), ['token' => $token]);
+        self::assertResponseRedirects();
+
+        self::assertFalse($this->storage()->fileExists($fileName));
     }
 }

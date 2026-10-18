@@ -75,7 +75,11 @@ services:
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:-}
 
       # S3 Storage (Hetzner Object Storage)
+      DOCUMENT_STORAGE: ${DOCUMENT_STORAGE:-s3}
       S3_ENDPOINT: ${S3_ENDPOINT:?S3_ENDPOINT is required}
+      # Falls back here rather than in flysystem.yaml: an empty value counts as set there,
+      # and an empty endpoint makes the AWS SDK sign download links for amazonaws.com.
+      S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-${S3_ENDPOINT}}
       S3_BUCKET: ${S3_BUCKET:?S3_BUCKET is required}
       S3_ACCESS_KEY: ${S3_ACCESS_KEY:?S3_ACCESS_KEY is required}
       S3_SECRET_KEY: ${S3_SECRET_KEY:?S3_SECRET_KEY is required}

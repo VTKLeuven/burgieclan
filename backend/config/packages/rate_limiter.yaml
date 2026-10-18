@@ -22,3 +22,9 @@ framework:
             policy: sliding_window
             limit: 120
             interval: '1 minute'
+
+        # Uploading images into exam reconstructions (ExamImageUploadController).
+        exam_image_upload:
+            policy: sliding_window
+            limit: 30
+            interval: '1 hour'
