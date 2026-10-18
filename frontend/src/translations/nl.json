@@ -438,7 +438,10 @@
         "admin": "Beheer",
         "my_vtk": "Mijn VTK",
         "old_burgieclan": "Oude Burgieclan",
-        "new_burgieclan_feedback": "Feedback Nieuwe Burgieclan"
+        "new_burgieclan_feedback": "Feedback Nieuwe Burgieclan",
+        "feedback_loading": "Formulier laden…",
+        "feedback_open_in_tab": "Open in een nieuw tabblad",
+        "feedback_close": "Sluiten"
     },
     "sidebar": {
         "home": "Home",
