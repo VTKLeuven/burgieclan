@@ -438,7 +438,10 @@
         "admin": "Admin",
         "my_vtk": "My VTK",
         "old_burgieclan": "Old Burgieclan",
-        "new_burgieclan_feedback": "Feedback New Burgieclan"
+        "new_burgieclan_feedback": "Feedback New Burgieclan",
+        "feedback_loading": "Loading the form…",
+        "feedback_open_in_tab": "Open in a new tab",
+        "feedback_close": "Close"
     },
     "sidebar": {
         "home": "Home",
