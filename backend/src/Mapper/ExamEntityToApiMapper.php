@@ -4,6 +4,7 @@ namespace App\Mapper;
 
 use App\ApiResource\CourseApi;
 use App\ApiResource\ExamApi;
+use App\Constants\MappingContext;
 use App\Entity\Exam;
 use App\Repository\CollabDocumentRepository;
 use App\Utils\ExamContent;
@@ -55,9 +56,12 @@ class ExamEntityToApiMapper extends BaseEntityToApiMapper
         $to->documentName = $from->getDocumentName();
 
         $document = $this->documents->findOneByName($from->getDocumentName());
-        $to->content = $document?->getContent();
-        $to->questionCount = ExamContent::countQuestions($to->content);
-        $to->sittings = ExamContent::sittings($document?->getFields());
+        $content = $document?->getContent();
+        $to->questionCount = ExamContent::countQuestions($content);
+        if (!($context[MappingContext::COLLECTION_OPERATION] ?? false)) {
+            $to->content = $content;
+            $to->sittings = ExamContent::sittings($document?->getFields());
+        }
 
         return $to;
     }

@@ -262,6 +262,8 @@ class ExamQuestionCommentResourceTest extends ApiTestCase
         $this->comment($browser, $token, $exam, 'q1/../x', 'Hm.')->assertStatus(422);
         $withoutExam = ['questionUid' => 'q1', 'content' => 'Zonder examen.'];
         $this->post($browser, $token, '/api/exam_question_comments', $withoutExam)->assertStatus(422);
+        $inlineExam = ['exam' => [], 'questionUid' => 'q1', 'content' => 'Inline examen.'];
+        $this->post($browser, $token, '/api/exam_question_comments', $inlineExam)->assertStatus(400);
         $this->assertSame([], $this->collabRequests);
     }
 

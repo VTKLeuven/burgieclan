@@ -34,6 +34,7 @@ interface FakeBackend {
     stores: { name: string; contributors: string[] }[];
     requests: { method: string; path: string }[];
     failLoadsFor: Set<string>;
+    failStoresFor: Set<string>;
     close(): Promise<void>;
 }
 
@@ -51,6 +52,7 @@ async function startFakeBackend(): Promise<FakeBackend> {
     const stores: { name: string; contributors: string[] }[] = [];
     const requests: { method: string; path: string }[] = [];
     const failLoadsFor = new Set<string>();
+    const failStoresFor = new Set<string>();
 
     const server: HttpServer = createServer(async (request, response) => {
         const method = request.method ?? 'GET';
@@ -87,6 +89,10 @@ async function startFakeBackend(): Promise<FakeBackend> {
         }
 
         if (method === 'PUT') {
+            if (failStoresFor.has(name)) {
+                response.writeHead(500).end();
+                return;
+            }
             const payload = JSON.parse(body) as Omit<StoredDocument, 'state'> & { state: string };
             documents.set(name, { ...payload, state: Buffer.from(payload.state, 'base64') });
             stores.push({ name, contributors: payload.contributors });
@@ -106,6 +112,7 @@ async function startFakeBackend(): Promise<FakeBackend> {
         stores,
         requests,
         failLoadsFor,
+        failStoresFor,
         close: () => new Promise((resolve) => server.close(() => resolve())),
     };
 }
@@ -464,6 +471,14 @@ describe('collab server', () => {
         const reloaded = new Y.Doc();
         Y.applyUpdate(reloaded, backend.documents.get('closed-doc')!.state);
         assert.deepEqual(paragraphs(reloaded), ['old version']);
+
+        // When storing the restored document fails, Symfony is told (500) instead of getting 204.
+        backend.failStoresFor.add('closed-doc');
+        const failedRestore = await internalRequest('/internal/documents/closed-doc/restore', {
+            state: Buffer.from(Y.encodeStateAsUpdate(current)).toString('base64'),
+        });
+        assert.equal(failedRestore.status, 500);
+        backend.failStoresFor.delete('closed-doc');
     });
 
     it('refuses internal requests that are unsigned, malformed or unknown', async () => {
@@ -474,11 +489,13 @@ describe('collab server', () => {
         assert.equal(forged.status, 401);
 
         assert.equal((await internalRequest('/internal/documents/x/restore', { state: '' })).status, 400);
+        assert.equal((await internalRequest('/internal/documents/x/restore', { state: '!!!not-base64!!!' })).status, 400);
         assert.equal((await internalRequest('/internal/documents/x/restore', 'not json')).status, 400);
         // Not a Yjs update: fails before anything is touched.
         const garbage = Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f]).toString('base64');
         assert.equal((await internalRequest('/internal/documents/garbage-doc/restore', { state: garbage })).status, 500);
         assert.equal((await internalRequest('/internal/documents/Bad_Name/disconnect', '')).status, 404);
+        assert.equal((await internalRequest('/internal/documents/%E0%A4%A/disconnect', '')).status, 404);
         assert.equal((await internalRequest('/internal/documents/x/explode', '')).status, 404);
         assert.equal(backend.documents.has('garbage-doc'), false);
     });

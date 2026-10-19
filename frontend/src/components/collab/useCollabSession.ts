@@ -128,7 +128,8 @@ export function useCollabSession(documentName: string): CollabSessionState {
 
     useEffect(() => {
         const doc = new Y.Doc();
-        let refused: ConnectionStatus | null = null;
+        let refused: 'denied' | 'unavailable' | null = null;
+        let transientFailure = false;
 
         const provider = new HocuspocusProvider({
             url: collabUrl(),
@@ -136,13 +137,36 @@ export function useCollabSession(documentName: string): CollabSessionState {
             document: doc,
             // A function, so every reconnect asks Symfony for a fresh token.
             token: async () => {
-                const result = await getCollabToken(documentName);
+                let result: Awaited<ReturnType<typeof getCollabToken>>;
+                try {
+                    result = await getCollabToken(documentName);
+                } catch {
+                    transientFailure = true;
+                    refused = null;
+                    setStatus('disconnected');
+                    provider.configuration.websocketProvider.webSocket?.close();
+                    throw new Error('Transient token error');
+                }
                 if ('error' in result) {
-                    refused = result.error.status === 503 ? 'unavailable' : 'denied';
+                    const { status } = result.error;
+                    if (status === 503) {
+                        refused = 'unavailable';
+                    } else if (status === 401 || status === 403 || status === 404) {
+                        refused = 'denied';
+                    } else {
+                        transientFailure = true;
+                        refused = null;
+                        setStatus('disconnected');
+                        provider.configuration.websocketProvider.webSocket?.close();
+                        throw new Error('Transient token error');
+                    }
+                    transientFailure = false;
                     setStatus(refused);
+                    provider.disconnect();
                     // An empty token makes the collab server refuse the connection.
                     return '';
                 }
+                transientFailure = false;
                 refused = null;
                 return result.token;
             },
@@ -168,7 +192,14 @@ export function useCollabSession(documentName: string): CollabSessionState {
                     }));
                 }
             },
-            onAuthenticationFailed: () => setStatus(refused ?? 'denied'),
+            onAuthenticationFailed: () => {
+                if (transientFailure) {
+                    setStatus('disconnected');
+                    return;
+                }
+                setStatus(refused ?? 'denied');
+                provider.disconnect();
+            },
             onSynced: () => setSynced(true),
             onAwarenessChange: ({ states }) => setPeople(namesOf(states)),
         });
@@ -182,7 +213,12 @@ export function useCollabSession(documentName: string): CollabSessionState {
             provider.destroy();
             doc.destroy();
             setSession(null);
+            setStatus('connecting');
+            setReadOnly(false);
             setSynced(false);
+            setPeople([]);
+            setTooLarge(false);
+            setActivity(null);
         };
     }, [documentName]);
 

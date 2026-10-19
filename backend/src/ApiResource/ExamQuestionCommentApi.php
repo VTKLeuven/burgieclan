@@ -66,7 +66,7 @@ class ExamQuestionCommentApi extends BaseEntityApi
     /** The question's permanent id in the editor (the examQuestion node's `id`). */
     #[Assert\NotBlank(groups: ['create'])]
     #[Assert\Length(max: ExamQuestion::MAX_UID_LENGTH)]
-    #[Assert\Regex(pattern: '/^[A-Za-z0-9_-]+$/', message: 'Not a question id.')]
+    #[Assert\Regex(pattern: ExamQuestion::UID_PATTERN, message: 'Not a question id.')]
     #[Groups([SerializationGroups::EXAM_QUESTION_COMMENT_GET, SerializationGroups::EXAM_QUESTION_COMMENT_CREATE])]
     public ?string $questionUid = null;
 

@@ -34,13 +34,36 @@ class ExamImageRepository extends ServiceEntityRepository
     }
 
     /**
-     * Newest first, removed ones included.
+     * The exam itself and any earlier reconstruction(s) it started as a copy of.
+     *
+     * @return list<Exam>
+     */
+    public function examChain(Exam $exam): array
+    {
+        $chain = [];
+        $seen = [];
+        for ($current = $exam; null !== $current; $current = $current->getCopiedFrom()) {
+            $id = $current->getId();
+            if (null !== $id && isset($seen[$id])) {
+                break;
+            }
+            if (null !== $id) {
+                $seen[$id] = true;
+            }
+            $chain[] = $current;
+        }
+
+        return $chain;
+    }
+
+    /**
+     * Newest first, removed ones included, along with images from any exam it was copied from.
      *
      * @return ExamImage[]
      */
     public function findForExam(Exam $exam): array
     {
-        return $this->findBy(['exam' => $exam], ['createdAt' => 'DESC', 'id' => 'DESC']);
+        return $this->findBy(['exam' => $this->examChain($exam)], ['createdAt' => 'DESC', 'id' => 'DESC']);
     }
 
     /**
