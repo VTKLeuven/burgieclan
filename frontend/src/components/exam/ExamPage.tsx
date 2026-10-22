@@ -41,6 +41,10 @@ export default function ExamPage() {
     const lastAccess = useRef<boolean | null>(null);
 
     useEffect(() => {
+        lastAccess.current = null;
+    }, [examId]);
+
+    useEffect(() => {
         let cancelled = false;
         requestExam('GET', `/api/exams/${examId}`).then((data) => {
             if (!cancelled && data) {

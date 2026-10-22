@@ -473,6 +473,18 @@
             "katex_end": " the underlying LaTeX interpreter."
         },
         "info_button": "Info",
+        "toolbar": {
+            "bold": "Bold",
+            "italic": "Italic",
+            "strike": "Strikethrough",
+            "code": "Code",
+            "heading1": "Heading 1",
+            "heading2": "Heading 2",
+            "bullet_list": "Bullet list",
+            "ordered_list": "Numbered list",
+            "undo": "Undo",
+            "redo": "Redo"
+        },
         "math": {
             "insert": "Insert formula",
             "edit": "Edit formula",

@@ -1,7 +1,7 @@
 import { Server, type Hocuspocus } from '@hocuspocus/server';
 import { TiptapTransformer } from '@hocuspocus/transformer';
 import * as Y from 'yjs';
-import type { Backend } from './backend.ts';
+import { BackendError, type Backend } from './backend.ts';
 import { handleInternalRequest } from './internal.ts';
 import { verifyCollabToken, type CollabIdentity } from './token.ts';
 
@@ -97,12 +97,18 @@ function cloneValue(value: unknown): unknown {
  * applying the old Yjs update itself would do nothing, because the live document already
  * contains everything in it.
  */
-export async function restoreDocument(hocuspocus: Hocuspocus, documentName: string, state: Uint8Array): Promise<void> {
+export async function restoreDocument(
+    hocuspocus: Hocuspocus,
+    documentName: string,
+    state: Uint8Array,
+    lastStoreError?: Map<string, unknown>,
+): Promise<void> {
     // Decode first: a broken update must fail before the live document is touched.
     const snapshot = new Y.Doc();
     try {
         Y.applyUpdate(snapshot, state);
 
+        lastStoreError?.delete(documentName);
         const connection = await hocuspocus.openDirectConnection(documentName, {});
         try {
             await connection.transact((document) => {
@@ -122,6 +128,11 @@ export async function restoreDocument(hocuspocus: Hocuspocus, documentName: stri
         } finally {
             await connection.disconnect();
         }
+        const storeError = lastStoreError?.get(documentName);
+        if (storeError !== undefined) {
+            lastStoreError?.delete(documentName);
+            throw storeError;
+        }
     } finally {
         snapshot.destroy();
     }
@@ -133,6 +144,8 @@ export function createCollabServer(options: CollabServerOptions): Server<Connect
 
     /** Per document: ids of the users who changed it since the last store. */
     const contributors = new Map<string, Set<string>>();
+    /** Per document: error thrown by the most recent onStoreDocument call, if it failed. */
+    const lastStoreError = new Map<string, unknown>();
 
     const isPastLock = (identity: CollabIdentity): boolean =>
         identity.editableUntil !== undefined && now() / 1000 >= identity.editableUntil;
@@ -248,31 +261,35 @@ export function createCollabServer(options: CollabServerOptions): Server<Connect
          */
         async onStoreDocument({ documentName, document, instance }) {
             const state = Y.encodeStateAsUpdate(document);
-
             const wasTooLarge = isTooLarge(documentName);
-            sizes.set(documentName, state.byteLength);
-            if (isTooLarge(documentName) !== wasTooLarge) {
-                if (wasTooLarge) {
-                    log.info(`"${documentName}" is back under ${maxDocumentBytes} bytes; editing is open again`);
-                } else {
-                    log.warn(`"${documentName}" grew to ${state.byteLength} bytes; editing is closed until it is rolled back`);
-                }
-                // Everyone reconnects and gets the access that fits the new size.
-                reconnectEveryone(instance, documentName);
-            }
             const changedBy = contributors.get(documentName) ?? new Set<string>();
             contributors.delete(documentName);
+            lastStoreError.delete(documentName);
 
             try {
                 await options.backend.store(documentName, state, { ...jsonCopy(document), contributors: [...changedBy] });
             } catch (error) {
-                // Keep them for the next attempt.
-                const pending = contributors.get(documentName) ?? new Set<string>();
-                changedBy.forEach((id) => pending.add(id));
-                contributors.set(documentName, pending);
+                lastStoreError.set(documentName, error);
+                // Keep them for the next attempt unless the document was deleted in Symfony (410 Gone).
+                if (!(error instanceof BackendError && error.status === 410)) {
+                    const pending = contributors.get(documentName) ?? new Set<string>();
+                    changedBy.forEach((id) => pending.add(id));
+                    contributors.set(documentName, pending);
+                }
 
                 log.error(`Could not store "${documentName}":`, error);
                 throw error;
+            } finally {
+                sizes.set(documentName, state.byteLength);
+                if (isTooLarge(documentName) !== wasTooLarge) {
+                    if (wasTooLarge) {
+                        log.info(`"${documentName}" is back under ${maxDocumentBytes} bytes; editing is open again`);
+                    } else {
+                        log.warn(`"${documentName}" grew to ${state.byteLength} bytes; editing is closed until it is rolled back`);
+                    }
+                    // Everyone reconnects and gets the access that fits the new size.
+                    reconnectEveryone(instance, documentName);
+                }
             }
         },
 
@@ -312,7 +329,7 @@ export function createCollabServer(options: CollabServerOptions): Server<Connect
             }
 
             const handled = await handleInternalRequest(request, response, options.secret, {
-                restore: (documentName, state) => restoreDocument(instance, documentName, state),
+                restore: (documentName, state) => restoreDocument(instance, documentName, state, lastStoreError),
                 disconnect: async (documentName) => reconnectEveryone(instance, documentName),
                 broadcast: (documentName, message) => instance.documents.get(documentName)?.broadcastStateless(message),
             }, log);

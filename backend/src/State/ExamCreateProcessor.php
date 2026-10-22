@@ -51,24 +51,28 @@ class ExamCreateProcessor implements ProcessorInterface
         );
 
         try {
-            $created = $this->inner->process($data, $operation, $uriVariables, $context);
+            return $this->entityManager->wrapInTransaction(
+                function () use ($data, $operation, $uriVariables, $context): ExamApi {
+                    $created = $this->inner->process($data, $operation, $uriVariables, $context);
+                    assert($created instanceof ExamApi);
+
+                    $exam = $this->entityManager->find(Exam::class, $created->id);
+                    assert($exam instanceof Exam);
+
+                    $source = $exam->getCopiedFrom();
+                    if (null === $source) {
+                        return $created;
+                    }
+
+                    $this->store->copy($source->getDocumentName(), $exam->getDocumentName());
+                    $this->entityManager->flush();
+
+                    return $this->microMapper->map($exam, ExamApi::class);
+                }
+            );
         } catch (UniqueConstraintViolationException) {
             // Two people starting the same exam at the same moment; NewExam catches the rest.
             throw new ConflictHttpException('There already is a reconstruction of this exam.');
         }
-        assert($created instanceof ExamApi);
-
-        $exam = $this->entityManager->find(Exam::class, $created->id);
-        assert($exam instanceof Exam);
-
-        $source = $exam->getCopiedFrom();
-        if (null === $source) {
-            return $created;
-        }
-
-        $this->store->copy($source->getDocumentName(), $exam->getDocumentName());
-        $this->entityManager->flush();
-
-        return $this->microMapper->map($exam, ExamApi::class);
     }
 }

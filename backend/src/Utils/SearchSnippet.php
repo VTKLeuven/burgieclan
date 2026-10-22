@@ -23,7 +23,7 @@ final class SearchSnippet
 
         $first = null;
         foreach (preg_split('/\s+/u', mb_strtolower(trim($query))) ?: [] as $term) {
-            $position = '' === $term ? false : mb_stripos($text, $term);
+            $position = mb_strlen($term) < 2 ? false : mb_stripos($text, $term);
             if (false !== $position && (null === $first || $position < $first)) {
                 $first = $position;
             }

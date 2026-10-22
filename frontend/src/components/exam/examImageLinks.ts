@@ -145,6 +145,10 @@ class ExamImageLinks {
                     this.links.set(uuid, UNAVAILABLE);
                 }
             }
+            if (this.failed.size === 0 && this.failedTimer !== null) {
+                clearTimeout(this.failedTimer);
+                this.failedTimer = null;
+            }
         }
 
         this.loading = false;

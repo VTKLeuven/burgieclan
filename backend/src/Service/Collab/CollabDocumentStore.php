@@ -128,8 +128,11 @@ class CollabDocumentStore
             return;
         }
 
-        foreach ($this->revisions->findBy(['document' => $document]) as $revision) {
-            $this->entityManager->remove($revision);
+        foreach ($this->revisions->findIdsForDocument($document) as $id) {
+            $revision = $this->entityManager->getReference(CollabDocumentRevision::class, $id);
+            if (null !== $revision) {
+                $this->entityManager->remove($revision);
+            }
         }
         $this->entityManager->remove($document);
     }
