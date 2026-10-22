@@ -118,7 +118,7 @@ services:
   # Local S3-compatible object storage, standing in for the production bucket.
   # Only used when the backend runs with DOCUMENT_STORAGE=s3, so it only starts with the s3 profile.
   s3:
-    image: chrislusf/seaweedfs:4.47
+    image: chrislusf/seaweedfs:4.47@sha256:ce9e796f1fe6f06968f4c04bdaf8f678dad9c8acdfef3d244133d71bfa6bf882
     profiles: [ s3 ]
     container_name: burgieclan-s3
     command: >-
