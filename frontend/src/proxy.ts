@@ -243,6 +243,6 @@ export const config = {
          * - public/images (public images)
          * - favicon.ico, sitemap.xml, robots.txt (metadata files)
          */
-        '/((?!_next/static|_next/image|images|favicon.ico|sitemap.xml|robots.txt).*)',
+        '/((?!_next/static|_next/image|images|favicon.ico|icon.png|apple-icon.png|sitemap.xml|robots.txt).*)',
     ],
 }

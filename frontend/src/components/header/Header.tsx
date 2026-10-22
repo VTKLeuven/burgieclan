@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState, type CSSProperties } from 'react';
+import { Suspense, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import { Menu, X } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,21 +23,7 @@ interface NavigationItem {
     dialog?: boolean;
 }
 
-const logoMaskStyle: CSSProperties = {
-    backgroundColor: '#c8c9cd',
-    maskImage: "url('/images/logos/burgieclan-cloud-mask.png')",
-    maskPosition: 'left center',
-    maskRepeat: 'no-repeat',
-    maskSize: 'contain',
-    WebkitMaskImage: "url('/images/logos/burgieclan-cloud-mask.png')",
-    WebkitMaskPosition: 'left center',
-    WebkitMaskRepeat: 'no-repeat',
-    WebkitMaskSize: 'contain',
-};
 
-const HeaderLogo = ({ className }: { className: string }) => (
-    <span aria-hidden="true" className={className} style={logoMaskStyle} />
-);
 
 /**
  * Sticky navy header with light navigation: the same dark bookend as the
@@ -80,13 +66,21 @@ export default function Header() {
                 className="flex min-h-[72px] w-full items-center gap-x-4 px-4 sm:px-6 md:gap-x-8"
             >
                 {/* Brand */}
-                <Link href={`/${i18n.language}`} className="flex shrink-0 items-center gap-4">
+                <Link href={`/${i18n.language}`} className="flex shrink-0 items-center gap-2.5">
                     <span className="sr-only">Burgieclan</span>
-                    <HeaderLogo className="block h-[34px] w-[60px] shrink-0" />
                     <Image
-                        src="/images/logos/burgieclan-wordmark-white.png"
+                        src="/images/logos/burgieclan-cloud-silver.svg"
+                        alt=""
+                        aria-hidden="true"
+                        width={61}
+                        height={34}
+                        className="block h-[34px] w-auto shrink-0"
+                        priority
+                    />
+                    <Image
+                        src="/images/logos/burgieclan-wordmark-silver.svg"
                         alt="Burgieclan"
-                        width={140}
+                        width={138}
                         height={18}
                         className="hidden h-[18px] w-auto object-contain lg:block"
                         priority
@@ -167,15 +161,24 @@ export default function Header() {
                 <div className="fixed inset-0 z-40 bg-vtk-ink/40" aria-hidden="true" />
                 <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-vtk-navy px-6 py-5 text-vtk-paper sm:max-w-sm">
                     <div className="flex items-center justify-between">
-                        <Link href={`/${i18n.language}`} className="flex shrink-0 items-center gap-3">
+                        <Link href={`/${i18n.language}`} className="flex shrink-0 items-center gap-2.5">
                             <span className="sr-only">Burgieclan</span>
-                            <HeaderLogo className="block h-[32px] w-[57px] shrink-0" />
                             <Image
-                                src="/images/logos/burgieclan-wordmark-white.png"
+                                src="/images/logos/burgieclan-cloud-silver.svg"
+                                alt=""
+                                aria-hidden="true"
+                                width={57}
+                                height={32}
+                                className="block h-[32px] w-auto shrink-0"
+                                priority
+                            />
+                            <Image
+                                src="/images/logos/burgieclan-wordmark-silver.svg"
                                 alt="Burgieclan"
-                                width={124}
+                                width={123}
                                 height={16}
                                 className="h-4 w-auto object-contain"
+                                priority
                             />
                         </Link>
                         <button
