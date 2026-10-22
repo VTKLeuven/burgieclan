@@ -1,4 +1,4 @@
-FROM php:8.4-apache@sha256:75325cceea4f9a8200f4e9e146e8155ec1b6466b2957b87accf0286b94547cbd
+FROM php:8.4.27-apache@sha256:a0b75cee7023ba2c127138dcad2ecc6ec7e09435534645e70450f29f24ea2a5a
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
