@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:18@sha256:5a5a84b19854a9ffaa54082c166ff4ec27473a361e496e5ea167f298f2da9722
+    image: postgres:18@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4
     container_name: burgieclan-db
     volumes:
       - burgieclan-db:/var/lib/postgresql
@@ -118,7 +118,7 @@ services:
   # Local S3-compatible object storage, standing in for the production bucket.
   # Only used when the backend runs with DOCUMENT_STORAGE=s3, so it only starts with the s3 profile.
   s3:
-    image: chrislusf/seaweedfs:4.47@sha256:ce9e796f1fe6f06968f4c04bdaf8f678dad9c8acdfef3d244133d71bfa6bf882
+    image: chrislusf/seaweedfs:4.51@sha256:f7a49e3f3972ebed5be2ed4befa4a0c68eb7bdddba6e692d42729ceb545134b8
     profiles: [ s3 ]
     container_name: burgieclan-s3
     command: >-
