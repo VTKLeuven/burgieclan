@@ -11,6 +11,7 @@ use App\Service\Exam\ExamQuestionSync;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
+use Psr\Log\LoggerInterface;
 
 /**
  * Writes live documents to the database and keeps their history.
@@ -34,6 +35,8 @@ class CollabDocumentStore
         private readonly EntityManagerInterface $entityManager,
         private readonly ExamRepository $exams,
         private readonly ExamQuestionSync $questionSync,
+        private readonly CollabServerClient $collab,
+        private readonly LoggerInterface $logger,
     ) {}
 
     /**
@@ -92,9 +95,12 @@ class CollabDocumentStore
     }
 
     /**
-     * Gives a new document the exact state of another one, e.g. when a reconstruction starts as a
-     * copy of an earlier exam. Copying the Yjs bytes is only safe because nobody can have the new
-     * document open yet; never use this to overwrite a document that already exists.
+     * Gives a new document the content of another one, e.g. when a reconstruction starts as a
+     * copy of an earlier exam: its questions, but not the days that exam was given on, which never
+     * apply to another exam period. Only the collab server can leave those out of the Yjs state
+     * (CollabServerClient::copy); when it cannot, the copy is exact and the days are left for
+     * editors to remove. Writing the state straight in is only safe because nobody can have the
+     * new document open yet; never use this to overwrite a document that already exists.
      *
      * Does nothing when the source was never stored (it is empty). Does not flush.
      */
@@ -109,9 +115,20 @@ class CollabDocumentStore
             return null;
         }
 
-        $copy = new CollabDocument($toName, $source->getState());
-        $copy->setContent($source->getContent());
-        $copy->setFields($source->getFields());
+        try {
+            $fresh = $this->collab->copy($toName, $source->getState());
+            $copy = new CollabDocument($toName, $fresh['state']);
+            $copy->setContent($fresh['content']);
+            $copy->setFields($fresh['fields']);
+        } catch (CollabServerException $exception) {
+            $this->logger->warning(
+                'Copied "{from}" to "{to}" with its days: {reason}',
+                ['from' => $fromName, 'to' => $toName, 'reason' => $exception->getMessage()]
+            );
+            $copy = new CollabDocument($toName, $source->getState());
+            $copy->setContent($source->getContent());
+            $copy->setFields($source->getFields());
+        }
         $this->entityManager->persist($copy);
         $this->syncQuestions($toName, $copy->getContent());
 
