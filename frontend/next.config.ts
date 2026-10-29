@@ -1,4 +1,4 @@
-import { withSentryConfig } from '@sentry/nextjs';
+import { withSentryConfig } from '@sentry/nextjs/config';
 import type { NextConfig } from 'next';
 // Single source of truth for the upload size limit (see src/utils/constants/upload.ts).
 import { FILE_SIZE_MB } from './src/utils/constants/upload';
