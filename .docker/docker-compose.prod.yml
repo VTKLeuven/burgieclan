@@ -1,7 +1,7 @@
 services:
   nginx:
     # Official nginx image
-    image: nginx:alpine@sha256:8b1e78743a03dbb2c95171cc58639fef29abc8816598e27fb910ed2e621e589a
+    image: nginx:alpine@sha256:785835ea65db4bba6f021acc0f3be91b0fef76a53fe41f8588c6698d2aed0606
     container_name: burgieclan-nginx
 
     # Restart policy
@@ -198,7 +198,7 @@ services:
 
   db:
     # Official PostgreSQL latest image
-    image: postgres:18@sha256:5a5a84b19854a9ffaa54082c166ff4ec27473a361e496e5ea167f298f2da9722
+    image: postgres:18@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4
     container_name: burgieclan-db
 
     # Restart policy

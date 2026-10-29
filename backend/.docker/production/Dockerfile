@@ -2,7 +2,7 @@
 # STAGE 1: CORE RUNTIME BASE (php_base)
 # Contains minimal system packages and compiled PHP extensions needed for R-U-N-T-I-M-E
 # ===============================================
-FROM php:8.4.27-fpm-alpine3.23@sha256:4bfe4f49843bd9f250d6d38b56f0b1806c88143f7cf109c02fc14aba7de13c18 AS php_base
+FROM php:8.4.27-fpm-alpine3.23@sha256:9eb263ac0fa59dfbef3dbaeebeb5f2319e212fc28c168a8c416050f77705b5b4 AS php_base
 
 # Install minimal runtime system dependencies.
 #

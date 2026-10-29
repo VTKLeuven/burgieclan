@@ -291,6 +291,7 @@ class DocumentCommentResourceTest extends ApiTestCase
                         'document' => '/api/documents/' . $document->getId(),
                     ],
                     'headers' => [
+                        'Content-Type' => 'application/ld+json',
                         'Authorization' => 'Bearer ' . $this->token
                     ]
                 ]
