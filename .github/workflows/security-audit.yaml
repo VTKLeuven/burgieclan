@@ -31,13 +31,10 @@ jobs:
           node-version: "24"
 
       # npm audit cannot ignore an advisory, so high and critical ones are filtered here.
-      # Allow only advisories with no patched version yet, and say why each is harmless:
-      # - GHSA-vfj7-8cjw-p6xm (braces <= 3.0.3): only reached through eslint-config-next, at
-      #   lint time, on our own glob patterns. The fix is micromatch/braces#72.
+      # Allow only advisories with no patched version yet, and say why each is harmless.
       - name: Run security audit
         env:
-          ALLOWED_ADVISORIES: |
-            GHSA-vfj7-8cjw-p6xm
+          ALLOWED_ADVISORIES: ""
         run: |
           npm audit --json > "$RUNNER_TEMP/audit.json" || true
           if ! jq -e 'has("vulnerabilities")' "$RUNNER_TEMP/audit.json" > /dev/null; then
