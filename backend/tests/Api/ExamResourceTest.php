@@ -150,7 +150,7 @@ class ExamResourceTest extends ApiTestCase
         $this->start(['course' => $iri, 'academicYear' => self::lastYear(), 'period' => 'march'])->assertStatus(422);
         $this->start(['course' => $iri, 'academicYear' => '2024-2025', 'period' => 'june'])->assertStatus(422);
         $this->start(['academicYear' => self::lastYear(), 'period' => 'june'])->assertStatus(422);
-        $this->start(['course' => [], 'academicYear' => self::lastYear(), 'period' => 'june'])->assertStatus(400);
+        $this->start(['course' => [], 'academicYear' => self::lastYear(), 'period' => 'june'])->assertStatus(422);
         $this->start(
             ['course' => $iri, 'academicYear' => self::lastYear(), 'period' => 'june', 'copiedFrom' => []]
         )->assertStatus(422);
