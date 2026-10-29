@@ -26,9 +26,13 @@ import { Extension, InputRule, PasteRule, type Editor, type MappablePosition } f
  *   and whole-line (block) modes, Enter saves, Escape cancels.
  */
 
-/** `$…$`: formula inside a sentence. Allows optional spaces inside, e.g. `$ x $` or `$1+1=2$`. */
+/**
+ * `$…$`: formula inside a sentence, either tight (`$1+1=2$`) or with a space on both sides
+ * (`$ x $`). A space on one side only is prose: `van $50 naar $100` holds two prices, not the
+ * formula `50 naar`.
+ */
 const INLINE = String.raw`\$([^\s$](?:[^$\n]*?[^\s$\\])?)\$`;
-const INLINE_SPACED = String.raw`\$\s*([^$\n]+?)\s*\$`;
+const INLINE_SPACED = String.raw`\$[^\S\n]+([^$\n]+?)[^\S\n]+\$`;
 /** `$$…$$`: block formula on its own line / display math. */
 const DISPLAY = String.raw`\$\$([\s\S]+?)\$\$`;
 
