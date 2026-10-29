@@ -1,10 +1,12 @@
-FROM php:8.4-apache@sha256:75325cceea4f9a8200f4e9e146e8155ec1b6466b2957b87accf0286b94547cbd
+FROM php:8.4.27-apache@sha256:a0b75cee7023ba2c127138dcad2ecc6ec7e09435534645e70450f29f24ea2a5a
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     curl \
     libpng-dev \
+    libjpeg62-turbo-dev \
+    libwebp-dev \
     libonig-dev \
     libxml2-dev \
     zip \
@@ -21,6 +23,11 @@ RUN docker-php-ext-install \
     zip \
     intl \
     xml
+
+# gd re-encodes images uploaded to exam reconstructions (resize, strip metadata); exif reads a
+# photo's orientation first, so stripping the metadata does not leave it lying on its side.
+RUN docker-php-ext-configure gd --with-jpeg --with-webp \
+    && docker-php-ext-install gd exif
 
 # Configure PHP
 RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/memory-limit.ini

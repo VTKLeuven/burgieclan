@@ -60,4 +60,12 @@ class SearchApi
      */
     #[Groups(SerializationGroups::SEARCH)]
     public array $documents = [];
+
+    /**
+     * Questions of exam reconstructions, each with a snippet around the match.
+     *
+     * @var ExamQuestionSearchResult[]
+     */
+    #[Groups(SerializationGroups::SEARCH)]
+    public array $examQuestions = [];
 }

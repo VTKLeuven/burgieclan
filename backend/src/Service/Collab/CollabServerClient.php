@@ -8,7 +8,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Asks the collab server to change a live document, for the few things Symfony itself starts:
- * rolling back to a revision, and dropping connections after a lock.
+ * rolling back to a revision, dropping connections after a lock, and telling everyone who has a
+ * document open that something around it changed.
  *
  * Changes to a live document must go through the collab server so every connected browser gets
  * them as a normal edit (see collab/README.md). Requests are signed the same way as the ones the
@@ -51,9 +52,27 @@ class CollabServerClient
     }
 
     /**
+     * Sends a small JSON message to everyone who has the document open, as a Hocuspocus stateless
+     * message. Nothing happens when nobody has it open. A short timeout: this is a notification,
+     * sent while someone waits for their own request.
+     *
+     * @param array<string, scalar> $message
+     *
      * @throws CollabServerException
      */
-    private function post(string $path, string $body): void
+    public function broadcast(string $documentName, array $message): void
+    {
+        $this->post(
+            sprintf('/internal/documents/%s/broadcast', rawurlencode($documentName)),
+            (string) json_encode($message),
+            3
+        );
+    }
+
+    /**
+     * @throws CollabServerException
+     */
+    private function post(string $path, string $body, int $timeout = 10): void
     {
         $timestamp = time();
         $headers = [
@@ -62,7 +81,7 @@ class CollabServerClient
             CollabRequestSignature::HEADER_SIGNATURE => $this->signature->sign('POST', $path, $timestamp, $body),
         ];
         $url = rtrim($this->baseUrl, '/') . $path;
-        $options = ['headers' => $headers, 'body' => $body, 'timeout' => 10];
+        $options = ['headers' => $headers, 'body' => $body, 'timeout' => $timeout];
 
         try {
             $response = $this->httpClient->request('POST', $url, $options);

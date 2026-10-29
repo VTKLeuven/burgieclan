@@ -208,7 +208,7 @@ export default function DocumentPreview({ id }: { id: string }) {
                         and scroll the column itself — so it sits outside the padded box the other
                         preview kinds share. */}
                     {document.contentUrl && isPdf ? (
-                        <PDFViewer file={document.contentUrl} />
+                        <PDFViewer documentId={document.id} />
                     ) : (
                         <div className="flex justify-center overflow-x-auto bg-vtk-paper-2 p-4">
                             {document.contentUrl && isImage ? (

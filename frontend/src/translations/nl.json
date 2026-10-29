@@ -125,6 +125,14 @@
         "title": "Home",
         "description": "Welkom bij Burgieclan! Je beste vriend bij het studeren voor examens. We bieden een platform waar studenten hun studiemateriaal met elkaar kunnen delen. Op deze manier kunnen jullie elkaar helpen en wordt studeren een stuk makkelijker. Dus waar wacht je nog op? Duik in de wereld van Burgieclan en begin met het delen van je kennis!",
         "recent_activities": "Ga verder waar je gebleven was",
+        "exam_prompt": {
+            "title": "Had je net een van deze examens?",
+            "description": "Vul de reconstructie aan met de vragen die je kreeg, nu je ze nog weet.",
+            "questions_one": "{{count}} vraag",
+            "questions_other": "{{count}} vragen",
+            "dismiss": "Niet meer tonen voor {{course}}",
+            "course_fallback": "Vak"
+        },
         "no_recent_activities": "Nog geen recente activiteiten gevonden",
         "news": "Nieuws",
         "navigate_to": "Navigeer naar",
@@ -380,6 +388,7 @@
         "cancel": "Annuleren",
         "apply": "Toepassen",
         "no-preview": "Geen voorbeeld beschikbaar voor {{filename}}",
+        "preview-error": "Dit document kon niet geladen worden.",
         "loading": "Uw document tot leven brengen...",
         "load-more": "Meer pagina's laden ({{displayedPages}} van {{numPages}})",
         "zoom": {
@@ -419,16 +428,20 @@
     },
     "search": {
         "placeholder": "Zoeken...",
-        "info": "Zoek naar vakken, modules, opleidingen, documenten...",
+        "info": "Zoek naar vakken, modules, opleidingen, documenten, examenvragen...",
         "info_sub": "Krijg snel toegang tot elke pagina door een globale zoekopdracht uit te voeren.",
         "no_results": "Geen resultaten gevonden",
-        "no_results_sub": "Probeer een andere zoekopdracht of navigeer naar een andere pagina."
+        "no_results_sub": "Probeer een andere zoekopdracht of navigeer naar een andere pagina.",
+        "exam_questions": "Examenvragen"
     },
     "header": {
         "admin": "Beheer",
         "my_vtk": "Mijn VTK",
         "old_burgieclan": "Oude Burgieclan",
-        "new_burgieclan_feedback": "Feedback Nieuwe Burgieclan"
+        "new_burgieclan_feedback": "Feedback Nieuwe Burgieclan",
+        "feedback_loading": "Formulier laden…",
+        "feedback_open_in_tab": "Open in een nieuw tabblad",
+        "feedback_close": "Sluiten"
     },
     "sidebar": {
         "home": "Home",
@@ -451,14 +464,38 @@
             "title": "Teksteditor",
             "description": "De editor laat je wiskundige formules schrijven en weergeven met LaTeX-syntaxis.",
             "inline": "Plaats je wiskundige expressies tussen",
-            "inline_end": "voor inline formules",
+            "inline_end": "voor een formule in de zin,",
             "block": " of ",
-            "block_end": "voor blokformules.",
+            "block_end": "alleen op een regel voor een blokformule.",
+            "edit": "Klik op een formule om ze aan te passen, of gebruik de Σ-knop om er een in te voegen.",
             "katex_overview": "Voor een overzicht van de ondersteunde functies, zie de ",
             "katex_doc": "documentatie van KaTeX",
             "katex_end": " de onderliggende LaTeX-interpreter."
         },
-        "info_button": "Info"
+        "info_button": "Info",
+        "toolbar": {
+            "bold": "Vet",
+            "italic": "Cursief",
+            "strike": "Doorhalen",
+            "code": "Code",
+            "heading1": "Kop 1",
+            "heading2": "Kop 2",
+            "bullet_list": "Opsommingslijst",
+            "ordered_list": "Genummerde lijst",
+            "undo": "Ongedaan maken",
+            "redo": "Opnieuw uitvoeren"
+        },
+        "math": {
+            "insert": "Formule invoegen",
+            "edit": "Formule aanpassen",
+            "mode_inline": "In de tekst ($…$)",
+            "mode_block": "Hele regel ($$…$$)",
+            "label": "LaTeX",
+            "preview_empty": "Typ een formule, bv. \\frac{a}{b}",
+            "keys": "Enter om te bewaren, Esc om te annuleren. Leegmaken en bewaren verwijdert de formule.",
+            "cancel": "Annuleren",
+            "save": "Bewaren"
+        }
     },
     "footer": {
         "navigate": "Navigeren",
@@ -551,7 +588,8 @@
             "copy-none": "Een leeg examen",
             "copy-help": "Handig als het examen grotendeels hetzelfde was als een eerder examen van dit vak.",
             "submit": "Starten",
-            "submitting": "Starten…"
+            "submitting": "Starten…",
+            "rate-limited": "Je hebt vandaag al veel reconstructies gestart. Probeer het later opnieuw, of vraag het aan een moderator."
         },
         "page": {
             "editable-until": "Iedereen kan dit bewerken tot {{date}}",
@@ -565,7 +603,8 @@
             "empty": "Nog geen vragen.",
             "add-question": "Vraag toevoegen",
             "shortcut": "Of Ctrl/⌘ + Shift + Enter om een vraag in te voegen na de vraag waarin je typt.",
-            "stored-copy": "Je ziet de laatst opgeslagen versie."
+            "stored-copy": "Je ziet de laatst opgeslagen versie.",
+            "too-large": "Deze reconstructie is te groot geworden om nog te bewerken. Een moderator kan een eerdere versie terugzetten."
         },
         "question": {
             "label": "Vraag",
@@ -575,6 +614,43 @@
             "down": "Vraag omlaag",
             "delete": "Vraag verwijderen"
         },
+        "images": {
+            "add": "Afbeelding toevoegen",
+            "uploading": "Afbeelding uploaden…",
+            "removed": "Afbeelding verwijderd door een moderator",
+            "unavailable": "Deze afbeelding kan niet getoond worden",
+            "hint": "PNG, JPG of WebP tot 8 MB, ook door ze te plakken of in een vraag te slepen. Enkel eigen tekeningen, schema's en figuren: geen foto's van het examenblad zelf.",
+            "errors": {
+                "type": "Alleen PNG-, JPG- en WebP-afbeeldingen kunnen toegevoegd worden.",
+                "unreadable": "Deze afbeelding kon niet gelezen worden.",
+                "pixels": "Deze afbeelding is te groot. Maak ze eerst kleiner.",
+                "size": "Afbeeldingen mogen maximaal 8 MB zijn.",
+                "limit": "Deze reconstructie bevat al het maximale aantal afbeeldingen.",
+                "locked": "Deze reconstructie is vergrendeld.",
+                "rate": "Je hebt veel afbeeldingen geüpload. Probeer het later opnieuw.",
+                "failed": "De afbeelding kon niet geüpload worden. Probeer het opnieuw."
+            }
+        },
+        "discussion": {
+            "comments_one": "{{count}} reactie",
+            "comments_other": "{{count}} reacties",
+            "had-this-too": "Ik had deze ook",
+            "had-this-too-help_one": "{{count}} persoon had deze vraag ook",
+            "had-this-too-help_other": "{{count}} mensen hadden deze vraag ook",
+            "loading": "Reacties laden…",
+            "empty": "Nog geen reacties. Vraag naar het antwoord, of vul aan wat je nog weet.",
+            "placeholder": "Bespreek het antwoord, of vul aan wat je nog weet",
+            "new": "Nieuwe reactie",
+            "as-anonymous": "Je reageert anoniem, onder dezelfde naam als je cursor in dit examen.",
+            "as-named": "Je reageert onder je eigen naam. Dat pas je aan bij je accountinstellingen.",
+            "post": "Plaatsen",
+            "edit": "Bewerken",
+            "save": "Opslaan",
+            "delete": "Verwijderen",
+            "delete-confirm": "Deze reactie verwijderen?",
+            "rate-limited": "Je gaat wat snel. Probeer het over een paar minuten opnieuw.",
+            "error": "Dat lukte niet. Probeer het opnieuw."
+        },
         "sittings": {
             "title": "Examendagen",
             "new": "Nieuwe examendag",
@@ -582,7 +658,14 @@
             "add": "Dag toevoegen",
             "add-first": "Examendag toevoegen",
             "rename": "{{label}} hernoemen",
-            "remove": "{{label}} verwijderen"
+            "remove": "{{label}} verwijderen",
+            "remove-confirm": {
+                "title": "{{label}} verwijderen?",
+                "body-one": "{{label}} is aangeduid bij 1 vraag. Als je de dag verwijdert, verdwijnt hij ook bij die vraag.",
+                "body-other": "{{label}} is aangeduid bij {{count}} vragen. Als je de dag verwijdert, verdwijnt hij ook bij die vragen.",
+                "undo": "Toch niet? Met Ctrl/⌘ + Z in de vragen zet je hem terug.",
+                "submit": "Dag verwijderen"
+            }
         }
     }
 }

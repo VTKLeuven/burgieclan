@@ -1,4 +1,6 @@
 {# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
 {# @var action \EasyCorp\Bundle\EasyAdminBundle\Dto\ActionDto #}
 {# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
-<form action="{{ action.linkUrl }}" method="POST"> {{ include('@EasyAdmin/crud/action.html.twig') }}</form>
+{# Renders an action as a POST button with a CSRF token. Every action that uses this template
+   must check that token, see App\Constants\AdminActionCsrf. #}
+<form action="{{ action.linkUrl }}" method="POST"><input type="hidden" name="_token" value="{{ csrf_token(constant('App\\Constants\\AdminActionCsrf::INTENTION')) }}"> {{ include('@EasyAdmin/crud/action.html.twig') }}</form>

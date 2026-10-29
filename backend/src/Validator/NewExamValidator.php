@@ -30,14 +30,33 @@ class NewExamValidator extends ConstraintValidator
             return;
         }
 
+        if (null !== $value->course && null === $value->course->id) {
+            $this->context->buildViolation('This value is not valid.')
+                ->atPath('course')
+                ->addViolation();
+        }
+        if (null !== $value->copiedFrom && null === $value->copiedFrom->id) {
+            $this->context->buildViolation('This value is not valid.')
+                ->atPath('copiedFrom')
+                ->addViolation();
+        }
+
         $period = ExamPeriod::tryFrom((string) $value->period);
         if (null === $period || null === $value->academicYear || null === $value->course?->id) {
             return;
         }
 
+        // The field's own Regex reports anything that is not "#### - ####" at all.
         try {
             $started = $period->hasStarted($value->academicYear);
         } catch (InvalidArgumentException) {
+            if (1 === preg_match('/^\d{4} - \d{4}$/', $value->academicYear)) {
+                $this->context->buildViolation($constraint->notConsecutiveMessage)
+                    ->atPath('academicYear')
+                    ->setCode(NewExam::NOT_CONSECUTIVE)
+                    ->addViolation();
+            }
+
             return;
         }
 

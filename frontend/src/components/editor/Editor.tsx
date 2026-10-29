@@ -2,9 +2,9 @@
 
 import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog';
 import { Code, Text } from '@/components/ui/Text';
-import { Mathematics } from '@tiptap/extension-mathematics';
-import { TextSelection } from '@tiptap/pm/state';
-import { EditorContent, useEditor, type Editor as TipTapEditor } from '@tiptap/react';
+import { LatexMath } from '@/components/editor/math/latexMath';
+import MathEditPopover from '@/components/editor/math/MathEditPopover';
+import { EditorContent, useEditor, useEditorState, type Editor as TipTapEditor } from '@tiptap/react';
 import { StarterKit } from "@tiptap/starter-kit";
 import 'katex/dist/katex.min.css';
 import {
@@ -17,7 +17,7 @@ import {
     List,
     ListOrdered,
     Redo2,
-    SquareFunction,
+    Sigma,
     Strikethrough,
     Undo2
 } from "lucide-react";
@@ -58,6 +58,8 @@ const InfoDialog = ({ isOpen, setIsOpen, parentDialogOpen }: InfoDialogProps) =>
                     {t('editor.info_dialog.inline')} <Code>$...$</Code> {t('editor.info_dialog.inline_end')}
                     {t('editor.info_dialog.block')} <Code>$$...$$</Code> {t('editor.info_dialog.block_end')}
                     <br /><br />
+                    {t('editor.info_dialog.edit')}
+                    <br /><br />
                     {t('editor.info_dialog.katex_overview')}
                     <a href="https://katex.org/docs/supported" target="_blank">{t('editor.info_dialog.katex_doc')}</a>,
                     {t('editor.info_dialog.katex_end')}
@@ -80,7 +82,13 @@ const InfoDialog = ({ isOpen, setIsOpen, parentDialogOpen }: InfoDialogProps) =>
  * it; undo and redo work there too, because the Collaboration extension provides both commands.
  */
 export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
+    const { t } = useTranslation();
     const [isInfoOpen, setIsInfoOpen] = useState(false);
+
+    useEditorState({
+        editor,
+        selector: ({ transactionNumber }) => transactionNumber,
+    });
 
     if (!editor) {
         return null
@@ -90,6 +98,7 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
         <div className="tiptap flex justify-between p-2 items-center border-b border-vtk-ink/10">
             <div>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleBold().run()}
                     disabled={
                         !editor.can()
@@ -98,11 +107,14 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .toggleBold()
                             .run()
                     }
+                    title={t('editor.toolbar.bold')}
+                    aria-label={t('editor.toolbar.bold')}
                     className={`${editor.isActive('bold') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <Bold className="icon" />
+                    <Bold className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleItalic().run()}
                     disabled={
                         !editor.can()
@@ -111,11 +123,14 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .toggleItalic()
                             .run()
                     }
+                    title={t('editor.toolbar.italic')}
+                    aria-label={t('editor.toolbar.italic')}
                     className={`${editor.isActive('italic') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <Italic className="icon" />
+                    <Italic className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleStrike().run()}
                     disabled={
                         !editor.can()
@@ -124,11 +139,14 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .toggleStrike()
                             .run()
                     }
+                    title={t('editor.toolbar.strike')}
+                    aria-label={t('editor.toolbar.strike')}
                     className={`${editor.isActive('strike') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <Strikethrough className="icon" />
+                    <Strikethrough className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleCode().run()}
                     disabled={
                         !editor.can()
@@ -137,35 +155,50 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .toggleCode()
                             .run()
                     }
+                    title={t('editor.toolbar.code')}
+                    aria-label={t('editor.toolbar.code')}
                     className={`${editor.isActive('code') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <CodeIcon className="icon" />
+                    <CodeIcon className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
+                    title={t('editor.toolbar.heading1')}
+                    aria-label={t('editor.toolbar.heading1')}
                     className={`${editor.isActive('heading', { level: 1 }) ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <Heading1 className="icon" />
+                    <Heading1 className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+                    title={t('editor.toolbar.heading2')}
+                    aria-label={t('editor.toolbar.heading2')}
                     className={`${editor.isActive('heading', { level: 2 }) ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <Heading2 className="icon" />
+                    <Heading2 className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleBulletList().run()}
+                    title={t('editor.toolbar.bullet_list')}
+                    aria-label={t('editor.toolbar.bullet_list')}
                     className={`${editor.isActive('bulletList') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <List className="icon" />
+                    <List className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+                    title={t('editor.toolbar.ordered_list')}
+                    aria-label={t('editor.toolbar.ordered_list')}
                     className={`${editor.isActive('orderedList') ? 'isActive' : 'hover:bg-vtk-paper-2'}`}
                 >
-                    <ListOrdered className="icon" />
+                    <ListOrdered className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().undo().run()}
                     disabled={
                         !editor.can()
@@ -174,11 +207,14 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .undo()
                             .run()
                     }
+                    title={t('editor.toolbar.undo')}
+                    aria-label={t('editor.toolbar.undo')}
                     className="p-1 mx-2 clickable"
                 >
-                    <Undo2 className="icon" />
+                    <Undo2 className="icon" aria-hidden="true" />
                 </button>
                 <button
+                    type="button"
                     onClick={() => editor?.chain().focus().redo().run()}
                     disabled={
                         !editor.can()
@@ -187,32 +223,33 @@ export const Toolbar = ({ editor }: { editor: TipTapEditor|null }) => {
                             .redo()
                             .run()
                     }
+                    title={t('editor.toolbar.redo')}
+                    aria-label={t('editor.toolbar.redo')}
                     className="p-1 mx-2 clickable"
                 >
-                    <Redo2 className="icon" />
+                    <Redo2 className="icon" aria-hidden="true" />
                 </button>
                 <button
-                    // Clicking inserts a math block
-                    onClick={() => {
-                        // Insert two dollar signs at the current cursor position
-                        editor.chain().focus().insertContent('$$').run();
-
-                        // Move the cursor between the dollar signs
-                        const { tr } = editor.state;
-                        const position = tr.selection.from - 1; // One character back (to move between the dollar signs)
-                        const newSelection = TextSelection.create(tr.doc, position);
-
-                        // Dispatch the transaction with the new cursor position
-                        editor.view.dispatch(tr.setSelection(newSelection));
-                    }}
+                    type="button"
+                    // Opens the formula editor (MathEditPopover) for a new formula at the cursor.
+                    onClick={() => editor.commands.openMathEditor()}
                     className="p-1 mx-2 clickable"
+                    title={t('editor.math.insert')}
+                    aria-label={t('editor.math.insert')}
                 >
-                    <SquareFunction className="icon" />
+                    <Sigma className="icon" aria-hidden="true" />
                 </button>
+                <MathEditPopover editor={editor} />
             </div>
             <div>
-                <button className="clickable" onClick={() => setIsInfoOpen(true)}>
-                    <Info className="icon" />
+                <button
+                    type="button"
+                    className="clickable"
+                    onClick={() => setIsInfoOpen(true)}
+                    title={t('editor.info_button')}
+                    aria-label={t('editor.info_button')}
+                >
+                    <Info className="icon" aria-hidden="true" />
                 </button>
                 <InfoDialog isOpen={isInfoOpen} setIsOpen={setIsInfoOpen} />
             </div>
@@ -239,7 +276,7 @@ const Editor = ({ className = '', onEditorReady }: EditorProps) => {    // Creat
                 code: {},
             }),
             // TextStyle.configure({types: [ListItem.name]}), // TODO check if this does anything
-            Mathematics,
+            LatexMath,
         ],
         autofocus: true,
         immediatelyRender: false, // Prevents hydration errors in Next.js
@@ -251,7 +288,9 @@ const Editor = ({ className = '', onEditorReady }: EditorProps) => {    // Creat
             handlePaste(view, event) {
                 event.preventDefault();
                 const text = event.clipboardData?.getData('text/plain');
-                view.dispatch(view.state.tr.insertText(text ?? '')); // Insert plain text as a new paragraph in the editor
+                // Insert plain text as a new paragraph in the editor. Marked as a paste, so the
+                // paste rules still run and turn $…$ in the pasted text into formulas (LatexMath).
+                view.dispatch(view.state.tr.insertText(text ?? '').setMeta('uiEvent', 'paste'));
                 return true;
             }
         },

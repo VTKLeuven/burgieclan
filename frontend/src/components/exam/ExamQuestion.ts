@@ -28,6 +28,17 @@ function sittingsOf(node: ProseMirrorNode): string[] {
     return Array.isArray(value) ? value.filter((id): id is string => typeof id === 'string') : [];
 }
 
+/** How many questions are marked as having come up on this day. */
+export function countQuestionsWithSitting(doc: ProseMirrorNode, sittingId: string): number {
+    let count = 0;
+    doc.forEach((node) => {
+        if (node.type.name === EXAM_QUESTION && sittingsOf(node).includes(sittingId)) {
+            count++;
+        }
+    });
+    return count;
+}
+
 const EMPTY_QUESTION: JSONContent = { type: EXAM_QUESTION, content: [{ type: 'paragraph' }] };
 
 /**

@@ -91,28 +91,28 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     /**
      * @var Collection<int, Program>
      */
-    #[ORM\ManyToMany(targetEntity: Program::class, inversedBy: 'users')]
+    #[ORM\ManyToMany(targetEntity: Program::class)]
     #[ORM\JoinTable(name: 'favorite_user_program')]
     private Collection $favoritePrograms;
 
     /**
      * @var Collection<int, Module>
      */
-    #[ORM\ManyToMany(targetEntity: Module::class, inversedBy: 'users')]
+    #[ORM\ManyToMany(targetEntity: Module::class)]
     #[ORM\JoinTable(name: 'favorite_user_module')]
     private Collection $favoriteModules;
 
     /**
      * @var Collection<int, Course>
      */
-    #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'users')]
+    #[ORM\ManyToMany(targetEntity: Course::class)]
     #[ORM\JoinTable(name: 'favorite_user_course')]
     private Collection $favoriteCourses;
 
     /**
      * @var Collection<int, Document>
      */
-    #[ORM\ManyToMany(targetEntity: Document::class, inversedBy: 'users')]
+    #[ORM\ManyToMany(targetEntity: Document::class)]
     #[ORM\JoinTable(name: 'favorite_user_document')]
     private Collection $favoriteDocuments;
 

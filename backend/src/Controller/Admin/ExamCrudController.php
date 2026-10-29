@@ -2,17 +2,25 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\AdminActionCsrf;
 use App\Controller\Admin\Filter\EntityContainsFilter;
+use App\Entity\CollabDocument;
 use App\Entity\CollabDocumentRevision;
 use App\Entity\Course;
 use App\Entity\Exam;
+use App\Entity\ExamImage;
+use App\Entity\ExamQuestionComment;
 use App\Entity\User;
 use App\Repository\CollabDocumentRepository;
 use App\Repository\CollabDocumentRevisionRepository;
+use App\Repository\ExamImageRepository;
+use App\Repository\ExamQuestionCommentRepository;
 use App\Repository\UserRepository;
 use App\Service\Collab\CollabDocumentStore;
 use App\Service\Collab\CollabServerClient;
 use App\Service\Collab\CollabServerException;
+use App\Service\Exam\ExamImageStore;
+use App\Service\Exam\ExamQuestionActivity;
 use App\Utils\ExamContent;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,7 +44,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Exam reconstructions for moderators: see who changed what, roll back, lock and reopen.
+ * Exam reconstructions for moderators: see who changed what, roll back, lock and reopen, and
+ * remove comments on questions and uploaded images.
  *
  * Students start and edit reconstructions on the site; nothing here edits content directly. A
  * rollback goes through the collab server (CollabServerClient::restore) so everyone who has the
@@ -46,9 +55,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * Locking and reopening only move `editableUntil`. Everyone who has the exam open is then
  * reconnected, which hands them a token for the new situation.
  *
- * The state-changing actions are POST-only, like the other custom admin actions: the session
- * cookie is SameSite=lax, so refusing GET is what stops another site from driving them. Their
- * paths have two segments so a GET is answered 405 instead of reaching the detail route
+ * The state-changing actions are POST-only and check a CSRF token (AdminActionCsrf). Their paths
+ * have two segments so a GET is answered 405 instead of reaching the detail route
  * (/admin/exam/{entityId}) with "lock" as an id.
  */
 #[IsGranted(User::ROLE_MODERATOR)]
@@ -61,6 +69,10 @@ class ExamCrudController extends AbstractCrudController
         private readonly CollabDocumentStore $store,
         private readonly CollabServerClient $collab,
         private readonly AdminUrlGenerator $adminUrlGenerator,
+        private readonly ExamQuestionCommentRepository $comments,
+        private readonly ExamQuestionActivity $activity,
+        private readonly ExamImageRepository $images,
+        private readonly ExamImageStore $imageStore,
     ) {}
 
     public static function getEntityFqcn(): string
@@ -174,6 +186,7 @@ class ExamCrudController extends AbstractCrudController
 
         $document = $this->documents->findOneByName($exam->getDocumentName());
         $revisions = null === $document ? [] : $this->revisions->findForDocument($document);
+        $names = $this->contributorNames($document, $revisions);
 
         $responseParameters->set(
             'exam_current',
@@ -181,7 +194,7 @@ class ExamCrudController extends AbstractCrudController
             'updatedAt' => $document->getUpdatedAt(),
             'questions' => ExamContent::questionTexts($document->getContent()),
             'sittings' => ExamContent::sittings($document->getFields()),
-            'contributors' => $this->userNames($document->getPendingContributors()),
+            'contributors' => $this->userNames($document->getPendingContributors(), $names),
             ]
         );
         $responseParameters->set(
@@ -193,7 +206,7 @@ class ExamCrudController extends AbstractCrudController
                     'note' => $revision->getNote(),
                     'questions' => ExamContent::questionTexts($revision->getContent()),
                     'sittings' => ExamContent::sittings($revision->getFields()),
-                    'contributors' => $this->userNames($revision->getContributors()),
+                    'contributors' => $this->userNames($revision->getContributors(), $names),
                     'restoreUrl' => $this->adminUrlGenerator
                         ->unsetAll()
                         ->setController(self::class)
@@ -204,6 +217,11 @@ class ExamCrudController extends AbstractCrudController
                 ],
                 $revisions
             )
+        );
+        $responseParameters->set('exam_comments', $this->commentsByQuestion($exam));
+        $responseParameters->set(
+            'exam_images',
+            array_map(fn(ExamImage $image): array => $this->imageRow($exam, $image), $this->images->findForExam($exam))
         );
 
         return $responseParameters;
@@ -217,10 +235,36 @@ class ExamCrudController extends AbstractCrudController
         $this->reconnectEveryone($entityInstance);
     }
 
+    /**
+     * Also drops everyone who has the exam open. Their browsers reconnect at once and are refused,
+     * so the page stops accepting edits that could no longer be stored. Only once the delete is
+     * committed: before that, the reconnect would still be handed a token.
+     */
+    public function deleteEntity(EntityManagerInterface $entityManager, object $entityInstance): void
+    {
+        assert($entityInstance instanceof Exam);
+        // The id, and so the name, is gone from the entity once it is deleted.
+        $documentName = $entityInstance->getDocumentName();
+
+        parent::deleteEntity($entityManager, $entityInstance);
+
+        try {
+            $this->collab->disconnect($documentName);
+        } catch (CollabServerException $exception) {
+            $this->addFlash(
+                'warning',
+                'Deleted, but people who have it open are not told until they reload: ' . $exception->getMessage()
+            );
+        }
+    }
+
     #[AdminRoute('/access/lock', name: 'lock', options: ['methods' => ['POST']])]
     public function lock(AdminContext $context, EntityManagerInterface $entityManager): RedirectResponse
     {
         $exam = $this->loadExam($context, $entityManager);
+        if ($invalid = $this->assertCsrf($context, $exam)) {
+            return $invalid;
+        }
 
         $exam->setEditableUntil(new DateTimeImmutable());
         $entityManager->flush();
@@ -235,6 +279,9 @@ class ExamCrudController extends AbstractCrudController
     public function reopen(AdminContext $context, EntityManagerInterface $entityManager): RedirectResponse
     {
         $exam = $this->loadExam($context, $entityManager);
+        if ($invalid = $this->assertCsrf($context, $exam)) {
+            return $invalid;
+        }
 
         $exam->setEditableUntil((new DateTimeImmutable())->modify(Exam::EDITABLE_FOR));
         $entityManager->flush();
@@ -259,6 +306,10 @@ class ExamCrudController extends AbstractCrudController
     public function restoreRevision(AdminContext $context, EntityManagerInterface $entityManager): RedirectResponse
     {
         $exam = $this->loadExam($context, $entityManager);
+        if ($invalid = $this->assertCsrf($context, $exam)) {
+            return $invalid;
+        }
+
         $document = $this->documents->findOneByName($exam->getDocumentName());
 
         $revision = $this->revisions->find((int) $context->getRequest()->query->get('revisionId'));
@@ -269,7 +320,7 @@ class ExamCrudController extends AbstractCrudController
         $moderator = $this->getUser();
         assert($moderator instanceof User);
 
-        $this->store->snapshot(
+        $snapshot = $this->store->snapshot(
             $document,
             sprintf(
                 'Before %s restored the version of %s',
@@ -282,6 +333,11 @@ class ExamCrudController extends AbstractCrudController
         try {
             $this->collab->restore($exam->getDocumentName(), $revision->getState());
         } catch (CollabServerException $exception) {
+            if (null !== $snapshot) {
+                $document->addPendingContributors($snapshot->getContributors());
+                $entityManager->remove($snapshot);
+                $entityManager->flush();
+            }
             $this->addFlash('danger', 'Nothing was restored: ' . $exception->getMessage());
 
             return $this->redirectToDetail($exam);
@@ -298,6 +354,139 @@ class ExamCrudController extends AbstractCrudController
         return $this->redirectToDetail($exam);
     }
 
+    /**
+     * Removes a comment on one of the exam's questions, e.g. one that is abusive or leaks
+     * something. Everyone who has the exam open sees it disappear.
+     */
+    // Not ".../delete": EasyAdmin's own /{entityId}/delete would catch it, with "comments" as the id.
+    #[AdminRoute('/comments/remove', name: 'deleteComment', options: ['methods' => ['POST']])]
+    public function deleteComment(AdminContext $context, EntityManagerInterface $entityManager): RedirectResponse
+    {
+        $exam = $this->loadExam($context, $entityManager);
+        if ($invalid = $this->assertCsrf($context, $exam)) {
+            return $invalid;
+        }
+
+        $comment = $this->comments->find((int) $context->getRequest()->query->get('commentId'));
+        if (null === $comment || $comment->getQuestion()->getExam()->getId() !== $exam->getId()) {
+            throw $this->createNotFoundException('This comment does not belong to this exam.');
+        }
+
+        $uid = $comment->getQuestion()->getUid();
+        $entityManager->remove($comment);
+        $entityManager->flush();
+        $this->activity->questionChanged((int) $exam->getId(), $uid);
+
+        $this->addFlash('success', 'Comment deleted.');
+
+        return $this->redirectToDetail($exam);
+    }
+
+    /**
+     * Takes an uploaded image down, e.g. a photo of the exam sheet. Its file is deleted, and the
+     * page, which only knows its UUID, shows a placeholder in its place. A page that already
+     * shows it keeps doing so until it is reloaded.
+     */
+    // Not ".../delete": EasyAdmin's own /{entityId}/delete would catch it, with "images" as the id.
+    #[AdminRoute('/images/remove', name: 'removeImage', options: ['methods' => ['POST']])]
+    public function removeImage(AdminContext $context, EntityManagerInterface $entityManager): RedirectResponse
+    {
+        $exam = $this->loadExam($context, $entityManager);
+        if ($invalid = $this->assertCsrf($context, $exam)) {
+            return $invalid;
+        }
+
+        $image = $this->images->find((int) $context->getRequest()->query->get('imageId'));
+        if (null === $image || !in_array($image->getExam(), $this->images->examChain($exam), true)) {
+            throw $this->createNotFoundException('This image does not belong to this exam.');
+        }
+
+        if (!$image->isRemoved()) {
+            $this->imageStore->remove($image);
+            $entityManager->flush();
+        }
+        $this->addFlash('success', 'Image removed.');
+
+        return $this->redirectToDetail($exam);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function imageRow(Exam $exam, ExamImage $image): array
+    {
+        $uploader = $image->getUploader();
+
+        return [
+            // Removed images have no file left to link to.
+            'url' => $image->isRemoved() ? null : $this->generateUrl('admin_exam_image', ['fileName' => $image->getFileName()]),
+            'uploader' => null === $uploader
+                ? '(deleted account)'
+                : sprintf('%s (%s)', $uploader->getFullName(), $uploader->getUsername()),
+            'createdAt' => $image->getCreatedAt(),
+            'size' => $image->getSize(),
+            'width' => $image->getWidth(),
+            'height' => $image->getHeight(),
+            'removed' => $image->isRemoved(),
+            'removeUrl' => $this->adminUrlGenerator
+                ->unsetAll()
+                ->setController(self::class)
+                ->setAction('removeImage')
+                ->setEntityId($exam->getId())
+                ->set('imageId', $image->getId())
+                ->generateUrl(),
+        ];
+    }
+
+    /**
+     * The comments for the detail page, grouped by question, with their real authors.
+     *
+     * @return list<array{question: string, removed: bool, comments: list<array<string, mixed>>}>
+     */
+    private function commentsByQuestion(Exam $exam): array
+    {
+        $groups = [];
+        foreach ($this->comments->findForExam($exam) as $comment) {
+            $question = $comment->getQuestion();
+            $key = (int) $question->getId();
+            $text = $question->getText();
+            $groups[$key] ??= [
+                'question' => match (true) {
+                    '' === $text => '(no text yet)',
+                    mb_strlen($text) > 160 => mb_substr($text, 0, 159) . '…',
+                    default => $text,
+                },
+                'removed' => $question->isRemoved(),
+                'comments' => [],
+            ];
+            $groups[$key]['comments'][] = $this->commentRow($exam, $comment);
+        }
+
+        return array_values($groups);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function commentRow(Exam $exam, ExamQuestionComment $comment): array
+    {
+        $author = $comment->getCreator();
+
+        return [
+            'author' => sprintf('%s (%s)', $author->getFullName(), $author->getUsername()),
+            'anonymous' => $comment->isAnonymous(),
+            'createdAt' => $comment->getCreatedAt(),
+            'content' => $comment->getContent(),
+            'deleteUrl' => $this->adminUrlGenerator
+                ->unsetAll()
+                ->setController(self::class)
+                ->setAction('deleteComment')
+                ->setEntityId($exam->getId())
+                ->set('commentId', $comment->getId())
+                ->generateUrl(),
+        ];
+    }
+
     private function reconnectEveryone(Exam $exam): void
     {
         try {
@@ -312,23 +501,46 @@ class ExamCrudController extends AbstractCrudController
     }
 
     /**
-     * @param int[] $userIds
+     * Everyone who changed the exam in the versions shown, looked up in one query rather than one
+     * per version.
      *
-     * @return list<string>
+     * @param CollabDocumentRevision[] $revisions
+     *
+     * @return array<int, string> "Full Name (username)" by user id
      */
-    private function userNames(array $userIds): array
+    private function contributorNames(?CollabDocument $document, array $revisions): array
     {
+        $userIds = array_merge(
+            $document?->getPendingContributors() ?? [],
+            ...array_map(
+                static fn(CollabDocumentRevision $revision): array => $revision->getContributors(),
+                $revisions
+            )
+        );
         if ([] === $userIds) {
             return [];
         }
 
-        $names = array_map(
-            static fn(User $user): string => sprintf('%s (%s)', $user->getFullName(), $user->getUsername()),
-            $this->users->findBy(['id' => $userIds])
-        );
-        sort($names);
+        $names = [];
+        foreach ($this->users->findBy(['id' => array_unique($userIds)]) as $user) {
+            $names[(int) $user->getId()] = sprintf('%s (%s)', $user->getFullName(), $user->getUsername());
+        }
 
         return $names;
+    }
+
+    /**
+     * @param int[]              $userIds
+     * @param array<int, string> $names   from contributorNames()
+     *
+     * @return list<string>
+     */
+    private function userNames(array $userIds, array $names): array
+    {
+        $found = array_values(array_intersect_key($names, array_flip($userIds)));
+        sort($found);
+
+        return $found;
     }
 
     private function siteUrl(Exam $exam): string
@@ -339,6 +551,22 @@ class ExamCrudController extends AbstractCrudController
             $exam->getCourse()->getId(),
             $exam->getId()
         );
+    }
+
+    /**
+     * Refuses a POST that did not come from a button on this admin. Returns the redirect to send
+     * back instead, like the other ways an action can fail here, or null when the token is good.
+     */
+    private function assertCsrf(AdminContext $context, Exam $exam): ?RedirectResponse
+    {
+        $token = (string) $context->getRequest()->request->get('_token');
+        if ($this->isCsrfTokenValid(AdminActionCsrf::INTENTION, $token)) {
+            return null;
+        }
+
+        $this->addFlash('danger', 'Invalid CSRF token, nothing was changed.');
+
+        return $this->redirectToDetail($exam);
     }
 
     /**

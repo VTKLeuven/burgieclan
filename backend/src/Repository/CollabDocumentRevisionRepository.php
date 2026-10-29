@@ -31,4 +31,20 @@ class CollabDocumentRevisionRepository extends ServiceEntityRepository
     {
         return $this->findBy(['document' => $document], ['createdAt' => 'DESC', 'id' => 'DESC'], $limit);
     }
+
+    /**
+     * @return list<int>
+     */
+    public function findIdsForDocument(CollabDocument $document): array
+    {
+        /** @var list<int> $ids */
+        $ids = $this->createQueryBuilder('r')
+            ->select('r.id')
+            ->where('r.document = :document')
+            ->setParameter('document', $document)
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        return array_map('intval', $ids);
+    }
 }

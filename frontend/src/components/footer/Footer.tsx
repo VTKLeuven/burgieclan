@@ -79,11 +79,11 @@ export default function Footer() {
                     {/* Brand */}
                     <div>
                         <Image
-                            src="/images/logos/vtk-logo-white.png"
-                            alt=""
-                            width={140}
-                            height={38}
-                            className="mb-4 h-[34px] w-auto max-w-[150px] object-contain object-left"
+                            src="/images/logos/burgieclan-lockup-white.svg"
+                            alt="Burgieclan"
+                            width={209}
+                            height={34}
+                            className="mb-4 h-[34px] w-auto object-contain object-left"
                         />
                         <p className="max-w-[24ch] whitespace-pre-line text-[22px] font-bold leading-[1.12] tracking-tight text-vtk-paper">
                             {t('footer.tagline')}

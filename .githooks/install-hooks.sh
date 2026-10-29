@@ -5,18 +5,31 @@
 #
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-GIT_DIR="$(git rev-parse --git-dir 2>/dev/null)"
+# Hooks are shared by every worktree of a repository, so they live in the common git
+# directory. --git-dir would point at .git/worktrees/<name> when run from a linked
+# worktree, and git never looks for hooks there.
+GIT_COMMON_DIR="$(git rev-parse --git-common-dir 2>/dev/null)"
 
-if [ -z "$GIT_DIR" ]; then
+if [ -z "$GIT_COMMON_DIR" ]; then
     echo "❌ Error: Not in a git repository"
     exit 1
 fi
 
+HOOKS_DIR="$(cd "$GIT_COMMON_DIR" && pwd)/hooks"
+
 echo "📦 Installing git hooks..."
 echo ""
 
+# core.hooksPath replaces the hooks directory outright, so hooks copied there would never run
+HOOKS_PATH="$(git config --get core.hooksPath)"
+if [ -n "$HOOKS_PATH" ]; then
+    echo "⚠️  Warning: core.hooksPath is set to '$HOOKS_PATH', so git will not run hooks from $HOOKS_DIR"
+    echo "   Unset it with 'git config --unset core.hooksPath' (check --global too) for these hooks to take effect"
+    echo ""
+fi
+
 # Create hooks directory if it doesn't exist
-mkdir -p "$GIT_DIR/hooks"
+mkdir -p "$HOOKS_DIR"
 
 # Array to store installed hooks info
 declare -a INSTALLED_HOOKS=()
@@ -47,7 +60,7 @@ for hook in "$SCRIPT_DIR"/*; do
     fi
     
     HOOK_NAME=$(basename "$hook")
-    TARGET="$GIT_DIR/hooks/$HOOK_NAME"
+    TARGET="$HOOKS_DIR/$HOOK_NAME"
     
     # Make the source hook executable
     chmod +x "$hook"
@@ -85,7 +98,7 @@ if [ ${#INSTALLED_HOOKS[@]} -gt 0 ]; then
     # Build uninstall command
     UNINSTALL_CMD="rm"
     for hook in "${INSTALLED_HOOKS[@]}"; do
-        UNINSTALL_CMD="$UNINSTALL_CMD $GIT_DIR/hooks/$hook"
+        UNINSTALL_CMD="$UNINSTALL_CMD $HOOKS_DIR/$hook"
     done
     echo "To uninstall, run: $UNINSTALL_CMD"
 fi

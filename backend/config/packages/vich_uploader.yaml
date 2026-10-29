@@ -1,23 +1,26 @@
 vich_uploader:
     db_driver: orm
+    # Always go through Flysystem; DOCUMENT_STORAGE (see flysystem.yaml) decides
+    # whether that means the local data/documents directory or an S3 bucket.
+    storage: flysystem
     metadata:
         type: attribute
     mappings:
         document_object:
             uri_prefix: /files/download
-            upload_destination: '%kernel.project_dir%/data/documents'
+            upload_destination: default.storage
             namer:
                 service: Vich\UploaderBundle\Naming\SmartUniqueNamer
                 options: { keep_extension: true }
 
-# Production: use Flysystem (S3) storage instead of local filesystem
-when@prod:
+# Tests read and write data/documents directly, so keep the plain filesystem storage there.
+when@test:
     vich_uploader:
-        storage: flysystem
+        storage: file_system
         mappings:
             document_object:
                 uri_prefix: /files/download
-                upload_destination: default.storage
+                upload_destination: '%kernel.project_dir%/data/documents'
                 namer:
                     service: Vich\UploaderBundle\Naming\SmartUniqueNamer
                     options: { keep_extension: true }

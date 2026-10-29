@@ -10,16 +10,14 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Get the root directory of the git repository
-GIT_ROOT=$(git rev-parse --show-toplevel)
-BACKEND_DIR="$GIT_ROOT/backend"
-PHPCS="$BACKEND_DIR/vendor/bin/phpcs"
-
-# Check if we're in a git repository
-if [ ! -d "$GIT_ROOT/.git" ]; then
+# Get the root directory of the git repository. Trust rev-parse rather than testing for a
+# .git directory: in a linked worktree .git is a file pointing at the main repository.
+if ! GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || [ -z "$GIT_ROOT" ]; then
     echo "${RED}❌ Error: Not in a git repository${NC}"
     exit 1
 fi
+BACKEND_DIR="$GIT_ROOT/backend"
+PHPCS="$BACKEND_DIR/vendor/bin/phpcs"
 
 # Check if backend directory exists
 if [ ! -d "$BACKEND_DIR" ]; then

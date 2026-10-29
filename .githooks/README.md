@@ -63,13 +63,16 @@ Each developer needs to install the hooks locally in their repository:
 Or manually:
 
 ```bash
-# Make the hook executable
-chmod +x .githooks/commit-msg
+# Hooks live in the common git directory, which every worktree shares. In a linked
+# worktree .git is a file, so don't hardcode .git/hooks.
+HOOKS_DIR="$(git rev-parse --git-common-dir)/hooks"
 
 # Copy to git hooks directory
-cp .githooks/commit-msg .git/hooks/commit-msg
-chmod +x .git/hooks/commit-msg
+cp .githooks/pre-commit .githooks/commit-msg "$HOOKS_DIR/"
+chmod +x "$HOOKS_DIR/pre-commit" "$HOOKS_DIR/commit-msg"
 ```
+
+Installing once, from the main checkout or any worktree, covers all worktrees of the repository.
 
 ## Hook Workflow
 
@@ -100,5 +103,5 @@ Each developer must explicitly install the hooks by running the installation scr
 To remove the hooks:
 
 ```bash
-rm .git/hooks/commit-msg
+rm "$(git rev-parse --git-common-dir)/hooks/pre-commit" "$(git rev-parse --git-common-dir)/hooks/commit-msg"
 ```

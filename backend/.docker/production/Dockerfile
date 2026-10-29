@@ -2,7 +2,7 @@
 # STAGE 1: CORE RUNTIME BASE (php_base)
 # Contains minimal system packages and compiled PHP extensions needed for R-U-N-T-I-M-E
 # ===============================================
-FROM php:8.4-fpm-alpine3.23@sha256:b2a757dc9d3c05a6a97c05cacd26b981b6225e65cc78da6ccb2ea0a8b4b6196b AS php_base
+FROM php:8.4.27-fpm-alpine3.23@sha256:4bfe4f49843bd9f250d6d38b56f0b1806c88143f7cf109c02fc14aba7de13c18 AS php_base
 
 # Install minimal runtime system dependencies.
 #
@@ -20,20 +20,32 @@ RUN apk update && \
     icu \
     icu-data-full \
     postgresql18-client \
+    libpng \
+    libjpeg-turbo \
+    libwebp \
     su-exec && \
     rm -rf /var/cache/apk/*
 
 # Install required PHP extensions and immediately clean up the *-dev packages
+#
+# gd (with JPEG and WebP) re-encodes images uploaded to exam reconstructions: resize, strip
+# metadata. exif reads a photo's orientation first. Their runtime libraries are installed above.
 RUN apk add --no-cache --virtual .build-deps \
     postgresql-dev \
     libzip-dev \
     icu-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    libwebp-dev \
+    && docker-php-ext-configure gd --with-jpeg --with-webp \
     && docker-php-ext-install \
     pdo \
     pdo_pgsql \
     zip \
     intl \
     opcache \
+    gd \
+    exif \
     # Remove the build dependencies to keep the image lean
     && apk del .build-deps \
     && rm -rf /var/cache/apk/*

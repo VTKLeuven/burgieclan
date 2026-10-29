@@ -1,5 +1,6 @@
 'use client'
 
+import RichTextView from "@/components/editor/RichTextView";
 import VoteButton from "@/components/ui/buttons/VoteButton";
 
 interface DocumentCommentProps {
@@ -12,7 +13,7 @@ interface DocumentCommentProps {
  * Component for displaying a document comment
  * @param id  The id of the comment
  * @param author  The author of the comment
- * @param content  The content of the comment
+ * @param content  The content of the comment, HTML from the editor
  * @constructor
  */
 export default function DocumentComment({ id, author, content }: DocumentCommentProps) {
@@ -23,7 +24,7 @@ export default function DocumentComment({ id, author, content }: DocumentComment
                 <p className="font-bold">{author}</p>
                 <VoteButton type='document_comment' objectId={id} className="py-1" />
             </div>
-            <p className="text-sm" dangerouslySetInnerHTML={{ __html: content }} />
+            <RichTextView html={content} className="text-sm" />
         </div>
     );
 }

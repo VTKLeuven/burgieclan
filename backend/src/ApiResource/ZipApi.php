@@ -8,6 +8,7 @@ use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\RequestBody;
 use ApiPlatform\OpenApi\Model\Response;
 use App\Controller\Api\DownloadZipController;
+use App\Service\DocumentFileUrlGenerator;
 use ArrayObject;
 
 #[ApiResource(
@@ -19,13 +20,16 @@ use ArrayObject;
             openapi: new Operation(
                 responses: [
                     '200' => new Response(
-                        description: 'Download zip file',
+                        description: 'A link, valid for ' . DocumentFileUrlGenerator::TTL_MINUTES
+                            . ' minutes, to download the zip from',
                         content: new ArrayObject(
                             [
-                                'application/zip' => [
+                                'application/json' => [
                                     'schema' => [
-                                        'type' => 'string',
-                                        'format' => 'binary',
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'url' => ['type' => 'string', 'format' => 'uri'],
+                                        ],
                                     ],
                                 ],
                             ],

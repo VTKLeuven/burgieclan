@@ -115,7 +115,7 @@ function AccountDocumentCard({ document, onDeleted }: { document: Document; onDe
 
             {expanded && isPdf && document.contentUrl && (
                 <div className="mt-3 pt-3 border-t border-vtk-line flex justify-center bg-vtk-paper-2 p-2 rounded-md">
-                    <PDFPages file={document.contentUrl} width={Math.min(containerWidth - 32, 800)} />
+                    <PDFPages documentId={document.id} width={Math.min(containerWidth - 32, 800)} />
                 </div>
             )}
         </div>

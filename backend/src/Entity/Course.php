@@ -109,9 +109,12 @@ class Course extends BaseEntity
     private Collection $courseComments;
 
     /**
+     * Symmetric, but mapped unidirectionally: Doctrine has no symmetric self-reference, so
+     * addIdenticalCourse() and removeIdenticalCourse() keep both directions as separate rows.
+     *
      * @var Collection<int, self>
      */
-    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: "identicalCourses")]
+    #[ORM\ManyToMany(targetEntity: self::class)]
     #[ORM\JoinTable(name: "course_identical_courses")]
     private Collection $identicalCourses;
 
@@ -356,7 +359,7 @@ class Course extends BaseEntity
     {
         if (!$this->identicalCourses->contains($course)) {
             $this->identicalCourses[] = $course;
-            $course->addIdenticalCourse($this); // Maintain bidirectional relationship
+            $course->addIdenticalCourse($this); // Mirror the relation on the other course
         }
 
         return $this;

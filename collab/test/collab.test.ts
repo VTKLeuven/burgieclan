@@ -7,7 +7,7 @@ import type { Server } from '@hocuspocus/server';
 import { SignJWT } from 'jose';
 import * as Y from 'yjs';
 import { createBackend, HEADER_SIGNATURE, HEADER_TIMESTAMP, signRequest } from '../src/backend.ts';
-import { createCollabServer, EDITOR_FIELD, type ConnectionContext } from '../src/server.ts';
+import { createCollabServer, EDITOR_FIELD, TOO_LARGE_MESSAGE, type ConnectionContext } from '../src/server.ts';
 import { TOKEN_AUDIENCE, TOKEN_ISSUER } from '../src/token.ts';
 
 /**
@@ -34,6 +34,7 @@ interface FakeBackend {
     stores: { name: string; contributors: string[] }[];
     requests: { method: string; path: string }[];
     failLoadsFor: Set<string>;
+    failStoresFor: Set<string>;
     close(): Promise<void>;
 }
 
@@ -51,6 +52,7 @@ async function startFakeBackend(): Promise<FakeBackend> {
     const stores: { name: string; contributors: string[] }[] = [];
     const requests: { method: string; path: string }[] = [];
     const failLoadsFor = new Set<string>();
+    const failStoresFor = new Set<string>();
 
     const server: HttpServer = createServer(async (request, response) => {
         const method = request.method ?? 'GET';
@@ -87,6 +89,10 @@ async function startFakeBackend(): Promise<FakeBackend> {
         }
 
         if (method === 'PUT') {
+            if (failStoresFor.has(name)) {
+                response.writeHead(500).end();
+                return;
+            }
             const payload = JSON.parse(body) as Omit<StoredDocument, 'state'> & { state: string };
             documents.set(name, { ...payload, state: Buffer.from(payload.state, 'base64') });
             stores.push({ name, contributors: payload.contributors });
@@ -106,6 +112,7 @@ async function startFakeBackend(): Promise<FakeBackend> {
         stores,
         requests,
         failLoadsFor,
+        failStoresFor,
         close: () => new Promise((resolve) => server.close(() => resolve())),
     };
 }
@@ -229,6 +236,8 @@ describe('collab server', () => {
             backend: createBackend({ baseUrl: backend.url, secret: SECRET, retryDelay: 10 }),
             log: { info: () => {}, warn: (message: string) => warnings.push(message), error: () => {} },
             now: () => Date.now() + clockOffset,
+            // Far above what the other tests write, easy to reach on purpose.
+            maxDocumentBytes: 20_000,
         });
         await server.listen();
         collabUrl = `ws://127.0.0.1:${server.address.port}`;
@@ -462,6 +471,14 @@ describe('collab server', () => {
         const reloaded = new Y.Doc();
         Y.applyUpdate(reloaded, backend.documents.get('closed-doc')!.state);
         assert.deepEqual(paragraphs(reloaded), ['old version']);
+
+        // When storing the restored document fails, Symfony is told (500) instead of getting 204.
+        backend.failStoresFor.add('closed-doc');
+        const failedRestore = await internalRequest('/internal/documents/closed-doc/restore', {
+            state: Buffer.from(Y.encodeStateAsUpdate(current)).toString('base64'),
+        });
+        assert.equal(failedRestore.status, 500);
+        backend.failStoresFor.delete('closed-doc');
     });
 
     it('refuses internal requests that are unsigned, malformed or unknown', async () => {
@@ -472,11 +489,13 @@ describe('collab server', () => {
         assert.equal(forged.status, 401);
 
         assert.equal((await internalRequest('/internal/documents/x/restore', { state: '' })).status, 400);
+        assert.equal((await internalRequest('/internal/documents/x/restore', { state: '!!!not-base64!!!' })).status, 400);
         assert.equal((await internalRequest('/internal/documents/x/restore', 'not json')).status, 400);
         // Not a Yjs update: fails before anything is touched.
         const garbage = Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f]).toString('base64');
         assert.equal((await internalRequest('/internal/documents/garbage-doc/restore', { state: garbage })).status, 500);
         assert.equal((await internalRequest('/internal/documents/Bad_Name/disconnect', '')).status, 404);
+        assert.equal((await internalRequest('/internal/documents/%E0%A4%A/disconnect', '')).status, 404);
         assert.equal((await internalRequest('/internal/documents/x/explode', '')).status, 404);
         assert.equal(backend.documents.has('garbage-doc'), false);
     });
@@ -519,5 +538,61 @@ describe('collab server', () => {
         assert.equal(client.provider.authorizedScope, 'readonly');
         await new Promise((resolve) => setTimeout(resolve, 200));
         assert.equal(JSON.stringify(backend.documents.get('until-doc')?.content).includes('after the lock'), false);
+    });
+
+    it('passes a notification from Symfony to everyone who has the document open, without loading others', async () => {
+        const client = await connect('notify-doc', await mintToken({ doc: 'notify-doc' }));
+        const received: string[] = [];
+        client.provider.on('stateless', ({ payload }: { payload: string }) => received.push(payload));
+
+        const message = { type: 'question-activity', uid: 'q1' };
+        const response = await internalRequest('/internal/documents/notify-doc/broadcast', message);
+        assert.equal(response.status, 204);
+        await waitFor(() => received.length === 1, 'the notification');
+        assert.deepEqual(JSON.parse(received[0] ?? ''), message);
+
+        // Nobody has this one open: nothing to tell, and nothing is loaded for it.
+        const idle = await internalRequest('/internal/documents/idle-doc/broadcast', message);
+        assert.equal(idle.status, 204);
+        assert.equal(backend.requests.some((request) => request.path.endsWith('/idle-doc')), false);
+
+        // Only a small JSON object, never content.
+        assert.equal((await internalRequest('/internal/documents/notify-doc/broadcast', [1, 2])).status, 400);
+        assert.equal((await internalRequest('/internal/documents/notify-doc/broadcast', { text: 'x'.repeat(5000) })).status, 400);
+        assert.equal((await internalRequest('/internal/documents/notify-doc/broadcast', message, 'wrong-secret-0123456789abcdef0123456789')).status, 401);
+        assert.equal(received.length, 1);
+    });
+
+    it('closes editing on a document that grew too large, says why, and reopens it once rolled back', async () => {
+        let tokens = 0;
+        const client = await connect('big-doc', async () => {
+            tokens++;
+            return mintToken({ doc: 'big-doc' });
+        });
+        const notices: string[] = [];
+        client.provider.on('stateless', ({ payload }: { payload: string }) => notices.push(payload));
+
+        addParagraph(client.doc, 'a normal question');
+        await waitFor(() => JSON.stringify(backend.documents.get('big-doc')?.content ?? {}).includes('a normal question'), 'the store');
+        const beforePaste = Buffer.from(backend.documents.get('big-doc')!.state);
+
+        addParagraph(client.doc, 'x'.repeat(30_000));
+        await waitFor(() => tokens === 2 && client.provider.isAuthenticated, 'the client to reconnect', 5000);
+        assert.equal(client.provider.authorizedScope, 'readonly');
+        await waitFor(() => notices.includes(TOO_LARGE_MESSAGE), 'the notice');
+        assert.ok(warnings.some((warning) => warning.includes('"big-doc" grew to')));
+
+        // Someone opening it now is read-only from the start.
+        const latecomer = await connect('big-doc', await mintToken({ doc: 'big-doc', sub: '2' }));
+        assert.equal(latecomer.provider.authorizedScope, 'readonly');
+
+        // A moderator rolls it back to before the paste: editing opens again for everyone.
+        const response = await internalRequest('/internal/documents/big-doc/restore', { state: beforePaste.toString('base64') });
+        assert.equal(response.status, 204);
+        await waitFor(
+            () => tokens === 3 && client.provider.isAuthenticated && client.provider.authorizedScope === 'read-write',
+            'editing to reopen',
+            5000,
+        );
     });
 });

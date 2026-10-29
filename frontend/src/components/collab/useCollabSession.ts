@@ -44,6 +44,49 @@ export interface CollabSessionState {
     synced: boolean;
     /** Names on everyone's cursor who has the document open, yourself included. */
     people: string[];
+    /**
+     * The document grew past what the collab server lets anyone edit (MAX_DOCUMENT_BYTES in
+     * collab/src/server.ts), so the connection is read-only until a moderator rolls it back.
+     */
+    tooLarge: boolean;
+    /**
+     * Comments and confirmations on questions, as announced by Symfony (ExamQuestionActivity):
+     * null until the first announcement.
+     */
+    activity: QuestionActivity | null;
+}
+
+export interface QuestionActivity {
+    /** Grows with every announcement, so the same question twice in a row still reads as new. */
+    seq: number;
+    /** Per question uid, how many announcements it had: a thread reloads when its own count moves. */
+    byQuestion: Record<string, number>;
+}
+
+type Notice = { type: 'too-large' } | { type: 'question-activity'; uid: string };
+
+/**
+ * Stateless messages from the collab server: TOO_LARGE_MESSAGE in collab/src/server.ts, and the
+ * question-activity messages Symfony sends through it. Anything else is ignored.
+ */
+function parseNotice(payload: string): Notice | null {
+    let message: unknown;
+    try {
+        message = JSON.parse(payload);
+    } catch {
+        return null;
+    }
+    if (typeof message !== 'object' || message === null || !('type' in message)) {
+        return null;
+    }
+    if (message.type === 'too-large') {
+        return { type: 'too-large' };
+    }
+    if (message.type === 'question-activity' && 'uid' in message && typeof message.uid === 'string') {
+        return { type: 'question-activity', uid: message.uid };
+    }
+
+    return null;
 }
 
 function collabUrl(): string {
@@ -80,10 +123,13 @@ export function useCollabSession(documentName: string): CollabSessionState {
     const [readOnly, setReadOnly] = useState(false);
     const [synced, setSynced] = useState(false);
     const [people, setPeople] = useState<string[]>([]);
+    const [tooLarge, setTooLarge] = useState(false);
+    const [activity, setActivity] = useState<QuestionActivity | null>(null);
 
     useEffect(() => {
         const doc = new Y.Doc();
-        let refused: ConnectionStatus | null = null;
+        let refused: 'denied' | 'unavailable' | null = null;
+        let transientFailure = false;
 
         const provider = new HocuspocusProvider({
             url: collabUrl(),
@@ -91,13 +137,36 @@ export function useCollabSession(documentName: string): CollabSessionState {
             document: doc,
             // A function, so every reconnect asks Symfony for a fresh token.
             token: async () => {
-                const result = await getCollabToken(documentName);
+                let result: Awaited<ReturnType<typeof getCollabToken>>;
+                try {
+                    result = await getCollabToken(documentName);
+                } catch {
+                    transientFailure = true;
+                    refused = null;
+                    setStatus('disconnected');
+                    provider.configuration.websocketProvider.webSocket?.close();
+                    throw new Error('Transient token error');
+                }
                 if ('error' in result) {
-                    refused = result.error.status === 503 ? 'unavailable' : 'denied';
+                    const { status } = result.error;
+                    if (status === 503) {
+                        refused = 'unavailable';
+                    } else if (status === 401 || status === 403 || status === 404) {
+                        refused = 'denied';
+                    } else {
+                        transientFailure = true;
+                        refused = null;
+                        setStatus('disconnected');
+                        provider.configuration.websocketProvider.webSocket?.close();
+                        throw new Error('Transient token error');
+                    }
+                    transientFailure = false;
                     setStatus(refused);
+                    provider.disconnect();
                     // An empty token makes the collab server refuse the connection.
                     return '';
                 }
+                transientFailure = false;
                 refused = null;
                 return result.token;
             },
@@ -109,8 +178,28 @@ export function useCollabSession(documentName: string): CollabSessionState {
             onAuthenticated: ({ scope }) => {
                 setReadOnly(scope === 'readonly');
                 setStatus('connected');
+                // Sent again right after this when it still applies.
+                setTooLarge(false);
             },
-            onAuthenticationFailed: () => setStatus(refused ?? 'denied'),
+            onStateless: ({ payload }) => {
+                const notice = parseNotice(payload);
+                if (notice?.type === 'too-large') {
+                    setTooLarge(true);
+                } else if (notice?.type === 'question-activity') {
+                    setActivity((previous) => ({
+                        seq: (previous?.seq ?? 0) + 1,
+                        byQuestion: { ...previous?.byQuestion, [notice.uid]: (previous?.byQuestion[notice.uid] ?? 0) + 1 },
+                    }));
+                }
+            },
+            onAuthenticationFailed: () => {
+                if (transientFailure) {
+                    setStatus('disconnected');
+                    return;
+                }
+                setStatus(refused ?? 'denied');
+                provider.disconnect();
+            },
             onSynced: () => setSynced(true),
             onAwarenessChange: ({ states }) => setPeople(namesOf(states)),
         });
@@ -124,9 +213,14 @@ export function useCollabSession(documentName: string): CollabSessionState {
             provider.destroy();
             doc.destroy();
             setSession(null);
+            setStatus('connecting');
+            setReadOnly(false);
             setSynced(false);
+            setPeople([]);
+            setTooLarge(false);
+            setActivity(null);
         };
     }, [documentName]);
 
-    return { session, status, readOnly, synced, people };
+    return { session, status, readOnly, synced, people, tooLarge, activity };
 }

@@ -2,12 +2,19 @@ import FoldableSection from "@/components/common/FoldableSection";
 import {
     CourseSearchResult,
     DocumentSearchResult,
+    ExamQuestionSearchResult,
     ModuleSearchResult,
     ProgramSearchResult
 } from "@/components/search/SearchResult";
 import { useApi } from '@/hooks/useApi';
-import type { Course, Document, Module, Program } from '@/types/entities';
-import { convertToCourse, convertToDocument, convertToModule, convertToProgram } from '@/utils/convertToEntity';
+import type { Course, Document, ExamQuestionSearchHit, Module, Program } from '@/types/entities';
+import {
+    convertToCourse,
+    convertToDocument,
+    convertToExamQuestionSearchHit,
+    convertToModule,
+    convertToProgram,
+} from '@/utils/convertToEntity';
 import { Combobox, ComboboxInput, ComboboxOptions, Dialog, DialogBackdrop, DialogPanel, } from '@headlessui/react';
 import { Frown, Globe, Search as SearchIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -24,20 +31,23 @@ type SearchResults = {
     modules: Module[];
     programs: Program[];
     documents: Document[];
+    examQuestions: ExamQuestionSearchHit[];
 };
+
+const NO_RESULTS: SearchResults = { courses: [], modules: [], programs: [], documents: [], examQuestions: [] };
 
 type SearchApiResponse = Partial<Record<keyof SearchResults, unknown[]>>;
 
 export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
     const [query, setQuery] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState('');
-    const [items, setItems] = useState<SearchResults>({ courses: [], modules: [], programs: [], documents: [] });
+    const [items, setItems] = useState<SearchResults>(NO_RESULTS);
     const { error, loading, isRedirecting, request } = useApi<SearchApiResponse | null>();
     const { t } = useTranslation();
     const router = useRouter();
 
     function convertToObjects(obj: SearchApiResponse): SearchResults {
-        const items: SearchResults = { courses: [], modules: [], programs: [], documents: [] };
+        const items: SearchResults = { courses: [], modules: [], programs: [], documents: [], examQuestions: [] };
         obj['courses']?.forEach((course) => {
             items.courses.push(convertToCourse(course));
         });
@@ -49,6 +59,9 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
         });
         obj['documents']?.forEach((document) => {
             items.documents.push(convertToDocument(document));
+        });
+        obj['examQuestions']?.forEach((hit) => {
+            items.examQuestions.push(convertToExamQuestionSearchHit(hit));
         });
         return items;
     }
@@ -68,13 +81,13 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
     useEffect(() => {
         const fetchData = async () => {
             if (debouncedQuery.length <= 2) {
-                setItems({ courses: [], modules: [], programs: [], documents: [] });
+                setItems(NO_RESULTS);
                 return;
             }
 
             const result = await request('GET', `/api/search?searchText=${encodeURIComponent(debouncedQuery)}`);
             if (!result) {
-                setItems({ courses: [], modules: [], programs: [], documents: [] });
+                setItems(NO_RESULTS);
                 return;
             }
 
@@ -224,6 +237,19 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                                     >
                                                         {items.documents.map((document) => (
                                                             <DocumentSearchResult key={document.id} document={document} />
+                                                        ))}
+                                                    </ul>
+                                                </li>
+                                            </FoldableSection>
+                                        }
+                                        {items.examQuestions.length > 0 &&
+                                            <FoldableSection key={'examQuestions'} title={t('search.exam_questions')} defaultOpen={true}>
+                                                <li className="list-none">
+                                                    <ul
+                                                        className="mt-2 text-sm text-vtk-ink pl-0"
+                                                    >
+                                                        {items.examQuestions.map((hit) => (
+                                                            <ExamQuestionSearchResult key={`${hit.examId}-${hit.uid}`} hit={hit} />
                                                         ))}
                                                     </ul>
                                                 </li>

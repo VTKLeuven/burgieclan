@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState, type CSSProperties } from 'react';
+import { Suspense, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import { Menu, X } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,30 +10,20 @@ import { useUser } from '@/components/UserContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/components/header/LanguageSwitcher';
 import Link from 'next/link';
+import Image from 'next/image';
 import { recordOldBurgieclanClick } from '@/actions/analytics';
+import FeedbackDialog from '@/components/header/FeedbackDialog';
 
 interface NavigationItem {
     name: string;
     href: string;
     external?: boolean;
     onClick?: () => void;
+    /** A button that opens a dialog instead of a link to `href`. */
+    dialog?: boolean;
 }
 
-const vtkLogoMaskStyle: CSSProperties = {
-    backgroundColor: '#c8c9cd',
-    maskImage: "url('/images/logos/vtk-logo-white.png')",
-    maskPosition: 'left center',
-    maskRepeat: 'no-repeat',
-    maskSize: 'contain',
-    WebkitMaskImage: "url('/images/logos/vtk-logo-white.png')",
-    WebkitMaskPosition: 'left center',
-    WebkitMaskRepeat: 'no-repeat',
-    WebkitMaskSize: 'contain',
-};
 
-const HeaderLogo = ({ className }: { className: string }) => (
-    <span aria-hidden="true" className={className} style={vtkLogoMaskStyle} />
-);
 
 /**
  * Sticky navy header with light navigation: the same dark bookend as the
@@ -42,6 +32,7 @@ const HeaderLogo = ({ className }: { className: string }) => (
  */
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [feedbackOpen, setFeedbackOpen] = useState(false);
 
     const { t, i18n } = useTranslation();
 
@@ -58,9 +49,12 @@ export default function Header() {
             onClick: () => { void recordOldBurgieclanClick(); },
         },
         {
+            // Dopl's feedback form, opened in FeedbackDialog rather than a new
+            // tab; the dialog carries its own "open in a new tab" link.
             name: t('header.new_burgieclan_feedback'),
-            href: 'https://docs.google.com/forms/d/e/1FAIpQLSdv8uIPyN9IMpCLNOzSKoiCbTqrdefb9uw-AfGtr0HjEG4REA/viewform?usp=publish-editor',
-            external: true,
+            href: 'https://dopl.vtk.be/f/burgieclan-burgieclan-feedback',
+            dialog: true,
+            onClick: () => setFeedbackOpen(true),
         },
         //{ name: t('overview'), href: '#' },
     ];
@@ -72,12 +66,25 @@ export default function Header() {
                 className="flex min-h-[72px] w-full items-center gap-x-4 px-4 sm:px-6 md:gap-x-8"
             >
                 {/* Brand */}
-                <Link href={`/${i18n.language}`} className="flex shrink-0 items-center gap-4">
+                <Link href={`/${i18n.language}`} className="flex shrink-0 items-center gap-2.5">
                     <span className="sr-only">Burgieclan</span>
-                    <HeaderLogo className="block h-[34px] w-[60px] shrink-0" />
-                    {/* Optical nudge: flex centring aligns the full line box, which
-                        leaves the cap-height block sitting high against the mark. */}
-                    <span className="hidden translate-y-[2px] text-xl font-bold tracking-tight lg:inline">Burgieclan</span>
+                    <Image
+                        src="/images/logos/burgieclan-cloud-silver.svg"
+                        alt=""
+                        aria-hidden="true"
+                        width={61}
+                        height={34}
+                        className="block h-[34px] w-auto shrink-0"
+                        priority
+                    />
+                    <Image
+                        src="/images/logos/burgieclan-wordmark-silver.svg"
+                        alt="Burgieclan"
+                        width={138}
+                        height={18}
+                        className="hidden h-[18px] w-auto object-contain lg:block"
+                        priority
+                    />
                 </Link>
 
                 {/* Search */}
@@ -113,7 +120,16 @@ export default function Header() {
                 <div className="ml-auto hidden items-center gap-x-6 xl:flex">
                     <Suspense fallback={<Skeleton style={{ width: 100, height: 20 }} />}>
                         {isAuthenticated &&
-                            navigation.map((item) => (
+                            navigation.map((item) => item.dialog ? (
+                                <button
+                                    key={item.name}
+                                    type="button"
+                                    onClick={item.onClick}
+                                    className="whitespace-nowrap text-sm font-medium text-vtk-paper/80 transition-colors hover:text-white rounded-sm focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white"
+                                >
+                                    {item.name}
+                                </button>
+                            ) : (
                                 <Link
                                     key={item.name}
                                     href={item.href}
@@ -147,7 +163,23 @@ export default function Header() {
                     <div className="flex items-center justify-between">
                         <Link href={`/${i18n.language}`} className="flex shrink-0 items-center gap-2.5">
                             <span className="sr-only">Burgieclan</span>
-                            <HeaderLogo className="block h-[32px] w-[57px] shrink-0" />
+                            <Image
+                                src="/images/logos/burgieclan-cloud-silver.svg"
+                                alt=""
+                                aria-hidden="true"
+                                width={57}
+                                height={32}
+                                className="block h-[32px] w-auto shrink-0"
+                                priority
+                            />
+                            <Image
+                                src="/images/logos/burgieclan-wordmark-silver.svg"
+                                alt="Burgieclan"
+                                width={123}
+                                height={16}
+                                className="h-4 w-auto object-contain"
+                                priority
+                            />
                         </Link>
                         <button
                             type="button"
@@ -160,7 +192,19 @@ export default function Header() {
                     </div>
 
                     <div className="mt-8 flex flex-col">
-                        {navigation.map((item) => (
+                        {navigation.map((item) => item.dialog ? (
+                            <button
+                                key={item.name}
+                                type="button"
+                                onClick={() => {
+                                    setMobileMenuOpen(false);
+                                    item.onClick?.();
+                                }}
+                                className="rounded-xl px-3 py-2.5 text-left text-base font-medium text-vtk-paper/80 transition-colors hover:bg-white/10 hover:text-white"
+                            >
+                                {item.name}
+                            </button>
+                        ) : (
                             <Link
                                 key={item.name}
                                 href={item.href}
@@ -186,6 +230,8 @@ export default function Header() {
                     </div>
                 </div>
             </Dialog>
+
+            <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} user={user} />
         </header>
     );
 }

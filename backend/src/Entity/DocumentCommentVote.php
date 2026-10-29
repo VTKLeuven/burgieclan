@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DocumentCommentVoteRepository::class)]
 #[ORM\UniqueConstraint(name: 'unique_user_vote_per_document_comment', columns: ['creator_id', 'document_comment_id'])]
+// Node::$creator is shared by every content entity, so the back-reference is declared per subclass.
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(name: 'creator', inversedBy: 'documentCommentVotes')])]
 class DocumentCommentVote extends AbstractVote
 {
     #[ORM\ManyToOne(targetEntity: DocumentComment::class, inversedBy: 'votes')]

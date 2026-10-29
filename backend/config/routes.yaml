@@ -10,9 +10,5 @@ controllers:
         namespace: App\Controller
     type: attribute
 
-document_download:
-    path: /files/download/{filename}
-    controller: App\Controller\DownloadController
-
 api_auth_login:
     path: /api/auth/login

@@ -8,7 +8,7 @@
  * documents and across sessions.
  */
 
-import PDFPages, { type PDFFile } from '@/components/document/pdf/PDFPages';
+import PDFPages from '@/components/document/pdf/PDFPages';
 import PDFZoomBar from '@/components/document/pdf/PDFZoomBar';
 import {
     clampPdfZoom,
@@ -39,7 +39,7 @@ interface ScrollAnchor {
     stackHeight: number;
 }
 
-export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
+export default function PDFViewer({ documentId }: { documentId: number }): JSX.Element {
     const { preference, setFit, setZoom } = usePdfZoomPreference();
 
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -376,7 +376,7 @@ export default function PDFViewer({ file }: { file: PDFFile }): JSX.Element {
                     style={previewRatio !== 1 ? { zoom: previewRatio } : undefined}
                 >
                     <PDFPages
-                        file={file}
+                        documentId={documentId}
                         width={renderWidth}
                         pageAspect={pageAspect}
                         onDocumentLoad={onDocumentLoad}
