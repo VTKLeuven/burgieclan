@@ -1,5 +1,7 @@
 import ExamQuestionView from '@/components/exam/ExamQuestionView';
-import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
+import { isChangeOrigin } from '@tiptap/extension-collaboration';
+import { NodeRange, type Node as ProseMirrorNode } from '@tiptap/pm/model';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { mergeAttributes, Node, ReactNodeViewRenderer, type JSONContent } from '@tiptap/react';
 
 export const EXAM_QUESTION = 'examQuestion';
@@ -40,6 +42,20 @@ export function countQuestionsWithSitting(doc: ProseMirrorNode, sittingId: strin
 }
 
 const EMPTY_QUESTION: JSONContent = { type: EXAM_QUESTION, content: [{ type: 'paragraph' }] };
+
+/** A document nobody wrote in yet: the editor shows it as one empty paragraph. */
+function isEmptyDocument(doc: ProseMirrorNode): boolean {
+    const only = doc.childCount === 1 ? doc.firstChild : null;
+    return only !== null && only.type.name === 'paragraph' && only.content.size === 0;
+}
+
+function hasQuestion(doc: ProseMirrorNode): boolean {
+    let found = false;
+    doc.forEach((node) => {
+        found ||= node.type.name === EXAM_QUESTION;
+    });
+    return found;
+}
 
 /**
  * One question of an exam reconstruction: any block content (text, lists, math, code), the days
@@ -92,6 +108,31 @@ export const ExamQuestion = Node.create({
 
     addNodeView() {
         return ReactNodeViewRenderer(ExamQuestionView, { as: 'section', className: 'exam-question' });
+    },
+
+    addProseMirrorPlugins() {
+        const type = this.type;
+        return [
+            new Plugin({
+                key: new PluginKey('examFirstQuestion'),
+                /*
+                 * The first thing written into an empty reconstruction becomes question 1: left as
+                 * a loose block, it would count as no question, stay out of search, and take no
+                 * comments. It is converted as it is written, not when the page opens: everyone
+                 * opening a new exam at once would each add an empty question, which Yjs keeps
+                 * side by side. Edits from other people are theirs to convert.
+                 */
+                appendTransaction: (transactions, oldState, newState) => {
+                    const written = transactions.some((transaction) => transaction.docChanged && !isChangeOrigin(transaction));
+                    const { doc } = newState;
+                    if (!written || !isEmptyDocument(oldState.doc) || isEmptyDocument(doc) || hasQuestion(doc)) {
+                        return null;
+                    }
+
+                    return newState.tr.wrap(new NodeRange(doc.resolve(0), doc.resolve(doc.content.size), 0), [{ type }]);
+                },
+            }),
+        ];
     },
 
     addCommands() {
