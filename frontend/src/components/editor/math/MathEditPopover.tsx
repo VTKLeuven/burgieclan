@@ -9,6 +9,11 @@ import { useTranslation } from 'react-i18next';
 const WIDTH = 380;
 const MARGIN = 8;
 
+/** WIDTH, or less on a screen too narrow for it. */
+function popoverWidth(): number {
+    return Math.min(WIDTH, window.innerWidth - 2 * MARGIN);
+}
+
 /** Where to show the popover: just below the formula, or the cursor for a new one. */
 function anchorOf(editor: Editor, target: MathEditTarget): { top: number; left: number } | null {
     try {
@@ -21,7 +26,7 @@ function anchorOf(editor: Editor, target: MathEditTarget): { top: number; left: 
             })();
         return {
             top: rect.bottom + 6,
-            left: Math.min(Math.max(rect.left, MARGIN), window.innerWidth - WIDTH - MARGIN),
+            left: Math.max(Math.min(rect.left, window.innerWidth - popoverWidth() - MARGIN), MARGIN),
         };
     } catch {
         return null;
@@ -113,7 +118,7 @@ function Popover({ editor, target }: { editor: Editor; target: MathEditTarget })
             role="dialog"
             aria-label={t(target.mode === 'edit' ? 'editor.math.edit' : 'editor.math.insert')}
             className="fixed z-50 rounded-lg border border-vtk-line bg-vtk-surface p-3 shadow-lg"
-            style={{ top: anchor.top, left: anchor.left, width: WIDTH }}
+            style={{ top: anchor.top, left: anchor.left, width: WIDTH, maxWidth: `calc(100vw - ${2 * MARGIN}px)` }}
         >
             <div className="flex items-center justify-between">
                 <label className="block text-xs font-medium text-vtk-muted" htmlFor="math-edit-latex">

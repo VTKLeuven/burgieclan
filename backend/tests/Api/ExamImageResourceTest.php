@@ -269,4 +269,60 @@ class ExamImageResourceTest extends ApiTestCase
         $this->assertSame([$uploaded['uuid']], array_keys($links));
         $this->serve($links[$uploaded['uuid']]['url'])->assertStatus(200);
     }
+
+    public function testDeletingAnExamWithCopiesHandsItsImagesToTheOldestCopy(): void
+    {
+        $original = ExamFactory::createOne(['period' => ExamPeriod::JANUARY]);
+        $course = $original->getCourse();
+        $source = ExamFactory::createOne(
+            ['course' => $course, 'period' => ExamPeriod::JUNE, 'copiedFrom' => $original]
+        );
+        $uploaded = $this->upload($source, self::png(10, 10))->assertStatus(201)->json()->decoded();
+        $copy = ExamFactory::createOne(['course' => $course, 'period' => ExamPeriod::AUGUST, 'copiedFrom' => $source]);
+        $laterCopy = ExamFactory::createOne(
+            [
+            'course' => $course,
+            'academicYear' => '2099 - 2100',
+            'period' => ExamPeriod::JUNE,
+            'copiedFrom' => $source,
+            ]
+        );
+
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $entityManager->remove($entityManager->find(Exam::class, $source->getId()));
+        $entityManager->flush();
+        $entityManager->clear();
+
+        $storage = self::getContainer()->get('exam_images.storage');
+        $this->assertInstanceOf(FilesystemOperator::class, $storage);
+        $this->assertTrue($storage->fileExists($uploaded['uuid'] . '.png'));
+
+        $image = self::getContainer()->get(ExamImageRepository::class)->findOneByUuid($uploaded['uuid']);
+        $this->assertSame($copy->getId(), $image?->getExam()->getId());
+        // The oldest copy takes the deleted exam's place in the chain; the other one starts from it.
+        $copiedFrom = fn(Exam $exam): ?int
+            => $entityManager->find(Exam::class, $exam->getId())?->getCopiedFrom()?->getId();
+        $this->assertSame($original->getId(), $copiedFrom($copy));
+        $this->assertSame($copy->getId(), $copiedFrom($laterCopy));
+
+        foreach ([$copy, $laterCopy] as $exam) {
+            $links = $this->links($exam);
+            $this->assertSame([$uploaded['uuid']], array_keys($links));
+            $this->serve($links[$uploaded['uuid']]['url'])->assertStatus(200);
+        }
+    }
+
+    public function testDeletingAnExamWithoutCopiesDeletesItsImageFiles(): void
+    {
+        $exam = ExamFactory::createOne();
+        $uploaded = $this->upload($exam, self::png(10, 10))->assertStatus(201)->json()->decoded();
+
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $entityManager->remove($entityManager->find(Exam::class, $exam->getId()));
+        $entityManager->flush();
+
+        $storage = self::getContainer()->get('exam_images.storage');
+        $this->assertInstanceOf(FilesystemOperator::class, $storage);
+        $this->assertFalse($storage->fileExists($uploaded['uuid'] . '.png'));
+    }
 }

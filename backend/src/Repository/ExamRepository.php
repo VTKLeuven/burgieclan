@@ -34,4 +34,14 @@ class ExamRepository extends ServiceEntityRepository
 
         return null === $id ? null : $this->find($id);
     }
+
+    /**
+     * The reconstructions that started as a copy of this one, oldest first.
+     *
+     * @return Exam[]
+     */
+    public function findCopiesOf(Exam $exam): array
+    {
+        return $this->findBy(['copiedFrom' => $exam], ['id' => 'ASC']);
+    }
 }

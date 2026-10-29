@@ -20,6 +20,7 @@ import { Frown, Globe, Search as SearchIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { i18nConfig } from '../../../i18nConfig';
 
 type SearchPopupProps = {
     open: boolean;
@@ -37,6 +38,18 @@ type SearchResults = {
 const NO_RESULTS: SearchResults = { courses: [], modules: [], programs: [], documents: [], examQuestions: [] };
 
 type SearchApiResponse = Partial<Record<keyof SearchResults, unknown[]>>;
+
+const LOCALE_PREFIX = new RegExp(`^/(?:${i18nConfig.locales.join('|')})(?=/|$)`);
+
+/**
+ * Whether a result only moves within the page you are on, like a question of the exam you have
+ * open. Results link without a locale; the address bar may have one (`/en/...`).
+ */
+function isOnThisPage(redirect: string): boolean {
+    const target = new URL(redirect, window.location.href);
+    const current = window.location.pathname.replace(LOCALE_PREFIX, '') || '/';
+    return target.hash !== '' && target.pathname === current;
+}
 
 export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
     const [query, setQuery] = useState('');
@@ -122,7 +135,15 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                             if (param?.redirect) {
                                 setOpen(false);
                                 setQuery('');
-                                router.push(param.redirect);
+                                if (isOnThisPage(param.redirect)) {
+                                    // router.push would change only the hash, with pushState, which
+                                    // fires no hashchange: the exam page would neither scroll to
+                                    // the question nor highlight it. Do what an anchor does.
+                                    window.history.pushState(null, '', new URL(param.redirect, window.location.href).hash);
+                                    window.dispatchEvent(new HashChangeEvent('hashchange'));
+                                } else {
+                                    router.push(param.redirect);
+                                }
                             }
                         }}
                     >

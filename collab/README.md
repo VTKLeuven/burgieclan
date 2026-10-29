@@ -40,6 +40,10 @@ browser ── TipTap + Collaboration ── websocket ──▶ collab (this ap
      document changed, e.g. a comment on a question (`{"type": "question-activity", "uid": "…"}`).
      It goes out as a stateless message to everyone who has the document open, and is dropped
      when nobody does. A document is never loaded just for this.
+   - `POST /internal/documents/{name}/copy` with `{"state": "<base64>"}`: a reconstruction starts as
+     a copy of an earlier exam. This server builds the new document from that state, keeping the
+     questions but not the days, and answers with its state and JSON copy for Symfony to store.
+     Nothing is loaded or kept here: nobody has the new document open yet.
 
    A token can also say when its document locks (`until`): a connection opened before that stops
    editing once it passes, and is sent away to fetch a read-only token.

@@ -2,7 +2,7 @@
 
 import { useExamEditor } from '@/components/exam/ExamContext';
 import ExamQuestionThread from '@/components/exam/ExamQuestionThread';
-import { NodeViewContent, NodeViewWrapper, type ReactNodeViewProps } from '@tiptap/react';
+import { NodeViewContent, NodeViewWrapper, useEditorState, type ReactNodeViewProps } from '@tiptap/react';
 import clsx from 'clsx';
 import { ArrowDown, ArrowUp, Check, GripVertical, MessageSquare, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -41,6 +41,22 @@ export default function ExamQuestionView({ node, editor, getPos, deleteNode }: R
             editor.commands.toggleExamQuestionSitting(pos, sittingId);
         }
     };
+
+    // Moving swaps with the block before or after, question or not, so only the document's own
+    // first and last block cannot move further. Read on every change: a question becomes the
+    // last one when the one below it is deleted, without itself changing.
+    const edges = useEditorState({
+        editor,
+        selector: ({ editor: current }) => {
+            const pos = position();
+            if (!editable || !current || pos === null) {
+                return { first: true, last: true };
+            }
+            const { doc } = current.state;
+            const index = doc.resolve(pos).index(0);
+            return { first: index === 0, last: index === doc.childCount - 1 };
+        },
+    });
 
     const move = (direction: -1 | 1) => {
         const pos = position();
@@ -126,10 +142,10 @@ export default function ExamQuestionView({ node, editor, getPos, deleteNode }: R
 
                     {editable && (
                         <div className="exam-question__actions">
-                            <button type="button" onClick={() => move(-1)} aria-label={t('exam.question.up')} title={t('exam.question.up')}>
+                            <button type="button" onClick={() => move(-1)} disabled={edges.first} aria-label={t('exam.question.up')} title={t('exam.question.up')}>
                                 <ArrowUp className="h-4 w-4" aria-hidden="true" />
                             </button>
-                            <button type="button" onClick={() => move(1)} aria-label={t('exam.question.down')} title={t('exam.question.down')}>
+                            <button type="button" onClick={() => move(1)} disabled={edges.last} aria-label={t('exam.question.down')} title={t('exam.question.down')}>
                                 <ArrowDown className="h-4 w-4" aria-hidden="true" />
                             </button>
                             <button type="button" onClick={() => deleteNode()} aria-label={t('exam.question.delete')} title={t('exam.question.delete')}>

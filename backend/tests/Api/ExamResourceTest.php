@@ -12,8 +12,12 @@ use App\Factory\ExamFactory;
 use App\Factory\UserFactory;
 use App\Repository\CollabDocumentRepository;
 use App\Repository\ExamRepository;
+use App\Service\Collab\CollabRequestSignature;
+use App\Service\Collab\CollabServerClient;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Zenstruck\Browser\KernelBrowser;
 
 class ExamResourceTest extends ApiTestCase
@@ -244,8 +248,70 @@ class ExamResourceTest extends ApiTestCase
             ->assertJsonMatches('editable', false);
     }
 
-    public function testStartingAsACopyOfAnotherExam(): void
+    public function testStartingAsACopyLeavesTheOtherExamsDaysBehind(): void
     {
+        $course = CourseFactory::createOne();
+        $january = ExamFactory::createOne(['course' => $course, 'academicYear' => self::lastYear()]);
+        $days = ['sittings' => [['id' => 'd1', 'label' => 'ma 20 jan']]];
+        $this->storeDocument($january->getDocumentName(), "yjs\x00state", self::QUESTIONS, $days);
+
+        // What the collab server builds: the same questions, no days on them or next to them.
+        $withoutDays = self::QUESTIONS;
+        $withoutDays['content'][0]['attrs'] = ['id' => 'q1'];
+        $withoutDays['content'][1]['attrs'] = ['id' => 'q2'];
+        $asked = [];
+        $browser = $this->browser();
+        $browser->client()->disableReboot();
+        $mock = new MockHttpClient(
+            function (string $method, string $url, array $options) use (&$asked, $withoutDays): MockResponse {
+                $asked[] = ['url' => $url, 'body' => json_decode((string) ($options['body'] ?? ''), true)];
+
+                return new MockResponse(
+                    (string) json_encode(
+                        [
+                            'state' => base64_encode('fresh state'),
+                            'content' => $withoutDays,
+                            'fields' => ['sittings' => []],
+                        ]
+                    )
+                );
+            }
+        );
+        $signature = self::getContainer()->get(CollabRequestSignature::class);
+        $collab = new CollabServerClient($mock, $signature, 'http://collab.test');
+        self::getContainer()->set(CollabServerClient::class, $collab);
+
+        $response = $this->startWith(
+            $browser,
+            [
+            'course' => '/api/courses/' . $course->getId(),
+            'academicYear' => self::lastYear(),
+            'period' => 'june',
+            'copiedFrom' => '/api/exams/' . $january->getId(),
+            ]
+        )
+            ->assertStatus(201)
+            ->assertJsonMatches('questionCount', 2)
+            ->json()
+            ->decoded();
+
+        $this->assertCount(1, $asked);
+        $copyUrl = 'http://collab.test/internal/documents/' . $response['documentName'] . '/copy';
+        $this->assertSame($copyUrl, $asked[0]['url']);
+        $this->assertSame(base64_encode("yjs\x00state"), $asked[0]['body']['state']);
+
+        $documents = self::getContainer()->get(CollabDocumentRepository::class);
+        $copy = $documents->findOneByName($response['documentName']);
+        $this->assertSame('fresh state', $copy?->getState());
+        $this->assertSame($withoutDays, $copy->getContent());
+        $this->assertSame(['sittings' => []], $copy->getFields());
+        // The exam it was copied from keeps its days.
+        $this->assertSame($days, $documents->findOneByName($january->getDocumentName())?->getFields());
+    }
+
+    public function testACopyIsExactWhenTheCollabServerCannotBuildIt(): void
+    {
+        // Nothing listens at COLLAB_INTERNAL_URL in tests (phpunit.xml.dist).
         $course = CourseFactory::createOne();
         $january = ExamFactory::createOne(['course' => $course, 'academicYear' => self::lastYear()]);
         $this->storeDocument($january->getDocumentName(), "yjs\x00state", self::QUESTIONS, ['sittings' => []]);

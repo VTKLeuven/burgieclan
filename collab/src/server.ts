@@ -89,6 +89,55 @@ function cloneValue(value: unknown): unknown {
     return value instanceof Y.AbstractType ? value.clone() : value;
 }
 
+/** Copies of the editor content of `document`, ready to insert into another one. */
+function clonedContent(document: Y.Doc): (Y.XmlElement | Y.XmlText)[] {
+    return document.getXmlFragment(EDITOR_FIELD).toArray()
+        // The editor never writes hooks; they could not be shown anyway.
+        .filter((node): node is Y.XmlElement | Y.XmlText => !(node instanceof Y.XmlHook))
+        .map((node) => node.clone());
+}
+
+/**
+ * The days an exam was given on: a JSON field, and the same name as an attribute on every
+ * question listing the days it came up on.
+ */
+const DAYS = 'sittings';
+
+/**
+ * A new document holding the content of `state`, for a reconstruction that starts as a copy of
+ * an earlier one. The questions come along, the days do not: a copy is always another exam
+ * period, so the days field stays empty and no question keeps its marks. Only this server can
+ * build it, since Symfony cannot edit Yjs state. Nobody has the copy open yet, so it is built
+ * apart from Hocuspocus and handed back for Symfony to store.
+ */
+export function freshCopy(state: Uint8Array): Y.Doc {
+    const source = new Y.Doc();
+    try {
+        Y.applyUpdate(source, state);
+
+        const copy = new Y.Doc();
+        copy.transact(() => {
+            const content = copy.getXmlFragment(EDITOR_FIELD);
+            content.insert(0, clonedContent(source));
+            for (const node of content.toArray()) {
+                if (node instanceof Y.XmlElement) {
+                    node.removeAttribute(DAYS);
+                }
+            }
+
+            for (const field of JSON_FIELDS) {
+                if (field !== DAYS) {
+                    copy.getArray(field).insert(0, source.getArray(field).toArray().map(cloneValue));
+                }
+            }
+        });
+
+        return copy;
+    } finally {
+        source.destroy();
+    }
+}
+
 /**
  * Makes a live document look like `state` again, as one normal edit, so everyone who has it open
  * sees the change and it is stored like any other.
@@ -114,10 +163,7 @@ export async function restoreDocument(
             await connection.transact((document) => {
                 const content = document.getXmlFragment(EDITOR_FIELD);
                 content.delete(0, content.length);
-                content.insert(0, snapshot.getXmlFragment(EDITOR_FIELD).toArray()
-                    // The editor never writes hooks; they could not be shown anyway.
-                    .filter((node): node is Y.XmlElement | Y.XmlText => !(node instanceof Y.XmlHook))
-                    .map((node) => node.clone()));
+                content.insert(0, clonedContent(snapshot));
 
                 for (const field of JSON_FIELDS) {
                     const items = document.getArray(field);
@@ -332,6 +378,14 @@ export function createCollabServer(options: CollabServerOptions): Server<Connect
                 restore: (documentName, state) => restoreDocument(instance, documentName, state, lastStoreError),
                 disconnect: async (documentName) => reconnectEveryone(instance, documentName),
                 broadcast: (documentName, message) => instance.documents.get(documentName)?.broadcastStateless(message),
+                copy: (state) => {
+                    const copy = freshCopy(state);
+                    try {
+                        return { state: Y.encodeStateAsUpdate(copy), ...jsonCopy(copy) };
+                    } finally {
+                        copy.destroy();
+                    }
+                },
             }, log);
 
             return handled ? Promise.reject() : undefined;

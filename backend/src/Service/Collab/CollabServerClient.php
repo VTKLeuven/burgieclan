@@ -9,7 +9,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * Asks the collab server to change a live document, for the few things Symfony itself starts:
  * rolling back to a revision, dropping connections after a lock, and telling everyone who has a
- * document open that something around it changed.
+ * document open that something around it changed. It also builds the new document when a
+ * reconstruction starts as a copy, since only it can edit Yjs state.
  *
  * Changes to a live document must go through the collab server so every connected browser gets
  * them as a normal edit (see collab/README.md). Requests are signed the same way as the ones the
@@ -70,9 +71,45 @@ class CollabServerClient
     }
 
     /**
+     * Builds a new document from `$state` for a reconstruction that starts as a copy of another
+     * one: the same questions, without that exam's days (collab/src/server.ts, freshCopy). The
+     * collab server keeps nothing of it; the caller stores what comes back.
+     *
+     * @return array{state: string, content: array<string, mixed>|null, fields: array<string, mixed>}
+     *
      * @throws CollabServerException
      */
-    private function post(string $path, string $body, int $timeout = 10): void
+    public function copy(string $documentName, string $state): array
+    {
+        $answer = json_decode(
+            $this->post(
+                sprintf('/internal/documents/%s/copy', rawurlencode($documentName)),
+                (string) json_encode(['state' => base64_encode($state)]),
+                5
+            ),
+            true
+        );
+
+        $copied = is_array($answer) && is_string($answer['state'] ?? null)
+            ? base64_decode($answer['state'], true)
+            : false;
+        if (false === $copied) {
+            throw new CollabServerException('The collab server did not answer with a document.');
+        }
+
+        return [
+            'state' => $copied,
+            'content' => is_array($answer['content'] ?? null) ? $answer['content'] : null,
+            'fields' => is_array($answer['fields'] ?? null) ? $answer['fields'] : [],
+        ];
+    }
+
+    /**
+     * Returns the body of the answer.
+     *
+     * @throws CollabServerException
+     */
+    private function post(string $path, string $body, int $timeout = 10): string
     {
         $timestamp = time();
         $headers = [
@@ -86,6 +123,7 @@ class CollabServerClient
         try {
             $response = $this->httpClient->request('POST', $url, $options);
             $status = $response->getStatusCode();
+            $content = $response->getContent(false);
         } catch (ExceptionInterface $exception) {
             throw new CollabServerException('The collab server could not be reached.', 0, $exception);
         }
@@ -93,5 +131,7 @@ class CollabServerClient
         if ($status < 200 || $status >= 300) {
             throw new CollabServerException(sprintf('The collab server answered HTTP %d.', $status));
         }
+
+        return $content;
     }
 }
