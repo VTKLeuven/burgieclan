@@ -9,6 +9,9 @@ import { HEADER_SIGNATURE, HEADER_TIMESTAMP, signRequest } from './backend.ts';
  *   POST /internal/documents/{name}/restore      {"state": "<base64 Yjs update>"}
  *   POST /internal/documents/{name}/disconnect
  *   POST /internal/documents/{name}/broadcast    {...}, any small JSON object
+ *   POST /internal/documents/{name}/copy         {"state": "<base64 Yjs update>"}
+ *        → 200 {"state": "<base64>", "content": {...}, "fields": {...}}: a new document {name}
+ *          built from that state without the exam days (freshCopy), for Symfony to store.
  *
  * Requests are signed exactly like the ones this server sends to Symfony (backend.ts), and
  * checked like Symfony checks those (CollabRequestSignature): same secret, same clock skew.
@@ -28,7 +31,7 @@ export const MAX_BODY_BYTES = 8 * 1024 * 1024;
 export const MAX_BROADCAST_BYTES = 4096;
 
 const DOCUMENT_NAME = /^[a-z0-9][a-z0-9-]{0,99}$/;
-const ROUTE = /^\/internal\/documents\/([^/]+)\/(restore|disconnect|broadcast)$/;
+const ROUTE = /^\/internal\/documents\/([^/]+)\/(restore|disconnect|broadcast|copy)$/;
 const BASE64_STATE = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 
 export interface InternalActions {
@@ -41,6 +44,8 @@ export interface InternalActions {
      * Does nothing when nobody does; never loads a document just for this.
      */
     broadcast(documentName: string, message: string): void;
+    /** Build a new document from `state`, for a reconstruction that starts as a copy. */
+    copy(state: Uint8Array): { state: Uint8Array; content: unknown; fields: Record<string, unknown> };
 }
 
 function hasFreshSignatureHeaders(headers: IncomingMessage['headers'], now = Date.now()): boolean {
@@ -187,7 +192,18 @@ export async function handleInternalRequest(
             return true;
         }
 
-        await actions.restore(documentName, new Uint8Array(Buffer.from(state, 'base64')));
+        const decoded = new Uint8Array(Buffer.from(state, 'base64'));
+        if (match[2] === 'copy') {
+            const copy = actions.copy(decoded);
+            response.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify({
+                state: Buffer.from(copy.state).toString('base64'),
+                content: copy.content,
+                fields: copy.fields,
+            }));
+            return true;
+        }
+
+        await actions.restore(documentName, decoded);
         reply(response, 204);
     } catch (error) {
         log.error(`Internal request ${path} failed:`, error);

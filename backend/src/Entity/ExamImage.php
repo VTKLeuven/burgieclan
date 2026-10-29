@@ -103,6 +103,14 @@ class ExamImage extends BaseEntity
         return $this->exam;
     }
 
+    /** Hands it to another exam, e.g. to a copy when the exam it was uploaded to is deleted. */
+    public function setExam(Exam $exam): static
+    {
+        $this->exam = $exam;
+
+        return $this;
+    }
+
     public function getUploader(): ?User
     {
         return $this->uploader;

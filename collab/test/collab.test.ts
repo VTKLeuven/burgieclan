@@ -481,6 +481,50 @@ describe('collab server', () => {
         backend.failStoresFor.delete('closed-doc');
     });
 
+    it('builds a copy of an exam for Symfony to store, without its days, and keeps none of it', async () => {
+        const source = new Y.Doc();
+        // y-prosemirror keeps attributes as JSON values, so the days marked on a question are an array.
+        const question = new Y.XmlElement<{ id: string; sittings: string[] }>('examQuestion');
+        question.setAttribute('id', 'q1');
+        question.setAttribute('sittings', ['d1']);
+        const paragraph = new Y.XmlElement('paragraph');
+        paragraph.insert(0, [new Y.XmlText('Bewijs de stelling van Rolle.')]);
+        question.insert(0, [paragraph]);
+        source.getXmlFragment(EDITOR_FIELD).push([question as unknown as Y.XmlElement]);
+        addParagraph(source, 'Deel 2: oefeningen');
+        const day = new Y.Map<string>();
+        day.set('id', 'd1');
+        day.set('label', 'ma 20 jan');
+        source.getArray('sittings').push([day]);
+
+        const response = await internalRequest('/internal/documents/copy-doc/copy', {
+            state: Buffer.from(Y.encodeStateAsUpdate(source)).toString('base64'),
+        });
+        assert.equal(response.status, 200);
+        const body = await response.json() as { state: string; content: unknown; fields: Record<string, unknown> };
+
+        const copy = new Y.Doc();
+        Y.applyUpdate(copy, Buffer.from(body.state, 'base64'));
+        const [copied] = copy.getXmlFragment(EDITOR_FIELD).toArray();
+        assert.ok(copied instanceof Y.XmlElement);
+        assert.equal(copied.nodeName, 'examQuestion');
+        assert.deepEqual(copied.getAttributes(), { id: 'q1' });
+        assert.deepEqual(paragraphs(copy).slice(1), ['Deel 2: oefeningen']);
+        assert.deepEqual(copy.getArray('sittings').toJSON(), []);
+
+        assert.deepEqual(body.fields, { sittings: [] });
+        assert.ok(JSON.stringify(body.content).includes('Bewijs de stelling van Rolle.'));
+        assert.ok(!JSON.stringify(body.content).includes('d1'));
+
+        // The copy is only built: nothing is loaded, kept or stored under its name.
+        assert.equal(server.hocuspocus.documents.has('copy-doc'), false);
+        assert.equal(backend.documents.has('copy-doc'), false);
+
+        const garbage = Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f]).toString('base64');
+        assert.equal((await internalRequest('/internal/documents/copy-doc/copy', { state: garbage })).status, 500);
+        assert.equal((await internalRequest('/internal/documents/copy-doc/copy', { state: '' })).status, 400);
+    });
+
     it('refuses internal requests that are unsigned, malformed or unknown', async () => {
         const unsigned = await fetch(`http://127.0.0.1:${server.address.port}/internal/documents/x/disconnect`, { method: 'POST' });
         assert.equal(unsigned.status, 401);

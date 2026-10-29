@@ -866,7 +866,7 @@
     }
 
     .exam-question__actions button {
-      @apply m-0 rounded-md p-1 text-vtk-muted hover:bg-vtk-paper-2 hover:text-vtk-ink;
+      @apply m-0 rounded-md p-1 text-vtk-muted hover:bg-vtk-paper-2 hover:text-vtk-ink disabled:pointer-events-none disabled:opacity-40;
     }
 
     .exam-question__body {
