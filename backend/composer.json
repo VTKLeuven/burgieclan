@@ -32,7 +32,7 @@
     "nelmio/cors-bundle": "^2.6",
     "nelmio/security-bundle": "^3.9",
     "phpdocumentor/reflection-docblock": "^6.0",
-    "phpstan/phpdoc-parser": "2.4.0",
+    "phpstan/phpdoc-parser": "2.4.1",
     "sentry/sentry-symfony": "5.15.0",
     "symfony/asset": "8.1",
     "symfony/console": "8.1.10",
