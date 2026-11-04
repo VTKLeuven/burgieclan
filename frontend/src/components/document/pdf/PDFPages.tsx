@@ -259,7 +259,7 @@ export default function PDFPages({ documentId, width, pageAspect = 1.414, onDocu
                 <div className="flex justify-center my-8">
                     <button
                         onClick={loadMorePages}
-                        className="white-button border border-vtk-ink hover:bg-vtk-ink hover:text-white"
+                        className="white-button border border-vtk-ink hover:bg-vtk-navy hover:text-white"
                     >
                         {t('document.load-more', { displayedPages, numPages })}
                     </button>

@@ -13,6 +13,8 @@ interface FavoriteButtonProps {
     className?: string;
     size?: number;
     colorScheme?: 'default' | 'gray';
+    /** Text after the star, for the labelled pill on the course page ("Favoriet"). */
+    label?: React.ReactNode;
 }
 
 const FavoriteButton: React.FC<FavoriteButtonProps> = ({
@@ -21,7 +23,8 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     onToggle: onToggleFavorite,
     className = '',
     size = 16,
-    colorScheme = 'default'
+    colorScheme = 'default',
+    label,
 }) => {
     const { t } = useTranslation();
     const { user } = useUser();
@@ -77,12 +80,16 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
         }
     };
 
-    // Determine colors based on the colorScheme
-    let baseClasses = "p-1 rounded-full";
+    // Determine colors based on the colorScheme. A labelled button takes its shape from the
+    // caller (the course page's white pill), so only the star keeps its colour.
+    let baseClasses = label ? "" : "p-1 rounded-full";
     let favoriteClasses = "";
     let fillColor = "";
 
-    if (colorScheme === 'gray') {
+    if (label) {
+        favoriteClasses = isFavorite ? "[&>svg]:text-vtk-yellow" : "[&>svg]:text-vtk-muted";
+        fillColor = isFavorite ? "fill-vtk-yellow" : "";
+    } else if (colorScheme === 'gray') {
         baseClasses += " hover:bg-vtk-paper-2";
         favoriteClasses = "text-vtk-muted hover:text-vtk-body";
         fillColor = isFavorite ? "fill-vtk-muted" : "";
@@ -94,7 +101,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
         fillColor = isFavorite ? "fill-vtk-yellow" : "";
     }
 
-    const label = isFavorite
+    const actionLabel = isFavorite
         ? t('favorites.remove-favorite')
         : t('favorites.add-favorite');
 
@@ -103,16 +110,19 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
             type="button"
             onClick={handleToggleFavorite}
             disabled={!user}
-            aria-label={label}
+            // With a visible label that text names the toggle and aria-pressed says its state;
+            // the icon-only star needs the spelled-out action instead.
+            aria-label={label ? undefined : actionLabel}
             aria-pressed={isFavorite}
             className={`${baseClasses} ${favoriteClasses} ${className} focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy disabled:opacity-50`}
-            title={label}
+            title={actionLabel}
         >
             <Star
                 size={size}
                 className={fillColor}
                 aria-hidden="true"
             />
+            {label}
         </button>
     );
 };

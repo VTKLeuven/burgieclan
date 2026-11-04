@@ -3,7 +3,6 @@ import ErrorPage from '@/components/error/ErrorPage';
 import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import { Announcement as AnnouncementEntity } from '@/types/entities';
 import { convertToAnnouncement } from '@/utils/convertToEntity';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -22,7 +21,7 @@ const getAnnouncementEndpoint = (locale: string) => {
 };
 
 export default function AnnouncementSlideShow() {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const currentLocale = i18n.language;
     const endpoint = getAnnouncementEndpoint(currentLocale);
     const [announcements, setAnnouncements] = useState<AnnouncementEntity[]>(() => {
@@ -30,7 +29,6 @@ export default function AnnouncementSlideShow() {
         return preloaded?.['hydra:member']?.map(convertToAnnouncement) || [];
     });
     const { request, loading, error } = useApi<HydraCollection<unknown>>();
-    const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
         // State was initialized from this cache above. Avoid entering useApi's loading state at
@@ -42,7 +40,6 @@ export default function AnnouncementSlideShow() {
             // into state instead of retaining the previous locale/bucket.
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setAnnouncements(cached['hydra:member']?.map(convertToAnnouncement) || []);
-            setCurrentIndex(0);
             return;
         }
 
@@ -55,36 +52,10 @@ export default function AnnouncementSlideShow() {
 
             const fetchedAnnouncements = response['hydra:member']?.map(convertToAnnouncement) || [];
             setAnnouncements(fetchedAnnouncements);
-            setCurrentIndex(0);
         };
 
         fetchAnnouncements();
     }, [endpoint, request]);
-
-    useEffect(() => {
-        if (announcements.length <= 1) return;
-
-        const interval = setInterval(() => {
-            setCurrentIndex((prevIndex) => (prevIndex + 1) % announcements.length);
-        }, 10000);
-
-        return () => clearInterval(interval);
-    }, [announcements.length]);
-
-
-    const handleDotClick = (index: number) => {
-        setCurrentIndex(index);
-    };
-
-    const handlePrevious = () => {
-        setCurrentIndex((prevIndex) =>
-            prevIndex === 0 ? announcements.length - 1 : prevIndex - 1
-        );
-    };
-
-    const handleNext = () => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % announcements.length);
-    };
 
     // Show loading state
     if (loading) {
@@ -101,48 +72,20 @@ export default function AnnouncementSlideShow() {
         return;
     }
 
+    // "Nieuws" in the wireframes: every current notice as a row in one card, rather than one at a
+    // time on a timer, so nothing is missed by whoever only glances at the page.
     return (
-        <div className="mt-6">
-            <div className="vtk-panel vtk-panel-muted flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:px-5">
-                <div className="min-w-0 flex-1">
-                    <Announcement {...announcements[currentIndex]} />
-                </div>
-
-                {/* Navigation controls, only when there is more than one notice. */}
-                {announcements.length > 1 && (
-                    <div className="flex shrink-0 items-center justify-end gap-1.5">
-                        <button
-                            onClick={handlePrevious}
-                            className="grid h-7 w-7 place-items-center rounded-full border border-vtk-line-2 bg-vtk-surface text-vtk-body transition-colors hover:border-vtk-ink hover:text-vtk-ink"
-                            aria-label="Previous announcement"
-                        >
-                            <ChevronLeft className="h-3.5 w-3.5" />
-                        </button>
-
-                        <div className="flex gap-1.5 px-1">
-                            {announcements.map((_, index) => (
-                                <button
-                                    key={index}
-                                    className={`h-1.5 w-1.5 rounded-full transition-colors duration-200 ${index === currentIndex
-                                        ? 'bg-vtk-ink'
-                                        : 'bg-vtk-line-2 hover:bg-vtk-muted'
-                                        }`}
-                                    onClick={() => handleDotClick(index)}
-                                    aria-label={`Go to announcement ${index + 1}`}
-                                />
-                            ))}
-                        </div>
-
-                        <button
-                            onClick={handleNext}
-                            className="grid h-7 w-7 place-items-center rounded-full border border-vtk-line-2 bg-vtk-surface text-vtk-body transition-colors hover:border-vtk-ink hover:text-vtk-ink"
-                            aria-label="Next announcement"
-                        >
-                            <ChevronRight className="h-3.5 w-3.5" />
-                        </button>
-                    </div>
-                )}
-            </div>
-        </div>
+        <section className="min-w-0 lg:w-[38%] lg:shrink-0" aria-labelledby="home-news-heading">
+            <h2 id="home-news-heading" className="vtk-section-title mb-4 !text-vtk-body">
+                {t('home.news')}
+            </h2>
+            <ul className="vtk-panel m-0 grid list-none gap-1 p-2">
+                {announcements.map((announcement) => (
+                    <li key={announcement.id}>
+                        <Announcement {...announcement} />
+                    </li>
+                ))}
+            </ul>
+        </section>
     );
 }

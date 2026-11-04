@@ -125,7 +125,7 @@ export default function LoginForm() {
     return (
         // Single white panel on the cool paper ground, mirroring `.vtk-auth`.
         <div className="flex flex-1 items-center justify-center bg-vtk-paper px-5 py-12 sm:px-9 sm:py-20">
-            <div className="w-full max-w-[430px] rounded-[18px] border border-vtk-line bg-vtk-surface p-7 shadow-[0_18px_50px_rgba(10,15,31,0.06)] sm:p-10">
+            <div className="w-full max-w-[430px] rounded-lg border border-vtk-line bg-vtk-surface p-7 shadow-[0_18px_50px_rgba(10,15,31,0.06)] sm:p-10">
                 <Link href="/" className="inline-block">
                     <span className="sr-only">Burgieclan</span>
                     <Logo width={56} height={56} />

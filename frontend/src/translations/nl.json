@@ -274,7 +274,8 @@
     },
     "favorites": {
         "add-favorite": "Voeg toe aan favorieten",
-        "remove-favorite": "Verwijder uit favorieten"
+        "remove-favorite": "Verwijder uit favorieten",
+        "label": "Favoriet"
     },
     "curriculum-navigator": {
         "search-placeholder": "Zoeken naar vakken, modules, richtingen...",
@@ -316,7 +317,13 @@
         "meta-modules_one": "onderdeel",
         "meta-modules_other": "onderdelen",
         "meta-courses_one": "vak",
-        "meta-courses_other": "vakken"
+        "meta-courses_other": "vakken",
+        "more-info": "Meer info",
+        "legend": {
+            "title": "Legende",
+            "first-semester": "Eerste semester",
+            "second-semester": "Tweede semester"
+        }
     },
     "account": {
         "menu": "Gebruikersmenu",
@@ -457,7 +464,8 @@
         "go_to_vtk": "Ga naar VTK",
         "user_avatar": "Gebruikersavatar",
         "in_this_folder": "In deze map",
-        "no_documents_in_folder": "Geen documenten in deze map"
+        "no_documents_in_folder": "Geen documenten in deze map",
+        "show_more": "Toon meer"
     },
     "editor": {
         "info_dialog": {

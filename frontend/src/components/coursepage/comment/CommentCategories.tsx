@@ -109,8 +109,8 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
 
     return (
         <div>
-            <div className="border-b border-vtk-line pb-3.5">
-                <h2 className="m-0 text-xl font-semibold tracking-tight text-vtk-ink">
+            <div>
+                <h2 className="vtk-section-title">
                     {t('course-page.comments.title')}
                 </h2>
                 <p className="m-0 mt-1.5 max-w-[70ch] text-sm leading-relaxed text-vtk-muted">

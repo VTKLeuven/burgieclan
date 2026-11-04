@@ -10,7 +10,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUser } from "@/components/UserContext";
-import { CircleUserRound, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
+import UserAvatar from '@/components/ui/UserAvatar';
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
@@ -36,10 +37,10 @@ export default function HeaderProfileButton() {
     return (
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
             <DropdownMenuTrigger
-                className="grid h-[38px] w-[38px] place-items-center rounded-full border border-vtk-paper/35 bg-white/12 text-vtk-paper transition hover:border-vtk-paper hover:bg-white/22 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-hidden"
+                className="rounded-full transition-opacity hover:opacity-85 focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-2 focus-visible:outline-hidden"
                 aria-label={t('account.menu', { defaultValue: 'User menu' })}
             >
-                <CircleUserRound size={20} strokeWidth={1.75} aria-hidden="true" />
+                <UserAvatar name={user?.fullName ?? user?.username} size={36} />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <DropdownMenuLabel className="pt-1.5 pb-1">{user?.fullName}</DropdownMenuLabel>

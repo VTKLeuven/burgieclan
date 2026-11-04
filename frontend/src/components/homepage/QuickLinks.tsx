@@ -2,7 +2,7 @@ import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { QuickLink } from '@/types/entities';
 import { MAX_QUICK_LINKS } from '@/utils/constants/homepage';
 import { convertToQuickLink } from '@/utils/convertToEntity';
-import { ChevronRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -44,29 +44,26 @@ export function QuickLinks() {
         return null;
     }
 
+    // Blue links with a small arrow, as the wireframes' "Snel navigeren naar" lists them. The
+    // section heading sits above the card on the home page.
     return (
-        <div>
-            <h2 className="m-0 mb-2 text-sm font-semibold tracking-tight text-vtk-ink">
-                {t('home.navigate_to')}
-            </h2>
-            <div className="grid grid-cols-1 gap-y-0.5">
-                {links.length > 0 ? (
-                    links.map((link) => (
-                        <Link
-                            key={link.id}
-                            href={link.linkTo}
-                            className="group -mx-1.5 flex items-center gap-1.5 rounded-md px-1.5 py-1 text-xs text-vtk-body transition-colors hover:bg-vtk-paper-2 hover:text-vtk-ink"
-                        >
-                            <ChevronRight className="h-3.5 w-3.5 shrink-0 text-vtk-muted transition-transform group-hover:translate-x-0.5 group-hover:text-vtk-ink" />
-                            <span className="truncate">{link.name ?? link.linkTo}</span>
-                        </Link>
-                    ))
-                ) : (
-                    <div className="vtk-empty py-2 text-xs">
-                        {t('home.no_quick_links')}
-                    </div>
-                )}
-            </div>
+        <div className="grid content-start gap-y-2.5">
+            {links.length > 0 ? (
+                links.map((link) => (
+                    <Link
+                        key={link.id}
+                        href={link.linkTo}
+                        className="group inline-flex items-center gap-2 text-sm text-vtk-link transition-colors hover:underline hover:underline-offset-2"
+                    >
+                        <span className="truncate">{link.name ?? link.linkTo}</span>
+                        <ArrowUpRight className="h-4 w-4 shrink-0 text-vtk-ink transition-transform group-hover:-translate-y-px group-hover:translate-x-px" aria-hidden="true" />
+                    </Link>
+                ))
+            ) : (
+                <div className="vtk-empty py-2 text-xs">
+                    {t('home.no_quick_links')}
+                </div>
+            )}
         </div>
     );
 }

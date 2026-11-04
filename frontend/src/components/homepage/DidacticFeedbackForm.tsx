@@ -77,15 +77,15 @@ export function DidacticFeedbackForm() {
     }
 
     return (
-        <div className="vtk-panel vtk-panel-muted px-4 py-3.5">
-            <div className="flex items-center gap-2">
-                <MessageSquarePlus className="h-4 w-4 text-vtk-ink shrink-0" aria-hidden="true" />
-                <h2 className="text-sm font-semibold text-vtk-ink">{t('home.feedback_title')}</h2>
+        <div className="vtk-panel px-5 py-5">
+            <div className="flex items-center gap-2.5">
+                <MessageSquarePlus className="h-5 w-5 text-vtk-ink shrink-0" aria-hidden="true" />
+                <h2 className="vtk-card-title">{t('home.feedback_title')}</h2>
             </div>
-            <p className="mt-1 text-xs leading-relaxed text-vtk-muted">{t('home.feedback_description')}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-vtk-body">{t('home.feedback_description')}</p>
 
-            <form onSubmit={handleSubmit} className="mt-2.5">
-                <div className="mb-2">
+            <form onSubmit={handleSubmit} className="mt-4">
+                <div className="mb-3">
                     <label htmlFor="feedback-type" className="sr-only">
                         {t('home.feedback_type_label')}
                     </label>
@@ -94,7 +94,7 @@ export function DidacticFeedbackForm() {
                         value={type}
                         onChange={(e) => setType(e.target.value as FeedbackType)}
                         disabled={isSubmitting}
-                        className="vtk-input text-xs py-1 px-2 bg-vtk-surface text-vtk-ink border border-vtk-line"
+                        className="vtk-select text-sm"
                     >
                         <option value="course_issue">{t('home.feedback_type_course_issue')}</option>
                         <option value="exam_feedback">{t('home.feedback_type_exam')}</option>
@@ -111,17 +111,17 @@ export function DidacticFeedbackForm() {
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                     placeholder={t('home.feedback_placeholder')}
-                    className="vtk-textarea min-h-16 text-xs p-2"
+                    className="vtk-textarea min-h-20 text-sm"
                     rows={2.5}
                     maxLength={MAX_LENGTH}
                     required
                     disabled={isSubmitting}
                 />
 
-                <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
                     <a
                         href={mailtoHref}
-                        className="inline-flex items-center gap-1 text-[11px] text-vtk-muted underline-offset-2 transition-colors hover:text-vtk-ink hover:underline"
+                        className="inline-flex items-center gap-1 text-xs text-vtk-link underline-offset-2 hover:underline"
                     >
                         <Mail className="h-3 w-3" aria-hidden="true" />
                         {t('home.feedback_mail')}
@@ -131,7 +131,7 @@ export function DidacticFeedbackForm() {
                         {showLengthHint && (
                             <p className="text-[11px] text-vtk-muted">{t('faq.ask_hint')}</p>
                         )}
-                        <button type="submit" disabled={!canSubmit} className="vtk-button vtk-button-sm vtk-button-accent">
+                        <button type="submit" disabled={!canSubmit} className="vtk-button vtk-button-sm vtk-button-primary">
                             {isSubmitting ? (
                                 <>
                                     <span className="spinner" />

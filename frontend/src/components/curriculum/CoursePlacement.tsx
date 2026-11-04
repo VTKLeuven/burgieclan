@@ -38,7 +38,7 @@ export default function CoursePlacement() {
             </button>
 
             {open && (
-                <div className="absolute left-0 top-full z-20 mt-2 w-max max-w-[min(32rem,80vw)] overflow-hidden rounded-[14px] border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
+                <div className="absolute left-0 top-full z-20 mt-2 w-max max-w-[min(32rem,80vw)] overflow-hidden rounded-lg border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
                     {paths.map((path) => {
                         const leaf = path.modules.at(-1);
                         const isActive = path === activePath;

@@ -44,7 +44,7 @@ export default function Pagination({ totalAmount, currentPage, itemsPerPage, onP
                             onClick={() => onPageChange(index + 1)}
                             aria-current={currentPage === index + 1 ? 'page' : undefined}
                             className={`h-8 min-w-8 rounded-full px-2.5 text-sm font-semibold transition-colors ${currentPage === index + 1
-                                ? 'bg-vtk-ink text-vtk-paper'
+                                ? 'bg-vtk-navy text-vtk-paper'
                                 : 'text-vtk-body hover:bg-vtk-paper-2 hover:text-vtk-ink'
                                 }`}
                         >

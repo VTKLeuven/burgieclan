@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 import { Slot } from "@radix-ui/react-slot"
-import { ChevronRight, MoreHorizontal } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
 import React from "react"
 
 const Breadcrumb = React.forwardRef<
@@ -18,7 +18,7 @@ const BreadcrumbList = React.forwardRef<
   <ol
     ref={ref}
     className={cn(
-      "flex flex-wrap pl-0 list-none items-center wrap-break-word text-sm text-vtk-muted dark:text-neutral-400",
+      "m-0 flex flex-wrap gap-x-2 gap-y-1 pl-0 list-none items-center wrap-break-word text-[13px] text-vtk-muted dark:text-neutral-400",
       className
     )}
     {...props}
@@ -79,10 +79,10 @@ const BreadcrumbSeparator = ({
   <li
     role="presentation"
     aria-hidden="true"
-    className={cn("[&>svg]:w-3.5 [&>svg]:h-3.5", className)}
+    className={cn("text-vtk-line-2 [&>svg]:w-3.5 [&>svg]:h-3.5", className)}
     {...props}
   >
-    {children ?? <ChevronRight />}
+    {children ?? '/'}
   </li>
 )
 BreadcrumbSeparator.displayName = "BreadcrumbSeparator"

@@ -200,7 +200,7 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
     return (
         <div className="relative mt-2" ref={containerRef}>
             <div
-                className="flex min-h-[42px] w-full flex-wrap items-center gap-1 rounded-xl border border-vtk-line-2 bg-vtk-paper px-3 py-1.5 text-sm text-vtk-ink focus-within:border-vtk-ink focus-within:shadow-[0_0_0_3px_rgba(14,26,54,0.08)] cursor-text"
+                className="flex min-h-[42px] w-full flex-wrap items-center gap-1 rounded-lg border border-vtk-line-2 bg-vtk-paper px-3 py-1.5 text-sm text-vtk-ink focus-within:border-vtk-ink focus-within:shadow-[0_0_0_3px_rgba(14,26,54,0.08)] cursor-text"
                 onClick={handleContainerClick}
             >
                 {/* Display selected tags by ID */}
@@ -268,7 +268,7 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
 
             {/* Tag suggestions dropdown */}
             {showSuggestions && !tagsLoading && (filteredTags.length > 0 || tagInput.trim() !== '') && (
-                <ul className="absolute z-20 left-0 right-0 mt-1.5 max-h-60 overflow-y-auto rounded-[14px] border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)] py-1">
+                <ul className="absolute z-20 left-0 right-0 mt-1.5 max-h-60 overflow-y-auto rounded-lg border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)] py-1">
                     {/* Existing tag suggestions */}
                     {filteredTags.map((tag, index) => (
                         <li

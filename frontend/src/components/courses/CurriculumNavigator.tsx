@@ -2,19 +2,17 @@
 
 import Loading from '@/components/loading/LoadingPage';
 import CurriculumSearchBar, { SearchFilters } from '@/components/courses/CurriculumSearchBar';
+import CurriculumLinkRow from '@/components/curriculum/CurriculumLinkRow';
 import CurriculumSearchResults, { CourseHit } from '@/components/curriculum/CurriculumSearchResults';
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import DownloadButton from '@/components/ui/DownloadButton';
-import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
-import FavoriteButton from '@/components/ui/FavoriteButton';
 import PageHead from '@/components/ui/PageHead';
 import { useUser } from "@/components/UserContext";
 import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { Course, Module, Program } from '@/types/entities';
 import { convertToProgram } from "@/utils/convertToEntity";
 import { courseMatchesFilters, initializeFuseInstances } from '@/utils/curriculumSearchUtils';
-import { ChevronRight, GraduationCap } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -143,26 +141,22 @@ export default function CurriculumNavigator() {
       {!programError && (results
         ? <CurriculumSearchResults hits={results} />
         : (
-          <div className="mt-5 grid gap-2">
-            {programs.map((program) => (
-              <div
-                key={program.id}
-                className="flex items-center gap-2 rounded-[18px] border border-vtk-line bg-vtk-surface px-4 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper"
-              >
-                <ApiPrefetchLink
+          <section className="mt-8">
+            <h2 className="vtk-label m-0 mb-1">{t('curriculum-navigator.programs')}</h2>
+            <div>
+              {programs.map((program) => (
+                <CurriculumLinkRow
+                  key={program.id}
                   href={curriculumHref.program(program)}
                   apiEndpoints={`/api/programs/${program.id}`}
-                  className="flex min-w-0 flex-1 items-center gap-3 py-3.5 text-[15px] font-medium text-vtk-ink rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
-                >
-                  <GraduationCap size={17} className="shrink-0 text-vtk-muted" aria-hidden="true" />
-                  <span className="min-w-0 flex-1 truncate">{program.name}</span>
-                  <ChevronRight size={16} className="shrink-0 text-vtk-muted" aria-hidden="true" />
-                </ApiPrefetchLink>
-                <FavoriteButton itemId={program.id} itemType="program" size={16} className="shrink-0" />
-                <DownloadButton programs={[program]} />
-              </div>
-            ))}
-          </div>
+                  name={program.name}
+                  title={program.name}
+                  favorite={{ id: program.id, type: 'program' }}
+                  actions={<DownloadButton programs={[program]} />}
+                />
+              ))}
+            </div>
+          </section>
         ))}
     </div>
   );

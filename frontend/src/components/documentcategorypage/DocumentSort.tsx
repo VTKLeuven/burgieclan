@@ -79,7 +79,7 @@ const DocumentSort: React.FC<DocumentSortProps> = ({ currentSort, onSortChange }
                     </button>
 
                     {isOpen && (
-                        <div className="absolute right-0 z-10 mt-1.5 w-48 overflow-hidden rounded-[14px] border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
+                        <div className="absolute right-0 z-10 mt-1.5 w-48 overflow-hidden rounded-lg border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
                             <div className="py-1">
                                 {sortableFields.map((field) => (
                                     <button

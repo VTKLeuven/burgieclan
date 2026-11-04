@@ -1,13 +1,17 @@
 @reference "../../app/globals.css";
 
+.footerHeading {
+    @apply mb-3.5 mt-0 font-display text-[15px] font-semibold tracking-tight text-vtk-ink
+}
+
 .footerText {
-    @apply text-xs leading-5 text-vtk-on-dark-muted
+    @apply text-xs leading-5 text-vtk-muted
 }
 
 .footerNavLink {
-    @apply text-sm text-vtk-paper/80 no-underline transition-colors hover:text-white
+    @apply text-sm text-vtk-body no-underline transition-colors hover:text-vtk-navy
 }
 
 .footerLink {
-    @apply text-xs font-medium leading-5 text-vtk-paper/80 underline underline-offset-4 transition-colors hover:text-white
+    @apply text-xs font-medium leading-5 text-vtk-body underline underline-offset-4 transition-colors hover:text-vtk-navy
 }

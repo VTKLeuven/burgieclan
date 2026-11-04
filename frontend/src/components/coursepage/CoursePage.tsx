@@ -16,7 +16,7 @@ import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import { readPreloadedApi, useApi } from "@/hooks/useApi";
 import { Course, CourseComment } from "@/types/entities";
 import { convertToCourse } from "@/utils/convertToEntity";
-import { ChartPie, Link as LinkIcon } from "lucide-react";
+import { ChartPie, FileText, Folder, Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -88,81 +88,90 @@ export default function CoursePage() {
     }
 
     return (course &&
-        <>
-            <div className="vtk-shell pb-16">
-                {/* Editorial page head: breadcrumb kicker, display title, and
-                    the course facts as a right-aligned spec block. */}
-                <PageHead
-                    kicker={<DynamicBreadcrumb />}
-                    title={courseName}
-                    actions={
+        <div className="w-full min-w-0 self-start">
+            {/* Grey hero band of the wireframes: breadcrumb, the course name in navy, its facts
+                with small icons, and the favourite as a white pill. */}
+            <div className="vtk-band">
+                <div className="vtk-shell pb-8">
+                    <PageHead
+                        kicker={<DynamicBreadcrumb />}
+                        title={<span className="text-vtk-navy">{courseName}</span>}
+                        icon={FileText}
+                    >
+                        <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-vtk-ink">
+                            <span className="flex items-center gap-2">
+                                <Folder size={16} strokeWidth={1.75} aria-hidden="true" />
+                                {course.code}
+                            </span>
+
+                            <span className="flex items-center gap-2">
+                                <ChartPie size={16} strokeWidth={1.75} aria-hidden="true" />
+                                {course.credits} {t('credits')}
+                            </span>
+
+                            {/* Skipped entirely when the semester is unknown: the indicator renders
+                                nothing in that case, so the span would be an empty flex item and
+                                the row would show a stray gap. */}
+                            {(course.semesters?.length ?? 0) > 0 && (
+                                <span className="flex items-center gap-2">
+                                    <SemesterIndicator semesters={course.semesters} size={16} />
+                                    {course.semesters!.includes("Semester 1") && course.semesters!.includes("Semester 2")
+                                        ? t('course-page.year-course')
+                                        : course.semesters!.join(", ")}
+                                </span>
+                            )}
+
+                            <Link
+                                href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`}
+                                className="vtk-link flex items-center gap-1.5"
+                            >
+                                <LinkIcon size={14} />
+                                ECTS
+                            </Link>
+
+                            <CoursePlacement />
+                        </div>
+
+                        <RelatedCourses course={course} />
+                    </PageHead>
+
+                    <div className="mt-6 flex flex-wrap items-center gap-2">
                         <FavoriteButton
                             itemId={course.id}
                             itemType="course"
-                            size={20}
-                            className="mt-2"
+                            size={14}
+                            label={t('favorites.label')}
+                            className="vtk-pill"
                         />
-                    }
-                    aside={
-                        course?.professors && course.professors.length > 0 ? (
-                            <div className="text-right">
-                                <div className="vtk-label mb-2.5">{t('course-page.teachers')}</div>
-                                <div className="flex justify-end -space-x-3">
-                                    {course.professors.map((p, index) => (
-                                        <ProfessorDiv key={index} unumber={p} index={index} />
-                                    ))}
-                                </div>
-                            </div>
-                        ) : undefined
-                    }
-                >
-                    <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-vtk-body">
-                        <span className="vtk-badge vtk-badge-muted font-mono">{course.code}</span>
-
-                        <span className="flex items-center gap-2">
-                            <ChartPie size={15} className="text-vtk-muted" />
-                            {course.credits} {t('credits')}
-                        </span>
-
-                        {/* Skipped entirely when the semester is unknown: the indicator renders
-                            nothing in that case, so the span would be an empty flex item and
-                            the row would show a stray gap. */}
-                        {(course.semesters?.length ?? 0) > 0 && (
-                            <span className="flex items-center gap-2">
-                                <SemesterIndicator semesters={course.semesters} size={15} />
-                                {course.semesters!.includes("Semester 1") && course.semesters!.includes("Semester 2")
-                                    ? t('course-page.year-course')
-                                    : course.semesters!.join(", ")}
-                            </span>
-                        )}
-
-                        <Link
-                            href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`}
-                            className="vtk-link flex items-center gap-1.5"
-                        >
-                            <LinkIcon size={14} />
-                            ECTS
-                        </Link>
-
-                        <CoursePlacement />
                     </div>
+                </div>
+            </div>
 
-                    <RelatedCourses course={course} />
-                </PageHead>
+            <div className="vtk-shell pb-16">
+                {/* Teachers: avatar, name and role, two to a row. */}
+                {course.professors && course.professors.length > 0 && (
+                    <section className="pt-10" aria-labelledby="course-teachers-heading">
+                        <h2 id="course-teachers-heading" className="vtk-section-title">{t('course-page.teachers')}</h2>
+                        <div className="mt-5 grid max-w-2xl gap-x-8 gap-y-4 sm:grid-cols-2">
+                            {course.professors.map((p, index) => (
+                                <ProfessorDiv key={index} unumber={p} index={index} size={44} showName />
+                            ))}
+                        </div>
+                    </section>
+                )}
 
                 {/* Documents */}
-                <div className="mt-8">
+                <div className="mt-12">
                     <DocumentSections course={course} documentCounts={course.documentCounts} />
                 </div>
 
-
                 {/* Exam reconstructions */}
-                <div className="mt-10 border-t border-vtk-line pt-8">
+                <div className="mt-12">
                     <ExamSection courseId={course.id} />
                 </div>
 
                 {/* Comments */}
-                <div className="mt-10 border-t border-vtk-line pt-8">
+                <div className="mt-12">
                     <CommentCategories
                         comments={course.courseComments ?? []}
                         courseId={course.id}
@@ -170,6 +179,6 @@ export default function CoursePage() {
                     />
                 </div>
             </div>
-        </>
+        </div>
     )
 }

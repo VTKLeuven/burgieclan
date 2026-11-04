@@ -34,9 +34,9 @@ export default function ExamSection({ courseId }: { courseId: number }) {
 
     return (
         <section aria-labelledby="exams-heading">
-            <div className="flex items-center justify-between gap-3 border-b border-vtk-line pb-3.5">
+            <div className="flex items-end justify-between gap-3">
                 <div>
-                    <h2 id="exams-heading" className="m-0 text-xl font-semibold tracking-tight text-vtk-ink">
+                    <h2 id="exams-heading" className="vtk-section-title">
                         {t('exam.section.title')}
                     </h2>
                     <p className="m-0 mt-1.5 max-w-[70ch] text-sm leading-relaxed text-vtk-muted">
@@ -70,9 +70,9 @@ export default function ExamSection({ courseId }: { courseId: number }) {
                         <li key={exam.id}>
                             <Link
                                 href={`/course/${courseId}/exams/${exam.id}`}
-                                className="group block h-full rounded-[18px] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-2"
+                                className="group block h-full rounded-lg focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-2"
                             >
-                                <div className="flex h-full flex-col gap-3 rounded-[18px] border border-vtk-line bg-vtk-surface p-5 transition-[transform,border-color] duration-200 group-hover:-translate-y-0.5 group-hover:border-vtk-line-2">
+                                <div className="flex h-full flex-col gap-3 rounded-lg border border-vtk-line bg-vtk-surface p-5 transition-[transform,border-color] duration-200 group-hover:-translate-y-0.5 group-hover:border-vtk-line-2">
                                     <div className="flex items-center justify-between gap-2.5">
                                         <div className="flex min-w-0 items-center gap-2.5">
                                             <NotebookPen className="h-4.5 w-4.5 shrink-0 text-vtk-muted" aria-hidden="true" />

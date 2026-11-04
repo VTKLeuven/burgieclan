@@ -111,8 +111,8 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
 
     return (
         <div>
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-vtk-line pb-3.5">
-                <h2 className="m-0 text-xl font-semibold tracking-tight text-vtk-ink">
+            <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+                <h2 className="vtk-section-title">
                     {t('course-page.documents.header')}
                 </h2>
 
@@ -150,7 +150,8 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                 </div>
             </div>
 
-            <div className="vtk-panel overflow-hidden">
+            {/* Rows on the page itself, hairline between them, as the wireframes list documents. */}
+            <div>
                 {loading ? (
                     <div className="flex items-center justify-center py-14">
                         <LoaderCircle className="animate-spin text-vtk-muted" size={28} />
@@ -159,16 +160,16 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                     <p className="vtk-empty m-0">{t('course-page.documents.no-documents')}</p>
                 ) : (
                     <>
-                        <div className="flex items-center border-b border-vtk-line bg-vtk-paper-2 px-4 py-2.5">
+                        <div className="flex items-center border-b border-vtk-line-2 px-2 pb-2.5">
                             <Checkbox
                                 label={allSelected ? t('course-page.documents.deselect-all') : t('course-page.documents.select-all')}
                                 checked={allSelected}
                                 onChange={handleSelectAll}
-                                className="my-0 text-xs font-semibold uppercase tracking-[0.08em] text-vtk-muted"
+                                className="my-0 text-[13px] text-vtk-muted"
                             />
                         </div>
 
-                        <div className="vtk-rows">
+                        <div className="[&>*]:border-b [&>*]:border-vtk-line-2">
                             {documents.map((document) => (
                                 <DocumentListItem
                                     key={document.id}
@@ -179,7 +180,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                             ))}
                         </div>
 
-                        <div className="border-t border-vtk-line px-4 py-3">
+                        <div className="px-2 py-4">
                             <Pagination totalAmount={totalItems} currentPage={page} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} />
                         </div>
                     </>

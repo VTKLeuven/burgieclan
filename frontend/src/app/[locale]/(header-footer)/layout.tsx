@@ -11,7 +11,7 @@ export default function HeaderLayout({ children }: Readonly<{ children: React.Re
         // The provider sits above both so the sidebar's folder tree can follow the page
         // below it without re-fetching what that page already loaded.
         <CurriculumLocationProvider>
-            <div className="flex min-h-full flex-col bg-vtk-paper">
+            <div className="flex min-h-full flex-col bg-vtk-surface">
                 {/* Skip to main content link for keyboard users */}
                 <a
                     href="#main-content"

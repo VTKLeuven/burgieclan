@@ -25,8 +25,8 @@ interface PageHeadProps {
 }
 
 /**
- * The editorial page head shared by every page: kicker, display title, optional subtitle
- * and right-aligned meta, with a rule underneath. Kept in one place so the spacing and
+ * The page head shared by every page, as in the wireframes: breadcrumb, large display title,
+ * optional description and right-aligned meta. Kept in one place so the spacing and
  * markup cannot drift between pages the way six hand-rolled copies did.
  */
 export default function PageHead({
@@ -46,7 +46,7 @@ export default function PageHead({
 
                 <div className="flex items-start gap-3">
                     {actions}
-                    {Icon && <Icon className="mt-1.5 h-6 w-6 shrink-0 text-vtk-muted" />}
+                    {Icon && <Icon className="mt-1.5 h-7 w-7 shrink-0 text-vtk-ink" strokeWidth={1.75} />}
                     <h1 className="vtk-page-title">{title}</h1>
                 </div>
 

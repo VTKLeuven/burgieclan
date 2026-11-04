@@ -274,7 +274,8 @@
     },
     "favorites": {
         "add-favorite": "Add to favorites",
-        "remove-favorite": "Remove from favorites"
+        "remove-favorite": "Remove from favorites",
+        "label": "Favourite"
     },
     "curriculum-navigator": {
         "search-placeholder": "Search for courses, modules, programs...",
@@ -316,7 +317,13 @@
         "meta-modules_one": "group",
         "meta-modules_other": "groups",
         "meta-courses_one": "course",
-        "meta-courses_other": "courses"
+        "meta-courses_other": "courses",
+        "more-info": "More info",
+        "legend": {
+            "title": "Legend",
+            "first-semester": "First semester",
+            "second-semester": "Second semester"
+        }
     },
     "account": {
         "menu": "User menu",
@@ -457,7 +464,8 @@
         "go_to_vtk": "Go to VTK",
         "user_avatar": "User avatar",
         "in_this_folder": "In this folder",
-        "no_documents_in_folder": "No documents in this folder"
+        "no_documents_in_folder": "No documents in this folder",
+        "show_more": "Show more"
     },
     "editor": {
         "info_dialog": {

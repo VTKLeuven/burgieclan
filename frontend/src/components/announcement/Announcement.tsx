@@ -1,25 +1,26 @@
 import type { Announcement } from '@/types/entities';
-import { AlertTriangle, Bell } from 'lucide-react';
+import { AlertTriangle, MessageSquareDot } from 'lucide-react';
 
+/** One notice in the "Nieuws" card: an outlined icon, the title, and the text under it. */
 export default function Announcement(props: Announcement) {
     const { priority, title, content, createdAt } = props;
 
     return (
-        <div className="flex items-start gap-4">
-            {/* Yellow pin marks the notice; priority swaps the glyph, not the colour. */}
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-vtk-yellow text-vtk-ink">
+        <div className="flex items-start gap-3.5 rounded-md px-3 py-2.5">
+            {/* Priority swaps the glyph, not the colour. */}
+            <span className="mt-0.5 shrink-0 text-vtk-ink" aria-hidden="true">
                 {priority
-                    ? <AlertTriangle size={16} aria-hidden="true" />
-                    : <Bell size={16} aria-hidden="true" />}
+                    ? <AlertTriangle size={18} strokeWidth={1.75} />
+                    : <MessageSquareDot size={18} strokeWidth={1.75} />}
             </span>
             <div className="min-w-0 flex-1">
-                <h2 className="m-0 text-[15px] font-semibold tracking-tight text-vtk-ink">{title}</h2>
+                <h3 className="m-0 font-sans text-sm font-medium tracking-normal text-vtk-body">{title}</h3>
                 <div
-                    className="mt-1 text-sm leading-relaxed text-vtk-body [&_p]:m-0 [&_p]:text-sm [&_p]:leading-relaxed"
+                    className="mt-0.5 text-xs leading-relaxed text-vtk-muted [&_p]:m-0 [&_p]:text-xs [&_p]:leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: content || '' }}
                 />
             </div>
-            <span className="hidden shrink-0 text-xs uppercase tracking-[0.08em] text-vtk-muted sm:block">
+            <span className="shrink-0 text-[11px] tabular-nums text-vtk-muted">
                 {createdAt?.toLocaleDateString()}
             </span>
         </div>

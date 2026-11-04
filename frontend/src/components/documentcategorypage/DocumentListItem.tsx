@@ -6,7 +6,7 @@ import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import VoteButton from '@/components/ui/buttons/VoteButton';
 import type { Document } from '@/types/entities';
 import { fileExtensionFor, inlineUrl, previewKindFor } from '@/utils/previewableFile';
-import { ExternalLink, Tag as TagIcon } from 'lucide-react';
+import { ArrowUpRight, ExternalLink, FileText, Tag as TagIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface DocumentListItemProps {
@@ -39,7 +39,7 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
         // Wraps on narrow screens: the title row keeps the checkbox, and the
         // badge/meta/action cluster drops to its own line rather than
         // overflowing the panel.
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 transition-colors hover:bg-vtk-paper" key={document.id}>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-2 py-3" key={document.id}>
             <Checkbox
                 label=""
                 checked={isSelected}
@@ -48,6 +48,10 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                 className="my-0"
             />
 
+            <span className="vtk-thumb" aria-hidden="true">
+                <FileText size={18} strokeWidth={1.5} />
+            </span>
+
             <div className="min-w-0 flex-1 basis-[min(100%,16rem)]">
                 <ApiPrefetchLink
                     href={`/document/${document.id}`}
@@ -55,7 +59,7 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                         `/api/documents/${document.id}?lang=${i18n.language}`,
                         `/api/document_comments?document=/api/documents/${document.id}`,
                     ]}
-                    className="block truncate text-[15px] font-semibold tracking-tight text-vtk-ink hover:underline"
+                    className="block truncate text-[15px] font-medium text-vtk-body hover:text-vtk-navy hover:underline"
                 >
                     {document.name}
                 </ApiPrefetchLink>
@@ -88,7 +92,7 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
             )}
 
             {/* Contributor and date, as a compact right-aligned spec block. */}
-            <div className="hidden shrink-0 text-right lg:block">
+            <div className="hidden shrink-0 text-right xl:block">
                 {/* Migrated archive files carry the original author; for those the uploader
                     is the archive account and says nothing useful, so the author wins the
                     line and the uploader moves into the tooltip. */}
@@ -132,6 +136,16 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                 )}
                 {!inlineHref && <span className="h-8 w-8 shrink-0" aria-hidden="true" />}
                 <DownloadButton documents={[document]} size={15} className="h-8 w-8" />
+                {/* The wireframes' round yellow "open" arrow. The title already links to the same
+                    page, so this one stays out of the tab order and away from screen readers. */}
+                <ApiPrefetchLink
+                    href={`/document/${document.id}`}
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    className="vtk-arrow-button ml-1"
+                >
+                    <ArrowUpRight size={16} strokeWidth={2} />
+                </ApiPrefetchLink>
             </div>
         </div>
     );

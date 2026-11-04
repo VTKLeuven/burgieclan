@@ -3,7 +3,7 @@
 import { useToast } from '@/components/ui/Toast';
 import { cn } from '@/lib/utils';
 import { ALLOWED_ACCEPT_STRING, FILE_SIZE_LIMIT, FILE_SIZE_MB, isAllowedFile } from '@/utils/constants/upload';
-import { FileText } from 'lucide-react';
+import { CloudUpload } from 'lucide-react';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -80,10 +80,10 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
         <div
             className={cn(
                 "flex h-full w-full cursor-pointer flex-col items-center justify-center p-6 text-center",
-                "rounded-[18px] border border-dashed transition-colors duration-200",
+                "rounded-lg border-2 border-dashed transition-colors duration-200",
                 isDragging
-                    ? "border-vtk-ink bg-vtk-paper-2"
-                    : "border-vtk-line-2 bg-vtk-surface hover:border-vtk-ink/40 hover:bg-vtk-paper",
+                    ? "border-vtk-navy bg-vtk-paper-2"
+                    : "border-vtk-muted/60 bg-vtk-paper hover:border-vtk-navy hover:bg-vtk-paper-2",
                 className
             )}
             onClick={handleClick}
@@ -99,16 +99,17 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
                 onChange={handleFileInput}
                 accept={ALLOWED_ACCEPT_STRING}
             />
-            <FileText
+            <CloudUpload
                 className={cn(
-                    "mb-3.5 h-9 w-9 transition-colors duration-200",
-                    isDragging ? "text-vtk-ink" : "text-vtk-muted"
+                    "mb-2 h-6 w-6 transition-colors duration-200",
+                    isDragging ? "text-vtk-navy" : "text-vtk-link"
                 )}
+                aria-hidden="true"
             />
-            <p className="m-0 text-[15px] font-semibold tracking-tight text-vtk-ink">
+            <p className="m-0 font-display text-xl font-bold tracking-tight text-vtk-body">
                 {t('upload.drag_drop_title')}
             </p>
-            <p className="m-0 mt-1.5 text-[13px] text-vtk-muted">
+            <p className="m-0 mt-1.5 text-[13px] text-vtk-body">
                 {t('upload.supported_formats', { size: FILE_SIZE_MB })}
             </p>
         </div>

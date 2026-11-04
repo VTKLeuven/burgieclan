@@ -33,7 +33,7 @@ const TooltipPortal: React.FC<{
     <div
       id={id}
       role="tooltip"
-      className={`absolute bg-vtk-ink text-vtk-paper border border-vtk-line rounded-md px-2 py-1 text-xs whitespace-nowrap shadow-lg pointer-events-none transform -translate-x-1/2 transition-opacity ${className || ''}`}
+      className={`absolute bg-vtk-navy text-vtk-paper border border-vtk-line rounded-md px-2 py-1 text-xs whitespace-nowrap shadow-lg pointer-events-none transform -translate-x-1/2 transition-opacity ${className || ''}`}
       style={{ top: position.top, left: position.left, zIndex: 10000 }}
     >
       {content}

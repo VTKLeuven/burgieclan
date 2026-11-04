@@ -1,15 +1,18 @@
 'use client';
 
+import { logOut } from '@/actions/auth';
 import { useCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import CurriculumTree from '@/components/curriculum/CurriculumTree';
 import ItemList from '@/components/layout/ItemList';
 import SidebarFolderDocuments from '@/components/layout/SidebarFolderDocuments';
 import CreateDocumentButton from '@/components/ui/CreateDocumentButton';
+import UserAvatar from '@/components/ui/UserAvatar';
 import { useUser } from "@/components/UserContext";
 import { useSiblingDocuments } from '@/hooks/useSiblingDocuments';
 import type { Course, Document } from "@/types/entities";
-import { ChevronDown, File, FolderOpen, FolderTree, PanelLeft, PanelLeftClose, Star } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { ChevronDown, ChevronsLeftRight, FolderOpen, FolderTree, LayoutPanelLeft, LogOut, NotebookText, SquareArrowOutUpRight, type LucideIcon } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { localizedCourseName } from '@/utils/courseName';
@@ -61,7 +64,9 @@ const mapDocumentsToItems = (documents: Document[]) => {
 };
 
 /**
- * The left rail: the curriculum folder tree, with the reader's favourites tucked underneath.
+ * The left rail of the wireframes: on the cool grey ground, the main destinations (home, your
+ * courses, your documents) and "Document toevoegen" at the top, the curriculum folder tree and the
+ * reader's favourites below that, and the account with "Ga naar VTK" and "Uitloggen" at the foot.
  *
  * Every block is `shrink-0`. Without it the tree is a flex item that the rail happily squeezes
  * to a fraction of its height while its rows keep painting at full size - which is exactly how
@@ -74,6 +79,7 @@ const NavigationSidebar = () => {
   const { user } = useUser();
   const { t, i18n } = useTranslation();
   const pathname = usePathname();
+  const router = useRouter();
   const pathWithoutLocale = pathname.replace(/^\/(?:en|nl)(?=\/|$)/, '') || '/';
   const isHome = pathWithoutLocale === '/';
   const showCurriculumNavigator = pathWithoutLocale === '/courses'
@@ -193,30 +199,45 @@ const NavigationSidebar = () => {
     });
   };
 
+  // Section headers read as the wireframes' quiet labels ("Mijn vakken"), with a chevron to fold.
   const sectionButton =
-    'flex w-full shrink-0 items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-sm font-semibold text-vtk-ink transition-colors hover:bg-vtk-paper-2 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy';
+    'flex w-full shrink-0 items-center justify-between gap-2 rounded-md px-2 py-1.5 font-display text-[13px] text-vtk-body transition-colors hover:bg-vtk-paper-2 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy';
 
-  // Home, FAQ, account and public content keep the original favourites sidebar. The curriculum
-  // tree is added only while the reader is actually browsing curriculum content.
+  const onLogout = async () => {
+    await logOut();
+    router.push('/login');
+  };
+
+  const mainLinks: { label: string; href: string; icon: LucideIcon; active: boolean }[] = [
+    { label: t('sidebar.home'), href: '/', icon: LayoutPanelLeft, active: isHome },
+    { label: t('sidebar.my_courses'), href: '/account#my-courses', icon: NotebookText, active: false },
+    { label: t('account.documents.my'), href: '/account#my-documents', icon: FolderOpen, active: false },
+  ];
+
+  // Home, FAQ, account and public content keep the favourites sidebar. The curriculum tree is
+  // added only while the reader is actually browsing curriculum content.
+  const navLink =
+    'flex items-center gap-3 rounded-md px-2 py-2 font-display text-[15px] text-vtk-ink transition-colors hover:bg-vtk-paper-2 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy';
+
   return (
-    <aside className="sticky top-[72px] hidden shrink-0 self-start md:block">
+    <aside className="sticky top-[73px] hidden shrink-0 self-start md:block">
       <div
-        className={`relative flex h-[calc(100vh-72px)] flex-col border-r border-vtk-line bg-vtk-paper transition-[width] ${isResizing ? 'duration-0' : 'duration-300'}`}
+        className={`relative flex h-[calc(100vh-73px)] flex-col bg-vtk-paper transition-[width] ${isResizing ? 'duration-0' : 'duration-300'}`}
         style={{
           width: isCollapsed
-            ? '4rem'
+            ? '4.5rem'
             : `clamp(${MIN_SIDEBAR_WIDTH}px, ${sidebarWidth}px, min(${MAX_SIDEBAR_WIDTH}px, calc(100vw - 30rem)))`,
         }}
       >
-        {/* Collapse toggle */}
+        {/* Collapse toggle: the small grey disc on the edge in the wireframes. */}
         <button
           type="button"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3.5 top-3.5 z-10 grid h-7 w-7 place-items-center rounded-full border border-vtk-line-2 bg-vtk-surface text-vtk-body shadow-sm transition hover:border-vtk-ink hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
+          className="absolute -right-3 top-4 z-10 grid h-6 w-6 place-items-center rounded-full bg-vtk-body/60 text-white transition hover:bg-vtk-body focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
           aria-label={isCollapsed ? t('sidebar.expand') : t('sidebar.collapse')}
           aria-expanded={!isCollapsed}
         >
-          {isCollapsed ? <PanelLeft size={14} aria-hidden="true" /> : <PanelLeftClose size={14} aria-hidden="true" />}
+          <ChevronsLeftRight size={14} aria-hidden="true" />
         </button>
 
         {!isCollapsed && (
@@ -244,16 +265,44 @@ const NavigationSidebar = () => {
           </div>
         )}
 
-        <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3">
+        <div className={`flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto py-4 ${isCollapsed ? 'items-center px-2' : 'px-4'}`}>
+          {user && (
+            <>
+              <nav aria-label={t('sidebar.home')} className="flex shrink-0 flex-col gap-0.5">
+                {mainLinks.map(({ label, href, icon: Icon, active }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    aria-current={active ? 'page' : undefined}
+                    aria-label={isCollapsed ? label : undefined}
+                    title={isCollapsed ? label : undefined}
+                    className={`${navLink} ${active ? 'bg-vtk-paper-2 font-semibold' : ''} ${isCollapsed ? 'justify-center px-2.5' : ''}`}
+                  >
+                    <Icon size={19} strokeWidth={1.75} className="shrink-0" aria-hidden="true" />
+                    {!isCollapsed && <span className="truncate">{label}</span>}
+                  </Link>
+                ))}
+              </nav>
+
+              <div className={`mb-4 mt-4 shrink-0 ${isCollapsed ? '' : 'w-full'}`}>
+                <CreateDocumentButton
+                  className={isCollapsed ? 'h-10 w-10 !p-0' : 'w-full'}
+                  showText={!isCollapsed}
+                  size={17}
+                />
+              </div>
+            </>
+          )}
+
           {!isCollapsed && showCurriculumNavigator && (
             hasFolderContext ? (
               <div className="flex flex-col shrink-0 mb-1">
                 {/* Tab selector at the very top, with mr-6 so it stays clear of the collapse toggle */}
-                <div className="grid grid-cols-2 p-0.5 bg-vtk-paper-2 rounded-xl text-xs font-semibold text-vtk-muted mb-2.5 gap-0.5 border border-vtk-line mr-6">
+                <div className="grid grid-cols-2 p-0.5 bg-vtk-paper-2 rounded-md text-xs font-semibold text-vtk-muted mb-2.5 gap-0.5">
                   <button
                     type="button"
                     onClick={() => setActiveTab('folder')}
-                    className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg transition-colors ${
+                    className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-[5px] transition-colors ${
                       activeTab === 'folder'
                         ? 'bg-vtk-surface text-vtk-ink font-semibold shadow-xs'
                         : 'hover:text-vtk-ink'
@@ -262,7 +311,7 @@ const NavigationSidebar = () => {
                     <FolderOpen size={14} className="shrink-0" />
                     <span className="truncate">{t('sidebar.in_this_folder')}</span>
                     {siblingDocuments.length > 0 && (
-                      <span className="rounded-full bg-vtk-paper px-1.5 py-0.5 text-[10px] tabular-nums font-semibold text-vtk-muted">
+                      <span className="rounded-full bg-vtk-paper-2 px-1.5 py-0.5 text-[10px] tabular-nums font-semibold text-vtk-muted">
                         {siblingDocuments.length}
                       </span>
                     )}
@@ -270,7 +319,7 @@ const NavigationSidebar = () => {
                   <button
                     type="button"
                     onClick={() => setActiveTab('curriculum')}
-                    className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg transition-colors ${
+                    className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-[5px] transition-colors ${
                       activeTab === 'curriculum'
                         ? 'bg-vtk-surface text-vtk-ink font-semibold shadow-xs'
                         : 'hover:text-vtk-ink'
@@ -301,10 +350,7 @@ const NavigationSidebar = () => {
                   onClick={() => toggleSection('curriculum')}
                   aria-expanded={expandedSections.curriculum}
                 >
-                  <span className="flex items-center gap-2.5">
-                    <FolderTree size={17} className="shrink-0" />
-                    <span>{t('curriculum-tree.label')}</span>
-                  </span>
+                  <span>{t('curriculum-tree.label')}</span>
                   <ChevronDown
                     size={15}
                     className={`shrink-0 text-vtk-muted transition-transform duration-200 ${
@@ -321,7 +367,7 @@ const NavigationSidebar = () => {
 
           {user && !isCollapsed && (
             <>
-              {showCurriculumNavigator && <div className="my-1 shrink-0 border-t border-vtk-line" />}
+              {showCurriculumNavigator && <div className="my-2 shrink-0 border-t border-vtk-line-2" />}
 
               <button
                 type="button"
@@ -329,10 +375,7 @@ const NavigationSidebar = () => {
                 onClick={() => toggleSection('courses')}
                 aria-expanded={expandedSections.courses}
               >
-                <span className="flex items-center gap-2.5">
-                  <Star size={17} className="shrink-0" />
-                  <span>{t('sidebar.my_courses')}</span>
-                </span>
+                <span>{t('sidebar.my_courses')}</span>
                 <ChevronDown
                   size={15}
                   className={`shrink-0 text-vtk-muted transition-transform duration-200 ${expandedSections.courses ? 'rotate-0' : '-rotate-90'
@@ -340,10 +383,11 @@ const NavigationSidebar = () => {
                 />
               </button>
               {expandedSections.courses && (
-                <div className="shrink-0">
+                <div className="mb-2 shrink-0">
                   <ItemList
                     items={mapCoursesToItems(user.favoriteCourses ?? [], i18n.language)}
                     emptyMessage={t('account.favorite.no_courses')}
+                    moreHref="/account#my-courses"
                   />
                 </div>
               )}
@@ -354,10 +398,7 @@ const NavigationSidebar = () => {
                 onClick={() => toggleSection('documents')}
                 aria-expanded={expandedSections.documents}
               >
-                <span className="flex items-center gap-2.5">
-                  <File size={17} className="shrink-0" />
-                  <span>{t('sidebar.my_favorite_documents')}</span>
-                </span>
+                <span>{t('sidebar.my_favorite_documents')}</span>
                 <ChevronDown
                   size={15}
                   className={`shrink-0 text-vtk-muted transition-transform duration-200 ${expandedSections.documents ? 'rotate-0' : '-rotate-90'
@@ -365,10 +406,11 @@ const NavigationSidebar = () => {
                 />
               </button>
               {expandedSections.documents && (
-                <div className="shrink-0">
+                <div className="mb-2 shrink-0">
                   <ItemList
                     items={mapDocumentsToItems(user.favoriteDocuments ?? [])}
                     emptyMessage={t('account.favorite.no_documents')}
+                    moreHref="/account#my-courses"
                   />
                 </div>
               )}
@@ -376,9 +418,47 @@ const NavigationSidebar = () => {
           )}
         </div>
 
+        {/* Foot: who is signed in, the way back to vtk.be, and signing out. */}
         {user && (
-          <div className="shrink-0 border-t border-vtk-line p-3">
-            <CreateDocumentButton className="w-full" showText={!isCollapsed} size={17} />
+          <div className={`shrink-0 pb-5 pt-3 ${isCollapsed ? 'flex flex-col items-center gap-3 px-2' : 'px-4'}`}>
+            {isCollapsed ? (
+              <>
+                <Link href="/account" aria-label={t('profile')} title={user.fullName ?? t('profile')} className="rounded-full focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy">
+                  <UserAvatar name={user.fullName ?? user.username} size={32} />
+                </Link>
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  aria-label={t('sidebar.log_out')}
+                  title={t('sidebar.log_out')}
+                  className="grid h-9 w-9 place-items-center rounded-md text-vtk-ink transition-colors hover:bg-vtk-paper-2"
+                >
+                  <LogOut size={17} aria-hidden="true" />
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/account"
+                  className="mb-2 flex items-center gap-3 rounded-md px-2 py-1.5 transition-colors hover:bg-vtk-paper-2 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
+                >
+                  <UserAvatar name={user.fullName ?? user.username} size={32} />
+                  <span className="min-w-0 truncate text-sm font-medium text-vtk-ink">{user.fullName ?? user.username}</span>
+                </Link>
+                <a
+                  href="https://vtk.be"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${navLink} justify-between`}
+                >
+                  {t('sidebar.go_to_vtk')}
+                  <SquareArrowOutUpRight size={14} className="shrink-0 text-vtk-muted" aria-hidden="true" />
+                </a>
+                <button type="button" onClick={onLogout} className={`${navLink} w-full text-left`}>
+                  {t('sidebar.log_out')}
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>

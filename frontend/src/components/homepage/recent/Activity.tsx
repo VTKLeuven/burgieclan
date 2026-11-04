@@ -1,5 +1,5 @@
 import ApiPrefetchLink from "@/components/ui/ApiPrefetchLink";
-import { Clock } from "lucide-react";
+import { ArrowUpRight, FileText } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { format, register } from 'timeago.js';
@@ -21,6 +21,10 @@ interface ActivityProps {
     link: string;
 }
 
+/**
+ * One recently opened document, drawn as the wireframes' document row: a grey thumbnail, the
+ * course as a small kicker above the title, and the round yellow arrow that opens it.
+ */
 export const Activity: React.FC<ActivityProps> = ({
     documentId,
     documentName,
@@ -36,22 +40,27 @@ export const Activity: React.FC<ActivityProps> = ({
 
     return (
         <ApiPrefetchLink
-            className="flex items-center gap-3.5 px-5 py-2.5 transition-colors hover:bg-vtk-paper-2"
+            className="group flex items-center gap-3.5 rounded-md px-3 py-2 transition-colors hover:bg-vtk-paper"
             href={link}
             apiEndpoints={apiEndpoints}
         >
-            <Clock aria-hidden="true" className="h-4 w-4 shrink-0 text-vtk-muted" />
+            <span className="vtk-thumb" aria-hidden="true">
+                <FileText size={18} strokeWidth={1.5} />
+            </span>
             <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium leading-snug text-vtk-ink">
-                    {documentName}
-                </p>
-                <p className="truncate text-[13px] leading-snug text-vtk-muted">
+                <p className="m-0 truncate text-[11px] leading-snug text-vtk-muted">
                     {courseName}
                 </p>
+                <p className="m-0 truncate text-sm leading-snug text-vtk-body">
+                    {documentName}
+                </p>
             </div>
-            {/* Compact relative time (e.g. "2h", "3d") right-aligned as a spec value. */}
+            {/* Compact relative time (e.g. "2h", "3d"), then the arrow that opens the document. */}
             <span className="shrink-0 text-xs tabular-nums text-vtk-muted">
                 {format(timestamp, 'minimal')}
+            </span>
+            <span className="vtk-arrow-button" aria-hidden="true">
+                <ArrowUpRight size={16} strokeWidth={2} />
             </span>
         </ApiPrefetchLink>
     );

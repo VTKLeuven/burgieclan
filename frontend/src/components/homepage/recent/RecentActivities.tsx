@@ -47,7 +47,7 @@ export const RecentActivities = () => {
         }
 
         return (
-            <div className="divide-y divide-vtk-line">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-1">
                 {documentViews.slice(0, MAX_ACTIVITIES).map(documentView => (
                     <Activity
                         key={documentView.id}
@@ -63,12 +63,10 @@ export const RecentActivities = () => {
     };
 
     return (
-        <div className="vtk-panel overflow-hidden">
-            <div className="border-b border-vtk-line px-5 py-3.5">
-                <h2 className="m-0 text-base font-semibold tracking-tight text-vtk-ink">
-                    {t('home.recent_activities')}
-                </h2>
-            </div>
+        <div className="vtk-panel overflow-hidden px-2 pb-3 pt-5">
+            <h2 className="vtk-card-title mb-3 px-3">
+                {t('home.recent_activities')}
+            </h2>
             {renderContent()}
         </div>
     );

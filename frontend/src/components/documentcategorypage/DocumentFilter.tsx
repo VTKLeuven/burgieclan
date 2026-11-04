@@ -99,7 +99,7 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 z-10 mt-1.5 w-80 rounded-[18px] border border-vtk-line bg-vtk-surface p-4 shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
+        <div className="absolute right-0 z-10 mt-1.5 w-80 rounded-lg border border-vtk-line bg-vtk-surface p-4 shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-sm font-medium">{t('document.filters')}</h3>
             {hasActiveFilters && (

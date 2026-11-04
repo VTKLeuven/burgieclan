@@ -65,8 +65,8 @@ export default function DocumentSections({ course, documentCounts }: DocumentSec
 
     return (
         <>
-            <div className="flex items-center justify-between gap-3 border-b border-vtk-line pb-3.5">
-                <h2 className="m-0 text-xl font-semibold tracking-tight text-vtk-ink">
+            <div className="flex items-end justify-between gap-3">
+                <h2 className="vtk-section-title">
                     {t('course-page.files')}
                 </h2>
                 <div className="flex items-center gap-2">

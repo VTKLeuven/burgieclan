@@ -69,26 +69,29 @@ export default function Footer() {
     const { t } = useTranslation();
 
     return (
-        // Dark navy band on every page: the closing bookend to the navy header,
-        // so the site opens and closes dark. Mirrors `.vtk-site-footer`.
-        <footer aria-labelledby="footer-heading" className="mt-auto border-t border-white/10 bg-vtk-navy text-vtk-paper antialiased">
+        // The light footer band of the wireframes: the sidebar's cool grey, ink text, the column
+        // titles in the display face.
+        <footer aria-labelledby="footer-heading" className="mt-auto border-t border-vtk-line bg-vtk-paper text-vtk-ink antialiased">
             <h2 id="footer-heading" className="sr-only">Footer</h2>
             <div className="mx-auto max-w-(--max) px-5 pb-8 pt-12 sm:px-9">
                 <div className="grid gap-9 md:grid-cols-2 lg:grid-cols-[1.6fr_repeat(3,minmax(0,1fr))]">
 
                     {/* Brand */}
                     <div>
-                        <Image
-                            src="/images/logos/burgieclan-lockup-white.png"
-                            alt="Burgieclan"
-                            width={220}
-                            height={34}
-                            className="mb-4 h-[34px] w-auto max-w-[220px] object-contain object-left"
-                        />
-                        <p className="max-w-[24ch] whitespace-pre-line text-[22px] font-bold leading-[1.12] tracking-tight text-vtk-paper">
+                        <div className="mb-4 flex items-center gap-2.5">
+                            <Image
+                                src="/images/logos/burgieclan-cloud-navy.png"
+                                alt=""
+                                width={50}
+                                height={28}
+                                className="h-7 w-auto"
+                            />
+                            <span className="font-display text-lg font-bold tracking-tight text-vtk-navy">Burgieclan</span>
+                        </div>
+                        <p className="max-w-[24ch] whitespace-pre-line font-display text-[22px] font-bold leading-[1.15] tracking-tight text-vtk-ink">
                             {t('footer.tagline')}
                         </p>
-                        <p className="mt-3.5 max-w-[36ch] text-[13px] leading-relaxed text-vtk-on-dark-muted">
+                        <p className="mt-3.5 max-w-[36ch] text-[13px] leading-relaxed text-vtk-body">
                             Kasteelpark Arenberg 6{'\n'}3001 Heverlee, België
                         </p>
 
@@ -97,7 +100,7 @@ export default function Footer() {
                                 <Link
                                     key={item.name}
                                     href={item.href}
-                                    className="text-vtk-paper/70 transition-colors hover:text-white"
+                                    className="text-vtk-ink transition-colors hover:text-vtk-navy"
                                 >
                                     <span className="sr-only">{item.name}</span>
                                     <item.icon aria-hidden="true" className="h-5 w-5" />
@@ -108,7 +111,7 @@ export default function Footer() {
 
                     {/* Link columns */}
                     <div>
-                        <h3 className="mb-3.5 text-xs font-semibold uppercase tracking-[0.1em] text-vtk-on-dark-muted">
+                        <h3 className={styles.footerHeading}>
                             {t('footer.navigate')}
                         </h3>
                         <ul className="m-0 flex list-none flex-col gap-2 p-0">
@@ -119,7 +122,7 @@ export default function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="mb-3.5 text-xs font-semibold uppercase tracking-[0.1em] text-vtk-on-dark-muted">
+                        <h3 className={styles.footerHeading}>
                             {t('footer.support')}
                         </h3>
                         <ul className="m-0 flex list-none flex-col gap-2 p-0">
@@ -138,7 +141,7 @@ export default function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="mb-3.5 text-xs font-semibold uppercase tracking-[0.1em] text-vtk-on-dark-muted">
+                        <h3 className={styles.footerHeading}>
                             {t('footer.community')}
                         </h3>
                         <ul className="m-0 flex list-none flex-col gap-2 p-0">
@@ -149,8 +152,8 @@ export default function Footer() {
                 </div>
 
                 {/* Bottom bar */}
-                <div className="mt-9 flex flex-col justify-between gap-4 border-t border-white/12 pt-4.5 text-xs text-vtk-on-dark-muted sm:flex-row">
-                    <p className="m-0">&copy; {currentYear} Vlaamse Technische Kring vzw</p>
+                <div className="mt-9 flex flex-col justify-between gap-4 border-t border-vtk-line-2 pt-4.5 text-xs text-vtk-muted sm:flex-row">
+                    <p className="m-0 text-xs">&copy; {currentYear} Vlaamse Technische Kring vzw</p>
                 </div>
             </div>
         </footer>

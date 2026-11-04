@@ -102,7 +102,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
                             <ChevronDown className="h-5 w-5" aria-hidden="true" />
                         </Combobox.Button>
                         {open && (
-                            <Combobox.Options className="absolute z-10 mt-1.5 max-h-60 w-full overflow-auto text-base focus:outline-hidden sm:text-sm rounded-[14px] border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
+                            <Combobox.Options className="absolute z-10 mt-1.5 max-h-60 w-full overflow-auto text-base focus:outline-hidden sm:text-sm rounded-lg border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
                                 {normalizedQuery.length < minimumQueryLength && (
                                     <div className="px-4 py-2 text-sm text-vtk-muted">
                                         {t('form.combo.minimum_query', { count: minimumQueryLength })}
@@ -118,7 +118,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
                                         key={option.id}
                                         value={option}
                                         className={({ active, focus, selected }) =>
-                                            `block w-full cursor-pointer px-4 py-2 text-sm ${(active || focus) ? 'bg-vtk-ink text-vtk-paper' : 'text-vtk-ink hover:bg-vtk-paper-2'
+                                            `block w-full cursor-pointer px-4 py-2 text-sm ${(active || focus) ? 'bg-vtk-navy text-vtk-paper' : 'text-vtk-ink hover:bg-vtk-paper-2'
                                             } ${selected ? 'font-semibold' : ''}`
                                         }
                                     >

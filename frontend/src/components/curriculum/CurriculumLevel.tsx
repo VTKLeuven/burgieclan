@@ -3,11 +3,10 @@
 import { CourseRow } from '@/components/courses/CourseRow';
 import { CourseTableHeader } from '@/components/courses/CourseTableHeader';
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
+import CurriculumLegend from '@/components/curriculum/CurriculumLegend';
+import CurriculumLinkRow from '@/components/curriculum/CurriculumLinkRow';
 import DownloadButton from '@/components/ui/DownloadButton';
-import FavoriteButton from '@/components/ui/FavoriteButton';
-import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import type { Course, Module } from '@/types/entities';
-import { ChevronRight, Folder } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface CurriculumLevelProps {
@@ -38,28 +37,21 @@ export default function CurriculumLevel({ modules, courses, moduleId }: Curricul
     }
 
     return (
-        <div className="mt-6 grid gap-8">
+        <div className="mt-6 grid gap-10">
             {hasModules && (
                 <section>
-                    <h2 className="vtk-label mb-3 text-vtk-muted">{t('curriculum-navigator.groups')}</h2>
-                    <div className="grid gap-2">
+                    <h2 className="vtk-label m-0 mb-1">{t('curriculum-navigator.groups')}</h2>
+                    <div>
                         {modules.map((node) => (
-                            <div
+                            <CurriculumLinkRow
                                 key={node.id}
-                                className="flex items-center gap-2 rounded-[14px] border border-vtk-line bg-vtk-surface px-4 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper"
-                            >
-                                <ApiPrefetchLink
-                                    href={curriculumHref.module(node)}
-                                    apiEndpoints={`/api/modules/${node.id}`}
-                                    className="flex min-w-0 flex-1 items-center gap-3 py-3 text-[15px] font-medium text-vtk-ink rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
-                                >
-                                    <Folder size={16} className="shrink-0 text-vtk-muted" aria-hidden="true" />
-                                    <span className="min-w-0 flex-1 truncate">{node.name}</span>
-                                    <ChevronRight size={16} className="shrink-0 text-vtk-muted" aria-hidden="true" />
-                                </ApiPrefetchLink>
-                                <FavoriteButton itemId={node.id} itemType="module" size={16} className="shrink-0" />
-                                <DownloadButton modules={[node]} />
-                            </div>
+                                href={curriculumHref.module(node)}
+                                apiEndpoints={`/api/modules/${node.id}`}
+                                name={node.name}
+                                title={node.name}
+                                favorite={{ id: node.id, type: 'module' }}
+                                actions={<DownloadButton modules={[node]} />}
+                            />
                         ))}
                     </div>
                 </section>
@@ -67,8 +59,8 @@ export default function CurriculumLevel({ modules, courses, moduleId }: Curricul
 
             {hasCourses && (
                 <section>
-                    <h2 className="vtk-label mb-3 text-vtk-muted">{t('courses')}</h2>
-                    <div className="overflow-hidden rounded-[14px] border border-vtk-line bg-vtk-surface" role="table">
+                    <h2 className="sr-only">{t('courses')}</h2>
+                    <div role="table" aria-label={t('courses')}>
                         <CourseTableHeader courses={courses} />
                         {courses.map((course, index) => (
                             <CourseRow
@@ -79,6 +71,7 @@ export default function CurriculumLevel({ modules, courses, moduleId }: Curricul
                             />
                         ))}
                     </div>
+                    <CurriculumLegend />
                 </section>
             )}
         </div>

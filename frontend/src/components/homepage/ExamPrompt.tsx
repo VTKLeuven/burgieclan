@@ -7,7 +7,7 @@ import { convertToExam } from '@/utils/convertToEntity';
 import { STORAGE_KEYS } from '@/utils/cookieNames';
 import { localizedCourseName } from '@/utils/courseName';
 import { currentExamPeriod, examCalendarYear } from '@/utils/examPeriods';
-import { NotebookPen, X } from 'lucide-react';
+import { ArrowUpRight, NotebookPen, X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -95,14 +95,14 @@ export const ExamPrompt = () => {
 
     return (
         <section className="vtk-panel overflow-hidden" aria-labelledby="exam-prompt-heading">
-            <div className="border-b border-vtk-line px-5 py-3.5">
-                <h2 id="exam-prompt-heading" className="m-0 text-base font-semibold tracking-tight text-vtk-ink">
+            <div className="px-5 pb-2 pt-5">
+                <h2 id="exam-prompt-heading" className="vtk-card-title">
                     {t('home.exam_prompt.title')}
                 </h2>
                 <p className="m-0 mt-1 text-sm leading-relaxed text-vtk-muted">{t('home.exam_prompt.description')}</p>
             </div>
 
-            <ul className="m-0 list-none divide-y divide-vtk-line p-0">
+            <ul className="m-0 list-none px-2 pb-3">
                 {shown.map((exam) => {
                     const course = courses.find((candidate) => candidate.id === exam.courseId);
                     const courseName = localizedCourseName(course, i18n.language) || t('home.exam_prompt.course_fallback');
@@ -112,19 +112,24 @@ export const ExamPrompt = () => {
                         <li key={exam.id} className="group relative">
                             <Link
                                 href={`/course/${exam.courseId}/exams/${exam.id}`}
-                                className="flex items-center gap-3.5 px-5 py-2.5 pr-12 transition-colors hover:bg-vtk-paper-2"
+                                className="group flex items-center gap-3.5 rounded-md px-3 py-2 pr-14 transition-colors hover:bg-vtk-paper"
                             >
-                                <NotebookPen aria-hidden="true" className="h-4 w-4 shrink-0 text-vtk-muted" />
+                                <span className="vtk-thumb" aria-hidden="true">
+                                    <NotebookPen size={18} strokeWidth={1.5} />
+                                </span>
                                 <div className="min-w-0 flex-1">
-                                    <p className="m-0 truncate text-sm font-medium leading-snug text-vtk-ink">{courseName}</p>
-                                    <p className="m-0 truncate text-[13px] leading-snug text-vtk-muted">
+                                    <p className="m-0 truncate text-[11px] leading-snug text-vtk-muted">
                                         {examName} · {t('home.exam_prompt.questions', { count: exam.questionCount })}
                                     </p>
+                                    <p className="m-0 truncate text-sm leading-snug text-vtk-body">{courseName}</p>
                                 </div>
+                                <span className="vtk-arrow-button" aria-hidden="true">
+                                    <ArrowUpRight size={16} strokeWidth={2} />
+                                </span>
                             </Link>
                             <button
                                 type="button"
-                                className="absolute inset-y-0 right-3 my-auto flex h-8 w-8 items-center justify-center rounded-md text-vtk-muted transition-colors hover:bg-vtk-paper-2 hover:text-vtk-ink"
+                                className="absolute inset-y-0 right-2 my-auto flex h-7 w-7 items-center justify-center rounded-md text-vtk-muted transition-colors hover:bg-vtk-paper-2 hover:text-vtk-ink"
                                 aria-label={t('home.exam_prompt.dismiss', { course: courseName })}
                                 title={t('home.exam_prompt.dismiss', { course: courseName })}
                                 onClick={() => dismiss(exam.id)}

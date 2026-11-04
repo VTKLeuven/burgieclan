@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 export default function UnderReviewBox({ action }: { action?: React.ReactNode }) {
     const { t } = useTranslation();
     return (
-        <div className="rounded-xl bg-vtk-paper-2 p-4">
+        <div className="rounded-lg bg-vtk-paper-2 p-4">
             <div className="flex flex-wrap items-center gap-3">
                 <div className="shrink-0">
                     <TriangleAlert aria-hidden="true" className="size-5 text-vtk-yellow" />

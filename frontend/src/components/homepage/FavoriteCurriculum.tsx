@@ -9,7 +9,7 @@ import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-/** Matches the recent-activity list next to it, so the two panels read as one column. */
+/** Enough to orient; the rest is one click away on the account page. */
 const MAX_PER_TYPE = 4;
 
 interface FavoriteRowProps {
@@ -21,23 +21,18 @@ interface FavoriteRowProps {
 }
 
 const FavoriteRow = ({ id, name, typeLabel, type, icon: Icon }: FavoriteRowProps) => (
-    // The star has to sit outside the link — a button nested in an anchor is invalid markup —
-    // so it is overlaid on the row instead, the same way the sidebar favourites do it.
-    <div className="group relative">
+    // The star has to sit outside the link — a button nested in an anchor is invalid markup.
+    <div className="flex items-center gap-1.5">
+        <FavoriteButton itemId={id} itemType={type} size={14} className="shrink-0" />
         <ApiPrefetchLink
-            className="flex items-center gap-3.5 px-5 py-2.5 pr-12 transition-colors hover:bg-vtk-paper-2"
+            className="group flex min-w-0 flex-1 items-center gap-2 text-sm text-vtk-link hover:underline hover:underline-offset-2"
             href={type === 'program' ? curriculumHref.program({ id }) : curriculumHref.module({ id })}
             apiEndpoints={type === 'program' ? `/api/programs/${id}` : `/api/modules/${id}`}
+            title={typeLabel}
         >
-            <Icon aria-hidden="true" className="h-4 w-4 shrink-0 text-vtk-muted" />
-            <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium leading-snug text-vtk-ink">{name}</p>
-                <p className="truncate text-[13px] leading-snug text-vtk-muted">{typeLabel}</p>
-            </div>
+            <span className="truncate">{name}</span>
+            <Icon aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-vtk-muted" />
         </ApiPrefetchLink>
-        <div className="absolute inset-y-0 right-4 flex items-center opacity-0 transition-opacity duration-100 focus-within:opacity-100 group-focus-within:opacity-100 group-hover:opacity-100">
-            <FavoriteButton itemId={id} itemType={type} size={16} />
-        </div>
     </div>
 );
 
@@ -60,45 +55,38 @@ export const FavoriteCurriculum = () => {
     const truncated = programs.length > MAX_PER_TYPE || modules.length > MAX_PER_TYPE;
 
     return (
-        <div className="vtk-panel overflow-hidden">
-            <div className="border-b border-vtk-line px-5 py-3.5">
-                <h2 className="m-0 text-base font-semibold tracking-tight text-vtk-ink">
-                    {t('home.favorite_curriculum')}
-                </h2>
-            </div>
-
-            <div className="divide-y divide-vtk-line">
-                {programs.slice(0, MAX_PER_TYPE).map(program => (
-                    <FavoriteRow
-                        key={`program-${program.id}`}
-                        id={program.id}
-                        name={program.name ?? ''}
-                        typeLabel={t('home.favorite_program_label')}
-                        type="program"
-                        icon={GraduationCap}
-                    />
-                ))}
-                {modules.slice(0, MAX_PER_TYPE).map(module => (
-                    <FavoriteRow
-                        key={`module-${module.id}`}
-                        id={module.id}
-                        name={module.name ?? ''}
-                        typeLabel={t('home.favorite_module_label')}
-                        type="module"
-                        icon={Layers}
-                    />
-                ))}
-            </div>
+        <div className="grid content-start gap-y-2">
+            <h3 className="m-0 font-sans text-sm font-bold tracking-normal text-vtk-navy">
+                {t('home.favorite_curriculum')}
+            </h3>
+            {programs.slice(0, MAX_PER_TYPE).map(program => (
+                <FavoriteRow
+                    key={`program-${program.id}`}
+                    id={program.id}
+                    name={program.name ?? ''}
+                    typeLabel={t('home.favorite_program_label')}
+                    type="program"
+                    icon={GraduationCap}
+                />
+            ))}
+            {modules.slice(0, MAX_PER_TYPE).map(module => (
+                <FavoriteRow
+                    key={`module-${module.id}`}
+                    id={module.id}
+                    name={module.name ?? ''}
+                    typeLabel={t('home.favorite_module_label')}
+                    type="module"
+                    icon={Layers}
+                />
+            ))}
 
             {truncated && (
-                <div className="border-t border-vtk-line px-5 py-2.5">
-                    <Link
-                        href="/account"
-                        className="text-[13px] text-vtk-muted transition-colors hover:text-vtk-ink"
-                    >
-                        {t('home.favorite_curriculum_all')}
-                    </Link>
-                </div>
+                <Link
+                    href="/account#my-courses"
+                    className="text-[13px] font-bold text-vtk-link hover:underline"
+                >
+                    {t('home.favorite_curriculum_all')}
+                </Link>
             )}
         </div>
     );

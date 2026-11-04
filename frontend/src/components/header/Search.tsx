@@ -64,17 +64,16 @@ export default function Search() {
                 style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}
                 aria-hidden="true"
             />
-            {/* Dark-glass field so the control reads as part of the navy bar
-                rather than a white box punched into it. */}
+            {/* Grey pill as in the wireframes: placeholder on the left, magnifier on the right. */}
             <button
                 ref={searchInputRef}
                 id="search"
                 type="button"
                 onClick={() => setSearchPopupOpen(true)}
-                className="flex h-[38px] w-full min-w-0 max-w-sm items-center gap-2 rounded-full border border-vtk-paper/25 bg-white/10 px-3.5 text-left text-sm text-vtk-paper/70 transition hover:border-vtk-paper/50 hover:bg-white/15 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white"
+                className="flex h-10 w-full min-w-0 max-w-sm items-center gap-2 rounded-full bg-vtk-paper px-4 text-left text-sm text-vtk-muted transition hover:bg-vtk-paper-2 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
             >
-                <SearchIcon aria-hidden="true" className="h-4 w-4 shrink-0" />
-                <span className="truncate">{placeholder}</span>
+                <span className="min-w-0 flex-1 truncate">{placeholder}</span>
+                <SearchIcon aria-hidden="true" className="h-[18px] w-[18px] shrink-0 text-vtk-ink" />
             </button>
             <SearchPopup open={searchPopupOpen} setOpen={setSearchPopupOpen} />
         </div>

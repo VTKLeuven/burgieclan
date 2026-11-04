@@ -87,13 +87,13 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
     }
 
     return (
-        <div className="mt-3 rounded-lg">
-            <div className="flex justify-between items-center">
-                <h3>{t('course-page.documents.header-favorites')}</h3>
+        <div className="mt-3">
+            <div className="mb-4 flex items-end justify-between">
+                <h2 className="vtk-section-title">{t('course-page.documents.header-favorites')}</h2>
                 {favoriteDocumentCount > 3 && (
                     <Link
-                        href="/account"
-                        className="flex items-center text-sm text-vtk-navy hover:text-vtk-ink"
+                        href="/account#my-courses"
+                        className="flex items-center text-[13px] text-vtk-muted hover:text-vtk-ink"
                     >
                         {t('course-page.documents.favorites-see-all')}
                         <ChevronRight className="h-4 w-4 ml-1" />

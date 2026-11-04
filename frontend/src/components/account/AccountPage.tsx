@@ -86,9 +86,12 @@ export default function AccountPage() {
             />
 
             <div className="mt-7 grid gap-4">
-                <DocumentList />
+                {/* Anchors for the sidebar's "Mijn documenten" and "Mijn vakken". */}
+                <div id="my-documents" className="scroll-mt-24">
+                    <DocumentList />
+                </div>
 
-                <div className="grid gap-4 lg:grid-cols-2">
+                <div id="my-courses" className="grid scroll-mt-24 gap-4 lg:grid-cols-2">
                     <FavoriteList
                         title={t('account.favorite.courses')}
                         items={mapCoursesToItems(favoriteCourses, i18n.language)}

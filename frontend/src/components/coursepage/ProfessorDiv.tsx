@@ -14,6 +14,11 @@ interface ProfessorDivProps {
     size?: number;
     /** Whether to link the avatar to the wieiswie profile page (default true). */
     linkToProfile?: boolean;
+    /**
+     * Show the name and role next to the avatar instead of in a tooltip, as the course page's
+     * "Docenten" list does in the wireframes.
+     */
+    showName?: boolean;
 }
 
 function getInitials(name: string): string {
@@ -42,6 +47,7 @@ export default function ProfessorDiv({
     index,
     size = 48,
     linkToProfile = true,
+    showName = false,
 }: ProfessorDivProps) {
     const { i18n, t } = useTranslation();
     const locale = i18n.language || 'en';
@@ -79,7 +85,9 @@ export default function ProfessorDiv({
     }, [sanitizedUnumber]);
 
     const roleText = index === 0 ? t('course-page.coordinator') : t('course-page.professor');
-    const borderClass = size < 36 ? 'border border-white' : 'border-2 border-white';
+    const borderClass = showName
+        ? 'border-2 border-vtk-yellow'
+        : size < 36 ? 'border border-white' : 'border-2 border-white';
 
     const avatarContent = !imageError ? (
         <div
@@ -124,6 +132,31 @@ export default function ProfessorDiv({
             {tooltip}
         </>
     );
+
+    if (showName) {
+        const named = (
+            <>
+                <span className="shrink-0">{avatarContent}</span>
+                <span className="min-w-0">
+                    <span className="block truncate text-sm text-vtk-body">{professorName}</span>
+                    <span className="block text-[11px] text-vtk-muted">{roleText}</span>
+                </span>
+            </>
+        );
+
+        return linkToProfile ? (
+            <Link
+                href={`https://www.kuleuven.be/wieiswie/${locale}/person/0${sanitizedUnumber}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex min-w-0 items-center gap-3 rounded-md focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
+            >
+                {named}
+            </Link>
+        ) : (
+            <div className="flex min-w-0 items-center gap-3">{named}</div>
+        );
+    }
 
     if (linkToProfile) {
         return (

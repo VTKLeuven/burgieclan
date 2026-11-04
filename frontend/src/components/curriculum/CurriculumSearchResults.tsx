@@ -38,7 +38,7 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
     }
 
     return (
-        <div className="mt-5 overflow-hidden rounded-[14px] border border-vtk-line bg-vtk-surface">
+        <div className="mt-5 overflow-hidden rounded-lg border border-vtk-line bg-vtk-surface">
             <div className="vtk-rows">
                 {hits.map(({ course, program, modules, language }) => (
                     <div

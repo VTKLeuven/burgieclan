@@ -137,7 +137,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
                             <button
                                 type="submit"
                                 disabled={editIsSubmitting || !editContent.trim()}
-                                className="text-xs px-3 py-1 bg-vtk-ink text-white rounded hover:bg-vtk-navy disabled:opacity-50 transition-colors inline-flex items-center"
+                                className="text-xs px-3 py-1 bg-vtk-navy text-white rounded hover:bg-vtk-navy disabled:opacity-50 transition-colors inline-flex items-center"
                             >
                                 {editIsSubmitting ? (
                                     <>

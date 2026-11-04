@@ -3,70 +3,79 @@
 @custom-variant dark (&:is(.dark *));
 
 /* Brand tokens for Tailwind utilities (bg-vtk-*, text-vtk-*). These mirror the
-   canonical palette in the `:root` block below, which is the same palette as
-   `apps/web/app/design/vtk-base.css` in vtk-website-new. Tailwind's @theme needs
-   concrete values to generate the utilities, so when you retune the palette,
-   change the custom properties below and keep these in sync. */
+   palette in the `:root` block below, which follows the Burgieclan wireframes in
+   Figma ("VTK - Wireframes", page "Feedback op wireframes"). Tailwind's @theme
+   needs concrete values to generate the utilities, so when you retune the
+   palette, change the custom properties below and keep these in sync. */
 @theme {
   --breakpoint-xs: 320px;
 
-  --color-vtk-ink: #0a0f1f;
-  --color-vtk-navy: #0e1a36;
-  --color-vtk-blue: #0e1a36;
-  --color-vtk-blue-dark: #0a0f1f;
-  --color-vtk-blue-light: #34405e;
-  --color-vtk-blue-soft: #e6ecf5;
-  --color-vtk-blue-muted: #eff2f8;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-heading), var(--font-body), ui-sans-serif, system-ui, sans-serif;
 
-  --color-vtk-yellow: #ffd23f;
-  --color-vtk-yellow-dark: #edbd22;
+  --color-vtk-ink: #0a0a0f;
+  --color-vtk-navy: #1a1f4a;
+  --color-vtk-blue: #1a1f4a;
+  --color-vtk-blue-dark: #12163a;
+  --color-vtk-blue-light: #3a4170;
+  --color-vtk-blue-soft: #e4e7f0;
+  --color-vtk-blue-muted: #eff1f7;
+  --color-vtk-link: #1f5fc1;
 
-  --color-vtk-paper: #eff2f8;
-  --color-vtk-paper-2: #e6ecf5;
+  --color-vtk-yellow: #ffd400;
+  --color-vtk-yellow-dark: #f0c400;
+
+  --color-vtk-paper: #eff1f7;
+  --color-vtk-paper-2: #e4e7f0;
   --color-vtk-surface: #ffffff;
   --color-vtk-surface-elevated: #ffffff;
 
-  --color-vtk-muted: #5c667f;
-  --color-vtk-body: #34405e;
-  --color-vtk-on-dark-muted: #b7c0dc;
+  --color-vtk-muted: #707070;
+  --color-vtk-body: #4a5b71;
+  --color-vtk-on-dark-muted: #b9bdd6;
 
-  --color-vtk-line: rgba(14, 26, 54, 0.1);
-  --color-vtk-line-2: rgba(14, 26, 54, 0.18);
+  --color-vtk-line: #eaeaea;
+  --color-vtk-line-2: #d9d9d9;
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 }
 
-/* Palette = single source of truth, shared with vtk-website-new. "paper" is the
-   (cool) page ground, "paper-2" its slightly deeper tint for bands and insets,
-   "surface" the white of cards and panels. Retune here and the whole app
-   follows; components reference the tokens, never raw hexes. */
+/* Palette = single source of truth for the app, taken from the Figma wireframes.
+   "paper" is the cool grey of the sidebar, bands, inputs and placeholders;
+   "paper-2" a deeper tint of it for hovers; "surface" the white of the page and
+   its cards. Navy carries primary actions, yellow the round arrow buttons and
+   accents. Retune here and the whole app follows; components reference the
+   tokens, never raw hexes. */
 :root {
-  --ink: #0a0f1f;
-  --navy: #0e1a36;
-  --paper: #eff2f8;
-  --paper-2: #e6ecf5;
+  --ink: #0a0a0f;
+  --navy: #1a1f4a;
+  --navy-2: #2b3166;
+  --paper: #eff1f7;
+  --paper-2: #e4e7f0;
   --surface: #ffffff;
-  --line: rgba(14, 26, 54, 0.1);
-  --line-2: rgba(14, 26, 54, 0.18);
-  --yellow: #ffd23f;
-  --muted: #5c667f;
-  --body: #34405e;
-  /* Muted text on a navy/ink ground (intentional dark bands only). */
-  --on-dark-muted: #b7c0dc;
+  --line: #eaeaea;
+  --line-2: #d9d9d9;
+  --input-line: #c9cdd6;
+  --yellow: #ffd400;
+  --muted: #707070;
+  --body: #4a5b71;
+  --link: #1f5fc1;
+  /* Muted text on a navy ground (dialogs' dark tooltips and the like). */
+  --on-dark-muted: #b9bdd6;
   --accent: var(--yellow);
-  --accent-2: #edbd22;
+  --accent-2: #f0c400;
   --danger: #b42318;
 
-  --max: 1320px;
+  --max: 1160px;
   --radius: 0.5rem;
   --vtk-header-height: 72px;
 }
 
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4, so
-  we pin it to the navy-tinted rule that the design system uses everywhere.
+  we pin it to the light hairline that the wireframes use everywhere.
 */
 @layer base {
   *,
@@ -85,15 +94,16 @@
     min-height: 100%;
     margin: 0;
     padding: 0;
-    background: var(--paper);
+    background: var(--surface);
     color: var(--ink);
+    font-family: var(--font-sans);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Editorial headings: tight tracking, restrained weight. Sizes are
-     deliberately smaller than the old scale; pages set their own display size
-     through `.vtk-page-title`. */
+  /* Headings use the geometric display face of the wireframes (Figtree standing
+     in for the Circular of the Figma file); body copy stays in Roboto. Pages set
+     their own display size through `.vtk-page-title`. */
   h1,
   h2,
   h3,
@@ -101,13 +111,15 @@
   h5,
   h6 {
     color: var(--ink);
+    font-family: var(--font-display);
     line-height: 1.15;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
     font-weight: 600;
   }
 
   h1 {
     @apply text-3xl sm:text-4xl my-4;
+    font-weight: 700;
   }
 
   h2 {
@@ -179,14 +191,14 @@
 
 @layer components {
   /* ---------------------------------------------------------------------
-     Page shell: generous max-width container on the cool paper ground, with
-     the editorial page head (kicker, large tight title, right-aligned meta,
-     rule underneath).
+     Page shell: a centred column on the white page, with the page head of
+     the wireframes underneath the header: muted breadcrumb, a large bold
+     display title and a short description. No rule underneath.
      --------------------------------------------------------------------- */
   .vtk-shell {
     max-width: var(--max);
     margin: 0 auto;
-    padding-inline: clamp(20px, 3vw, 36px);
+    padding-inline: clamp(20px, 4vw, 56px);
     width: 100%;
   }
 
@@ -195,12 +207,11 @@
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 32px;
     align-items: end;
-    padding-block: clamp(24px, 3vw, 40px) clamp(16px, 2vw, 24px);
-    border-bottom: 1px solid var(--line);
+    padding-block: clamp(24px, 3vw, 40px) clamp(8px, 1.5vw, 16px);
   }
 
   .vtk-page-kicker {
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     color: var(--muted);
     font-size: 13px;
   }
@@ -209,27 +220,26 @@
     margin: 0;
     max-width: 900px;
     color: var(--ink);
-    font-size: clamp(28px, 3.4vw, 44px);
-    line-height: 1.05;
-    letter-spacing: -0.025em;
-    font-weight: 600;
+    font-family: var(--font-display);
+    font-size: clamp(30px, 3.4vw, 44px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    font-weight: 700;
   }
 
   .vtk-page-subtitle {
-    max-width: 95ch;
-    margin-top: 12px;
+    max-width: 80ch;
+    margin-top: 14px;
     color: var(--body);
-    font-size: 16px;
-    line-height: 1.55;
+    font-size: 15px;
+    line-height: 1.6;
   }
 
   .vtk-page-meta {
     color: var(--muted);
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.8;
     text-align: right;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
   }
 
   .vtk-page-meta b {
@@ -237,64 +247,91 @@
     font-weight: 600;
   }
 
-  /* Small uppercase label used above groups and in table headers. */
+  /* Grey band that heads a page (the course page's hero), full width of the
+     main column, with the page shell inside it. */
+  .vtk-band {
+    background: var(--paper);
+  }
+
+  /* Plain label above groups and in table headers: "1e Bachelor",
+     "Studiepunten", "Mijn vakken". */
   .vtk-label {
     color: var(--muted);
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 400;
+  }
+
+  /* Section heading inside a page: "Documenten", "Best beoordeeld". */
+  .vtk-section-title {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.2vw, 28px);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    font-weight: 600;
+  }
+
+  /* Heading inside a card: "Ga verder waar je gebleven was". */
+  .vtk-card-title {
+    margin: 0;
+    color: var(--body);
+    font-family: var(--font-display);
+    font-size: 20px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   /* ---------------------------------------------------------------------
-     Surfaces
+     Surfaces: white cards with a light hairline and a small radius.
      --------------------------------------------------------------------- */
   .vtk-panel {
     border: 1px solid var(--line);
-    border-radius: 18px;
+    border-radius: 8px;
     background: var(--surface);
   }
 
   .vtk-panel-muted {
-    background: var(--paper-2);
+    border-color: var(--paper);
+    background: var(--paper);
   }
 
   .vtk-panel-dark {
     border-color: var(--navy);
     background: var(--navy);
-    color: var(--paper);
+    color: #fff;
   }
 
   .vtk-card {
     border: 1px solid var(--line);
-    border-radius: 18px;
+    border-radius: 8px;
     background: var(--surface);
-    padding: clamp(20px, 3vw, 28px);
+    padding: clamp(16px, 2vw, 20px);
     transition:
-      transform 180ms ease,
-      border-color 180ms ease,
-      background 180ms ease;
+      border-color 160ms ease,
+      box-shadow 160ms ease;
   }
 
   .vtk-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--line-2);
+    border-color: var(--navy);
   }
 
-  /* A featured card is marked with a yellow accent rail, never a navy fill. */
+  /* A featured card is marked with a yellow accent rail. */
   .vtk-card-featured {
     box-shadow: inset 3px 0 0 var(--yellow);
   }
 
   .vtk-card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+    gap: 14px;
   }
 
   /* ---------------------------------------------------------------------
-     Buttons: pill-shaped. Primary is ink with paper text; ghost is bordered
-     on paper; yellow is reserved for accents and active states.
+     Buttons: rectangles with a small radius. Primary is navy with white
+     text, the default is outlined in navy, accent is the wireframes'
+     yellow. Round yellow arrow buttons live in `.vtk-arrow-button`.
      --------------------------------------------------------------------- */
   /* `.primary-button` / `.white-button` are legacy aliases kept so untouched
      call sites stay on-palette; prefer `.vtk-button*` for new work. */
@@ -306,20 +343,19 @@
     justify-content: center;
     gap: 8px;
     min-height: 40px;
-    padding: 10px 18px;
-    border: 1px solid var(--line-2);
-    border-radius: 999px;
+    padding: 10px 16px;
+    border: 1px solid var(--navy);
+    border-radius: 4px;
     background: var(--surface);
-    color: var(--ink);
+    color: var(--navy);
     font: inherit;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1;
     text-decoration: none;
     white-space: nowrap;
     cursor: pointer;
     transition:
-      transform 160ms ease,
       background 160ms ease,
       border-color 160ms ease,
       color 160ms ease;
@@ -328,28 +364,30 @@
   .vtk-button:hover:not(:disabled),
   .primary-button:hover:not(:disabled),
   .white-button:hover:not(:disabled) {
-    transform: translateY(-1px);
-    border-color: var(--ink);
+    background: var(--paper);
   }
 
   .vtk-button:focus-visible,
   .primary-button:focus-visible,
   .white-button:focus-visible,
-  .vtk-icon-button:focus-visible {
+  .vtk-icon-button:focus-visible,
+  .vtk-arrow-button:focus-visible,
+  .vtk-chip:focus-visible {
     outline: 2px solid var(--navy);
     outline-offset: 2px;
   }
 
   .vtk-button-primary,
   .primary-button {
-    border-color: var(--ink);
-    background: var(--ink);
-    color: var(--paper);
+    border-color: var(--navy);
+    background: var(--navy);
+    color: #fff;
   }
 
   .vtk-button-primary:hover:not(:disabled),
   .primary-button:hover:not(:disabled) {
-    background: var(--navy);
+    border-color: var(--navy-2);
+    background: var(--navy-2);
   }
 
   .white-button {
@@ -368,18 +406,21 @@
   }
 
   .vtk-button-ghost {
+    border-color: transparent;
     background: transparent;
   }
 
   .vtk-button-ghost:hover:not(:disabled) {
-    background: rgba(14, 26, 54, 0.04);
+    background: var(--paper);
   }
 
   .vtk-button-subtle {
+    border-color: var(--paper);
     background: var(--paper);
   }
 
   .vtk-button-subtle:hover:not(:disabled) {
+    border-color: var(--paper-2);
     background: var(--paper-2);
   }
 
@@ -389,17 +430,38 @@
     color: #fff;
   }
 
+  .vtk-button-danger:hover:not(:disabled) {
+    border-color: #8f1c13;
+    background: #8f1c13;
+  }
+
   .vtk-button-sm {
     min-height: 32px;
     padding: 6px 12px;
     font-size: 13px;
   }
 
+  /* The small yellow "Meer info" / "Bekijk" tag-button of the wireframes. */
+  .vtk-button-tag {
+    min-height: 26px;
+    padding: 5px 10px;
+    border-color: var(--yellow);
+    border-radius: 3px;
+    background: var(--yellow);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .vtk-button-tag:hover:not(:disabled) {
+    border-color: var(--accent-2);
+    background: var(--accent-2);
+  }
+
   .vtk-button:disabled,
   .vtk-button-disabled {
     opacity: 0.48;
     cursor: not-allowed;
-    transform: none;
   }
 
   /* Compact round icon button for repeated row actions. */
@@ -421,13 +483,94 @@
   }
 
   .vtk-icon-button:hover:not(:disabled) {
-    border-color: var(--ink);
-    background: var(--paper-2);
+    border-color: var(--navy);
+    background: var(--paper);
   }
 
   .vtk-icon-button:disabled {
     opacity: 0.48;
     cursor: not-allowed;
+  }
+
+  /* Round yellow button with a ↗ arrow: "open this" at the end of a row. */
+  .vtk-arrow-button {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+    border-radius: 999px;
+    background: var(--yellow);
+    color: var(--ink);
+    transition:
+      background 160ms ease,
+      transform 160ms ease;
+  }
+
+  .vtk-arrow-button:hover,
+  .group:hover .vtk-arrow-button {
+    background: var(--accent-2);
+  }
+
+  .vtk-arrow-button-sm {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* Pill chip: outlined navy, filled when active. Category filters, tags. */
+  .vtk-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 6px 14px;
+    border: 1.5px solid var(--navy);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--navy);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background 140ms ease,
+      color 140ms ease;
+  }
+
+  .vtk-chip:hover {
+    background: var(--paper);
+  }
+
+  .vtk-chip[aria-pressed='true'],
+  .vtk-chip[aria-selected='true'],
+  .vtk-chip.is-active {
+    background: var(--navy);
+    color: #fff;
+  }
+
+  /* White pill on a grey band: "Favoriet", "Delen". */
+  .vtk-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 6px 14px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--body);
+    font: inherit;
+    font-size: 13px;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 140ms ease;
+  }
+
+  .vtk-pill:hover {
+    background: var(--paper-2);
   }
 
   /* Slider for continuous controls (the PDF zoom bar). Native range inputs pick up the OS accent
@@ -461,7 +604,7 @@
     height: 14px;
     border: 2px solid var(--surface);
     border-radius: 999px;
-    background: var(--ink);
+    background: var(--navy);
   }
 
   .vtk-range::-moz-range-thumb {
@@ -469,7 +612,7 @@
     height: 14px;
     border: 2px solid var(--surface);
     border-radius: 999px;
-    background: var(--ink);
+    background: var(--navy);
   }
 
   .vtk-range:focus-visible {
@@ -479,7 +622,8 @@
   }
 
   /* ---------------------------------------------------------------------
-     Form controls
+     Form controls: white fields with a grey border and a small radius, as
+     in the wireframes' "Document toevoegen" dialog.
      --------------------------------------------------------------------- */
   .vtk-field {
     display: grid;
@@ -487,18 +631,18 @@
   }
 
   .vtk-field-label {
-    color: var(--muted);
-    font-size: 12px;
-    font-weight: 700;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 500;
   }
 
   .vtk-input,
   .vtk-select,
   .vtk-textarea {
     width: 100%;
-    border: 1px solid var(--line-2);
-    border-radius: 12px;
-    background: var(--paper);
+    border: 1px solid var(--input-line);
+    border-radius: 4px;
+    background: var(--surface);
     color: var(--ink);
     font: inherit;
     font-size: 14px;
@@ -520,13 +664,13 @@
   .vtk-select:focus,
   .vtk-textarea:focus {
     outline: none;
-    border-color: var(--ink);
-    box-shadow: 0 0 0 3px rgba(14, 26, 54, 0.08);
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(26, 31, 74, 0.1);
   }
 
   .vtk-input::placeholder,
   .vtk-textarea::placeholder {
-    color: var(--muted);
+    color: #a7a7a7;
   }
 
   .vtk-help {
@@ -549,12 +693,12 @@
     gap: 6px;
     min-height: 24px;
     padding: 4px 9px;
-    border: 1px solid var(--line);
+    border: 1px solid var(--line-2);
     border-radius: 999px;
     background: var(--surface);
     color: var(--ink);
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1;
   }
 
@@ -564,8 +708,9 @@
   }
 
   .vtk-badge-muted {
-    background: var(--paper-2);
-    color: var(--muted);
+    border-color: var(--paper);
+    background: var(--paper);
+    color: var(--body);
   }
 
   .vtk-badge-success {
@@ -586,7 +731,7 @@
   .vtk-table-wrap {
     overflow-x: auto;
     border: 1px solid var(--line);
-    border-radius: 18px;
+    border-radius: 8px;
     background: var(--surface);
   }
 
@@ -597,7 +742,7 @@
   }
 
   .vtk-table thead {
-    background: var(--paper-2);
+    background: var(--paper);
   }
 
   .vtk-table th,
@@ -610,12 +755,12 @@
 
   .vtk-table th {
     color: var(--muted);
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 500;
   }
 
   .vtk-table tbody tr:hover {
-    background: rgba(255, 210, 63, 0.08);
+    background: var(--paper);
   }
 
   .vtk-table tbody tr:last-child td {
@@ -636,7 +781,7 @@
   }
 
   .vtk-row-click:hover {
-    background: var(--paper-2);
+    background: var(--paper);
   }
 
   .vtk-empty {
@@ -646,25 +791,34 @@
     text-align: center;
   }
 
+  /* Small grey square in front of a document row, standing in for a preview. */
+  .vtk-thumb {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+    border-radius: 4px;
+    background: var(--paper);
+    color: var(--body);
+  }
+
   /* ---------------------------------------------------------------------
-     Tabs / segmented control
+     Tabs / segmented control: a row of chips, the active one filled navy.
      --------------------------------------------------------------------- */
   .vtk-tabs {
     display: inline-flex;
-    gap: 6px;
-    padding: 5px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--surface);
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .vtk-tab {
     min-height: 32px;
     padding: 6px 14px;
-    border: 0;
+    border: 1.5px solid var(--navy);
     border-radius: 999px;
-    background: transparent;
-    color: var(--muted);
+    background: var(--surface);
+    color: var(--navy);
     font: inherit;
     font-size: 13px;
     font-weight: 600;
@@ -675,28 +829,27 @@
   }
 
   .vtk-tab:hover {
-    color: var(--ink);
+    background: var(--paper);
   }
 
   .vtk-tab[aria-selected='true'],
   .vtk-tab.is-active {
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--navy);
+    color: #fff;
   }
 
   /* ---------------------------------------------------------------------
      Misc
      --------------------------------------------------------------------- */
   .vtk-link {
-    color: var(--navy);
+    color: var(--link);
     font-weight: 500;
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    text-decoration-color: var(--yellow);
+    text-decoration: none;
   }
 
   .vtk-link:hover {
-    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   .vtk-muted {
@@ -712,11 +865,10 @@
     vertical-align: middle;
   }
 
-  /* Striped placeholder so missing images stay visible. */
+  /* Grey placeholder block so missing images stay visible. */
   .vtk-placeholder {
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: repeating-linear-gradient(-45deg, var(--paper-2) 0 8px, var(--paper) 8px 16px);
+    border-radius: 8px;
+    background: var(--paper);
   }
 }
 

@@ -6,13 +6,23 @@ import TranslationsProvider from "@/components/TranslationProvider";
 import { ToastProvider } from "@/components/ui/Toast";
 import { UserProvider } from "@/components/UserContext";
 import type { Metadata } from "next";
-import { Inter } from 'next/font/google';
+import { Figtree, Roboto } from 'next/font/google';
 import React from "react";
 
-// Inter as default font
-const inter = Inter({
+// The wireframes pair a geometric display face (Circular in Figma; Figtree is the closest open
+// match) for headings and navigation with Roboto for body copy. Both are exposed as CSS variables
+// that globals.css maps onto Tailwind's font-sans and font-display.
+const roboto = Roboto({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+  variable: '--font-body',
+})
+
+const figtree = Figtree({
   subsets: ['latin'],
   display: 'swap',
+  variable: '--font-heading',
 })
 
 // Metadata for improved SEO and web shareability
@@ -43,7 +53,7 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
       <TranslationsProvider
         locale={locale}
         resources={resources}>
-        <html lang={locale} className={`${inter.className} h-full`}>
+        <html lang={locale} className={`${roboto.variable} ${figtree.variable} h-full`}>
           <body className="flex min-h-full flex-col">
             {/* ToastProvider uses client-side hooks (useState, useContext) so must be placed inside body tags */}
             <ToastProvider>

@@ -251,7 +251,7 @@ const CourseCommentList = ({
                 role="button"
                 tabIndex={0}
                 aria-expanded={expanded}
-                className="relative z-20 flex cursor-pointer items-center gap-2.5 rounded-[18px] border border-vtk-line bg-vtk-surface px-4 py-3 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-2"
+                className="relative z-20 flex cursor-pointer items-center gap-2.5 rounded-lg border border-vtk-line bg-vtk-surface px-4 py-3 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-2"
                 onClick={() => setExpanded(!expanded)}
                 onKeyDown={(e) => {
                     if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {

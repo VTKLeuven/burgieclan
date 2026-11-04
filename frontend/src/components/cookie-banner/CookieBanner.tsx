@@ -29,15 +29,15 @@ const CookieBanner = () => {
         consentGiven !== 'undecided' ? <></> :
             // Navy glass panel pinned bottom-right, matching `.vtk-cookie-consent`.
             <div className="pointer-events-none fixed inset-x-0 bottom-4 z-1000 flex justify-end px-4 sm:bottom-8 sm:px-8">
-                <div className="pointer-events-auto w-full max-w-[560px] rounded-[18px] border border-white/15 bg-vtk-navy p-5.5 text-vtk-paper shadow-[0_24px_70px_rgba(10,15,31,0.3)]">
-                    <p className="m-0 text-sm leading-relaxed text-vtk-on-dark-muted">
+                <div className="pointer-events-auto w-full max-w-[520px] rounded-lg border border-vtk-line bg-vtk-surface p-5 text-vtk-ink shadow-[0_18px_50px_rgba(26,31,74,0.16)]">
+                    <p className="m-0 text-sm leading-relaxed text-vtk-body">
                         {t('cookie_banner_text')}
                     </p>
                     <div className="mt-4 flex justify-end">
                         <button
                             type="button"
                             onClick={handleAcceptCookies}
-                            className="vtk-button vtk-button-accent vtk-button-sm">
+                            className="vtk-button vtk-button-primary vtk-button-sm">
                             {t('cookie_banner_accept')}
                         </button>
                     </div>

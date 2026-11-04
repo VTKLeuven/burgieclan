@@ -87,7 +87,7 @@ export default function StartExamDialog({ isOpen, onClose, courseId, exams }: St
                                 return (
                                     <label
                                         key={candidate}
-                                        className={`flex cursor-pointer flex-col gap-1 rounded-xl border p-3 text-sm ${period === candidate ? 'border-vtk-ink bg-vtk-paper' : 'border-vtk-line-2'} ${started ? '' : 'cursor-not-allowed opacity-50'}`}
+                                        className={`flex cursor-pointer flex-col gap-1 rounded-lg border p-3 text-sm ${period === candidate ? 'border-vtk-ink bg-vtk-paper' : 'border-vtk-line-2'} ${started ? '' : 'cursor-not-allowed opacity-50'}`}
                                     >
                                         <span className="flex items-center gap-2 font-semibold text-vtk-ink">
                                             <input

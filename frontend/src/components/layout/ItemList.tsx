@@ -14,10 +14,16 @@ interface Item {
 interface ItemListProps {
     items: Item[];
     emptyMessage: string;
+    /** Where "Toon meer" leads once the list is longer than it shows. */
+    moreHref?: string;
 }
 
-const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage }) => {
-    const { i18n } = useTranslation();
+/**
+ * A favourites list in the sidebar, as the wireframes draw "Mijn vakken": a yellow star in front
+ * of every name (it is the favourite toggle itself), and "Toon meer" in blue under a long list.
+ */
+const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage, moreHref = '/account' }) => {
+    const { t, i18n } = useTranslation();
     const itemsPerList = 10;
     const displayedItems = items.slice(0, itemsPerList);
     const apiEndpointFor = (item: Item) => {
@@ -28,35 +34,32 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage }) => {
     };
 
     return (
-        <div className="pl-2">
+        <div>
             {items && items.length > 0 ? (
                 <ul className="m-0 list-none space-y-0 p-0">
                     {displayedItems.map((item) => (
                         <li
                             key={`${item.type}-${item.id}`}
-                            className="group relative rounded-lg transition-colors duration-100 hover:bg-vtk-paper-2"
+                            className="flex items-start gap-1 rounded-md transition-colors duration-100 hover:bg-vtk-paper-2"
                         >
+                            {/* The star sits beside the link, not inside it: a button nested in an
+                                anchor is invalid markup. */}
+                            <FavoriteButton
+                                itemId={item.id}
+                                itemType={item.type}
+                                size={14}
+                                className="mt-1 shrink-0 p-1"
+                            />
                             <ApiPrefetchLink
                                 href={item.redirectUrl}
                                 apiEndpoints={apiEndpointFor(item)}
-                                className="flex w-full min-w-0 items-center rounded-lg px-2 py-1.5 pr-9 focus-visible:ring-2 focus-visible:ring-vtk-ink/20"
+                                className="flex min-w-0 flex-1 items-center rounded-md py-1.5 pr-2 focus-visible:ring-2 focus-visible:ring-vtk-navy"
                             >
-                                <div className="flex min-w-0 items-center overflow-hidden">
-                                    <span className="truncate text-sm font-normal text-vtk-body">
-                                        {item.name}
-                                        {item.code && <span className="ml-1 text-xs text-vtk-muted">({item.code})</span>}
-                                    </span>
-                                </div>
+                                <span className="text-sm leading-snug text-vtk-ink">
+                                    {item.name}
+                                    {item.code && <span className="ml-1 text-xs text-vtk-muted">({item.code})</span>}
+                                </span>
                             </ApiPrefetchLink>
-                            <div className="absolute inset-y-0 right-2 z-10 flex items-center opacity-0 transition-opacity duration-100 focus-within:opacity-100 group-focus-within:opacity-100 group-hover:opacity-100">
-                                <FavoriteButton
-                                    itemId={item.id}
-                                    itemType={item.type}
-                                    size={14}
-                                    className="p-0.5"
-                                    colorScheme="gray"
-                                />
-                            </div>
                         </li>
                     ))}
                 </ul>
@@ -65,10 +68,10 @@ const ItemList: React.FC<ItemListProps> = ({ items, emptyMessage }) => {
             )}
             {items.length > itemsPerList && (
                 <ApiPrefetchLink
-                    href="/account"
-                    className="mt-1 block rounded-lg px-2 py-1 text-[13px] text-vtk-muted transition-colors duration-100 hover:bg-vtk-paper-2 hover:text-vtk-ink"
+                    href={moreHref}
+                    className="mt-1 block rounded-md px-2 py-1 text-[13px] font-bold text-vtk-link transition-colors duration-100 hover:underline"
                 >
-                    View All
+                    {t('sidebar.show_more')}
                 </ApiPrefetchLink>
             )}
         </div>

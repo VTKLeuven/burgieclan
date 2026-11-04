@@ -26,7 +26,7 @@ export default function SearchResult({ mainResult, extraInfo, redirect, apiEndpo
         value={{ redirect, apiEndpoint }}
         onMouseEnter={prefetch}
         onFocus={prefetch}
-        className="cursor-default select-none px-4 py-2 data-focus:bg-vtk-ink data-focus:text-white"
+        className="cursor-default select-none px-4 py-2 data-focus:bg-vtk-navy data-focus:text-white"
     >
         {({ focus }) => (<div className="flex justify-between">
             <span className="truncate">{mainResult}</span>
@@ -76,7 +76,7 @@ export function ExamQuestionSearchResult({ hit }: { hit: ExamQuestionSearchHit }
         value={{ redirect: `${page}#q-${encodeURIComponent(hit.uid)}` }}
         onMouseEnter={() => router.prefetch(page)}
         onFocus={() => router.prefetch(page)}
-        className="cursor-default select-none px-4 py-2 data-focus:bg-vtk-ink data-focus:text-white"
+        className="cursor-default select-none px-4 py-2 data-focus:bg-vtk-navy data-focus:text-white"
     >
         {({ focus }) => (<div className="grid gap-0.5">
             <span className="line-clamp-2">{hit.snippet}</span>
