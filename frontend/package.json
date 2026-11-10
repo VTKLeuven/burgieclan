@@ -66,6 +66,6 @@
     "postcss": "$postcss",
     "sharp": "$sharp",
     "brace-expansion": "^5.0.8",
-    "minimatch": "^10.0.3"
+    "minimatch": "^11.0.0"
   }
 }
