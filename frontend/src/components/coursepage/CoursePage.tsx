@@ -9,19 +9,32 @@ import ExamSection from "@/components/coursepage/exam/ExamSection";
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import RelatedCourses from "@/components/coursepage/RelatedCourses";
 import ErrorPage from "@/components/error/ErrorPage";
+import PageHeader from "@/components/layout/PageHeader";
+import CourseBadge from "@/components/layout/CourseBadge";
+import CreateDocumentButton from "@/components/ui/CreateDocumentButton";
+import DownloadButton from "@/components/ui/DownloadButton";
 import DynamicBreadcrumb from "@/components/ui/DynamicBreadcrumb";
-import PageHead from "@/components/ui/PageHead";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import { readPreloadedApi, useApi } from "@/hooks/useApi";
 import { Course, CourseComment } from "@/types/entities";
 import { convertToCourse } from "@/utils/convertToEntity";
-import { ChartPie, Link as LinkIcon } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { localizedCourseName } from '@/utils/courseName';
+
+/** One label/value line of the properties sidebar, as on a Dopl item page. */
+function Property({ label, children }: { label: string; children: ReactNode }) {
+    return (
+        <div className="grid grid-cols-[104px_minmax(0,1fr)] items-start gap-3 py-1.5">
+            <dt className="pt-0.5 text-small text-fg-muted">{label}</dt>
+            <dd className="m-0 min-w-0 text-body text-fg [overflow-wrap:anywhere]">{children}</dd>
+        </div>
+    );
+}
 
 export default function CoursePage() {
     const { id: courseId } = useParams();
@@ -78,97 +91,112 @@ export default function CoursePage() {
         return <ErrorPage status={error.status} detail={error.message} />;
     }
 
-    // Show loading state only if we don't have course data yet
     if (!courseId || !course || (loading && !course)) {
         return (
-            <div className="flex items-center justify-center h-full w-full">
+            <>
+                <PageHeader breadcrumb={<DynamicBreadcrumb />} />
                 <Loading />
-            </div>
+            </>
         );
     }
 
-    return (course &&
+    const semesters = course.semesters ?? [];
+    const semesterLabel = semesters.includes("Semester 1") && semesters.includes("Semester 2")
+        ? t('course-page.year-course')
+        : semesters.join(", ");
+    const professors = course.professors ?? [];
+
+    return (
         <>
-            <div className="vtk-shell pb-16">
-                {/* Editorial page head: breadcrumb kicker, display title, and
-                    the course facts as a right-aligned spec block. */}
-                <PageHead
-                    kicker={<DynamicBreadcrumb />}
-                    title={courseName}
-                    actions={
-                        <FavoriteButton
-                            itemId={course.id}
-                            itemType="course"
-                            size={20}
-                            className="mt-2"
-                        />
-                    }
-                    aside={
-                        course?.professors && course.professors.length > 0 ? (
-                            <div className="text-right">
-                                <div className="vtk-label mb-2.5">{t('course-page.teachers')}</div>
-                                <div className="flex justify-end -space-x-3">
-                                    {course.professors.map((p, index) => (
-                                        <ProfessorDiv key={index} unumber={p} index={index} />
-                                    ))}
-                                </div>
+            <PageHeader
+                breadcrumb={<DynamicBreadcrumb />}
+                actions={
+                    <>
+                        <FavoriteButton itemId={course.id} itemType="course" size={18} className="vtk-icon-button" />
+                        <DownloadButton courses={[course]} size={18} />
+                        <CreateDocumentButton initialData={{ course }} size={16} />
+                    </>
+                }
+            />
+
+            {/* Dopl's item page: the content in a main column, the facts in a sidebar beside it. */}
+            <div className="flex flex-1 flex-col lg:flex-row">
+                <div className="min-w-0 flex-1 px-4 pt-7 pb-16 md:px-8">
+                    <div className="mx-auto max-w-[880px]">
+                        <div className="flex items-start gap-3.5">
+                            <CourseBadge name={courseName} seed={course.code} size={40} className="mt-0.5 hidden rounded-card sm:inline-flex" />
+                            <div className="min-w-0">
+                                <h1 className="vtk-page-title">{courseName}</h1>
+                                <p className="m-0 mt-1 flex flex-wrap items-center gap-x-2 text-body text-fg-muted">
+                                    <span className="tabular">{course.code}</span>
+                                    <span aria-hidden="true">·</span>
+                                    <span>{course.credits} {t('credits')}</span>
+                                    {semesterLabel && (
+                                        <>
+                                            <span aria-hidden="true">·</span>
+                                            <span>{semesterLabel}</span>
+                                        </>
+                                    )}
+                                </p>
                             </div>
-                        ) : undefined
-                    }
-                >
-                    <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-vtk-body">
-                        <span className="vtk-badge vtk-badge-muted font-mono">{course.code}</span>
+                        </div>
 
-                        <span className="flex items-center gap-2">
-                            <ChartPie size={15} className="text-vtk-muted" />
-                            {course.credits} {t('credits')}
-                        </span>
+                        <RelatedCourses course={course} />
 
-                        {/* Skipped entirely when the semester is unknown: the indicator renders
-                            nothing in that case, so the span would be an empty flex item and
-                            the row would show a stray gap. */}
-                        {(course.semesters?.length ?? 0) > 0 && (
-                            <span className="flex items-center gap-2">
-                                <SemesterIndicator semesters={course.semesters} size={15} />
-                                {course.semesters!.includes("Semester 1") && course.semesters!.includes("Semester 2")
-                                    ? t('course-page.year-course')
-                                    : course.semesters!.join(", ")}
-                            </span>
-                        )}
-
-                        <Link
-                            href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`}
-                            className="vtk-link flex items-center gap-1.5"
-                        >
-                            <LinkIcon size={14} />
-                            ECTS
-                        </Link>
-
-                        <CoursePlacement />
+                        <div className="mt-8 grid gap-10">
+                            <DocumentSections course={course} documentCounts={course.documentCounts} />
+                            <ExamSection courseId={course.id} />
+                            <CommentCategories
+                                comments={course.courseComments ?? []}
+                                courseId={course.id}
+                                onCommentsUpdate={handleCommentsUpdate}
+                            />
+                        </div>
                     </div>
-
-                    <RelatedCourses course={course} />
-                </PageHead>
-
-                {/* Documents */}
-                <div className="mt-8">
-                    <DocumentSections course={course} documentCounts={course.documentCounts} />
                 </div>
 
+                <aside className="shrink-0 border-t border-border px-4 py-6 md:px-8 lg:w-[300px] lg:border-t-0 lg:border-l lg:px-6">
+                    <div className="lg:sticky lg:top-[calc(var(--header-height)+24px)]">
+                        <dl className="m-0">
+                            <Property label="Code">
+                                <span className="tabular">{course.code}</span>
+                            </Property>
+                            <Property label={t('curriculum-navigator.credits')}>
+                                <span className="tabular">{course.credits}</span>
+                            </Property>
+                            {semesterLabel && (
+                                <Property label={t('curriculum-navigator.semester')}>
+                                    <span className="flex items-center gap-2">
+                                        <SemesterIndicator semesters={course.semesters} size={14} />
+                                        {semesterLabel}
+                                    </span>
+                                </Property>
+                            )}
+                            {professors.length > 0 && (
+                                <Property label={t('course-page.teachers')}>
+                                    <div className="flex flex-col">
+                                        {professors.map((p, index) => (
+                                            <ProfessorDiv key={p} unumber={p} index={index} size={24} variant="row" />
+                                        ))}
+                                    </div>
+                                </Property>
+                            )}
+                            <CoursePlacement />
+                        </dl>
 
-                {/* Exam reconstructions */}
-                <div className="mt-10 border-t border-vtk-line pt-8">
-                    <ExamSection courseId={course.id} />
-                </div>
-
-                {/* Comments */}
-                <div className="mt-10 border-t border-vtk-line pt-8">
-                    <CommentCategories
-                        comments={course.courseComments ?? []}
-                        courseId={course.id}
-                        onCommentsUpdate={handleCommentsUpdate}
-                    />
-                </div>
+                        <div className="mt-4 border-t border-border pt-4">
+                            <Link
+                                href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 text-body font-medium text-link hover:underline"
+                            >
+                                {t('course-page.ects-sheet')}
+                                <ArrowUpRight className="size-4" aria-hidden="true" />
+                            </Link>
+                        </div>
+                    </div>
+                </aside>
             </div>
         </>
     )

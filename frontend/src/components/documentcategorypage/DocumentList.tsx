@@ -2,7 +2,6 @@ import DocumentFilter from '@/components/documentcategorypage/DocumentFilter';
 import DocumentListItem from '@/components/documentcategorypage/DocumentListItem';
 import DocumentSort from '@/components/documentcategorypage/DocumentSort';
 import { Checkbox } from '@/components/ui/Checkbox';
-import CreateDocumentButton from '@/components/ui/CreateDocumentButton';
 import DownloadButton from '@/components/ui/DownloadButton';
 import Pagination from '@/components/ui/Pagination';
 import useRetrieveDocuments, { DocumentFilters, DocumentSortOptions } from '@/hooks/useRetrieveDocuments';
@@ -110,62 +109,59 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
     const allSelected = documents.length > 0 && selectedDocuments.length === documents.length;
 
     return (
-        <div>
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-vtk-line pb-3.5">
-                <h2 className="m-0 text-xl font-semibold tracking-tight text-vtk-ink">
-                    {t('course-page.documents.header')}
-                </h2>
+        <section aria-label={t('course-page.documents.header')}>
+            {/* Toolbar: filter and sort on the left, the selection's own actions on the right. */}
+            <div className="mb-3 flex min-h-8 flex-wrap items-center gap-2">
+                <DocumentFilter
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    onClearFilters={handleClearFilters}
+                    course={course}
+                    category={category}
+                />
+                <DocumentSort currentSort={sort} onSortChange={handleSortChange} />
 
-                <div className="flex flex-wrap items-center gap-2">
-                    {selectedDocuments.length > 0 && (
-                        <div className="mr-1 flex items-center gap-2">
-                            <span className="text-sm text-vtk-body">
-                                {t('course-page.documents.selected', { amount: selectedDocuments.length })}
-                            </span>
-                            <DownloadButton documents={selectedDocuments} size={15} showText={true} className="vtk-button-sm" />
-                            <button
-                                onClick={handleClearSelection}
-                                className="vtk-icon-button h-8 w-8"
-                                title={t('course-page.documents.clear-selection')}
-                            >
-                                <X size={14} />
-                            </button>
-                        </div>
-                    )}
-
-                    <DocumentFilter
-                        filters={filters}
-                        onFilterChange={handleFilterChange}
-                        onClearFilters={handleClearFilters}
-                        course={course}
-                        category={category}
-                    />
-
-                    <DocumentSort
-                        currentSort={sort}
-                        onSortChange={handleSortChange}
-                    />
-
-                    <CreateDocumentButton initialData={{ course, category }} size={16} />
-                </div>
+                {selectedDocuments.length > 0 && (
+                    <div className="ml-auto flex items-center gap-1.5">
+                        <span className="text-small text-fg-muted">
+                            {t('course-page.documents.selected', { amount: selectedDocuments.length })}
+                        </span>
+                        <DownloadButton documents={selectedDocuments} size={16} showText={true} className="vtk-button-sm" />
+                        <button
+                            type="button"
+                            onClick={handleClearSelection}
+                            className="vtk-icon-button"
+                            title={t('course-page.documents.clear-selection')}
+                            aria-label={t('course-page.documents.clear-selection')}
+                        >
+                            <X size={16} />
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className="vtk-panel overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-14">
-                        <LoaderCircle className="animate-spin text-vtk-muted" size={28} />
+                        <LoaderCircle className="animate-spin text-icon" size={20} />
                     </div>
                 ) : documents.length === 0 ? (
                     <p className="vtk-empty m-0">{t('course-page.documents.no-documents')}</p>
                 ) : (
                     <>
-                        <div className="flex items-center border-b border-vtk-line bg-vtk-paper-2 px-4 py-2.5">
+                        <div className="flex h-10 items-center gap-3 border-b border-border bg-surface-muted px-4">
                             <Checkbox
                                 label={allSelected ? t('course-page.documents.deselect-all') : t('course-page.documents.select-all')}
                                 checked={allSelected}
                                 onChange={handleSelectAll}
-                                className="my-0 text-xs font-semibold uppercase tracking-[0.08em] text-vtk-muted"
+                                className="my-0"
+                                labelClassName="text-small font-medium text-fg-muted"
                             />
+                            <span className="ml-auto text-small text-fg-muted tabular">
+                                {totalItems === 1
+                                    ? t('course-page.document-count.one')
+                                    : t('course-page.document-count.other', { count: totalItems })}
+                            </span>
                         </div>
 
                         <div className="vtk-rows">
@@ -179,13 +175,15 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                             ))}
                         </div>
 
-                        <div className="border-t border-vtk-line px-4 py-3">
-                            <Pagination totalAmount={totalItems} currentPage={page} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} />
-                        </div>
+                        {totalItems > itemsPerPage && (
+                            <div className="border-t border-border px-4 py-3">
+                                <Pagination totalAmount={totalItems} currentPage={page} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} />
+                            </div>
+                        )}
                     </>
                 )}
             </div>
-        </div>
+        </section>
     );
 };
 

@@ -1,11 +1,11 @@
 'use client'
 import Loading from '@/components/loading/LoadingPage';
 import DocumentCategoryPage from "@/components/coursepage/DocumentCategory";
-import CreateDocumentButton from '@/components/ui/CreateDocumentButton';
-import DownloadButton from "@/components/ui/DownloadButton";
+import SectionHeader from '@/components/ui/SectionHeader';
 import { HydraCollection, readPreloadedApi, useApi } from "@/hooks/useApi";
 import type { Course, DocumentCategory } from "@/types/entities";
 import { convertToDocumentCategory } from "@/utils/convertToEntity";
+import { FolderOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -55,32 +55,34 @@ export default function DocumentSections({ course, documentCounts }: DocumentSec
         ? documentCategories
         : documentCategories.filter((category) => countFor(category) > 0);
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-24 w-full">
-                <Loading />
-            </div>
-        );
-    }
+    const total = documentCategories.reduce((sum, category) => sum + countFor(category), 0);
 
     return (
-        <>
-            <div className="flex items-center justify-between gap-3 border-b border-vtk-line pb-3.5">
-                <h2 className="m-0 text-xl font-semibold tracking-tight text-vtk-ink">
-                    {t('course-page.files')}
-                </h2>
-                <div className="flex items-center gap-2">
-                    <CreateDocumentButton
-                        initialData={{ course }}
-                        size={16}
-                    />
-                    <DownloadButton courses={[{ id: courseId }]} size={16} />
-                </div>
-            </div>
-            {visibleCategories.length === 0 ? (
-                <p className="vtk-empty mt-5">{t('course-page.no-documents-yet')}</p>
+        <section aria-labelledby="documents-heading">
+            <SectionHeader
+                id="documents-heading"
+                icon={<FolderOpen />}
+                title={t('course-page.files')}
+                count={hasCounts ? total : undefined}
+                action={emptyCategories.length > 0 && (
+                    <button
+                        type="button"
+                        onClick={() => setShowEmpty((previous) => !previous)}
+                        aria-expanded={showEmpty}
+                        className="vtk-button vtk-button-sm vtk-button-ghost"
+                    >
+                        {showEmpty
+                            ? t('course-page.hide-empty-categories')
+                            : t('course-page.show-empty-categories', { count: emptyCategories.length })}
+                    </button>
+                )}
+            />
+            {loading ? (
+                <Loading compact />
+            ) : visibleCategories.length === 0 ? (
+                <div className="vtk-panel vtk-empty">{t('course-page.no-documents-yet')}</div>
             ) : (
-                <div className="vtk-card-grid mt-5">
+                <div className="vtk-list">
                     {visibleCategories.map((category) => (
                         <DocumentCategoryPage
                             key={category.id}
@@ -95,19 +97,6 @@ export default function DocumentSections({ course, documentCounts }: DocumentSec
                     ))}
                 </div>
             )}
-
-            {emptyCategories.length > 0 && (
-                <button
-                    type="button"
-                    onClick={() => setShowEmpty((previous) => !previous)}
-                    aria-expanded={showEmpty}
-                    className="vtk-button vtk-button-sm vtk-button-ghost mt-4"
-                >
-                    {showEmpty
-                        ? t('course-page.hide-empty-categories')
-                        : t('course-page.show-empty-categories', { count: emptyCategories.length })}
-                </button>
-            )}
-        </>
+        </section>
     );
 }

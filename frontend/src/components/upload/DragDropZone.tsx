@@ -3,18 +3,21 @@
 import { useToast } from '@/components/ui/Toast';
 import { cn } from '@/lib/utils';
 import { ALLOWED_ACCEPT_STRING, FILE_SIZE_LIMIT, FILE_SIZE_MB, isAllowedFile } from '@/utils/constants/upload';
-import { FileText } from 'lucide-react';
+import { FileText, Upload } from 'lucide-react';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface DragDropZoneProps {
     onFileDrop: (file: File) => void;
     className?: string;
+    /** `bar` is a single line, like the capture bar on Dopl's home page. */
+    variant?: 'area' | 'bar';
 }
 
 export const DragDropZone: React.FC<DragDropZoneProps> = ({
     onFileDrop,
-    className
+    className,
+    variant = 'area',
 }) => {
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -76,39 +79,80 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
         }
     }, [onFileDrop, showToast, t, validateFile]);
 
+    const input = (
+        <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden"
+            onChange={handleFileInput}
+            accept={ALLOWED_ACCEPT_STRING}
+        />
+    );
+
+    const handlers = {
+        onClick: handleClick,
+        onDrop: handleDrop,
+        onDragOver: handleDragOver,
+        onDragLeave: handleDragLeave,
+    };
+
+    if (variant === 'bar') {
+        return (
+            <div
+                role="button"
+                tabIndex={0}
+                onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        handleClick();
+                    }
+                }}
+                className={cn(
+                    "flex h-12 w-full cursor-pointer items-center gap-3 rounded-card border px-4 text-left transition-colors duration-150",
+                    isDragging
+                        ? "border-dashed border-sky-500 bg-sky-50"
+                        : "border-border bg-surface hover:border-border-strong hover:bg-surface-hover",
+                    className
+                )}
+                {...handlers}
+                data-testid="drag-drop-zone"
+            >
+                {input}
+                <Upload className={cn("size-4 shrink-0", isDragging ? "text-sky-700" : "text-icon")} aria-hidden="true" />
+                <span className="min-w-0 flex-1 truncate text-body text-fg-placeholder">
+                    {t('upload.drag_drop_bar')}
+                </span>
+                <span className="hidden shrink-0 text-caption text-fg-muted sm:block">
+                    {t('upload.supported_formats', { size: FILE_SIZE_MB })}
+                </span>
+            </div>
+        );
+    }
+
     return (
         <div
             className={cn(
                 "flex h-full w-full cursor-pointer flex-col items-center justify-center p-6 text-center",
-                "rounded-[18px] border border-dashed transition-colors duration-200",
+                "rounded-card border border-dashed transition-colors duration-150",
                 isDragging
-                    ? "border-vtk-ink bg-vtk-paper-2"
-                    : "border-vtk-line-2 bg-vtk-surface hover:border-vtk-ink/40 hover:bg-vtk-paper",
+                    ? "border-sky-500 bg-sky-50"
+                    : "border-border-strong bg-surface hover:bg-surface-hover",
                 className
             )}
-            onClick={handleClick}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
+            {...handlers}
             data-testid="drag-drop-zone"
         >
-            <input
-                ref={fileInputRef}
-                type="file"
-                className="hidden"
-                onChange={handleFileInput}
-                accept={ALLOWED_ACCEPT_STRING}
-            />
+            {input}
             <FileText
                 className={cn(
-                    "mb-3.5 h-9 w-9 transition-colors duration-200",
-                    isDragging ? "text-vtk-ink" : "text-vtk-muted"
+                    "mb-3 size-7 transition-colors duration-150",
+                    isDragging ? "text-sky-700" : "text-icon"
                 )}
             />
-            <p className="m-0 text-[15px] font-semibold tracking-tight text-vtk-ink">
+            <p className="m-0 text-body font-semibold text-fg">
                 {t('upload.drag_drop_title')}
             </p>
-            <p className="m-0 mt-1.5 text-[13px] text-vtk-muted">
+            <p className="m-0 mt-1 text-small text-fg-muted">
                 {t('upload.supported_formats', { size: FILE_SIZE_MB })}
             </p>
         </div>

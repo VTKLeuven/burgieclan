@@ -33,21 +33,18 @@ const CreateDocumentButton: React.FC<CreateDocumentButtonProps> = ({
 
     const label = t('upload.button.create_document');
 
-    const paddingClass = showText ? '' : 'px-0';
+    const paddingClass = showText ? 'max-sm:w-9 max-sm:px-0' : 'w-9 px-0';
 
     return (<>
         <button
             onClick={handleCreateDocument}
-            className={`primary-button ${paddingClass} ${className}`}
-            aria-label={showText ? undefined : label}
+            className={`vtk-button vtk-button-primary ${paddingClass} ${className}`}
+            aria-label={label}
             title={showText ? undefined : label}
         >
             <Plus size={size} className="shrink-0" />
-            {showText && (
-                <span className="ml-1.5 text-sm">
-                    {label}
-                </span>
-            )}
+            {/* On a phone the page header only has room for the icon. */}
+            {showText && <span className="max-sm:sr-only">{label}</span>}
         </button>
         <UploadDialog
             isOpen={isUploadDialogOpen}

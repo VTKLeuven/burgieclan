@@ -6,6 +6,7 @@ import DownloadButton from '@/components/ui/DownloadButton';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
+import CourseBadge from '@/components/layout/CourseBadge';
 import type { Course, Module, Program } from '@/types/entities';
 import { localizedCourseName } from '@/utils/courseName';
 import { shortProgramName } from '@/utils/curriculumLabels';
@@ -34,18 +35,21 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
     const { t, i18n } = useTranslation();
 
     if (hits.length === 0) {
-        return <p className="vtk-empty mt-5">{t('curriculum-navigator.no-search-results')}</p>;
+        return <div className="vtk-panel vtk-empty mt-5">{t('curriculum-navigator.no-search-results')}</div>;
     }
 
     return (
-        <div className="mt-5 overflow-hidden rounded-[14px] border border-vtk-line bg-vtk-surface">
-            <div className="vtk-rows">
+        <div className="mt-5">
+            <p className="m-0 mb-2 text-small text-fg-muted tabular">
+                {t('curriculum-navigator.result-count', { count: hits.length })}
+            </p>
+            <div className="vtk-list">
                 {hits.map(({ course, program, modules, language }) => (
                     <div
                         key={`${program.id}:${course.id}`}
-                        className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-vtk-paper"
+                        className="group/row vtk-list-row vtk-list-row-hover pr-2"
                     >
-                        <FavoriteButton itemId={course.id} itemType="course" size={16} className="shrink-0" />
+                        <CourseBadge name={localizedCourseName(course, language ?? i18n.language)} seed={course.code} size={20} />
 
                         <div className="min-w-0 flex-1">
                             <ApiPrefetchLink
@@ -58,13 +62,13 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
                                     const leaf = modules.at(-1);
                                     if (leaf) rememberBranch(course.id, leaf.id);
                                 }}
-                                className="block truncate text-[15px] font-semibold tracking-tight text-vtk-ink hover:underline"
+                                className="block truncate text-body font-medium text-fg hover:underline"
                             >
                                 {localizedCourseName(course, language ?? i18n.language)}
                             </ApiPrefetchLink>
 
                             {/* The branch, as breadcrumbs rather than a tree to hunt through. */}
-                            <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-1 text-xs text-vtk-muted">
+                            <div className="flex min-w-0 flex-wrap items-center gap-x-1 text-caption text-fg-muted">
                                 <span className="truncate">{shortProgramName(program.name)}</span>
                                 {modules.map((node) => (
                                     <span key={node.id} className="flex min-w-0 items-center gap-1">
@@ -75,8 +79,8 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
                             </div>
                         </div>
 
-                        <span className="hidden shrink-0 font-mono text-sm text-vtk-body sm:block">{course.code}</span>
-                        <span className="vtk-badge vtk-badge-muted hidden shrink-0 sm:inline-flex">{course.credits}</span>
+                        <span className="hidden w-20 shrink-0 text-small text-fg-muted tabular sm:block">{course.code}</span>
+                        <span className="hidden w-14 shrink-0 text-right text-small text-fg-muted tabular sm:block">{course.credits} SP</span>
                         <span className="hidden shrink-0 sm:block">
                             <SemesterIndicator semesters={course.semesters} size={16} />
                         </span>
@@ -85,7 +89,10 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
                                 <ProfessorDiv key={unumber} unumber={unumber} index={index} size={26} linkToProfile={false} />
                             ))}
                         </span>
-                        <DownloadButton courses={[course]} size={16} />
+                        <span className="reveal-on-hover">
+                            <DownloadButton courses={[course]} size={16} />
+                        </span>
+                        <FavoriteButton itemId={course.id} itemType="course" size={16} className="vtk-icon-button" />
                     </div>
                 ))}
             </div>

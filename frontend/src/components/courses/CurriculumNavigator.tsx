@@ -6,13 +6,15 @@ import CurriculumSearchResults, { CourseHit } from '@/components/curriculum/Curr
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import DownloadButton from '@/components/ui/DownloadButton';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
-import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
+import { FavoriteCurriculum } from '@/components/homepage/FavoriteCurriculum';
+import PageHeader from '@/components/layout/PageHeader';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import PageHead from '@/components/ui/PageHead';
 import { useUser } from "@/components/UserContext";
 import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { Course, Module, Program } from '@/types/entities';
 import { convertToProgram } from "@/utils/convertToEntity";
+import { programQualifier, shortProgramName } from '@/utils/curriculumLabels';
 import { courseMatchesFilters, initializeFuseInstances } from '@/utils/curriculumSearchUtils';
 import { ChevronRight, GraduationCap } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -116,54 +118,93 @@ export default function CurriculumNavigator() {
     setResults(null);
   };
 
+  const header = <PageHeader crumbs={[{ label: t('courses'), icon: <GraduationCap /> }]} />;
+
   if (initialLoading) {
-    return <Loading />;
+    return <>{header}<Loading /></>;
   }
 
+  const groups = groupPrograms(programs);
+  const favoriteCount = (user?.favoritePrograms?.length ?? 0) + (user?.favoriteModules?.length ?? 0);
+
   return (
-    <div className="vtk-shell pb-16">
-      <PageHead
-        kicker={<DynamicBreadcrumb />}
-        title={t('courses')}
-        meta={<><b>{programs.length}</b> {t('curriculum-navigator.meta-programs', { count: programs.length })}</>}
-      />
+    <>
+      {header}
+      <div className="vtk-shell">
+        <PageHead
+          title={t('courses')}
+          subtitle={t('curriculum-navigator.subtitle', { count: programs.length })}
+        />
 
-      <div className="mt-7">
-        <CurriculumSearchBar onSearch={handleSearch} clearSearch={clearSearch} loading={searching} />
+        <div className="mt-6">
+          <CurriculumSearchBar onSearch={handleSearch} clearSearch={clearSearch} loading={searching} />
+        </div>
+
+        <div className="sr-only" role="status" aria-live="polite">
+          {results && t('curriculum-navigator.result-count', { count: results.length })}
+        </div>
+
+        {(programError || treeError) && (
+          <div className="vtk-panel vtk-empty mt-5">{t('unexpected')}</div>
+        )}
+
+        {!programError && (results
+          ? <CurriculumSearchResults hits={results} />
+          : (
+            <div className="mt-5 grid gap-8">
+              {favoriteCount > 0 && <FavoriteCurriculum />}
+
+              <section aria-label={t('curriculum-navigator.programs')}>
+                <div className="vtk-list">
+                  {groups.map((group) => (
+                    <div key={group.key}>
+                      <div className="flex h-9 items-center gap-2 border-b border-border bg-surface-muted px-4">
+                        <span className="text-small font-medium text-fg">{t(`curriculum-navigator.group.${group.key}`)}</span>
+                        <span className="text-small text-fg-muted tabular">{group.programs.length}</span>
+                      </div>
+                      <div className="vtk-rows">
+                        {group.programs.map((program) => (
+                          <div key={program.id} className="group/row vtk-list-row vtk-list-row-hover py-0 pr-2">
+                            <ApiPrefetchLink
+                              href={curriculumHref.program(program)}
+                              apiEndpoints={`/api/programs/${program.id}`}
+                              className="flex min-h-12 min-w-0 flex-1 items-center gap-3"
+                            >
+                              <GraduationCap className="size-4 shrink-0 text-icon" aria-hidden="true" />
+                              <span className="min-w-0 flex-1">
+                                <span className="block truncate text-body font-medium text-fg">{shortProgramName(program.name)}</span>
+                                {programQualifier(program.name) && (
+                                  <span className="block truncate text-caption text-fg-muted">{programQualifier(program.name)}</span>
+                                )}
+                              </span>
+                            </ApiPrefetchLink>
+                            <span className="reveal-on-hover flex items-center gap-0.5">
+                              <DownloadButton programs={[program]} />
+                            </span>
+                            <FavoriteButton itemId={program.id} itemType="program" size={16} className="vtk-icon-button" />
+                            <ChevronRight className="size-4 shrink-0 text-fg-placeholder" aria-hidden="true" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </div>
+          ))}
       </div>
-
-      <div className="sr-only" role="status" aria-live="polite">
-        {results && t('curriculum-navigator.result-count', { count: results.length })}
-      </div>
-
-      {(programError || treeError) && (
-        <div className="vtk-panel vtk-empty mt-5">{t('unexpected')}</div>
-      )}
-
-      {!programError && (results
-        ? <CurriculumSearchResults hits={results} />
-        : (
-          <div className="mt-5 grid gap-2">
-            {programs.map((program) => (
-              <div
-                key={program.id}
-                className="flex items-center gap-2 rounded-[18px] border border-vtk-line bg-vtk-surface px-4 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper"
-              >
-                <ApiPrefetchLink
-                  href={curriculumHref.program(program)}
-                  apiEndpoints={`/api/programs/${program.id}`}
-                  className="flex min-w-0 flex-1 items-center gap-3 py-3.5 text-[15px] font-medium text-vtk-ink rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
-                >
-                  <GraduationCap size={17} className="shrink-0 text-vtk-muted" aria-hidden="true" />
-                  <span className="min-w-0 flex-1 truncate">{program.name}</span>
-                  <ChevronRight size={16} className="shrink-0 text-vtk-muted" aria-hidden="true" />
-                </ApiPrefetchLink>
-                <FavoriteButton itemId={program.id} itemType="program" size={16} className="shrink-0" />
-                <DownloadButton programs={[program]} />
-              </div>
-            ))}
-          </div>
-        ))}
-    </div>
+    </>
   );
+}
+
+type ProgramGroupKey = 'bachelor' | 'master' | 'other';
+
+/** Bachelors, then masters, then everything else (bridging and preparatory programmes). */
+function groupPrograms(programs: Program[]): { key: ProgramGroupKey; programs: Program[] }[] {
+  const keyOf = (name = ''): ProgramGroupKey =>
+    /^bachelor/i.test(name) ? 'bachelor' : /^master/i.test(name) ? 'master' : 'other';
+
+  return (['bachelor', 'master', 'other'] as const)
+    .map((key) => ({ key, programs: programs.filter((program) => keyOf(program.name) === key) }))
+    .filter((group) => group.programs.length > 0);
 }

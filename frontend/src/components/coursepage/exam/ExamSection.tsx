@@ -6,7 +6,8 @@ import { type HydraCollection, useApi } from '@/hooks/useApi';
 import type { Exam } from '@/types/entities';
 import { convertToExam } from '@/utils/convertToEntity';
 import { compareExamsNewestFirst, examCalendarYear } from '@/utils/examPeriods';
-import { Lock, NotebookPen, Plus } from 'lucide-react';
+import SectionHeader from '@/components/ui/SectionHeader';
+import { ChevronRight, Lock, NotebookPen, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,65 +35,52 @@ export default function ExamSection({ courseId }: { courseId: number }) {
 
     return (
         <section aria-labelledby="exams-heading">
-            <div className="flex items-center justify-between gap-3 border-b border-vtk-line pb-3.5">
-                <div>
-                    <h2 id="exams-heading" className="m-0 text-xl font-semibold tracking-tight text-vtk-ink">
-                        {t('exam.section.title')}
-                    </h2>
-                    <p className="m-0 mt-1.5 max-w-[70ch] text-sm leading-relaxed text-vtk-muted">
-                        {t('exam.section.description')}
-                    </p>
-                </div>
-                <button
-                    type="button"
-                    className="vtk-button vtk-button-primary vtk-button-sm shrink-0"
-                    onClick={() => setStarting(true)}
-                    disabled={exams === null}
-                >
-                    <Plus className="h-4 w-4" aria-hidden="true" />
-                    {t('exam.section.start')}
-                </button>
-            </div>
+            <SectionHeader
+                id="exams-heading"
+                icon={<NotebookPen />}
+                title={t('exam.section.title')}
+                count={exams?.length}
+                description={t('exam.section.description')}
+                action={
+                    <button
+                        type="button"
+                        className="vtk-button vtk-button-sm"
+                        onClick={() => setStarting(true)}
+                        disabled={exams === null}
+                    >
+                        <Plus className="size-4" aria-hidden="true" />
+                        {t('exam.section.start')}
+                    </button>
+                }
+            />
 
-            {exams === null && !error && (
-                <div className="flex h-24 w-full items-center justify-center">
-                    <Loading />
-                </div>
-            )}
-            {error && <p className="vtk-error-text mt-5">{t('exam.section.error')}</p>}
+            {exams === null && !error && <Loading compact />}
+            {error && <p className="vtk-error-text">{t('exam.section.error')}</p>}
             {exams !== null && exams.length === 0 && (
-                <p className="vtk-empty mt-5">{t('exam.section.empty')}</p>
+                <div className="vtk-panel vtk-empty">{t('exam.section.empty')}</div>
             )}
 
             {exams !== null && exams.length > 0 && (
-                <ul className="vtk-card-grid mt-5 list-none p-0">
+                <ul className="vtk-list m-0 list-none p-0">
                     {exams.map((exam) => (
                         <li key={exam.id}>
-                            <Link
-                                href={`/course/${courseId}/exams/${exam.id}`}
-                                className="group block h-full rounded-[18px] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-2"
-                            >
-                                <div className="flex h-full flex-col gap-3 rounded-[18px] border border-vtk-line bg-vtk-surface p-5 transition-[transform,border-color] duration-200 group-hover:-translate-y-0.5 group-hover:border-vtk-line-2">
-                                    <div className="flex items-center justify-between gap-2.5">
-                                        <div className="flex min-w-0 items-center gap-2.5">
-                                            <NotebookPen className="h-4.5 w-4.5 shrink-0 text-vtk-muted" aria-hidden="true" />
-                                            <h3 className="m-0 truncate text-[15px] font-semibold tracking-tight text-vtk-ink">
-                                                {t(`exam.name.${exam.period}`, { year: examCalendarYear(exam.academicYear) })}
-                                            </h3>
-                                        </div>
-                                        {exam.editable ? (
-                                            <span className="vtk-badge vtk-badge-success shrink-0 text-xs">{t('exam.section.open')}</span>
-                                        ) : (
-                                            <span className="vtk-badge vtk-badge-muted shrink-0 text-xs">
-                                                <Lock className="h-3 w-3" aria-hidden="true" />
-                                                {t('exam.section.locked')}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <span className="text-sm text-vtk-muted">
-                                        {exam.academicYear} · {t('exam.section.questions', { count: exam.questionCount })}
+                            <Link href={`/course/${courseId}/exams/${exam.id}`} className="vtk-list-row group">
+                                <NotebookPen className="size-4 shrink-0 text-icon" aria-hidden="true" />
+                                <span className="min-w-0 flex-1 truncate text-body font-medium text-fg">
+                                    {t(`exam.name.${exam.period}`, { year: examCalendarYear(exam.academicYear) })}
+                                </span>
+                                <span className="hidden shrink-0 text-small text-fg-muted tabular sm:inline">
+                                    {t('exam.section.questions', { count: exam.questionCount })}
+                                </span>
+                                {exam.editable ? (
+                                    <span className="vtk-badge vtk-badge-success shrink-0">{t('exam.section.open')}</span>
+                                ) : (
+                                    <span className="vtk-badge vtk-badge-muted shrink-0">
+                                        <Lock className="size-3" aria-hidden="true" />
+                                        {t('exam.section.locked')}
                                     </span>
-                                </div>
+                                )}
+                                <ChevronRight className="size-4 shrink-0 text-fg-placeholder transition-colors group-hover:text-icon" aria-hidden="true" />
                             </Link>
                         </li>
                     ))}

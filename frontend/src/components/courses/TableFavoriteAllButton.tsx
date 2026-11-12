@@ -95,20 +95,20 @@ export default function TableFavoriteAllButton({
             aria-label={label}
             title={label}
             aria-pressed={isAllFavorited}
-            className={`mr-1 inline-flex shrink-0 items-center justify-center rounded-sm p-0.5 text-vtk-muted transition-colors hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy cursor-pointer ${className}`}
+            className={`vtk-icon-button size-7 ${className}`}
         >
             {loading ? (
-                <LoaderCircle size={size} className="animate-spin text-vtk-navy" aria-hidden="true" />
+                <LoaderCircle size={size} className="animate-spin text-icon" aria-hidden="true" />
             ) : isAllFavorited ? (
                 <Star
                     size={size}
-                    className="text-vtk-yellow fill-vtk-yellow transition-transform duration-150 active:scale-125"
+                    className="fill-star text-star"
                     aria-hidden="true"
                 />
             ) : (
                 <Star
                     size={size}
-                    className="text-vtk-muted/70 hover:text-vtk-ink transition-colors duration-150 active:scale-125"
+                    className="text-icon"
                     aria-hidden="true"
                 />
             )}

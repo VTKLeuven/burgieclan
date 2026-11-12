@@ -251,7 +251,7 @@ const CourseCommentList = ({
                 role="button"
                 tabIndex={0}
                 aria-expanded={expanded}
-                className="relative z-20 flex cursor-pointer items-center gap-2.5 rounded-[18px] border border-vtk-line bg-vtk-surface px-4 py-3 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-2"
+                className="relative z-20 flex min-h-12 cursor-pointer items-center gap-2.5 px-4 py-2 transition-colors hover:bg-surface-hover focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
                 onClick={() => setExpanded(!expanded)}
                 onKeyDown={(e) => {
                     if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
@@ -265,7 +265,7 @@ const CourseCommentList = ({
                     className="shrink-0 text-vtk-muted transition-transform duration-200"
                     style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
                 />
-                <span className="min-w-0 flex-1 truncate text-[15px] font-medium text-vtk-ink">{category.name}</span>
+                <span className="min-w-0 flex-1 truncate text-body font-medium text-fg">{category.name}</span>
 
                 {/* Visible without expanding: the score is the thing most people came for. */}
                 {rating && <RatingSummary rating={rating} recentYearCount={recentYearCount} compact />}
@@ -279,7 +279,7 @@ const CourseCommentList = ({
                             onKeyDown={(e) => {
                                 e.stopPropagation();
                             }}
-                            className="vtk-icon-button h-8 w-8"
+                            className="vtk-icon-button"
                             aria-label={t('course-page.comments.add-new')}
                         >
                             <MessageSquarePlus size={15} />
@@ -289,7 +289,7 @@ const CourseCommentList = ({
 
                 {/* Comment count */}
                 <span
-                    className="vtk-badge vtk-badge-muted shrink-0"
+                    className="min-w-5 shrink-0 text-right text-small text-fg-muted tabular"
                     title={comments.length === 1
                         ? t('course-page.comments.comment-single', { count: 1 })
                         : t('course-page.comments.comment-multiple', { count: comments.length })}
@@ -307,10 +307,10 @@ const CourseCommentList = ({
                 inert={!expanded}
                 className={`grid transition-all duration-300 ease-in-out ${expanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
             >
-                <div className={`ml-5 min-h-0 space-y-1.5 border-l border-vtk-line pl-4 ${expanded ? 'mt-1.5 overflow-visible' : 'overflow-hidden'}`}>
+                <div className={`min-h-0 space-y-2 px-4 ${expanded ? 'overflow-visible pb-4' : 'overflow-hidden'}`}>
                     {/* Category description */}
                     {category.description && (
-                        <div className="flex items-start gap-2.5 rounded-2xl border border-vtk-line bg-vtk-paper-2 px-4 py-3">
+                        <div className="flex items-start gap-2.5 rounded-card border border-border bg-surface-muted px-4 py-3">
                             <Info className="mt-0.5 h-4 w-4 shrink-0 text-vtk-muted" />
                             <p className="m-0 text-sm leading-relaxed text-vtk-body" dangerouslySetInnerHTML={{ __html: category.description }} />
                         </div>
@@ -319,9 +319,9 @@ const CourseCommentList = ({
                     {/* Rating block. Only drawn for a section an admin marked as rated, and only
                         once the summary has arrived - never a placeholder that shifts the layout. */}
                     {rating && (
-                        <div className="flex flex-wrap items-start justify-between gap-4 rounded-2xl border border-vtk-line bg-vtk-surface px-4 py-3">
+                        <div className="flex flex-wrap items-start justify-between gap-4 rounded-card border border-border bg-surface px-4 py-3">
                             <div className="flex flex-col gap-1.5">
-                                <span className="text-xs font-semibold uppercase tracking-[0.08em] text-vtk-muted">
+                                <span className="text-caption font-medium text-fg-muted">
                                     {t('course-page.comments.your-rating')}
                                 </span>
                                 <StarRating
@@ -339,7 +339,7 @@ const CourseCommentList = ({
 
                     {/* Add comment form */}
                     {showAddForm && (
-                        <div className="rounded-2xl border border-vtk-line bg-vtk-surface p-4">
+                        <div className="rounded-card border border-border bg-surface p-4">
                             <form onSubmit={handleAddComment} className="space-y-3">
                                 <textarea
                                     ref={textareaRef}
@@ -403,7 +403,7 @@ const CourseCommentList = ({
                         <>
                             {visibleGroups.map((group) => (
                                 <div key={group.year ?? 'unknown'} className="flex flex-col gap-1.5">
-                                    <span className="text-xs font-semibold uppercase tracking-[0.08em] text-vtk-muted">
+                                    <span className="text-caption font-medium text-fg-muted">
                                         {group.year ?? t('course-page.comments.year-unknown')}
                                     </span>
                                     <div className="vtk-panel vtk-rows relative overflow-visible">

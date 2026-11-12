@@ -1,5 +1,7 @@
 import { getHttpStatusDescription } from "@/utils/error/httpStatusDescriptions";
 import { STATUS_CODES } from 'http';
+import PageHeader from "@/components/layout/PageHeader";
+import { TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 
@@ -27,26 +29,24 @@ export default function ErrorPage({ status, detail }: { status?: number; detail?
     };
 
     return (
-        <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
-            <div className="text-center">
-                <p className="text-base font-semibold text-vtk-ink">{status}</p>
-                <h1 className="mt-4">{statusDescription}</h1>
-                <p className="mt-6 text-vtk-body">{customDescription}</p>
-                <div className="mt-10 flex items-center justify-center space-x-6">
-                    <button
-                        type="button"
-                        onClick={redirectHome}
-                        className="primary-button flex-1">
+        <>
+            <PageHeader crumbs={[{ label: String(status), icon: <TriangleAlert /> }]} />
+            <div className="flex min-h-[60vh] flex-1 flex-col items-center justify-center gap-3 px-6 py-16 text-center">
+                <div className="relative mb-1 grid size-12 place-items-center rounded-card border border-border bg-surface shadow-card">
+                    <span aria-hidden="true" className="absolute -inset-3 -z-10 rounded-[20px] bg-sky-50/70" />
+                    <span className="text-body font-semibold text-sky-700 tabular">{status}</span>
+                </div>
+                <h1 className="m-0 text-title font-semibold text-fg">{statusDescription}</h1>
+                {customDescription && <p className="m-0 max-w-sm text-body text-fg-muted">{customDescription}</p>}
+                <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+                    <button type="button" onClick={redirectHome} className="vtk-button vtk-button-primary">
                         {t('go_home')}
                     </button>
-                    <button
-                        type="button"
-                        onClick={redirectSupport}
-                        className="white-button flex-1 min-w-max">
-                        {t('contact_support')} <span aria-hidden="true">&rarr;</span>
+                    <button type="button" onClick={redirectSupport} className="vtk-button">
+                        {t('contact_support')}
                     </button>
                 </div>
             </div>
-        </main>
+        </>
     );
 }

@@ -8,11 +8,14 @@ import ErrorPage from '@/components/error/ErrorPage';
 import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import PageHead from '@/components/ui/PageHead';
+import PageHeader from '@/components/layout/PageHeader';
+import DownloadButton from '@/components/ui/DownloadButton';
+import { GraduationCap } from 'lucide-react';
 import { readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { Program } from '@/types/entities';
 import { convertToProgram } from '@/utils/convertToEntity';
 import { programQualifier, shortProgramName } from '@/utils/curriculumLabels';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function ProgramPage({ id }: { id: number }) {
@@ -46,22 +49,31 @@ export default function ProgramPage({ id }: { id: number }) {
         }
     }, [program?.name]);
 
+    const header = (actions?: React.ReactNode) => <PageHeader breadcrumb={<DynamicBreadcrumb />} actions={actions} />;
+
     if (error) return <ErrorPage status={error.status} detail={error.message} />;
-    if (loading || !program) return <Loading />;
+    if (loading || !program) return <>{header()}<Loading /></>;
 
     const moduleCount = program.modules?.length ?? 0;
 
     return (
         <ProgramLanguageProvider language={program.language}>
-            <div className="vtk-shell pb-16">
-                {/* The bracketed qualifier moves under the title: at display size it turned a
-                    programme name into three lines of heading and pushed the list off screen. */}
+            {header(
+                <>
+                    <FavoriteButton itemId={program.id} itemType="program" size={18} className="vtk-icon-button" />
+                    <DownloadButton programs={[program]} showText size={16} className="vtk-button-sm" />
+                </>
+            )}
+            <div className="vtk-shell">
+                {/* The bracketed qualifier moves under the title, where it does not turn a
+                    programme name into three lines of heading. */}
                 <PageHead
-                    kicker={<DynamicBreadcrumb />}
+                    icon={GraduationCap}
                     title={shortProgramName(program.name)}
-                    subtitle={programQualifier(program.name)}
-                    actions={<FavoriteButton itemId={program.id} itemType="program" size={20} className="mt-2" />}
-                    meta={<><b>{moduleCount}</b> {t('curriculum-navigator.meta-modules', { count: moduleCount })}</>}
+                    subtitle={[
+                        programQualifier(program.name),
+                        t('curriculum-navigator.meta-modules-count', { count: moduleCount }),
+                    ].filter(Boolean).join(' · ')}
                 />
 
                 <CurriculumLevel modules={program.modules} />

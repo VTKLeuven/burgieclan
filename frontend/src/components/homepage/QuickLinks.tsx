@@ -2,7 +2,9 @@ import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { QuickLink } from '@/types/entities';
 import { MAX_QUICK_LINKS } from '@/utils/constants/homepage';
 import { convertToQuickLink } from '@/utils/convertToEntity';
-import { ChevronRight } from 'lucide-react';
+import Loading from '@/components/loading/LoadingPage';
+import SectionHeader from '@/components/ui/SectionHeader';
+import { ArrowUpRight, Compass } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,9 +36,7 @@ export function QuickLinks() {
 
     if (loading && links.length === 0) {
         return (
-            <div className="flex justify-center items-center py-8">
-                <div className="animate-spin h-6 w-6 border-2 border-vtk-line-2 rounded-full border-t-transparent"></div>
-            </div>
+            <Loading compact />
         );
     }
 
@@ -45,28 +45,26 @@ export function QuickLinks() {
     }
 
     return (
-        <div>
-            <h2 className="m-0 mb-2 text-sm font-semibold tracking-tight text-vtk-ink">
-                {t('home.navigate_to')}
-            </h2>
-            <div className="grid grid-cols-1 gap-y-0.5">
+        <section aria-labelledby="quick-links-heading">
+            <SectionHeader id="quick-links-heading" icon={<Compass />} title={t('home.navigate_to')} />
+            <div className="-mx-2 grid grid-cols-1 gap-y-0.5">
                 {links.length > 0 ? (
                     links.map((link) => (
                         <Link
                             key={link.id}
                             href={link.linkTo}
-                            className="group -mx-1.5 flex items-center gap-1.5 rounded-md px-1.5 py-1 text-xs text-vtk-body transition-colors hover:bg-vtk-paper-2 hover:text-vtk-ink"
+                            className="group flex h-8 items-center gap-2 rounded-control px-2 text-body text-fg-secondary transition-colors hover:bg-neutral-150 hover:text-fg"
                         >
-                            <ChevronRight className="h-3.5 w-3.5 shrink-0 text-vtk-muted transition-transform group-hover:translate-x-0.5 group-hover:text-vtk-ink" />
+                            <ArrowUpRight className="size-4 shrink-0 text-icon" aria-hidden="true" />
                             <span className="truncate">{link.name ?? link.linkTo}</span>
                         </Link>
                     ))
                 ) : (
-                    <div className="vtk-empty py-2 text-xs">
+                    <div className="px-2 text-small text-fg-muted">
                         {t('home.no_quick_links')}
                     </div>
                 )}
             </div>
-        </div>
+        </section>
     );
 }

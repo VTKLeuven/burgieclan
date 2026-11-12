@@ -4,6 +4,8 @@ import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import { CommentCategory, CourseComment, CourseRatingSummary, SectionRating } from '@/types/entities';
 import { convertToCommentCategory, convertToCourseRatingSummary } from '@/utils/convertToEntity';
 import { useCallback, useMemo, useState, useEffect } from 'react';
+import SectionHeader from '@/components/ui/SectionHeader';
+import { MessagesSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 type CommentCategoriesProps = {
@@ -93,32 +95,28 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
 
     if (loading && allCategories.length === 0) {
         return (
-            <div className="flex justify-center py-4">
-                <Loading />
-            </div>
+            <Loading compact />
         );
     }
 
     if (allCategories.length === 0) {
         return (
-            <div className="text-center py-4">
-                <p>{t('course-page.comments.no-categories')}</p>
-            </div>
+            <div className="vtk-panel vtk-empty">{t('course-page.comments.no-categories')}</div>
         );
     }
 
     return (
-        <div>
-            <div className="border-b border-vtk-line pb-3.5">
-                <h2 className="m-0 text-xl font-semibold tracking-tight text-vtk-ink">
-                    {t('course-page.comments.title')}
-                </h2>
-                <p className="m-0 mt-1.5 max-w-[70ch] text-sm leading-relaxed text-vtk-muted">
-                    {t('course-page.comments.description')}
-                </p>
-            </div>
+        <section aria-labelledby="evaluation-heading">
+            <SectionHeader
+                id="evaluation-heading"
+                icon={<MessagesSquare />}
+                title={t('course-page.comments.title')}
+                count={comments.length}
+                description={t('course-page.comments.description')}
+            />
 
-            <div className="mt-5 grid gap-2.5">
+            {/* No overflow-hidden here, unlike .vtk-list: the comment rows show tooltips. */}
+            <div className="divide-y divide-border rounded-card border border-border bg-surface">
                 {allCategories.map((category) => (
                 <CourseCommentList
                     key={category.id}
@@ -131,7 +129,7 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
                     />
                 ))}
             </div>
-        </div>
+        </section>
     );
 };
 

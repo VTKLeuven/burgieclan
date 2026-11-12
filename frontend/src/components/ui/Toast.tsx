@@ -20,20 +20,10 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 // Toast Message Component
 const ToastMessage = ({ message, type }: { message: string; type: ToastType }) => {
-    // Semantic tones matching `.vtk-basic-badge-success` / `-danger`.
+    // Dopl toast: a white card with a coloured icon; the colour is never the only signal.
     const styles = {
-        success: {
-            bg: 'bg-[#eef8ea]',
-            border: 'border-[#b8dec1]',
-            text: 'text-[#2f6f33]',
-            icon: 'text-[#2f6f33]'
-        },
-        error: {
-            bg: 'bg-[#fff0ed]',
-            border: 'border-[#f0c6bd]',
-            text: 'text-[#9d2f1f]',
-            icon: 'text-[#9d2f1f]'
-        }
+        success: { icon: 'text-success' },
+        error: { icon: 'text-danger' },
     }[type];
 
     const Icon = type === 'error' ? AlertCircle : CheckCircle;
@@ -42,19 +32,19 @@ const ToastMessage = ({ message, type }: { message: string; type: ToastType }) =
         <Transition
             appear
             show={true}
-            enter="transform ease-out duration-300 transition"
-            enterFrom="-translate-y-2 opacity-0"
+            enter="transform ease-out duration-200 transition"
+            enterFrom="translate-y-1 opacity-0"
             enterTo="translate-y-0 opacity-100"
             leave="transition ease-in duration-200"
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
         >
             <div
-                className={`inline-flex items-center ${styles.bg} border ${styles.border} rounded-2xl px-4 py-2.5 shadow-[0_18px_42px_rgba(10,15,31,0.12)]`}
+                className="inline-flex max-w-[min(420px,calc(100vw-2rem))] items-center gap-2.5 rounded-card border border-border bg-surface px-3.5 py-2.5 shadow-popover"
                 role="alert"
             >
-                <Icon className={`h-5 w-5 ${styles.icon}`} aria-hidden="true" />
-                <p className={`ml-2 text-sm font-medium ${styles.text}`}>
+                <Icon className={`size-4 shrink-0 ${styles.icon}`} aria-hidden="true" />
+                <p className="m-0 text-body font-medium text-fg">
                     {message}
                 </p>
             </div>
@@ -77,7 +67,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     return (
         <ToastContext.Provider value={{ showToast }}>
             {children}
-            <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2">
+            <div className="fixed bottom-4 left-4 z-[70] flex flex-col items-start gap-2">
                 {toasts.map(toast => (
                     <ToastMessage
                         key={toast.id}

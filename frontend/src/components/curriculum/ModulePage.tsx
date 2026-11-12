@@ -9,11 +9,12 @@ import DownloadButton from '@/components/ui/DownloadButton';
 import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import PageHead from '@/components/ui/PageHead';
+import PageHeader from '@/components/layout/PageHeader';
 import { readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { Module } from '@/types/entities';
 import { convertToModule } from '@/utils/convertToEntity';
 import { Folder } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function ModulePage({ id }: { id: number }) {
@@ -47,29 +48,32 @@ export default function ModulePage({ id }: { id: number }) {
         }
     }, [module?.name]);
 
+    const header = (actions?: React.ReactNode) => <PageHeader breadcrumb={<DynamicBreadcrumb />} actions={actions} />;
+
     if (error) return <ErrorPage status={error.status} detail={error.message} />;
-    if (loading || !module) return <Loading />;
+    if (loading || !module) return <>{header()}<Loading /></>;
 
     const courseCount = module.courses?.length ?? 0;
+    const groupCount = module.modules?.length ?? 0;
+    const credits = (module.courses ?? []).reduce((sum, course) => sum + (course.credits ?? 0), 0);
 
     return (
         <ProgramLanguageProvider language={module.program?.language}>
-            <div className="vtk-shell pb-16">
+            {header(
+                <>
+                    <FavoriteButton itemId={module.id} itemType="module" size={18} className="vtk-icon-button" />
+                    <DownloadButton modules={[module]} showText size={16} className="vtk-button-sm" />
+                </>
+            )}
+            <div className="vtk-shell">
                 <PageHead
-                    kicker={<DynamicBreadcrumb />}
-                    title={module.name}
                     icon={Folder}
-                    actions={<FavoriteButton itemId={module.id} itemType="module" size={20} className="mt-2" />}
-                    aside={
-                        <div className="flex flex-col items-end gap-3">
-                            {courseCount > 0 && (
-                                <div className="vtk-page-meta">
-                                    <b>{courseCount}</b> {t('curriculum-navigator.meta-courses', { count: courseCount })}
-                                </div>
-                            )}
-                            <DownloadButton modules={[module]} showText size={16} />
-                        </div>
-                    }
+                    title={module.name}
+                    subtitle={[
+                        groupCount > 0 ? t('curriculum-navigator.meta-modules-count', { count: groupCount }) : null,
+                        courseCount > 0 ? t('curriculum-navigator.meta-courses-count', { count: courseCount }) : null,
+                        credits > 0 ? `${credits} ${t('credits')}` : null,
+                    ].filter(Boolean).join(' · ')}
                 />
 
                 <CurriculumLevel modules={module.modules} courses={module.courses} moduleId={module.id} />

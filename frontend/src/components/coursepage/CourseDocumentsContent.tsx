@@ -3,6 +3,8 @@
 import Loading from '@/components/loading/LoadingPage';
 import { usePublishCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import DocumentCategoryPage from '@/components/documentcategorypage/DocumentCategoryPage';
+import PageHeader from '@/components/layout/PageHeader';
+import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
 import { readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { Course, DocumentCategory } from '@/types/entities';
 import { convertToCourse, convertToDocumentCategory } from '@/utils/convertToEntity';
@@ -78,15 +80,12 @@ export default function CourseDocumentsContent({ courseId, categoryId }: CourseD
 
     if (!course || !category) {
         return (
-            <div className="flex items-center justify-center h-full w-full">
+            <>
+                <PageHeader breadcrumb={<DynamicBreadcrumb />} />
                 <Loading />
-            </div>
+            </>
         );
     }
 
-    return (
-        <div className="flex h-full w-full items-center justify-center">
-            <DocumentCategoryPage category={category} course={course} />
-        </div>
-    );
+    return <DocumentCategoryPage category={category} course={course} />;
 }

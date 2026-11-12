@@ -1,11 +1,12 @@
 import Badge from '@/components/ui/Badge';
 import DeleteDocumentButton from '@/components/document/DeleteDocumentButton';
 import VoteButton from '@/components/ui/buttons/VoteButton';
-import CollapsibleSection from '@/components/ui/CollapsibleSection';
+import Loading from '@/components/loading/LoadingPage';
+import CreateDocumentButton from '@/components/ui/CreateDocumentButton';
 import Pagination from '@/components/ui/Pagination';
 import useRetrieveDocuments from '@/hooks/useRetrieveDocuments';
 import type { Document } from '@/types/entities';
-import { ChevronDown, ChevronUp, ExternalLink, LoaderCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, FileText } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import React, { useEffect, useRef, useState } from 'react';
@@ -44,77 +45,67 @@ function AccountDocumentCard({ document, onDeleted }: { document: Document; onDe
         `/api/document_comments?document=/api/documents/${document.id}`,
     ];
 
+    const created = document.createdAt
+        ? new Date(document.createdAt).toLocaleDateString(i18n.language === 'nl' ? 'nl-BE' : 'en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+        })
+        : null;
+
     return (
-        <div ref={containerRef} className="border border-vtk-line p-4 rounded-md shadow-xs bg-vtk-paper hover:shadow-md transition-shadow">
-            <div className="flex justify-between items-start gap-2">
-                <ApiPrefetchLink
-                    href={`/document/${document.id}`}
-                    apiEndpoints={docEndpoints}
-                    className="hover:underline flex-1 min-w-0"
-                >
-                    <h3 className="text-lg font-semibold truncate text-vtk-ink">{document.name}</h3>
-                </ApiPrefetchLink>
-                <div className="shrink-0 flex items-center gap-2">
-                    {document.underReview ? (
-                        <Badge text={t('document.under_review')} color="yellow" />
-                    ) : (
-                        <Badge text={t('document.approved')} color="green" />
-                    )}
-                    {document.canDelete && (
-                        <DeleteDocumentButton
-                            documentId={document.id}
-                            documentName={document.name}
-                            variant="icon"
-                            onDeleted={() => onDeleted(document.id)}
-                        />
+        <div ref={containerRef} className="group/row">
+            <div className="flex min-h-[52px] items-center gap-3 px-4 py-2 transition-colors hover:bg-surface-hover">
+                <FileText className="size-4 shrink-0 text-icon" aria-hidden="true" />
+                <div className="min-w-0 flex-1">
+                    <span className="flex min-w-0 items-center gap-2">
+                        <ApiPrefetchLink
+                            href={`/document/${document.id}`}
+                            apiEndpoints={docEndpoints}
+                            className="min-w-0 truncate text-body font-medium text-fg hover:underline"
+                        >
+                            {document.name}
+                        </ApiPrefetchLink>
+                        {document.underReview && <Badge text={t('document.under_review')} color="yellow" />}
+                    </span>
+                    {(courseName || document.category?.name) && (
+                        <p className="m-0 truncate text-caption text-fg-muted">
+                            {[courseName, document.category?.name].filter(Boolean).join(' · ')}
+                        </p>
                     )}
                 </div>
-            </div>
-
-            <div className="mt-1 text-sm text-vtk-body">
-                {courseName && <p className="truncate font-medium">{courseName}</p>}
-                {document.category?.name && <p className="text-xs text-vtk-muted truncate">{document.category.name}</p>}
-            </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-2 mt-3 pt-2 border-t border-vtk-line">
+                {created && (
+                    <span className="hidden w-24 shrink-0 text-right text-small text-fg-muted tabular sm:block">{created}</span>
+                )}
                 <VoteButton type="document" objectId={document.id} size="small" />
-
-                <div className="flex items-center gap-2.5 ml-auto">
-                    {document.createdAt && (
-                        <span className="text-vtk-muted text-xs tabular-nums">
-                            {new Date(document.createdAt).toLocaleDateString('en-GB', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric'
-                            })}
-                        </span>
-                    )}
-
+                <span className="flex shrink-0 items-center gap-0.5">
                     {isPdf && document.contentUrl && (
                         <button
                             type="button"
                             onClick={() => setExpanded(!expanded)}
-                            className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-md bg-vtk-paper-2 hover:bg-vtk-line text-vtk-ink transition-colors font-medium cursor-pointer"
+                            className="vtk-icon-button reveal-on-hover"
+                            aria-expanded={expanded}
                             title={t('document.preview', { defaultValue: 'Preview' })}
+                            aria-label={t('document.preview', { defaultValue: 'Preview' })}
                         >
-                            <span>{t('document.preview', { defaultValue: 'Preview' })}</span>
-                            {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                            {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </button>
                     )}
-
-                    <ApiPrefetchLink
-                        href={`/document/${document.id}`}
-                        apiEndpoints={docEndpoints}
-                        className="p-1 text-vtk-muted hover:text-vtk-ink transition-colors"
-                        title={t('document.open', { defaultValue: 'Open Document' })}
-                    >
-                        <ExternalLink size={15} />
-                    </ApiPrefetchLink>
-                </div>
+                    {document.canDelete && (
+                        <span className="reveal-on-hover">
+                            <DeleteDocumentButton
+                                documentId={document.id}
+                                documentName={document.name}
+                                variant="icon"
+                                onDeleted={() => onDeleted(document.id)}
+                            />
+                        </span>
+                    )}
+                </span>
             </div>
 
             {expanded && isPdf && document.contentUrl && (
-                <div className="mt-3 pt-3 border-t border-vtk-line flex justify-center bg-vtk-paper-2 p-2 rounded-md">
+                <div className="flex justify-center border-t border-border bg-surface-muted p-3">
                     <PDFPages documentId={document.id} width={Math.min(containerWidth - 32, 800)} />
                 </div>
             )}
@@ -161,36 +152,34 @@ const DocumentList: React.FC = () => {
         };
     }, []);
 
-    return (
-        <CollapsibleSection header={<h3 className="text-xl font-semibold">{t('account.documents.my')} <span className="text-sm">({Math.max(totalItems - deletedIds.length, 0)})</span></h3>}>
-            <div className="rounded-lg shadow-xs">
-                {loading ?
-                    <div className="flex justify-center items-center h-full py-8">
-                        <LoaderCircle className="animate-spin text-vtk-navy" size={48} />
-                    </div>
-                    : visibleDocuments.length === 0 ? (
-                        <p className='p-4'>{t('account.documents.no_uploads')}</p>
-                    ) : (
-                        <div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-                                {visibleDocuments.map((doc) => (
-                                    <AccountDocumentCard
-                                        key={doc.id}
-                                        document={doc}
-                                        onDeleted={handleDeleted}
-                                    />
-                                ))}
-                            </div>
-                            <Pagination
-                                totalAmount={Math.max(totalItems - deletedIds.length, 0)}
-                                currentPage={page}
-                                itemsPerPage={itemsPerPage}
-                                onPageChange={setPage}
-                            />
-                        </div>
-                    )}
+    const total = Math.max(totalItems - deletedIds.length, 0);
+
+    if (loading) {
+        return <Loading compact />;
+    }
+
+    if (visibleDocuments.length === 0) {
+        return (
+            <div className="flex flex-col items-center gap-3 rounded-card border border-dashed border-border-strong px-4 py-10 text-center">
+                <p className="m-0 text-body text-fg-muted">{t('account.documents.no_uploads')}</p>
+                <CreateDocumentButton size={16} className="vtk-button-sm" />
             </div>
-        </CollapsibleSection>
+        );
+    }
+
+    return (
+        <div className="vtk-panel overflow-hidden">
+            <div className="vtk-rows">
+                {visibleDocuments.map((doc) => (
+                    <AccountDocumentCard key={doc.id} document={doc} onDeleted={handleDeleted} />
+                ))}
+            </div>
+            {total > itemsPerPage && (
+                <div className="border-t border-border px-4 py-3">
+                    <Pagination totalAmount={total} currentPage={page} itemsPerPage={itemsPerPage} onPageChange={setPage} />
+                </div>
+            )}
+        </div>
     );
 };
 

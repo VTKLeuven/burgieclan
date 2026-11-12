@@ -2,79 +2,219 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Brand tokens for Tailwind utilities (bg-vtk-*, text-vtk-*). These mirror the
-   canonical palette in the `:root` block below, which is the same palette as
-   `apps/web/app/design/vtk-base.css` in vtk-website-new. Tailwind's @theme needs
-   concrete values to generate the utilities, so when you retune the palette,
-   change the custom properties below and keep these in sync. */
+/*
+ * Burgieclan design tokens, in the design language of Dopl (VTK's IT workspace): a light grey
+ * canvas, one white working panel, crisp 1px hairlines, almost no shadows, near-black primary
+ * buttons and a sky accent for links, focus and selection. Colour is information, not decoration.
+ *
+ * Two layers live here:
+ *  - the Dopl tokens (canvas, surface, border, fg, sky, tag palette, type scale, radii), which new
+ *    code uses: `bg-canvas`, `text-fg-muted`, `rounded-control`, `text-small`, ...
+ *  - the older `vtk-*` names, remapped onto the same values so every component that still says
+ *    `text-vtk-muted` or `border-vtk-line` lands on the new palette without a rewrite.
+ */
 @theme {
   --breakpoint-xs: 320px;
 
-  --color-vtk-ink: #0a0f1f;
-  --color-vtk-navy: #0e1a36;
-  --color-vtk-blue: #0e1a36;
-  --color-vtk-blue-dark: #0a0f1f;
-  --color-vtk-blue-light: #34405e;
-  --color-vtk-blue-soft: #e6ecf5;
-  --color-vtk-blue-muted: #eff2f8;
+  /* Accent scales: sky is the primary accent (links, focus, selection), lavender the secondary.
+     Text in either hue uses 700 or darker. */
+  --color-sky-50: #f0f8ff;
+  --color-sky-100: #deefff;
+  --color-sky-200: #bee1ff;
+  --color-sky-300: #88c9fe;
+  --color-sky-400: #42b0ff;
+  --color-sky-500: #3199e8;
+  --color-sky-600: #1f82d1;
+  --color-sky-700: #0a6cba;
+  --color-sky-800: #0e5693;
+  --color-sky-900: #12416d;
 
-  --color-vtk-yellow: #ffd23f;
-  --color-vtk-yellow-dark: #edbd22;
+  --color-lavender-50: #f6f6ff;
+  --color-lavender-100: #ebebfe;
+  --color-lavender-200: #d9d8fe;
+  --color-lavender-300: #ada8ff;
+  --color-lavender-500: #837ded;
+  --color-lavender-700: #5b4fd9;
+  --color-lavender-800: #4840ac;
 
-  --color-vtk-paper: #eff2f8;
-  --color-vtk-paper-2: #e6ecf5;
+  /* Neutrals */
+  --color-neutral-0: #ffffff;
+  --color-neutral-25: #fcfcfd;
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f6;
+  --color-neutral-150: #f0f0f2;
+  --color-neutral-200: #ececee;
+  --color-neutral-250: #e2e2e5;
+  --color-neutral-300: #d4d4d8;
+  --color-neutral-400: #a1a1aa;
+  --color-neutral-500: #8b8b93;
+  --color-neutral-600: #6b6b73;
+  --color-neutral-700: #52525b;
+  --color-neutral-800: #3f3f46;
+  --color-neutral-900: #18181b;
+  --color-neutral-950: #16161a;
+
+  /* Semantic surfaces and text */
+  --color-canvas: #f5f5f6;
+  --color-surface: #ffffff;
+  --color-surface-muted: #fafafa;
+  --color-surface-hover: #f7f7f8;
+  --color-surface-selected: #f0f8ff;
+  --color-sidebar-hover: #f0f0f2;
+  --color-sidebar-active: #ebebed;
+  --color-border: #ececee;
+  --color-border-strong: #e2e2e5;
+  --color-fg: #18181b;
+  --color-fg-secondary: #52525b;
+  --color-fg-muted: #6b6b73;
+  --color-fg-placeholder: #8b8b93;
+  --color-fg-disabled: #a1a1aa;
+  --color-fg-nav: #3f3f46;
+  --color-link: #0a6cba;
+  --color-icon: #6b6b73;
+  --color-icon-strong: #3f3f46;
+
+  --color-primary: #16161a;
+  --color-primary-hover: #2a2a30;
+  --color-primary-active: #000000;
+  --color-on-primary: #ffffff;
+  --color-focus: #1f82d1;
+
+  --color-danger: #dc2626;
+  --color-danger-hover: #c21f1f;
+  --color-danger-text: #b91c1c;
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-warning: #d97706;
+  --color-warning-text: #b45309;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fde68a;
+  --color-success: #16a34a;
+  --color-success-text: #15803d;
+  --color-success-bg: #f0fdf4;
+  --color-success-border: #bbf7d0;
+  --color-info-text: #0a6cba;
+  --color-info-bg: #f0f8ff;
+  --color-info-border: #bee1ff;
+
+  /* Favourites: the one warm colour, so a starred item stands out where it matters. */
+  --color-star: #f5a524;
+
+  /* Tag palette: bg-50 / border-200 / text-700 */
+  --color-tag-purple-bg: #faf5ff;
+  --color-tag-purple-border: #e9d5ff;
+  --color-tag-purple-text: #7e22ce;
+  --color-tag-blue-bg: #eff6ff;
+  --color-tag-blue-border: #bfdbfe;
+  --color-tag-blue-text: #1d4ed8;
+  --color-tag-green-bg: #f0fdf4;
+  --color-tag-green-border: #bbf7d0;
+  --color-tag-green-text: #15803d;
+  --color-tag-amber-bg: #fffbeb;
+  --color-tag-amber-border: #fde68a;
+  --color-tag-amber-text: #b45309;
+  --color-tag-teal-bg: #f0fdfa;
+  --color-tag-teal-border: #99f6e4;
+  --color-tag-teal-text: #0f766e;
+  --color-tag-pink-bg: #fdf2f8;
+  --color-tag-pink-border: #fbcfe8;
+  --color-tag-pink-text: #be185d;
+  --color-tag-orange-bg: #fff7ed;
+  --color-tag-orange-border: #fed7aa;
+  --color-tag-orange-text: #c2410c;
+  --color-tag-grey-bg: #f4f4f5;
+  --color-tag-grey-border: #e4e4e7;
+  --color-tag-grey-text: #52525b;
+
+  /* Legacy names, remapped onto the palette above. */
+  --color-vtk-ink: #18181b;
+  --color-vtk-navy: #16161a;
+  --color-vtk-blue: #16161a;
+  --color-vtk-blue-dark: #000000;
+  --color-vtk-blue-light: #2a2a30;
+  --color-vtk-blue-soft: #f0f0f2;
+  --color-vtk-blue-muted: #f5f5f6;
+  --color-vtk-yellow: #f5a524;
+  --color-vtk-yellow-dark: #d9890b;
+  --color-vtk-paper: #f5f5f6;
+  --color-vtk-paper-2: #f0f0f2;
   --color-vtk-surface: #ffffff;
   --color-vtk-surface-elevated: #ffffff;
+  --color-vtk-muted: #6b6b73;
+  --color-vtk-body: #52525b;
+  --color-vtk-on-dark-muted: #a1a1aa;
+  --color-vtk-line: #ececee;
+  --color-vtk-line-2: #e2e2e5;
 
-  --color-vtk-muted: #5c667f;
-  --color-vtk-body: #34405e;
-  --color-vtk-on-dark-muted: #b7c0dc;
+  /* Typography */
+  --text-display: 24px;
+  --text-display--line-height: 32px;
+  --text-display--letter-spacing: -0.015em;
+  --text-title-lg: 20px;
+  --text-title-lg--line-height: 28px;
+  --text-title-lg--letter-spacing: -0.012em;
+  --text-title: 16px;
+  --text-title--line-height: 24px;
+  --text-title--letter-spacing: -0.006em;
+  --text-nav: 15px;
+  --text-nav--line-height: 20px;
+  --text-nav--letter-spacing: -0.006em;
+  --text-body: 14px;
+  --text-body--line-height: 20px;
+  --text-body--letter-spacing: -0.003em;
+  --text-small: 13px;
+  --text-small--line-height: 18px;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-micro: 11px;
+  --text-micro--line-height: 14px;
+  --text-micro--letter-spacing: 0.01em;
 
-  --color-vtk-line: rgba(14, 26, 54, 0.1);
-  --color-vtk-line-2: rgba(14, 26, 54, 0.18);
+  /* Radii */
+  --radius-chip: 8px;
+  --radius-control: 10px;
+  --radius-card: 12px;
+  --radius-panel: 16px;
 
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  /* Elevation: borders first, shadows only for floating layers */
+  --shadow-xs: 0 1px 2px rgb(16 16 20 / 0.04);
+  --shadow-card: 0 1px 2px rgb(16 16 20 / 0.04), 0 1px 1px rgb(16 16 20 / 0.02);
+  --shadow-popover: 0 8px 24px -6px rgb(16 16 20 / 0.1), 0 2px 6px -2px rgb(16 16 20 / 0.05);
+  --shadow-dialog: 0 24px 64px -12px rgb(16 16 20 / 0.18), 0 4px 12px -4px rgb(16 16 20 / 0.06);
+
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* Palette = single source of truth, shared with vtk-website-new. "paper" is the
-   (cool) page ground, "paper-2" its slightly deeper tint for bands and insets,
-   "surface" the white of cards and panels. Retune here and the whole app
-   follows; components reference the tokens, never raw hexes. */
 :root {
-  --ink: #0a0f1f;
-  --navy: #0e1a36;
-  --paper: #eff2f8;
-  --paper-2: #e6ecf5;
+  /* Kept for the few places that read them as plain custom properties. */
+  --ink: #18181b;
+  --navy: #16161a;
+  --paper: #f5f5f6;
+  --paper-2: #f0f0f2;
   --surface: #ffffff;
-  --line: rgba(14, 26, 54, 0.1);
-  --line-2: rgba(14, 26, 54, 0.18);
-  --yellow: #ffd23f;
-  --muted: #5c667f;
-  --body: #34405e;
-  /* Muted text on a navy/ink ground (intentional dark bands only). */
-  --on-dark-muted: #b7c0dc;
-  --accent: var(--yellow);
-  --accent-2: #edbd22;
-  --danger: #b42318;
+  --line: #ececee;
+  --line-2: #e2e2e5;
+  --yellow: #f5a524;
+  --muted: #6b6b73;
+  --body: #52525b;
+  --accent: #1f82d1;
+  --danger: #b91c1c;
 
-  --max: 1320px;
-  --radius: 0.5rem;
-  --vtk-header-height: 72px;
+  --dur-fast: 120ms;
+  --dur-base: 160ms;
+  --sidebar-width: 248px;
+  --panel-inset: 8px;
+  --header-height: 56px;
+  color-scheme: light;
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4, so
-  we pin it to the navy-tinted rule that the design system uses everywhere.
-*/
 @layer base {
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--line);
+    border-color: var(--color-border);
   }
 
   html {
@@ -85,53 +225,54 @@
     min-height: 100%;
     margin: 0;
     padding: 0;
-    background: var(--paper);
-    color: var(--ink);
-    line-height: 1.5;
+    background: var(--color-canvas);
+    color: var(--color-fg);
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: -0.003em;
+    font-feature-settings: 'cv11', 'ss01';
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
-  /* Editorial headings: tight tracking, restrained weight. Sizes are
-     deliberately smaller than the old scale; pages set their own display size
-     through `.vtk-page-title`. */
+  ::selection {
+    background: var(--color-sky-100);
+  }
+
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    color: var(--ink);
-    line-height: 1.15;
-    letter-spacing: -0.02em;
+    color: var(--color-fg);
     font-weight: 600;
   }
 
   h1 {
-    @apply text-3xl sm:text-4xl my-4;
+    @apply text-display my-3;
   }
 
   h2 {
-    @apply text-2xl sm:text-3xl my-3;
+    @apply text-title-lg my-3;
   }
 
   h3 {
-    @apply text-xl sm:text-2xl my-2;
+    @apply text-title my-2;
   }
 
   h4 {
-    @apply text-lg sm:text-xl my-2;
+    @apply text-nav my-2;
   }
 
-  h5 {
-    @apply text-base sm:text-lg my-1;
-  }
-
+  h5,
   h6 {
-    @apply text-sm sm:text-base my-1;
+    @apply text-body my-1;
   }
 
   p {
-    @apply text-base leading-7;
+    @apply text-body;
   }
 
   ul {
@@ -152,13 +293,11 @@
     @apply mt-1 mb-1;
   }
 
-  /* Focus-visible base indicator for keyboard accessibility */
   :focus-visible {
-    outline: 2px solid var(--navy);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
   }
 
-  /* Form inputs draw their own distinct border/ring on focus */
   input:focus,
   textarea:focus,
   select:focus,
@@ -175,264 +314,283 @@
   button {
     outline-color: transparent;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 1ms !important;
+    }
+  }
 }
 
 @layer components {
   /* ---------------------------------------------------------------------
-     Page shell: generous max-width container on the cool paper ground, with
-     the editorial page head (kicker, large tight title, right-aligned meta,
-     rule underneath).
+     Page content inside the white panel. The panel itself and its header
+     belong to the app shell (components/layout).
      --------------------------------------------------------------------- */
   .vtk-shell {
-    max-width: var(--max);
-    margin: 0 auto;
-    padding-inline: clamp(20px, 3vw, 36px);
     width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 16px 64px;
   }
 
-  .vtk-page-head {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 32px;
-    align-items: end;
-    padding-block: clamp(24px, 3vw, 40px) clamp(16px, 2vw, 24px);
-    border-bottom: 1px solid var(--line);
+  @media (min-width: 768px) {
+    .vtk-shell {
+      padding-inline: 32px;
+    }
   }
 
-  .vtk-page-kicker {
-    margin-bottom: 12px;
-    color: var(--muted);
-    font-size: 13px;
+  /* A narrower reading column for forms, settings and long text. */
+  .vtk-shell-narrow {
+    max-width: 880px;
   }
 
   .vtk-page-title {
     margin: 0;
-    max-width: 900px;
-    color: var(--ink);
-    font-size: clamp(28px, 3.4vw, 44px);
-    line-height: 1.05;
-    letter-spacing: -0.025em;
+    color: var(--color-fg);
+    font-size: 24px;
+    line-height: 32px;
+    letter-spacing: -0.015em;
     font-weight: 600;
   }
 
   .vtk-page-subtitle {
-    max-width: 95ch;
-    margin-top: 12px;
-    color: var(--body);
-    font-size: 16px;
-    line-height: 1.55;
+    margin-top: 4px;
+    color: var(--color-fg-muted);
+    font-size: 14px;
+    line-height: 20px;
   }
 
-  .vtk-page-meta {
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.8;
-    text-align: right;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  .vtk-page-meta b {
-    color: var(--ink);
-    font-weight: 600;
-  }
-
-  /* Small uppercase label used above groups and in table headers. */
+  /* Small label above groups: sentence case, muted, never shouting. */
   .vtk-label {
-    color: var(--muted);
+    color: var(--color-fg-muted);
     font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    line-height: 16px;
+    font-weight: 500;
   }
 
   /* ---------------------------------------------------------------------
      Surfaces
      --------------------------------------------------------------------- */
   .vtk-panel {
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: var(--surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
   }
 
   .vtk-panel-muted {
-    background: var(--paper-2);
-  }
-
-  .vtk-panel-dark {
-    border-color: var(--navy);
-    background: var(--navy);
-    color: var(--paper);
+    background: var(--color-surface-muted);
   }
 
   .vtk-card {
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: var(--surface);
-    padding: clamp(20px, 3vw, 28px);
-    transition:
-      transform 180ms ease,
-      border-color 180ms ease,
-      background 180ms ease;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    padding: 16px;
+    transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
   }
 
   .vtk-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--line-2);
-  }
-
-  /* A featured card is marked with a yellow accent rail, never a navy fill. */
-  .vtk-card-featured {
-    box-shadow: inset 3px 0 0 var(--yellow);
+    border-color: var(--color-border-strong);
   }
 
   .vtk-card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+    gap: 12px;
+  }
+
+  /* A bordered list: rows separated by hairlines, the Dopl list pattern. */
+  .vtk-list {
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+  }
+
+  .vtk-list > * + * {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .vtk-list-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 8px 16px;
+    transition: background var(--dur-fast) var(--ease-out);
+  }
+
+  a.vtk-list-row:hover,
+  button.vtk-list-row:hover,
+  .vtk-list-row-hover:hover {
+    background: var(--color-surface-hover);
   }
 
   /* ---------------------------------------------------------------------
-     Buttons: pill-shaped. Primary is ink with paper text; ghost is bordered
-     on paper; yellow is reserved for accents and active states.
+     Buttons: radius 10, 36px. Secondary is white and outlined, primary
+     near-black; there is only ever one primary per page header.
+     `.primary-button` / `.white-button` are legacy aliases.
      --------------------------------------------------------------------- */
-  /* `.primary-button` / `.white-button` are legacy aliases kept so untouched
-     call sites stay on-palette; prefer `.vtk-button*` for new work. */
   .vtk-button,
   .primary-button,
   .white-button {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    min-height: 40px;
-    padding: 10px 18px;
-    border: 1px solid var(--line-2);
-    border-radius: 999px;
-    background: var(--surface);
-    color: var(--ink);
+    gap: 6px;
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-control);
+    background: var(--color-surface);
+    color: var(--color-fg);
+    box-shadow: var(--shadow-xs);
     font: inherit;
     font-size: 14px;
-    font-weight: 600;
-    line-height: 1;
+    font-weight: 500;
+    line-height: 20px;
     text-decoration: none;
     white-space: nowrap;
     cursor: pointer;
+    user-select: none;
     transition:
-      transform 160ms ease,
-      background 160ms ease,
-      border-color 160ms ease,
-      color 160ms ease;
+      background-color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+
+  .vtk-button svg,
+  .primary-button svg,
+  .white-button svg {
+    flex-shrink: 0;
+    color: var(--color-icon);
   }
 
   .vtk-button:hover:not(:disabled),
-  .primary-button:hover:not(:disabled),
   .white-button:hover:not(:disabled) {
-    transform: translateY(-1px);
-    border-color: var(--ink);
+    background: var(--color-surface-hover);
   }
 
   .vtk-button:focus-visible,
   .primary-button:focus-visible,
   .white-button:focus-visible,
   .vtk-icon-button:focus-visible {
-    outline: 2px solid var(--navy);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
   }
 
   .vtk-button-primary,
-  .primary-button {
-    border-color: var(--ink);
-    background: var(--ink);
-    color: var(--paper);
+  .primary-button,
+  .vtk-button-accent {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    box-shadow: none;
+  }
+
+  .vtk-button-primary svg,
+  .primary-button svg,
+  .vtk-button-accent svg {
+    color: rgb(255 255 255 / 0.8);
   }
 
   .vtk-button-primary:hover:not(:disabled),
-  .primary-button:hover:not(:disabled) {
-    background: var(--navy);
+  .primary-button:hover:not(:disabled),
+  .vtk-button-accent:hover:not(:disabled) {
+    border-color: var(--color-primary-hover);
+    background: var(--color-primary-hover);
   }
 
   .white-button {
     width: 100%;
   }
 
-  .vtk-button-accent {
-    border-color: var(--yellow);
-    background: var(--yellow);
-    color: var(--ink);
-  }
-
-  .vtk-button-accent:hover:not(:disabled) {
-    background: var(--accent-2);
-    border-color: var(--accent-2);
-  }
-
   .vtk-button-ghost {
+    border-color: transparent;
     background: transparent;
+    box-shadow: none;
+    color: var(--color-fg-secondary);
   }
 
   .vtk-button-ghost:hover:not(:disabled) {
-    background: rgba(14, 26, 54, 0.04);
+    background: var(--color-neutral-150);
+    color: var(--color-fg);
   }
 
   .vtk-button-subtle {
-    background: var(--paper);
+    border-color: transparent;
+    background: var(--color-neutral-150);
+    box-shadow: none;
   }
 
   .vtk-button-subtle:hover:not(:disabled) {
-    background: var(--paper-2);
+    background: var(--color-neutral-200);
   }
 
   .vtk-button-danger {
-    border-color: var(--danger);
-    background: var(--danger);
+    border-color: var(--color-danger);
+    background: var(--color-danger);
     color: #fff;
+    box-shadow: none;
+  }
+
+  .vtk-button-danger svg {
+    color: rgb(255 255 255 / 0.85);
+  }
+
+  .vtk-button-danger:hover:not(:disabled) {
+    border-color: var(--color-danger-hover);
+    background: var(--color-danger-hover);
   }
 
   .vtk-button-sm {
-    min-height: 32px;
-    padding: 6px 12px;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 9px;
     font-size: 13px;
   }
 
   .vtk-button:disabled,
+  .primary-button:disabled,
   .vtk-button-disabled {
-    opacity: 0.48;
+    opacity: 0.5;
     cursor: not-allowed;
-    transform: none;
   }
 
-  /* Compact round icon button for repeated row actions. */
+  /* Square ghost icon button for repeated row actions and header tools. */
   .vtk-icon-button {
     display: inline-grid;
     place-items: center;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     flex: 0 0 auto;
-    border: 1px solid var(--line-2);
-    border-radius: 999px;
-    background: var(--surface);
-    color: var(--ink);
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--color-icon);
     cursor: pointer;
     transition:
-      background 160ms ease,
-      border-color 160ms ease,
-      color 160ms ease;
+      background var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
   }
 
   .vtk-icon-button:hover:not(:disabled) {
-    border-color: var(--ink);
-    background: var(--paper-2);
+    background: var(--color-neutral-150);
+    color: var(--color-fg);
   }
 
   .vtk-icon-button:disabled {
-    opacity: 0.48;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 
-  /* Slider for continuous controls (the PDF zoom bar). Native range inputs pick up the OS accent
-     colour, which clashes with the navy palette on every platform, so both the track and the thumb
-     are drawn here for WebKit and Gecko alike. */
+  /* Slider for continuous controls (the PDF zoom bar). */
   .vtk-range {
     -webkit-appearance: none;
     appearance: none;
@@ -444,13 +602,13 @@
   .vtk-range::-webkit-slider-runnable-track {
     height: 4px;
     border-radius: 999px;
-    background: var(--line-2);
+    background: var(--color-neutral-250);
   }
 
   .vtk-range::-moz-range-track {
     height: 4px;
     border-radius: 999px;
-    background: var(--line-2);
+    background: var(--color-neutral-250);
   }
 
   .vtk-range::-webkit-slider-thumb {
@@ -459,21 +617,21 @@
     margin-top: -5px;
     width: 14px;
     height: 14px;
-    border: 2px solid var(--surface);
+    border: 2px solid var(--color-surface);
     border-radius: 999px;
-    background: var(--ink);
+    background: var(--color-primary);
   }
 
   .vtk-range::-moz-range-thumb {
     width: 14px;
     height: 14px;
-    border: 2px solid var(--surface);
+    border: 2px solid var(--color-surface);
     border-radius: 999px;
-    background: var(--ink);
+    background: var(--color-primary);
   }
 
   .vtk-range:focus-visible {
-    outline: 2px solid var(--navy);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
     border-radius: 999px;
   }
@@ -483,36 +641,42 @@
      --------------------------------------------------------------------- */
   .vtk-field {
     display: grid;
-    gap: 7px;
+    gap: 6px;
   }
 
   .vtk-field-label {
-    color: var(--muted);
-    font-size: 12px;
-    font-weight: 700;
+    color: var(--color-fg);
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 500;
   }
 
   .vtk-input,
   .vtk-select,
   .vtk-textarea {
     width: 100%;
-    border: 1px solid var(--line-2);
-    border-radius: 12px;
-    background: var(--paper);
-    color: var(--ink);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-control);
+    background: var(--color-surface);
+    color: var(--color-fg);
+    box-shadow: var(--shadow-xs);
     font: inherit;
     font-size: 14px;
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
   }
 
   .vtk-input,
   .vtk-select {
-    min-height: 42px;
-    padding: 9px 12px;
+    height: 36px;
+    padding: 0 12px;
   }
 
   .vtk-textarea {
-    min-height: 104px;
-    padding: 11px 12px;
+    min-height: 96px;
+    padding: 8px 12px;
+    line-height: 22px;
     resize: vertical;
   }
 
@@ -520,74 +684,84 @@
   .vtk-select:focus,
   .vtk-textarea:focus {
     outline: none;
-    border-color: var(--ink);
-    box-shadow: 0 0 0 3px rgba(14, 26, 54, 0.08);
+    border-color: var(--color-focus);
+    box-shadow: 0 0 0 3px rgb(66 176 255 / 0.28);
   }
 
   .vtk-input::placeholder,
   .vtk-textarea::placeholder {
-    color: var(--muted);
+    color: var(--color-fg-placeholder);
   }
 
   .vtk-help {
-    color: var(--muted);
+    color: var(--color-fg-muted);
     font-size: 12px;
-    line-height: 1.45;
+    line-height: 16px;
   }
 
   .vtk-error-text {
-    color: var(--danger);
-    font-size: 13px;
+    color: var(--color-danger-text);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
   }
 
   /* ---------------------------------------------------------------------
-     Badges
+     Pills: tinted bg, saturated text, same-hue border, radius 7.
      --------------------------------------------------------------------- */
   .vtk-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    min-height: 24px;
-    padding: 4px 9px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--surface);
-    color: var(--ink);
-    font-size: 12px;
-    font-weight: 600;
+    gap: 4px;
+    height: 24px;
+    padding: 0 8px;
+    border: 1px solid var(--color-tag-grey-border);
+    border-radius: 7px;
+    background: var(--color-surface);
+    color: var(--color-fg-secondary);
+    font-size: 13px;
+    font-weight: 500;
     line-height: 1;
-  }
-
-  .vtk-badge-accent {
-    border-color: var(--yellow);
-    background: var(--yellow);
+    white-space: nowrap;
   }
 
   .vtk-badge-muted {
-    background: var(--paper-2);
-    color: var(--muted);
+    background: var(--color-tag-grey-bg);
+    color: var(--color-tag-grey-text);
+  }
+
+  .vtk-badge-accent {
+    border-color: var(--color-tag-amber-border);
+    background: var(--color-tag-amber-bg);
+    color: var(--color-tag-amber-text);
+  }
+
+  .vtk-badge-info {
+    border-color: var(--color-info-border);
+    background: var(--color-info-bg);
+    color: var(--color-info-text);
   }
 
   .vtk-badge-success {
-    border-color: #b8dec1;
-    background: #eef8ea;
-    color: #2f6f33;
+    border-color: var(--color-success-border);
+    background: var(--color-success-bg);
+    color: var(--color-success-text);
   }
 
   .vtk-badge-danger {
-    border-color: #f0c6bd;
-    background: #fff0ed;
-    color: #9d2f1f;
+    border-color: var(--color-danger-border);
+    background: var(--color-danger-bg);
+    color: var(--color-danger-text);
   }
 
   /* ---------------------------------------------------------------------
-     Tables and lists
+     Tables and rows
      --------------------------------------------------------------------- */
   .vtk-table-wrap {
     overflow-x: auto;
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: var(--surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
   }
 
   .vtk-table {
@@ -596,35 +770,32 @@
     font-size: 14px;
   }
 
-  .vtk-table thead {
-    background: var(--paper-2);
-  }
-
   .vtk-table th,
   .vtk-table td {
-    padding: 13px 16px;
-    border-bottom: 1px solid var(--line);
+    padding: 0 16px;
+    height: 48px;
+    border-bottom: 1px solid var(--color-border);
     text-align: left;
     vertical-align: middle;
   }
 
   .vtk-table th {
-    color: var(--muted);
-    font-size: 12px;
-    font-weight: 700;
+    height: 40px;
+    color: var(--color-fg-muted);
+    font-size: 13px;
+    font-weight: 500;
   }
 
   .vtk-table tbody tr:hover {
-    background: rgba(255, 210, 63, 0.08);
+    background: var(--color-surface-hover);
   }
 
   .vtk-table tbody tr:last-child td {
     border-bottom: 0;
   }
 
-  /* Rows inside a bordered panel: hairline separated, no outer border. */
   .vtk-rows > * + * {
-    border-top: 1px solid var(--line);
+    border-top: 1px solid var(--color-border);
   }
 
   .vtk-row {
@@ -632,75 +803,79 @@
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    transition: background 140ms ease;
+    transition: background var(--dur-fast) var(--ease-out);
   }
 
   .vtk-row-click:hover {
-    background: var(--paper-2);
+    background: var(--color-surface-hover);
   }
 
   .vtk-empty {
-    padding: 20px 16px;
-    color: var(--muted);
+    padding: 24px 16px;
+    color: var(--color-fg-muted);
     font-size: 14px;
     text-align: center;
   }
 
   /* ---------------------------------------------------------------------
-     Tabs / segmented control
+     Segmented control (was pill tabs)
      --------------------------------------------------------------------- */
   .vtk-tabs {
     display: inline-flex;
-    gap: 6px;
-    padding: 5px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--surface);
+    align-items: center;
+    gap: 2px;
+    height: 32px;
+    padding: 2px;
+    border-radius: var(--radius-control);
+    background: var(--color-neutral-150);
   }
 
   .vtk-tab {
-    min-height: 32px;
-    padding: 6px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 10px;
     border: 0;
-    border-radius: 999px;
+    border-radius: 8px;
     background: transparent;
-    color: var(--muted);
+    color: var(--color-fg-muted);
     font: inherit;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     transition:
-      background 140ms ease,
-      color 140ms ease;
+      background var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
   }
 
   .vtk-tab:hover {
-    color: var(--ink);
+    color: var(--color-fg);
   }
 
   .vtk-tab[aria-selected='true'],
   .vtk-tab.is-active {
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--color-surface);
+    color: var(--color-fg);
+    box-shadow: var(--shadow-xs);
   }
 
   /* ---------------------------------------------------------------------
      Misc
      --------------------------------------------------------------------- */
   .vtk-link {
-    color: var(--navy);
+    color: var(--color-link);
     font-weight: 500;
-    text-decoration: underline;
+    text-decoration: none;
     text-underline-offset: 4px;
-    text-decoration-color: var(--yellow);
   }
 
   .vtk-link:hover {
-    color: var(--ink);
+    text-decoration: underline;
   }
 
   .vtk-muted {
-    color: var(--muted);
+    color: var(--color-fg-muted);
   }
 
   .vtk-dot {
@@ -708,15 +883,107 @@
     width: 6px;
     height: 6px;
     border-radius: 999px;
-    background: var(--yellow);
+    background: var(--color-sky-600);
     vertical-align: middle;
   }
 
-  /* Striped placeholder so missing images stay visible. */
   .vtk-placeholder {
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: repeating-linear-gradient(-45deg, var(--paper-2) 0 8px, var(--paper) 8px 16px);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    background: var(--color-surface-muted);
+  }
+
+  /* Rich text from the CMS (pages, FAQ answers, announcements): Dopl's rich-text scale. */
+  .vtk-prose {
+    color: var(--color-fg-secondary);
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  .vtk-prose > * + * {
+    margin-top: 12px;
+  }
+
+  .vtk-prose p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  .vtk-prose h1,
+  .vtk-prose h2 {
+    margin: 24px 0 0;
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .vtk-prose h3,
+  .vtk-prose h4 {
+    margin: 20px 0 0;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .vtk-prose a {
+    color: var(--color-link);
+    font-weight: 500;
+  }
+
+  .vtk-prose a:hover {
+    text-decoration: underline;
+  }
+
+  .vtk-prose ul,
+  .vtk-prose ol {
+    margin-left: 0;
+    padding-left: 20px;
+    list-style-position: outside;
+  }
+
+  .vtk-prose img {
+    max-width: 100%;
+    border-radius: var(--radius-card);
+  }
+
+  /* Keyboard hint, e.g. ⌘ K in the search field. */
+  .vtk-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 18px;
+    min-width: 18px;
+    padding: 0 4px;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 5px;
+    background: var(--color-surface);
+    color: var(--color-fg-muted);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+  }
+}
+
+/* Tabular figures for tables, dates, counters and codes. */
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-neutral-300) transparent;
+}
+
+/* Row actions that only show while their row is hovered or focused, so long lists stay quiet. */
+@utility reveal-on-hover {
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+  :where(.group\/row:hover, .group\/row:focus-within) &,
+  &:focus-visible,
+  &[aria-pressed='true'] {
+    opacity: 1;
+  }
+  @media (hover: none) {
+    opacity: 1;
   }
 }
 
@@ -836,7 +1103,7 @@
 
     .exam-question {
       counter-increment: exam-question;
-      @apply my-4 rounded-xl border border-vtk-line bg-vtk-surface;
+      @apply my-3 rounded-card border border-border bg-surface;
     }
 
     .exam-question.ProseMirror-selectednode {
@@ -881,7 +1148,7 @@
 
     /* The comments below a question: outside the document, so not editable text. */
     .exam-question__thread {
-      @apply grid gap-3 rounded-b-xl border-t border-vtk-line bg-vtk-paper-2 px-4 py-3 select-text;
+      @apply grid gap-3 rounded-b-card border-t border-vtk-line bg-vtk-paper-2 px-4 py-3 select-text;
     }
 
     .exam-thread__link {
@@ -923,7 +1190,7 @@
 
   /* A day an exam was given on: a tag in the days bar, a toggle on each question. */
   .exam-chip {
-    @apply inline-flex items-center gap-1 rounded-full border border-vtk-line-2 bg-vtk-surface px-2.5 py-0.5 text-xs font-semibold text-vtk-muted transition-colors;
+    @apply inline-flex h-6 items-center gap-1 rounded-[7px] border border-border-strong bg-surface px-2 text-small font-medium text-fg-muted transition-colors;
   }
 
   button.exam-chip:hover {

@@ -1,5 +1,4 @@
 import Announcement from '@/components/announcement/Announcement';
-import ErrorPage from '@/components/error/ErrorPage';
 import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import { Announcement as AnnouncementEntity } from '@/types/entities';
 import { convertToAnnouncement } from '@/utils/convertToEntity';
@@ -91,9 +90,9 @@ export default function AnnouncementSlideShow() {
         return;
     }
 
-    // Show error state
+    // A notice that fails to load is not worth a broken home page; leave the space empty.
     if (error) {
-        return <ErrorPage status={error.status} detail={error.message} />;
+        return null;
     }
 
     // Don't render anything if no announcements
@@ -102,8 +101,8 @@ export default function AnnouncementSlideShow() {
     }
 
     return (
-        <div className="mt-6">
-            <div className="vtk-panel vtk-panel-muted flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:px-5">
+        <div>
+            <div className="flex flex-col gap-3 rounded-card border border-info-border bg-info-bg px-4 py-3 sm:flex-row sm:items-center">
                 <div className="min-w-0 flex-1">
                     <Announcement {...announcements[currentIndex]} />
                 </div>
@@ -113,7 +112,7 @@ export default function AnnouncementSlideShow() {
                     <div className="flex shrink-0 items-center justify-end gap-1.5">
                         <button
                             onClick={handlePrevious}
-                            className="grid h-7 w-7 place-items-center rounded-full border border-vtk-line-2 bg-vtk-surface text-vtk-body transition-colors hover:border-vtk-ink hover:text-vtk-ink"
+                            className="grid size-7 place-items-center rounded-[8px] text-icon transition-colors hover:bg-white/70 hover:text-fg"
                             aria-label="Previous announcement"
                         >
                             <ChevronLeft className="h-3.5 w-3.5" />
@@ -124,8 +123,8 @@ export default function AnnouncementSlideShow() {
                                 <button
                                     key={index}
                                     className={`h-1.5 w-1.5 rounded-full transition-colors duration-200 ${index === currentIndex
-                                        ? 'bg-vtk-ink'
-                                        : 'bg-vtk-line-2 hover:bg-vtk-muted'
+                                        ? 'bg-sky-700'
+                                        : 'bg-sky-200 hover:bg-sky-300'
                                         }`}
                                     onClick={() => handleDotClick(index)}
                                     aria-label={`Go to announcement ${index + 1}`}
@@ -135,7 +134,7 @@ export default function AnnouncementSlideShow() {
 
                         <button
                             onClick={handleNext}
-                            className="grid h-7 w-7 place-items-center rounded-full border border-vtk-line-2 bg-vtk-surface text-vtk-body transition-colors hover:border-vtk-ink hover:text-vtk-ink"
+                            className="grid size-7 place-items-center rounded-[8px] text-icon transition-colors hover:bg-white/70 hover:text-fg"
                             aria-label="Next announcement"
                         >
                             <ChevronRight className="h-3.5 w-3.5" />

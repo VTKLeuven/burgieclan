@@ -2,6 +2,8 @@
 
 import Loading from "@/components/loading/LoadingPage";
 import ErrorPage from "@/components/error/ErrorPage";
+import PageHeader from '@/components/layout/PageHeader';
+import { FileText } from 'lucide-react';
 import PageHead from "@/components/ui/PageHead";
 import { readPreloadedApi, useApi } from "@/hooks/useApi";
 import { type Page } from "@/types/entities";
@@ -64,15 +66,12 @@ export default function PageContent({ url_key }: PageContentProps) {
     const content = { __html: page.content || "" };
 
     return (
-        <div className="vtk-shell pb-16">
-            {/* Managed pages have no hierarchy to trace, so the kicker carries the site
-                name rather than a breadcrumb. */}
-            <PageHead kicker="Burgieclan" title={page.name} />
-
-            <div
-                className="mt-7 max-w-3xl text-base leading-7 text-vtk-body"
-                dangerouslySetInnerHTML={content}
-            />
-        </div>
+        <>
+            <PageHeader crumbs={[{ label: page.name ?? '', icon: <FileText /> }]} />
+            <div className="vtk-shell vtk-shell-narrow">
+                <PageHead title={page.name} />
+                <div className="vtk-prose mt-6" dangerouslySetInnerHTML={content} />
+            </div>
+        </>
     );
 }

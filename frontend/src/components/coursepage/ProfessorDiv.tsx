@@ -14,6 +14,8 @@ interface ProfessorDivProps {
     size?: number;
     /** Whether to link the avatar to the wieiswie profile page (default true). */
     linkToProfile?: boolean;
+    /** `row` draws the avatar with the name and role next to it, for a properties list. */
+    variant?: 'avatar' | 'row';
 }
 
 function getInitials(name: string): string {
@@ -28,10 +30,12 @@ function getInitials(name: string): string {
 // of accent colours; only the tone varies per person.
 function getAvatarColor(name: string): string {
     const tones = [
-        'bg-vtk-navy text-vtk-paper',
-        'bg-vtk-ink text-vtk-paper',
-        'bg-vtk-blue-light text-vtk-paper',
-        'bg-vtk-yellow text-vtk-ink',
+        'bg-tag-blue-bg text-tag-blue-text',
+        'bg-tag-green-bg text-tag-green-text',
+        'bg-tag-purple-bg text-tag-purple-text',
+        'bg-tag-amber-bg text-tag-amber-text',
+        'bg-tag-teal-bg text-tag-teal-text',
+        'bg-tag-pink-bg text-tag-pink-text',
     ];
     const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return tones[hash % tones.length];
@@ -42,6 +46,7 @@ export default function ProfessorDiv({
     index,
     size = 48,
     linkToProfile = true,
+    variant = 'avatar',
 }: ProfessorDivProps) {
     const { i18n, t } = useTranslation();
     const locale = i18n.language || 'en';
@@ -83,8 +88,8 @@ export default function ProfessorDiv({
 
     const avatarContent = !imageError ? (
         <div
-            className={`rounded-full overflow-hidden bg-vtk-paper-2 ${borderClass} shadow-xs
-                ${linkToProfile ? 'hover:shadow-md transition-all duration-200 hover:scale-110 cursor-pointer' : ''}
+            className={`rounded-full overflow-hidden bg-neutral-150 ${borderClass} 
+                ${linkToProfile && variant === 'avatar' ? 'cursor-pointer transition-transform duration-200 hover:scale-105' : ''}
                 relative z-10 group-hover:z-20 group-focus-within:z-20`}
             style={{ width: size, height: size }}
         >
@@ -100,8 +105,8 @@ export default function ProfessorDiv({
         </div>
     ) : (
         <div
-            className={`relative z-10 flex items-center justify-center rounded-full ${borderClass} font-semibold shadow-xs
-                ${linkToProfile ? 'cursor-pointer transition-all duration-200 hover:scale-110 hover:shadow-md' : ''}
+            className={`relative z-10 flex items-center justify-center rounded-full ${borderClass} font-semibold 
+                ${linkToProfile && variant === 'avatar' ? 'cursor-pointer transition-transform duration-200 hover:scale-105' : ''}
                 group-hover:z-20 group-focus-within:z-20 ${getAvatarColor(professorName)}`}
             style={{ width: size, height: size, fontSize: size * 0.28 }}
         >
@@ -110,7 +115,7 @@ export default function ProfessorDiv({
     );
 
     const tooltip = (
-        <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-vtk-ink text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none" role="tooltip">
+        <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-neutral-900 text-white text-caption rounded-[8px] py-1.5 px-2 shadow-popover opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none" role="tooltip">
             <div className="font-medium">{professorName}</div>
             <div className="text-vtk-on-dark-muted">{roleText}</div>
             {/* Arrow pointing up */}
@@ -125,11 +130,30 @@ export default function ProfessorDiv({
         </>
     );
 
+    const profileHref = `https://www.kuleuven.be/wieiswie/${locale}/person/0${sanitizedUnumber}`;
+
+    if (variant === 'row') {
+        return (
+            <Link
+                href={profileHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="-mx-1.5 flex min-w-0 items-center gap-2 rounded-[8px] px-1.5 py-1 transition-colors hover:bg-neutral-150"
+            >
+                <span className="shrink-0">{avatarContent}</span>
+                <span className="min-w-0">
+                    <span className="block truncate text-body text-fg">{professorName}</span>
+                    <span className="block text-caption text-fg-muted">{roleText}</span>
+                </span>
+            </Link>
+        );
+    }
+
     if (linkToProfile) {
         return (
             <div className="relative group">
                 <Link
-                    href={`https://www.kuleuven.be/wieiswie/${locale}/person/0${sanitizedUnumber}`}
+                    href={profileHref}
                     aria-label={`${professorName} (${roleText})`}
                     target="_blank"
                     rel="noopener noreferrer"

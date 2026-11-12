@@ -5,10 +5,12 @@ import type { DocumentView } from '@/types/entities';
 import { convertToDocumentView } from '@/utils/convertToEntity';
 import { localizedCourseName } from '@/utils/courseName';
 import { useEffect, useState } from 'react';
+import SectionHeader from '@/components/ui/SectionHeader';
+import { History } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 /** The panel is a nudge back into recent work, not a history page: four rows is enough. */
-const MAX_ACTIVITIES = 4;
+const MAX_ACTIVITIES = 6;
 
 export const RecentActivities = () => {
     const { t, i18n } = useTranslation();
@@ -40,14 +42,14 @@ export const RecentActivities = () => {
 
         if ((error || documentViews.length === 0) && !loading) {
             return (
-                <div className="vtk-empty py-10">
+                <div className="vtk-panel vtk-empty">
                     {t('home.no_recent_activities')}
                 </div>
             );
         }
 
         return (
-            <div className="divide-y divide-vtk-line">
+            <div className="vtk-list">
                 {documentViews.slice(0, MAX_ACTIVITIES).map(documentView => (
                     <Activity
                         key={documentView.id}
@@ -63,13 +65,9 @@ export const RecentActivities = () => {
     };
 
     return (
-        <div className="vtk-panel overflow-hidden">
-            <div className="border-b border-vtk-line px-5 py-3.5">
-                <h2 className="m-0 text-base font-semibold tracking-tight text-vtk-ink">
-                    {t('home.recent_activities')}
-                </h2>
-            </div>
+        <section aria-labelledby="recent-heading">
+            <SectionHeader id="recent-heading" icon={<History />} title={t('home.recent_activities')} />
             {renderContent()}
-        </div>
+        </section>
     );
 };

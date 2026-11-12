@@ -77,7 +77,7 @@ export default function SittingsBar({ sittings, editable, onAdd, onRename, onRem
                             }}
                             onKeyDown={cancelOnEscape(() => setEditing(null))}
                             aria-label={t('exam.sittings.rename', { label: sitting.label })}
-                            className="vtk-input min-h-8! w-40 rounded-full! px-3! py-1! text-sm"
+                            className="vtk-input h-8! w-40 text-small"
                         />
                     </form>
                 ) : (
@@ -119,7 +119,7 @@ export default function SittingsBar({ sittings, editable, onAdd, onRename, onRem
                         onChange={(event) => setDraft(event.target.value)}
                         onKeyDown={cancelOnEscape(() => setAdding(false))}
                         aria-label={t('exam.sittings.new')}
-                        className="vtk-input min-h-8! w-48 rounded-full! px-3! py-1! text-sm"
+                        className="vtk-input h-8! w-48 text-small"
                     />
                     <button type="submit" className="vtk-button vtk-button-sm">{t('exam.sittings.add')}</button>
                     <button type="button" className="vtk-button vtk-button-sm vtk-button-ghost" onClick={() => setAdding(false)}>

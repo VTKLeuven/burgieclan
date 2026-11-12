@@ -2,6 +2,8 @@
 
 import FaqAccordion from '@/components/faq/FaqAccordion';
 import FaqQuestionForm from '@/components/faq/FaqQuestionForm';
+import PageHeader from '@/components/layout/PageHeader';
+import { CircleHelp } from 'lucide-react';
 import PageHead from '@/components/ui/PageHead';
 import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import { FaqItem } from '@/types/entities';
@@ -42,37 +44,31 @@ export default function FaqPage() {
     }, [endpoint, faqItems.length, request]);
 
     return (
-        <main className="vtk-shell pb-10">
-            {/* Page header */}
-            <PageHead
-                kicker={t('FAQ')}
-                title={t('faq.title')}
-                subtitle={t('faq.description')}
-            />
+        <>
+            <PageHeader crumbs={[{ label: t('FAQ'), icon: <CircleHelp /> }]} />
+            <div className="vtk-shell vtk-shell-narrow">
+                <PageHead title={t('faq.title')} subtitle={t('faq.description')} />
 
-            {/* FAQ Items */}
-            <div className="mt-7 max-w-3xl">
-                {loading ? (
-                    <div className="flex flex-col gap-3">
-                        {[...Array(4)].map((_, i) => (
-                            <div key={i} className="vtk-panel animate-pulse px-6 py-5">
-                                <div className="h-5 w-3/4 rounded bg-vtk-paper-2" />
-                            </div>
-                        ))}
-                    </div>
-                ) : faqItems.length === 0 ? (
-                    <div className="vtk-panel p-8 text-center">
-                        <p className="text-vtk-muted">{t('faq.no_items')}</p>
-                    </div>
-                ) : (
-                    <FaqAccordion items={faqItems} />
-                )}
-            </div>
+                <div className="mt-6">
+                    {loading ? (
+                        <div className="vtk-list">
+                            {[...Array(4)].map((_, i) => (
+                                <div key={i} className="flex h-12 items-center px-4">
+                                    <div className="h-4 w-2/3 animate-pulse rounded-[6px] bg-neutral-150" />
+                                </div>
+                            ))}
+                        </div>
+                    ) : faqItems.length === 0 ? (
+                        <div className="vtk-panel vtk-empty">{t('faq.no_items')}</div>
+                    ) : (
+                        <FaqAccordion items={faqItems} />
+                    )}
+                </div>
 
-            {/* Ask a question */}
-            <div className="mt-6 max-w-3xl">
-                <FaqQuestionForm />
+                <div className="mt-10">
+                    <FaqQuestionForm />
+                </div>
             </div>
-        </main>
+        </>
     );
 }

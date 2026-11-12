@@ -45,13 +45,13 @@ export default function AnonymousSetting() {
     }, [error, showToast, t]);
 
     return (
-        <div className="vtk-panel p-5">
+        <div className="py-4">
             <div className="flex items-center justify-between gap-4">
                 <div className="min-w-0">
-                    <h2 className="m-0 text-base font-semibold tracking-tight text-vtk-ink">
+                    <h3 className="m-0 text-body font-medium text-fg">
                         {t('account.anonymous_setting.title')}
-                    </h2>
-                    <p className="m-0 mt-1 text-sm leading-relaxed text-vtk-body">
+                    </h3>
+                    <p className="m-0 mt-0.5 text-small text-fg-muted">
                         {t('account.anonymous_setting.description')}
                     </p>
                 </div>
@@ -63,7 +63,7 @@ export default function AnonymousSetting() {
                         disabled={loading}
                         aria-label={t('account.anonymous_setting.toggle_label')}
                     />
-                    <Label htmlFor="anonymous-mode" className="whitespace-nowrap text-sm">
+                    <Label htmlFor="anonymous-mode" className="whitespace-nowrap text-small text-fg-secondary">
                         {user?.defaultAnonymous
                             ? t('account.anonymous_setting.enabled')
                             : t('account.anonymous_setting.disabled')}

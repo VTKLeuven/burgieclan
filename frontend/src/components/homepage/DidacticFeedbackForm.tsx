@@ -4,6 +4,7 @@ import { useToast } from '@/components/ui/Toast';
 import { useApi } from '@/hooks/useApi';
 import { CheckCircle2, Mail, MessageSquarePlus, Send } from 'lucide-react';
 import { useState } from 'react';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { useTranslation } from 'react-i18next';
 
 const MIN_LENGTH = 10;
@@ -55,12 +56,12 @@ export function DidacticFeedbackForm() {
 
     if (isSubmitted) {
         return (
-            <div className="vtk-panel vtk-panel-muted px-4 py-3.5">
+            <div className="rounded-card border border-success-border bg-success-bg px-4 py-3.5">
                 <div className="flex items-start gap-2.5">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-vtk-ink" aria-hidden="true" />
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
                     <div>
-                        <h3 className="text-sm font-semibold text-vtk-ink">{t('home.feedback_success_title')}</h3>
-                        <p className="mt-1 text-xs leading-relaxed text-vtk-body">
+                        <h3 className="m-0 text-body font-semibold text-fg">{t('home.feedback_success_title')}</h3>
+                        <p className="m-0 mt-1 text-small text-fg-secondary">
                             {t('home.feedback_success_description')}
                         </p>
                         <button
@@ -77,14 +78,15 @@ export function DidacticFeedbackForm() {
     }
 
     return (
-        <div className="vtk-panel vtk-panel-muted px-4 py-3.5">
-            <div className="flex items-center gap-2">
-                <MessageSquarePlus className="h-4 w-4 text-vtk-ink shrink-0" aria-hidden="true" />
-                <h2 className="text-sm font-semibold text-vtk-ink">{t('home.feedback_title')}</h2>
-            </div>
-            <p className="mt-1 text-xs leading-relaxed text-vtk-muted">{t('home.feedback_description')}</p>
+        <section aria-labelledby="didactic-feedback-heading">
+            <SectionHeader
+                id="didactic-feedback-heading"
+                icon={<MessageSquarePlus />}
+                title={t('home.feedback_title')}
+                description={t('home.feedback_description')}
+            />
 
-            <form onSubmit={handleSubmit} className="mt-2.5">
+            <form onSubmit={handleSubmit} className="rounded-card border border-border bg-surface p-3">
                 <div className="mb-2">
                     <label htmlFor="feedback-type" className="sr-only">
                         {t('home.feedback_type_label')}
@@ -94,7 +96,7 @@ export function DidacticFeedbackForm() {
                         value={type}
                         onChange={(e) => setType(e.target.value as FeedbackType)}
                         disabled={isSubmitting}
-                        className="vtk-input text-xs py-1 px-2 bg-vtk-surface text-vtk-ink border border-vtk-line"
+                        className="vtk-select h-8 text-small"
                     >
                         <option value="course_issue">{t('home.feedback_type_course_issue')}</option>
                         <option value="exam_feedback">{t('home.feedback_type_exam')}</option>
@@ -111,7 +113,7 @@ export function DidacticFeedbackForm() {
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                     placeholder={t('home.feedback_placeholder')}
-                    className="vtk-textarea min-h-16 text-xs p-2"
+                    className="vtk-textarea min-h-20 text-small"
                     rows={2.5}
                     maxLength={MAX_LENGTH}
                     required
@@ -121,17 +123,17 @@ export function DidacticFeedbackForm() {
                 <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
                     <a
                         href={mailtoHref}
-                        className="inline-flex items-center gap-1 text-[11px] text-vtk-muted underline-offset-2 transition-colors hover:text-vtk-ink hover:underline"
+                        className="inline-flex items-center gap-1 text-caption text-fg-muted underline-offset-2 transition-colors hover:text-fg hover:underline"
                     >
-                        <Mail className="h-3 w-3" aria-hidden="true" />
+                        <Mail className="size-3" aria-hidden="true" />
                         {t('home.feedback_mail')}
                     </a>
 
                     <div className="ml-auto flex items-center gap-2">
                         {showLengthHint && (
-                            <p className="text-[11px] text-vtk-muted">{t('faq.ask_hint')}</p>
+                            <p className="m-0 text-caption text-fg-muted">{t('faq.ask_hint')}</p>
                         )}
-                        <button type="submit" disabled={!canSubmit} className="vtk-button vtk-button-sm vtk-button-accent">
+                        <button type="submit" disabled={!canSubmit} className="vtk-button vtk-button-sm">
                             {isSubmitting ? (
                                 <>
                                     <span className="spinner" />
@@ -139,7 +141,7 @@ export function DidacticFeedbackForm() {
                                 </>
                             ) : (
                                 <>
-                                    <Send className="h-3.5 w-3.5" aria-hidden="true" />
+                                    <Send className="size-3.5" aria-hidden="true" />
                                     {t('home.feedback_button')}
                                 </>
                             )}
@@ -147,6 +149,6 @@ export function DidacticFeedbackForm() {
                     </div>
                 </div>
             </form>
-        </div>
+        </section>
     );
 }

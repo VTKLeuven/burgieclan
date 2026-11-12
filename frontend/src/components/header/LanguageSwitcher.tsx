@@ -4,10 +4,7 @@ import { useTranslation } from "react-i18next";
 import { i18nConfig } from "../../../i18nConfig";
 import { persistLocale } from '@/actions/locale';
 
-/**
- * Subtle NL / EN toggle for the navy header: light text, the active locale in
- * solid white. Mirrors `.vtk-site-header .lang-toggle` in vtk-website-new.
- */
+/** NL / EN as a small segmented control, used in the account menu and next to "Inloggen". */
 const LanguageSwitcher = () => {
     const { t, i18n } = useTranslation();
     const pathname = usePathname();
@@ -44,25 +41,23 @@ const LanguageSwitcher = () => {
         <div
             role="group"
             aria-label={t('language', { defaultValue: 'Language' })}
-            className="flex items-center gap-0.5 text-[13px] text-vtk-paper/75"
+            className="inline-flex h-7 items-center gap-0.5 rounded-[9px] bg-neutral-150 p-0.5"
         >
-            {i18nConfig.locales.map((locale, index) => (
-                <span key={locale} className="flex items-center">
-                    {index > 0 && <span className="text-vtk-paper/40" aria-hidden="true">/</span>}
-                    <button
-                        type="button"
-                        onClick={() => !isTransitioning && switchLanguage(locale)}
-                        aria-pressed={currentLocale === locale}
-                        aria-label={locale === 'nl' ? 'Nederlands' : 'English'}
-                        disabled={isTransitioning}
-                        className={`p-1 uppercase transition-colors rounded-xs focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-hidden ${currentLocale === locale
-                            ? 'font-semibold text-white'
-                            : 'hover:text-white'
-                            }`}
-                    >
-                        {locale}
-                    </button>
-                </span>
+            {i18nConfig.locales.map((locale) => (
+                <button
+                    key={locale}
+                    type="button"
+                    onClick={() => !isTransitioning && switchLanguage(locale)}
+                    aria-pressed={currentLocale === locale}
+                    aria-label={locale === 'nl' ? 'Nederlands' : 'English'}
+                    disabled={isTransitioning}
+                    className={`inline-flex h-6 min-w-8 items-center justify-center rounded-[7px] px-1.5 text-caption font-medium uppercase transition-colors ${currentLocale === locale
+                        ? 'bg-surface text-fg shadow-xs'
+                        : 'text-fg-muted hover:text-fg'
+                        }`}
+                >
+                    {locale}
+                </button>
             ))}
         </div>
     );

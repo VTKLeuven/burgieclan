@@ -26,11 +26,11 @@ export default function SearchResult({ mainResult, extraInfo, redirect, apiEndpo
         value={{ redirect, apiEndpoint }}
         onMouseEnter={prefetch}
         onFocus={prefetch}
-        className="cursor-default select-none px-4 py-2 data-focus:bg-vtk-ink data-focus:text-white"
+        className="cursor-default select-none rounded-[8px] px-2 py-2 data-focus:bg-neutral-150"
     >
         {({ focus }) => (<div className="flex justify-between">
             <span className="truncate">{mainResult}</span>
-            <span className={clsx('ml-2', focus && 'text-white', !focus && 'text-vtk-muted')}>
+            <span className={clsx('ml-2 shrink-0 text-small tabular', focus ? 'text-fg-secondary' : 'text-fg-muted')}>
                 {extraInfo}
             </span>
         </div>
@@ -76,11 +76,11 @@ export function ExamQuestionSearchResult({ hit }: { hit: ExamQuestionSearchHit }
         value={{ redirect: `${page}#q-${encodeURIComponent(hit.uid)}` }}
         onMouseEnter={() => router.prefetch(page)}
         onFocus={() => router.prefetch(page)}
-        className="cursor-default select-none px-4 py-2 data-focus:bg-vtk-ink data-focus:text-white"
+        className="cursor-default select-none rounded-[8px] px-2 py-2 data-focus:bg-neutral-150"
     >
         {({ focus }) => (<div className="grid gap-0.5">
             <span className="line-clamp-2">{hit.snippet}</span>
-            <span className={clsx('truncate text-xs', focus ? 'text-white' : 'text-vtk-muted')}>
+            <span className={clsx('truncate text-caption', focus ? 'text-fg-secondary' : 'text-fg-muted')}>
                 {course} · {exam}
             </span>
         </div>

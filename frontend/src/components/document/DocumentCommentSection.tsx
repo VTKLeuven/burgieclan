@@ -4,7 +4,8 @@ import { HydraCollection, readPreloadedApi, useApi } from "@/hooks/useApi";
 import type { DocumentComment as DocumentCommentEntity } from "@/types/entities";
 import { convertToDocumentComment } from "@/utils/convertToEntity";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from "@headlessui/react";
-import { MessageSquarePlus, X } from "lucide-react";
+import SectionHeader from "@/components/ui/SectionHeader";
+import { MessagesSquare, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -71,19 +72,22 @@ export default function DocumentCommentSection({
 
     if (displayInline) {
         return (
-            <aside className="vtk-panel p-5">
-                <h2 className="m-0 mb-4 text-base font-semibold tracking-tight text-vtk-ink">
-                    {t('document.comments.title')}
-                    <span className="ml-2 text-[13px] font-normal text-vtk-muted">({comments.length})</span>
-                </h2>
+            <section aria-labelledby={`document-comments-heading-${documentId}`}>
+                <SectionHeader
+                    id={`document-comments-heading-${documentId}`}
+                    icon={<MessagesSquare />}
+                    title={t('document.comments.title')}
+                    count={comments.length}
+                />
                 {commentsBody}
-            </aside>
+            </section>
         );
     }
 
     const drawerId = `document-comments-${documentId}`;
     const isLoadingCount = loading && comments.length === 0;
 
+    // On a narrow page the comments are a button in the page header that opens a drawer.
     return (
         <>
             <button
@@ -95,52 +99,42 @@ export default function DocumentCommentSection({
                     ? t('document.comments.loading')
                     : t('document.comments.open', { count: comments.length })}
                 title={t('document.comments.open', { count: comments.length })}
-                className="fixed right-0 top-1/2 z-[8] flex w-12 -translate-y-1/2 flex-col items-center gap-2 rounded-l-2xl border border-r-0 border-vtk-line-2 bg-vtk-navy px-2 py-3 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(10,15,31,0.22)] transition-all hover:w-14 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-yellow"
+                className="vtk-button vtk-button-sm"
             >
-                <MessageSquarePlus className="h-5 w-5 shrink-0" aria-hidden="true" />
-                <span className="rotate-180 leading-none tracking-wide [writing-mode:vertical-rl]">
-                    {t('document.comments.title')}
-                </span>
-                <span
-                    aria-live="polite"
-                    className={`grid min-h-6 min-w-6 place-items-center rounded-full px-1.5 text-xs font-bold ${comments.length > 0
-                        ? 'bg-vtk-yellow text-vtk-ink'
-                        : 'bg-white/15 text-white'
-                        }`}
-                >
+                <MessagesSquare className="size-4" aria-hidden="true" />
+                <span className="hidden sm:inline">{t('document.comments.title')}</span>
+                <span aria-live="polite" className="text-fg-muted tabular">
                     {isLoadingCount ? '…' : comments.length}
                 </span>
             </button>
 
-            <Dialog open={isOpen} onClose={setIsOpen} className="relative z-[9]">
+            <Dialog open={isOpen} onClose={setIsOpen} className="relative z-50">
                 <DialogBackdrop
                     transition
-                    className="fixed inset-0 bg-vtk-ink/35 backdrop-blur-xs transition-opacity duration-200 data-closed:opacity-0"
+                    className="fixed inset-0 bg-neutral-900/25 transition-opacity duration-200 data-closed:opacity-0"
                 />
-                <div className="fixed bottom-0 right-0 top-[72px] flex w-full max-w-[420px]">
+                <div className="fixed inset-y-0 right-0 flex w-full max-w-[420px]">
                     <DialogPanel
                         transition
                         id={drawerId}
-                        className="h-full w-full overflow-y-auto overscroll-contain border-l border-vtk-line bg-vtk-surface p-5 shadow-[-18px_0_48px_rgba(10,15,31,0.16)] transition duration-300 ease-out data-closed:translate-x-full"
+                        className="h-full w-full overflow-y-auto overscroll-contain border-l border-border bg-surface shadow-dialog transition duration-200 ease-out data-closed:translate-x-full"
                     >
-                        <div className="mb-4 flex items-center justify-between gap-4">
-                            <DialogTitle className="m-0 text-lg font-semibold tracking-tight text-vtk-ink">
+                        <div className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b border-border bg-surface px-5">
+                            <DialogTitle className="m-0 flex items-center gap-2 text-title font-semibold text-fg">
                                 {t('document.comments.title')}
-                                <span className="ml-2 text-[13px] font-normal text-vtk-muted">
-                                    ({comments.length})
-                                </span>
+                                <span className="text-body font-normal text-fg-muted tabular">{comments.length}</span>
                             </DialogTitle>
                             <button
                                 type="button"
                                 onClick={() => setIsOpen(false)}
-                                className="vtk-icon-button h-9 w-9 shrink-0"
+                                className="vtk-icon-button"
                                 aria-label={t('document.comments.close')}
                                 title={t('document.comments.close')}
                             >
-                                <X className="h-4 w-4" aria-hidden="true" />
+                                <X className="size-4" aria-hidden="true" />
                             </button>
                         </div>
-                        {commentsBody}
+                        <div className="p-5">{commentsBody}</div>
                     </DialogPanel>
                 </div>
             </Dialog>

@@ -19,12 +19,12 @@ interface DocumentCommentProps {
 export default function DocumentComment({ id, author, content }: DocumentCommentProps) {
 
     return (
-        <div className="border rounded-lg max-w-sm p-2 h-fit">
-            <div className="flex flex-row justify-between pb-2">
-                <p className="font-bold">{author}</p>
-                <VoteButton type='document_comment' objectId={id} className="py-1" />
+        <div className="h-fit rounded-card border border-border bg-surface px-3.5 py-3">
+            <div className="mb-1.5 flex items-center justify-between gap-2">
+                <p className="m-0 truncate text-small font-medium text-fg">{author}</p>
+                <VoteButton type='document_comment' objectId={id} size="small" />
             </div>
-            <RichTextView html={content} className="text-sm" />
+            <RichTextView html={content} className="text-body text-fg-secondary" />
         </div>
     );
 }

@@ -6,7 +6,9 @@ import { useUser } from "@/components/UserContext";
 import AnonymousSetting from "@/components/account/AnonymousSetting";
 import DocumentList from "@/components/account/DocumentList";
 import FavoriteList from "@/components/account/FavoriteList";
-import PageHead from "@/components/ui/PageHead";
+import PageHeader from "@/components/layout/PageHeader";
+import { LogOut, UserRound } from "lucide-react";
+import { useState } from "react";
 import type { Course, Document, Module, Program } from "@/types/entities";
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import { useRouter } from "next/navigation";
@@ -50,75 +52,118 @@ const mapDocumentsToItems = (documents: Document[]) => {
     }));
 };
 
+type Tab = 'documents' | 'favorites' | 'settings';
+
 export default function AccountPage() {
     const { user, loading } = useUser();
     const { t, i18n } = useTranslation();
     const router = useRouter();
+    const [tab, setTab] = useState<Tab>('documents');
+
+    const header = <PageHeader crumbs={[{ label: t('shell.my_account'), icon: <UserRound /> }]} />;
 
     if (loading || !user) {
-        return <Loading />;
+        return <>{header}<Loading /></>;
     }
 
-    // Derive favorites directly from user data
     const favoriteCourses = user.favoriteCourses || [];
     const favoriteModules = user.favoriteModules || [];
     const favoritePrograms = user.favoritePrograms || [];
     const favoriteDocuments = user.favoriteDocuments || [];
-
+    const favoriteCount = favoriteCourses.length + favoriteModules.length + favoritePrograms.length + favoriteDocuments.length;
 
     async function handleLogout() {
         await logOut();
         await router.push("/login");
     }
 
+    const tabs: { key: Tab; label: string; count?: number }[] = [
+        { key: 'documents', label: t('account.documents.my') },
+        { key: 'favorites', label: t('account.tabs.favorites'), count: favoriteCount },
+        { key: 'settings', label: t('account.tabs.settings') },
+    ];
+
     return (
-        <div className="vtk-shell pb-16">
-            <PageHead
-                kicker={t('account.account')}
-                title={t('account.greeting', { name: user.fullName })}
-                subtitle={<span dangerouslySetInnerHTML={{ __html: t('account.welcome_text') }} />}
-                meta={
-                    <>
-                        <b>{favoriteCourses.length}</b> {t('account.meta-courses')}<br />
-                        <b>{favoriteDocuments.length}</b> {t('account.meta-documents')}
-                    </>
-                }
-            />
-
-            <div className="mt-7 grid gap-4">
-                <DocumentList />
-
-                <div className="grid gap-4 lg:grid-cols-2">
-                    <FavoriteList
-                        title={t('account.favorite.courses')}
-                        items={mapCoursesToItems(favoriteCourses, i18n.language)}
-                        emptyMessage={t('account.favorite.no_courses')}
-                    />
-                    <FavoriteList
-                        title={t('account.favorite.modules')}
-                        items={mapModulesToItems(favoriteModules)}
-                        emptyMessage={t('account.favorite.no_modules')}
-                    />
-                    <FavoriteList
-                        title={t('account.favorite.programs')}
-                        items={mapProgramsToItems(favoritePrograms)}
-                        emptyMessage={t('account.favorite.no_programs')}
-                    />
-                    <FavoriteList
-                        title={t('account.favorite.documents')}
-                        items={mapDocumentsToItems(favoriteDocuments)}
-                        emptyMessage={t('account.favorite.no_documents')}
-                    />
+        <>
+            {header}
+            <div className="vtk-shell vtk-shell-narrow">
+                <div className="flex items-center gap-4">
+                    <span className="grid size-12 shrink-0 place-items-center rounded-full bg-neutral-900 text-body font-semibold text-white">
+                        {(user.fullName ?? '?').split(/\s+/).map((part) => part[0]).slice(0, 2).join('').toUpperCase()}
+                    </span>
+                    <div className="min-w-0">
+                        <h1 className="vtk-page-title truncate">{user.fullName}</h1>
+                        <p className="vtk-page-subtitle m-0 truncate">{[user.username, user.email].filter(Boolean).join(' · ')}</p>
+                    </div>
                 </div>
 
-                <AnonymousSetting />
+                {/* Underline tabs, as on Dopl's settings pages: one thing at a time. */}
+                <div role="tablist" aria-label={t('shell.my_account')} className="mt-6 flex items-center gap-5 border-b border-border">
+                    {tabs.map(({ key, label, count }) => (
+                        <button
+                            key={key}
+                            type="button"
+                            role="tab"
+                            id={`account-tab-${key}`}
+                            aria-selected={tab === key}
+                            aria-controls={`account-panel-${key}`}
+                            onClick={() => setTab(key)}
+                            className={`relative -mb-px inline-flex h-10 items-center gap-1.5 border-b-2 text-body font-medium transition-colors ${tab === key
+                                ? 'border-fg text-fg'
+                                : 'border-transparent text-fg-muted hover:text-fg'
+                                }`}
+                        >
+                            {label}
+                            {count !== undefined && <span className="text-fg-muted tabular">{count}</span>}
+                        </button>
+                    ))}
+                </div>
 
-                <div className="flex justify-end border-t border-vtk-line pt-5">
-                    <button onClick={handleLogout} className="vtk-button vtk-button-danger">
-                        {t('logout')}
-                    </button>
+                <div role="tabpanel" id={`account-panel-${tab}`} aria-labelledby={`account-tab-${tab}`} className="mt-6">
+                    {tab === 'documents' && <DocumentList />}
+
+                    {tab === 'favorites' && (
+                        <div className="grid gap-8 md:grid-cols-2">
+                            <FavoriteList
+                                title={t('account.favorite.courses')}
+                                items={mapCoursesToItems(favoriteCourses, i18n.language)}
+                                emptyMessage={t('account.favorite.no_courses')}
+                            />
+                            <FavoriteList
+                                title={t('account.favorite.documents')}
+                                items={mapDocumentsToItems(favoriteDocuments)}
+                                emptyMessage={t('account.favorite.no_documents')}
+                            />
+                            <FavoriteList
+                                title={t('account.favorite.programs')}
+                                items={mapProgramsToItems(favoritePrograms)}
+                                emptyMessage={t('account.favorite.no_programs')}
+                            />
+                            <FavoriteList
+                                title={t('account.favorite.modules')}
+                                items={mapModulesToItems(favoriteModules)}
+                                emptyMessage={t('account.favorite.no_modules')}
+                            />
+                        </div>
+                    )}
+
+                    {tab === 'settings' && (
+                        <div className="divide-y divide-border">
+                            <AnonymousSetting />
+                            <div className="flex items-center justify-between gap-4 py-4">
+                                <div className="min-w-0">
+                                    <h3 className="m-0 text-body font-medium text-fg">{t('logout')}</h3>
+                                    <p className="m-0 mt-0.5 text-small text-fg-muted">{t('account.logout_description')}</p>
+                                </div>
+                                <button onClick={handleLogout} className="vtk-button vtk-button-sm text-danger-text!">
+                                    <LogOut className="size-4 text-danger-text!" aria-hidden="true" />
+                                    {t('logout')}
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
-        </div>
+        </>
     );
 }

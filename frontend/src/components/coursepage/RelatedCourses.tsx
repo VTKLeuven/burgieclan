@@ -37,7 +37,7 @@ export default function RelatedCourses({ course }: RelatedCoursesProps) {
     }
 
     return (
-        <div className="mt-6 flex flex-col gap-3">
+        <div className="mt-4 flex flex-col gap-2">
             {groups.map(({ key, icon: Icon, courses }) => (
                 <div key={key} className="flex flex-wrap items-center gap-x-3 gap-y-2">
                     <span className="vtk-label flex items-center gap-1.5 text-vtk-muted">
@@ -58,20 +58,20 @@ export default function RelatedCourses({ course }: RelatedCoursesProps) {
                             // Yellow is the accent for an active/selected badge, so hover
                             // lifts the surface and darkens the text instead - the same
                             // treatment the rest of the app uses for a hovered control.
-                            className="vtk-badge vtk-badge-muted transition-colors hover:border-vtk-line-2 hover:bg-vtk-surface hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-1"
+                            className="vtk-badge transition-colors hover:border-border-strong hover:bg-surface-hover hover:text-fg"
                         >
-                            <span className="font-mono">{related.code}</span>
+                            <span className="tabular text-fg-muted">{related.code}</span>
                             {/* The name is absent when the API returned the course as a bare
                                 IRI reference; the code alone still identifies it. */}
                             {localizedCourseName(related, i18n.language) && (
-                                <span className="ml-1.5">{localizedCourseName(related, i18n.language)}</span>
+                                <span className="ml-1 text-link">{localizedCourseName(related, i18n.language)}</span>
                             )}
                             {/* How much is actually over there. A reform leaves the new code
                                 nearly empty while the old one holds a decade of exams, and
                                 without a number the link reads as a footnote rather than as
                                 the place the material still lives. */}
                             {related.documentCount !== undefined && related.documentCount > 0 && (
-                                <span className="ml-1.5 text-vtk-muted">
+                                <span className="ml-1 text-fg-muted">
                                     {t('course-page.related.documents', { count: related.documentCount })}
                                 </span>
                             )}

@@ -119,7 +119,8 @@
                     "type": "File type is not supported"
                 }
             }
-        }
+        },
+        "drag_drop_bar": "Drop a file here, or click to add a document"
     },
     "home": {
         "title": "Home",
@@ -157,7 +158,16 @@
         "favorite_curriculum": "Your favorites",
         "favorite_curriculum_all": "View all favorites",
         "favorite_program_label": "Programme",
-        "favorite_module_label": "Module"
+        "favorite_module_label": "Module",
+        "greeting_morning": "Good morning, {{name}}",
+        "greeting_afternoon": "Good afternoon, {{name}}",
+        "greeting_evening": "Good evening, {{name}}",
+        "greeting_night": "Hello, {{name}}",
+        "summary_courses_one": "{{count}} course pinned",
+        "summary_courses_other": "{{count}} courses pinned",
+        "all_courses": "All courses",
+        "no_courses_yet": "Star the courses you are taking this year and they will show up here and in the sidebar.",
+        "find_courses": "Find courses"
     },
     "form": {
         "errors": {
@@ -261,9 +271,11 @@
         "hide-empty-categories": "Hide empty folders",
         "no-documents-yet": "This course has no documents yet.",
         "placement": {
-            "other_one": "also in 1 other program",
-            "other_other": "also in {{count}} other programs"
-        }
+            "other_one": "Also in 1 other programme",
+            "other_other": "Also in {{count}} other programmes",
+            "label": "Programme"
+        },
+        "ects-sheet": "ECTS sheet"
     },
     "download": {
         "download": "Download",
@@ -316,7 +328,20 @@
         "meta-modules_one": "group",
         "meta-modules_other": "groups",
         "meta-courses_one": "course",
-        "meta-courses_other": "courses"
+        "meta-courses_other": "courses",
+        "subtitle_one": "{{count}} programme. Search for a course or browse by programme.",
+        "subtitle_other": "{{count}} programmes. Search for a course or browse by programme.",
+        "filters": "Filters",
+        "credits-short": "ECTS",
+        "group": {
+            "bachelor": "Bachelor",
+            "master": "Master",
+            "other": "Other programmes"
+        },
+        "meta-modules-count_one": "{{count}} group",
+        "meta-modules-count_other": "{{count}} groups",
+        "meta-courses-count_one": "{{count}} course",
+        "meta-courses-count_other": "{{count}} courses"
     },
     "account": {
         "menu": "User menu",
@@ -347,7 +372,12 @@
             "disabled": "Disabled",
             "update_success": "Setting updated",
             "update_error": "Failed to update setting"
-        }
+        },
+        "tabs": {
+            "favorites": "Favourites",
+            "settings": "Settings"
+        },
+        "logout_description": "Sign out on this device."
     },
     "document": {
         "name": "Name",
@@ -419,7 +449,11 @@
             "previous": "Previous document",
             "next": "Next document",
             "position": "{{index}} of {{total}}"
-        }
+        },
+        "date": "Added",
+        "size": "Size",
+        "votes": "Votes",
+        "details": "Details"
     },
     "pagination": {
         "previous": "Previous",
@@ -667,5 +701,14 @@
                 "submit": "Remove day"
             }
         }
+    },
+    "shell": {
+        "my_account": "My account",
+        "my_courses": "My courses",
+        "favorite_documents": "Favourite documents",
+        "browse": "Browse",
+        "no_courses": "Star a course to pin it here.",
+        "show_all": "View all {{count}}",
+        "feedback": "Give feedback"
     }
 }

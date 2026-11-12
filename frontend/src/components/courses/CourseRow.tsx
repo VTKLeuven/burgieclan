@@ -36,7 +36,6 @@ function hasCourseRowData(course: Course): boolean {
 export const CourseRow = memo(({
     course: initialCourse,
     highlightMatch = false,
-    isFirstRow = false,
     moduleId,
 }: CourseRowProps) => {
     const { i18n } = useTranslation();
@@ -80,33 +79,26 @@ export const CourseRow = memo(({
         }
     }, [initialCourse, request]);
 
-    // Add margin-top classes conditionally based on whether this is the first row
-    const marginClass = isFirstRow ? '' : 'mt-0';
-
     // Render the row structure, using either real data or skeletons
     const content = loading || !course ? {
         name: <Skeleton />,
         code: <Skeleton />,
         credits: <Skeleton />,
         semesters: <Skeleton circle width={16} height={16} />,
-        professor: <Skeleton circle width={28} height={28} />
+        professor: <Skeleton circle width={24} height={24} />
     } : {
         name: localizedCourseName(course, programLanguage ?? i18n.language),
         code: course.code,
-        credits: (
-            <span className="vtk-badge vtk-badge-muted">
-                {course.credits}
-            </span>
-        ),
+        credits: course.credits,
         semesters: <SemesterIndicator semesters={course.semesters} size={16} />,
         professor: (
-            <div className="flex -space-x-1.5">
+            <div className="flex -space-x-1">
                 {course.professors?.map((unumber, index) => (
                     <ProfessorDiv
                         key={unumber}
                         unumber={unumber}
                         index={index}
-                        size={28}
+                        size={24}
                         linkToProfile={false}
                     />
                 ))}
@@ -115,25 +107,17 @@ export const CourseRow = memo(({
     };
 
     return (
-        <div role="row" className={`grid grid-cols-12 py-2 px-3 border-b leading-tight hover:bg-vtk-paper rounded-md ${highlightMatch ? 'ring-1 ring-vtk-yellow' : ''
-            } ${marginClass}`}>
-            <div role="cell" className="col-span-5 flex items-center">
+        <div role="row" className={`group/row flex min-h-12 items-center gap-3 py-1.5 pr-2 pl-3 transition-colors hover:bg-surface-hover ${highlightMatch ? 'bg-surface-selected' : ''}`}>
+            <div role="cell" className="flex w-8 shrink-0 justify-center">
                 {loading || !course ? (
-                    <div className="mr-2 inline-block">
-                        <Skeleton circle width={16} height={16} />
-                    </div>
+                    <Skeleton circle width={16} height={16} />
                 ) : (
-                    <FavoriteButton
-                        itemId={course.id}
-                        itemType="course"
-                        size={16}
-                        className="mr-1 shrink-0"
-                    />
+                    <FavoriteButton itemId={course.id} itemType="course" size={16} className="vtk-icon-button size-7" />
                 )}
+            </div>
+            <div role="cell" className="min-w-0 flex-1">
                 {loading || !course ? (
-                    <div className="grow">
-                        {content.name}
-                    </div>
+                    content.name
                 ) : (
                     <ApiPrefetchLink
                         href={`/course/${course.id}`}
@@ -143,25 +127,21 @@ export const CourseRow = memo(({
                             `/api/comment_categories?lang=${i18n.language}`,
                             `/api/courses/${course.id}/ratings`,
                         ]}
-                        // The branch the reader walked, so the course page's breadcrumb and
-                        // folder tree name the programme they actually came from rather than
-                        // whichever one the course happens to be listed under first.
+                        // The branch the reader walked, so the course page's breadcrumb names
+                        // the programme they actually came from rather than whichever one the
+                        // course happens to be listed under first.
                         onClick={moduleId === undefined ? undefined : () => rememberBranch(course.id, moduleId)}
-                        className="hover:text-vtk-navy hover:underline text-sm text-vtk-body rounded-xs focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-1"
+                        className="block truncate text-body font-medium text-fg hover:underline"
                     >
                         {content.name}
                     </ApiPrefetchLink>
                 )}
             </div>
-            <div role="cell" className="col-span-1 flex items-center text-sm font-mono text-vtk-body">{content.code}</div>
-            <div role="cell" className="col-span-1 flex items-center justify-center">{content.credits}</div>
-            <div role="cell" className="col-span-2 flex justify-center items-center">
-                {content.semesters}
-            </div>
-            <div role="cell" className="col-span-2 flex justify-center items-center relative hover:z-50">
-                {content.professor}
-            </div>
-            <div role="cell" className="col-span-1 flex justify-end items-center">
+            <div role="cell" className="hidden w-20 shrink-0 text-small text-fg-muted tabular sm:block">{content.code}</div>
+            <div role="cell" className="hidden w-12 shrink-0 text-right text-small text-fg-secondary tabular sm:block">{content.credits}</div>
+            <div role="cell" className="hidden w-16 shrink-0 justify-center md:flex">{content.semesters}</div>
+            <div role="cell" className="relative hidden w-24 shrink-0 hover:z-50 lg:flex">{content.professor}</div>
+            <div role="cell" className="reveal-on-hover flex w-8 shrink-0 justify-end">
                 {!loading && course && <DownloadButton courses={[course]} size={16} />}
             </div>
         </div>

@@ -131,15 +131,13 @@ export default function VoteButton({
     const displayedVoteCount = Math.max(0, voteCount);
 
     const iconSize = size === 'small' ? 16 : 20;
-    const textSize = size === 'small' ? 'text-xs' : 'text-sm';
-    const padding = size === 'small' ? 'p-0.5' : 'p-1';
-    const spacing = size === 'small' ? 'space-x-1' : 'space-x-1.5';
+    const textSize = size === 'small' ? 'text-small' : 'text-body';
+    const height = size === 'small' ? 'h-7 px-1' : 'h-8 px-1.5';
 
     return (
-        // Both directions read on the navy scale; the active state is an ink
-        // fill rather than a second accent colour.
-        <span ref={buttonRef} className={`inline-flex items-center rounded-full border border-vtk-line-2 bg-vtk-surface
-            ${padding} ${spacing}
+        // A small outlined chip; an upvote you gave fills in the sky accent, like a selection.
+        <span ref={buttonRef} className={`inline-flex items-center gap-0.5 rounded-chip border border-border bg-surface
+            ${height}
             ${disabled ? 'opacity-50' : ''}
             ${className}`}
         >
@@ -151,19 +149,19 @@ export default function VoteButton({
                 onClick={() => handleVote(VoteDirection.UP)}
                 onMouseEnter={() => setIsUpvoteHovered(true)}
                 onMouseLeave={() => setIsUpvoteHovered(false)}
-                className={`focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-1 rounded-full transition-colors ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                className={`grid place-items-center rounded-[6px] p-0.5 transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-focus hover:bg-neutral-150 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
             >
                 <ArrowBigUpIcon
                     size={iconSize}
                     strokeWidth={isUpvoteHovered ? '2' : '1.5'}
                     aria-hidden="true"
                     className={`transition-colors
-                        ${disabled ? '' : 'hover:text-vtk-ink'}
-                        ${voteState === VoteDirection.UP ? 'fill-vtk-ink text-vtk-ink' : 'text-vtk-muted'}
+                        ${disabled ? '' : 'hover:text-fg'}
+                        ${voteState === VoteDirection.UP ? 'fill-sky-600 text-sky-600' : 'text-icon'}
                     `}
                 />
             </button>
-            <div className={`${textSize} min-w-4 text-center tabular-nums ${voteState === VoteDirection.NONE ? 'text-vtk-body' : 'font-semibold text-vtk-ink'
+            <div className={`${textSize} min-w-4 text-center tabular-nums ${voteState === VoteDirection.NONE ? 'text-fg-secondary' : 'font-semibold text-fg'
                 }`}>
                 {displayedVoteCount}
             </div>
@@ -175,15 +173,15 @@ export default function VoteButton({
                 onClick={() => handleVote(VoteDirection.DOWN)}
                 onMouseEnter={() => setIsDownvoteHovered(true)}
                 onMouseLeave={() => setIsDownvoteHovered(false)}
-                className={`focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy focus-visible:ring-offset-1 rounded-full transition-colors ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                className={`grid place-items-center rounded-[6px] p-0.5 transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-focus hover:bg-neutral-150 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
             >
                 <ArrowBigDownIcon
                     size={iconSize}
                     strokeWidth={isDownvoteHovered ? '2' : '1.5'}
                     aria-hidden="true"
                     className={`transition-colors
-                        ${disabled ? '' : 'hover:text-vtk-ink'}
-                        ${voteState === VoteDirection.DOWN ? 'fill-vtk-ink text-vtk-ink' : 'text-vtk-muted'}
+                        ${disabled ? '' : 'hover:text-fg'}
+                        ${voteState === VoteDirection.DOWN ? 'fill-fg text-fg' : 'text-icon'}
                     `}
                 />
             </button>

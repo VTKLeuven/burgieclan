@@ -31,38 +31,38 @@ export function Dialog({ isOpen, onClose, size = 'lg', className, children }: Di
         <Transition appear show={isOpen} as={React.Fragment}>
             <HeadlessDialog
                 as="div"
-                className="relative z-10"
+                className="relative z-50"
                 onClose={() => onClose()}
                 open={isOpen}
             >
                 <Transition.Child
                     as={React.Fragment}
-                    enter="ease-out duration-300"
+                    enter="ease-out duration-200"
                     enterFrom="opacity-0"
                     enterTo="opacity-100"
                     leave="ease-in duration-200"
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 bg-vtk-ink/40 backdrop-blur-xs" />
+                    <div className="fixed inset-0 bg-neutral-900/25" />
                 </Transition.Child>
 
-                <div className="fixed inset-0 z-10 overflow-y-auto">
+                <div className="fixed inset-0 z-50 overflow-y-auto">
                     <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                         <Transition.Child
                             as={React.Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            enter="ease-out duration-200"
+                            enterFrom="opacity-0 translate-y-2 sm:translate-y-0 sm:scale-[0.98]"
                             enterTo="opacity-100 translate-y-0 sm:scale-100"
                             leave="ease-in duration-200"
                             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            leaveTo="opacity-0 translate-y-2 sm:translate-y-0 sm:scale-[0.98]"
                         >
                             <HeadlessDialog.Panel
                                 className={clsx(
                                     className,
                                     sizes[size],
-                                    "relative w-full transform overflow-hidden rounded-[22px] border border-vtk-line bg-vtk-surface px-4 pb-4 pt-5 text-left shadow-[0_24px_70px_rgba(10,15,31,0.2)] transition-all sm:my-8 sm:p-6"
+                                    "relative w-full transform overflow-hidden rounded-panel border border-border bg-surface px-4 pb-4 pt-5 text-left shadow-dialog transition-all sm:my-8 sm:p-6"
                                 )}
                             >
                                 <DialogCloseButton onClose={onClose} />
@@ -85,7 +85,7 @@ export function DialogTitle({ className, children }: DialogTitleProps) {
     return (
         <HeadlessDialog.Title
             as="h3"
-            className={clsx(className, 'px-10')}
+            className={clsx('m-0 px-10 text-title font-semibold text-fg', className)}
         >
             {children}
         </HeadlessDialog.Title>
@@ -127,7 +127,7 @@ export function DialogCloseButton({ onClose }: DialogCloseButtonProps) {
         <button
             type="button"
             onClick={onClose}
-            className="vtk-icon-button absolute right-4 top-4 h-8 w-8"
+            className="vtk-icon-button absolute right-4 top-4"
         >
             <span className="sr-only">{t('dialog.close')}</span>
             <X aria-hidden="true" className="h-4 w-4" />

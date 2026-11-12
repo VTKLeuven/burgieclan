@@ -12,7 +12,7 @@ export default function FoldableSection({
     title,
     defaultOpen,
     children,
-    headerClassName = "bg-vtk-paper-2 text-xs font-semibold text-vtk-ink" // Default styling
+    headerClassName = ""
 }: FoldableSectionProps) {
     const [isOpen, setIsOpen] = useState(defaultOpen);
     const sectionId = useId();
@@ -29,11 +29,11 @@ export default function FoldableSection({
                     onClick={toggleSection}
                     aria-expanded={isOpen}
                     aria-controls={sectionId}
-                    className={`w-full cursor-pointer px-4 py-2.5 capitalize flex items-center justify-between text-left focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy ${headerClassName}`}
+                    className={`flex h-7 w-full cursor-pointer items-center justify-between rounded-[8px] px-2 text-left text-caption font-medium text-fg-muted hover:text-fg focus:outline-hidden focus-visible:ring-2 focus-visible:ring-focus ${headerClassName}`}
                 >
                     <span>{title}</span>
                     <ChevronDown
-                        className={`h-4 w-4 transform transition-transform duration-200 ${isOpen ? 'rotate-0' : '-rotate-90'
+                        className={`size-3.5 transform transition-transform duration-200 ${isOpen ? 'rotate-0' : '-rotate-90'
                             }`}
                         aria-hidden="true"
                     />
@@ -45,7 +45,7 @@ export default function FoldableSection({
                 className={`transition-all duration-200 ease-in-out overflow-hidden ${isOpen ? 'opacity-100' : 'max-h-0 opacity-0'
                     }`}
             >
-                <div className="content text-sm text-vtk-ink">
+                <div className="content text-body text-fg">
                     {children}
                 </div>
             </div>

@@ -83,14 +83,14 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
     <div className="relative" ref={filterRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`vtk-button vtk-button-sm h-[34px] ${hasActiveFilters ? 'border-vtk-ink bg-vtk-paper-2' : ''
+        className={`vtk-button vtk-button-sm ${hasActiveFilters ? 'border-info-border! bg-info-bg! text-info-text!' : ''
           }`}
         aria-expanded={isOpen}
       >
-        <Filter size={16} className={`mr-1 ${hasActiveFilters ? 'text-vtk-ink' : ''}`} />
+        <Filter size={16} className={hasActiveFilters ? 'text-info-text!' : ''} />
         <span>{t('document.filter')}</span>
         {hasActiveFilters && (
-          <span className="vtk-badge vtk-badge-accent min-h-5 px-1.5 py-0">
+          <span className="rounded-full bg-sky-600 px-1.5 text-micro font-semibold leading-4 text-white tabular">
             {Object.values(filters).filter(v =>
               v !== undefined && v !== '' && (Array.isArray(v) ? v.length > 0 : v)
             ).length}
@@ -99,9 +99,9 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 z-10 mt-1.5 w-80 rounded-[18px] border border-vtk-line bg-vtk-surface p-4 shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
+        <div className="absolute left-0 z-30 mt-1.5 w-80 max-w-[calc(100vw-2rem)] rounded-card border border-border bg-surface p-4 shadow-popover">
           <div className="flex justify-between items-center mb-3">
-            <h3 className="text-sm font-medium">{t('document.filters')}</h3>
+            <h3 className="m-0 text-body font-semibold">{t('document.filters')}</h3>
             {hasActiveFilters && (
               <button
                 onClick={handleClearFilters}

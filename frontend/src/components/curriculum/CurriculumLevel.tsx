@@ -7,7 +7,8 @@ import DownloadButton from '@/components/ui/DownloadButton';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import type { Course, Module } from '@/types/entities';
-import { ChevronRight, Folder } from 'lucide-react';
+import SectionHeader from '@/components/ui/SectionHeader';
+import { BookOpen, ChevronRight, Folder } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface CurriculumLevelProps {
@@ -34,31 +35,35 @@ export default function CurriculumLevel({ modules, courses, moduleId }: Curricul
     const hasCourses = !!courses && courses.length > 0;
 
     if (!hasModules && !hasCourses) {
-        return <p className="vtk-empty mt-6">{t('curriculum-navigator.no-courses-in-module')}</p>;
+        return <div className="vtk-panel vtk-empty mt-6">{t('curriculum-navigator.no-courses-in-module')}</div>;
     }
 
     return (
         <div className="mt-6 grid gap-8">
             {hasModules && (
-                <section>
-                    <h2 className="vtk-label mb-3 text-vtk-muted">{t('curriculum-navigator.groups')}</h2>
-                    <div className="grid gap-2">
+                <section aria-labelledby="groups-heading">
+                    <SectionHeader id="groups-heading" icon={<Folder />} title={t('curriculum-navigator.groups')} count={modules.length} />
+                    <div className="vtk-list">
                         {modules.map((node) => (
-                            <div
-                                key={node.id}
-                                className="flex items-center gap-2 rounded-[14px] border border-vtk-line bg-vtk-surface px-4 transition-colors hover:border-vtk-line-2 hover:bg-vtk-paper"
-                            >
+                            <div key={node.id} className="group/row vtk-list-row vtk-list-row-hover py-0 pr-2">
                                 <ApiPrefetchLink
                                     href={curriculumHref.module(node)}
                                     apiEndpoints={`/api/modules/${node.id}`}
-                                    className="flex min-w-0 flex-1 items-center gap-3 py-3 text-[15px] font-medium text-vtk-ink rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
+                                    className="flex min-h-12 min-w-0 flex-1 items-center gap-3"
                                 >
-                                    <Folder size={16} className="shrink-0 text-vtk-muted" aria-hidden="true" />
-                                    <span className="min-w-0 flex-1 truncate">{node.name}</span>
-                                    <ChevronRight size={16} className="shrink-0 text-vtk-muted" aria-hidden="true" />
+                                    <Folder className="size-4 shrink-0 text-icon" aria-hidden="true" />
+                                    <span className="min-w-0 flex-1 truncate text-body font-medium text-fg">{node.name}</span>
+                                    {(node.courses?.length ?? 0) > 0 && (
+                                        <span className="shrink-0 text-small text-fg-muted tabular">
+                                            {t('curriculum-navigator.meta-courses-count', { count: node.courses!.length })}
+                                        </span>
+                                    )}
                                 </ApiPrefetchLink>
-                                <FavoriteButton itemId={node.id} itemType="module" size={16} className="shrink-0" />
-                                <DownloadButton modules={[node]} />
+                                <span className="reveal-on-hover">
+                                    <DownloadButton modules={[node]} />
+                                </span>
+                                <FavoriteButton itemId={node.id} itemType="module" size={16} className="vtk-icon-button" />
+                                <ChevronRight className="size-4 shrink-0 text-fg-placeholder" aria-hidden="true" />
                             </div>
                         ))}
                     </div>
@@ -66,18 +71,20 @@ export default function CurriculumLevel({ modules, courses, moduleId }: Curricul
             )}
 
             {hasCourses && (
-                <section>
-                    <h2 className="vtk-label mb-3 text-vtk-muted">{t('courses')}</h2>
-                    <div className="overflow-hidden rounded-[14px] border border-vtk-line bg-vtk-surface" role="table">
+                <section aria-labelledby="courses-heading">
+                    <SectionHeader id="courses-heading" icon={<BookOpen />} title={t('courses')} count={courses.length} />
+                    <div className="overflow-hidden rounded-card border border-border bg-surface" role="table">
                         <CourseTableHeader courses={courses} />
-                        {courses.map((course, index) => (
-                            <CourseRow
-                                key={course.id}
-                                course={course}
-                                isFirstRow={index === 0}
-                                moduleId={moduleId}
-                            />
-                        ))}
+                        <div className="vtk-rows" role="rowgroup">
+                            {courses.map((course, index) => (
+                                <CourseRow
+                                    key={course.id}
+                                    course={course}
+                                    isFirstRow={index === 0}
+                                    moduleId={moduleId}
+                                />
+                            ))}
+                        </div>
                     </div>
                 </section>
             )}

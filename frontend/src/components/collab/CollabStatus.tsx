@@ -4,8 +4,8 @@ import type { ConnectionStatus } from '@/components/collab/useCollabSession';
 import { useTranslation } from 'react-i18next';
 
 const STATUS_DOT: Record<ConnectionStatus, string> = {
-    connecting: 'bg-vtk-yellow',
-    connected: 'bg-emerald-500',
+    connecting: 'bg-warning',
+    connected: 'bg-success',
     disconnected: 'bg-vtk-muted',
     denied: 'bg-red-600',
     unavailable: 'bg-red-600',
