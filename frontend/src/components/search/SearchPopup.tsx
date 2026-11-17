@@ -125,7 +125,9 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                 className="fixed inset-0 bg-vtk-ink/40 backdrop-blur-xs transition-opacity data-closed:opacity-0 data-enter:duration-300 data-leave:duration-200 data-enter:ease-out data-leave:ease-in"
             />
 
-            <div className="fixed inset-0 z-10 w-screen overflow-y-auto p-4 sm:p-6 md:p-20">
+            {/* The sticky header (72px, z-50) paints over this dialog. md:p-20 clears it; below
+                md the panel needs the same clearance or its input sits hidden behind the header. */}
+            <div className="fixed inset-0 z-10 w-screen overflow-y-auto p-4 pt-[88px] sm:p-6 sm:pt-[88px] md:p-20">
                 <DialogPanel
                     transition
                     className="mx-auto max-w-xl transform overflow-hidden rounded-[22px] border border-vtk-line bg-vtk-surface shadow-[0_24px_70px_rgba(10,15,31,0.2)] transition-all data-closed:scale-95 data-closed:opacity-0 data-enter:duration-300 data-leave:duration-200 data-enter:ease-out data-leave:ease-in"

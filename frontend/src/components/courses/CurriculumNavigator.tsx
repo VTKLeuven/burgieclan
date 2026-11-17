@@ -25,7 +25,7 @@ function flatten(programs: Program[]): CourseHit[] {
   const walk = (program: Program, module: Module, trail: Module[]) => {
     const path = [...trail, module];
     module.courses?.forEach((course) => {
-      hits.push({ course, program, modules: path, language: program.language });
+      hits.push({ course, program, modules: path });
     });
     module.modules?.forEach((child) => walk(program, child, path));
   };
@@ -143,7 +143,9 @@ export default function CurriculumNavigator() {
       {!programError && (results
         ? <CurriculumSearchResults hits={results} />
         : (
-          <div className="mt-5 grid gap-2">
+          // grid-cols-1 is minmax(0, 1fr): an implicit column grows to the longest programme name,
+          // which pushed the whole page sideways on a phone instead of truncating the names.
+          <div className="mt-5 grid grid-cols-1 gap-2">
             {programs.map((program) => (
               <div
                 key={program.id}
@@ -155,7 +157,9 @@ export default function CurriculumNavigator() {
                   className="flex min-w-0 flex-1 items-center gap-3 py-3.5 text-[15px] font-medium text-vtk-ink rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
                 >
                   <GraduationCap size={17} className="shrink-0 text-vtk-muted" aria-hidden="true" />
-                  <span className="min-w-0 flex-1 truncate">{program.name}</span>
+                  {/* Wraps on phones: the names differ only after "Master in de
+                      ingenieurswetenschappen:", so truncating made every row read the same. */}
+                  <span className="min-w-0 flex-1 break-words hyphens-auto sm:truncate">{program.name}</span>
                   <ChevronRight size={16} className="shrink-0 text-vtk-muted" aria-hidden="true" />
                 </ApiPrefetchLink>
                 <FavoriteButton itemId={program.id} itemType="program" size={16} className="shrink-0" />

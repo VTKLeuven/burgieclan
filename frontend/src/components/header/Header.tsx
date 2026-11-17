@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from 'react';
 import { Dialog } from '@headlessui/react';
-import { Menu, X } from 'lucide-react';
+import { ExternalLink, Menu, X } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import Search from "@/components/header/Search";
 import HeaderProfileButton from "@/components/header/HeaderProfileButton";
@@ -11,6 +11,8 @@ import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/components/header/LanguageSwitcher';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { logOut } from '@/actions/auth';
 import { recordOldBurgieclanClick } from '@/actions/analytics';
 import FeedbackDialog from '@/components/header/FeedbackDialog';
 
@@ -36,8 +38,16 @@ export default function Header() {
 
     const { t, i18n } = useTranslation();
 
-    const { user } = useUser();
+    const router = useRouter();
+    const { user, isAdmin } = useUser();
     const isAuthenticated = user !== null;
+    const adminUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin`;
+
+    const onClickLogout = async () => {
+        setMobileMenuOpen(false);
+        await logOut();
+        router.push('/login');
+    };
 
     const navigation: NavigationItem[] = [
         { name: t('courses'), href: '/courses' },
@@ -108,7 +118,8 @@ export default function Header() {
                             </button>
                         </div>
                     ) : (
-                        <div className="ml-auto flex xl:hidden">
+                        <div className="ml-auto flex items-center gap-x-3 xl:hidden">
+                            <LanguageSwitcher />
                             <Link href="/login" className="vtk-button vtk-button-accent vtk-button-sm">
                                 {t('login')}
                             </Link>
@@ -227,6 +238,45 @@ export default function Header() {
                         >
                             {t('profile')}
                         </Link>
+                        {/* The rest of the desktop profile dropdown, which phones never see. */}
+                        {isAdmin && (
+                            <a
+                                href={adminUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-base font-medium text-vtk-paper/80 transition-colors hover:bg-white/10 hover:text-white"
+                            >
+                                {t('header.admin')}
+                                <ExternalLink size={14} aria-hidden="true" />
+                            </a>
+                        )}
+                        <a
+                            href="https://vtk.be/account/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-base font-medium text-vtk-paper/80 transition-colors hover:bg-white/10 hover:text-white"
+                        >
+                            {t('header.my_vtk')}
+                            <ExternalLink size={14} aria-hidden="true" />
+                        </a>
+                        <button
+                            type="button"
+                            onClick={onClickLogout}
+                            className="rounded-xl px-3 py-2.5 text-left text-base font-medium text-[#fda29b] transition-colors hover:bg-white/10 hover:text-[#fecdca]"
+                        >
+                            {t('logout')}
+                        </button>
+
+                        <div className="my-4 border-t border-white/15" />
+                        <div className="flex items-center justify-between px-3">
+                            <span className="text-base font-medium text-vtk-paper/80">{t('language')}</span>
+                            {/* LanguageSwitcher reads useSearchParams, which needs a Suspense boundary. */}
+                            <Suspense fallback={null}>
+                                <LanguageSwitcher size="lg" />
+                            </Suspense>
+                        </div>
                     </div>
                 </div>
             </Dialog>

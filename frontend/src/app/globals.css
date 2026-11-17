@@ -207,12 +207,17 @@
 
   .vtk-page-title {
     margin: 0;
+    min-width: 0;
     max-width: 900px;
     color: var(--ink);
     font-size: clamp(28px, 3.4vw, 44px);
     line-height: 1.05;
     letter-spacing: -0.025em;
     font-weight: 600;
+    /* Dutch compounds like "ingenieurswetenschappen" are wider than a phone at display size:
+       hyphenate where the language allows it, and break anywhere rather than overflow. */
+    hyphens: auto;
+    overflow-wrap: anywhere;
   }
 
   .vtk-page-subtitle {

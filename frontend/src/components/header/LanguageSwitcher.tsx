@@ -7,8 +7,11 @@ import { persistLocale } from '@/actions/locale';
 /**
  * Subtle NL / EN toggle for the navy header: light text, the active locale in
  * solid white. Mirrors `.vtk-site-header .lang-toggle` in vtk-website-new.
+ *
+ * `size="lg"` is the same toggle with finger-sized targets, for the mobile menu:
+ * the 13px header version is about 20px tall, well under a comfortable tap.
  */
-const LanguageSwitcher = () => {
+const LanguageSwitcher = ({ size = 'sm' }: { size?: 'sm' | 'lg' }) => {
     const { t, i18n } = useTranslation();
     const pathname = usePathname();
     const router = useRouter();
@@ -44,7 +47,7 @@ const LanguageSwitcher = () => {
         <div
             role="group"
             aria-label={t('language', { defaultValue: 'Language' })}
-            className="flex items-center gap-0.5 text-[13px] text-vtk-paper/75"
+            className={`flex items-center gap-0.5 text-vtk-paper/75 ${size === 'lg' ? 'text-base' : 'text-[13px]'}`}
         >
             {i18nConfig.locales.map((locale, index) => (
                 <span key={locale} className="flex items-center">
@@ -55,7 +58,7 @@ const LanguageSwitcher = () => {
                         aria-pressed={currentLocale === locale}
                         aria-label={locale === 'nl' ? 'Nederlands' : 'English'}
                         disabled={isTransitioning}
-                        className={`p-1 uppercase transition-colors rounded-xs focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-hidden ${currentLocale === locale
+                        className={`${size === 'lg' ? 'min-h-11 min-w-11 px-2' : 'p-1'} uppercase transition-colors rounded-xs focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-hidden ${currentLocale === locale
                             ? 'font-semibold text-white'
                             : 'hover:text-white'
                             }`}
