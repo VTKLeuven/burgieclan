@@ -1,7 +1,6 @@
 'use client';
 
 import Loading from '@/components/loading/LoadingPage';
-import { ProgramLanguageProvider } from '@/components/courses/ProgramLanguageContext';
 import CurriculumLevel from '@/components/curriculum/CurriculumLevel';
 import { usePublishCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import ErrorPage from '@/components/error/ErrorPage';
@@ -53,27 +52,28 @@ export default function ModulePage({ id }: { id: number }) {
     const courseCount = module.courses?.length ?? 0;
 
     return (
-        <ProgramLanguageProvider language={module.program?.language}>
-            <div className="vtk-shell pb-16">
-                <PageHead
-                    kicker={<DynamicBreadcrumb />}
-                    title={module.name}
-                    icon={Folder}
-                    actions={<FavoriteButton itemId={module.id} itemType="module" size={20} className="mt-2" />}
-                    aside={
-                        <div className="flex flex-col items-end gap-3">
-                            {courseCount > 0 && (
-                                <div className="vtk-page-meta">
-                                    <b>{courseCount}</b> {t('curriculum-navigator.meta-courses', { count: courseCount })}
-                                </div>
-                            )}
-                            <DownloadButton modules={[module]} showText size={16} />
-                        </div>
-                    }
-                />
+        <div className="vtk-shell pb-16">
+            <PageHead
+                kicker={<DynamicBreadcrumb />}
+                title={module.name}
+                icon={Folder}
+                actions={<FavoriteButton itemId={module.id} itemType="module" size={20} className="mt-2" />}
+                aside={
+                    // On a phone the labelled button and the count squeezed the title into a
+                    // sliver; the icon button is what every list row uses anyway.
+                    <div className="flex flex-col items-end gap-3">
+                        {courseCount > 0 && (
+                            <div className="vtk-page-meta hidden sm:block">
+                                <b>{courseCount}</b> {t('curriculum-navigator.meta-courses', { count: courseCount })}
+                            </div>
+                        )}
+                        <DownloadButton modules={[module]} size={16} className="sm:hidden" />
+                        <DownloadButton modules={[module]} showText size={16} className="hidden sm:inline-flex" />
+                    </div>
+                }
+            />
 
-                <CurriculumLevel modules={module.modules} courses={module.courses} moduleId={module.id} />
-            </div>
-        </ProgramLanguageProvider>
+            <CurriculumLevel modules={module.modules} courses={module.courses} moduleId={module.id} />
+        </div>
     );
 }
