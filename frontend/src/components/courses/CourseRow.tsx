@@ -3,7 +3,6 @@ import DownloadButton from '@/components/ui/DownloadButton';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import SemesterIndicator from "@/components/ui/SemesterIndicator";
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
-import { useProgramLanguage } from '@/components/courses/ProgramLanguageContext';
 import { useApi } from "@/hooks/useApi";
 import type { Course } from '@/types/entities';
 import { convertToCourse } from "@/utils/convertToEntity";
@@ -40,9 +39,6 @@ export const CourseRow = memo(({
     moduleId,
 }: CourseRowProps) => {
     const { i18n } = useTranslation();
-    // Inside the curriculum navigator the programme decides the title language; elsewhere there is
-    // no programme in context and the reader's own locale is the right fallback.
-    const programLanguage = useProgramLanguage();
     const [course, setCourse] = useState<Course | null>(
         () => hasCourseRowData(initialCourse) ? initialCourse : null
     );
@@ -91,7 +87,7 @@ export const CourseRow = memo(({
         semesters: <Skeleton circle width={16} height={16} />,
         professor: <Skeleton circle width={28} height={28} />
     } : {
-        name: localizedCourseName(course, programLanguage ?? i18n.language),
+        name: localizedCourseName(course, i18n.language),
         code: course.code,
         credits: (
             <span className="vtk-badge vtk-badge-muted">
@@ -117,7 +113,8 @@ export const CourseRow = memo(({
     return (
         <div role="row" className={`grid grid-cols-12 py-2 px-3 border-b leading-tight hover:bg-vtk-paper rounded-md ${highlightMatch ? 'ring-1 ring-vtk-yellow' : ''
             } ${marginClass}`}>
-            <div role="cell" className="col-span-5 flex items-center">
+            {/* Column spans mirror CourseTableHeader: name + download on phones, all columns from sm. */}
+            <div role="cell" className="col-span-10 sm:col-span-5 flex min-w-0 items-center">
                 {loading || !course ? (
                     <div className="mr-2 inline-block">
                         <Skeleton circle width={16} height={16} />
@@ -153,15 +150,15 @@ export const CourseRow = memo(({
                     </ApiPrefetchLink>
                 )}
             </div>
-            <div role="cell" className="col-span-1 flex items-center text-sm font-mono text-vtk-body">{content.code}</div>
-            <div role="cell" className="col-span-1 flex items-center justify-center">{content.credits}</div>
-            <div role="cell" className="col-span-2 flex justify-center items-center">
+            <div role="cell" className="hidden sm:flex col-span-1 items-center text-sm font-mono text-vtk-body">{content.code}</div>
+            <div role="cell" className="hidden sm:flex col-span-1 items-center justify-center">{content.credits}</div>
+            <div role="cell" className="hidden sm:flex col-span-2 justify-center items-center">
                 {content.semesters}
             </div>
-            <div role="cell" className="col-span-2 flex justify-center items-center relative hover:z-50">
+            <div role="cell" className="hidden sm:flex col-span-2 justify-center items-center relative hover:z-50">
                 {content.professor}
             </div>
-            <div role="cell" className="col-span-1 flex justify-end items-center">
+            <div role="cell" className="col-span-2 sm:col-span-1 flex justify-end items-center">
                 {!loading && course && <DownloadButton courses={[course]} size={16} />}
             </div>
         </div>

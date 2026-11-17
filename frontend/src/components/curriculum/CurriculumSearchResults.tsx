@@ -18,8 +18,6 @@ export interface CourseHit {
     course: Course;
     program: Program;
     modules: Module[];
-    /** The programme's language, which decides which of the course's titles to show. */
-    language?: string;
 }
 
 /**
@@ -40,7 +38,7 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
     return (
         <div className="mt-5 overflow-hidden rounded-[14px] border border-vtk-line bg-vtk-surface">
             <div className="vtk-rows">
-                {hits.map(({ course, program, modules, language }) => (
+                {hits.map(({ course, program, modules }) => (
                     <div
                         key={`${program.id}:${course.id}`}
                         className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-vtk-paper"
@@ -60,7 +58,7 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
                                 }}
                                 className="block truncate text-[15px] font-semibold tracking-tight text-vtk-ink hover:underline"
                             >
-                                {localizedCourseName(course, language ?? i18n.language)}
+                                {localizedCourseName(course, i18n.language)}
                             </ApiPrefetchLink>
 
                             {/* The branch, as breadcrumbs rather than a tree to hunt through. */}

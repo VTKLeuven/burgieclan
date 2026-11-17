@@ -1,7 +1,6 @@
 'use client';
 
 import Loading from '@/components/loading/LoadingPage';
-import { ProgramLanguageProvider } from '@/components/courses/ProgramLanguageContext';
 import CurriculumLevel from '@/components/curriculum/CurriculumLevel';
 import { usePublishCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import ErrorPage from '@/components/error/ErrorPage';
@@ -52,20 +51,18 @@ export default function ProgramPage({ id }: { id: number }) {
     const moduleCount = program.modules?.length ?? 0;
 
     return (
-        <ProgramLanguageProvider language={program.language}>
-            <div className="vtk-shell pb-16">
-                {/* The bracketed qualifier moves under the title: at display size it turned a
-                    programme name into three lines of heading and pushed the list off screen. */}
-                <PageHead
-                    kicker={<DynamicBreadcrumb />}
-                    title={shortProgramName(program.name)}
-                    subtitle={programQualifier(program.name)}
-                    actions={<FavoriteButton itemId={program.id} itemType="program" size={20} className="mt-2" />}
-                    meta={<><b>{moduleCount}</b> {t('curriculum-navigator.meta-modules', { count: moduleCount })}</>}
-                />
+        <div className="vtk-shell pb-16">
+            {/* The bracketed qualifier moves under the title: at display size it turned a
+                programme name into three lines of heading and pushed the list off screen. */}
+            <PageHead
+                kicker={<DynamicBreadcrumb />}
+                title={shortProgramName(program.name)}
+                subtitle={programQualifier(program.name)}
+                actions={<FavoriteButton itemId={program.id} itemType="program" size={20} className="mt-2" />}
+                meta={<><b>{moduleCount}</b> {t('curriculum-navigator.meta-modules', { count: moduleCount })}</>}
+            />
 
-                <CurriculumLevel modules={program.modules} />
-            </div>
-        </ProgramLanguageProvider>
+            <CurriculumLevel modules={program.modules} />
+        </div>
     );
 }
