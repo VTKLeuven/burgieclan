@@ -44,27 +44,36 @@ class ModuleEntityToApiMapper extends BaseEntityToApiMapper
 
         $includeCurriculumTree = $context[MappingContext::CURRICULUM_TREE] ?? false;
         $to->courses = array_map(
-            function (Course $course) use ($includeCurriculumTree) {
-                if (!$includeCurriculumTree) {
-                    return $this->microMapper->map(
-                        $course,
-                        CourseApi::class,
-                        [MappingContext::SUMMARY => true]
-                    );
-                }
-
+            function (Course $course): object {
                 return $this->microMapper->map(
                     $course,
                     CourseApi::class,
-                    [
-                        MicroMapperInterface::MAX_DEPTH => 1,
-                    ]
+                    [MappingContext::SUMMARY => true]
                 );
             },
             $from->getCourses()->getValues()
         );
+
+        /** @var array<int, true> $visited */
+        $visited = $context['visited_modules'] ?? [];
+        $moduleId = $from->getId();
+        if ($moduleId !== null) {
+            $visited[$moduleId] = true;
+        }
+
+        $childModules = $from->getModules()->getValues();
+        if ($includeCurriculumTree) {
+            $childModules = array_values(
+                array_filter(
+                    $childModules,
+                    static fn (Module $module): bool => $module->getId() === null
+                        || !isset($visited[$module->getId()])
+                )
+            );
+        }
+
         $to->modules = array_map(
-            function (Module $module) use ($includeCurriculumTree) {
+            function (Module $module) use ($includeCurriculumTree, $visited): object {
                 if (!$includeCurriculumTree) {
                     return $this->microMapper->map(
                         $module,
@@ -77,15 +86,15 @@ class ModuleEntityToApiMapper extends BaseEntityToApiMapper
                     $module,
                     ModuleApi::class,
                     [
-                        MicroMapperInterface::MAX_DEPTH => 1,
                         MappingContext::CURRICULUM_TREE => true,
+                        'visited_modules' => $visited,
                     ]
                 );
             },
-            $from->getModules()->getValues()
+            $childModules
         );
 
-        if ($from->getProgram() !== null) {
+        if (!$includeCurriculumTree && $from->getProgram() !== null) {
             $to->program = $this->microMapper->map(
                 $from->getProgram(),
                 ProgramApi::class,

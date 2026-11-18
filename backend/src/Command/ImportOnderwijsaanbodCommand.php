@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Repository\ProgramRepository;
 use App\Service\Onderwijsaanbod\OnderwijsaanbodClient;
 use App\Service\Onderwijsaanbod\OnderwijsaanbodImporter;
 use App\Service\Onderwijsaanbod\ProgramTreeMapper;
@@ -36,6 +37,7 @@ class ImportOnderwijsaanbodCommand extends Command
         private readonly OnderwijsaanbodClient $client,
         private readonly ProgramTreeMapper $mapper,
         private readonly OnderwijsaanbodImporter $importer,
+        private readonly ProgramRepository $programRepository,
     ) {
         parent::__construct();
     }
@@ -43,11 +45,32 @@ class ImportOnderwijsaanbodCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('search', null, InputOption::VALUE_REQUIRED, 'Search programmes by title and list their ids, then exit')
+            ->addOption(
+                'search',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Search programmes by title and list their ids, then exit'
+            )
             ->addOption('program', null, InputOption::VALUE_REQUIRED, 'KU Leuven programId to import')
-            ->addOption('lang', null, InputOption::VALUE_REQUIRED, 'Title language: nl or en', 'nl')
-            ->addOption('flatten', null, InputOption::VALUE_REQUIRED, 'Comma-separated group names/ids whose folder is skipped (courses attach to the parent)', 'Verplichte opleidingsonderdelen,Compulsory courses')
-            ->addOption('semester', null, InputOption::VALUE_REQUIRED, 'Comma-separated group names/ids to regroup by degree-wide semester (Semester 1..N)')
+            ->addOption(
+                'lang',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Title language: nl or en (defaults to saved setting or KU Leuven programme language)'
+            )
+            ->addOption(
+                'flatten',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Comma-separated group names/ids whose folder is skipped (courses attach to the parent)',
+                'Verplichte opleidingsonderdelen,Compulsory courses'
+            )
+            ->addOption(
+                'semester',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Comma-separated group names/ids to regroup by degree-wide semester (Semester 1..N)'
+            )
             ->addOption(
                 'semester-flat',
                 null,
@@ -56,8 +79,19 @@ class ImportOnderwijsaanbodCommand extends Command
                 . 'folders; elective options inside them become a folder per semester'
             )
             ->addOption('no-merge', null, InputOption::VALUE_NONE, 'Do not collapse single-child, course-less modules')
-            ->addOption('electives', null, InputOption::VALUE_REQUIRED, 'How to group the lettered keuzepakketten: none | perTrack | programme', ProgramTreeMapper::ELECTIVES_PER_TRACK)
-            ->addOption('no-enrich', null, InputOption::VALUE_NONE, 'Skip fetching professors and identical courses from the OPO index')
+            ->addOption(
+                'electives',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'How to group the lettered keuzepakketten: none | perTrack | programme',
+                ProgramTreeMapper::ELECTIVES_PER_TRACK
+            )
+            ->addOption(
+                'no-enrich',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip fetching professors and identical courses from the OPO index'
+            )
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Compute changes but write nothing to the database');
     }
 
@@ -77,7 +111,19 @@ class ImportOnderwijsaanbodCommand extends Command
             return Command::INVALID;
         }
 
-        $lang = (string) $input->getOption('lang') === 'en' ? 'en' : 'nl';
+        $langOption = $input->getOption('lang');
+        $explicitLang = null;
+        if (is_string($langOption) && $langOption !== '') {
+            $normalizedLang = strtolower(trim($langOption));
+            if (!in_array($normalizedLang, ['nl', 'en'], true)) {
+                $io->error('--lang must be nl or en.');
+
+                return Command::INVALID;
+            }
+            /** @var 'nl'|'en' $explicitLang */
+            $explicitLang = $normalizedLang;
+        }
+
         $flatten = $this->splitList((string) $input->getOption('flatten'));
         $semester = $this->splitList((string) $input->getOption('semester'));
         $semesterFlat = $this->splitList((string) $input->getOption('semester-flat'));
@@ -94,10 +140,20 @@ class ImportOnderwijsaanbodCommand extends Command
         $io->section(sprintf('Fetching programme %s', $programId));
         $source = $this->client->fetchProgramSource($programId);
         if ($source === null) {
-            $io->error(sprintf('No programme found for programId %s.', $programId));
+            $apiError = $this->client->getLastError();
+            $io->error(
+                $apiError !== null
+                    ? sprintf('Failed to reach KU Leuven onderwijsaanbod API: %s', $apiError)
+                    : sprintf('No programme found for programId %s.', $programId)
+            );
 
             return Command::FAILURE;
         }
+
+        $existingProgram = $this->programRepository->findOneByKulId($programId);
+        $lang = $explicitLang
+            ?? $existingProgram?->getResolvedImportSettings()['lang']
+            ?? $this->client->extractOriginalLanguage($source, $programId);
 
         $programData = $this->mapper->map(
             $source,
@@ -124,7 +180,18 @@ class ImportOnderwijsaanbodCommand extends Command
             )
         );
 
-        $result = $this->importer->import($programData, $enrich, $dryRun);
+        $importSettings = [
+            'programId' => $programId,
+            'lang' => $lang,
+            'flatten' => $flatten,
+            'semester' => $semester,
+            'semesterFlat' => $semesterFlat,
+            'merge' => $merge,
+            'enrich' => $enrich,
+            'electiveGrouping' => $electiveGrouping,
+        ];
+
+        $result = $this->importer->import($programData, $enrich, $dryRun, $importSettings);
 
         $io->section($dryRun ? 'Dry run — no changes written' : 'Import complete');
         $io->definitionList(
@@ -171,14 +238,23 @@ class ImportOnderwijsaanbodCommand extends Command
     {
         $results = $this->client->searchPrograms($query);
         if ($results === []) {
+            $apiError = $this->client->getLastError();
+            if ($apiError !== null) {
+                $io->error(sprintf('Failed to reach KU Leuven onderwijsaanbod API: %s', $apiError));
+
+                return Command::FAILURE;
+            }
             $io->warning('No programmes matched.');
 
             return Command::SUCCESS;
         }
 
         $io->table(
-            ['programId', 'title'],
-            array_map(static fn (array $r): array => [$r['programId'], $r['title']], $results),
+            ['programId', 'lang', 'title'],
+            array_map(
+                static fn (array $r): array => [$r['programId'], strtoupper($r['language']), $r['title']],
+                $results
+            ),
         );
 
         return Command::SUCCESS;

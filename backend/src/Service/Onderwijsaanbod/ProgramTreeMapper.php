@@ -219,8 +219,12 @@ class ProgramTreeMapper
      * @param list<string> $keys
      * @param bool         $keepPackages lift elective packages out instead of dissolving them
      */
-    private function applySemesterize(ModuleData $module, string $programId, array $keys, bool $keepPackages): ModuleData
-    {
+    private function applySemesterize(
+        ModuleData $module,
+        string $programId,
+        array $keys,
+        bool $keepPackages,
+    ): ModuleData {
         if ($this->matches($module, $keys)) {
             return $this->toSemesterModule($module, $programId, $keepPackages);
         }
@@ -515,8 +519,12 @@ class ProgramTreeMapper
      *
      * @param array<string, ModuleData> $registry deduplicated packages, keyed by lowercased name
      */
-    private function applyGroupElectives(ModuleData $module, string $language, string $programId, array &$registry): ModuleData
-    {
+    private function applyGroupElectives(
+        ModuleData $module,
+        string $language,
+        string $programId,
+        array &$registry,
+    ): ModuleData {
         // Loop rather than array_map(fn ...) so $registry stays the same array by reference —
         // see the note in map().
         $children = [];
@@ -859,7 +867,9 @@ class ProgramTreeMapper
             credits: $credits,
             semesters: $this->semestersOf($module),
             mandatory: filter_var($module['mandatory'] ?? true, FILTER_VALIDATE_BOOL),
-            stage: isset($module['stageStart']) && is_numeric($module['stageStart']) ? (int) $module['stageStart'] : null,
+            stage: isset($module['stageStart']) && is_numeric($module['stageStart'])
+                ? (int) $module['stageStart']
+                : null,
         );
     }
 
