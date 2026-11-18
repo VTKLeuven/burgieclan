@@ -712,7 +712,10 @@
         "browse": "Bekijk alle",
         "no_courses": "Markeer een vak met een ster om het hier vast te zetten.",
         "show_all": "Alle {{count}} bekijken",
-        "feedback": "Feedback geven"
+        "feedback": "Feedback geven",
+        "hide_sidebar": "Menu verbergen",
+        "show_sidebar": "Menu tonen",
+        "resize_sidebar": "Breedte van het menu aanpassen"
     },
     "study_planner": {
         "nav": "Planner",
@@ -934,6 +937,7 @@
     "curriculum-panel": {
         "show": "Curriculum tonen",
         "hide": "Curriculum verbergen",
+        "resize": "Breedte van het curriculum aanpassen",
         "filter": "Filter vakken in deze opleiding",
         "clear-filter": "Filter wissen",
         "choose-program": "Kies een opleiding",

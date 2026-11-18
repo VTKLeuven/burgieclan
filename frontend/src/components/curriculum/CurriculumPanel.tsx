@@ -1,9 +1,11 @@
 'use client';
 
 import { useCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
-import { useCurriculumPanel } from '@/components/curriculum/CurriculumPanelContext';
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import CourseBadge from '@/components/layout/CourseBadge';
+import ResizeHandle from '@/components/layout/ResizeHandle';
+import { useCurriculumPanel, useSidebarPanel, type PanelState } from '@/components/layout/ShellPanels';
+import ShowSidebarButton from '@/components/layout/ShowSidebarButton';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import {
     DropdownMenu,
@@ -29,7 +31,6 @@ import {
     Folder,
     GraduationCap,
     LoaderCircle,
-    PanelLeftClose,
     Search,
     X,
 } from 'lucide-react';
@@ -78,15 +79,17 @@ function normalize(value: string | undefined) {
  * course anywhere in that programme, also in branches that were never opened.
  */
 export default function CurriculumPanel() {
-    const { available, open, setOpen } = useCurriculumPanel();
+    const panel = useCurriculumPanel();
 
-    if (!available || !open) return null;
+    if (!panel.available || !panel.open) return null;
 
-    return <CurriculumColumn onHide={() => setOpen(false)} />;
+    return <CurriculumColumn panel={panel} />;
 }
 
-function CurriculumColumn({ onHide }: { onHide: () => void }) {
+function CurriculumColumn({ panel }: { panel: PanelState }) {
     const { t } = useTranslation();
+    const columnRef = useRef<HTMLElement>(null);
+    const sidebar = useSidebarPanel();
     const { activePath } = useCurriculumLocation();
     const programs = usePrograms();
 
@@ -108,19 +111,23 @@ function CurriculumColumn({ onHide }: { onHide: () => void }) {
 
     return (
         <aside
+            ref={columnRef}
             aria-label={t('curriculum-tree.label')}
-            className="hidden w-[272px] shrink-0 flex-col border-r border-border bg-surface-muted lg:flex"
+            style={{ width: panel.width }}
+            className="relative hidden shrink-0 flex-col border-r border-border bg-surface-muted lg:flex"
         >
-            <div className="flex h-[var(--header-height)] shrink-0 items-center gap-2 border-b border-border pr-2.5 pl-4">
+            <ResizeHandle panel={panel} targetRef={columnRef} label={t('curriculum-panel.resize')} />
+            <div className={cn('flex h-[var(--header-height)] shrink-0 items-center gap-2 border-b border-border pr-2.5', sidebar.open ? 'pl-4' : 'pl-3.5')}>
+                <ShowSidebarButton />
                 <h2 className="m-0 flex-1 text-body font-semibold text-fg">{t('curriculum-tree.label')}</h2>
                 <button
                     type="button"
-                    onClick={onHide}
+                    onClick={() => panel.setOpen(false)}
                     className="vtk-icon-button size-7!"
                     aria-label={t('curriculum-panel.hide')}
                     title={t('curriculum-panel.hide')}
                 >
-                    <PanelLeftClose className="size-4" aria-hidden="true" />
+                    <X className="size-4" aria-hidden="true" />
                 </button>
             </div>
 
@@ -571,6 +578,9 @@ function TreeRow({
     const { t } = useTranslation();
     const rowRef = useRef<HTMLDivElement>(null);
     const indent = Math.min(depth, MAX_INDENT);
+    // The highlight starts at this row's own level, so it never covers the guides of the levels
+    // above it; a top-level row has none and fills the width.
+    const highlightLeft = indent === 0 ? 0 : BASE_PADDING + indent * INDENT_STEP;
 
     // Brings the reader's own row into view when they arrive, without fighting later scrolling.
     useEffect(() => {
@@ -581,15 +591,21 @@ function TreeRow({
         <div
             ref={rowRef}
             className={cn(
-                'relative flex h-7 items-center rounded-[8px] pr-1.5 text-small transition-colors',
-                active
-                    ? 'bg-surface font-medium text-fg shadow-[0_0_0_1px_var(--color-border-strong),var(--shadow-xs)]'
-                    : muted
-                        ? 'text-fg-muted hover:bg-sidebar-hover'
-                        : 'font-medium text-fg-nav hover:bg-sidebar-hover',
+                'group/row relative flex h-7 items-center pr-1.5 text-small',
+                active ? 'font-medium text-fg' : muted ? 'text-fg-muted' : 'font-medium text-fg-nav',
             )}
             style={{ paddingLeft: BASE_PADDING + indent * INDENT_STEP }}
         >
+            <span
+                aria-hidden="true"
+                className={cn(
+                    'pointer-events-none absolute inset-y-0 right-0 rounded-[8px] transition-colors',
+                    active
+                        ? 'bg-surface shadow-[0_0_0_1px_var(--color-border-strong),var(--shadow-xs)]'
+                        : 'group-hover/row:bg-sidebar-hover',
+                )}
+                style={{ left: highlightLeft }}
+            />
             {Array.from({ length: indent }, (_, level) => (
                 <span
                     key={level}

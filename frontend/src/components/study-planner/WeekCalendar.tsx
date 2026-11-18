@@ -142,7 +142,7 @@ export default function WeekCalendar({ api, onSelect }: { api: PlannerApi; onSel
                             checked={showHidden}
                             disabled={hiddenCount === 0}
                             onChange={(e) => setShowHidden(e.target.checked)}
-                            className="size-4 accent-neutral-900"
+                            className="size-4 accent-primary"
                         />
                         {t('study_planner.week.show_hidden', { count: hiddenCount })}
                     </label>

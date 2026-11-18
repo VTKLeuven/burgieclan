@@ -712,7 +712,10 @@
         "browse": "Browse",
         "no_courses": "Star a course to pin it here.",
         "show_all": "View all {{count}}",
-        "feedback": "Give feedback"
+        "feedback": "Give feedback",
+        "hide_sidebar": "Hide sidebar",
+        "show_sidebar": "Show sidebar",
+        "resize_sidebar": "Resize sidebar"
     },
     "study_planner": {
         "nav": "Planner",
@@ -934,6 +937,7 @@
     "curriculum-panel": {
         "show": "Show curriculum",
         "hide": "Hide curriculum",
+        "resize": "Resize curriculum",
         "filter": "Filter courses in this programme",
         "clear-filter": "Clear filter",
         "choose-program": "Choose a programme",

@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { i18nConfig } from "../../../i18nConfig";
 import { persistLocale } from '@/actions/locale';
 
-/** NL / EN as a small segmented control, used in the account menu and next to "Inloggen". */
+/** NL / EN as a small segmented control, used at the foot of the sidebar and next to "Inloggen". */
 const LanguageSwitcher = () => {
     const { t, i18n } = useTranslation();
     const pathname = usePathname();
