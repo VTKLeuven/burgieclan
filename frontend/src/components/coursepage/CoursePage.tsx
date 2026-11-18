@@ -6,6 +6,7 @@ import { useCurriculumLocation, usePublishCurriculumLocation } from "@/component
 import CommentCategories from "@/components/coursepage/comment/CommentCategories";
 import DocumentSections from "@/components/coursepage/DocumentSections";
 import ExamSection from "@/components/coursepage/exam/ExamSection";
+import { useFeature } from "@/components/FeaturesContext";
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import RelatedCourses from "@/components/coursepage/RelatedCourses";
 import ErrorPage from "@/components/error/ErrorPage";
@@ -38,6 +39,7 @@ export default function CoursePage() {
         return preloaded ? convertToCourse(preloaded) : null;
     });
     const { t, i18n } = useTranslation();
+    const examsEnabled = useFeature('exam_reconstructions');
     const { request, loading, error } = useApi();
 
     useEffect(() => {
@@ -172,7 +174,7 @@ export default function CoursePage() {
 
                     <div className="mt-8 grid gap-10">
                         <DocumentSections course={course} documentCounts={course.documentCounts} />
-                        <ExamSection courseId={course.id} />
+                        {examsEnabled && <ExamSection courseId={course.id} />}
                         <CommentCategories
                             comments={course.courseComments ?? []}
                             courseId={course.id}

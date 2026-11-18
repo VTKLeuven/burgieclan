@@ -597,7 +597,7 @@
             "august": "Herexamen augustus {{year}}"
         },
         "section": {
-            "title": "Examens",
+            "title": "Examenreconstructies",
             "description": "Reconstructies van examens, samen opgebouwd door wie ze aflegde. Net een examen gehad? Vul de vragen aan terwijl ze nog vers zijn.",
             "start": "Reconstructie starten",
             "empty": "Nog geen reconstructies voor dit vak.",

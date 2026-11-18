@@ -597,7 +597,7 @@
             "august": "August {{year}} resit"
         },
         "section": {
-            "title": "Exams",
+            "title": "Exam reconstructions",
             "description": "Reconstructions of past exams, rebuilt together by the students who took them. Just had an exam? Add the questions while they are fresh.",
             "start": "Start a reconstruction",
             "empty": "No reconstructions for this course yet.",
