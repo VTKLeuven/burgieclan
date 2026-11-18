@@ -277,7 +277,8 @@
             "other-short_one": "+1 andere",
             "other-short_other": "+{{count}} andere"
         },
-        "ects-sheet": "ECTS-fiche"
+        "ects-sheet": "ECTS-fiche",
+        "open-category": "Openen als pagina"
     },
     "download": {
         "download": "Download",
