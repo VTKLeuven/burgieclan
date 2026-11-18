@@ -1,7 +1,6 @@
 'use client';
 
 import Loading from '@/components/loading/LoadingPage';
-import { ProgramLanguageProvider } from '@/components/courses/ProgramLanguageContext';
 import CurriculumLevel from '@/components/curriculum/CurriculumLevel';
 import { usePublishCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import ErrorPage from '@/components/error/ErrorPage';
@@ -57,7 +56,7 @@ export default function ProgramPage({ id }: { id: number }) {
     const moduleCount = program.modules?.length ?? 0;
 
     return (
-        <ProgramLanguageProvider language={program.language}>
+        <>
             {header(
                 <>
                     <FavoriteButton itemId={program.id} itemType="program" size={18} className="vtk-icon-button" />
@@ -78,6 +77,6 @@ export default function ProgramPage({ id }: { id: number }) {
 
                 <CurriculumLevel modules={program.modules} />
             </div>
-        </ProgramLanguageProvider>
+        </>
     );
 }

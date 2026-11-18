@@ -1,7 +1,6 @@
 'use client';
 
 import Loading from '@/components/loading/LoadingPage';
-import { ProgramLanguageProvider } from '@/components/courses/ProgramLanguageContext';
 import CurriculumLevel from '@/components/curriculum/CurriculumLevel';
 import { usePublishCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import ErrorPage from '@/components/error/ErrorPage';
@@ -58,7 +57,7 @@ export default function ModulePage({ id }: { id: number }) {
     const credits = (module.courses ?? []).reduce((sum, course) => sum + (course.credits ?? 0), 0);
 
     return (
-        <ProgramLanguageProvider language={module.program?.language}>
+        <>
             {header(
                 <>
                     <FavoriteButton itemId={module.id} itemType="module" size={18} className="vtk-icon-button" />
@@ -78,6 +77,6 @@ export default function ModulePage({ id }: { id: number }) {
 
                 <CurriculumLevel modules={module.modules} courses={module.courses} moduleId={module.id} />
             </div>
-        </ProgramLanguageProvider>
+        </>
     );
 }

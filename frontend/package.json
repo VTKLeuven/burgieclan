@@ -13,7 +13,7 @@
   "dependencies": {
     "@headlessui/react": "^2.1.8",
     "@hocuspocus/provider": "^4.7.0",
-    "@hookform/resolvers": "^5.2.2",
+    "@hookform/resolvers": "^6.0.0",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-switch": "^1.2.6",
@@ -51,21 +51,21 @@
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
     "@playwright/test": "1.64.1",
-    "@tailwindcss/postcss": "4.3.4",
+    "@tailwindcss/postcss": "4.3.5",
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "eslint": "9.39.5",
-    "eslint-config-next": "16.4.5",
+    "eslint-config-next": "16.4.6",
     "eslint-config-prettier": "10.1.8",
-    "postcss": "8.5.32",
-    "tailwindcss": "4.3.4",
+    "postcss": "8.5.33",
+    "tailwindcss": "4.3.5",
     "typescript": "6.0.3"
   },
   "overrides": {
     "postcss": "$postcss",
     "sharp": "$sharp",
     "brace-expansion": "^5.0.8",
-    "minimatch": "^10.0.3"
+    "minimatch": "^11.0.0"
   }
 }

@@ -3,7 +3,6 @@ import DownloadButton from '@/components/ui/DownloadButton';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import SemesterIndicator from "@/components/ui/SemesterIndicator";
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
-import { useProgramLanguage } from '@/components/courses/ProgramLanguageContext';
 import { useApi } from "@/hooks/useApi";
 import type { Course } from '@/types/entities';
 import { convertToCourse } from "@/utils/convertToEntity";
@@ -39,9 +38,6 @@ export const CourseRow = memo(({
     moduleId,
 }: CourseRowProps) => {
     const { i18n } = useTranslation();
-    // Inside the curriculum navigator the programme decides the title language; elsewhere there is
-    // no programme in context and the reader's own locale is the right fallback.
-    const programLanguage = useProgramLanguage();
     const [course, setCourse] = useState<Course | null>(
         () => hasCourseRowData(initialCourse) ? initialCourse : null
     );
@@ -87,7 +83,7 @@ export const CourseRow = memo(({
         semesters: <Skeleton circle width={16} height={16} />,
         professor: <Skeleton circle width={24} height={24} />
     } : {
-        name: localizedCourseName(course, programLanguage ?? i18n.language),
+        name: localizedCourseName(course, i18n.language),
         code: course.code,
         credits: course.credits,
         semesters: <SemesterIndicator semesters={course.semesters} size={16} />,

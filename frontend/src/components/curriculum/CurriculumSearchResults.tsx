@@ -19,8 +19,6 @@ export interface CourseHit {
     course: Course;
     program: Program;
     modules: Module[];
-    /** The programme's language, which decides which of the course's titles to show. */
-    language?: string;
 }
 
 /**
@@ -44,12 +42,12 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
                 {t('curriculum-navigator.result-count', { count: hits.length })}
             </p>
             <div className="vtk-list">
-                {hits.map(({ course, program, modules, language }) => (
+                {hits.map(({ course, program, modules }) => (
                     <div
                         key={`${program.id}:${course.id}`}
                         className="group/row vtk-list-row vtk-list-row-hover pr-2"
                     >
-                        <CourseBadge name={localizedCourseName(course, language ?? i18n.language)} seed={course.code} size={20} />
+                        <CourseBadge name={localizedCourseName(course, i18n.language)} seed={course.code} size={20} />
 
                         <div className="min-w-0 flex-1">
                             <ApiPrefetchLink
@@ -64,7 +62,7 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
                                 }}
                                 className="block truncate text-body font-medium text-fg hover:underline"
                             >
-                                {localizedCourseName(course, language ?? i18n.language)}
+                                {localizedCourseName(course, i18n.language)}
                             </ApiPrefetchLink>
 
                             {/* The branch, as breadcrumbs rather than a tree to hunt through. */}

@@ -351,11 +351,16 @@
 
   .vtk-page-title {
     margin: 0;
+    min-width: 0;
     color: var(--color-fg);
     font-size: 24px;
     line-height: 32px;
     letter-spacing: -0.015em;
     font-weight: 600;
+    /* Dutch compounds like "ingenieurswetenschappen" are wider than a phone at display size:
+       hyphenate where the language allows it, and break anywhere rather than overflow. */
+    hyphens: auto;
+    overflow-wrap: anywhere;
   }
 
   .vtk-page-subtitle {
