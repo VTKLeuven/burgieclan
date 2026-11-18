@@ -4,7 +4,7 @@
 
 /*
  * Burgieclan design tokens, in the design language of Dopl (VTK's IT workspace): a light grey
- * canvas, one white working panel, crisp 1px hairlines, almost no shadows, near-black primary
+ * canvas, one white working panel, crisp 1px hairlines, almost no shadows, navy primary
  * buttons and a sky accent for links, focus and selection. Colour is information, not decoration.
  *
  * Two layers live here:
@@ -74,9 +74,9 @@
   --color-icon: #6b6b73;
   --color-icon-strong: #3f3f46;
 
-  --color-primary: #16161a;
-  --color-primary-hover: #2a2a30;
-  --color-primary-active: #000000;
+  --color-primary: #0f1a36;
+  --color-primary-hover: #1d2b52;
+  --color-primary-active: #0a1226;
   --color-on-primary: #ffffff;
   --color-focus: #1f82d1;
 
@@ -128,10 +128,10 @@
 
   /* Legacy names, remapped onto the palette above. */
   --color-vtk-ink: #18181b;
-  --color-vtk-navy: #16161a;
-  --color-vtk-blue: #16161a;
-  --color-vtk-blue-dark: #000000;
-  --color-vtk-blue-light: #2a2a30;
+  --color-vtk-navy: #0f1a36;
+  --color-vtk-blue: #0f1a36;
+  --color-vtk-blue-dark: #0a1226;
+  --color-vtk-blue-light: #1d2b52;
   --color-vtk-blue-soft: #f0f0f2;
   --color-vtk-blue-muted: #f5f5f6;
   --color-vtk-yellow: #f5a524;
@@ -188,7 +188,7 @@
 :root {
   /* Kept for the few places that read them as plain custom properties. */
   --ink: #18181b;
-  --navy: #16161a;
+  --navy: #0f1a36;
   --paper: #f5f5f6;
   --paper-2: #f0f0f2;
   --surface: #ffffff;
