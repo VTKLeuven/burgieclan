@@ -115,6 +115,9 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
         () => (courses.length > 1 ? dedupeBySeafileFile(documents, courses[0].id) : documents),
         [documents, courses],
     );
+    // The server counts every row; the copies hidden above are not files the reader will see.
+    // Exact while everything fits on one page, which is the common case for a single folder.
+    const shownTotal = totalItems - (documents.length - shown.length);
     const groups = useMemo(
         () => (sort.field === 'year' ? groupByYear(shown) : [{ year: null, documents: shown }]),
         [shown, sort.field],
@@ -145,9 +148,9 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
                     labelClassName="text-small font-medium text-fg-muted"
                 />
                 <span className="ml-auto text-small text-fg-muted tabular">
-                    {totalItems === 1
+                    {shownTotal === 1
                         ? t('course-page.document-count.one')
-                        : t('course-page.document-count.other', { count: totalItems })}
+                        : t('course-page.document-count.other', { count: shownTotal })}
                 </span>
             </div>
 

@@ -356,6 +356,45 @@ class CourseResourceTest extends ApiTestCase
         $this->assertSame(1, $json['documentCounts'][$exams->getId()]);
     }
 
+    /**
+     * The folder shows a course and its identical courses as one list, a Seafile file once. The
+     * count promised on the course page has to match what opening the folder then shows.
+     */
+    public function testRelatedDocumentCountsCountAnIdenticalCoursesCopyOnce(): void
+    {
+        $twin = CourseFactory::createOne();
+        $otherTwin = CourseFactory::createOne();
+        $old = CourseFactory::createOne();
+        $course = CourseFactory::createOne(['identicalCourses' => [$twin, $otherTwin], 'oldCourses' => [$old]]);
+        $exams = DocumentCategoryFactory::createOne();
+        $shared = str_repeat('a', 40);
+        $twinsOnly = str_repeat('b', 40);
+        $published = ['category' => $exams, 'under_review' => false];
+
+        // The course's own file, mirrored on a twin: adds nothing.
+        DocumentFactory::createOne([...$published, 'course' => $course, 'seafileFileId' => $shared]);
+        DocumentFactory::createOne([...$published, 'course' => $twin, 'seafileFileId' => $shared]);
+        // One file on both twins: adds one.
+        DocumentFactory::createOne([...$published, 'course' => $twin, 'seafileFileId' => $twinsOnly]);
+        DocumentFactory::createOne([...$published, 'course' => $otherTwin, 'seafileFileId' => $twinsOnly]);
+        // An upload on a twin: adds one.
+        DocumentFactory::createOne([...$published, 'course' => $twin]);
+        // An older course's copy is listed in its own section, so it does count.
+        DocumentFactory::createOne([...$published, 'course' => $old, 'seafileFileId' => $shared]);
+
+        $this->browser()
+            ->get(
+                '/api/courses/' . $course->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('relatedDocumentCounts."' . $exams->getId() . '"', 3);
+    }
+
     public function testGetCourseExposesDocumentCountsByCategory(): void
     {
         $course = CourseFactory::createOne();
