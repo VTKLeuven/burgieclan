@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { categoryPageCourseEndpoint } from '@/utils/courseEndpoints';
 
 const PROGRAMS_ENDPOINT = '/api/programs?pagination=false&order[name]=asc';
 const TREE_ENDPOINT = '/api/programs/tree?pagination=false&order[name]=asc';
@@ -435,7 +436,7 @@ function ProgramTree({ programId }: { programId: number }) {
                                         label={item.name ?? ''}
                                         href={`/course/${node.id}/documents/category/${item.id}`}
                                         apiEndpoints={[
-                                            `/api/courses/${node.id}?summary=true`,
+                                            categoryPageCourseEndpoint(node.id),
                                             `/api/document_categories/${item.id}?lang=${i18n.language}`,
                                         ]}
                                         depth={depth + 1}

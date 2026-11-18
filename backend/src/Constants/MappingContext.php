@@ -10,6 +10,8 @@ final class MappingContext
     public const COLLECTION_OPERATION = 'collection_operation';
     public const OPERATION_NAME = 'operation_name';
     public const SUMMARY = 'summary';
+    /** With SUMMARY on a course: still include its old, new and identical courses (`?related=true`). */
+    public const WITH_RELATED = 'with_related';
     public const CURRICULUM_TREE = 'curriculum_tree';
     public const INCLUDE_FILE_METADATA = 'include_file_metadata';
 }

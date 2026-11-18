@@ -101,6 +101,35 @@ class DocumentRepository extends ServiceEntityRepository
     }
 
     /**
+     * Published documents per category summed over a set of courses, as categoryId => count.
+     *
+     * @param Course[] $courses
+     * @return array<int, int>
+     */
+    public function countByCategoryForCourses(array $courses): array
+    {
+        if ([] === $courses) {
+            return [];
+        }
+
+        $results = $this->createQueryBuilder('d')
+            ->select('IDENTITY(d.category) AS categoryId, COUNT(d.id) AS docCount')
+            ->andWhere('d.course IN (:courses)')
+            ->andWhere('d.under_review = false')
+            ->setParameter('courses', $courses)
+            ->groupBy('d.category')
+            ->getQuery()
+            ->getArrayResult();
+
+        $counts = [];
+        foreach ($results as $row) {
+            $counts[(int) $row['categoryId']] = (int) $row['docCount'];
+        }
+
+        return $counts;
+    }
+
+    /**
      * Published document totals for a set of courses, as courseId => count.
      *
      * One query for the whole set: the related courses on a course page are counted together,

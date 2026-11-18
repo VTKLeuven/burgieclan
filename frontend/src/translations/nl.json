@@ -189,7 +189,8 @@
         "document-count": {
             "zero": "0 documenten",
             "one": "1 document",
-            "other": "{{count}} documenten"
+            "other": "{{count}} documenten",
+            "related": "+{{count}} van gelijkwaardige en vorige vakken"
         },
         "comments": {
             "comment-single": "1 reactie",
@@ -258,7 +259,11 @@
             "select-all": "Selecteer alles",
             "deselect-all": "Deselecteer alles",
             "clear-selection": "Selectie wissen",
-            "favorites-see-all": "Bekijk alle favorieten"
+            "favorites-see-all": "Bekijk alle favorieten",
+            "this-course": "Dit vak",
+            "older-courses": "Vroeger gegeven als",
+            "none-see-older": "Nog geen documenten onder deze code. Bekijk de vorige vakken hieronder.",
+            "no-year": "Jaar onbekend"
         },
         "related": {
             "predecessors": "Vroeger gegeven als",
