@@ -31,11 +31,16 @@ class OnderwijsaanbodImporter
     ) {}
 
     /**
-     * @param bool $enrich fetch professors and identical-course links from the OPO index
-     * @param bool $dryRun compute the changes but persist nothing
+     * @param bool                       $enrich         fetch professors and identical-course links from the OPO index
+     * @param bool                       $dryRun         compute the changes but persist nothing
+     * @param array<string, mixed>|null  $importSettings import options to persist on the programme
      */
-    public function import(ProgramData $data, bool $enrich = true, bool $dryRun = false): ImportResult
-    {
+    public function import(
+        ProgramData $data,
+        bool $enrich = true,
+        bool $dryRun = false,
+        ?array $importSettings = null,
+    ): ImportResult {
         $result = new ImportResult();
         $result->dryRun = $dryRun;
 
@@ -49,7 +54,7 @@ class OnderwijsaanbodImporter
         }
 
         try {
-            return $this->runImport($data, $enrich, $dryRun, $result);
+            return $this->runImport($data, $enrich, $dryRun, $result, $importSettings);
         } finally {
             if ($dryRun) {
                 $this->entityManager->rollback();
@@ -59,15 +64,21 @@ class OnderwijsaanbodImporter
     }
 
     /**
-     * @param bool $enrich fetch professors and identical-course links from the OPO index
-     * @param bool $dryRun compute the changes but persist nothing
+     * @param bool                      $enrich         fetch professors and identical-course links from the OPO index
+     * @param bool                      $dryRun         compute the changes but persist nothing
+     * @param array<string, mixed>|null $importSettings import options to persist on the programme
      */
-    private function runImport(ProgramData $data, bool $enrich, bool $dryRun, ImportResult $result): ImportResult
-    {
+    private function runImport(
+        ProgramData $data,
+        bool $enrich,
+        bool $dryRun,
+        ImportResult $result,
+        ?array $importSettings = null,
+    ): ImportResult {
         // Enrichment lookup table: ECTS code => ['professors' => [...], 'identical' => [...]].
         $enrichment = $enrich ? $this->fetchEnrichment($data->allCourseCodes()) : [];
 
-        $program = $this->upsertProgram($data, $result);
+        $program = $this->upsertProgram($data, $result, $importSettings);
 
         // Upsert every course once (courses are shared across modules), keyed by code.
         /** @var array<string, Course> $coursesByCode */
@@ -97,15 +108,33 @@ class OnderwijsaanbodImporter
         return $result;
     }
 
-    private function upsertProgram(ProgramData $data, ImportResult $result): Program
-    {
+    /**
+     * @param array<string, mixed>|null $importSettings
+     */
+    private function upsertProgram(
+        ProgramData $data,
+        ImportResult $result,
+        ?array $importSettings = null,
+    ): Program {
         $program = $this->programRepository->findOneByKulId($data->kulId);
-        if (!$program instanceof Program) {
+        $isNew = !$program instanceof Program;
+        if ($isNew) {
             $program = new Program();
             $program->setKulId($data->kulId);
+            $program->setName($data->name);
             $result->programCreated = true;
+        } elseif (
+            $importSettings !== null
+            && isset($importSettings['lang'])
+            && $importSettings['lang'] !== $program->getLanguage()
+        ) {
+            // Preserve admin-customized programme names (e.g. "Bachelor: Burgie") on routine
+            // re-syncs; only refresh the title from KU Leuven when the import language changes.
+            $program->setName($data->name);
         }
-        $program->setName($data->name);
+        if ($importSettings !== null) {
+            $program->setImportSettings($importSettings);
+        }
         $this->entityManager->persist($program);
 
         return $program;
@@ -166,7 +195,10 @@ class OnderwijsaanbodImporter
         // The KU Leuven mandatory flag sits on each course entry but never varies within a group,
         // so it is stored once on the module. A module with no courses of its own keeps the default.
         $mandatory = null;
+        /** @var array<string, true> $expectedCodes */
+        $expectedCodes = [];
         foreach ($data->courses as $courseData) {
+            $expectedCodes[$courseData->code] = true;
             $course = $coursesByCode[$courseData->code] ?? null;
             if ($course instanceof Course) {
                 $module->addCourse($course);
@@ -175,6 +207,15 @@ class OnderwijsaanbodImporter
             // Should the API ever disagree within one group, the compulsory reading wins: showing a
             // course as required when it is optional is the safer of the two errors for a student.
             $mandatory = ($mandatory ?? false) || $courseData->mandatory;
+        }
+        // Unlink courses that are still part of this programme's incoming tree (e.g. moved into
+        // Semester child folders when structural options changed) so they do not render in both the
+        // parent and child module. Courses dropped by KU Leuven altogether are kept and warned about.
+        foreach ($module->getCourses()->toArray() as $existingCourse) {
+            $existingCode = $existingCourse->getCode();
+            if (isset($coursesByCode[$existingCode]) && !isset($expectedCodes[$existingCode])) {
+                $module->removeCourse($existingCourse);
+            }
         }
         if ($mandatory !== null) {
             $module->setCoursesMandatory($mandatory);
@@ -211,7 +252,13 @@ class OnderwijsaanbodImporter
             $this->recordChange($result, $course, 'credits', $course->getCredits(), $data->credits);
             $this->recordChange($result, $course, 'semesters', $course->getSemesters(), $data->semesters);
             if ($enrichment !== null) {
-                $this->recordChange($result, $course, 'professors', $course->getProfessors(), $enrichment['professors']);
+                $this->recordChange(
+                    $result,
+                    $course,
+                    'professors',
+                    $course->getProfessors(),
+                    $enrichment['professors']
+                );
             }
         }
 
@@ -246,18 +293,13 @@ class OnderwijsaanbodImporter
     }
 
     /**
-     * Bring identical-course links in line with the OPO index, adding what is missing and removing
-     * what is gone.
+     * Add identical-course links discovered in the OPO index without deleting existing links.
      *
-     * Removal is deliberately narrow: a link is only dropped when **both** courses took part in
-     * this import *and* the index returned a document for both, i.e. when the importer has
-     * authoritative data for the pair and could have created that link itself. Links reaching a
-     * course outside this programme, or one whose document was not found, are left alone — those
-     * may well have been added by an admin, and `Course::addIdenticalCourse()` mirrors the relation
-     * so a wrong removal would silently affect both sides.
-     *
-     * The desired set is built as an unordered pair set first, so an asymmetric answer from the API
-     * (A lists B, B does not list A) cannot make two passes fight over the same link.
+     * Manually curated equivalents (including cross-programme or historical code pairs not active
+     * in OPO's `moduleIdenticalModuleSet`) share the `course_identical_courses` table with no
+     * source marker. Removing links absent from OPO would wipe those curations on Quick Sync, so
+     * unmatched stored pairs between courses in this import are left intact and reported as
+     * warnings for an admin to review if desired.
      *
      * @param array<string, Course>                                                 $coursesByCode
      * @param array<string, array{professors: list<string>, identical: list<string>}> $enrichment
@@ -274,7 +316,8 @@ class OnderwijsaanbodImporter
         $desiredPairs = [];
         foreach ($coursesByCode as $code => $course) {
             foreach ($enrichment[$code]['identical'] ?? [] as $identicalCode) {
-                $identical = $coursesByCode[$identicalCode] ?? $this->courseRepository->findOneBy(['code' => $identicalCode]);
+                $identical = $coursesByCode[$identicalCode]
+                    ?? $this->courseRepository->findOneBy(['code' => $identicalCode]);
                 if ($identical instanceof Course && $identical !== $course) {
                     $course->addIdenticalCourse($identical);
                     $desiredPairs[$this->pairKey($code, $identicalCode)] = true;
@@ -282,9 +325,11 @@ class OnderwijsaanbodImporter
             }
         }
 
+        /** @var array<string, true> $warnedUnmatchedPairs */
+        $warnedUnmatchedPairs = [];
         foreach ($coursesByCode as $code => $course) {
             if (!isset($enrichment[$code])) {
-                // No authoritative answer for this course: never drop any of its links.
+                // No authoritative answer for this course: never warn about missing OPO links.
                 continue;
             }
             foreach ($course->getIdenticalCourses()->toArray() as $linked) {
@@ -292,10 +337,19 @@ class OnderwijsaanbodImporter
                 if (!isset($coursesByCode[$linkedCode], $enrichment[$linkedCode])) {
                     continue;
                 }
-                if (isset($desiredPairs[$this->pairKey($code, $linkedCode)])) {
+                $pairKey = $this->pairKey($code, $linkedCode);
+                if (isset($desiredPairs[$pairKey]) || isset($warnedUnmatchedPairs[$pairKey])) {
                     continue;
                 }
-                $course->removeIdenticalCourse($linked);
+                $warnedUnmatchedPairs[$pairKey] = true;
+                [$firstCode, $secondCode] = $code < $linkedCode ? [$code, $linkedCode] : [$linkedCode, $code];
+                $result->addWarning(
+                    sprintf(
+                        'Identical-course link %s <-> %s is not in the KU Leuven OPO index; left in place.',
+                        $firstCode,
+                        $secondCode,
+                    )
+                );
             }
         }
 
@@ -396,45 +450,58 @@ class OnderwijsaanbodImporter
      */
     private function pruneStaleModules(ProgramData $data, Program $program, ImportResult $result): void
     {
-        /** @var array<string, true> $incoming */
-        $incoming = [];
+        /** @var array<string, true> $allIncoming */
+        $allIncoming = [];
         foreach ($this->collectModuleKulIds($data->modules) as $kulId) {
-            $incoming[$kulId] = true;
+            $allIncoming[$kulId] = true;
         }
+        $expectedChildren = $this->collectExpectedChildren($data->modules);
 
         // $modules is a self-referencing ManyToMany, so nothing in the schema forbids a cycle.
         /** @var array<int, true> $visited */
         $visited = [];
-        $this->pruneChildren($program->getModules()->toArray(), $incoming, $visited, $result, $program, null);
+        $this->pruneChildren(
+            $program->getModules()->toArray(),
+            $expectedChildren,
+            $allIncoming,
+            $visited,
+            $result,
+            $program,
+            null,
+        );
     }
 
     /**
-     * @param list<Module>          $children
-     * @param array<string, true>   $incoming kulIds the incoming tree contains
-     * @param array<int, true>      $visited  module ids already walked
+     * @param list<Module>                       $children
+     * @param array<string, array<string, true>> $expectedChildren parent kulId (or '__ROOT__') => expected child kulIds
+     * @param array<string, true>                $allIncoming      every kulId present anywhere in the incoming tree
+     * @param array<int, true>                   $visited          module ids already walked
      */
     private function pruneChildren(
         array $children,
-        array $incoming,
+        array $expectedChildren,
+        array $allIncoming,
         array &$visited,
         ImportResult $result,
         Program $program,
         ?Module $parent,
     ): void {
+        $parentKey = $parent === null ? '__ROOT__' : (string) $parent->getKulId();
         foreach ($children as $child) {
             $kulId = $child->getKulId();
             if ($kulId === null) {
                 continue;
             }
 
-            if (!isset($incoming[$kulId])) {
+            if (!isset($expectedChildren[$parentKey][$kulId])) {
                 if ($parent === null) {
                     $program->removeModule($child);
                 } else {
                     $parent->removeModule($child);
                 }
                 $result->modulesDetached++;
-                $result->addWarning($this->describeDetachment($child, $parent, $result->dryRun));
+                $stillInProgram = isset($allIncoming[$kulId]);
+                $result->addWarning($this->describeDetachment($child, $parent, $result->dryRun, $stillInProgram));
 
                 continue;
             }
@@ -447,7 +514,15 @@ class OnderwijsaanbodImporter
                 $visited[$id] = true;
             }
 
-            $this->pruneChildren($child->getModules()->toArray(), $incoming, $visited, $result, $program, $child);
+            $this->pruneChildren(
+                $child->getModules()->toArray(),
+                $expectedChildren,
+                $allIncoming,
+                $visited,
+                $result,
+                $program,
+                $child,
+            );
         }
     }
 
@@ -457,10 +532,25 @@ class OnderwijsaanbodImporter
      * A "Semester 3" or "Keuzepakketten" folder only ever existed because of the structural options
      * chosen for the import, so it vanishing means those options changed — saying KU Leuven dropped
      * it would send an admin looking for a curriculum change that never happened. A real module
-     * group disappearing is the opposite: nothing changed here, the source did.
+     * group disappearing is the opposite: nothing changed here, the source did. And a module still
+     * present elsewhere in the incoming tree was re-parented (e.g. un-flattening or undoing a
+     * manual move).
      */
-    private function describeDetachment(Module $module, ?Module $parent, bool $dryRun): string
-    {
+    private function describeDetachment(
+        Module $module,
+        ?Module $parent,
+        bool $dryRun,
+        bool $stillInProgram = false,
+    ): string {
+        if ($stillInProgram) {
+            return sprintf(
+                'Module "%s" moved elsewhere in the programme structure, so it is %s %s.',
+                $module->getName(),
+                $dryRun ? 'about to be detached from' : 'detached from',
+                $parent === null ? 'the programme' : sprintf('"%s"', $parent->getName()),
+            );
+        }
+
         $synthetic = false;
         foreach (ProgramTreeMapper::SYNTHETIC_KULID_PREFIXES as $prefix) {
             if (str_starts_with((string) $module->getKulId(), $prefix)) {
@@ -479,6 +569,27 @@ class OnderwijsaanbodImporter
             $dryRun ? 'about to be detached from' : 'detached from',
             $parent === null ? 'the programme' : sprintf('"%s"', $parent->getName()),
         );
+    }
+
+    /**
+     * @param list<ModuleData> $modules
+     *
+     * @return array<string, array<string, true>>
+     */
+    private function collectExpectedChildren(array $modules): array
+    {
+        /** @var array<string, array<string, true>> $expected */
+        $expected = ['__ROOT__' => []];
+        $walk = static function (array $children, string $parentKey) use (&$walk, &$expected): void {
+            foreach ($children as $child) {
+                $expected[$parentKey][$child->kulId] = true;
+                $expected[$child->kulId] ??= [];
+                $walk($child->children, $child->kulId);
+            }
+        };
+        $walk($modules, '__ROOT__');
+
+        return $expected;
     }
 
     /**
@@ -507,8 +618,13 @@ class OnderwijsaanbodImporter
      * @param list<string>|string|int|null $old
      * @param list<string>|string|int|null $new
      */
-    private function recordChange(ImportResult $result, Course $course, string $field, array|string|int|null $old, array|string|int|null $new): void
-    {
+    private function recordChange(
+        ImportResult $result,
+        Course $course,
+        string $field,
+        array|string|int|null $old,
+        array|string|int|null $new,
+    ): void {
         if (is_array($old) && is_array($new)) {
             $a = $old;
             $b = $new;
@@ -521,7 +637,13 @@ class OnderwijsaanbodImporter
             return;
         }
 
-        $result->addCourseChange($course->getCode(), $course->getName(), $field, $this->display($old), $this->display($new));
+        $result->addCourseChange(
+            $course->getCode(),
+            $course->getName(),
+            $field,
+            $this->display($old),
+            $this->display($new),
+        );
     }
 
     /**

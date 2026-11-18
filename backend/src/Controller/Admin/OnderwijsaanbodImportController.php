@@ -12,7 +12,6 @@ use App\Service\Onderwijsaanbod\Dto\ProgramData;
 use App\Service\Onderwijsaanbod\OnderwijsaanbodClient;
 use App\Service\Onderwijsaanbod\OnderwijsaanbodImporter;
 use App\Service\Onderwijsaanbod\ProgramTreeMapper;
-use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,7 +39,6 @@ class OnderwijsaanbodImportController extends AbstractController
         private readonly ProgramRepository $programRepository,
         private readonly ModuleRepository $moduleRepository,
         private readonly CourseRepository $courseRepository,
-        private readonly EntityManagerInterface $entityManager,
     ) {}
 
     #[AdminRoute('/onderwijsaanbod/import', name: 'onderwijsaanbod_import')]
@@ -48,6 +46,12 @@ class OnderwijsaanbodImportController extends AbstractController
     {
         $query = trim((string) $request->query->get('q', ''));
         $searchResults = $query !== '' ? $this->client->searchPrograms($query) : [];
+        if ($query !== '' && $searchResults === [] && $this->client->getLastError() !== null) {
+            $this->addFlash(
+                'danger',
+                sprintf('KU Leuven onderwijsaanbod API error: %s', $this->client->getLastError())
+            );
+        }
 
         return $this->render(
             'admin/onderwijsaanbod/form.html.twig',
@@ -59,23 +63,35 @@ class OnderwijsaanbodImportController extends AbstractController
         );
     }
 
-    #[AdminRoute('/onderwijsaanbod/import/preview', name: 'onderwijsaanbod_import_preview', options: ['methods' => ['POST']])]
+    #[AdminRoute(
+        '/onderwijsaanbod/import/preview',
+        name: 'onderwijsaanbod_import_preview',
+        options: ['methods' => ['POST']]
+    )]
     public function preview(Request $request): Response
     {
-        $options = $this->readOptions($request);
+        $programId = trim((string) $request->request->get('programId', ''));
+        $source = $programId !== '' ? $this->client->fetchProgramSource($programId) : null;
+        if ($source === null) {
+            $this->flashMissingSource($programId);
 
-        $programData = $this->buildProgramData($options);
+            return $this->redirectToRoute('admin_onderwijsaanbod_import');
+        }
+
+        $options = $this->readOptions($request, $source);
+        $programData = $this->mapProgramData($source, $options);
         if ($programData === null) {
             $this->addFlash('danger', sprintf('No programme found for programId %s.', $options['programId']));
 
             return $this->redirectToRoute('admin_onderwijsaanbod_import');
         }
 
-        $summary = $this->importer->import($programData, $options['enrich'], dryRun: true);
+        $summary = $this->importer->import($programData, $options['enrich'], dryRun: true, importSettings: $options);
 
         // The untransformed named tree provides the full list of selectable groups (checkboxes),
         // independent of what the current flatten/semester choices removed from the result.
-        $namedTree = $this->buildProgramData(
+        $namedTree = $this->mapProgramData(
+            $source,
             [
             'programId' => $options['programId'],
             'lang' => $options['lang'],
@@ -102,7 +118,11 @@ class OnderwijsaanbodImportController extends AbstractController
         );
     }
 
-    #[AdminRoute('/onderwijsaanbod/import/commit', name: 'onderwijsaanbod_import_commit', options: ['methods' => ['POST']])]
+    #[AdminRoute(
+        '/onderwijsaanbod/import/commit',
+        name: 'onderwijsaanbod_import_commit',
+        options: ['methods' => ['POST']]
+    )]
     public function commit(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('onderwijsaanbod_import', (string) $request->request->get('_token'))) {
@@ -111,20 +131,24 @@ class OnderwijsaanbodImportController extends AbstractController
             return $this->redirectToRoute('admin_onderwijsaanbod_import');
         }
 
-        $options = $this->readOptions($request);
-        $programData = $this->buildProgramData($options);
+        $programId = trim((string) $request->request->get('programId', ''));
+        $source = $programId !== '' ? $this->client->fetchProgramSource($programId) : null;
+        if ($source === null) {
+            $this->flashMissingSource($programId);
+
+            return $this->redirectToRoute('admin_onderwijsaanbod_import');
+        }
+
+        $options = $this->readOptions($request, $source);
+        $programData = $this->mapProgramData($source, $options);
         if ($programData === null) {
             $this->addFlash('danger', sprintf('No programme found for programId %s.', $options['programId']));
 
             return $this->redirectToRoute('admin_onderwijsaanbod_import');
         }
 
-        $result = $this->importer->import($programData, $options['enrich'], dryRun: false);
+        $result = $this->importer->import($programData, $options['enrich'], dryRun: false, importSettings: $options);
         $program = $this->programRepository->findOneByKulId($programData->kulId);
-        if ($program !== null) {
-            $program->setImportSettings($options);
-            $this->entityManager->flush();
-        }
 
         $this->addFlash(
             'success',
@@ -138,6 +162,9 @@ class OnderwijsaanbodImportController extends AbstractController
                 $result->enrichedCourses,
             )
         );
+        foreach ($result->warnings as $warning) {
+            $this->addFlash('warning', $warning);
+        }
 
         if ($program !== null) {
             return $this->redirectToRoute(
@@ -154,6 +181,8 @@ class OnderwijsaanbodImportController extends AbstractController
     }
 
     /**
+     * @param array<string, mixed> $source
+     *
      * @return array{
      *     programId: string,
      *     lang: 'nl'|'en',
@@ -165,20 +194,20 @@ class OnderwijsaanbodImportController extends AbstractController
      *     electiveGrouping: string,
      * }
      */
-    private function readOptions(Request $request): array
+    private function readOptions(Request $request, array $source): array
     {
         $programId = trim((string) $request->request->get('programId', ''));
         $existingProgram = $programId !== '' ? $this->programRepository->findOneByKulId($programId) : null;
         $saved = $existingProgram?->getResolvedImportSettings();
 
-        // Language: explicit request parameter takes precedence over saved settings
+        // Language: explicit request parameter takes precedence over saved settings and API language
         $langParam = $request->request->get('lang');
-        if ($langParam !== null) {
+        if ($langParam !== null && $langParam !== '') {
             /** @var 'nl'|'en' $lang */
             $lang = (string) $langParam === 'en' ? 'en' : 'nl';
         } else {
             /** @var 'nl'|'en' $lang */
-            $lang = $saved['lang'] ?? 'nl';
+            $lang = $saved['lang'] ?? $this->client->extractOriginalLanguage($source, $programId);
         }
 
         // Flatten/semester/merge: use explicit form values when the form was configured,
@@ -223,6 +252,7 @@ class OnderwijsaanbodImportController extends AbstractController
     }
 
     /**
+     * @param array<string, mixed> $source
      * @param array{
      *     programId: string,
      *     lang: 'nl'|'en',
@@ -234,13 +264,9 @@ class OnderwijsaanbodImportController extends AbstractController
      *     electiveGrouping: string,
      * } $options
      */
-    private function buildProgramData(array $options): ?ProgramData
+    private function mapProgramData(array $source, array $options): ?ProgramData
     {
         if ($options['programId'] === '') {
-            return null;
-        }
-        $source = $this->client->fetchProgramSource($options['programId']);
-        if ($source === null) {
             return null;
         }
 
@@ -254,6 +280,21 @@ class OnderwijsaanbodImportController extends AbstractController
             $options['electiveGrouping'],
             $options['semesterFlat'],
         );
+    }
+
+    private function flashMissingSource(string $programId): void
+    {
+        $apiError = $this->client->getLastError();
+        if ($apiError !== null) {
+            $this->addFlash(
+                'danger',
+                sprintf('Failed to reach KU Leuven onderwijsaanbod API: %s', $apiError)
+            );
+
+            return;
+        }
+
+        $this->addFlash('danger', sprintf('No programme found for programId %s.', $programId));
     }
 
     /**

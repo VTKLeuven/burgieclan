@@ -2,6 +2,7 @@
 
 namespace App\Tests\Api;
 
+use App\Entity\Course;
 use App\Factory\ProgramFactory;
 use App\Factory\ModuleFactory;
 
@@ -94,18 +95,49 @@ class ProgramResourceTest extends ApiTestCase
 
     public function testCurriculumTreeRemainsAvailableForExplicitSearches(): void
     {
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $depth2Course = (new Course())
+            ->setCode('H01A1A')
+            ->setName('Analyse I')
+            ->setNameNl('Analyse I')
+            ->setNameEn('Calculus I')
+            ->setLanguage('nl')
+            ->setCredits(6)
+            ->setSemesters(['Semester 1']);
+        $depth3Course = (new Course())
+            ->setCode('H02B2B')
+            ->setName('Keuzevak A')
+            ->setNameNl('Keuzevak A')
+            ->setNameEn('Elective Course A')
+            ->setLanguage('nl')
+            ->setCredits(3)
+            ->setSemesters(['Semester 2']);
+        $em->persist($depth2Course);
+        $em->persist($depth3Course);
+        $em->flush();
+
         $program = ProgramFactory::createOne();
+        $grandchild = ModuleFactory::createOne(
+            [
+            'program' => null,
+            'name' => 'Searchable grandchild',
+            'courses' => [$depth3Course],
+            'modules' => [],
+            ]
+        );
         $child = ModuleFactory::createOne(
             [
             'program' => null,
             'name' => 'Searchable child',
-            'modules' => [],
+            'courses' => [$depth2Course],
+            'modules' => [$grandchild],
             ]
         );
         ModuleFactory::createOne(
             [
             'program' => $program,
             'name' => 'Searchable parent',
+            'courses' => [],
             'modules' => [$child],
             ]
         );
@@ -120,7 +152,23 @@ class ProgramResourceTest extends ApiTestCase
             ->decoded()['hydra:member'][0];
 
         $this->assertSame('Searchable parent', $programJson['modules'][0]['name']);
-        $this->assertSame('Searchable child', $programJson['modules'][0]['modules'][0]['name']);
+        $childJson = $programJson['modules'][0]['modules'][0];
+        $this->assertSame('Searchable child', $childJson['name']);
+        $this->assertSame('H01A1A', $childJson['courses'][0]['code']);
+        $this->assertSame('Analyse I', $childJson['courses'][0]['name']);
+        $this->assertSame('Analyse I', $childJson['courses'][0]['nameNl']);
+        $this->assertSame('Calculus I', $childJson['courses'][0]['nameEn']);
+        $this->assertSame(6, $childJson['courses'][0]['credits']);
+        $this->assertSame(['Semester 1'], $childJson['courses'][0]['semesters']);
+
+        $grandchildJson = $childJson['modules'][0];
+        $this->assertSame('Searchable grandchild', $grandchildJson['name']);
+        $this->assertSame('H02B2B', $grandchildJson['courses'][0]['code']);
+        $this->assertSame('Keuzevak A', $grandchildJson['courses'][0]['name']);
+        $this->assertSame('Keuzevak A', $grandchildJson['courses'][0]['nameNl']);
+        $this->assertSame('Elective Course A', $grandchildJson['courses'][0]['nameEn']);
+        $this->assertSame(3, $grandchildJson['courses'][0]['credits']);
+        $this->assertSame(['Semester 2'], $grandchildJson['courses'][0]['semesters']);
     }
 
     /**

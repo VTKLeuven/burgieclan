@@ -30,6 +30,8 @@ class OnderwijsaanbodClient
 
     private LoggerInterface $logger;
 
+    private ?string $lastError = null;
+
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         ?LoggerInterface $logger = null,
@@ -40,10 +42,15 @@ class OnderwijsaanbodClient
         $this->logger = $logger ?? new NullLogger();
     }
 
+    public function getLastError(): ?string
+    {
+        return $this->lastError;
+    }
+
     /**
      * Full-text search over programmes, for the admin autocomplete.
      *
-     * @return list<array{programId: string, title: string, qualificationId: ?string}>
+     * @return list<array{programId: string, title: string, qualificationId: ?string, language: 'nl'|'en'}>
      */
     public function searchPrograms(string $query, int $size = 30): array
     {
@@ -94,8 +101,10 @@ class OnderwijsaanbodClient
                 ],
                 '_source' => [
                     'qualificationId',
+                    'qualificationOriginalLangu',
                     'inProgramguide',
                     'programSet.programId',
+                    'programSet.originalLangu',
                     'programSet.inProgramGuide',
                     'programSet.programLanguageSet.programLangu',
                     'programSet.programLanguageSet.programTitleSet.description',
@@ -114,26 +123,35 @@ class OnderwijsaanbodClient
                     continue;
                 }
 
-                if (isset($programSet['inProgramGuide']) && strtolower((string) $programSet['inProgramGuide']) === 'false') {
+                $inGuide = $programSet['inProgramGuide'] ?? null;
+                if ($inGuide !== null && strtolower((string) $inGuide) === 'false') {
                     continue;
                 }
 
-                $title = $this->extractProgramTitle($programSet);
+                $language = $this->extractOriginalLanguage($source, $programId);
+                $title = $this->extractProgramTitle($programSet, $language);
                 $seen[$programId] = true;
 
                 $results[] = [
                     'programId' => $programId,
                     'title' => $title,
                     'qualificationId' => $qualificationId,
+                    'language' => $language,
                 ];
             }
         }
 
-        // Rank results: prioritize direct matches, short titles, and demote prep/shortened programs if query doesn't ask for them
+        // Rank results: prioritize direct matches, short titles, and demote prep/shortened programs
+        // unless the query asks for them.
         $qLower = mb_strtolower($cleanQuery);
+        $cleanLen = static function (string $title): int {
+            $stripped = trim((string) preg_replace('/\s*\([^)]*\)/u', '', $title));
+
+            return min(15, (int) (mb_strlen($stripped) / 10));
+        };
         usort(
             $results,
-            static function (array $a, array $b) use ($terms, $qLower): int {
+            static function (array $a, array $b) use ($terms, $qLower, $cleanLen): int {
                 $titleA = mb_strtolower($a['title']);
                 $titleB = mb_strtolower($b['title']);
 
@@ -174,8 +192,8 @@ class OnderwijsaanbodClient
                     }
                 }
 
-                $scoreA -= (int) (mb_strlen($a['title']) / 10);
-                $scoreB -= (int) (mb_strlen($b['title']) / 10);
+                $scoreA -= $cleanLen($a['title']);
+                $scoreB -= $cleanLen($b['title']);
 
                 return $scoreB <=> $scoreA;
             }
@@ -261,6 +279,29 @@ class OnderwijsaanbodClient
     }
 
     /**
+     * Resolve the original language of instruction for a programme ('en' or 'nl').
+     *
+     * @param array<string, mixed> $programSource
+     *
+     * @return 'nl'|'en'
+     */
+    public function extractOriginalLanguage(array $programSource, ?string $programId = null): string
+    {
+        $raw = null;
+        if ($programId !== null) {
+            foreach ($programSource['programSet'] ?? [] as $programSet) {
+                if ((string) ($programSet['programId'] ?? '') === $programId) {
+                    $raw = $programSet['originalLangu'] ?? null;
+                    break;
+                }
+            }
+        }
+        $raw ??= $programSource['qualificationOriginalLangu'] ?? 'NL';
+
+        return str_starts_with(strtolower(trim((string) $raw)), 'en') ? 'en' : 'nl';
+    }
+
+    /**
      * Execute an OpenSearch `_search` and return the decoded response, or an empty result shape
      * on failure (logged). Never throws, so a transient API hiccup degrades gracefully.
      *
@@ -270,6 +311,7 @@ class OnderwijsaanbodClient
      */
     private function search(string $index, array $body): array
     {
+        $this->lastError = null;
         $url = sprintf('%s/%s/_search', rtrim($this->baseUrl, '/'), $index);
         try {
             $response = $this->httpClient->request(
@@ -284,6 +326,7 @@ class OnderwijsaanbodClient
 
             return $response->toArray();
         } catch (HttpExceptionInterface $e) {
+            $this->lastError = $e->getMessage();
             $this->logger->error(
                 'Onderwijsaanbod API request failed',
                 [
@@ -297,11 +340,12 @@ class OnderwijsaanbodClient
     }
 
     /**
-     * Pick a human-readable title from a programSet entry, preferring Dutch then English.
+     * Pick a human-readable title from a programSet entry, preferring the programme's own
+     * language of instruction before falling back to the other translation.
      *
      * @param array<string, mixed> $programSet
      */
-    private function extractProgramTitle(array $programSet): string
+    private function extractProgramTitle(array $programSet, string $preferredLanguage = 'nl'): string
     {
         $titles = [];
         foreach ($programSet['programLanguageSet'] ?? [] as $lang) {
@@ -312,6 +356,10 @@ class OnderwijsaanbodClient
                     $titles[$langCode] = $description;
                 }
             }
+        }
+
+        if ($preferredLanguage === 'en') {
+            return $titles['EN'] ?? $titles['NL'] ?? reset($titles) ?: '';
         }
 
         return $titles['NL'] ?? $titles['EN'] ?? reset($titles) ?: '';

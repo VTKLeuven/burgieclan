@@ -135,7 +135,11 @@ class ProgramTreeAdminController extends AbstractController
         return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
     }
 
-    #[AdminRoute('/program/{id}/tree/attach-courses', name: 'program_tree_attach_courses', options: ['methods' => ['POST']])]
+    #[AdminRoute(
+        '/program/{id}/tree/attach-courses',
+        name: 'program_tree_attach_courses',
+        options: ['methods' => ['POST']]
+    )]
     public function attachCourses(int $id, Request $request): Response
     {
         if ($invalid = $this->assertCsrf($id, $request)) {
@@ -174,7 +178,10 @@ class ProgramTreeAdminController extends AbstractController
 
         $this->entityManager->flush();
 
-        $this->addFlash('success', sprintf('Attached %d course(s) to module "%s".', $attachedCount, $module->getName()));
+        $this->addFlash(
+            'success',
+            sprintf('Attached %d course(s) to module "%s".', $attachedCount, $module->getName())
+        );
 
         return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
     }
@@ -362,7 +369,8 @@ class ProgramTreeAdminController extends AbstractController
             static fn (Module $p): bool => !isset($modulesBeingRemoved[$p->getId()]) && $p->getId() !== $module->getId()
         );
 
-        $hasExternalProgram = $module->getProgram() !== null && $module->getProgram()->getId() !== $currentProgram->getId();
+        $hasExternalProgram = $module->getProgram() !== null
+            && $module->getProgram()->getId() !== $currentProgram->getId();
 
         if (count($externalParents) > 0 || $hasExternalProgram) {
             $parentNames = array_map(static fn (Module $p): string => $p->getName(), $externalParents);
@@ -391,7 +399,11 @@ class ProgramTreeAdminController extends AbstractController
         $this->entityManager->remove($module);
     }
 
-    #[AdminRoute('/program/{id}/tree/reorder-module', name: 'program_tree_reorder_module', options: ['methods' => ['POST']])]
+    #[AdminRoute(
+        '/program/{id}/tree/reorder-module',
+        name: 'program_tree_reorder_module',
+        options: ['methods' => ['POST']]
+    )]
     public function reorderModule(int $id, Request $request): Response
     {
         if ($invalid = $this->assertCsrf($id, $request)) {
@@ -464,7 +476,11 @@ class ProgramTreeAdminController extends AbstractController
         return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
     }
 
-    #[AdminRoute('/program/{id}/tree/rename-module', name: 'program_tree_rename_module', options: ['methods' => ['POST']])]
+    #[AdminRoute(
+        '/program/{id}/tree/rename-module',
+        name: 'program_tree_rename_module',
+        options: ['methods' => ['POST']]
+    )]
     public function renameModule(int $id, Request $request): Response
     {
         if ($invalid = $this->assertCsrf($id, $request)) {
@@ -496,7 +512,11 @@ class ProgramTreeAdminController extends AbstractController
         return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
     }
 
-    #[AdminRoute('/program/{id}/tree/sync-onderwijsaanbod', name: 'program_tree_sync', options: ['methods' => ['POST']])]
+    #[AdminRoute(
+        '/program/{id}/tree/sync-onderwijsaanbod',
+        name: 'program_tree_sync',
+        options: ['methods' => ['POST']]
+    )]
     public function syncOnderwijsaanbod(int $id, Request $request): Response
     {
         if ($invalid = $this->assertCsrf($id, $request)) {
@@ -513,7 +533,13 @@ class ProgramTreeAdminController extends AbstractController
         $kulId = $program->getKulId();
         $source = $this->client->fetchProgramSource($kulId);
         if ($source === null) {
-            $this->addFlash('danger', sprintf('Could not fetch data for KU Leuven ID %s', $kulId));
+            $apiError = $this->client->getLastError();
+            $this->addFlash(
+                'danger',
+                $apiError !== null
+                    ? sprintf('Failed to reach KU Leuven API: %s', $apiError)
+                    : sprintf('Could not fetch data for KU Leuven ID %s', $kulId)
+            );
 
             return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
         }
@@ -550,6 +576,9 @@ class ProgramTreeAdminController extends AbstractController
                 $result->coursesUpdated
             )
         );
+        foreach ($result->warnings as $warning) {
+            $this->addFlash('warning', $warning);
+        }
 
         return $this->redirectToRoute('admin_program_tree', ['id' => $id]);
     }

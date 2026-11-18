@@ -61,7 +61,7 @@ class ProgramEntityToApiMapper extends BaseEntityToApiMapper
                     $module,
                     ModuleApi::class,
                     [
-                        MicroMapperInterface::MAX_DEPTH => 2,
+                        MicroMapperInterface::MAX_DEPTH => 16,
                         MappingContext::CURRICULUM_TREE => true,
                     ]
                 );

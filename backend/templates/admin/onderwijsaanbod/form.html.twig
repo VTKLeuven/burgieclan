@@ -31,6 +31,7 @@
                                                    {{ loop.first ? 'checked' : '' }}>
                                         </td>
                                         <td class="bc-col-shrink"><code>{{ r.programId }}</code></td>
+                                        <td class="bc-col-shrink"><span class="badge badge-secondary">{{ r.language|upper }}</span></td>
                                         <td>{{ r.title }}</td>
                                     </tr>
                                 {% endfor %}
@@ -52,7 +53,8 @@
                     <div class="form-group col-md-6">
                         <label class="form-label" for="lang">Title language</label>
                         <select id="lang" name="lang" class="form-select">
-                            <option value="nl" selected>Nederlands</option>
+                            <option value="" selected>Auto (programme / saved language)</option>
+                            <option value="nl">Nederlands</option>
                             <option value="en">English</option>
                         </select>
                     </div>
