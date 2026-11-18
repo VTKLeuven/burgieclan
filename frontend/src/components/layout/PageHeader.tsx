@@ -1,9 +1,10 @@
 'use client';
 
+import { useCurriculumPanel } from '@/components/curriculum/CurriculumPanelContext';
 import { openMobileNav, openSearch } from '@/components/layout/navEvents';
 import { useUser } from '@/components/UserContext';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Menu, Search } from 'lucide-react';
+import { ChevronRight, Menu, PanelLeftOpen, Search } from 'lucide-react';
 import Link from 'next/link';
 import { Fragment, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -108,6 +109,7 @@ export default function PageHeader({
 }) {
     const { t } = useTranslation();
     const { user } = useUser();
+    const curriculumPanel = useCurriculumPanel();
 
     return (
         <header
@@ -124,6 +126,18 @@ export default function PageHeader({
             >
                 <Menu className="size-[18px]" aria-hidden="true" />
             </button>
+            {/* Reopens the curriculum column; it only exists from lg, so neither does this. */}
+            {curriculumPanel.available && !curriculumPanel.open && (
+                <button
+                    type="button"
+                    onClick={() => curriculumPanel.setOpen(true)}
+                    className="vtk-icon-button -ml-1.5 hidden lg:inline-grid"
+                    aria-label={t('curriculum-panel.show')}
+                    title={t('curriculum-panel.show')}
+                >
+                    <PanelLeftOpen className="size-[18px]" aria-hidden="true" />
+                </button>
+            )}
             {breadcrumb ?? <Breadcrumbs crumbs={crumbs ?? []} />}
             <div className="flex shrink-0 items-center gap-1.5">
                 {actions}

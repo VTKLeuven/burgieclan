@@ -273,7 +273,9 @@
         "placement": {
             "other_one": "Ook in 1 andere richting",
             "other_other": "Ook in {{count}} andere richtingen",
-            "label": "Opleiding"
+            "label": "Opleiding",
+            "other-short_one": "+1 andere",
+            "other-short_other": "+{{count}} andere"
         },
         "ects-sheet": "ECTS-fiche"
     },
@@ -927,5 +929,15 @@
             "stop": "Verwijder mijn planner",
             "stop_confirm": "Alles verwijderen"
         }
+    },
+    "curriculum-panel": {
+        "show": "Curriculum tonen",
+        "hide": "Curriculum verbergen",
+        "filter": "Filter vakken in deze opleiding",
+        "clear-filter": "Filter wissen",
+        "choose-program": "Kies een opleiding",
+        "switch-program": "Andere opleiding bekijken",
+        "favorite-programs": "Favoriete opleidingen",
+        "all-programs": "Alle opleidingen"
     }
 }
