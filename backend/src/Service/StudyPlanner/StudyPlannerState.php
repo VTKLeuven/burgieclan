@@ -146,7 +146,7 @@ class StudyPlannerState
             'courseId' => $courseId,
             'type' => $event->getType(),
             'location' => null === $event->getLocation() ? null : self::room($event->getLocation()),
-            'people' => $event->getPeople(),
+            'people' => StudyPlannerSubjects::people($event),
             'done' => $event->isDone(),
             'hidden' => $event->isHidden() ? 'event' : (null !== $hideRule ? 'rule' : null),
             'hiddenRule' => null === $hideRule ? null : (string) $hideRule->getId(),

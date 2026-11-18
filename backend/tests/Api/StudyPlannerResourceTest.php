@@ -189,6 +189,35 @@ class StudyPlannerResourceTest extends ApiTestCase
         $this->assertCount(1, $this->fetched);
     }
 
+    public function testGroupsActivitiesNamedTogetherAcrossLanguages(): void
+    {
+        $token = $this->token();
+        $this->feed = self::ics(
+            [
+            ['uid' => 'en1@timeedit.com', 'start' => '20260921T083500Z', 'end' => '20260921T103000Z', 'summary' => 'H04B7a Finite Elements for Electromagnetic Fields: Lecture, Ruth Vazquez Sabariego'],
+            ['uid' => 'nl1@timeedit.com', 'start' => '20260922T120000Z', 'end' => '20260922T140000Z', 'summary' => 'H00T2a Eindige elementen voor elektromagnetische velden: oefeningen, H04C0a Finite Elements for Electromagnetic Fields: Exercises, Ruth Vazquez Sabariego', 'kind' => '02 Practicum'],
+            ['uid' => 'nl2@timeedit.com', 'start' => '20260929T120000Z', 'end' => '20260929T140000Z', 'summary' => 'H00T2a Eindige elementen voor elektromagnetische velden: oefeningen, H04C0a Finite Elements for Electromagnetic Fields: Exercises, Ruth Vazquez Sabariego', 'kind' => '02 Practicum'],
+            ['uid' => 'ba@timeedit.com', 'start' => '20260923T083500Z', 'end' => '20260923T103000Z', 'summary' => 'H0T34a Nuclear Energy: Basic Aspects, William Dhaeseleer'],
+            ['uid' => 'di@timeedit.com', 'start' => '20260924T083500Z', 'end' => '20260924T103000Z', 'summary' => 'H0H03a Nuclear Energy: Deepening Insights, William Dhaeseleer'],
+            ]
+        );
+        $state = $this->call($this->browserWithFeed(), $token, 'POST', '/api/study_planner/subscription', ['icsUrl' => self::LINK]);
+
+        $labels = array_column($state['subjects'], 'label');
+        sort($labels);
+        $this->assertSame(
+            [
+            'Finite Elements for Electromagnetic Fields',
+            'Nuclear Energy: Basic Aspects',
+            'Nuclear Energy: Deepening Insights',
+            ],
+            $labels
+        );
+        $this->assertSame(self::event($state, 'en1@timeedit.com')['subject'], self::event($state, 'nl1@timeedit.com')['subject']);
+        // The other activity is not a person.
+        $this->assertSame('Ruth Vazquez Sabariego', self::event($state, 'nl1@timeedit.com')['people']);
+    }
+
     public function testSyncKeepsHistoryAndMarksRemovedSessions(): void
     {
         $token = $this->token();
