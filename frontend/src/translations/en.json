@@ -596,6 +596,8 @@
         "section": {
             "title": "Exams",
             "description": "Reconstructions of past exams, rebuilt together by the students who took them. Just had an exam? Add the questions while they are fresh.",
+            "under-construction": "Under construction",
+            "under-construction-description": "Exam reconstructions are currently under construction and will be available soon.",
             "start": "Start a reconstruction",
             "empty": "No reconstructions for this course yet.",
             "error": "The reconstructions could not be loaded.",

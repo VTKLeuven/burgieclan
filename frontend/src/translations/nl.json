@@ -596,6 +596,8 @@
         "section": {
             "title": "Examens",
             "description": "Reconstructies van examens, samen opgebouwd door wie ze aflegde. Net een examen gehad? Vul de vragen aan terwijl ze nog vers zijn.",
+            "under-construction": "Binnenkort beschikbaar",
+            "under-construction-description": "Examenreconstructies worden momenteel gebouwd en zijn binnenkort beschikbaar.",
             "start": "Reconstructie starten",
             "empty": "Nog geen reconstructies voor dit vak.",
             "error": "De reconstructies konden niet geladen worden.",

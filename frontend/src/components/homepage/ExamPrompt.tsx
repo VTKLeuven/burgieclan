@@ -13,6 +13,8 @@ import { useEffect, useMemo, useState } from 'react';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { useTranslation } from 'react-i18next';
 
+const EXAM_RECONSTRUCTIONS_ENABLED = process.env.NODE_ENV !== 'production';
+
 /** Exams whose prompt was closed in this browser, by id. */
 function readDismissed(): number[] {
     try {
@@ -51,7 +53,7 @@ export const ExamPrompt = () => {
     const current = useMemo(() => currentExamPeriod(), []);
     const courses = useMemo(() => user?.favoriteCourses ?? [], [user?.favoriteCourses]);
     const query = useMemo(() => {
-        if (!current || courses.length === 0) {
+        if (!EXAM_RECONSTRUCTIONS_ENABLED || !current || courses.length === 0) {
             return null;
         }
         const params = new URLSearchParams({ academicYear: current.academicYear, period: current.period, itemsPerPage: '50' });
@@ -82,7 +84,7 @@ export const ExamPrompt = () => {
 
     const exams = result !== null && result.query === query ? result.exams : [];
     const shown = dismissed === null ? [] : exams.filter((exam) => !dismissed.includes(exam.id));
-    if (!current || shown.length === 0) {
+    if (!EXAM_RECONSTRUCTIONS_ENABLED || !current || shown.length === 0) {
         return null;
     }
 

@@ -27,7 +27,7 @@ function flatten(programs: Program[]): CourseHit[] {
   const walk = (program: Program, module: Module, trail: Module[]) => {
     const path = [...trail, module];
     module.courses?.forEach((course) => {
-      hits.push({ course, program, modules: path, language: program.language });
+      hits.push({ course, program, modules: path });
     });
     module.modules?.forEach((child) => walk(program, child, path));
   };

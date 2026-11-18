@@ -12,11 +12,13 @@ import type { Course, Exam } from '@/types/entities';
 import { convertToCourse, convertToExam } from '@/utils/convertToEntity';
 import { localizedCourseName } from '@/utils/courseName';
 import { examCalendarYear } from '@/utils/examPeriods';
-import { Copy, Lock, NotebookPen, PencilLine } from 'lucide-react';
+import { Construction, Copy, Lock, NotebookPen, PencilLine } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+const EXAM_RECONSTRUCTIONS_ENABLED = process.env.NODE_ENV !== 'production';
 
 /**
  * One exam reconstruction: course/{id}/exams/{examId}.
@@ -46,6 +48,7 @@ export default function ExamPage() {
     }, [examId]);
 
     useEffect(() => {
+        if (!EXAM_RECONSTRUCTIONS_ENABLED) return;
         let cancelled = false;
         requestExam('GET', `/api/exams/${examId}`).then((data) => {
             if (!cancelled && data) {
@@ -85,6 +88,36 @@ export default function ExamPage() {
             document.title = `${title} · ${courseName} | Burgieclan`;
         }
     }, [title, courseName]);
+
+    if (!EXAM_RECONSTRUCTIONS_ENABLED) {
+        return (
+            <>
+                <PageHeader breadcrumb={<DynamicBreadcrumb />} />
+                <div className="vtk-shell vtk-shell-narrow">
+                    <PageHead
+                        icon={Construction}
+                        title={t('exam.section.title')}
+                        subtitle={
+                            course ? (
+                                <Link href={`/course/${course.id}`} className="hover:text-fg hover:underline">{courseName}</Link>
+                            ) : undefined
+                        }
+                    >
+                        <div className="mt-3">
+                            <span className="vtk-badge vtk-badge-muted">
+                                <Construction className="size-3" aria-hidden="true" />
+                                {t('exam.section.under-construction')}
+                            </span>
+                        </div>
+                    </PageHead>
+
+                    <div className="vtk-panel vtk-empty mt-6">
+                        {t('exam.section.under-construction-description')}
+                    </div>
+                </div>
+            </>
+        );
+    }
 
     const error = examApi.error ?? courseApi.error;
     if (error) {
