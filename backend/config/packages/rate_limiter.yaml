@@ -28,3 +28,15 @@ framework:
             policy: sliding_window
             limit: 30
             interval: '1 hour'
+
+        # Syncing a study planner's timetable by hand, or subscribing (StudyPlannerProcessor).
+        study_planner_sync:
+            policy: sliding_window
+            limit: 6
+            interval: '10 minutes'
+
+        # Ticking off, hiding, marking and deadlines in the study planner (StudyPlannerProcessor).
+        study_planner_change:
+            policy: sliding_window
+            limit: 240
+            interval: '1 minute'

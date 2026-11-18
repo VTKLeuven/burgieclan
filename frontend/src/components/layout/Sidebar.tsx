@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 import { localizedCourseName } from '@/utils/courseName';
 import {
     ArrowUpRight,
+    CalendarDays,
     ChevronRight,
     ChevronsUpDown,
     CircleHelp,
@@ -185,6 +186,15 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
                     active={inCurriculum && !courses.some((c) => c.id === currentCourse?.id)}
                     onNavigate={onNavigate}
                 />
+                {user && (
+                    <NavItem
+                        href="/planner"
+                        icon={<CalendarDays />}
+                        label={t('study_planner.nav')}
+                        active={isActive('/planner')}
+                        onNavigate={onNavigate}
+                    />
+                )}
                 {user && (
                     <NavItem
                         href="/account"
