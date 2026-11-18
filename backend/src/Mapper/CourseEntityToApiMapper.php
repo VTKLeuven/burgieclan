@@ -90,8 +90,18 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
         // What the category pages also show from identical and older courses. Without it a
         // category that only the predecessor has files in would read as empty and be hidden
         // on the course page, which after a reform is exactly where the exams are.
-        $related = [...$from->getIdenticalCourses()->getValues(), ...$from->getOldCourses()->getValues()];
-        $to->relatedDocumentCounts = $this->documentRepository->countByCategoryForCourses($related);
+        // The two parts are counted the way the folder shows them: an identical course's copy of
+        // a Seafile file the course already holds is hidden there, an older course's is not.
+        $identical = $this->documentRepository->countIdenticalExtrasByCategory(
+            $from,
+            $from->getIdenticalCourses()->getValues()
+        );
+        $older = $this->documentRepository->countByCategoryForCourses($from->getOldCourses()->getValues());
+        $related = $identical;
+        foreach ($older as $categoryId => $count) {
+            $related[$categoryId] = ($related[$categoryId] ?? 0) + $count;
+        }
+        $to->relatedDocumentCounts = $related;
 
         return $to;
     }
