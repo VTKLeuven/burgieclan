@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\ApiResource\CourseApi;
 use App\ApiResource\DocumentApi;
 use App\ApiResource\ExamQuestionSearchResult;
+use App\Constants\Feature;
 use App\ApiResource\ModuleApi;
 use App\ApiResource\ProgramApi;
 use App\ApiResource\SearchApi;
@@ -17,6 +18,7 @@ use App\Entity\Program;
 use App\Repository\CourseRepository;
 use App\Repository\DocumentRepository;
 use App\Repository\ExamQuestionRepository;
+use App\Service\Feature\FeatureFlags;
 use App\Repository\ModuleRepository;
 use App\Repository\ProgramRepository;
 use App\Utils\SearchSnippet;
@@ -33,6 +35,7 @@ class SearchController extends AbstractController
         private readonly DocumentRepository $documentRepository,
         private readonly ExamQuestionRepository $examQuestionRepository,
         private readonly MicroMapperInterface $microMapper,
+        private readonly FeatureFlags $flags,
     ) {}
 
     public function __invoke(Request $request)
@@ -43,7 +46,9 @@ class SearchController extends AbstractController
         $modules = $this->moduleRepository->findBySearchQuery($searchText);
         $programs = $this->programRepository->findBySearchQuery($searchText);
         $documents = $this->documentRepository->findBySearchQuery($searchText);
-        $examQuestions = $this->examQuestionRepository->findBySearchQuery($searchText);
+        $examQuestions = $this->flags->isEnabled(Feature::EXAM_RECONSTRUCTIONS)
+            ? $this->examQuestionRepository->findBySearchQuery($searchText)
+            : [];
 
         $searchApi = new SearchApi();
         $searchApi->courses = array_map(

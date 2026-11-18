@@ -2,6 +2,7 @@
 
 namespace App\Tests\Api;
 
+use App\Constants\Feature;
 use App\Entity\Exam;
 use App\Entity\ExamQuestion;
 use App\Entity\User;
@@ -23,6 +24,13 @@ use Zenstruck\Browser\KernelBrowser;
  */
 class ExamQuestionCommentResourceTest extends ApiTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Off by default; FeatureFlagTest covers the switched-off side.
+        self::enableFeature(Feature::EXAM_RECONSTRUCTIONS);
+    }
+
     /** @var list<array{url: string, body: string}> */
     private array $collabRequests = [];
 

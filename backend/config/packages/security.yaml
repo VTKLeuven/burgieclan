@@ -109,6 +109,7 @@ security:
         - { path: ^/api/auth, roles: PUBLIC_ACCESS } # Allows accessing the auth endpoints
         - { path: ^/api/pages, roles: PUBLIC_ACCESS } # Allows accessing the public available pages (see PageVoter)
         - { path: ^/api/healthcheck, roles: PUBLIC_ACCESS } # Allows accessing the healthcheck endpoint
+        - { path: ^/api/features$, roles: PUBLIC_ACCESS } # Which features are switched on, read on every page (FeatureController)
         - { path: ^/api/study_planner/feed/, roles: PUBLIC_ACCESS } # Exported calendars: the token in the link is the key (StudyPlannerFeedController)
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY } # Restricts access to all api endpoints for not logged-in users
         - { path: ^/files/download, roles: IS_AUTHENTICATED_REMEMBERED } # Restricts access to download endpoint for not logged-in users

@@ -2,6 +2,7 @@
 
 namespace App\Tests\Api;
 
+use App\Constants\Feature;
 use App\Entity\User;
 use App\Factory\ExamFactory;
 use App\Factory\UserFactory;
@@ -20,6 +21,13 @@ use Zenstruck\Browser\KernelBrowser;
 
 class CollabTokenTest extends ApiTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Off by default; FeatureFlagTest covers the switched-off side.
+        self::enableFeature(Feature::EXAM_RECONSTRUCTIONS);
+    }
+
     private const SECRET = 'test-collab-secret-0123456789abcdef0123456789';
 
     public function testRequiresLogin(): void

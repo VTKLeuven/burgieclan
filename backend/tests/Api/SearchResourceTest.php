@@ -2,6 +2,7 @@
 
 namespace App\Tests\Api;
 
+use App\Constants\Feature;
 use App\Entity\Exam;
 use App\Factory\CourseFactory;
 use App\Factory\DocumentFactory;
@@ -12,6 +13,13 @@ use App\Service\Collab\CollabDocumentStore;
 
 class SearchResourceTest extends ApiTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Off by default; FeatureFlagTest covers the switched-off side.
+        self::enableFeature(Feature::EXAM_RECONSTRUCTIONS);
+    }
+
     public function testSearch(): void
     {
         CourseFactory::createMany(5);

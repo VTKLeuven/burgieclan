@@ -140,6 +140,9 @@ class DashboardController extends AbstractDashboardController
         }
         yield $faqMenu;
 
+        yield MenuItem::linkTo(FeatureFlagCrudController::class, 'Features', 'fa-solid fa-toggle-on')
+            ->setPermission(User::ROLE_ADMIN);
+
         yield MenuItem::section('Frontend');
         // Was '/', which only worked because nginx puts both apps on one origin in production
         // (@see .docker/nginx.conf) — locally the backend and frontend are separate ports, so '/'

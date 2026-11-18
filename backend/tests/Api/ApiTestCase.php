@@ -2,7 +2,10 @@
 
 namespace App\Tests\Api;
 
+use App\Constants\Feature;
+use App\Entity\FeatureFlag;
 use App\Factory\UserFactory;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Zenstruck\Browser\HttpOptions;
@@ -27,6 +30,16 @@ abstract class ApiTestCase extends KernelTestCase
     {
         $user = UserFactory::createOne(['plainPassword' => 'password']);
         $this->token = $this->getToken($user->getUsername(), 'password');
+    }
+
+    /**
+     * Switches a feature on for this test. Features are off without a row (App\Constants\Feature).
+     */
+    protected static function enableFeature(Feature $feature): void
+    {
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $entityManager->persist(new FeatureFlag($feature, true));
+        $entityManager->flush();
     }
 
     protected function getToken(string $username, string $password)
