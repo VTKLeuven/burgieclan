@@ -34,7 +34,14 @@ jobs:
       # Allow only advisories with no patched version yet, and say why each is harmless.
       - name: Run security audit
         env:
-          ALLOWED_ADVISORIES: ""
+          # One advisory ID per line.
+          #
+          # GHSA-fc5q-39xc-vjpf: picomatch ReDoS on repeated extglobs. Every version up to the
+          # latest (4.0.7) is listed and there is no fix; GitHub has since withdrawn the advisory.
+          # picomatch only runs at build and lint time (Sentry's Rollup plugin, ESLint's globbing)
+          # on glob patterns from our own config, never on user input.
+          ALLOWED_ADVISORIES: |
+            GHSA-fc5q-39xc-vjpf
         run: |
           npm audit --json > "$RUNNER_TEMP/audit.json" || true
           if ! jq -e 'has("vulnerabilities")' "$RUNNER_TEMP/audit.json" > /dev/null; then
