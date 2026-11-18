@@ -719,6 +719,14 @@
     },
     "study_planner": {
         "nav": "Planner",
+        "info": {
+            "button": "Hoe werkt de planner?",
+            "title": "Hoe werkt de planner?",
+            "link": "Koppel je lessenrooster één keer met de iCal-link uit KU Loket › Agenda › Agenda Sync.",
+            "marks": "Vink lessen af die je gevolgd hebt, verberg wat je niet volgt, en duid labo's of oefenzittingen aan als verplicht.",
+            "track": "Houd je deadlines en verplichte lessen bij, en zie per vak hoeveel lessen je al gevolgd hebt en hoeveel er nog komen.",
+            "subscribe": "Abonneer je via Toevoegen aan agenda in Google of Apple Agenda: daar zie je dan alleen wat voor jou telt."
+        },
         "title": "Planner",
         "load_failed": "Je planner kon niet geladen worden.",
         "sync_warning": "Het lessenrooster kon niet bijgewerkt worden: {{error}} Je ziet de lessen van de laatste synchronisatie.",

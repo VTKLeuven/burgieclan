@@ -719,6 +719,14 @@
     },
     "study_planner": {
         "nav": "Planner",
+        "info": {
+            "button": "How does the planner work?",
+            "title": "How does the planner work?",
+            "link": "Link your timetable once, with the iCal link from KU Loket › Agenda › Agenda Sync.",
+            "marks": "Tick off the classes you attended, hide the ones you don't follow, and mark labs or exercise sessions as mandatory.",
+            "track": "Keep track of your deadlines and mandatory sessions, and see per course how many classes you have done and how many are still to come.",
+            "subscribe": "Subscribe through Add to calendar in Google or Apple Calendar, so it only shows what matters to you."
+        },
         "title": "Planner",
         "load_failed": "Your planner could not be loaded.",
         "sync_warning": "The timetable could not be updated: {{error}} You are seeing the sessions from the last sync.",
