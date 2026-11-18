@@ -229,8 +229,11 @@ class DownloadZipResourceTest extends ApiTestCase
 
         // The browser rebooted the kernel, so work on a freshly loaded copy.
         $fresh = DocumentFactory::repository()->find($document->getId());
-        // The category is a folder inside the zip, so the old zip no longer matches.
-        $fresh->setCategory(DocumentCategoryFactory::createOne());
+        // The category is a folder inside the zip, so the old zip no longer matches. Named
+        // explicitly: the zip is keyed on the folder *name*, and the factory's default
+        // "(en)<random word>" draws from Faker's 249 lorem words, so about once in 250 runs
+        // it repeated the original category's name and the zip legitimately stayed the same.
+        $fresh->setCategory(DocumentCategoryFactory::createOne(['name_en' => 'Moved here']));
         save($fresh);
 
         $this->assertNotSame($first, $this->requestExport($payload), 'A moved document needs a new zip');
