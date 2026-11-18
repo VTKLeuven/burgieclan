@@ -27,11 +27,11 @@ export default function DocumentSiblingNav({ document }: { document: Document })
     const previous = documents[index - 1];
     const next = documents[index + 1];
 
-    const arrow = 'vtk-icon-button h-8 w-8';
+    const arrow = 'vtk-icon-button';
     const disabled = 'pointer-events-none opacity-40';
 
     return (
-        <div className="flex items-center gap-1.5">
+        <div className="mr-1 hidden items-center gap-0.5 sm:flex">
             {previous ? (
                 <ApiPrefetchLink
                     href={`/document/${previous.id}`}
@@ -51,7 +51,7 @@ export default function DocumentSiblingNav({ document }: { document: Document })
                 </span>
             )}
 
-            <span className="whitespace-nowrap text-xs tabular-nums text-vtk-muted">
+            <span className="whitespace-nowrap text-small text-fg-muted tabular">
                 {t('document.siblings.position', { index: index + 1, total: documents.length })}
             </span>
 

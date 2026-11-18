@@ -102,7 +102,7 @@ const ComboboxController: React.FC<ComboboxControllerProps> = ({
                             <ChevronDown className="h-5 w-5" aria-hidden="true" />
                         </Combobox.Button>
                         {open && (
-                            <Combobox.Options className="absolute z-10 mt-1.5 max-h-60 w-full overflow-auto text-base focus:outline-hidden sm:text-sm rounded-[14px] border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
+                            <Combobox.Options className="absolute z-10 mt-1.5 max-h-60 w-full overflow-auto text-base focus:outline-hidden sm:text-sm rounded-card border border-vtk-line bg-vtk-surface shadow-popover">
                                 {normalizedQuery.length < minimumQueryLength && (
                                     <div className="px-4 py-2 text-sm text-vtk-muted">
                                         {t('form.combo.minimum_query', { count: minimumQueryLength })}

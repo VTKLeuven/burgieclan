@@ -7,9 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-    return (
-        <div className="flex h-full w-full items-center justify-center">
-            <CoursePage />
-        </div>
-    );
+    return <CoursePage />;
 };

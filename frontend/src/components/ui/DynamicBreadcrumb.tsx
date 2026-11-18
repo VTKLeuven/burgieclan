@@ -1,17 +1,9 @@
 'use client';
 
-import { Fragment } from 'react';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import { Breadcrumbs, type Crumb } from '@/components/layout/PageHeader';
 import { useCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
-import Link from "next/link";
+import { GraduationCap } from 'lucide-react';
 import { useTranslation } from "react-i18next";
 import { localizedCourseName } from '@/utils/courseName';
 import { shortProgramName } from '@/utils/curriculumLabels';
@@ -21,14 +13,7 @@ import { shortProgramName } from '@/utils/curriculumLabels';
  * two groups are what orient a reader; the ones in between are collapsed to an ellipsis that
  * still links back to the programme.
  */
-const MAX_MODULES = 3;
-
-interface Crumb {
-    label: string;
-    title?: string;
-    href: string;
-    current?: boolean;
-}
+const MAX_MODULES = 2;
 
 /**
  * The trail from the home page down to whatever the reader is looking at, read straight from the
@@ -37,13 +22,12 @@ interface Crumb {
  * "Home > Courses > <course>" was the whole trail before, which skipped every part the reader
  * actually navigated through and left them unable to step back to the semester they came from.
  */
-export default function DynamicBreadcrumb() {
+export function useCurriculumCrumbs(): Crumb[] {
     const { t, i18n } = useTranslation();
     const { activePath, course, category, document: currentDocument } = useCurriculumLocation();
 
     const crumbs: Crumb[] = [
-        { label: t('home.title'), href: '/' },
-        { label: t('courses'), href: curriculumHref.programs() },
+        { label: t('courses'), href: curriculumHref.programs(), icon: <GraduationCap /> },
     ];
 
     if (activePath) {
@@ -90,34 +74,10 @@ export default function DynamicBreadcrumb() {
         });
     }
 
-    crumbs[crumbs.length - 1].current = true;
+    return crumbs;
+}
 
-    return (
-        <Breadcrumb>
-            {/* One line that scrolls sideways under pressure rather than wrapping to two: a
-                two-line kicker pushes the page title down and reads as a paragraph. */}
-            <BreadcrumbList className="flex-nowrap overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {crumbs.map((crumb, index) => (
-                    <Fragment key={`${crumb.href}:${index}`}>
-                        <BreadcrumbItem className="shrink-0">
-                            {crumb.current ? (
-                                <BreadcrumbPage className="block max-w-[20rem] truncate">{crumb.label}</BreadcrumbPage>
-                            ) : (
-                                <BreadcrumbLink asChild>
-                                    <Link
-                                        href={crumb.href}
-                                        title={crumb.title ?? crumb.label}
-                                        className="block max-w-[13rem] truncate"
-                                    >
-                                        {crumb.label}
-                                    </Link>
-                                </BreadcrumbLink>
-                            )}
-                        </BreadcrumbItem>
-                        {index < crumbs.length - 1 && <BreadcrumbSeparator className="shrink-0" />}
-                    </Fragment>
-                ))}
-            </BreadcrumbList>
-        </Breadcrumb>
-    );
+/** The curriculum trail for the page header, read from the curriculum location. */
+export default function DynamicBreadcrumb() {
+    return <Breadcrumbs crumbs={useCurriculumCrumbs()} />;
 }

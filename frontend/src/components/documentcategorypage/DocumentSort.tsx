@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown } from 'lucide-react';
 
 export type SortOption = {
     field: string;
@@ -62,7 +62,7 @@ const DocumentSort: React.FC<DocumentSortProps> = ({ currentSort, onSortChange }
     const currentFieldLabel = sortableFields.find(f => f.value === currentSort.field)?.label || t('document.sort-by');
 
     // Common button style to ensure consistent height
-    const buttonStyle = "h-10 flex items-center px-3 py-2 text-sm border focus:outline-hidden";
+    const buttonStyle = "h-8 flex items-center gap-1.5 border border-border-strong bg-surface px-2.5 text-body text-fg shadow-xs transition-colors hover:bg-surface-hover focus:outline-hidden focus-visible:ring-2 focus-visible:ring-focus";
 
     return (
         <div className="relative">
@@ -70,23 +70,25 @@ const DocumentSort: React.FC<DocumentSortProps> = ({ currentSort, onSortChange }
                 <div className="relative">
                     <button
                         onClick={() => setIsOpen(!isOpen)}
-                        className={`${buttonStyle} rounded-l-md hover:bg-vtk-paper`}
+                        className={`${buttonStyle} rounded-l-control`}
                         aria-haspopup="true"
                         aria-expanded={isOpen}
                     >
-                        <span>{currentFieldLabel}</span>
-                        <ChevronDown size={16} className="ml-1" />
+                        <ArrowUpDown size={16} className="text-icon" aria-hidden="true" />
+                        <span className="text-fg-muted">{t('document.sort-by')}</span>
+                        <span className="font-medium">{currentFieldLabel}</span>
+                        <ChevronDown size={14} className="text-icon" aria-hidden="true" />
                     </button>
 
                     {isOpen && (
-                        <div className="absolute right-0 z-10 mt-1.5 w-48 overflow-hidden rounded-[14px] border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
-                            <div className="py-1">
+                        <div className="absolute left-0 z-30 mt-1.5 w-52 overflow-hidden rounded-card border border-border bg-surface p-1 shadow-popover">
+                            <div>
                                 {sortableFields.map((field) => (
                                     <button
                                         key={field.value}
                                         onClick={() => handleFieldChange(field.value)}
-                                        className={`block w-full text-left px-4 py-2 text-sm hover:bg-vtk-paper-2 ${
-                                            currentSort.field === field.value ? 'bg-vtk-paper text-vtk-ink' : 'text-vtk-body'
+                                        className={`block h-8 w-full rounded-[8px] px-2 text-left text-body hover:bg-neutral-150 ${
+                                            currentSort.field === field.value ? 'font-medium text-fg' : 'text-fg-secondary'
                                         }`}
                                     >
                                         {field.label}
@@ -99,7 +101,7 @@ const DocumentSort: React.FC<DocumentSortProps> = ({ currentSort, onSortChange }
 
                 <button
                     onClick={toggleDirection}
-                    className={`${buttonStyle} border-l-0 rounded-r-md hover:bg-vtk-paper`}
+                    className={`${buttonStyle} -ml-px rounded-r-control px-2 text-icon`}
                     title={currentSort.direction === 'asc' ? t('document.sort-ascending') : t('document.sort-descending')}
                 >
                     {currentSort.direction === 'asc' ? (

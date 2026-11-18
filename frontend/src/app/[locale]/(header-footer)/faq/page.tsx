@@ -13,11 +13,5 @@ export default async function Faq({ params }: { params: Params }) {
 
     await initTranslations(locale);
 
-    return (
-        <div className="flex flex-1 h-full">
-            <div className="flex flex-1">
-                <FaqPage />
-            </div>
-        </div>
-    );
+    return <FaqPage />;
 }

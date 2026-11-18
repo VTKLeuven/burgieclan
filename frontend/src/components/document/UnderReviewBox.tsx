@@ -9,13 +9,13 @@ import { useTranslation } from "react-i18next";
 export default function UnderReviewBox({ action }: { action?: React.ReactNode }) {
     const { t } = useTranslation();
     return (
-        <div className="rounded-xl bg-vtk-paper-2 p-4">
+        <div className="rounded-card border border-warning-border bg-warning-bg px-4 py-3">
             <div className="flex flex-wrap items-center gap-3">
                 <div className="shrink-0">
-                    <TriangleAlert aria-hidden="true" className="size-5 text-vtk-yellow" />
+                    <TriangleAlert aria-hidden="true" className="size-4 text-warning" />
                 </div>
                 <div className="min-w-0 grow">
-                    <h3 className="text-sm font-medium text-vtk-ink">
+                    <h3 className="m-0 text-body font-medium text-warning-text">
                         {t("document.under-review-warning")}
                     </h3>
                 </div>

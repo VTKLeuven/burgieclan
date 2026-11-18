@@ -13,12 +13,5 @@ export default async function Homepage({ params }: { params: Params }) {
 
     await initTranslations(locale);
 
-    return (
-        <div className="flex flex-1 h-full">
-            {/* Main Content */}
-            <div className="flex flex-1">
-                <HomePage />
-            </div>
-        </div>
-    );
+    return <HomePage />;
 }

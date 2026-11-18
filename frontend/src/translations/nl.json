@@ -119,7 +119,8 @@
                     "type": "Bestandstype wordt niet ondersteund"
                 }
             }
-        }
+        },
+        "drag_drop_bar": "Sleep een bestand hierheen, of klik om een document toe te voegen"
     },
     "home": {
         "title": "Home",
@@ -157,7 +158,16 @@
         "favorite_curriculum": "Je favorieten",
         "favorite_curriculum_all": "Bekijk alle favorieten",
         "favorite_program_label": "Opleiding",
-        "favorite_module_label": "Module"
+        "favorite_module_label": "Module",
+        "greeting_morning": "Goedemorgen, {{name}}",
+        "greeting_afternoon": "Goedemiddag, {{name}}",
+        "greeting_evening": "Goedenavond, {{name}}",
+        "greeting_night": "Hallo, {{name}}",
+        "summary_courses_one": "{{count}} vak vastgezet",
+        "summary_courses_other": "{{count}} vakken vastgezet",
+        "all_courses": "Alle vakken",
+        "no_courses_yet": "Zet de vakken die je dit jaar volgt vast met een ster, dan staan ze hier en in de zijbalk.",
+        "find_courses": "Vakken zoeken"
     },
     "form": {
         "errors": {
@@ -261,9 +271,11 @@
         "hide-empty-categories": "Verberg lege mappen",
         "no-documents-yet": "Er staan nog geen documenten bij dit vak.",
         "placement": {
-            "other_one": "ook in 1 andere richting",
-            "other_other": "ook in {{count}} andere richtingen"
-        }
+            "other_one": "Ook in 1 andere richting",
+            "other_other": "Ook in {{count}} andere richtingen",
+            "label": "Opleiding"
+        },
+        "ects-sheet": "ECTS-fiche"
     },
     "download": {
         "download": "Download",
@@ -316,7 +328,20 @@
         "meta-modules_one": "onderdeel",
         "meta-modules_other": "onderdelen",
         "meta-courses_one": "vak",
-        "meta-courses_other": "vakken"
+        "meta-courses_other": "vakken",
+        "subtitle_one": "{{count}} richting. Zoek een vak of blader per richting.",
+        "subtitle_other": "{{count}} richtingen. Zoek een vak of blader per richting.",
+        "filters": "Filters",
+        "credits-short": "SP",
+        "group": {
+            "bachelor": "Bachelor",
+            "master": "Master",
+            "other": "Andere opleidingen"
+        },
+        "meta-modules-count_one": "{{count}} onderdeel",
+        "meta-modules-count_other": "{{count}} onderdelen",
+        "meta-courses-count_one": "{{count}} vak",
+        "meta-courses-count_other": "{{count}} vakken"
     },
     "account": {
         "menu": "Gebruikersmenu",
@@ -347,7 +372,12 @@
             "disabled": "Uitgeschakeld",
             "update_success": "Instelling bijgewerkt",
             "update_error": "Bijwerken mislukt"
-        }
+        },
+        "tabs": {
+            "favorites": "Favorieten",
+            "settings": "Instellingen"
+        },
+        "logout_description": "Meld je af op dit toestel."
     },
     "document": {
         "name": "Naam",
@@ -419,7 +449,11 @@
             "previous": "Vorig document",
             "next": "Volgend document",
             "position": "{{index}} van {{total}}"
-        }
+        },
+        "date": "Toegevoegd",
+        "size": "Grootte",
+        "votes": "Stemmen",
+        "details": "Details"
     },
     "pagination": {
         "previous": "Vorige",
@@ -667,5 +701,14 @@
                 "submit": "Dag verwijderen"
             }
         }
+    },
+    "shell": {
+        "my_account": "Mijn account",
+        "my_courses": "Mijn vakken",
+        "favorite_documents": "Favoriete documenten",
+        "browse": "Bekijk alle",
+        "no_courses": "Markeer een vak met een ster om het hier vast te zetten.",
+        "show_all": "Alle {{count}} bekijken",
+        "feedback": "Feedback geven"
     }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
-import CollapsibleSection from '@/components/ui/CollapsibleSection';
+import SectionHeader from '@/components/ui/SectionHeader';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import { useTranslation } from 'react-i18next';
 
@@ -37,30 +37,25 @@ const FavoriteList: React.FC<FavoriteListProps> = ({
     };
 
     return (
-        <CollapsibleSection
-            header={
-                <h2 className="m-0 flex items-baseline gap-2 text-base font-semibold tracking-tight text-vtk-ink">
-                    {title}
-                    <span className="text-[13px] font-normal text-vtk-muted">({items.length})</span>
-                </h2>
-            }
-        >
+        <section>
+            <SectionHeader title={title} count={items.length} as="h3" />
             {items && items.length > 0 ? (
-                <ul className="vtk-rows m-0 list-none p-0">
+                <ul className="vtk-list m-0 list-none p-0">
                     {items.map((item, index) => (
-                        <li key={index} className="vtk-row vtk-row-click px-5">
+                        <li key={index} className="group/row vtk-list-row vtk-list-row-hover min-h-11 py-0 pr-2">
                             <ApiPrefetchLink
                                 href={item.redirectUrl}
                                 apiEndpoints={apiEndpointFor(item)}
-                                className="min-w-0 flex-1 truncate text-sm text-vtk-body hover:text-vtk-ink"
+                                className="flex min-h-11 min-w-0 flex-1 items-center gap-2"
                             >
-                                {item.name}
-                                {item.code && <span className="ml-1.5 text-[13px] text-vtk-muted">[{item.code}]</span>}
+                                <span className="min-w-0 truncate text-body text-fg">{item.name}</span>
+                                {item.code && <span className="shrink-0 text-small text-fg-muted tabular">{item.code}</span>}
                             </ApiPrefetchLink>
                             <FavoriteButton
                                 itemId={item.id}
                                 itemType={item.type}
                                 size={16}
+                                className="vtk-icon-button"
                                 onToggle={(isFavorite) => {
                                     if (!isFavorite && onRemoveItem) {
                                         onRemoveItem(index);
@@ -71,9 +66,9 @@ const FavoriteList: React.FC<FavoriteListProps> = ({
                     ))}
                 </ul>
             ) : (
-                <p className="vtk-empty m-0">{emptyMessage}</p>
+                <p className="m-0 rounded-card border border-dashed border-border-strong px-4 py-4 text-small text-fg-muted">{emptyMessage}</p>
             )}
-        </CollapsibleSection>
+        </section>
     );
 };
 

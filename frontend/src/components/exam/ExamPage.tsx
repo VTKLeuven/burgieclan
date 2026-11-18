@@ -5,13 +5,14 @@ import ErrorPage from '@/components/error/ErrorPage';
 import ExamEditor from '@/components/exam/ExamEditor';
 import Loading from '@/components/loading/LoadingPage';
 import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
+import PageHeader from '@/components/layout/PageHeader';
 import PageHead from '@/components/ui/PageHead';
 import { readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { Course, Exam } from '@/types/entities';
 import { convertToCourse, convertToExam } from '@/utils/convertToEntity';
 import { localizedCourseName } from '@/utils/courseName';
 import { examCalendarYear } from '@/utils/examPeriods';
-import { Copy, Lock, PencilLine } from 'lucide-react';
+import { Copy, Lock, NotebookPen, PencilLine } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -95,39 +96,42 @@ export default function ExamPage() {
     }
     if (!exam || !course) {
         return (
-            <div className="flex h-full w-full items-center justify-center">
+            <>
+                <PageHeader breadcrumb={<DynamicBreadcrumb />} />
                 <Loading />
-            </div>
+            </>
         );
     }
 
     const editableUntil = exam.editableUntil?.toLocaleDateString(i18n.language, { day: 'numeric', month: 'long', year: 'numeric' });
 
     return (
-        <div className="vtk-shell pb-16">
+        <>
+        <PageHeader breadcrumb={<DynamicBreadcrumb />} />
+        <div className="vtk-shell vtk-shell-narrow">
             <PageHead
-                kicker={<DynamicBreadcrumb />}
+                icon={NotebookPen}
                 title={title}
                 subtitle={
-                    <Link href={`/course/${course.id}`} className="vtk-link">{courseName}</Link>
+                    <Link href={`/course/${course.id}`} className="hover:text-fg hover:underline">{courseName}</Link>
                 }
             >
-                <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-vtk-body">
-                    <span className="vtk-badge vtk-badge-muted">{exam.academicYear}</span>
+                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-small text-fg-secondary">
+                    <span className="vtk-badge vtk-badge-muted tabular">{exam.academicYear}</span>
                     {exam.editable ? (
                         <span className="inline-flex items-center gap-2">
-                            <PencilLine size={15} className="text-vtk-muted" aria-hidden="true" />
+                            <PencilLine size={15} className="text-icon" aria-hidden="true" />
                             {t('exam.page.editable-until', { date: editableUntil })}
                         </span>
                     ) : (
                         <span className="inline-flex items-center gap-2">
-                            <Lock size={15} className="text-vtk-muted" aria-hidden="true" />
+                            <Lock size={15} className="text-icon" aria-hidden="true" />
                             {t('exam.page.locked')}
                         </span>
                     )}
                     {exam.copiedFromId !== undefined && (
                         <span className="inline-flex items-center gap-2">
-                            <Copy size={15} className="text-vtk-muted" aria-hidden="true" />
+                            <Copy size={15} className="text-icon" aria-hidden="true" />
                             <Link href={`/course/${course.id}/exams/${exam.copiedFromId}`} className="vtk-link">
                                 {t('exam.page.copied-from')}
                             </Link>
@@ -136,7 +140,7 @@ export default function ExamPage() {
                 </div>
             </PageHead>
 
-            <p className="m-0 mt-6 max-w-[70ch] text-sm leading-relaxed text-vtk-muted">
+            <p className="m-0 mt-6 max-w-[70ch] text-body text-fg-muted">
                 {t('exam.page.intro')}
             </p>
 
@@ -146,5 +150,6 @@ export default function ExamPage() {
 
             <p className="vtk-help mt-6 max-w-[70ch]">{t('exam.page.privacy')}</p>
         </div>
+        </>
     );
 }

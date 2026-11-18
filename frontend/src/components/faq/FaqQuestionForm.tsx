@@ -2,7 +2,8 @@
 
 import { useToast } from '@/components/ui/Toast';
 import { useApi } from '@/hooks/useApi';
-import { CheckCircle2, Mail, Send } from 'lucide-react';
+import SectionHeader from '@/components/ui/SectionHeader';
+import { CheckCircle2, Mail, MessageCircleQuestion, Send } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -59,12 +60,12 @@ export default function FaqQuestionForm() {
 
     if (isSubmitted) {
         return (
-            <div className="vtk-panel vtk-panel-muted px-6 py-5">
+            <div className="rounded-card border border-success-border bg-success-bg px-4 py-4">
                 <div className="flex items-start gap-3">
-                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-vtk-ink" aria-hidden="true" />
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
                     <div>
-                        <h2 className="text-lg font-semibold text-vtk-ink">{t('faq.ask_success_title')}</h2>
-                        <p className="mt-1.5 text-[14px] leading-relaxed text-vtk-body">
+                        <h2 className="m-0 text-body font-semibold text-fg">{t('faq.ask_success_title')}</h2>
+                        <p className="m-0 mt-1 text-body text-fg-secondary">
                             {t('faq.ask_success_description')}
                         </p>
                         <button
@@ -81,11 +82,15 @@ export default function FaqQuestionForm() {
     }
 
     return (
-        <div className="vtk-panel vtk-panel-muted px-6 py-5">
-            <h2 className="text-lg font-semibold text-vtk-ink">{t('faq.ask_title')}</h2>
-            <p className="mt-1.5 text-[14px] leading-relaxed text-vtk-body">{t('faq.ask_description')}</p>
+        <section aria-labelledby="faq-ask-heading">
+            <SectionHeader
+                id="faq-ask-heading"
+                icon={<MessageCircleQuestion />}
+                title={t('faq.ask_title')}
+                description={t('faq.ask_description')}
+            />
 
-            <form onSubmit={handleSubmit} className="mt-3.5">
+            <form onSubmit={handleSubmit} className="rounded-card border border-border bg-surface p-3">
                 <label htmlFor="faq-question" className="sr-only">
                     {t('faq.ask_label')}
                 </label>
@@ -105,7 +110,7 @@ export default function FaqQuestionForm() {
                     {/* Mail fallback sits opposite the submit button so both routes read as equals. */}
                     <a
                         href={mailtoHref}
-                        className="inline-flex items-center gap-1.5 text-xs text-vtk-muted underline-offset-2 transition-colors hover:text-vtk-ink hover:underline"
+                        className="inline-flex items-center gap-1.5 text-small text-fg-muted underline-offset-2 transition-colors hover:text-fg hover:underline"
                     >
                         <Mail className="h-3.5 w-3.5" aria-hidden="true" />
                         {t('faq.ask_mail')}
@@ -113,9 +118,9 @@ export default function FaqQuestionForm() {
 
                     <div className="ml-auto flex items-center gap-3">
                         {showLengthHint && (
-                            <p className="text-xs text-vtk-muted">{t('faq.ask_hint')}</p>
+                            <p className="m-0 text-caption text-fg-muted">{t('faq.ask_hint')}</p>
                         )}
-                        <button type="submit" disabled={!canSubmit} className="vtk-button vtk-button-accent">
+                        <button type="submit" disabled={!canSubmit} className="vtk-button vtk-button-primary vtk-button-sm">
                             {isSubmitting ? (
                                 <>
                                     <span className="spinner" />
@@ -131,6 +136,6 @@ export default function FaqQuestionForm() {
                     </div>
                 </div>
             </form>
-        </div>
+        </section>
     );
 }

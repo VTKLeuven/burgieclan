@@ -1,6 +1,5 @@
 'use client';
 
-import Loading from '@/components/loading/LoadingPage';
 import Badge from '@/components/ui/Badge';
 import DownloadButton from '@/components/ui/DownloadButton';
 import FavoriteButton from '@/components/ui/FavoriteButton';
@@ -9,7 +8,8 @@ import { useApi } from '@/hooks/useApi';
 import type { Course, Document, DocumentCategory } from '@/types/entities';
 import { convertToDocument } from '@/utils/convertToEntity';
 import { captureException } from '@sentry/nextjs';
-import { ChevronRight } from 'lucide-react';
+import SectionHeader from '@/components/ui/SectionHeader';
+import { ChevronRight, FileText, Star } from 'lucide-react';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -79,7 +79,9 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
     }, [user?.favoriteDocuments, course.id, category.id, userLoading, request]);
 
     if (userLoading || loading) {
-        return <div className="my-6"><Loading /></div>;
+        // Nothing until it is known whether there is anything to show, so the list below does
+        // not jump down and back up.
+        return null;
     }
 
     if (favoriteDocuments.length === 0) {
@@ -87,81 +89,55 @@ const FavoriteDocuments: React.FC<FavoriteDocumentsProps> = ({ category, course 
     }
 
     return (
-        <div className="mt-3 rounded-lg">
-            <div className="flex justify-between items-center">
-                <h3>{t('course-page.documents.header-favorites')}</h3>
-                {favoriteDocumentCount > 3 && (
-                    <Link
-                        href="/account"
-                        className="flex items-center text-sm text-vtk-navy hover:text-vtk-ink"
-                    >
+        <section aria-labelledby="favorite-documents-heading">
+            <SectionHeader
+                id="favorite-documents-heading"
+                icon={<Star className="fill-star text-star!" />}
+                title={t('course-page.documents.header-favorites')}
+                count={favoriteDocumentCount}
+                action={favoriteDocumentCount > 4 && (
+                    <Link href="/account" className="flex items-center gap-1 text-small font-medium text-fg-muted hover:text-fg">
                         {t('course-page.documents.favorites-see-all')}
-                        <ChevronRight className="h-4 w-4 ml-1" />
+                        <ChevronRight className="size-4" aria-hidden="true" />
                     </Link>
                 )}
-            </div>
+            />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto pb-2">
+            <div className="vtk-list">
                 {favoriteDocuments.slice(0, 4).map((document) => (
-                    <div
-                        key={document.id}
-                        className="vtk-panel relative p-4"
-                    >
-                        <Link
-                            href={`/document/${document.id}`}
-                            className="block"
-                        >
-                            <div className="flex items-center gap-2">
-                                <h4 className="font-medium text-vtk-ink truncate">{document.name}</h4>
-                                {document.underReview && (
-                                    <Badge text={t('document.under_review')} color="yellow" />
-                                )}
-                            </div>
-
-                            <div className="text-xs text-vtk-muted flex justify-between mt-1">
-                                <p className="whitespace-nowrap">
-                                    {document.updatedAt && new Date(document.updatedAt).toLocaleString('en-GB', {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        year: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: false
-                                    })}
-                                </p>
-                                <p className="truncate ml-2">
-                                    {document.anonymous
-                                        ? t('course-page.documents.anonymous')
-                                        : (document.creator?.fullName || document.creator?.username)}
-                                </p>
-                            </div>
+                    <div key={document.id} className="group/row vtk-list-row vtk-list-row-hover">
+                        <FileText className="size-4 shrink-0 text-icon" aria-hidden="true" />
+                        <Link href={`/document/${document.id}`} className="min-w-0 flex-1 truncate text-body font-medium text-fg hover:underline">
+                            {document.name}
                         </Link>
-
-                        <div className="flex justify-between pt-3 border-t border-vtk-line">
+                        {document.underReview && (
+                            <Badge text={t('document.under_review')} color="yellow" />
+                        )}
+                        <span className="hidden max-w-40 shrink-0 truncate text-small text-fg-muted sm:block">
+                            {document.anonymous
+                                ? t('course-page.documents.anonymous')
+                                : (document.creator?.fullName || document.creator?.username)}
+                        </span>
+                        <span className="flex shrink-0 items-center gap-0.5">
                             <FavoriteButton
                                 itemId={document.id}
                                 itemType="document"
+                                className="vtk-icon-button"
                                 onToggle={(isFavorite) => {
                                     if (!isFavorite) {
-                                        // Remove from local state when unfavorited
-                                        setFavoriteDocuments(prev =>
-                                            prev.filter(doc => doc.id !== document.id)
-                                        );
+                                        setFavoriteDocuments(prev => prev.filter(doc => doc.id !== document.id));
                                         setFavoriteDocumentCount(prev => Math.max(0, prev - 1));
                                     }
                                 }}
                             />
-
-                            <DownloadButton 
-                                documents={[document]} 
-                                className="vtk-icon-button h-8 w-8"
-                                size={16}
-                            />
-                        </div>
+                            <span className="reveal-on-hover">
+                                <DownloadButton documents={[document]} size={16} />
+                            </span>
+                        </span>
                     </div>
                 ))}
             </div>
-        </div>
+        </section>
     );
 };
 

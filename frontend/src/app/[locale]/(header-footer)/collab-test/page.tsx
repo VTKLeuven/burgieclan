@@ -1,5 +1,6 @@
 import initTranslations from "@/app/i18n";
 import CollabEditor from "@/components/collab/CollabEditor";
+import PageHeader from "@/components/layout/PageHeader";
 import PageHead from "@/components/ui/PageHead";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -27,15 +28,14 @@ export default async function CollabTestPage({ params }: { params: Params }) {
     const { t } = await initTranslations(locale);
 
     return (
-        <div className="vtk-shell pb-16">
-            <PageHead
-                kicker={t('collab.kicker')}
-                title={t('collab.title')}
-                subtitle={t('collab.subtitle')}
-            />
-            <div className="mt-7">
-                <CollabEditor documentName="collab-test" />
+        <>
+            <PageHeader crumbs={[{ label: t('collab.kicker') }]} />
+            <div className="vtk-shell vtk-shell-narrow">
+                <PageHead title={t('collab.title')} subtitle={t('collab.subtitle')} />
+                <div className="mt-6">
+                    <CollabEditor documentName="collab-test" />
+                </div>
             </div>
-        </div>
+        </>
     );
 }

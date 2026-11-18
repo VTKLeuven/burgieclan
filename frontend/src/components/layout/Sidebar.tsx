@@ -1,389 +1,369 @@
 'use client';
 
+import { recordOldBurgieclanClick } from '@/actions/analytics';
+import { logOut } from '@/actions/auth';
+import FeedbackDialog from '@/components/header/FeedbackDialog';
+import LanguageSwitcher from '@/components/header/LanguageSwitcher';
 import { useCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
-import CurriculumTree from '@/components/curriculum/CurriculumTree';
-import ItemList from '@/components/layout/ItemList';
-import SidebarFolderDocuments from '@/components/layout/SidebarFolderDocuments';
-import CreateDocumentButton from '@/components/ui/CreateDocumentButton';
-import { useUser } from "@/components/UserContext";
-import { useSiblingDocuments } from '@/hooks/useSiblingDocuments';
-import type { Course, Document } from "@/types/entities";
-import { ChevronDown, File, FolderOpen, FolderTree, PanelLeft, PanelLeftClose, Star } from 'lucide-react';
-import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
-import { useTranslation } from 'react-i18next';
+import CourseBadge from '@/components/layout/CourseBadge';
+import { openSearch } from '@/components/layout/navEvents';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useUser } from '@/components/UserContext';
+import { cn } from '@/lib/utils';
 import { localizedCourseName } from '@/utils/courseName';
+import {
+    ArrowUpRight,
+    ChevronRight,
+    ChevronsUpDown,
+    CircleHelp,
+    ExternalLink,
+    FileText,
+    GraduationCap,
+    House,
+    LogOut,
+    MessageSquareText,
+    Search,
+    Shield,
+    UserRound,
+} from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { Suspense, useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
-const DEFAULT_SIDEBAR_WIDTH = 304;
-const MIN_SIDEBAR_WIDTH = 256;
-const MAX_SIDEBAR_WIDTH = 560;
-const SIDEBAR_WIDTH_STORAGE_KEY = 'burgieclan:sidebar-width';
-const SIDEBAR_SECTIONS_STORAGE_KEY = 'burgieclan:sidebar-sections';
+/** How many favourite documents the sidebar lists before it points to the account page. */
+const MAX_DOCUMENTS = 6;
 
-type SidebarMode = 'home' | 'curriculum' | 'standard';
-type ExpandedSections = { curriculum: boolean; courses: boolean; documents: boolean };
+function stripLocale(pathname: string) {
+    return pathname.replace(/^\/(?:en|nl)(?=\/|$)/, '') || '/';
+}
 
-const parseStoredSections = (
-  raw: string | null
-): Partial<Record<SidebarMode, ExpandedSections>> | null => {
-  if (!raw) return null;
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    if (typeof parsed !== 'object' || parsed === null) return null;
-    return parsed as Partial<Record<SidebarMode, ExpandedSections>>;
-  } catch {
-    return null;
-  }
-};
+function NavItem({
+    href,
+    icon,
+    label,
+    active,
+    onNavigate,
+    trailing,
+    external,
+    title,
+    onClick,
+}: {
+    href: string;
+    icon: ReactNode;
+    label: string;
+    active?: boolean;
+    onNavigate?: () => void;
+    trailing?: ReactNode;
+    external?: boolean;
+    title?: string;
+    onClick?: () => void;
+}) {
+    return (
+        <Link
+            href={href}
+            onClick={() => {
+                onClick?.();
+                onNavigate?.();
+            }}
+            target={external ? '_blank' : undefined}
+            rel={external ? 'noopener noreferrer' : undefined}
+            aria-current={active ? 'page' : undefined}
+            title={title}
+            className={cn(
+                'group flex h-7 items-center gap-2.5 rounded-control px-2.5 text-small font-medium text-fg-nav',
+                'transition-colors duration-[var(--dur-fast)] ease-out',
+                '[&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-icon-strong',
+                active ? 'bg-sidebar-active text-fg' : 'hover:bg-sidebar-hover',
+            )}
+        >
+            {icon}
+            <span className="min-w-0 flex-1 truncate">{label}</span>
+            {trailing}
+        </Link>
+    );
+}
 
-const clampSidebarWidth = (width: number) => Math.min(
-  MAX_SIDEBAR_WIDTH,
-  Math.max(MIN_SIDEBAR_WIDTH, Math.round(width))
-);
+function SectionLabel({ children, action }: { children: ReactNode; action?: ReactNode }) {
+    return (
+        <div className="mt-4 mb-0.5 flex h-6 items-center justify-between px-2.5">
+            <span className="text-caption font-medium text-fg-muted">{children}</span>
+            {action}
+        </div>
+    );
+}
 
-const mapCoursesToItems = (courses: Course[], locale: string) => {
-  return courses.map(course => ({
-    id: course.id,
-    name: localizedCourseName(course, locale),
-    code: course.code,
-    redirectUrl: `/course/${course.id}`,
-    type: 'course' as const
-  }));
-};
+function initials(name?: string) {
+    if (!name) return '?';
+    const parts = name.trim().split(/\s+/);
+    return ((parts[0]?.[0] ?? '') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+}
 
-const mapDocumentsToItems = (documents: Document[]) => {
-  return documents.map(document => ({
-    id: document.id,
-    name: document.name,
-    redirectUrl: `/document/${document.id}`,
-    type: 'document' as const
-  }));
-};
+export function SidebarBrand() {
+    const { i18n } = useTranslation();
+    return (
+        <Link
+            href={`/${i18n.language === 'nl' ? '' : i18n.language}`}
+            className="flex h-11 items-center gap-2.5 rounded-control px-1"
+        >
+            <Image
+                src="/images/logos/burgieclan-cloud-navy.svg"
+                alt=""
+                aria-hidden="true"
+                width={52}
+                height={29}
+                className="h-[26px] w-auto"
+                priority
+            />
+            <span className="text-[20px] leading-7 font-semibold tracking-[-0.02em] text-fg">Burgieclan</span>
+        </Link>
+    );
+}
 
 /**
- * The left rail: the curriculum folder tree, with the reader's favourites tucked underneath.
- *
- * Every block is `shrink-0`. Without it the tree is a flex item that the rail happily squeezes
- * to a fraction of its height while its rows keep painting at full size - which is exactly how
- * the folder tree ended up printed on top of the favourites list.
- *
- * My Courses starts open on Home, where favourites are the rail's primary navigation. It stays
- * collapsed next to the curriculum tree so both course lists do not compete for the same space.
+ * The app's navigation, sitting directly on the grey canvas next to the white panel (Dopl's
+ * shell). Top to bottom: brand, search, the few places there are, the reader's own courses and
+ * documents, and the account menu. Everything that used to live in the navy header and the
+ * footer is in here now, so a page never has to say where else you can go.
  */
-const NavigationSidebar = () => {
-  const { user } = useUser();
-  const { t, i18n } = useTranslation();
-  const pathname = usePathname();
-  const pathWithoutLocale = pathname.replace(/^\/(?:en|nl)(?=\/|$)/, '') || '/';
-  const isHome = pathWithoutLocale === '/';
-  const showCurriculumNavigator = pathWithoutLocale === '/courses'
-    || pathWithoutLocale.startsWith('/courses/')
-    || pathWithoutLocale.startsWith('/course/')
-    || pathWithoutLocale.startsWith('/document/');
-  const sidebarMode = (isHome ? 'home' : showCurriculumNavigator ? 'curriculum' : 'standard') as SidebarMode;
-  const defaultExpandedSections: ExpandedSections = { curriculum: false, courses: isHome, documents: false };
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
-  const [isResizing, setIsResizing] = useState(false);
-  const sidebarWidthRef = useRef(DEFAULT_SIDEBAR_WIDTH);
-  const resizeStartRef = useRef<{ pointerX: number; width: number } | null>(null);
-  const [expandedSectionsByMode, setExpandedSectionsByMode] = useState<Partial<Record<
-    SidebarMode,
-    ExpandedSections
-  >>>({});
-  const expandedSections = {
-    ...defaultExpandedSections,
-    ...expandedSectionsByMode[sidebarMode],
-  };
-  const { course, category, document } = useCurriculumLocation();
-  const hasFolderContext = Boolean(course && category);
-  const { documents: siblingDocuments, loading: siblingsLoading } = useSiblingDocuments(
-    hasFolderContext ? course?.id : undefined,
-    hasFolderContext ? category?.id : undefined
-  );
+export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+    const { t, i18n } = useTranslation();
+    const { user, isAdmin } = useUser();
+    const router = useRouter();
+    const path = stripLocale(usePathname());
+    const { course: currentCourse } = useCurriculumLocation();
+    const [feedbackOpen, setFeedbackOpen] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<'folder' | 'curriculum'>('folder');
-  const lastCategoryIdRef = useRef<number | undefined>(undefined);
+    const isActive = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`));
+    const inCurriculum = ['/courses', '/course/', '/document/'].some((p) => path === p || path.startsWith(p));
 
-  useEffect(() => {
-    if (category?.id !== undefined && category.id !== lastCategoryIdRef.current) {
-      lastCategoryIdRef.current = category.id;
-      setActiveTab('folder');
-    }
-  }, [category?.id]);
+    const courses = user?.favoriteCourses ?? [];
+    const documents = user?.favoriteDocuments ?? [];
+    const adminUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin`;
 
-  useEffect(() => {
-    const storedWidth = Number(window.localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY));
-    if (Number.isFinite(storedWidth) && storedWidth >= MIN_SIDEBAR_WIDTH) {
-      const nextWidth = clampSidebarWidth(storedWidth);
-      sidebarWidthRef.current = nextWidth;
-      // Reading browser-only preferences after hydration intentionally updates the initial width.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSidebarWidth(nextWidth);
-    }
+    const handleLogout = async () => {
+        await logOut();
+        router.push('/login');
+    };
 
-    const storedSections = parseStoredSections(window.localStorage.getItem(SIDEBAR_SECTIONS_STORAGE_KEY));
-    if (storedSections) {
-      setExpandedSectionsByMode(storedSections);
-    }
-  }, []);
+    return (
+        <nav aria-label="Burgieclan" className="flex h-full flex-col px-3 pt-3 pb-3">
+            <SidebarBrand />
 
-  const updateSidebarWidth = (width: number, persist = false) => {
-    const nextWidth = clampSidebarWidth(width);
-    sidebarWidthRef.current = nextWidth;
-    setSidebarWidth(nextWidth);
-    if (persist) {
-      window.localStorage.setItem(SIDEBAR_WIDTH_STORAGE_KEY, String(nextWidth));
-    }
-  };
-
-  const startResize = (event: PointerEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.currentTarget.setPointerCapture(event.pointerId);
-    resizeStartRef.current = { pointerX: event.clientX, width: sidebarWidthRef.current };
-    setIsResizing(true);
-  };
-
-  const resize = (event: PointerEvent<HTMLDivElement>) => {
-    if (!resizeStartRef.current) return;
-
-    updateSidebarWidth(
-      resizeStartRef.current.width + event.clientX - resizeStartRef.current.pointerX
-    );
-  };
-
-  const finishResize = (event: PointerEvent<HTMLDivElement>) => {
-    if (!resizeStartRef.current) return;
-
-    resizeStartRef.current = null;
-    setIsResizing(false);
-    window.localStorage.setItem(SIDEBAR_WIDTH_STORAGE_KEY, String(sidebarWidthRef.current));
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-  };
-
-  const resizeWithKeyboard = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-
-    event.preventDefault();
-    updateSidebarWidth(sidebarWidthRef.current + (event.key === 'ArrowRight' ? 16 : -16), true);
-  };
-
-  const toggleSection = (section: keyof ExpandedSections) => {
-    setExpandedSectionsByMode((previous) => {
-      const currentSections = {
-        ...defaultExpandedSections,
-        ...previous[sidebarMode],
-      };
-      const nextModeSections = {
-        ...currentSections,
-        [section]: !currentSections[section],
-      };
-      const next = {
-        ...previous,
-        [sidebarMode]: nextModeSections,
-      };
-      try {
-        window.localStorage.setItem(SIDEBAR_SECTIONS_STORAGE_KEY, JSON.stringify(next));
-      } catch {
-        // Ignore localStorage quota or access errors
-      }
-      return next;
-    });
-  };
-
-  const sectionButton =
-    'flex w-full shrink-0 items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-sm font-semibold text-vtk-ink transition-colors hover:bg-vtk-paper-2 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy';
-
-  // Home, FAQ, account and public content keep the original favourites sidebar. The curriculum
-  // tree is added only while the reader is actually browsing curriculum content.
-  return (
-    <aside className="sticky top-[72px] hidden shrink-0 self-start md:block">
-      <div
-        className={`relative flex h-[calc(100vh-72px)] flex-col border-r border-vtk-line bg-vtk-paper transition-[width] ${isResizing ? 'duration-0' : 'duration-300'}`}
-        style={{
-          width: isCollapsed
-            ? '4rem'
-            : `clamp(${MIN_SIDEBAR_WIDTH}px, ${sidebarWidth}px, min(${MAX_SIDEBAR_WIDTH}px, calc(100vw - 30rem)))`,
-        }}
-      >
-        {/* Collapse toggle */}
-        <button
-          type="button"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3.5 top-3.5 z-10 grid h-7 w-7 place-items-center rounded-full border border-vtk-line-2 bg-vtk-surface text-vtk-body shadow-sm transition hover:border-vtk-ink hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy"
-          aria-label={isCollapsed ? t('sidebar.expand') : t('sidebar.collapse')}
-          aria-expanded={!isCollapsed}
-        >
-          {isCollapsed ? <PanelLeft size={14} aria-hidden="true" /> : <PanelLeftClose size={14} aria-hidden="true" />}
-        </button>
-
-        {!isCollapsed && (
-          <div
-            role="separator"
-            aria-orientation="vertical"
-            aria-label={t('sidebar.resize')}
-            aria-valuemin={MIN_SIDEBAR_WIDTH}
-            aria-valuemax={MAX_SIDEBAR_WIDTH}
-            aria-valuenow={sidebarWidth}
-            tabIndex={0}
-            title={t('sidebar.resize')}
-            onPointerDown={startResize}
-            onPointerMove={resize}
-            onPointerUp={finishResize}
-            onPointerCancel={finishResize}
-            onKeyDown={resizeWithKeyboard}
-            onDoubleClick={() => updateSidebarWidth(DEFAULT_SIDEBAR_WIDTH, true)}
-            className="group absolute inset-y-0 -right-1 z-[5] hidden w-2 cursor-col-resize touch-none items-center justify-center focus:outline-hidden lg:flex"
-          >
-            <span
-              aria-hidden="true"
-              className={`h-full w-0.5 bg-vtk-navy transition-opacity ${isResizing ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus:opacity-100'}`}
-            />
-          </div>
-        )}
-
-        <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3">
-          {!isCollapsed && showCurriculumNavigator && (
-            hasFolderContext ? (
-              <div className="flex flex-col shrink-0 mb-1">
-                {/* Tab selector at the very top, with mr-6 so it stays clear of the collapse toggle */}
-                <div className="grid grid-cols-2 p-0.5 bg-vtk-paper-2 rounded-xl text-xs font-semibold text-vtk-muted mb-2.5 gap-0.5 border border-vtk-line mr-6">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('folder')}
-                    className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg transition-colors ${
-                      activeTab === 'folder'
-                        ? 'bg-vtk-surface text-vtk-ink font-semibold shadow-xs'
-                        : 'hover:text-vtk-ink'
-                    }`}
-                  >
-                    <FolderOpen size={14} className="shrink-0" />
-                    <span className="truncate">{t('sidebar.in_this_folder')}</span>
-                    {siblingDocuments.length > 0 && (
-                      <span className="rounded-full bg-vtk-paper px-1.5 py-0.5 text-[10px] tabular-nums font-semibold text-vtk-muted">
-                        {siblingDocuments.length}
-                      </span>
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('curriculum')}
-                    className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg transition-colors ${
-                      activeTab === 'curriculum'
-                        ? 'bg-vtk-surface text-vtk-ink font-semibold shadow-xs'
-                        : 'hover:text-vtk-ink'
-                    }`}
-                  >
-                    <FolderTree size={14} className="shrink-0" />
-                    <span className="truncate">{t('curriculum-tree.label')}</span>
-                  </button>
-                </div>
-
-                {activeTab === 'folder' ? (
-                  <SidebarFolderDocuments
-                    course={course!}
-                    category={category!}
-                    currentDocument={document}
-                    documents={siblingDocuments}
-                    loading={siblingsLoading}
-                  />
-                ) : (
-                  <CurriculumTree />
-                )}
-              </div>
-            ) : (
-              <>
+            {user && (
                 <button
-                  type="button"
-                  className={`${sectionButton} pr-8`}
-                  onClick={() => toggleSection('curriculum')}
-                  aria-expanded={expandedSections.curriculum}
+                    type="button"
+                    onClick={() => {
+                        onNavigate?.();
+                        openSearch();
+                    }}
+                    className="mt-3 flex h-8 w-full items-center gap-2 rounded-control border border-border-strong bg-surface px-2.5 text-left text-small text-fg-placeholder shadow-xs transition-colors hover:border-neutral-300"
                 >
-                  <span className="flex items-center gap-2.5">
-                    <FolderTree size={17} className="shrink-0" />
-                    <span>{t('curriculum-tree.label')}</span>
-                  </span>
-                  <ChevronDown
-                    size={15}
-                    className={`shrink-0 text-vtk-muted transition-transform duration-200 ${
-                      expandedSections.curriculum ? 'rotate-0' : '-rotate-90'
-                    }`}
-                  />
+                    <Search className="size-4 text-icon" aria-hidden="true" />
+                    <span className="flex-1 truncate">{t('search.placeholder')}</span>
+                    <span className="flex items-center gap-0.5" aria-hidden="true">
+                        <kbd className="vtk-kbd">⌘</kbd>
+                        <kbd className="vtk-kbd">K</kbd>
+                    </span>
                 </button>
-                <div className={expandedSections.curriculum ? 'shrink-0' : 'hidden'}>
-                  <CurriculumTree />
-                </div>
-              </>
-            )
-          )}
+            )}
 
-          {user && !isCollapsed && (
-            <>
-              {showCurriculumNavigator && <div className="my-1 shrink-0 border-t border-vtk-line" />}
-
-              <button
-                type="button"
-                className={sectionButton}
-                onClick={() => toggleSection('courses')}
-                aria-expanded={expandedSections.courses}
-              >
-                <span className="flex items-center gap-2.5">
-                  <Star size={17} className="shrink-0" />
-                  <span>{t('sidebar.my_courses')}</span>
-                </span>
-                <ChevronDown
-                  size={15}
-                  className={`shrink-0 text-vtk-muted transition-transform duration-200 ${expandedSections.courses ? 'rotate-0' : '-rotate-90'
-                    }`}
+            <div className="mt-3 flex flex-col gap-0.5">
+                <NavItem href="/" icon={<House />} label={t('home.title')} active={path === '/'} onNavigate={onNavigate} />
+                <NavItem
+                    href="/courses"
+                    icon={<GraduationCap />}
+                    label={t('courses')}
+                    active={inCurriculum && !courses.some((c) => c.id === currentCourse?.id)}
+                    onNavigate={onNavigate}
                 />
-              </button>
-              {expandedSections.courses && (
-                <div className="shrink-0">
-                  <ItemList
-                    items={mapCoursesToItems(user.favoriteCourses ?? [], i18n.language)}
-                    emptyMessage={t('account.favorite.no_courses')}
-                  />
-                </div>
-              )}
+                {user && (
+                    <NavItem
+                        href="/account"
+                        icon={<UserRound />}
+                        label={t('shell.my_account')}
+                        active={isActive('/account')}
+                        onNavigate={onNavigate}
+                    />
+                )}
+                <NavItem href="/faq" icon={<CircleHelp />} label={t('FAQ')} active={isActive('/faq')} onNavigate={onNavigate} />
+            </div>
 
-              <button
-                type="button"
-                className={sectionButton}
-                onClick={() => toggleSection('documents')}
-                aria-expanded={expandedSections.documents}
-              >
-                <span className="flex items-center gap-2.5">
-                  <File size={17} className="shrink-0" />
-                  <span>{t('sidebar.my_favorite_documents')}</span>
-                </span>
-                <ChevronDown
-                  size={15}
-                  className={`shrink-0 text-vtk-muted transition-transform duration-200 ${expandedSections.documents ? 'rotate-0' : '-rotate-90'
-                    }`}
+            {/* Scrolls on its own, so the account menu always stays at the bottom. */}
+            <div className="-mx-1 flex min-h-0 flex-1 flex-col overflow-y-auto px-1 scrollbar-thin">
+                {user && (
+                    <>
+                        <SectionLabel
+                            action={
+                                <Link
+                                    href="/courses"
+                                    onClick={onNavigate}
+                                    className="rounded-[6px] text-caption font-medium text-fg-muted hover:text-fg"
+                                >
+                                    {t('shell.browse')}
+                                </Link>
+                            }
+                        >
+                            {t('shell.my_courses')}
+                        </SectionLabel>
+                        <div className="flex flex-col gap-0.5">
+                            {courses.length === 0 ? (
+                                <p className="m-0 px-2.5 py-1.5 text-small text-fg-muted">{t('shell.no_courses')}</p>
+                            ) : (
+                                courses.map((course) => {
+                                    const name = localizedCourseName(course, i18n.language) ?? course.code ?? '';
+                                    return (
+                                        <NavItem
+                                            key={course.id}
+                                            href={`/course/${course.id}`}
+                                            icon={<CourseBadge name={name} seed={course.code} />}
+                                            label={name}
+                                            title={name}
+                                            active={currentCourse?.id === course.id && inCurriculum}
+                                            onNavigate={onNavigate}
+                                            trailing={
+                                                <span className="text-caption font-medium text-fg-muted tabular opacity-0 transition-opacity group-hover:opacity-100">
+                                                    {course.code}
+                                                </span>
+                                            }
+                                        />
+                                    );
+                                })
+                            )}
+                        </div>
+
+                        {documents.length > 0 && (
+                            <>
+                                <SectionLabel>{t('shell.favorite_documents')}</SectionLabel>
+                                <div className="flex flex-col gap-0.5">
+                                    {documents.slice(0, MAX_DOCUMENTS).map((document) => (
+                                        <NavItem
+                                            key={document.id}
+                                            href={`/document/${document.id}`}
+                                            icon={<FileText />}
+                                            label={document.name ?? ''}
+                                            title={document.name}
+                                            active={isActive(`/document/${document.id}`)}
+                                            onNavigate={onNavigate}
+                                        />
+                                    ))}
+                                    {documents.length > MAX_DOCUMENTS && (
+                                        <Link
+                                            href="/account"
+                                            onClick={onNavigate}
+                                            className="flex h-7 items-center gap-1 rounded-control px-2.5 text-small text-fg-muted hover:bg-sidebar-hover hover:text-fg"
+                                        >
+                                            {t('shell.show_all', { count: documents.length })}
+                                            <ChevronRight className="size-3.5" aria-hidden="true" />
+                                        </Link>
+                                    )}
+                                </div>
+                            </>
+                        )}
+                    </>
+                )}
+            </div>
+
+            <div className="mt-2 flex flex-col gap-0.5 border-t border-border pt-2">
+                <NavItem
+                    href="https://burgieclan-backup.vtk.be"
+                    icon={<ArrowUpRight />}
+                    label={t('header.old_burgieclan')}
+                    external
+                    onClick={() => { void recordOldBurgieclanClick(); }}
+                    onNavigate={onNavigate}
                 />
-              </button>
-              {expandedSections.documents && (
-                <div className="shrink-0">
-                  <ItemList
-                    items={mapDocumentsToItems(user.favoriteDocuments ?? [])}
-                    emptyMessage={t('account.favorite.no_documents')}
-                  />
+                {user && (
+                    <button
+                        type="button"
+                        onClick={() => setFeedbackOpen(true)}
+                        className="flex h-7 items-center gap-2.5 rounded-control px-2.5 text-left text-small font-medium text-fg-nav transition-colors hover:bg-sidebar-hover [&_svg]:size-4 [&_svg]:text-icon-strong"
+                    >
+                        <MessageSquareText aria-hidden="true" />
+                        <span className="truncate">{t('shell.feedback')}</span>
+                    </button>
+                )}
+            </div>
+
+            {user ? (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <button
+                            type="button"
+                            className="mt-1 flex h-11 w-full items-center gap-2.5 rounded-control px-2 text-left transition-colors hover:bg-sidebar-hover data-[state=open]:bg-sidebar-hover"
+                            aria-label={t('account.menu')}
+                        >
+                            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-neutral-900 text-caption font-semibold text-white">
+                                {initials(user.fullName)}
+                            </span>
+                            <span className="min-w-0 flex-1">
+                                <span className="block truncate text-body font-medium text-fg">{user.fullName}</span>
+                                <span className="block truncate text-caption text-fg-muted">{user.username}</span>
+                            </span>
+                            <ChevronsUpDown className="size-4 shrink-0 text-icon" aria-hidden="true" />
+                        </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="top" align="start" className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-56">
+                        <DropdownMenuLabel className="truncate">{user.email ?? user.username}</DropdownMenuLabel>
+                        <DropdownMenuItem
+                            onSelect={() => {
+                                onNavigate?.();
+                                router.push('/account');
+                            }}
+                        >
+                            <UserRound />
+                            {t('shell.my_account')}
+                        </DropdownMenuItem>
+                        {isAdmin && (
+                            <DropdownMenuItem asChild>
+                                <a href={adminUrl} target="_blank" rel="noopener noreferrer">
+                                    <Shield />
+                                    <span className="flex-1">{t('header.admin')}</span>
+                                    <ExternalLink className="size-3.5!" />
+                                </a>
+                            </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem asChild>
+                            <a href="https://vtk.be/account/" target="_blank" rel="noopener noreferrer">
+                                <ArrowUpRight />
+                                <span className="flex-1">{t('header.my_vtk')}</span>
+                                <ExternalLink className="size-3.5!" />
+                            </a>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <div className="flex items-center justify-between gap-3 px-2 py-1">
+                            <span className="text-body text-fg-secondary">{t('language')}</span>
+                            <Suspense fallback={null}>
+                                <LanguageSwitcher />
+                            </Suspense>
+                        </div>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onSelect={handleLogout} className="text-danger-text focus:text-danger-text [&_svg]:text-danger-text!">
+                            <LogOut />
+                            {t('logout')}
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ) : (
+                <div className="mt-2 flex items-center gap-2">
+                    <Link href="/login" onClick={onNavigate} className="vtk-button vtk-button-primary flex-1">
+                        {t('login')}
+                    </Link>
+                    <Suspense fallback={null}>
+                        <LanguageSwitcher />
+                    </Suspense>
                 </div>
-              )}
-            </>
-          )}
-        </div>
+            )}
 
-        {user && (
-          <div className="shrink-0 border-t border-vtk-line p-3">
-            <CreateDocumentButton className="w-full" showText={!isCollapsed} size={17} />
-          </div>
-        )}
-      </div>
-    </aside>
-  );
-};
-
-export default NavigationSidebar;
+            <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} user={user} />
+        </nav>
+    );
+}

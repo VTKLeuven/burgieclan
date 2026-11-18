@@ -197,7 +197,9 @@ export default function PDFViewer({ documentId }: { documentId: number }): JSX.E
         const pageRect = anchored.getBoundingClientRect();
         const deltaY = pageRect.top + anchor.fractionY * pageRect.height - anchor.viewportY;
         if (Math.abs(deltaY) > 0.5) {
-            window.scrollBy(0, deltaY);
+            // The page scrolls inside the app panel, not the window.
+            const scroller = stack.closest<HTMLElement>("[data-scroll-root]");
+            if (scroller) scroller.scrollTop += deltaY; else window.scrollBy(0, deltaY);
         }
 
         const deltaX = stackRect.left + anchor.fractionX * stackRect.width - anchor.viewportX;

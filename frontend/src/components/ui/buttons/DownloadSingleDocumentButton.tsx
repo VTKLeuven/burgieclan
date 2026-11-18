@@ -4,7 +4,6 @@ import useDownloadContent from "@/hooks/useDownloadContent";
 import type { Document } from "@/types/entities";
 import { Download, Loader } from "lucide-react";
 import { formatFileSize } from "@/utils/fileSize";
-import { useState } from "react";
 import { useTranslation } from 'react-i18next';
 
 interface DownloadButtonProps {
@@ -15,7 +14,6 @@ interface DownloadButtonProps {
 
 export default function DownloadSingleDocumentButton({document, fileSize, disabled = false,}: DownloadButtonProps) {
     const { downloadContent, loading: isDownloading } = useDownloadContent();
-    const [isHovered, setIsHovered] = useState(false); // Used to show file size on hover
     const { t } = useTranslation();
 
     // Use the provided fileSize prop or format the document's fileSize
@@ -32,45 +30,17 @@ export default function DownloadSingleDocumentButton({document, fileSize, disabl
 
     return (
         <button
-            className={`
-                inline-flex items-center px-3 py-1 border rounded-2xl
-                transition-all duration-300 ease-in-out
-                ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                border-vtk-line-2 relative
-                ${isDownloading ? 'w-18' : `${isHovered ? 'w-24' : 'w-12'}`}
-            `}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+            type="button"
+            className="vtk-button vtk-button-sm"
             onClick={handleDownload}
-            disabled={disabled}
+            disabled={disabled || isDownloading}
             title={t('download.title', { name: document.name, size: formattedFileSize })}
         >
-            <Download
-                size={20}
-                strokeWidth={isHovered && (!isDownloading) ? '2.5' : '1.5'}
-                className={`
-                    transition-all duration-300 text-vtk-muted
-                    ${isHovered ? '-translate-x-1' : ''}
-                    ${isDownloading ? 'opacity-0 duration-0' : 'opacity-100 duration-300'}
-                `}
-            />
-
-            <span
-                className={`
-                    absolute
-                    right-3
-                    text-sm
-                    font-semibold
-                    text-vtk-muted
-                    transition-opacity
-                    ${isDownloading ? 'opacity-100 duration-300' : `${isHovered ? 'opacity-100 duration-300' : 'opacity-0 duration-0'}`}
-                `}
-            >
-                {isDownloading
-                    ? <Loader size={20} className="animate-spin" />
-                    : formattedFileSize
-                }
-            </span>
+            {isDownloading
+                ? <Loader className="size-4 animate-spin" aria-hidden="true" />
+                : <Download className="size-4" aria-hidden="true" />}
+            <span className="hidden sm:inline">{t('download.download')}</span>
+            {formattedFileSize && <span className="hidden text-fg-muted tabular md:inline">{formattedFileSize}</span>}
         </button>
     );
 }

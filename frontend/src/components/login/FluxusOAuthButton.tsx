@@ -11,10 +11,10 @@ const FluxusOAuthButton = ({ loginHandler }: FluxusOAuthButtonProps) => {
         <button
             type="submit"
             onClick={loginHandler}
-            className="vtk-button vtk-button-subtle w-full"
+            className="vtk-button vtk-button-primary h-10 w-full"
         >
             <Image
-                src="/images/logos/vtk-logo-blue.png"
+                src="/images/logos/vtk-logo-white.png"
                 alt=""
                 width={50}
                 height={25}

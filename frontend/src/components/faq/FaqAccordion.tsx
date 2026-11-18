@@ -16,35 +16,32 @@ export default function FaqAccordion({ items }: FaqAccordionProps) {
     };
 
     return (
-        <div className="flex flex-col gap-3">
+        <div className="vtk-list">
             {items.map((item, index) => (
-                <div
-                    key={item.id}
-                    className="vtk-panel overflow-hidden transition-all duration-200"
-                >
+                <div key={item.id}>
                     <button
                         onClick={() => toggle(index)}
-                        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-vtk-paper/60"
+                        className="flex min-h-12 w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-surface-hover"
                         aria-expanded={openIndex === index}
                     >
-                        <span className="text-[15px] font-semibold leading-snug text-vtk-ink">
+                        <span className="text-body font-medium text-fg">
                             {item.question}
                         </span>
                         <ChevronDown
-                            className={`h-5 w-5 shrink-0 text-vtk-muted transition-transform duration-300 ${
+                            className={`size-4 shrink-0 text-icon transition-transform duration-200 ${
                                 openIndex === index ? 'rotate-180' : ''
                             }`}
                             aria-hidden="true"
                         />
                     </button>
                     <div
-                        className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
+                        className={`grid transition-[grid-template-rows] duration-200 ease-out ${
                             openIndex === index ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
                         }`}
                     >
                         <div className="overflow-hidden">
                             <div
-                                className="border-t border-vtk-line px-6 pb-5 pt-4 text-[14px] leading-relaxed text-vtk-body"
+                                className="vtk-prose px-4 pb-4"
                                 dangerouslySetInnerHTML={{ __html: item.answer || '' }}
                             />
                         </div>

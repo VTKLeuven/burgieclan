@@ -10,6 +10,7 @@ import { currentExamPeriod, examCalendarYear } from '@/utils/examPeriods';
 import { NotebookPen, X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import SectionHeader from '@/components/ui/SectionHeader';
 import { useTranslation } from 'react-i18next';
 
 /** Exams whose prompt was closed in this browser, by id. */
@@ -94,15 +95,16 @@ export const ExamPrompt = () => {
     const examName = t(`exam.name.${current.period}`, { year: examCalendarYear(current.academicYear) });
 
     return (
-        <section className="vtk-panel overflow-hidden" aria-labelledby="exam-prompt-heading">
-            <div className="border-b border-vtk-line px-5 py-3.5">
-                <h2 id="exam-prompt-heading" className="m-0 text-base font-semibold tracking-tight text-vtk-ink">
-                    {t('home.exam_prompt.title')}
-                </h2>
-                <p className="m-0 mt-1 text-sm leading-relaxed text-vtk-muted">{t('home.exam_prompt.description')}</p>
-            </div>
+        <section aria-labelledby="exam-prompt-heading">
+            <SectionHeader
+                id="exam-prompt-heading"
+                icon={<NotebookPen />}
+                title={t('home.exam_prompt.title')}
+                count={shown.length}
+                description={t('home.exam_prompt.description')}
+            />
 
-            <ul className="m-0 list-none divide-y divide-vtk-line p-0">
+            <ul className="vtk-list m-0 list-none p-0">
                 {shown.map((exam) => {
                     const course = courses.find((candidate) => candidate.id === exam.courseId);
                     const courseName = localizedCourseName(course, i18n.language) || t('home.exam_prompt.course_fallback');
@@ -112,24 +114,22 @@ export const ExamPrompt = () => {
                         <li key={exam.id} className="group relative">
                             <Link
                                 href={`/course/${exam.courseId}/exams/${exam.id}`}
-                                className="flex items-center gap-3.5 px-5 py-2.5 pr-12 transition-colors hover:bg-vtk-paper-2"
+                                className="flex min-h-12 items-center gap-3 px-4 py-2 pr-12 transition-colors hover:bg-surface-hover"
                             >
-                                <NotebookPen aria-hidden="true" className="h-4 w-4 shrink-0 text-vtk-muted" />
-                                <div className="min-w-0 flex-1">
-                                    <p className="m-0 truncate text-sm font-medium leading-snug text-vtk-ink">{courseName}</p>
-                                    <p className="m-0 truncate text-[13px] leading-snug text-vtk-muted">
-                                        {examName} · {t('home.exam_prompt.questions', { count: exam.questionCount })}
-                                    </p>
-                                </div>
+                                <NotebookPen aria-hidden="true" className="size-4 shrink-0 text-icon" />
+                                <span className="min-w-0 flex-1 truncate text-body font-medium text-fg">{courseName}</span>
+                                <span className="hidden shrink-0 text-small text-fg-muted sm:inline">
+                                    {examName} · {t('home.exam_prompt.questions', { count: exam.questionCount })}
+                                </span>
                             </Link>
                             <button
                                 type="button"
-                                className="absolute inset-y-0 right-3 my-auto flex h-8 w-8 items-center justify-center rounded-md text-vtk-muted transition-colors hover:bg-vtk-paper-2 hover:text-vtk-ink"
+                                className="vtk-icon-button absolute inset-y-0 right-2 my-auto"
                                 aria-label={t('home.exam_prompt.dismiss', { course: courseName })}
                                 title={t('home.exam_prompt.dismiss', { course: courseName })}
                                 onClick={() => dismiss(exam.id)}
                             >
-                                <X className="h-4 w-4" aria-hidden="true" />
+                                <X className="size-4" aria-hidden="true" />
                             </button>
                         </li>
                     );

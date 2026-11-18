@@ -136,7 +136,7 @@ const TagFilter: React.FC<TagFilterProps> = ({
   return (
     <div className="relative" ref={containerRef}>
       <div
-        className="flex min-h-[42px] w-full cursor-text flex-wrap items-center rounded-xl border border-vtk-line-2 bg-vtk-paper px-2 focus-within:border-vtk-ink focus-within:shadow-[0_0_0_3px_rgba(14,26,54,0.08)]"
+        className="flex min-h-9 w-full cursor-text flex-wrap items-center rounded-control border border-border-strong bg-surface shadow-xs px-2 focus-within:border-focus focus-within:shadow-[0_0_0_3px_rgb(66_176_255_/_0.28)]"
         onClick={handleContainerClick}
       >
         {/* Display selected tags by ID */}
@@ -192,7 +192,7 @@ const TagFilter: React.FC<TagFilterProps> = ({
       {showSuggestions && (
         <>
           {tagsLoading || filteredTags.length > 0 ? (
-            <ul className="absolute z-20 mt-1.5 max-h-60 w-full overflow-y-auto rounded-[14px] border border-vtk-line bg-vtk-surface shadow-[0_18px_42px_rgba(10,15,31,0.12)]">
+            <ul className="absolute z-20 mt-1.5 max-h-60 w-full overflow-y-auto rounded-card border border-vtk-line bg-vtk-surface shadow-popover">
               {tagsLoading ? (
                 <li className="px-3 py-2 text-sm text-vtk-muted">{t('common.loading')}</li>
               ) : (

@@ -54,12 +54,12 @@ export default function FeedbackDialog({
         <Dialog open={open} onClose={onClose} className="relative z-[60]">
             <DialogBackdrop
                 transition
-                className="fixed inset-0 bg-vtk-ink/35 backdrop-blur-xs transition-opacity duration-200 data-closed:opacity-0"
+                className="fixed inset-0 bg-neutral-900/25 transition-opacity duration-200 data-closed:opacity-0"
             />
             <div className="fixed inset-0 flex items-start justify-center overflow-y-auto p-4 sm:items-center">
                 <DialogPanel
                     transition
-                    className="w-full max-w-[560px] overflow-hidden rounded-2xl border border-vtk-line bg-vtk-surface shadow-[0_18px_48px_rgba(10,15,31,0.18)] transition duration-200 data-closed:scale-95 data-closed:opacity-0"
+                    className="w-full max-w-[560px] overflow-hidden rounded-panel border border-vtk-line bg-vtk-surface shadow-dialog transition duration-200 data-closed:scale-95 data-closed:opacity-0"
                 >
                     <DialogTitle className="sr-only">{t('header.new_burgieclan_feedback')}</DialogTitle>
                     {/* Mounted only while open: Dopl loads on the click, and a

@@ -123,27 +123,26 @@ export default function LoginForm() {
     }
 
     return (
-        // Single white panel on the cool paper ground, mirroring `.vtk-auth`.
-        <div className="flex flex-1 items-center justify-center bg-vtk-paper px-5 py-12 sm:px-9 sm:py-20">
-            <div className="w-full max-w-[430px] rounded-[18px] border border-vtk-line bg-vtk-surface p-7 shadow-[0_18px_50px_rgba(10,15,31,0.06)] sm:p-10">
-                <Link href="/" className="inline-block">
-                    <span className="sr-only">Burgieclan</span>
-                    <Logo width={56} height={56} />
+        // Dopl's sign-in: one centred white card on the grey canvas, the mark and name small on top.
+        <div className="flex flex-1 items-center justify-center bg-canvas px-4 py-12">
+            <div className="w-full max-w-[400px] rounded-panel border border-border bg-surface p-6 shadow-card sm:p-8">
+                <Link href="/" className="inline-flex items-center gap-2 rounded-control">
+                    <Logo width={32} height={32} />
+                    <span className="text-title font-semibold text-fg">Burgieclan</span>
                 </Link>
 
-                <p className="mt-6 text-[13px] text-vtk-muted">Burgieclan</p>
-                <h1 className="m-0 mt-2.5 text-[clamp(30px,4vw,42px)] font-semibold leading-none tracking-[-0.03em] text-vtk-ink">
+                <h1 className="m-0 mt-6 text-display font-semibold text-fg">
                     {t('sign_in')}
                 </h1>
 
                 {/* Handles OAuth login via the VTK authorization server */}
-                <div className="mt-7">
+                <div className="mt-6">
                     <FluxusOAuthButton loginHandler={handleOAuthLogin} />
                 </div>
 
                 <button
                     type="button"
-                    className="mt-3.5 flex w-full items-center justify-center gap-1 text-sm font-medium text-vtk-muted transition-colors hover:text-vtk-ink"
+                    className="mt-3 flex h-8 w-full items-center justify-center gap-1 rounded-control text-small font-medium text-fg-muted transition-colors hover:text-fg"
                     onClick={toggleCollapse}
                     aria-expanded={isOpen}
                 >
@@ -155,9 +154,9 @@ export default function LoginForm() {
                 </button>
 
                 {isOpen && (
-                    <form onSubmit={handleCredentialsLogin} className="mt-6 flex flex-col gap-4.5 border-t border-vtk-line pt-6">
+                    <form onSubmit={handleCredentialsLogin} className="mt-4 flex flex-col gap-4 border-t border-border pt-5">
                         <div className="vtk-field">
-                            <label htmlFor="username" className="vtk-field-label uppercase tracking-[0.08em]">
+                            <label htmlFor="username" className="vtk-field-label">
                                 {t('username')}
                             </label>
                             <Input
@@ -173,7 +172,7 @@ export default function LoginForm() {
                         </div>
 
                         <div className="vtk-field">
-                            <label htmlFor="password" className="vtk-field-label uppercase tracking-[0.08em]">
+                            <label htmlFor="password" className="vtk-field-label">
                                 {t('password')}
                             </label>
                             <div className="relative">
@@ -189,7 +188,7 @@ export default function LoginForm() {
                                 />
                                 <button
                                     type="button"
-                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-vtk-muted transition-colors hover:text-vtk-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-vtk-navy rounded-xs"
+                                    className="absolute inset-y-0 right-0 flex items-center rounded-control pr-3 text-icon transition-colors hover:text-fg"
                                     onClick={() => setShowPassword(!showPassword)}
                                     aria-label={showPassword ? t('hide_password', { defaultValue: 'Hide password' }) : t('show_password', { defaultValue: 'Show password' })}
                                     aria-controls="password"

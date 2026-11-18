@@ -1,5 +1,6 @@
 'use client';
 
+import { MessageSquarePlus } from 'lucide-react';
 import AddDocumentCommentModal from "@/components/document/AddDocumentCommentModal";
 import type { DocumentComment } from "@/types/entities";
 import { useState } from "react";
@@ -18,11 +19,14 @@ export default function AddDocumentCommentBox({ documentId, file, content, onCom
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
-        <div className="border rounded-lg max-w-sm p-2 min-h-20">
+        <div>
+            {/* Looks like the composer it opens, as at the bottom of a Dopl timeline. */}
             <button
-                className="flex flex-row justify-between pb-2 text-vtk-body"
+                type="button"
+                className="flex h-9 w-full items-center gap-2 rounded-control border border-border-strong bg-surface px-3 text-left text-body text-fg-placeholder shadow-xs transition-colors hover:border-neutral-300"
                 onClick={() => setIsModalOpen(true)}>
-                <span className="text-left">{t("document.comments.add")}</span>
+                <MessageSquarePlus className="size-4 shrink-0 text-icon" aria-hidden="true" />
+                <span className="truncate">{t("document.comments.add")}</span>
             </button>
             <AddDocumentCommentModal
                 documentId={documentId}
@@ -31,7 +35,7 @@ export default function AddDocumentCommentBox({ documentId, file, content, onCom
                 setIsModalOpen={setIsModalOpen}
                 onCommentAdded={onCommentAdded}
             />
-            <p className="text-sm">{content}</p>
+            {content && <p className="mt-2 text-small text-fg-muted">{content}</p>}
         </div>
     );
 }
