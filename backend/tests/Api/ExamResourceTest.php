@@ -2,6 +2,7 @@
 
 namespace App\Tests\Api;
 
+use App\Constants\Feature;
 use App\Constants\AcademicYear;
 use App\Constants\ExamPeriod;
 use App\Entity\CollabDocument;
@@ -22,6 +23,13 @@ use Zenstruck\Browser\KernelBrowser;
 
 class ExamResourceTest extends ApiTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Off by default; FeatureFlagTest covers the switched-off side.
+        self::enableFeature(Feature::EXAM_RECONSTRUCTIONS);
+    }
+
     private const QUESTIONS = [
         'type' => 'doc',
         'content' => [

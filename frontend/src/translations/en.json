@@ -273,9 +273,12 @@
         "placement": {
             "other_one": "Also in 1 other programme",
             "other_other": "Also in {{count}} other programmes",
-            "label": "Programme"
+            "label": "Programme",
+            "other-short_one": "+1 other",
+            "other-short_other": "+{{count}} others"
         },
-        "ects-sheet": "ECTS sheet"
+        "ects-sheet": "ECTS sheet",
+        "open-category": "Open as page"
     },
     "download": {
         "download": "Download",
@@ -594,10 +597,8 @@
             "august": "August {{year}} resit"
         },
         "section": {
-            "title": "Exams",
+            "title": "Exam reconstructions",
             "description": "Reconstructions of past exams, rebuilt together by the students who took them. Just had an exam? Add the questions while they are fresh.",
-            "under-construction": "Under construction",
-            "under-construction-description": "Exam reconstructions are currently under construction and will be available soon.",
             "start": "Start a reconstruction",
             "empty": "No reconstructions for this course yet.",
             "error": "The reconstructions could not be loaded.",
@@ -711,10 +712,21 @@
         "browse": "Browse",
         "no_courses": "Star a course to pin it here.",
         "show_all": "View all {{count}}",
-        "feedback": "Give feedback"
+        "feedback": "Give feedback",
+        "hide_sidebar": "Hide sidebar",
+        "show_sidebar": "Show sidebar",
+        "resize_sidebar": "Resize sidebar"
     },
     "study_planner": {
         "nav": "Planner",
+        "info": {
+            "button": "How does the planner work?",
+            "title": "How does the planner work?",
+            "link": "Link your timetable once, with the iCal link from KU Loket › Agenda › Agenda Sync.",
+            "marks": "Tick off the classes you attended, hide the ones you don't follow, and mark labs or exercise sessions as mandatory.",
+            "track": "Keep track of your deadlines and mandatory sessions, and see per course how many classes you have done and how many are still to come.",
+            "subscribe": "Subscribe through Add to calendar in Google or Apple Calendar, so it only shows what matters to you."
+        },
         "title": "Planner",
         "load_failed": "Your planner could not be loaded.",
         "sync_warning": "The timetable could not be updated: {{error}} You are seeing the sessions from the last sync.",
@@ -929,5 +941,16 @@
             "stop": "Remove my planner",
             "stop_confirm": "Remove everything"
         }
+    },
+    "curriculum-panel": {
+        "show": "Show curriculum",
+        "hide": "Hide curriculum",
+        "resize": "Resize curriculum",
+        "filter": "Filter courses in this programme",
+        "clear-filter": "Clear filter",
+        "choose-program": "Choose a programme",
+        "switch-program": "Look at another programme",
+        "favorite-programs": "Favourite programmes",
+        "all-programs": "All programmes"
     }
 }

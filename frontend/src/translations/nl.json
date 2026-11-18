@@ -273,9 +273,12 @@
         "placement": {
             "other_one": "Ook in 1 andere richting",
             "other_other": "Ook in {{count}} andere richtingen",
-            "label": "Opleiding"
+            "label": "Opleiding",
+            "other-short_one": "+1 andere",
+            "other-short_other": "+{{count}} andere"
         },
-        "ects-sheet": "ECTS-fiche"
+        "ects-sheet": "ECTS-fiche",
+        "open-category": "Openen als pagina"
     },
     "download": {
         "download": "Download",
@@ -594,10 +597,8 @@
             "august": "Herexamen augustus {{year}}"
         },
         "section": {
-            "title": "Examens",
+            "title": "Examenreconstructies",
             "description": "Reconstructies van examens, samen opgebouwd door wie ze aflegde. Net een examen gehad? Vul de vragen aan terwijl ze nog vers zijn.",
-            "under-construction": "Binnenkort beschikbaar",
-            "under-construction-description": "Examenreconstructies worden momenteel gebouwd en zijn binnenkort beschikbaar.",
             "start": "Reconstructie starten",
             "empty": "Nog geen reconstructies voor dit vak.",
             "error": "De reconstructies konden niet geladen worden.",
@@ -711,10 +712,21 @@
         "browse": "Bekijk alle",
         "no_courses": "Markeer een vak met een ster om het hier vast te zetten.",
         "show_all": "Alle {{count}} bekijken",
-        "feedback": "Feedback geven"
+        "feedback": "Feedback geven",
+        "hide_sidebar": "Menu verbergen",
+        "show_sidebar": "Menu tonen",
+        "resize_sidebar": "Breedte van het menu aanpassen"
     },
     "study_planner": {
         "nav": "Planner",
+        "info": {
+            "button": "Hoe werkt de planner?",
+            "title": "Hoe werkt de planner?",
+            "link": "Koppel je lessenrooster één keer met de iCal-link uit KU Loket › Agenda › Agenda Sync.",
+            "marks": "Vink lessen af die je gevolgd hebt, verberg wat je niet volgt, en duid labo's of oefenzittingen aan als verplicht.",
+            "track": "Houd je deadlines en verplichte lessen bij, en zie per vak hoeveel lessen je al gevolgd hebt en hoeveel er nog komen.",
+            "subscribe": "Abonneer je via Toevoegen aan agenda in Google of Apple Agenda: daar zie je dan alleen wat voor jou telt."
+        },
         "title": "Planner",
         "load_failed": "Je planner kon niet geladen worden.",
         "sync_warning": "Het lessenrooster kon niet bijgewerkt worden: {{error}} Je ziet de lessen van de laatste synchronisatie.",
@@ -929,5 +941,16 @@
             "stop": "Verwijder mijn planner",
             "stop_confirm": "Alles verwijderen"
         }
+    },
+    "curriculum-panel": {
+        "show": "Curriculum tonen",
+        "hide": "Curriculum verbergen",
+        "resize": "Breedte van het curriculum aanpassen",
+        "filter": "Filter vakken in deze opleiding",
+        "clear-filter": "Filter wissen",
+        "choose-program": "Kies een opleiding",
+        "switch-program": "Andere opleiding bekijken",
+        "favorite-programs": "Favoriete opleidingen",
+        "all-programs": "Alle opleidingen"
     }
 }

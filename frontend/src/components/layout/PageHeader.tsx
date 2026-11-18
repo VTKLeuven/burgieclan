@@ -1,9 +1,11 @@
 'use client';
 
 import { openMobileNav, openSearch } from '@/components/layout/navEvents';
+import { useCurriculumPanel, useSidebarPanel } from '@/components/layout/ShellPanels';
+import ShowSidebarButton from '@/components/layout/ShowSidebarButton';
 import { useUser } from '@/components/UserContext';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Menu, Search } from 'lucide-react';
+import { ChevronRight, ListTree, Menu, Search } from 'lucide-react';
 import Link from 'next/link';
 import { Fragment, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,14 +22,14 @@ export interface Crumb {
  * The trail in the page header: feature icon and name first, `›` between levels, the current
  * page last in full weight. On a phone only the last two levels are shown, so it stays one line.
  */
-export function Breadcrumbs({ crumbs }: { crumbs: Crumb[] }) {
+export function Breadcrumbs({ crumbs, className }: { crumbs: Crumb[]; className?: string }) {
     // Middle levels give way first: below xl the trail is "first › … › parent › current", and on
     // a phone only "parent › current". Hover the ellipsis for the levels it stands for.
     const collapsible = crumbs.length > 3;
     const hidden = crumbs.slice(1, -2);
 
     return (
-        <nav aria-label="Breadcrumb" className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">
+        <nav aria-label="Breadcrumb" className={cn('flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden', className)}>
             {crumbs.map((crumb, index) => {
                 const last = index === crumbs.length - 1;
                 const isMiddle = collapsible && index > 0 && index < crumbs.length - 2;
@@ -108,6 +110,10 @@ export default function PageHeader({
 }) {
     const { t } = useTranslation();
     const { user } = useUser();
+    const sidebar = useSidebarPanel();
+    const curriculumPanel = useCurriculumPanel();
+    const showCurriculum = curriculumPanel.available && !curriculumPanel.open;
+    const curriculumShown = curriculumPanel.available && curriculumPanel.open;
 
     return (
         <header
@@ -124,6 +130,31 @@ export default function PageHeader({
             >
                 <Menu className="size-[18px]" aria-hidden="true" />
             </button>
+            {/* Reopen the hidden columns, from the breakpoint at which each exists: the sidebar from md,
+                the curriculum column from lg. While the curriculum column is open, the sidebar's button
+                sits in that column's header instead, at the panel's left edge. */}
+            {(!sidebar.open || showCurriculum) && (
+                <div
+                    className={cn(
+                        '-ml-1.5 hidden shrink-0 items-center gap-0.5',
+                        sidebar.open ? 'lg:flex' : 'md:flex',
+                        !sidebar.open && curriculumShown && 'lg:hidden',
+                    )}
+                >
+                    <ShowSidebarButton />
+                    {showCurriculum && (
+                        <button
+                            type="button"
+                            onClick={() => curriculumPanel.setOpen(true)}
+                            className="vtk-icon-button hidden lg:inline-grid"
+                            aria-label={t('curriculum-panel.show')}
+                            title={t('curriculum-panel.show')}
+                        >
+                            <ListTree className="size-[18px]" aria-hidden="true" />
+                        </button>
+                    )}
+                </div>
+            )}
             {breadcrumb ?? <Breadcrumbs crumbs={crumbs ?? []} />}
             <div className="flex shrink-0 items-center gap-1.5">
                 {actions}

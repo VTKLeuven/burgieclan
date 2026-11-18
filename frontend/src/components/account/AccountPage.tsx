@@ -88,7 +88,7 @@ export default function AccountPage() {
             {header}
             <div className="vtk-shell vtk-shell-narrow">
                 <div className="flex items-center gap-4">
-                    <span className="grid size-12 shrink-0 place-items-center rounded-full bg-neutral-900 text-body font-semibold text-white">
+                    <span className="grid size-12 shrink-0 place-items-center rounded-full bg-primary text-body font-semibold text-on-primary">
                         {(user.fullName ?? '?').split(/\s+/).map((part) => part[0]).slice(0, 2).join('').toUpperCase()}
                     </span>
                     <div className="min-w-0">

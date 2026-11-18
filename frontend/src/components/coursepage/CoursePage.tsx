@@ -2,10 +2,11 @@
 
 import Loading from '@/components/loading/LoadingPage';
 import CoursePlacement from "@/components/curriculum/CoursePlacement";
-import { usePublishCurriculumLocation } from "@/components/curriculum/CurriculumLocationContext";
+import { useCurriculumLocation, usePublishCurriculumLocation } from "@/components/curriculum/CurriculumLocationContext";
 import CommentCategories from "@/components/coursepage/comment/CommentCategories";
 import DocumentSections from "@/components/coursepage/DocumentSections";
 import ExamSection from "@/components/coursepage/exam/ExamSection";
+import { useFeature } from "@/components/FeaturesContext";
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import RelatedCourses from "@/components/coursepage/RelatedCourses";
 import ErrorPage from "@/components/error/ErrorPage";
@@ -22,18 +23,12 @@ import { convertToCourse } from "@/utils/convertToEntity";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { localizedCourseName } from '@/utils/courseName';
 
-/** One label/value line of the properties sidebar, as on a Dopl item page. */
-function Property({ label, children }: { label: string; children: ReactNode }) {
-    return (
-        <div className="grid grid-cols-[104px_minmax(0,1fr)] items-start gap-3 py-1.5">
-            <dt className="pt-0.5 text-small text-fg-muted">{label}</dt>
-            <dd className="m-0 min-w-0 text-body text-fg [overflow-wrap:anywhere]">{children}</dd>
-        </div>
-    );
+function MetaDot() {
+    return <span aria-hidden="true">·</span>;
 }
 
 export default function CoursePage() {
@@ -44,6 +39,7 @@ export default function CoursePage() {
         return preloaded ? convertToCourse(preloaded) : null;
     });
     const { t, i18n } = useTranslation();
+    const examsEnabled = useFeature('exam_reconstructions');
     const { request, loading, error } = useApi();
 
     useEffect(() => {
@@ -69,6 +65,7 @@ export default function CoursePage() {
 
     // Feeds the folder tree and the breadcrumb in the layout, which cannot read this route.
     usePublishCurriculumLocation({ course: course ?? undefined });
+    const { activePath } = useCurriculumLocation();
 
     const courseName = localizedCourseName(course, i18n.language);
 
@@ -119,84 +116,72 @@ export default function CoursePage() {
                 }
             />
 
-            {/* Dopl's item page: the content in a main column, the facts in a sidebar beside it. */}
-            <div className="flex flex-1 flex-col lg:flex-row">
-                <div className="min-w-0 flex-1 px-4 pt-7 pb-16 md:px-8">
-                    <div className="mx-auto max-w-[880px]">
-                        <div className="flex items-start gap-3.5">
+            <div className="min-w-0 flex-1 px-4 pt-7 pb-16 md:px-8">
+                <div className="mx-auto max-w-[960px]">
+                    {/* Every fact about the course sits under its name, so the documents get the
+                        full width of the page instead of sharing it with a properties column. */}
+                    <div className="flex flex-wrap items-start gap-x-8 gap-y-4">
+                        <div className="flex min-w-0 flex-1 basis-[26rem] items-start gap-3.5">
                             <CourseBadge name={courseName} seed={course.code} size={40} className="mt-0.5 hidden rounded-card sm:inline-flex" />
                             <div className="min-w-0">
                                 <h1 className="vtk-page-title">{courseName}</h1>
-                                <p className="m-0 mt-1 flex flex-wrap items-center gap-x-2 text-body text-fg-muted">
+                                <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-body text-fg-muted">
                                     <span className="tabular">{course.code}</span>
-                                    <span aria-hidden="true">·</span>
+                                    <MetaDot />
                                     <span>{course.credits} {t('credits')}</span>
                                     {semesterLabel && (
                                         <>
-                                            <span aria-hidden="true">·</span>
-                                            <span>{semesterLabel}</span>
+                                            <MetaDot />
+                                            <span className="inline-flex items-center gap-1.5">
+                                                <SemesterIndicator semesters={course.semesters} size={14} />
+                                                {semesterLabel}
+                                            </span>
                                         </>
                                     )}
-                                </p>
+                                    {activePath && (
+                                        <>
+                                            <MetaDot />
+                                            <CoursePlacement />
+                                        </>
+                                    )}
+                                    <MetaDot />
+                                    <Link
+                                        href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1 font-medium text-link hover:underline"
+                                    >
+                                        {t('course-page.ects-sheet')}
+                                        <ArrowUpRight className="size-3.5" aria-hidden="true" />
+                                    </Link>
+                                </div>
                             </div>
                         </div>
 
-                        <RelatedCourses course={course} />
+                        {professors.length > 0 && (
+                            <div className="flex shrink-0 flex-col gap-1.5 sm:items-end">
+                                <span className="text-caption font-medium text-fg-muted">{t('course-page.teachers')}</span>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {professors.map((p, index) => (
+                                        <ProfessorDiv key={p} unumber={p} index={index} size={36} />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
-                        <div className="mt-8 grid gap-10">
-                            <DocumentSections course={course} documentCounts={course.documentCounts} />
-                            <ExamSection courseId={course.id} />
-                            <CommentCategories
-                                comments={course.courseComments ?? []}
-                                courseId={course.id}
-                                onCommentsUpdate={handleCommentsUpdate}
-                            />
-                        </div>
+                    <RelatedCourses course={course} />
+
+                    <div className="mt-8 grid gap-10">
+                        <DocumentSections course={course} documentCounts={course.documentCounts} />
+                        {examsEnabled && <ExamSection courseId={course.id} />}
+                        <CommentCategories
+                            comments={course.courseComments ?? []}
+                            courseId={course.id}
+                            onCommentsUpdate={handleCommentsUpdate}
+                        />
                     </div>
                 </div>
-
-                <aside className="shrink-0 border-t border-border px-4 py-6 md:px-8 lg:w-[300px] lg:border-t-0 lg:border-l lg:px-6">
-                    <div className="lg:sticky lg:top-[calc(var(--header-height)+24px)]">
-                        <dl className="m-0">
-                            <Property label="Code">
-                                <span className="tabular">{course.code}</span>
-                            </Property>
-                            <Property label={t('curriculum-navigator.credits')}>
-                                <span className="tabular">{course.credits}</span>
-                            </Property>
-                            {semesterLabel && (
-                                <Property label={t('curriculum-navigator.semester')}>
-                                    <span className="flex items-center gap-2">
-                                        <SemesterIndicator semesters={course.semesters} size={14} />
-                                        {semesterLabel}
-                                    </span>
-                                </Property>
-                            )}
-                            {professors.length > 0 && (
-                                <Property label={t('course-page.teachers')}>
-                                    <div className="flex flex-col">
-                                        {professors.map((p, index) => (
-                                            <ProfessorDiv key={p} unumber={p} index={index} size={24} variant="row" />
-                                        ))}
-                                    </div>
-                                </Property>
-                            )}
-                            <CoursePlacement />
-                        </dl>
-
-                        <div className="mt-4 border-t border-border pt-4">
-                            <Link
-                                href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 text-body font-medium text-link hover:underline"
-                            >
-                                {t('course-page.ects-sheet')}
-                                <ArrowUpRight className="size-4" aria-hidden="true" />
-                            </Link>
-                        </div>
-                    </div>
-                </aside>
             </div>
         </>
     )

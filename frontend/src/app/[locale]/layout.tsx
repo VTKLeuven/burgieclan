@@ -1,7 +1,9 @@
 import { canAccessAdmin, getUserId } from "@/actions/auth";
+import { getFeatures } from "@/actions/features";
 import "@/app/globals.css";
 import initTranslations from "@/app/i18n";
 import CookieBanner from "@/components/cookie-banner/CookieBanner";
+import { FeaturesProvider } from "@/components/FeaturesContext";
 import TranslationsProvider from "@/components/TranslationProvider";
 import { ToastProvider } from "@/components/ui/Toast";
 import { UserProvider } from "@/components/UserContext";
@@ -34,10 +36,11 @@ type Params = Promise<{ locale: string }>;
 export default async function RootLayout({ children, params }: Readonly<{ children: React.ReactNode; params: Params; }>) {
   const { locale } = await params;
 
-  const [translations, userId, isAdmin] = await Promise.all([
+  const [translations, userId, isAdmin, features] = await Promise.all([
     initTranslations(locale),
     getUserId(),
-    canAccessAdmin()
+    canAccessAdmin(),
+    getFeatures(),
   ]);
   const { resources } = translations;
 
@@ -51,10 +54,12 @@ export default async function RootLayout({ children, params }: Readonly<{ childr
           <body className="flex min-h-full flex-col">
             {/* ToastProvider uses client-side hooks (useState, useContext) so must be placed inside body tags */}
             <ToastProvider>
-              <div className="flex min-h-full w-full flex-1 flex-col">
-                {children}
-                <CookieBanner />
-              </div>
+              <FeaturesProvider features={features}>
+                <div className="flex min-h-full w-full flex-1 flex-col">
+                  {children}
+                  <CookieBanner />
+                </div>
+              </FeaturesProvider>
             </ToastProvider>
           </body>
         </html>

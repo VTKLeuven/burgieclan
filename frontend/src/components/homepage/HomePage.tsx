@@ -14,6 +14,7 @@ import { DragDropZone } from '@/components/upload/DragDropZone';
 import UploadDialog from '@/components/upload/UploadDialog';
 import { useUploadFlow } from '@/hooks/useUploadFlow';
 import { House } from 'lucide-react';
+import { useFeature } from '@/components/FeaturesContext';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -36,6 +37,7 @@ export default function HomePage() {
 
     // The time of day is the visitor's, not the server's, so it is filled in after hydration.
     const [now, setNow] = useState<Date | null>(null);
+    const examsEnabled = useFeature('exam_reconstructions');
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setNow(new Date());
@@ -57,7 +59,7 @@ export default function HomePage() {
                 actions={user && <CreateDocumentButton size={16} />}
             />
 
-            <div className="vtk-shell">
+            <div className="vtk-shell @container">
                 <h1 className="vtk-page-title">{user && firstName ? greeting : t('home.title')}</h1>
                 <p className="vtk-page-subtitle m-0 first-letter:uppercase" suppressHydrationWarning>
                     {[date, user && courseCount > 0 ? t('home.summary_courses', { count: courseCount }) : null].filter(Boolean).join(' · ')}
@@ -68,15 +70,19 @@ export default function HomePage() {
                     <AnnouncementSlideShow />
                 </div>
 
-                <div className="mt-8 grid items-start gap-x-8 gap-y-10 lg:grid-cols-[minmax(0,1fr)_340px]">
-                    <div className="grid min-w-0 gap-10">
-                        <ExamPrompt />
+                {/* Two columns once the page itself is wide enough, whatever the window: the sidebar
+                    beside it can be dragged wider. Every section may shrink below its content's
+                    width; grid items otherwise stretch to their widest row and push into the
+                    column beside them. */}
+                <div className="mt-8 grid items-start gap-x-8 gap-y-10 @[52rem]:grid-cols-[minmax(0,1fr)_340px]">
+                    <div className="grid min-w-0 gap-10 [&>*]:min-w-0">
+                        {examsEnabled && <ExamPrompt />}
                         <RecentActivities />
                         <MyCourses />
                         <FavoriteCurriculum />
                     </div>
 
-                    <div className="grid min-w-0 gap-10">
+                    <div className="grid min-w-0 gap-10 [&>*]:min-w-0">
                         <QuickLinks />
                         <DidacticFeedbackForm />
                     </div>

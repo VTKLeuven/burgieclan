@@ -151,7 +151,9 @@ export default function CurriculumNavigator() {
         {!programError && (results
           ? <CurriculumSearchResults hits={results} />
           : (
-            <div className="mt-5 grid gap-8">
+            // grid-cols-1 is minmax(0, 1fr): an implicit column grows to the longest programme name,
+            // which pushed the whole page sideways on a phone instead of truncating the names.
+            <div className="mt-5 grid grid-cols-1 gap-8">
               {favoriteCount > 0 && <FavoriteCurriculum />}
 
               <section aria-label={t('curriculum-navigator.programs')}>

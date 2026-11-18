@@ -2,6 +2,7 @@
 
 namespace App\Tests\Api;
 
+use App\Constants\Feature;
 use App\Constants\ExamPeriod;
 use App\Entity\Course;
 use App\Entity\Exam;
@@ -21,6 +22,13 @@ use Zenstruck\Browser\KernelBrowser;
  */
 class ExamImageResourceTest extends ApiTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Off by default; FeatureFlagTest covers the switched-off side.
+        self::enableFeature(Feature::EXAM_RECONSTRUCTIONS);
+    }
+
     private static function png(int $width, int $height): string
     {
         $image = imagecreatetruecolor($width, $height);

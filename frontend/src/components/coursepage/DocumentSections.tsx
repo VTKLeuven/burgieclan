@@ -1,6 +1,6 @@
 'use client'
 import Loading from '@/components/loading/LoadingPage';
-import DocumentCategoryPage from "@/components/coursepage/DocumentCategory";
+import DocumentCategoryRow from "@/components/coursepage/DocumentCategory";
 import SectionHeader from '@/components/ui/SectionHeader';
 import { HydraCollection, readPreloadedApi, useApi } from "@/hooks/useApi";
 import type { Course, DocumentCategory } from "@/types/entities";
@@ -15,7 +15,6 @@ interface DocumentSectionsProps {
 }
 
 export default function DocumentSections({ course, documentCounts }: DocumentSectionsProps) {
-    const courseId = course.id;
     const { t, i18n } = useTranslation();
     const categoriesEndpoint = `/api/document_categories?lang=${i18n.language}`;
     const [documentCategories, setDocumentCategories] = useState<DocumentCategory[]>(() => {
@@ -23,6 +22,15 @@ export default function DocumentSections({ course, documentCounts }: DocumentSec
         return preloaded?.['hydra:member'].map(convertToDocumentCategory) ?? [];
     });
     const [showEmpty, setShowEmpty] = useState(false);
+    const [openIds, setOpenIds] = useState<Set<number>>(new Set());
+
+    const toggleCategory = (id: number) => {
+        setOpenIds((previous) => {
+            const next = new Set(previous);
+            if (next.has(id)) next.delete(id); else next.add(id);
+            return next;
+        });
+    };
     const { request, loading } = useApi<HydraCollection<unknown>>();
 
     const countFor = (category: DocumentCategory) => documentCounts?.[category.id] ?? 0;
@@ -84,15 +92,13 @@ export default function DocumentSections({ course, documentCounts }: DocumentSec
             ) : (
                 <div className="vtk-list">
                     {visibleCategories.map((category) => (
-                        <DocumentCategoryPage
+                        <DocumentCategoryRow
                             key={category.id}
-                            title={category.name ?? ''}
-                            href={`/course/${courseId}/documents/category/${category.id}`}
-                            apiEndpoints={[
-                                `/api/courses/${courseId}?summary=true`,
-                                `/api/document_categories/${category.id}?lang=${i18n.language}`,
-                            ]}
+                            category={category}
+                            course={course}
                             count={countFor(category)}
+                            open={openIds.has(category.id)}
+                            onToggle={() => toggleCategory(category.id)}
                         />
                     ))}
                 </div>

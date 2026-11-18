@@ -28,8 +28,10 @@ import {
     FileText,
     GraduationCap,
     House,
+    Languages,
     LogOut,
     MessageSquareText,
+    PanelLeftClose,
     Search,
     Shield,
     UserRound,
@@ -113,7 +115,7 @@ export function SidebarBrand() {
     return (
         <Link
             href={`/${i18n.language === 'nl' ? '' : i18n.language}`}
-            className="flex h-11 items-center gap-2.5 rounded-control px-1"
+            className="flex h-11 min-w-0 items-center gap-2.5 rounded-control px-1"
         >
             <Image
                 src="/images/logos/burgieclan-cloud-navy.svg"
@@ -121,10 +123,10 @@ export function SidebarBrand() {
                 aria-hidden="true"
                 width={52}
                 height={29}
-                className="h-[26px] w-auto"
+                className="h-[26px] w-auto shrink-0"
                 priority
             />
-            <span className="text-[20px] leading-7 font-semibold tracking-[-0.02em] text-fg">Burgieclan</span>
+            <span className="truncate text-[20px] leading-7 font-semibold tracking-[-0.02em] text-fg">Burgieclan</span>
         </Link>
     );
 }
@@ -135,7 +137,11 @@ export function SidebarBrand() {
  * documents, and the account menu. Everything that used to live in the navy header and the
  * footer is in here now, so a page never has to say where else you can go.
  */
-export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+export default function Sidebar({ onNavigate, onCollapse }: {
+    onNavigate?: () => void;
+    /** Hides the desktop sidebar; the mobile drawer closes by other means and leaves it out. */
+    onCollapse?: () => void;
+}) {
     const { t, i18n } = useTranslation();
     const { user, isAdmin } = useUser();
     const router = useRouter();
@@ -157,7 +163,22 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
     return (
         <nav aria-label="Burgieclan" className="flex h-full flex-col px-3 pt-3 pb-3">
-            <SidebarBrand />
+            <div className="flex items-center gap-1">
+                <div className="flex min-w-0 flex-1">
+                    <SidebarBrand />
+                </div>
+                {onCollapse && (
+                    <button
+                        type="button"
+                        onClick={onCollapse}
+                        className="vtk-icon-button size-7!"
+                        aria-label={t('shell.hide_sidebar')}
+                        title={t('shell.hide_sidebar')}
+                    >
+                        <PanelLeftClose className="size-4" aria-hidden="true" />
+                    </button>
+                )}
+            </div>
 
             {user && (
                 <button
@@ -301,6 +322,16 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
                         <span className="truncate">{t('shell.feedback')}</span>
                     </button>
                 )}
+                {/* Logged out, the switcher sits next to "Inloggen" below instead. */}
+                {user && (
+                    <div className="flex h-8 items-center gap-2.5 pr-0.5 pl-2.5 text-small font-medium text-fg-nav [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-icon-strong">
+                        <Languages aria-hidden="true" />
+                        <span className="min-w-0 flex-1 truncate">{t('language')}</span>
+                        <Suspense fallback={null}>
+                            <LanguageSwitcher />
+                        </Suspense>
+                    </div>
+                )}
             </div>
 
             {user ? (
@@ -311,7 +342,7 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
                             className="mt-1 flex h-11 w-full items-center gap-2.5 rounded-control px-2 text-left transition-colors hover:bg-sidebar-hover data-[state=open]:bg-sidebar-hover"
                             aria-label={t('account.menu')}
                         >
-                            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-neutral-900 text-caption font-semibold text-white">
+                            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary text-caption font-semibold text-on-primary">
                                 {initials(user.fullName)}
                             </span>
                             <span className="min-w-0 flex-1">
@@ -348,13 +379,6 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
                                 <ExternalLink className="size-3.5!" />
                             </a>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <div className="flex items-center justify-between gap-3 px-2 py-1">
-                            <span className="text-body text-fg-secondary">{t('language')}</span>
-                            <Suspense fallback={null}>
-                                <LanguageSwitcher />
-                            </Suspense>
-                        </div>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onSelect={handleLogout} className="text-danger-text focus:text-danger-text [&_svg]:text-danger-text!">
                             <LogOut />

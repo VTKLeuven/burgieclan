@@ -1,7 +1,8 @@
 'use client';
 
 import Loading from '@/components/loading/LoadingPage';
-import PageHeader from '@/components/layout/PageHeader';
+import PageHeader, { Breadcrumbs } from '@/components/layout/PageHeader';
+import PlannerInfo from '@/components/study-planner/PlannerInfo';
 import { cn } from '@/lib/utils';
 import { AlertTriangle, CalendarDays, CalendarPlus, Settings2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -70,7 +71,12 @@ export default function StudyPlannerPage() {
     const subscribed = state?.subscribed === true;
     const header = (
         <PageHeader
-            crumbs={[{ label: t('study_planner.title'), icon: <CalendarDays /> }]}
+            breadcrumb={
+                <div className="flex min-w-0 flex-1 items-center gap-1">
+                    <Breadcrumbs crumbs={[{ label: t('study_planner.title'), icon: <CalendarDays /> }]} className="flex-none" />
+                    <PlannerInfo />
+                </div>
+            }
             actions={
                 subscribed && (
                     <>

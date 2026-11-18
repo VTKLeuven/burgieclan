@@ -7,12 +7,10 @@ import type { Exam } from '@/types/entities';
 import { convertToExam } from '@/utils/convertToEntity';
 import { compareExamsNewestFirst, examCalendarYear } from '@/utils/examPeriods';
 import SectionHeader from '@/components/ui/SectionHeader';
-import { ChevronRight, Construction, Lock, NotebookPen, Plus } from 'lucide-react';
+import { ChevronRight, Lock, NotebookPen, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const EXAM_RECONSTRUCTIONS_ENABLED = process.env.NODE_ENV !== 'production';
 
 /**
  * "Examens" on a course page: the exam reconstructions of this course, newest first, and the
@@ -25,8 +23,6 @@ export default function ExamSection({ courseId }: { courseId: number }) {
     const { request, error } = useApi<HydraCollection<unknown>>();
 
     useEffect(() => {
-        if (!EXAM_RECONSTRUCTIONS_ENABLED) return;
-
         let cancelled = false;
         request('GET', `/api/exams?course=/api/courses/${courseId}&itemsPerPage=100`).then((data) => {
             // On failure `error` is set and the list stays unknown rather than "empty".
@@ -36,28 +32,6 @@ export default function ExamSection({ courseId }: { courseId: number }) {
         });
         return () => { cancelled = true; };
     }, [courseId, request]);
-
-    if (!EXAM_RECONSTRUCTIONS_ENABLED) {
-        return (
-            <section aria-labelledby="exams-heading">
-                <SectionHeader
-                    id="exams-heading"
-                    icon={<NotebookPen />}
-                    title={t('exam.section.title')}
-                    description={t('exam.section.description')}
-                    action={
-                        <span className="vtk-badge vtk-badge-muted shrink-0">
-                            <Construction className="size-3" aria-hidden="true" />
-                            {t('exam.section.under-construction')}
-                        </span>
-                    }
-                />
-                <div className="vtk-panel vtk-empty">
-                    {t('exam.section.under-construction-description')}
-                </div>
-            </section>
-        );
-    }
 
     return (
         <section aria-labelledby="exams-heading">

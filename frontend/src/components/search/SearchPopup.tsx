@@ -37,8 +37,6 @@ type SearchResults = {
 
 const NO_RESULTS: SearchResults = { courses: [], modules: [], programs: [], documents: [], examQuestions: [] };
 
-const EXAM_RECONSTRUCTIONS_ENABLED = process.env.NODE_ENV !== 'production';
-
 type SearchApiResponse = Partial<Record<keyof SearchResults, unknown[]>>;
 
 const LOCALE_PREFIX = new RegExp(`^/(?:${i18nConfig.locales.join('|')})(?=/|$)`);
@@ -75,11 +73,9 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
         obj['documents']?.forEach((document) => {
             items.documents.push(convertToDocument(document));
         });
-        if (EXAM_RECONSTRUCTIONS_ENABLED) {
-            obj['examQuestions']?.forEach((hit) => {
-                items.examQuestions.push(convertToExamQuestionSearchHit(hit));
-            });
-        }
+        obj['examQuestions']?.forEach((hit) => {
+            items.examQuestions.push(convertToExamQuestionSearchHit(hit));
+        });
         return items;
     }
 

@@ -2,9 +2,11 @@
 
 namespace App\Security\Voter;
 
+use App\Constants\Feature;
 use App\Entity\CollabDocument;
 use App\Entity\User;
 use App\Repository\ExamRepository;
+use App\Service\Feature\FeatureFlags;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -18,7 +20,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  * outcome.
  *
  * - "exam-{id}", an exam reconstruction: every logged-in user may view it, and edit it until its
- *   `editableUntil`. After that it is read-only until a moderator reopens it.
+ *   `editableUntil`. After that it is read-only until a moderator reopens it. Nobody, while the
+ *   exam reconstructions feature is switched off.
  * - "collab-test", the phase 0 test page: moderators only.
  *
  * Any other name is denied.
@@ -35,6 +38,7 @@ class CollabDocumentVoter extends Voter
     public function __construct(
         private readonly AccessDecisionManagerInterface $accessDecisionManager,
         private readonly ExamRepository $exams,
+        private readonly FeatureFlags $flags,
     ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -58,6 +62,10 @@ class CollabDocumentVoter extends Voter
             // Goes through the decision manager rather than reading getRoles(), so the role
             // hierarchy applies: an admin counts as a moderator.
             return $this->accessDecisionManager->decide($token, [User::ROLE_MODERATOR]);
+        }
+
+        if (!$this->flags->isEnabled(Feature::EXAM_RECONSTRUCTIONS)) {
+            return false;
         }
 
         $exam = $this->exams->findByDocumentName($subject);

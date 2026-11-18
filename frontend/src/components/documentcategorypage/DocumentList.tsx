@@ -13,9 +13,11 @@ import { useTranslation } from 'react-i18next';
 interface DocumentListProps {
     course?: Course;
     category?: DocumentCategory;
+    /** Extra controls at the right end of the toolbar, e.g. a link to the folder's own page. */
+    toolbarEnd?: React.ReactNode;
 }
 
-const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
+const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEnd }) => {
     const [page, setPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(50);
     const [filters, setFilters] = useState<DocumentFilters>({});
@@ -136,6 +138,11 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category }) => {
                         >
                             <X size={16} />
                         </button>
+                    </div>
+                )}
+                {toolbarEnd && (
+                    <div className={selectedDocuments.length > 0 ? 'flex items-center' : 'ml-auto flex items-center'}>
+                        {toolbarEnd}
                     </div>
                 )}
             </div>
