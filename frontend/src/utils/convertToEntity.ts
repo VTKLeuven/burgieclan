@@ -20,6 +20,12 @@ import {
     type RatingScore,
     type Program,
     type QuickLink,
+    type StudyPlanner,
+    type StudyPlannerEvent,
+    type StudyPlannerItem,
+    type StudyPlannerMark,
+    type StudyPlannerRule,
+    type StudyPlannerSubject,
     type Tag,
     type User,
     type VoteSummary
@@ -469,4 +475,81 @@ function parseId(urlId: unknown): number {
         throw new Error(`Invalid id value: "${urlId}"`);
     }
     return parsed;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Study planner. Null fields are left out of the response, so every field has a default.
+
+const str = (value: unknown, fallback = ''): string => (typeof value === 'string' ? value : fallback);
+const strOrNull = (value: unknown): string | null => (typeof value === 'string' ? value : null);
+const num = (value: unknown, fallback = 0): number => (typeof value === 'number' && Number.isFinite(value) ? value : fallback);
+const numOrNull = (value: unknown): number | null => (typeof value === 'number' && Number.isFinite(value) ? value : null);
+const mark = (value: unknown): StudyPlannerMark => (value === 'event' || value === 'rule' ? value : null);
+const records = (value: unknown): ApiRecord[] =>
+    Array.isArray(value) ? value.filter((v): v is ApiRecord => typeof v === 'object' && v !== null) : [];
+
+export function convertToStudyPlanner(planner: unknown): StudyPlanner {
+    const data = toRecord(planner, 'StudyPlanner');
+    const subjects: StudyPlannerSubject[] = records(data.subjects).map((s) => ({
+        key: str(s.key),
+        label: str(s.label),
+        courseId: numOrNull(s.courseId),
+        courseCode: strOrNull(s.courseCode),
+        nameNl: strOrNull(s.nameNl),
+        nameEn: strOrNull(s.nameEn),
+    }));
+    const events: StudyPlannerEvent[] = records(data.events).map((e) => ({
+        uid: str(e.uid),
+        date: str(e.date),
+        start: str(e.start),
+        end: strOrNull(e.end),
+        startMin: num(e.startMin),
+        endMin: num(e.endMin),
+        course: str(e.course),
+        code: strOrNull(e.code),
+        subject: str(e.subject),
+        courseId: numOrNull(e.courseId),
+        type: str(e.type, 'other'),
+        location: strOrNull(e.location),
+        people: strOrNull(e.people),
+        done: e.done === true,
+        hidden: mark(e.hidden),
+        hiddenRule: strOrNull(e.hiddenRule),
+        mandatory: mark(e.mandatory),
+        mandatoryRule: strOrNull(e.mandatoryRule),
+    }));
+    const items: StudyPlannerItem[] = records(data.items).map((i) => ({
+        id: str(i.id),
+        subject: str(i.subject),
+        subjectLabel: str(i.subjectLabel),
+        kind: i.kind === 'mandatory' ? 'mandatory' : 'deadline',
+        title: str(i.title),
+        date: str(i.date),
+        time: strOrNull(i.time),
+        end: strOrNull(i.end),
+        note: str(i.note),
+        done: strOrNull(i.done),
+        createdAt: str(i.createdAt),
+    }));
+    const rules: StudyPlannerRule[] = records(data.rules).map((r) => ({
+        id: str(r.id),
+        action: r.action === 'mandatory' ? 'mandatory' : 'hide',
+        course: str(r.course),
+        weekday: num(r.weekday),
+        time: str(r.time),
+        location: str(r.location),
+    }));
+    return {
+        subscribed: data.subscribed === true,
+        icsUrl: strOrNull(data.icsUrl),
+        feedPath: strOrNull(data.feedPath),
+        lastSync: strOrNull(data.lastSync),
+        syncError: strOrNull(data.syncError),
+        today: str(data.today),
+        now: num(data.now),
+        subjects,
+        events,
+        items,
+        rules,
+    };
 }

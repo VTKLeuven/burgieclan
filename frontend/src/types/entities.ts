@@ -248,3 +248,111 @@ export interface FaqItem extends BaseEntity {
     answer?: string;
     position?: number;
 }
+// ---------------------------------------------------------------------------------------------
+// Study planner (GET /api/study_planner): the reader's KU Leuven timetable and what they marked
+// in it. Times are Leuven wall-clock times; dates are "YYYY-MM-DD".
+
+/** A course of the timetable. `key` is "course:{id}" when matched to a Burgieclan course. */
+export interface StudyPlannerSubject {
+    key: string;
+    label: string;
+    courseId: number | null;
+    courseCode: string | null;
+    nameNl: string | null;
+    nameEn: string | null;
+}
+
+/** "event" = this session itself, "rule" = every week at this time (StudyPlannerRule). */
+export type StudyPlannerMark = 'event' | 'rule' | null;
+
+export interface StudyPlannerEvent {
+    uid: string;
+    date: string;
+    /** "HH:MM" */
+    start: string;
+    end: string | null;
+    startMin: number;
+    endMin: number;
+    /** Course name without the code, e.g. "Power Systems: Lecture". */
+    course: string;
+    code: string | null;
+    subject: string;
+    courseId: number | null;
+    /** college | practicum | oefenzitting | excursie | opdracht | other */
+    type: string;
+    location: string | null;
+    people: string | null;
+    done: boolean;
+    hidden: StudyPlannerMark;
+    hiddenRule: string | null;
+    mandatory: StudyPlannerMark;
+    mandatoryRule: string | null;
+}
+
+export type StudyPlannerItemKind = 'deadline' | 'mandatory';
+
+/** A deadline or mandatory session entered by hand. */
+export interface StudyPlannerItem {
+    id: string;
+    subject: string;
+    /** The subject's name when the item was saved, for when it leaves the timetable. */
+    subjectLabel: string;
+    kind: StudyPlannerItemKind;
+    title: string;
+    date: string;
+    time: string | null;
+    /** End time of a mandatory session. */
+    end: string | null;
+    note: string;
+    /** ISO timestamp when ticked off. */
+    done: string | null;
+    createdAt: string;
+}
+
+export interface StudyPlannerRule {
+    id: string;
+    action: 'hide' | 'mandatory';
+    course: string;
+    weekday: number;
+    time: string;
+    location: string;
+}
+
+export interface StudyPlanner {
+    subscribed: boolean;
+    icsUrl: string | null;
+    /** Path of the exported calendar on the backend, e.g. "/api/study_planner/feed/….ics". */
+    feedPath: string | null;
+    lastSync: string | null;
+    syncError: string | null;
+    today: string;
+    /** Minutes since midnight in Leuven when the planner was loaded. */
+    now: number;
+    subjects: StudyPlannerSubject[];
+    events: StudyPlannerEvent[];
+    items: StudyPlannerItem[];
+    rules: StudyPlannerRule[];
+}
+
+export interface StudyPlannerItemInput {
+    subject: string;
+    kind: StudyPlannerItemKind;
+    title: string;
+    date: string;
+    time: string | null;
+    end: string | null;
+    note: string;
+}
+
+/** Body of POST /api/study_planner/operations. */
+export type StudyPlannerOperation =
+    | { op: 'done'; uid: string; value: boolean }
+    | { op: 'hide'; uid: string; value: boolean }
+    | { op: 'mandatory'; uid: string; value: boolean }
+    | { op: 'keepOnly'; uid: string }
+    | { op: 'addRule'; uid: string; action: 'hide' | 'mandatory' }
+    | { op: 'removeRule'; id: string }
+    | { op: 'addItem'; item: StudyPlannerItemInput }
+    | { op: 'updateItem'; id: string; item: StudyPlannerItemInput }
+    | { op: 'deleteItem'; id: string }
+    | { op: 'itemDone'; id: string; value: boolean };
