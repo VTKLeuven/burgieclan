@@ -21,7 +21,8 @@ export interface DocumentSortOptions {
 const useRetrieveDocuments = (
     page: number,
     itemsPerPage: number = 30,
-    course?: Course,
+    /** One course, or several whose documents come back as one list (e.g. a course and its identical courses). */
+    course?: Course | Course[],
     category?: DocumentCategory,
     onlyUserDocuments: boolean = true,
     filters?: DocumentFilters,
@@ -49,8 +50,13 @@ const useRetrieveDocuments = (
                     url += `&creator=${encodeURIComponent(`/api/users/${user.id}`)}`;
                 }
 
-                // Add course filter if provided
-                if (course) {
+                // Add course filter if provided. The exact SearchFilter takes `course[]` for
+                // "any of these", which keeps paging and sorting on the server for the whole set.
+                if (Array.isArray(course)) {
+                    course.forEach(c => {
+                        url += `&course[]=${encodeURIComponent('/api/courses/' + c.id)}`;
+                    });
+                } else if (course) {
                     url += `&course=${encodeURIComponent('/api/courses/' + course.id)}`;
                 }
 

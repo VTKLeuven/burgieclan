@@ -49,6 +49,7 @@ class CourseResourceTest extends ApiTestCase
                 'modules',
                 'courseComments',
                 'documentCounts',
+                'relatedDocumentCounts',
                 'createdAt',
                 'updatedAt',
             ],
@@ -285,6 +286,74 @@ class CourseResourceTest extends ApiTestCase
         $this->assertSame([], $json['oldCourses']);
         $this->assertSame([], $json['courseComments']);
         $this->assertSame([], $json['documentCounts']);
+    }
+
+    /**
+     * A document category page lists the related courses' documents too, so it needs those
+     * courses - but still none of the comments or modules a full course response maps.
+     */
+    public function testGetCourseSummaryWithRelatedIncludesRelatedCoursesOnly(): void
+    {
+        $old = CourseFactory::createOne();
+        $twin = CourseFactory::createOne();
+        $course = CourseFactory::createOne(['oldCourses' => [$old], 'identicalCourses' => [$twin]]);
+        DocumentFactory::createOne(['course' => $course, 'under_review' => false]);
+
+        $json = $this->browser()
+            ->get(
+                '/api/courses/' . $course->getId() . '?summary=true&related=true',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJson()
+            ->json()->decoded();
+
+        $this->assertSame([$old->getCode()], array_column($json['oldCourses'], 'code'));
+        $this->assertSame([$twin->getCode()], array_column($json['identicalCourses'], 'code'));
+        $this->assertSame([], $json['courseComments']);
+        $this->assertSame([], $json['modules']);
+        $this->assertSame([], $json['documentCounts']);
+    }
+
+    /**
+     * After a reform the new course often has nothing in a category while its predecessor holds
+     * years of exams there; the course page needs this count to keep that category visible.
+     */
+    public function testGetCourseExposesRelatedDocumentCountsByCategory(): void
+    {
+        $old = CourseFactory::createOne();
+        $twin = CourseFactory::createOne();
+        $course = CourseFactory::createOne(['oldCourses' => [$old], 'identicalCourses' => [$twin]]);
+        $exams = DocumentCategoryFactory::createOne();
+        $notes = DocumentCategoryFactory::createOne();
+
+        DocumentFactory::createMany(3, ['course' => $old, 'category' => $exams, 'under_review' => false]);
+        DocumentFactory::createMany(2, ['course' => $twin, 'category' => $exams, 'under_review' => false]);
+        DocumentFactory::createOne(['course' => $twin, 'category' => $notes, 'under_review' => false]);
+        // Neither a pending upload nor the course's own documents count as related.
+        DocumentFactory::createOne(['course' => $old, 'category' => $exams, 'under_review' => true]);
+        DocumentFactory::createOne(['course' => $course, 'category' => $exams, 'under_review' => false]);
+
+        $json = $this->browser()
+            ->get(
+                '/api/courses/' . $course->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJson()
+            ->json()->decoded();
+
+        $this->assertSame(5, $json['relatedDocumentCounts'][$exams->getId()]);
+        $this->assertSame(1, $json['relatedDocumentCounts'][$notes->getId()]);
+        $this->assertSame(1, $json['documentCounts'][$exams->getId()]);
     }
 
     public function testGetCourseExposesDocumentCountsByCategory(): void

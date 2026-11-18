@@ -5,6 +5,7 @@ import DocumentList from '@/components/documentcategorypage/DocumentList';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import { cn } from '@/lib/utils';
 import type { Course, DocumentCategory as DocumentCategoryEntity } from '@/types/entities';
+import { categoryPageCourseEndpoint } from '@/utils/courseEndpoints';
 import { ArrowUpRight, ChevronRight, Folder, FolderOpen } from "lucide-react";
 import { useId } from 'react';
 import { useTranslation } from "react-i18next";
@@ -13,6 +14,8 @@ interface DocumentCategoryProps {
     category: DocumentCategoryEntity;
     course: Course;
     count?: number;
+    /** Documents of identical and older courses, which the folder also lists below the course's own. */
+    relatedCount?: number;
     open: boolean;
     onToggle: () => void;
 }
@@ -22,16 +25,20 @@ interface DocumentCategoryProps {
  * with the same filter, sort and selection as the folder's own page, which stays one click away
  * for a link to share or a view with more room.
  */
-export default function DocumentCategory({ category, course, count = 0, open, onToggle }: DocumentCategoryProps) {
+export default function DocumentCategory({ category, course, count = 0, relatedCount = 0, open, onToggle }: DocumentCategoryProps) {
     const { t, i18n } = useTranslation();
     const regionId = useId();
     const href = `/course/${course.id}/documents/category/${category.id}`;
 
-    const countLabel = count === 0
+    const ownLabel = count === 0
         ? t('course-page.document-count.zero')
         : count === 1
             ? t('course-page.document-count.one')
             : t('course-page.document-count.other', { count });
+    const countLabel = relatedCount > 0
+        ? `${ownLabel}, ${t('course-page.document-count.related', { count: relatedCount })}`
+        : ownLabel;
+    const isEmpty = count === 0 && relatedCount === 0;
 
     const FolderIcon = open ? FolderOpen : Folder;
 
@@ -50,7 +57,7 @@ export default function DocumentCategory({ category, course, count = 0, open, on
                 />
                 <FolderIcon className="size-4 shrink-0 text-icon" aria-hidden="true" />
                 <span className="min-w-0 flex-1 truncate text-body font-medium text-fg">{category.name}</span>
-                <span className={`shrink-0 text-small tabular ${count === 0 ? 'text-fg-placeholder' : 'text-fg-muted'}`}>
+                <span className={`shrink-0 text-small tabular ${isEmpty ? 'text-fg-placeholder' : 'text-fg-muted'}`}>
                     {countLabel}
                 </span>
             </button>
@@ -64,7 +71,7 @@ export default function DocumentCategory({ category, course, count = 0, open, on
                         <ApiPrefetchLink
                             href={href}
                             apiEndpoints={[
-                                `/api/courses/${course.id}?summary=true`,
+                                categoryPageCourseEndpoint(course.id),
                                 `/api/document_categories/${category.id}?lang=${i18n.language}`,
                             ]}
                             className="inline-flex h-8 items-center gap-1 rounded-control px-2 text-small font-medium text-fg-muted transition-colors hover:bg-neutral-150 hover:text-fg"

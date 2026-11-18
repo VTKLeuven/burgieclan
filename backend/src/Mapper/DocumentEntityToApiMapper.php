@@ -59,6 +59,7 @@ class DocumentEntityToApiMapper extends BaseEntityToApiMapper
         $to->author = $from->getAuthor();
         $to->under_review = $from->isUnderReview();
         $to->anonymous = $from->isAnonymous();
+        $to->seafileFileId = $from->getSeafileFileId();
         $to->creator = $this->microMapper->map(
             $from->getCreator(),
             UserApi::class,

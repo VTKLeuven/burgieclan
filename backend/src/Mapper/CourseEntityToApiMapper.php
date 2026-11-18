@@ -49,13 +49,17 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
 
         // A course row already has everything it renders. Avoid walking comments, replacement
         // courses and reverse module associations when embedded in a module detail response.
+        // A document category page asks for a summary plus the related courses
+        // (`?summary=true&related=true`): it lists their documents too, but renders no comments.
         if ($context[MappingContext::SUMMARY] ?? false) {
+            if ($context[MappingContext::WITH_RELATED] ?? false) {
+                $this->mapAllRelatedCourses($from, $to);
+            }
+
             return $to;
         }
 
-        $to->oldCourses = $this->mapRelatedCourses($from->getOldCourses()->getValues());
-        $to->newCourses = $this->mapRelatedCourses($from->getNewCourses()->getValues());
-        $to->identicalCourses = $this->mapRelatedCourses($from->getIdenticalCourses()->getValues());
+        $this->mapAllRelatedCourses($from, $to);
 
         $to->modules = array_map(
             function (Module $module) {
@@ -85,7 +89,20 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
 
         $to->documentCounts = $this->documentRepository->countByCategoryForCourse($from);
 
+        // What the category pages also show from identical and older courses. Without it a
+        // category that only the predecessor has files in would read as empty and be hidden
+        // on the course page, which after a reform is exactly where the exams are.
+        $related = [...$from->getIdenticalCourses()->getValues(), ...$from->getOldCourses()->getValues()];
+        $to->relatedDocumentCounts = $this->documentRepository->countByCategoryForCourses($related);
+
         return $to;
+    }
+
+    private function mapAllRelatedCourses(Course $from, CourseApi $to): void
+    {
+        $to->oldCourses = $this->mapRelatedCourses($from->getOldCourses()->getValues());
+        $to->newCourses = $this->mapRelatedCourses($from->getNewCourses()->getValues());
+        $to->identicalCourses = $this->mapRelatedCourses($from->getIdenticalCourses()->getValues());
     }
 
     /**

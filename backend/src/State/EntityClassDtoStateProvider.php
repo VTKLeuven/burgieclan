@@ -75,6 +75,7 @@ class EntityClassDtoStateProvider implements ProviderInterface
         $request = $this->requestStack->getCurrentRequest();
         $lang = $request->query->get('lang'); // If the language is given as param, pass it to the mapper
         $summary = CourseApi::class === $resourceClass && $request->query->getBoolean('summary');
+        $related = CourseApi::class === $resourceClass && $request->query->getBoolean('related');
         return $this->microMapper->map(
             $entity,
             $resourceClass,
@@ -83,6 +84,7 @@ class EntityClassDtoStateProvider implements ProviderInterface
                 MappingContext::COLLECTION_OPERATION => $collectionOperation,
                 MappingContext::OPERATION_NAME => $operation->getName(),
                 MappingContext::SUMMARY => $summary,
+                MappingContext::WITH_RELATED => $related,
             ]
         );
     }

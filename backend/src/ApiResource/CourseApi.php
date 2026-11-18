@@ -178,6 +178,13 @@ class CourseApi extends BaseEntityApi
     public array $documentCounts = [];
 
     /**
+     * @var array<int, int> Map of category ID to the number of documents the identical and older
+     *                      courses hold there, which the category page lists below this course's own
+     */
+    #[Groups([SerializationGroups::COURSE_GET])]
+    public array $relatedDocumentCounts = [];
+
+    /**
      * Published documents on this course, as a single total.
      *
      * Only filled in for the related courses hanging off a course detail response, where it is

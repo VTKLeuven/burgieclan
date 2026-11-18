@@ -189,7 +189,8 @@
         "document-count": {
             "zero": "0 documents",
             "one": "1 document",
-            "other": "{{count}} documents"
+            "other": "{{count}} documents",
+            "related": "+{{count}} from equivalent and previous courses"
         },
         "comments": {
             "comment-single": "1 comment",
@@ -258,7 +259,11 @@
             "select-all": "Select all",
             "deselect-all": "Deselect all",
             "clear-selection": "Clear selection",
-            "favorites-see-all": "See all favorites"
+            "favorites-see-all": "See all favorites",
+            "this-course": "This course",
+            "older-courses": "Previously taught as",
+            "none-see-older": "No documents under this code yet. See the previous courses below.",
+            "no-year": "Year unknown"
         },
         "related": {
             "predecessors": "Previously taught as",

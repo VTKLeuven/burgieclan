@@ -2,6 +2,7 @@
 
 namespace App\ApiResource;
 
+use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
@@ -133,7 +134,21 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: EntityClassDtoStateProcessor::class,
     stateOptions: new Options(entityClass: Document::class)
 )]
-#[ApiFilter(OrderFilter::class)]
+// Sorting by year puts documents without one last in both directions. Postgres sorts NULL
+// first on DESC, and "newest year first" is the default order of every document list, so
+// without this the undated files would sit on top of a course's most recent material.
+#[ApiFilter(
+    OrderFilter::class,
+    properties: [
+        'id',
+        'name',
+        'year' => ['nulls_comparison' => OrderFilterInterface::NULLS_ALWAYS_LAST],
+        'author',
+        'createdAt',
+        'updatedAt',
+        'creator.fullName',
+    ]
+)]
 class DocumentApi extends NodeApi
 {
     #[Assert\NotBlank]
@@ -189,6 +204,17 @@ class DocumentApi extends NodeApi
     #[ApiFilter(BooleanFilter::class)]
     #[Groups([SerializationGroups::DOCUMENT_GET])]
     public bool $anonymous = false;
+
+    /**
+     * The old Seafile file this document was migrated from, or null for an upload on the new site.
+     *
+     * One Seafile file can sit on several courses (identical courses in two programmes share a
+     * folder), and a course page that lists its identical courses' documents too uses this to
+     * show such a file once instead of twice.
+     */
+    #[ApiProperty(writable: false)]
+    #[Groups([SerializationGroups::DOCUMENT_GET])]
+    public ?string $seafileFileId = null;
 
     /**
      * Whether the requesting user may withdraw this upload - see App\Security\Voter\DocumentVoter,
