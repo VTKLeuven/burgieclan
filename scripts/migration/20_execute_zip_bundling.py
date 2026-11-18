@@ -90,9 +90,8 @@ for folder_rel, cc, cat_id, title, fname in bundles:
         "rclone", "copyto", out_zip, s3_target,
         "--s3-provider=Other",
         "--s3-region=nbg1",
-        "--s3-endpoint=https://nbg1.your-objectstorage.com",
-        "--s3-access-key-id=UT1UM2KCMQP920Z1RVF1",
-        "--s3-secret-access-key=SO2eAne4eirNYlZDTAAQKGfQeTS5ZQlKrGUle4gU"
+        "--s3-endpoint=https://nbg1.your-objectstorage.com"
+        # Credentials come from RCLONE_S3_ACCESS_KEY_ID / RCLONE_S3_SECRET_ACCESS_KEY in the environment.
     ]
     sub_res = subprocess.run(cmd, capture_output=True, text=True)
     if sub_res.returncode != 0:
