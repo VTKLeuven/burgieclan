@@ -263,7 +263,9 @@
             "this-course": "This course",
             "older-courses": "Previously taught as",
             "none-see-older": "No documents under this code yet. See the previous courses below.",
-            "no-year": "Year unknown"
+            "no-year": "Year unknown",
+            "from-course": "On {{code}}, an equivalent course",
+            "open-course": "Open the course page of {{code}}"
         },
         "related": {
             "predecessors": "Previously taught as",

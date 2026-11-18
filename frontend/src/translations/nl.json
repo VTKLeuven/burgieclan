@@ -263,7 +263,9 @@
             "this-course": "Dit vak",
             "older-courses": "Vroeger gegeven als",
             "none-see-older": "Nog geen documenten onder deze code. Bekijk de vorige vakken hieronder.",
-            "no-year": "Jaar onbekend"
+            "no-year": "Jaar onbekend",
+            "from-course": "Staat op {{code}}, een gelijkwaardig vak",
+            "open-course": "Open de vakpagina van {{code}}"
         },
         "related": {
             "predecessors": "Vroeger gegeven als",

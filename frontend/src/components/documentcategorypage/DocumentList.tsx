@@ -190,6 +190,7 @@ interface OlderCourseSectionProps {
 
 /** One older course: its own memoised course list and total callback, so the section's fetch stays put. */
 function OlderCourseSection({ older, onTotal, language, ...rest }: OlderCourseSectionProps) {
+    const { t } = useTranslation();
     const courses = useMemo(() => [older], [older]);
     const handleTotal = useCallback((total: number) => onTotal(older.id, total), [older.id, onTotal]);
 
@@ -198,6 +199,9 @@ function OlderCourseSection({ older, onTotal, language, ...rest }: OlderCourseSe
             {...rest}
             courses={courses}
             onTotal={handleTotal}
+            // The older course's own page holds what this folder cannot show, such as its comments.
+            titleHref={`/course/${older.id}`}
+            titleLinkLabel={t('course-page.documents.open-course', { code: older.code })}
             title={(
                 <>
                     <span className="font-mono text-fg-muted">{older.code}</span>

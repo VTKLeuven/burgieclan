@@ -3,7 +3,8 @@ import { Checkbox } from '@/components/ui/Checkbox';
 import Pagination from '@/components/ui/Pagination';
 import useRetrieveDocuments, { DocumentFilters, DocumentSortOptions } from '@/hooks/useRetrieveDocuments';
 import type { Course, Document, DocumentCategory } from '@/types/entities';
-import { ChevronRight, LoaderCircle } from 'lucide-react';
+import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
+import { ArrowUpRight, ChevronRight, LoaderCircle } from 'lucide-react';
 import React, { useEffect, useId, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -19,6 +20,9 @@ interface DocumentSectionProps {
     title?: React.ReactNode;
     /** Opens a collapsed section, e.g. when the course itself has nothing in this category. */
     openByDefault?: boolean;
+    /** A page the section's heading belongs to, e.g. the older course's own page with its comments. */
+    titleHref?: string;
+    titleLinkLabel?: string;
     emptyMessage?: string;
     isSelected: (document: Document) => boolean;
     onToggleSelect: (document: Document) => void;
@@ -73,6 +77,8 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
     sort,
     title,
     openByDefault = false,
+    titleHref,
+    titleLinkLabel,
     emptyMessage,
     isSelected,
     onToggleSelect,
@@ -168,6 +174,9 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
                                 document={document}
                                 isSelected={isSelected(document)}
                                 onToggleSelect={onToggleSelect}
+                                courseBadge={courses.length > 1 && document.course?.id !== courses[0].id
+                                    ? document.course?.code
+                                    : undefined}
                             />
                         ))}
                     </div>
@@ -188,12 +197,14 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
 
     return (
         <section className="vtk-panel overflow-hidden">
+            {/* The toggle and the link sit side by side: a link inside a button is not valid HTML. */}
+            <div className="flex items-center">
             <button
                 type="button"
                 aria-expanded={open}
                 aria-controls={contentId}
                 onClick={() => setUserOpen(!open)}
-                className="group flex h-10 w-full items-center gap-2.5 px-4 text-left hover:bg-surface-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+                className="group flex h-10 min-w-0 flex-1 items-center gap-2.5 px-4 text-left hover:bg-surface-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
             >
                 <ChevronRight
                     className={`size-4 shrink-0 text-fg-placeholder transition-transform duration-150 group-hover:text-icon ${open ? 'rotate-90' : ''}`}
@@ -208,6 +219,17 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
                     </span>
                 )}
             </button>
+            {titleHref && (
+                <ApiPrefetchLink
+                    href={titleHref}
+                    className="inline-flex h-10 shrink-0 items-center gap-1 px-3 text-small font-medium text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+                    aria-label={titleLinkLabel}
+                    title={titleLinkLabel}
+                >
+                    <ArrowUpRight className="size-3.5" aria-hidden="true" />
+                </ApiPrefetchLink>
+            )}
+            </div>
             {open && (
                 <div id={contentId} className="border-t border-border">
                     {body}
