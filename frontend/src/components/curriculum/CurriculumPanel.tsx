@@ -44,11 +44,29 @@ const TREE_ENDPOINT = '/api/programs/tree?pagination=false&order[name]=asc';
 
 /** Past this depth rows stop stepping right, or a deep branch runs out of column to indent into. */
 const MAX_INDENT = 5;
-/** Row padding before the first chevron, and how far each level steps in. */
+/** Row padding before a top-level row's chevron. */
 const BASE_PADDING = 4;
-const INDENT_STEP = 14;
-/** The chevron button is 20px wide; guides run through its centre. */
-const CHEVRON_CENTRE = 10;
+/** The leading chevron button of a top-level row. */
+const CHEVRON_WIDTH = 20;
+/** The gap between the chevron and the icon, which the link pads in front of its icon. */
+const LINK_INSET = 2;
+const ICON_SIZE = 16;
+/** How far each level below the first steps in. */
+const INDENT_STEP = 20;
+
+/**
+ * Where a row's icon starts. A nested row has no chevron in front of it, so the first level lines
+ * its icon up under its parent's, and every level after that steps one further in. Reserving an
+ * empty chevron slot on every row instead cost the names a fifth of a narrow column.
+ */
+function iconLeft(indent: number): number {
+    return BASE_PADDING + CHEVRON_WIDTH + LINK_INSET + Math.max(0, indent - 1) * INDENT_STEP;
+}
+
+/** The guide down the children of a row at `level`: through its chevron at the top, its icon below. */
+function guideLeft(level: number): number {
+    return level === 0 ? BASE_PADDING + CHEVRON_WIDTH / 2 : iconLeft(level) + ICON_SIZE / 2;
+}
 const MAX_FILTER_RESULTS = 50;
 /** How many files of the open folder to list around the one being read; the rest is one link away. */
 const FOLDER_WINDOW = 8;
@@ -162,7 +180,7 @@ function CurriculumColumn({ panel }: { panel: PanelState }) {
                 </div>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-3 scrollbar-thin">
+            <div className="min-h-0 flex-1 overflow-y-auto px-2 pt-1 pb-3 scrollbar-thin">
                 {browsingId === null ? (
                     <p className="m-0 px-2 py-2 text-small text-fg-muted">{t('curriculum-panel.choose-program')}</p>
                 ) : query.trim() ? (
@@ -529,7 +547,7 @@ function FolderDocuments({
                     <ApiPrefetchLink
                         href={folderHref}
                         className="flex h-7 items-center rounded-[8px] pr-2 text-caption font-medium text-fg-muted hover:bg-sidebar-hover hover:text-fg"
-                        style={{ paddingLeft: BASE_PADDING + Math.min(depth, MAX_INDENT) * INDENT_STEP + 22 }}
+                        style={{ paddingLeft: iconLeft(Math.min(depth, MAX_INDENT)) }}
                     >
                         {t('shell.show_all', { count: documents.length })}
                     </ApiPrefetchLink>
@@ -649,6 +667,9 @@ interface TreeRowProps {
 /**
  * One row: a chevron that only opens the branch, and a label that only navigates. Looking inside
  * a semester and going to it are different things, so they are different targets.
+ *
+ * A top-level row carries its chevron in front, like a folder in a file tree. A nested row carries
+ * it behind the label, so its icon stays in line with its siblings' whether or not it opens.
  */
 function TreeRow({
     label, href, apiEndpoints, depth, icon, expandable = false, open = false, loading = false,
@@ -657,14 +678,32 @@ function TreeRow({
     const { t } = useTranslation();
     const rowRef = useRef<HTMLDivElement>(null);
     const indent = Math.min(depth, MAX_INDENT);
-    // The highlight starts at this row's own level, so it never covers the guides of the levels
-    // above it; a top-level row has none and fills the width.
-    const highlightLeft = indent === 0 ? 0 : BASE_PADDING + indent * INDENT_STEP;
+    const leading = indent === 0;
+    // The highlight starts just past the guide this row hangs from, so it never covers the guides
+    // of the levels above it; a top-level row has none and fills the width.
+    const highlightLeft = leading ? 0 : guideLeft(indent - 1) + 6;
 
     // Brings the reader's own row into view when they arrive, without fighting later scrolling.
     useEffect(() => {
         if (active) rowRef.current?.scrollIntoView({ block: 'nearest' });
     }, [active]);
+
+    const chevron = expandable && (
+        <button
+            type="button"
+            onClick={onToggle}
+            aria-expanded={open}
+            aria-label={t(open ? 'curriculum-tree.collapse' : 'curriculum-tree.expand', { name: label })}
+            className={cn(
+                'relative grid h-7 shrink-0 place-items-center rounded-[6px] text-fg-placeholder hover:text-fg focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-hidden',
+                leading ? 'w-5' : 'w-6',
+            )}
+        >
+            {loading
+                ? <LoaderCircle className="size-3.5 animate-spin" aria-hidden="true" />
+                : <ChevronRight className={cn('size-3.5 transition-transform duration-150', open && 'rotate-90')} strokeWidth={2.25} aria-hidden="true" />}
+        </button>
+    );
 
     return (
         <div
@@ -673,7 +712,7 @@ function TreeRow({
                 'group/row relative flex h-7 items-center pr-1.5 text-small',
                 active ? 'font-medium text-fg' : muted ? 'text-fg-muted' : 'font-medium text-fg-nav',
             )}
-            style={{ paddingLeft: BASE_PADDING + indent * INDENT_STEP }}
+            style={{ paddingLeft: leading ? BASE_PADDING : iconLeft(indent) - LINK_INSET }}
         >
             <span
                 aria-hidden="true"
@@ -690,25 +729,11 @@ function TreeRow({
                     key={level}
                     aria-hidden="true"
                     className="pointer-events-none absolute inset-y-0 w-px bg-border-strong"
-                    style={{ left: BASE_PADDING + level * INDENT_STEP + CHEVRON_CENTRE }}
+                    style={{ left: guideLeft(level) }}
                 />
             ))}
 
-            {expandable ? (
-                <button
-                    type="button"
-                    onClick={onToggle}
-                    aria-expanded={open}
-                    aria-label={t(open ? 'curriculum-tree.collapse' : 'curriculum-tree.expand', { name: label })}
-                    className="relative grid h-7 w-5 shrink-0 place-items-center rounded-[6px] text-fg-placeholder hover:text-fg focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-hidden"
-                >
-                    {loading
-                        ? <LoaderCircle className="size-3.5 animate-spin" aria-hidden="true" />
-                        : <ChevronRight className={cn('size-3.5 transition-transform duration-150', open && 'rotate-90')} strokeWidth={2.25} aria-hidden="true" />}
-                </button>
-            ) : (
-                <span className="w-5 shrink-0" aria-hidden="true" />
-            )}
+            {leading && (chevron || <span className="w-5 shrink-0" aria-hidden="true" />)}
 
             <ApiPrefetchLink
                 href={href}
@@ -724,6 +749,8 @@ function TreeRow({
                     <span className="shrink-0 text-caption font-medium text-fg-muted tabular">{count}</span>
                 )}
             </ApiPrefetchLink>
+
+            {!leading && chevron}
         </div>
     );
 }
@@ -732,7 +759,7 @@ function EmptyRow({ depth, label }: { depth: number; label: string }) {
     return (
         <p
             className="m-0 py-1 pr-2 text-caption text-fg-muted italic"
-            style={{ paddingLeft: BASE_PADDING + Math.min(depth, MAX_INDENT) * INDENT_STEP + 22 }}
+            style={{ paddingLeft: iconLeft(Math.min(depth, MAX_INDENT)) }}
         >
             {label}
         </p>
