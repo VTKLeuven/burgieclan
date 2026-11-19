@@ -22,7 +22,7 @@ import { formatFileSize } from "@/utils/fileSize";
 import { inlineUrl, previewKindFor } from "@/utils/previewableFile";
 import { useDocumentAsidePanel } from "@/components/layout/ShellPanels";
 import { cn } from "@/lib/utils";
-import { CalendarDays, ExternalLink, HardDrive, PanelRightClose, PanelRightOpen, PenLine, UserRound } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, ExternalLink, HardDrive, PenLine, UserRound } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -184,25 +184,36 @@ export default function DocumentPreview({ id }: { id: string }) {
                         fileSize={document.fileSize ? formatFileSize(document.fileSize) : undefined}
                         disabled={!user}
                     />
-                    {roomForAside && (
+                </>
+            )}
+
+            <div ref={previewLayoutRef} className={cn('relative flex flex-1', showAside ? 'flex-row' : 'flex-col')}>
+                {/* The fold sits on the aside's own edge, halfway down the screen, rather than in
+                    the header where nothing tied it to the column it hides. A zero-width rail as
+                    tall as the page carries it, so the tab stays in view while the page scrolls. */}
+                {roomForAside && (
+                    <div
+                        className={cn('pointer-events-none absolute inset-y-0 z-10 w-0', !showAside && 'right-0')}
+                        style={showAside ? { right: asidePanel.width } : undefined}
+                    >
                         <button
                             type="button"
                             onClick={() => asidePanel.setOpen(!asidePanel.open)}
-                            className="vtk-icon-button"
+                            className={cn(
+                                'pointer-events-auto sticky top-[45vh] grid h-10 w-6 place-items-center border border-border bg-surface text-icon shadow-xs transition-colors hover:bg-surface-hover hover:text-icon-strong focus:outline-hidden focus-visible:ring-2 focus-visible:ring-focus',
+                                showAside ? '-translate-x-1/2 rounded-full' : '-translate-x-full rounded-l-[8px] border-r-0',
+                            )}
                             aria-expanded={asidePanel.open}
                             aria-controls="document-aside"
                             aria-label={asideLabel}
                             title={asideLabel}
                         >
-                            {asidePanel.open
-                                ? <PanelRightClose className="size-[18px]" aria-hidden="true" />
-                                : <PanelRightOpen className="size-[18px]" aria-hidden="true" />}
+                            {showAside
+                                ? <ChevronRight className="size-4" aria-hidden="true" />
+                                : <ChevronLeft className="size-4" aria-hidden="true" />}
                         </button>
-                    )}
-                </>
-            )}
-
-            <div ref={previewLayoutRef} className={cn('flex flex-1', showAside ? 'flex-row' : 'flex-col')}>
+                    </div>
+                )}
                 <div className="min-w-0 flex-1 px-4 pt-7 pb-16 md:px-8">
                     <h1 className="vtk-page-title">{document.name}</h1>
                     <p className="m-0 mt-1 flex flex-wrap gap-x-2 text-body text-fg-muted">
