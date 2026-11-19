@@ -6,6 +6,7 @@ import MobileNav from '@/components/layout/MobileNav';
 import ResizeHandle from '@/components/layout/ResizeHandle';
 import { useSidebarPanel } from '@/components/layout/ShellPanels';
 import Sidebar from '@/components/layout/Sidebar';
+import SlideColumn from '@/components/layout/SlideColumn';
 import { cn } from '@/lib/utils';
 import { useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,17 +32,17 @@ export default function AppShell({ children }: { children: ReactNode }) {
             >
                 Skip to main content
             </a>
-            {sidebar.open && (
-                <aside ref={sidebarRef} style={{ width: sidebar.width }} className="relative hidden shrink-0 md:block">
+            <SlideColumn open={sidebar.open} width={sidebar.width} className="hidden md:flex">
+                <aside ref={sidebarRef} style={{ width: sidebar.width }} className="relative shrink-0">
                     <Sidebar onCollapse={() => sidebar.setOpen(false)} />
                     <ResizeHandle panel={sidebar} targetRef={sidebarRef} label={t('shell.resize_sidebar')} />
                 </aside>
-            )}
+            </SlideColumn>
             {/* The white panel. On curriculum pages it opens with the folder tree in a column of
                 its own; only the page beside it is the scroll root. */}
             <div
                 className={cn(
-                    'relative flex min-w-0 flex-1 overflow-hidden bg-surface md:my-[var(--panel-inset)] md:mr-[var(--panel-inset)] md:rounded-panel md:border md:border-border',
+                    'relative flex min-w-0 flex-1 overflow-hidden bg-surface transition-[margin] duration-200 ease-[var(--ease-out)] motion-reduce:transition-none md:my-[var(--panel-inset)] md:mr-[var(--panel-inset)] md:rounded-panel md:border md:border-border',
                     !sidebar.open && 'md:ml-[var(--panel-inset)]',
                 )}
             >

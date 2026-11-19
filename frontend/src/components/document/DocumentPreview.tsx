@@ -21,6 +21,7 @@ import { convertToDocument } from "@/utils/convertToEntity";
 import { formatFileSize } from "@/utils/fileSize";
 import { inlineUrl, previewKindFor } from "@/utils/previewableFile";
 import { useDocumentAsidePanel } from "@/components/layout/ShellPanels";
+import SlideColumn from "@/components/layout/SlideColumn";
 import { cn } from "@/lib/utils";
 import { CalendarDays, ChevronLeft, ChevronRight, ExternalLink, HardDrive, PenLine, UserRound } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -192,20 +193,20 @@ export default function DocumentPreview({ id }: { id: string }) {
         <>
             {header}
 
-            <div ref={previewLayoutRef} className={cn('relative flex flex-1', showAside ? 'flex-row' : 'flex-col')}>
+            <div ref={previewLayoutRef} className="relative flex flex-1">
                 {/* The fold sits on the aside's own edge, halfway down the screen, rather than in
                     the header where nothing tied it to the column it hides. A zero-width rail as
                     tall as the page carries it, so the tab stays in view while the page scrolls. */}
                 {roomForAside && (
                     <div
-                        className={cn('pointer-events-none absolute inset-y-0 z-10 w-0', !showAside && 'right-0')}
-                        style={showAside ? { right: asidePanel.width } : undefined}
+                        className="pointer-events-none absolute inset-y-0 z-10 w-0 transition-[right] duration-[220ms] ease-[var(--ease-out)] motion-reduce:transition-none"
+                        style={{ right: showAside ? asidePanel.width : 0 }}
                     >
                         <button
                             type="button"
                             onClick={() => asidePanel.setOpen(!asidePanel.open)}
                             className={cn(
-                                'pointer-events-auto sticky top-[45vh] grid h-10 w-6 place-items-center rounded-full border border-border bg-surface text-icon shadow-xs transition-colors hover:bg-surface-hover hover:text-icon-strong focus:outline-hidden focus-visible:ring-2 focus-visible:ring-focus',
+                                'pointer-events-auto sticky top-[45vh] grid h-10 w-6 place-items-center rounded-full border border-border bg-surface text-icon shadow-xs transition-[translate,background-color,color] duration-[220ms] hover:bg-surface-hover hover:text-icon-strong focus:outline-hidden focus-visible:ring-2 focus-visible:ring-focus',
                                 // Folded, it keeps clear of the panel's edge: right against it, a
                                 // click meant for the tab landed on the page's scrollbar instead.
                                 showAside ? '-translate-x-1/2' : '-translate-x-[calc(100%+12px)]',
@@ -320,7 +321,7 @@ export default function DocumentPreview({ id }: { id: string }) {
 
                 </div>
 
-                {showAside && (
+                <SlideColumn open={showAside} width={asidePanel.width} from="end">
                     <aside
                         id="document-aside"
                         style={{ width: asidePanel.width }}
@@ -333,7 +334,7 @@ export default function DocumentPreview({ id }: { id: string }) {
                             {comments}
                         </div>
                     </aside>
-                )}
+                </SlideColumn>
             </div>
         </>
     )

@@ -3,6 +3,7 @@
 import { useCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import ResizeHandle from '@/components/layout/ResizeHandle';
+import SlideColumn from '@/components/layout/SlideColumn';
 import { useCurriculumPanel, useSidebarPanel, type PanelState } from '@/components/layout/ShellPanels';
 import ShowSidebarButton from '@/components/layout/ShowSidebarButton';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
@@ -104,9 +105,13 @@ function normalize(value: string | undefined) {
 export default function CurriculumPanel() {
     const panel = useCurriculumPanel();
 
-    if (!panel.available || !panel.open) return null;
+    if (!panel.available) return null;
 
-    return <CurriculumColumn panel={panel} />;
+    return (
+        <SlideColumn open={panel.open} width={panel.width} className="hidden lg:flex">
+            <CurriculumColumn panel={panel} />
+        </SlideColumn>
+    );
 }
 
 function CurriculumColumn({ panel }: { panel: PanelState }) {
@@ -137,7 +142,7 @@ function CurriculumColumn({ panel }: { panel: PanelState }) {
             ref={columnRef}
             aria-label={t('curriculum-tree.label')}
             style={{ width: panel.width }}
-            className="relative hidden shrink-0 flex-col border-r border-border bg-surface-muted lg:flex"
+            className="relative flex shrink-0 flex-col border-r border-border bg-surface-muted"
         >
             <ResizeHandle panel={panel} targetRef={columnRef} label={t('curriculum-panel.resize')} />
             <div className={cn('flex h-[var(--header-height)] shrink-0 items-center gap-2 border-b border-border pr-2.5', sidebar.open ? 'pl-4' : 'pl-3.5')}>
