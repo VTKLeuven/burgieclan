@@ -3,9 +3,10 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Burgieclan design tokens, in the design language of Dopl (VTK's IT workspace): a light grey
- * canvas, one white working panel, crisp 1px hairlines, almost no shadows, navy primary
- * buttons and a sky accent for links, focus and selection. Colour is information, not decoration.
+ * Burgieclan design tokens, in the design language of Dopl (VTK's IT workspace) and VTK's house
+ * colours: a navy sidebar with yellow marking where you are, one white working panel, crisp 1px
+ * hairlines, almost no shadows, navy text and primary buttons, and a sky accent for focus.
+ * Colour is information, not decoration.
  *
  * Two layers live here:
  *  - the Dopl tokens (canvas, surface, border, fg, sky, tag palette, type scale, radii), which new
@@ -42,7 +43,7 @@
   --color-neutral-25: #fcfcfd;
   --color-neutral-50: #fafafa;
   --color-neutral-100: #f5f5f6;
-  --color-neutral-150: #f0f0f2;
+  --color-neutral-150: #eceef4;
   --color-neutral-200: #ececee;
   --color-neutral-250: #e2e2e5;
   --color-neutral-300: #d4d4d8;
@@ -57,28 +58,49 @@
   /* Semantic surfaces and text */
   --color-canvas: #f5f5f6;
   --color-surface: #ffffff;
-  --color-surface-muted: #fafafa;
-  --color-surface-hover: #f7f7f8;
-  --color-surface-selected: #f0f8ff;
+  --color-surface-muted: #f5f6fa;
+  --color-surface-hover: #f5f6fa;
+  --color-surface-selected: #fff4cc;
   --color-sidebar-hover: #f0f0f2;
   --color-sidebar-active: #ebebed;
-  --color-border: #ececee;
-  --color-border-strong: #e2e2e5;
-  --color-fg: #18181b;
-  --color-fg-secondary: #52525b;
-  --color-fg-muted: #6b6b73;
-  --color-fg-placeholder: #8b8b93;
-  --color-fg-disabled: #a1a1aa;
+  --color-border: #d8dbe5;
+  --color-border-strong: #c2c7d6;
+  /* Text and icons are navy-tinted, so every grey belongs to the primary. */
+  --color-fg: #0f1a36;
+  --color-fg-secondary: #383f55;
+  --color-fg-muted: #525a70;
+  --color-fg-placeholder: #6b7287;
+  --color-fg-disabled: #8b91a3;
   --color-fg-nav: #3f3f46;
-  --color-link: #0a6cba;
-  --color-icon: #6b6b73;
-  --color-icon-strong: #3f3f46;
+  /* Links are navy like the text around them; `.vtk-link` adds the yellow underline that sets
+     them apart. */
+  --color-link: #0f1a36;
+  --color-icon: #525a70;
+  --color-icon-strong: #0f1a36;
 
   --color-primary: #0f1a36;
   --color-primary-hover: #1d2b52;
   --color-primary-active: #0a1226;
   --color-on-primary: #ffffff;
   --color-focus: #1f82d1;
+
+  /* House yellow. A fill, never a text colour: on white it reaches only 1.44:1, so it sits on
+     navy or carries navy text (11.9:1). */
+  --color-secondary: #ffd23f;
+  --color-on-secondary: #0f1a36;
+  --color-secondary-soft: #fff4cc;
+
+  /* The navy sidebar. Its own tokens rather than canvas or sidebar-hover/active: those are also
+     used inside the white panel (CurriculumPanel, DocumentFolderList, the login form), which
+     must stay light. */
+  --color-sidebar: #0f1a36;
+  --color-sidebar-fg: #e3e7f1;
+  --color-sidebar-fg-muted: #a3acc6;
+  --color-sidebar-item-hover: #1d2b52;
+  --color-sidebar-item-active: #ffd23f;
+  --color-sidebar-item-active-fg: #0f1a36;
+  --color-sidebar-field: #18244a;
+  --color-sidebar-line: #34446f;
 
   --color-danger: #dc2626;
   --color-danger-hover: #c21f1f;
@@ -127,7 +149,7 @@
   --color-tag-grey-text: #52525b;
 
   /* Legacy names, remapped onto the palette above. */
-  --color-vtk-ink: #18181b;
+  --color-vtk-ink: #0f1a36;
   --color-vtk-navy: #0f1a36;
   --color-vtk-blue: #0f1a36;
   --color-vtk-blue-dark: #0a1226;
@@ -140,11 +162,11 @@
   --color-vtk-paper-2: #f0f0f2;
   --color-vtk-surface: #ffffff;
   --color-vtk-surface-elevated: #ffffff;
-  --color-vtk-muted: #6b6b73;
-  --color-vtk-body: #52525b;
+  --color-vtk-muted: #525a70;
+  --color-vtk-body: #383f55;
   --color-vtk-on-dark-muted: #a1a1aa;
-  --color-vtk-line: #ececee;
-  --color-vtk-line-2: #e2e2e5;
+  --color-vtk-line: #d8dbe5;
+  --color-vtk-line-2: #c2c7d6;
 
   /* Typography */
   --text-display: 24px;
@@ -187,16 +209,16 @@
 
 :root {
   /* Kept for the few places that read them as plain custom properties. */
-  --ink: #18181b;
+  --ink: #0f1a36;
   --navy: #0f1a36;
   --paper: #f5f5f6;
   --paper-2: #f0f0f2;
   --surface: #ffffff;
-  --line: #ececee;
-  --line-2: #e2e2e5;
+  --line: #d8dbe5;
+  --line-2: #c2c7d6;
   --yellow: #f5a524;
-  --muted: #6b6b73;
-  --body: #52525b;
+  --muted: #525a70;
+  --body: #383f55;
   --accent: #1f82d1;
   --danger: #b91c1c;
 
@@ -246,7 +268,7 @@
   }
 
   ::selection {
-    background: var(--color-sky-100);
+    background: var(--color-secondary-soft);
   }
 
   h1,
@@ -512,6 +534,23 @@
   .primary-button svg,
   .vtk-button-accent svg {
     color: rgb(255 255 255 / 0.8);
+  }
+
+  /* Yellow with navy text: the primary action on navy ground, where a navy button vanishes. */
+  .vtk-button-secondary {
+    border-color: var(--color-secondary);
+    background: var(--color-secondary);
+    color: var(--color-on-secondary);
+    box-shadow: none;
+  }
+
+  .vtk-button-secondary svg {
+    color: var(--color-on-secondary);
+  }
+
+  .vtk-button-secondary:hover:not(:disabled) {
+    border-color: #ffdc66;
+    background: #ffdc66;
   }
 
   .vtk-button-primary:hover:not(:disabled),
@@ -795,7 +834,8 @@
 
   .vtk-table th {
     height: 40px;
-    color: var(--color-fg-muted);
+    background: var(--color-surface-muted);
+    color: var(--color-fg-secondary);
     font-size: 13px;
     font-weight: 500;
   }
@@ -869,8 +909,8 @@
 
   .vtk-tab[aria-selected='true'],
   .vtk-tab.is-active {
-    background: var(--color-surface);
-    color: var(--color-fg);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
     box-shadow: var(--shadow-xs);
   }
 
@@ -880,12 +920,13 @@
   .vtk-link {
     color: var(--color-link);
     font-weight: 500;
-    text-decoration: none;
+    text-decoration: underline 2px var(--color-secondary);
     text-underline-offset: 4px;
+    transition: text-decoration-color var(--dur-fast) var(--ease-out);
   }
 
   .vtk-link:hover {
-    text-decoration: underline;
+    text-decoration-color: var(--color-primary);
   }
 
   .vtk-muted {
@@ -941,10 +982,12 @@
   .vtk-prose a {
     color: var(--color-link);
     font-weight: 500;
+    text-decoration: underline 2px var(--color-secondary);
+    text-underline-offset: 4px;
   }
 
   .vtk-prose a:hover {
-    text-decoration: underline;
+    text-decoration-color: var(--color-primary);
   }
 
   .vtk-prose ul,

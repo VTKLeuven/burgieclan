@@ -11,7 +11,7 @@ import { useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
- * The app shell, in Dopl's layout: the sidebar sits on the grey canvas, every page lives in one
+ * The app shell, in Dopl's layout: the sidebar sits on the navy ground, every page lives in one
  * white panel inset from the window edge, and only that panel scrolls. Each page draws its own
  * PageHeader (breadcrumb and actions) as the panel's sticky top bar.
  *
@@ -24,7 +24,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
     const sidebarRef = useRef<HTMLElement>(null);
 
     return (
-        <div className="flex h-dvh bg-canvas">
+        <div className="flex h-dvh bg-sidebar">
             <a
                 href="#main-content"
                 className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-control focus:bg-primary focus:px-4 focus:py-2 focus:text-body focus:font-medium focus:text-on-primary"

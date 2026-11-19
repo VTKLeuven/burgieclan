@@ -82,10 +82,12 @@ function NavItem({
             aria-current={active ? 'page' : undefined}
             title={title}
             className={cn(
-                'group flex h-7 items-center gap-2.5 rounded-control px-2.5 text-small font-medium text-fg-nav',
+                'group flex h-7 items-center gap-2.5 rounded-control px-2.5 text-small font-medium text-sidebar-fg',
                 'transition-colors duration-[var(--dur-fast)] ease-out',
-                '[&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-icon-strong',
-                active ? 'bg-sidebar-active text-fg' : 'hover:bg-sidebar-hover',
+                '[&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-sidebar-fg-muted',
+                active
+                    ? 'bg-sidebar-item-active font-semibold text-sidebar-item-active-fg [&_svg]:text-sidebar-item-active-fg'
+                    : 'hover:bg-sidebar-item-hover hover:text-white',
             )}
         >
             {icon}
@@ -98,7 +100,7 @@ function NavItem({
 function SectionLabel({ children, action }: { children: ReactNode; action?: ReactNode }) {
     return (
         <div className="mt-4 mb-0.5 flex h-6 items-center justify-between px-2.5">
-            <span className="text-caption font-medium text-fg-muted">{children}</span>
+            <span className="text-caption font-medium text-sidebar-fg-muted">{children}</span>
             {action}
         </div>
     );
@@ -118,7 +120,7 @@ export function SidebarBrand() {
             className="flex h-11 min-w-0 items-center gap-2.5 rounded-control px-1"
         >
             <Image
-                src="/images/logos/burgieclan-cloud-navy.svg"
+                src="/images/logos/burgieclan-cloud-white.svg"
                 alt=""
                 aria-hidden="true"
                 width={52}
@@ -126,14 +128,14 @@ export function SidebarBrand() {
                 className="h-[26px] w-auto shrink-0"
                 priority
             />
-            <span className="truncate text-[20px] leading-7 font-semibold tracking-[-0.02em] text-fg">Burgieclan</span>
+            <span className="truncate text-[20px] leading-7 font-semibold tracking-[-0.02em] text-white">Burgieclan</span>
         </Link>
     );
 }
 
 /**
- * The app's navigation, sitting directly on the grey canvas next to the white panel (Dopl's
- * shell). Top to bottom: brand, search, the few places there are, the reader's own courses and
+ * The app's navigation, sitting directly on the navy ground next to the white panel (Dopl's
+ * shell, in VTK's house colours: navy, with yellow for where you are). Top to bottom: brand, search, the few places there are, the reader's own courses and
  * documents, and the account menu. Everything that used to live in the navy header and the
  * footer is in here now, so a page never has to say where else you can go.
  */
@@ -171,7 +173,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                     <button
                         type="button"
                         onClick={onCollapse}
-                        className="vtk-icon-button size-7!"
+                        className="vtk-icon-button size-7! text-sidebar-fg-muted hover:bg-sidebar-item-hover hover:text-white"
                         aria-label={t('shell.hide_sidebar')}
                         title={t('shell.hide_sidebar')}
                     >
@@ -187,13 +189,13 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                         onNavigate?.();
                         openSearch();
                     }}
-                    className="mt-3 flex h-8 w-full items-center gap-2 rounded-control border border-border-strong bg-surface px-2.5 text-left text-small text-fg-placeholder shadow-xs transition-colors hover:border-neutral-300"
+                    className="mt-3 flex h-8 w-full items-center gap-2 rounded-control border border-sidebar-line bg-sidebar-field px-2.5 text-left text-small text-sidebar-fg-muted transition-colors hover:border-sidebar-fg-muted"
                 >
-                    <Search className="size-4 text-icon" aria-hidden="true" />
+                    <Search className="size-4 text-sidebar-fg-muted" aria-hidden="true" />
                     <span className="flex-1 truncate">{t('search.placeholder')}</span>
                     <span className="flex items-center gap-0.5" aria-hidden="true">
-                        <kbd className="vtk-kbd">⌘</kbd>
-                        <kbd className="vtk-kbd">K</kbd>
+                        <kbd className="vtk-kbd border-sidebar-line bg-sidebar-item-hover text-sidebar-fg-muted">⌘</kbd>
+                        <kbd className="vtk-kbd border-sidebar-line bg-sidebar-item-hover text-sidebar-fg-muted">K</kbd>
                     </span>
                 </button>
             )}
@@ -237,7 +239,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                                 <Link
                                     href="/courses"
                                     onClick={onNavigate}
-                                    className="rounded-[6px] text-caption font-medium text-fg-muted hover:text-fg"
+                                    className="rounded-[6px] text-caption font-medium text-sidebar-fg-muted hover:text-white"
                                 >
                                     {t('shell.browse')}
                                 </Link>
@@ -247,7 +249,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                         </SectionLabel>
                         <div className="flex flex-col gap-0.5">
                             {courses.length === 0 ? (
-                                <p className="m-0 px-2.5 py-1.5 text-small text-fg-muted">{t('shell.no_courses')}</p>
+                                <p className="m-0 px-2.5 py-1.5 text-small text-sidebar-fg-muted">{t('shell.no_courses')}</p>
                             ) : (
                                 courses.map((course) => {
                                     const name = localizedCourseName(course, i18n.language) ?? course.code ?? '';
@@ -264,7 +266,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                                                 active={currentCourse?.id === course.id && inCurriculum}
                                                 onNavigate={onNavigate}
                                                 trailing={
-                                                    <span className="text-caption font-medium text-fg-muted tabular opacity-0 transition-opacity group-hover:opacity-100">
+                                                    <span className="text-caption font-medium text-sidebar-fg-muted tabular opacity-0 transition-opacity group-hover:opacity-100 group-aria-[current=page]:text-sidebar-item-active-fg">
                                                         {course.code}
                                                     </span>
                                                 }
@@ -273,7 +275,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                                                 itemId={course.id}
                                                 itemType="course"
                                                 size={14}
-                                                className="absolute top-1/2 left-1.5 grid size-6 -translate-y-1/2 place-items-center rounded-[6px]! p-0! hover:bg-neutral-200/70!"
+                                                className="absolute top-1/2 left-1.5 grid size-6 -translate-y-1/2 place-items-center rounded-[6px]! p-0! hover:bg-white/10!"
                                             />
                                         </div>
                                     );
@@ -300,7 +302,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                                         <Link
                                             href="/account"
                                             onClick={onNavigate}
-                                            className="flex h-7 items-center gap-1 rounded-control px-2.5 text-small text-fg-muted hover:bg-sidebar-hover hover:text-fg"
+                                            className="flex h-7 items-center gap-1 rounded-control px-2.5 text-small text-sidebar-fg-muted hover:bg-sidebar-item-hover hover:text-white"
                                         >
                                             {t('shell.show_all', { count: documents.length })}
                                             <ChevronRight className="size-3.5" aria-hidden="true" />
@@ -313,7 +315,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                 )}
             </div>
 
-            <div className="mt-2 flex flex-col gap-0.5 border-t border-border pt-2">
+            <div className="mt-2 flex flex-col gap-0.5 border-t border-sidebar-line pt-2">
                 <NavItem
                     href="https://burgieclan-backup.vtk.be"
                     icon={<ArrowUpRight />}
@@ -326,7 +328,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                     <button
                         type="button"
                         onClick={() => setFeedbackOpen(true)}
-                        className="flex h-7 items-center gap-2.5 rounded-control px-2.5 text-left text-small font-medium text-fg-nav transition-colors hover:bg-sidebar-hover [&_svg]:size-4 [&_svg]:text-icon-strong"
+                        className="flex h-7 items-center gap-2.5 rounded-control px-2.5 text-left text-small font-medium text-sidebar-fg transition-colors hover:bg-sidebar-item-hover hover:text-white [&_svg]:size-4 [&_svg]:text-sidebar-fg-muted"
                     >
                         <MessageSquareText aria-hidden="true" />
                         <span className="truncate">{t('shell.feedback')}</span>
@@ -334,7 +336,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                 )}
                 {/* Logged out, the switcher sits next to "Inloggen" below instead. */}
                 {user && (
-                    <div className="flex h-8 items-center gap-2.5 pr-0.5 pl-2.5 text-small font-medium text-fg-nav [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-icon-strong">
+                    <div className="flex h-8 items-center gap-2.5 pr-0.5 pl-2.5 text-small font-medium text-sidebar-fg [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-fg-muted">
                         <Languages aria-hidden="true" />
                         <span className="min-w-0 flex-1 truncate">{t('language')}</span>
                         <Suspense fallback={null}>
@@ -349,17 +351,17 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                     <DropdownMenuTrigger asChild>
                         <button
                             type="button"
-                            className="mt-1 flex h-11 w-full items-center gap-2.5 rounded-control px-2 text-left transition-colors hover:bg-sidebar-hover data-[state=open]:bg-sidebar-hover"
+                            className="mt-1 flex h-11 w-full items-center gap-2.5 rounded-control px-2 text-left transition-colors hover:bg-sidebar-item-hover data-[state=open]:bg-sidebar-item-hover"
                             aria-label={t('account.menu')}
                         >
-                            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary text-caption font-semibold text-on-primary">
+                            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-secondary text-caption font-semibold text-on-secondary">
                                 {initials(user.fullName)}
                             </span>
                             <span className="min-w-0 flex-1">
-                                <span className="block truncate text-body font-medium text-fg">{user.fullName}</span>
-                                <span className="block truncate text-caption text-fg-muted">{user.username}</span>
+                                <span className="block truncate text-body font-medium text-white">{user.fullName}</span>
+                                <span className="block truncate text-caption text-sidebar-fg-muted">{user.username}</span>
                             </span>
-                            <ChevronsUpDown className="size-4 shrink-0 text-icon" aria-hidden="true" />
+                            <ChevronsUpDown className="size-4 shrink-0 text-sidebar-fg-muted" aria-hidden="true" />
                         </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="top" align="start" className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-56">
@@ -398,7 +400,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                 </DropdownMenu>
             ) : (
                 <div className="mt-2 flex items-center gap-2">
-                    <Link href="/login" onClick={onNavigate} className="vtk-button vtk-button-primary flex-1">
+                    <Link href="/login" onClick={onNavigate} className="vtk-button vtk-button-secondary flex-1">
                         {t('login')}
                     </Link>
                     <Suspense fallback={null}>
