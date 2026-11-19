@@ -131,8 +131,10 @@ class FluxusOAuthCallbackController extends AbstractController
             // Get the expiration timestamp
             $refreshTokenExpiration = $refreshToken->getValid()->getTimestamp();
 
-            // Get frontend redirect URL
-            $frontendRedirectTo = $request->cookies->get(FluxusOAuthCookies::FRONTEND_REDIRECT, '/');
+            // Get frontend redirect URL (re-validated defensively in case the cookie was tampered with)
+            $frontendRedirectTo = FluxusOAuthInitiateController::sanitizeRedirectTo(
+                $request->cookies->get(FluxusOAuthCookies::FRONTEND_REDIRECT)
+            );
 
             // Redirect to frontend with local JWTs. (The VTK token is dropped here
             // as it's short-lived and only needed for sync).

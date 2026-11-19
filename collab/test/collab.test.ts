@@ -7,7 +7,7 @@ import type { Server } from '@hocuspocus/server';
 import { SignJWT } from 'jose';
 import * as Y from 'yjs';
 import { createBackend, HEADER_SIGNATURE, HEADER_TIMESTAMP, signRequest } from '../src/backend.ts';
-import { createCollabServer, EDITOR_FIELD, TOO_LARGE_MESSAGE, type ConnectionContext } from '../src/server.ts';
+import { createCollabServer, EDITOR_FIELD, MAX_MESSAGE_BYTES, TOO_LARGE_MESSAGE, type ConnectionContext } from '../src/server.ts';
 import { TOKEN_AUDIENCE, TOKEN_ISSUER } from '../src/token.ts';
 
 /**
@@ -638,5 +638,45 @@ describe('collab server', () => {
             'editing to reopen',
             5000,
         );
+    });
+
+    it('rejects an oversized single message without mutating, persisting, or locking out the document', async () => {
+        const alice = await connect('dos-doc', await mintToken({ doc: 'dos-doc', name: 'Alice', sub: '1' }));
+        const attacker = await connect('dos-doc', await mintToken({ doc: 'dos-doc', name: 'Attacker', sub: '2' }));
+
+        addParagraph(alice.doc, 'initial question');
+        await waitFor(() => paragraphs(attacker.doc).includes('initial question'), 'initial sync to attacker');
+        await waitFor(
+            () => JSON.stringify(backend.documents.get('dos-doc')?.content ?? {}).includes('initial question'),
+            'initial store',
+        );
+
+        let attackerClosed = false;
+        attacker.provider.on('close', () => {
+            attackerClosed = true;
+        });
+
+        addParagraph(attacker.doc, 'x'.repeat(MAX_MESSAGE_BYTES + 1024));
+
+        await waitFor(
+            () => warnings.some((w) => w.includes('Rejected oversized message') && w.includes('"dos-doc"')),
+            'oversized message warning',
+        );
+        await waitFor(() => attackerClosed, 'attacker connection to close');
+        attacker.provider.destroy();
+
+        // Other users can keep editing and the document is not locked or polluted.
+        addParagraph(alice.doc, 'still editable');
+        await waitFor(
+            () => JSON.stringify(backend.documents.get('dos-doc')?.content ?? {}).includes('still editable'),
+            'subsequent store from Alice',
+        );
+
+        assert.deepEqual(paragraphs(alice.doc), ['initial question', 'still editable']);
+        assert.equal(JSON.stringify(backend.documents.get('dos-doc')?.content).includes('xxxx'), false);
+
+        const carol = await connect('dos-doc', await mintToken({ doc: 'dos-doc', name: 'Carol', sub: '3' }));
+        assert.equal(carol.scope, 'read-write');
+        assert.deepEqual(paragraphs(carol.doc), ['initial question', 'still editable']);
     });
 });

@@ -143,6 +143,9 @@ final class DownloadController extends AbstractController
 
     private function serve(Document $document, bool $isInline): Response
     {
+        $contentType = $isInline ? PreviewableFile::contentTypeFor((string) $document->getFileName()) : null;
+        $effectiveInline = $isInline && null !== $contentType;
+
         try {
             $response = $this->downloadHandler->downloadObject(
                 $document,
@@ -151,21 +154,21 @@ final class DownloadController extends AbstractController
                 // Serve under the document's own name instead of the storage name,
                 // which carries the uniqid the SmartUniqueNamer appended on upload.
                 DownloadFilename::forDocument($document),
-                !$isInline
+                !$effectiveInline
             );
         } catch (NoFileFoundException | FilesystemException) {
             return new Response('File not found', Response::HTTP_NOT_FOUND);
         }
 
-        // When ?inline=1 is set, serve for in-browser viewing instead of download
-        if ($isInline) {
+        // When ?inline=1 is set for a previewable file, serve for in-browser viewing instead of download.
+        // Non-previewable files (e.g. .svg, .zip) stay attachment + octet-stream to prevent stored XSS.
+        if ($effectiveInline) {
             $response->headers->set('Content-Disposition', 'inline');
             // Correct the MIME type, which VichUploader falls back to
             // application/octet-stream for when the entity has no mimeType field.
-            $contentType = PreviewableFile::contentTypeFor((string) $document->getFileName());
-            if (null !== $contentType) {
-                $response->headers->set('Content-Type', $contentType);
-            }
+            $response->headers->set('Content-Type', $contentType);
+        } elseif ($isInline) {
+            $response->headers->set('Content-Type', 'application/octet-stream');
         }
 
         return $response;

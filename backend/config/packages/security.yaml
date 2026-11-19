@@ -23,6 +23,9 @@ security:
             pattern: ^/api
             stateless: true
             entry_point: jwt
+            login_throttling:
+                max_attempts: 5
+                interval: '1 minute'
             json_login:
               check_path: /api/auth/login
               success_handler: lexik_jwt_authentication.handler.authentication_success
@@ -52,6 +55,9 @@ security:
             # this firewall does not have a 'pattern' option because it applies to all URLs
             lazy: true
             provider: database_users
+            login_throttling:
+                max_attempts: 5
+                interval: '1 minute'
 
             custom_authenticators:
                 - App\Security\FluxusAuthenticator
@@ -135,8 +141,15 @@ when@test:
                 memory_cost: 10 # Lowest possible value for argon
 
         firewalls:
+            api:
+                login_throttling:
+                    max_attempts: 1000
+                    interval: '1 minute'
             main:
                 http_basic: ~
+                login_throttling:
+                    max_attempts: 1000
+                    interval: '1 minute'
 
 when@dev:
     security:

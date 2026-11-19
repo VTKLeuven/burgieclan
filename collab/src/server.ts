@@ -39,6 +39,13 @@ export const CLOSE_ACCESS_CHANGED = { code: 4000, reason: 'Access changed, recon
  */
 export const MAX_DOCUMENT_BYTES = 2 * 1024 * 1024;
 
+/**
+ * Maximum size in bytes of a single incoming WebSocket message. Rejects oversized updates before
+ * they can mutate the in-memory Y.Doc or lock out a document by pushing it past MAX_DOCUMENT_BYTES
+ * in one frame.
+ */
+export const MAX_MESSAGE_BYTES = 64 * 1024;
+
 /** Stateless message sent to everyone who opens a document over MAX_DOCUMENT_BYTES. */
 export const TOO_LARGE_MESSAGE = JSON.stringify({ type: 'too-large' });
 
@@ -70,6 +77,8 @@ export interface CollabServerOptions {
     now?: () => number;
     /** Defaults to MAX_DOCUMENT_BYTES; tests lower it. */
     maxDocumentBytes?: number;
+    /** Defaults to MAX_MESSAGE_BYTES; tests may override it. */
+    maxMessageBytes?: number;
 }
 
 const CARET_COLOR = /^#[0-9a-f]{6}$/i;
@@ -203,6 +212,7 @@ export function createCollabServer(options: CollabServerOptions): Server<Connect
      */
     const sizes = new Map<string, number>();
     const maxDocumentBytes = options.maxDocumentBytes ?? MAX_DOCUMENT_BYTES;
+    const maxMessageBytes = options.maxMessageBytes ?? MAX_MESSAGE_BYTES;
     const isTooLarge = (documentName: string): boolean => (sizes.get(documentName) ?? 0) > maxDocumentBytes;
 
     return new Server<ConnectionContext>({
@@ -248,7 +258,11 @@ export function createCollabServer(options: CollabServerOptions): Server<Connect
          * The same goes for a document that turns out to be too large once it is loaded: the
          * first connection to it was let in before its size was known.
          */
-        async beforeHandleMessage({ connection, context, documentName }) {
+        async beforeHandleMessage({ connection, context, documentName, update }) {
+            if (update.byteLength > maxMessageBytes) {
+                log.warn(`Rejected oversized message (${update.byteLength} bytes) on "${documentName}"`);
+                throw new Error(`Message exceeds ${maxMessageBytes} bytes`);
+            }
             if (connection.readOnly) {
                 return;
             }

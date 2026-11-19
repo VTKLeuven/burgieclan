@@ -7,6 +7,7 @@ use App\Factory\DocumentCategoryFactory;
 use App\Factory\DocumentFactory;
 use App\Factory\TagFactory;
 use App\Factory\UserFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zenstruck\Browser\HttpOptions;
 
@@ -146,6 +147,7 @@ class DocumentResourceTest extends ApiTestCase
         $document = DocumentFactory::createOne(
             [
                 'anonymous' => false,
+                'under_review' => false,
             ]
         );
 
@@ -168,6 +170,7 @@ class DocumentResourceTest extends ApiTestCase
         $document = DocumentFactory::createOne(
             [
                 'anonymous' => true,
+                'under_review' => false,
             ]
         );
 
@@ -401,6 +404,7 @@ class DocumentResourceTest extends ApiTestCase
             1,
             [
                 'creator' => $user1,
+                'anonymous' => false,
                 'under_review' => false, // Only non-under-review documents are returned (except if the user is the creator)
             ]
         );
@@ -408,6 +412,7 @@ class DocumentResourceTest extends ApiTestCase
             2,
             [
                 'creator' => $user2,
+                'anonymous' => false,
                 'under_review' => false,
             ]
         );
@@ -415,6 +420,7 @@ class DocumentResourceTest extends ApiTestCase
             5,
             [
                 'creator' => UserFactory::createOne(),
+                'anonymous' => false,
                 'under_review' => false,
             ]
         );
@@ -590,6 +596,7 @@ class DocumentResourceTest extends ApiTestCase
         $document = DocumentFactory::createOne(
             [
                 'anonymous' => true,
+                'under_review' => false,
                 'creator' => UserFactory::createOne(),
             ]
         );
@@ -647,7 +654,7 @@ class DocumentResourceTest extends ApiTestCase
         );
 
         // Create document through normal upload process
-        $document = DocumentFactory::new()->withoutPersisting()->create();
+        $document = DocumentFactory::new()->withoutPersisting()->create(['under_review' => false]);
         $document->setFile($uploadedFile);
         save($document);
 
@@ -773,7 +780,8 @@ class DocumentResourceTest extends ApiTestCase
     {
         $document = DocumentFactory::createOne(
             [
-                'anonymous' => false
+                'anonymous' => false,
+                'under_review' => false,
             ]
         );
 
@@ -1547,7 +1555,7 @@ class DocumentResourceTest extends ApiTestCase
                     ]
                 ]
             )
-            ->assertJsonMatches('canDelete', false);
+            ->assertStatus(404);
     }
 
     /**
@@ -1720,5 +1728,214 @@ class DocumentResourceTest extends ApiTestCase
         if (is_file($filePath)) {
             unlink($filePath);
         }
+    }
+
+    #[DataProvider('provideDisallowedUploads')]
+    public function testPostToCreateDocumentRejectsDisallowedFiles(
+        string $originalName,
+        string $content,
+        string $clientMime,
+    ): void {
+        $course = CourseFactory::createOne();
+        $category = DocumentCategoryFactory::createOne();
+
+        $filePath = tempnam(sys_get_temp_dir(), 'upload_reject_');
+        file_put_contents($filePath, $content);
+        $file = new UploadedFile($filePath, $originalName, $clientMime, null, true);
+
+        $this->browser()
+            ->post(
+                '/api/documents',
+                [
+                    'headers' => [
+                        'Content-Type' => 'multipart/form-data',
+                        'Authorization' => 'Bearer ' . $this->token,
+                    ],
+                    'body' => [
+                        'name' => 'Disallowed Upload',
+                        'course' => '/api/courses/' . $course->getId(),
+                        'category' => '/api/document_categories/' . $category->getId(),
+                        'anonymous' => 'true',
+                    ],
+                    'files' => [
+                        'file' => $file,
+                    ],
+                ]
+            )
+            ->assertStatus(400);
+
+        if (is_file($filePath)) {
+            unlink($filePath);
+        }
+    }
+
+    /**
+     * @return iterable<string, array{string, string, string}>
+     */
+    public static function provideDisallowedUploads(): iterable
+    {
+        yield 'html file' => [
+            'exploit.html',
+            '<!DOCTYPE html><html><script>alert(1)</script></html>',
+            'text/html',
+        ];
+        yield 'svg file' => [
+            'vector.svg',
+            '<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"></svg>',
+            'image/svg+xml',
+        ];
+        yield 'javascript file' => [
+            'script.js',
+            'alert(1);',
+            'application/javascript',
+        ];
+        yield 'php file' => [
+            'shell.php',
+            '<?php echo "hi";',
+            'application/x-php',
+        ];
+        yield 'html disguised as txt' => [
+            'notes.txt',
+            '<!DOCTYPE html><html><body><script>alert(1)</script></body></html>',
+            'text/plain',
+        ];
+    }
+
+    public function testPostToCreateDocumentAcceptsUppercaseAllowedExtension(): void
+    {
+        $course = CourseFactory::createOne();
+        $category = DocumentCategoryFactory::createOne();
+
+        $filePath = tempnam(sys_get_temp_dir(), 'upload_pdf_');
+        file_put_contents($filePath, "%PDF-1.7\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF");
+        $file = new UploadedFile($filePath, 'LECTURE.PDF', 'application/pdf', null, true);
+
+        $json = $this->browser()
+            ->post(
+                '/api/documents',
+                [
+                    'headers' => [
+                        'Content-Type' => 'multipart/form-data',
+                        'Authorization' => 'Bearer ' . $this->token,
+                    ],
+                    'body' => [
+                        'name' => 'Uppercase PDF',
+                        'course' => '/api/courses/' . $course->getId(),
+                        'category' => '/api/document_categories/' . $category->getId(),
+                        'anonymous' => 'true',
+                    ],
+                    'files' => [
+                        'file' => $file,
+                    ],
+                ]
+            )
+            ->assertStatus(201)
+            ->json();
+
+        if (is_file($filePath)) {
+            unlink($filePath);
+        }
+        $contentUrl = $json->decoded()['contentUrl'] ?? null;
+        if ($contentUrl) {
+            $array = explode('/', $contentUrl);
+            $filename = end($array);
+            $target = __DIR__ . '/../../data/documents/' . $filename;
+            if (is_file($target)) {
+                unlink($target);
+            }
+        }
+    }
+
+    public function testFilterByCreatorExcludesAnonymousDocuments(): void
+    {
+        $targetUser = UserFactory::createOne(['fullName' => 'Alice Targetsson']);
+        $publicDoc = DocumentFactory::createOne(
+            [
+            'creator' => $targetUser,
+            'anonymous' => false,
+            'under_review' => false,
+            ]
+        );
+        DocumentFactory::createOne(
+            [
+            'creator' => $targetUser,
+            'anonymous' => true,
+            'under_review' => false,
+            ]
+        );
+
+        // Filtering by creator IRI only returns the non-anonymous document
+        $this->browser()
+            ->get(
+                '/api/documents?creator=/api/users/' . $targetUser->getId(),
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('"hydra:member"[0]."@id"', '/api/documents/' . $publicDoc->getId());
+
+        // Filtering by creator.fullName also excludes anonymous documents
+        $this->browser()
+            ->get(
+                '/api/documents?creator.fullName=Targetsson',
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('"hydra:member"[0]."@id"', '/api/documents/' . $publicDoc->getId());
+    }
+
+    public function testUnderReviewDocumentItemAccess(): void
+    {
+        $creator = UserFactory::createOne(
+            [
+            'username' => 'pending-item-creator',
+            'plainPassword' => 'password',
+            ]
+        );
+        $creatorToken = $this->loginAs($creator->getUsername());
+
+        $moderator = UserFactory::createOne(
+            [
+            'username' => 'pending-item-moderator',
+            'plainPassword' => 'password',
+            'roles' => [\App\Entity\User::ROLE_MODERATOR],
+            ]
+        );
+        $moderatorToken = $this->loginAs($moderator->getUsername());
+
+        $pendingDoc = DocumentFactory::createOne(
+            [
+            'creator' => $creator,
+            'under_review' => true,
+            'anonymous' => false,
+            ]
+        );
+
+        // Regular user cannot view another user's pending document
+        $this->browser()
+            ->get(
+                '/api/documents/' . $pendingDoc->getId(),
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(404);
+
+        // Creator can view their own pending document
+        $this->browser()
+            ->get(
+                '/api/documents/' . $pendingDoc->getId(),
+                ['headers' => ['Authorization' => 'Bearer ' . $creatorToken]]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('"@id"', '/api/documents/' . $pendingDoc->getId());
+
+        // Moderator can view any pending document
+        $this->browser()
+            ->get(
+                '/api/documents/' . $pendingDoc->getId(),
+                ['headers' => ['Authorization' => 'Bearer ' . $moderatorToken]]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('"@id"', '/api/documents/' . $pendingDoc->getId());
     }
 }

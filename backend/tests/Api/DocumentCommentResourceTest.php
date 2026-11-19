@@ -213,18 +213,21 @@ class DocumentCommentResourceTest extends ApiTestCase
             1,
             [
                 'creator' => $user1,
+                'anonymous' => false,
             ]
         );
         DocumentCommentFactory::createMany(
             2,
             [
                 'creator' => $user2,
+                'anonymous' => false,
             ]
         );
         DocumentCommentFactory::createMany(
             5,
             [
                 'creator' => UserFactory::createOne(),
+                'anonymous' => false,
             ]
         );
 
@@ -268,7 +271,7 @@ class DocumentCommentResourceTest extends ApiTestCase
     public function testPostToCreateDocumentComment(): void
     {
         $user = UserFactory::createOne();
-        $document = DocumentFactory::createOne();
+        $document = DocumentFactory::createOne(['under_review' => false]);
 
         $this->browser()
             ->post(
@@ -306,7 +309,7 @@ class DocumentCommentResourceTest extends ApiTestCase
      */
     public function testPostStripsScriptsFromDocumentComment(): void
     {
-        $document = DocumentFactory::createOne();
+        $document = DocumentFactory::createOne(['under_review' => false]);
 
         $json = $this->browser()
             ->post(
@@ -340,7 +343,7 @@ class DocumentCommentResourceTest extends ApiTestCase
      */
     public function testPostKeepsEditorOutputOfDocumentComment(): void
     {
-        $document = DocumentFactory::createOne();
+        $document = DocumentFactory::createOne(['under_review' => false]);
         $content = '<h1>Titel</h1><p><strong>vet</strong> <em>schuin</em> <s>weg</s> <u>onder</u> <code>x</code>'
             . ' en <span data-type="inline-math" data-latex="\\frac{a}{b}"></span><br />volgende regel</p>'
             . '<ul><li><p>een</p></li></ul><ol><li><p>twee</p></li></ol>'
@@ -565,5 +568,40 @@ class DocumentCommentResourceTest extends ApiTestCase
                 ]
             )
             ->assertStatus(404);
+    }
+
+    public function testFilterByCreatorExcludesAnonymousDocumentComments(): void
+    {
+        $targetUser = UserFactory::createOne(['fullName' => 'DocComment Targetsson']);
+        $publicComment = DocumentCommentFactory::createOne(
+            [
+            'creator' => $targetUser,
+            'anonymous' => false,
+            ]
+        );
+        DocumentCommentFactory::createOne(
+            [
+            'creator' => $targetUser,
+            'anonymous' => true,
+            ]
+        );
+
+        $this->browser()
+            ->get(
+                '/api/document_comments?creator=/api/users/' . $targetUser->getId(),
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('"hydra:member"[0]."@id"', '/api/document_comments/' . $publicComment->getId());
+
+        $this->browser()
+            ->get(
+                '/api/document_comments?creator.fullName=Targetsson',
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('"hydra:member"[0]."@id"', '/api/document_comments/' . $publicComment->getId());
     }
 }

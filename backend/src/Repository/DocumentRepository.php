@@ -228,7 +228,8 @@ class DocumentRepository extends ServiceEntityRepository
             return [];
         }
 
-        $queryBuilder = $this->createQueryBuilder('d');
+        $queryBuilder = $this->createQueryBuilder('d')
+            ->andWhere('d.under_review = false');
 
         foreach ($searchTerms as $key => $term) {
             $queryBuilder

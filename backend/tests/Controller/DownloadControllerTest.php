@@ -108,6 +108,56 @@ class DownloadControllerTest extends ApiTestCase
             ->assertHeaderContains('Content-Type', 'application/pdf');
     }
 
+    public function testLocalFallbackForcesAttachmentAndOctetStreamForNonPreviewableInlineRequest(): void
+    {
+        $svgName = $this->storeFile(
+            'phpunit-xss-test.svg',
+            '<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"></svg>'
+        );
+        DocumentFactory::createOne(
+            [
+                'name' => 'Malicious SVG',
+                'file_name' => $svgName,
+                'under_review' => false,
+            ]
+        );
+
+        $this->browser()
+            ->get(
+                '/files/download/' . $svgName . '?inline=1',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token,
+                    ],
+                ]
+            )
+            ->assertStatus(200)
+            ->assertHeaderContains('Content-Disposition', 'attachment')
+            ->assertHeaderContains('Content-Type', 'application/octet-stream');
+
+        $zipName = $this->storeFile('phpunit-archive-test.zip', "PK\x03\x04");
+        DocumentFactory::createOne(
+            [
+                'name' => 'Archive',
+                'file_name' => $zipName,
+                'under_review' => false,
+            ]
+        );
+
+        $this->browser()
+            ->get(
+                '/files/download/' . $zipName . '?inline=1',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token,
+                    ],
+                ]
+            )
+            ->assertStatus(200)
+            ->assertHeaderContains('Content-Disposition', 'attachment')
+            ->assertHeaderContains('Content-Type', 'application/octet-stream');
+    }
+
     /**
      * A browser whose PresignedUrlGenerator is active, backed by a real in-memory SigV4 S3Client.
      * The existence check still reads the local test storage.

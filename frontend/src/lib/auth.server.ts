@@ -1,0 +1,203 @@
+import { COOKIE_NAMES } from '@/utils/cookieNames';
+import { decodeJWT, getUserIdFromJWT, getUserRolesFromJWT, isJWTExpired } from '@/utils/jwt';
+import { refreshTokenExpiry, SESSION_COOKIE_SAME_SITE } from '@/utils/sessionCookies';
+import { captureException } from '@sentry/nextjs';
+import { cookies } from 'next/headers';
+
+// Server-only auth helpers. Intentionally NOT marked with `'use server'` so Next.js
+// does not expose these functions (e.g. `getActiveJWT`, `getServerJWT`) as client-callable
+// Server Actions. Importing `next/headers` prevents accidental bundling into Client Components.
+
+/**
+ * Server-side function to get the current user ID from JWT stored in HTTP-only cookie.
+ */
+export const getUserId = async (): Promise<number | null> => {
+    const cookieStore = await cookies();
+    const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
+
+    if (!jwt) {
+        return null;
+    }
+
+    if (isJWTExpired(jwt)) {
+        return null;
+    }
+
+    return getUserIdFromJWT(jwt);
+};
+
+/**
+ * Roles that get past the backend's `^/admin` firewall rule. Spelled out in full because the JWT
+ * carries stored roles rather than the hierarchy-expanded set, so ROLE_ADMIN does not imply
+ * ROLE_MODERATOR here the way it does in Symfony. Keep in sync with config/packages/security.yaml.
+ */
+const ADMIN_ROLES = ['ROLE_MODERATOR', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'];
+
+/**
+ * Whether the current user may open the admin panel. Only decides whether to *show* the link —
+ * the backend firewall is what actually keeps non-admins out.
+ */
+export const canAccessAdmin = async (): Promise<boolean> => {
+    const cookieStore = await cookies();
+    const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
+
+    if (!jwt || isJWTExpired(jwt)) {
+        return false;
+    }
+
+    return getUserRolesFromJWT(jwt).some((role) => ADMIN_ROLES.includes(role));
+};
+
+/**
+ * Server-side function to check if user is authenticated.
+ */
+export const isAuthenticated = async (): Promise<boolean> => {
+    const userId = await getUserId();
+    return userId !== null;
+};
+
+/**
+ * Server-side function to get the JWT token from HTTP-only cookie.
+ */
+export const getServerJWT = async (): Promise<string | null> => {
+    const cookieStore = await cookies();
+    const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
+
+    if (!jwt) {
+        return null;
+    }
+
+    if (isJWTExpired(jwt)) {
+        return null;
+    }
+
+    return jwt;
+};
+
+/**
+ * Store JWT and optional refresh token in HTTP-only cookies.
+ */
+export const persistTokenCookies = async (
+    jwt: string,
+    refreshToken?: string,
+    refreshTokenExpiration?: number
+) => {
+    const cookieStore = await cookies();
+
+    // Calculate JWT expiration from the token itself
+    const jwtPayload = decodeJWT(jwt);
+    if (!jwtPayload || typeof jwtPayload.exp !== 'number') {
+        throw new Error('Failed to decode JWT or expiration is missing');
+    }
+    const jwtExpiration = new Date(jwtPayload.exp * 1000);
+
+    // Set JWT cookie
+    cookieStore.set({
+        name: COOKIE_NAMES.JWT,
+        value: jwt,
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: SESSION_COOKIE_SAME_SITE,
+        expires: jwtExpiration,
+    });
+
+    // Set refresh token cookie if provided
+    if (refreshToken) {
+        cookieStore.set({
+            name: COOKIE_NAMES.REFRESH_TOKEN,
+            value: refreshToken,
+            path: '/',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: SESSION_COOKIE_SAME_SITE,
+            expires: refreshTokenExpiry(refreshTokenExpiration),
+        });
+    }
+};
+
+/**
+ * Clear all authentication cookies.
+ */
+export const clearTokenCookies = async () => {
+    const cookieStore = await cookies();
+    // The path must match the one the cookies were set with (see persistTokenCookies).
+    // A browser only replaces a cookie when name, domain and path all match, and a
+    // Set-Cookie without an explicit Path is scoped to the requesting URL's directory
+    // — so deleting by name alone left the real Path=/ cookies in place, and the stale
+    // session was picked up by whoever logged in next.
+    cookieStore.delete({ name: COOKIE_NAMES.JWT, path: '/' });
+    cookieStore.delete({ name: COOKIE_NAMES.REFRESH_TOKEN, path: '/' });
+};
+
+/**
+ * Server-side function to get an active JWT, refreshing if necessary.
+ * This function handles automatic token refresh using the refresh token.
+ */
+export const getActiveJWT = async (): Promise<string | null> => {
+    const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    if (!backendBaseUrl) {
+        throw new Error('Missing environment variable for backend base URL');
+    }
+
+    const cookieStore = await cookies();
+    const jwt = cookieStore.get(COOKIE_NAMES.JWT)?.value;
+    const refreshToken = cookieStore.get(COOKIE_NAMES.REFRESH_TOKEN)?.value;
+
+    // If JWT is still good, return it
+    if (jwt && !isJWTExpired(jwt)) {
+        return jwt;
+    }
+
+    // Otherwise the refresh token decides, and it is the only thing that can. The JWT cookie
+    // expires with the token it holds, an hour after it was issued, so coming back the next
+    // day there is no JWT to look at - and bailing on that absence declared the session over
+    // while the refresh token still had weeks left.
+    if (!refreshToken) {
+        return null;
+    }
+
+    try {
+        // Call the refresh endpoint
+        const response = await fetch(`${backendBaseUrl}/api/auth/token/refresh`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                refresh_token: refreshToken
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const newJwt = data.token;
+            const newRefreshToken = data.refresh_token;
+            const refreshTokenExpiration = data.refresh_token_expiration; // Unix timestamp
+            await persistTokenCookies(newJwt, newRefreshToken, refreshTokenExpiration);
+            return newJwt;
+        } else {
+            const responseText = await response.text();
+            captureException(
+                new Error(`Token refresh failed with status: ${response.status}; Response: ${responseText}`),
+                {
+                    extra: {
+                        context: "Token refresh failed",
+                        status: response.status,
+                        response: responseText,
+                    },
+                }
+            );
+            // Refresh failed, clear the tokens
+            await clearTokenCookies();
+            return null;
+        }
+    } catch (error) {
+        captureException(
+            error instanceof Error ? error : new Error(String(error)),
+            { extra: { context: "Token refresh failed" } }
+        );
+        await clearTokenCookies();
+        return null;
+    }
+};
