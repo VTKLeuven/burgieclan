@@ -456,6 +456,10 @@
         "date": "Toegevoegd",
         "size": "Grootte",
         "votes": "Stemmen",
+        "aside": {
+            "show": "Zijpaneel tonen",
+            "hide": "Zijpaneel verbergen"
+        },
         "details": "Details"
     },
     "pagination": {

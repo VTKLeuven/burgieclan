@@ -4,8 +4,7 @@ import { usePublishCurriculumLocation } from '@/components/curriculum/Curriculum
 import ErrorPage from '@/components/error/ErrorPage';
 import ExamEditor from '@/components/exam/ExamEditor';
 import Loading from '@/components/loading/LoadingPage';
-import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
-import PageHeader from '@/components/layout/PageHeader';
+import CurriculumPageHeader from '@/components/ui/DynamicBreadcrumb';
 import PageHead from '@/components/ui/PageHead';
 import { readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { Course, Exam } from '@/types/entities';
@@ -97,7 +96,7 @@ export default function ExamPage() {
     if (!exam || !course) {
         return (
             <>
-                <PageHeader breadcrumb={<DynamicBreadcrumb />} />
+                <CurriculumPageHeader />
                 <Loading />
             </>
         );
@@ -107,7 +106,7 @@ export default function ExamPage() {
 
     return (
         <>
-        <PageHeader breadcrumb={<DynamicBreadcrumb />} />
+        <CurriculumPageHeader />
         <div className="vtk-shell vtk-shell-narrow">
             <PageHead
                 icon={NotebookPen}

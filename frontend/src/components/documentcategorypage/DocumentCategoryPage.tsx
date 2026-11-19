@@ -1,10 +1,9 @@
 'use client'
 
-import PageHeader from "@/components/layout/PageHeader";
 import DocumentList from "@/components/documentcategorypage/DocumentList";
 import FavoriteDocuments from "@/components/documentcategorypage/FavoriteDocuments";
 import CreateDocumentButton from "@/components/ui/CreateDocumentButton";
-import DynamicBreadcrumb from "@/components/ui/DynamicBreadcrumb";
+import CurriculumPageHeader from "@/components/ui/DynamicBreadcrumb";
 import type { Course, DocumentCategory } from "@/types/entities";
 import { localizedCourseName } from '@/utils/courseName';
 import Link from "next/link";
@@ -26,8 +25,7 @@ export default function DocumentCategoryPage({ category, course }: DocumentCateg
 
     return (
         <>
-            <PageHeader
-                breadcrumb={<DynamicBreadcrumb />}
+            <CurriculumPageHeader
                 actions={<CreateDocumentButton initialData={{ course, category }} size={16} />}
             />
 

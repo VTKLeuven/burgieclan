@@ -5,7 +5,6 @@ import { logOut } from '@/actions/auth';
 import FeedbackDialog from '@/components/header/FeedbackDialog';
 import LanguageSwitcher from '@/components/header/LanguageSwitcher';
 import { useCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
-import CourseBadge from '@/components/layout/CourseBadge';
 import { openSearch } from '@/components/layout/navEvents';
 import {
     DropdownMenu,
@@ -16,6 +15,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useUser } from '@/components/UserContext';
+import FavoriteButton from '@/components/ui/FavoriteButton';
 import { cn } from '@/lib/utils';
 import { localizedCourseName } from '@/utils/courseName';
 import {
@@ -251,21 +251,31 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                             ) : (
                                 courses.map((course) => {
                                     const name = localizedCourseName(course, i18n.language) ?? course.code ?? '';
+                                    // The star says why the course is listed here, and clicking it
+                                    // takes it off the list. A sibling laid over the icon slot rather
+                                    // than inside the link, which may not hold a button.
                                     return (
-                                        <NavItem
-                                            key={course.id}
-                                            href={`/course/${course.id}`}
-                                            icon={<CourseBadge name={name} seed={course.code} />}
-                                            label={name}
-                                            title={name}
-                                            active={currentCourse?.id === course.id && inCurriculum}
-                                            onNavigate={onNavigate}
-                                            trailing={
-                                                <span className="text-caption font-medium text-fg-muted tabular opacity-0 transition-opacity group-hover:opacity-100">
-                                                    {course.code}
-                                                </span>
-                                            }
-                                        />
+                                        <div key={course.id} className="relative">
+                                            <NavItem
+                                                href={`/course/${course.id}`}
+                                                icon={<span className="size-4 shrink-0" aria-hidden="true" />}
+                                                label={name}
+                                                title={name}
+                                                active={currentCourse?.id === course.id && inCurriculum}
+                                                onNavigate={onNavigate}
+                                                trailing={
+                                                    <span className="text-caption font-medium text-fg-muted tabular opacity-0 transition-opacity group-hover:opacity-100">
+                                                        {course.code}
+                                                    </span>
+                                                }
+                                            />
+                                            <FavoriteButton
+                                                itemId={course.id}
+                                                itemType="course"
+                                                size={14}
+                                                className="absolute top-1/2 left-1.5 grid size-6 -translate-y-1/2 place-items-center rounded-[6px]! p-0! hover:bg-neutral-200/70!"
+                                            />
+                                        </div>
                                     );
                                 })
                             )}

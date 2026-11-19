@@ -9,10 +9,12 @@ const isDev = process.env.NODE_ENV === 'development';
 export const COOKIE_NAMES = {
     JWT: isDev ? 'BUR_DEV_jwt' : 'BUR_jwt',
     REFRESH_TOKEN: isDev ? 'BUR_DEV_refresh_token' : 'BUR_refresh_token',
-    // Open/closed and width of the app sidebar and the curriculum column (ShellPanels). Cookies, not
-    // storage, so the server renders them the way the reader left them.
+    // Open/closed and width of the app sidebar, the curriculum column and the column beside a
+    // document (ShellPanels). Cookies, not storage, so the server renders them the way the reader
+    // left them.
     SIDEBAR: isDev ? 'BUR_DEV_sidebar' : 'BUR_sidebar',
     CURRICULUM_PANEL: isDev ? 'BUR_DEV_curriculum_panel' : 'BUR_curriculum_panel',
+    DOCUMENT_ASIDE: isDev ? 'BUR_DEV_document_aside' : 'BUR_document_aside',
 } as const;
 
 // LocalStorage keys with environment-specific prefixes

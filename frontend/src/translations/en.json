@@ -456,6 +456,10 @@
         "date": "Added",
         "size": "Size",
         "votes": "Votes",
+        "aside": {
+            "show": "Show side panel",
+            "hide": "Hide side panel"
+        },
         "details": "Details"
     },
     "pagination": {

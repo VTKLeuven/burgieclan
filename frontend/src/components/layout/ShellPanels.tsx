@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import {
     clampWidth,
     CURRICULUM,
+    DOCUMENT_ASIDE,
     serializePanelCookie,
     SIDEBAR,
     type PanelConfig,
@@ -22,7 +23,7 @@ export interface PanelState extends PanelConfig {
 
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
-function writeCookie(config: PanelConfig, open: boolean, width: number) {
+function writeCookie(config: PanelConfig, open: boolean, width: number | null) {
     document.cookie = `${config.cookie}=${serializePanelCookie(open, width)}; path=/; max-age=${ONE_YEAR}; samesite=lax`;
 }
 
@@ -30,14 +31,17 @@ function writeCookie(config: PanelConfig, open: boolean, width: number) {
  * Reads what the reader chose before the preference moved from localStorage to a cookie, and
  * removes it. Null when there was nothing, or storage is unavailable.
  */
-function takeLegacyPrefs(config: PanelConfig): { open: boolean; width: number } | null {
+function takeLegacyPrefs(config: PanelConfig): { open: boolean; width: number | null } | null {
+    const key = config.legacyStorageKey;
+    if (!key) return null;
     try {
-        const open = window.localStorage.getItem(config.legacyStorageKey);
-        const width = Number(window.localStorage.getItem(`${config.legacyStorageKey}:width`));
-        window.localStorage.removeItem(config.legacyStorageKey);
-        window.localStorage.removeItem(`${config.legacyStorageKey}:width`);
+        const open = window.localStorage.getItem(key);
+        const width = Number(window.localStorage.getItem(`${key}:width`));
+        window.localStorage.removeItem(key);
+        window.localStorage.removeItem(`${key}:width`);
         if (open === null && !(width > 0)) return null;
-        return { open: open !== 'closed', width: width > 0 ? clampWidth(config, width) : config.defaultWidth };
+        const chosen = width > 0 && width !== config.formerDefaultWidth;
+        return { open: open !== 'closed', width: chosen ? clampWidth(config, width) : null };
     } catch {
         return null;
     }
@@ -50,6 +54,9 @@ function takeLegacyPrefs(config: PanelConfig): { open: boolean; width: number } 
 function usePanel(config: PanelConfig, initial: PanelPrefs): PanelState {
     const [open, setOpenState] = useState(initial.open);
     const [width, setWidthState] = useState(initial.width);
+    // Until the reader drags the column, only open/closed is remembered and the width follows the
+    // default, so a better default later still reaches them.
+    const [widthChosen, setWidthChosen] = useState(initial.widthChosen);
 
     // Carries over a preference saved before it was a cookie, once.
     useEffect(() => {
@@ -58,19 +65,25 @@ function usePanel(config: PanelConfig, initial: PanelPrefs): PanelState {
         if (!legacy) return;
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setOpenState(legacy.open);
-        setWidthState(legacy.width);
+        if (legacy.width !== null) {
+            setWidthState(legacy.width);
+            setWidthChosen(true);
+        }
         writeCookie(config, legacy.open, legacy.width);
     }, [config, initial.stored]);
 
     const setOpen = useCallback((next: boolean) => {
         setOpenState(next);
-        writeCookie(config, next, width);
-    }, [config, width]);
+        writeCookie(config, next, widthChosen ? width : null);
+    }, [config, width, widthChosen]);
 
     const setWidth = useCallback((next: number) => {
         const clamped = clampWidth(config, next);
+        // Back at the default (a double-click on the grip) counts as no choice.
+        const chosen = clamped !== config.defaultWidth;
         setWidthState(clamped);
-        writeCookie(config, open, clamped);
+        setWidthChosen(chosen);
+        writeCookie(config, open, chosen ? clamped : null);
     }, [config, open]);
 
     return useMemo(() => ({ ...config, open, setOpen, width, setWidth }), [config, open, setOpen, width, setWidth]);
@@ -92,27 +105,30 @@ interface ShellPanelsValue {
     sidebar: PanelState;
     /** `available`: whether the current page sits in the curriculum, so the column has a place. */
     curriculum: PanelState & { available: boolean };
+    /** The folder and comments beside a document; one choice for every document. */
+    documentAside: PanelState;
 }
 
 const ShellPanelsContext = createContext<ShellPanelsValue | null>(null);
 
 /**
- * Open/closed state and width of the two columns beside the page: the app sidebar on the canvas
- * and the curriculum tree inside the white panel. It lives above the page so the page header,
+ * Open/closed state and width of the columns beside the page: the app sidebar on the canvas, the
+ * curriculum tree inside the white panel and, on a document, the column to its right. It lives above the page so the page header,
  * which belongs to the route, can offer to reopen a column it does not render.
  */
 export function ShellPanelsProvider({ initial, children }: {
     /** The stored preferences, read from the cookies by the layout. */
-    initial: { sidebar: PanelPrefs; curriculum: PanelPrefs };
+    initial: { sidebar: PanelPrefs; curriculum: PanelPrefs; documentAside: PanelPrefs };
     children: ReactNode;
 }) {
     const available = isCurriculumPath(usePathname());
     const sidebar = usePanel(SIDEBAR, initial.sidebar);
     const curriculumPanel = usePanel(CURRICULUM, initial.curriculum);
+    const documentAside = usePanel(DOCUMENT_ASIDE, initial.documentAside);
 
     const value = useMemo(
-        () => ({ sidebar, curriculum: { ...curriculumPanel, available } }),
-        [sidebar, curriculumPanel, available],
+        () => ({ sidebar, curriculum: { ...curriculumPanel, available }, documentAside }),
+        [sidebar, curriculumPanel, available, documentAside],
     );
 
     return <ShellPanelsContext.Provider value={value}>{children}</ShellPanelsContext.Provider>;
@@ -133,4 +149,8 @@ export function useSidebarPanel() {
 
 export function useCurriculumPanel() {
     return useShellPanels().curriculum;
+}
+
+export function useDocumentAsidePanel() {
+    return useShellPanels().documentAside;
 }

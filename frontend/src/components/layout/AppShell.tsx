@@ -50,7 +50,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
                     id="main-content"
                     tabIndex={-1}
                     data-scroll-root
-                    className="relative flex min-w-0 flex-1 flex-col overflow-y-auto focus:outline-hidden"
+                    // Never sideways: anything wider than the panel scrolls within itself (tables,
+                    // the PDF viewer) rather than dragging the whole page along.
+                    className="relative flex min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto focus:outline-hidden"
                 >
                     {children}
                 </main>

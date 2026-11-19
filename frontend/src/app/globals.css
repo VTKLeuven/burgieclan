@@ -220,6 +220,16 @@
     height: 100%;
   }
 
+  /*
+   * A grid without columns of its own gets one implicit `auto` column, which grows to fit its
+   * widest unbreakable line: one long file name in a truncated row and the whole page scrolls
+   * sideways. One column that never outgrows the grid instead; any grid-cols-* utility still
+   * wins, because utilities come after base.
+   */
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   body {
     min-height: 100%;
     margin: 0;

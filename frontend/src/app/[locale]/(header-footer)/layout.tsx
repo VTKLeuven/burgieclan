@@ -1,7 +1,7 @@
 import { CurriculumLocationProvider } from "@/components/curriculum/CurriculumLocationContext";
 import AppShell from "@/components/layout/AppShell";
 import { ShellPanelsProvider } from "@/components/layout/ShellPanels";
-import { CURRICULUM, parsePanelCookie, SIDEBAR } from "@/components/layout/shellPanelPrefs";
+import { CURRICULUM, DOCUMENT_ASIDE, parsePanelCookie, SIDEBAR } from "@/components/layout/shellPanelPrefs";
 import { cookies } from "next/headers";
 import React from "react";
 
@@ -16,6 +16,7 @@ export default async function AppLayout({ children }: Readonly<{ children: React
     const initial = {
         sidebar: parsePanelCookie(SIDEBAR, cookieStore.get(SIDEBAR.cookie)?.value),
         curriculum: parsePanelCookie(CURRICULUM, cookieStore.get(CURRICULUM.cookie)?.value),
+        documentAside: parsePanelCookie(DOCUMENT_ASIDE, cookieStore.get(DOCUMENT_ASIDE.cookie)?.value),
     };
 
     return (

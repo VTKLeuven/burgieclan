@@ -5,13 +5,12 @@ import DeleteDocumentButton from "@/components/document/DeleteDocumentButton";
 import DocumentCommentSection from "@/components/document/DocumentCommentSection";
 import DocumentFolderList from "@/components/document/DocumentFolderList";
 import DocumentSiblingNav from "@/components/document/DocumentSiblingNav";
-import PageHeader from "@/components/layout/PageHeader";
 import UnderReviewBox from "@/components/document/UnderReviewBox";
 import ErrorPage from "@/components/error/ErrorPage";
 import LoadingPage from "@/components/loading/LoadingPage";
 import DownloadSingleDocumentButton from "@/components/ui/buttons/DownloadSingleDocumentButton";
 import VoteButton from "@/components/ui/buttons/VoteButton";
-import DynamicBreadcrumb from "@/components/ui/DynamicBreadcrumb";
+import CurriculumPageHeader from "@/components/ui/DynamicBreadcrumb";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import { useUser } from "@/components/UserContext";
 import { logDocumentView } from "@/hooks/logDocumentView";
@@ -21,7 +20,9 @@ import type { Document } from "@/types/entities";
 import { convertToDocument } from "@/utils/convertToEntity";
 import { formatFileSize } from "@/utils/fileSize";
 import { inlineUrl, previewKindFor } from "@/utils/previewableFile";
-import { ExternalLink } from "lucide-react";
+import { useDocumentAsidePanel } from "@/components/layout/ShellPanels";
+import { cn } from "@/lib/utils";
+import { CalendarDays, ExternalLink, HardDrive, PanelRightClose, PanelRightOpen, PenLine, UserRound } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -30,15 +31,22 @@ import { localizedCourseName } from "@/utils/courseName";
 
 // Lazy-load PDFViewer so pdfjs-dist never runs on the server (no DOMMatrix in Node)
 const PDFViewer = dynamic(() => import("@/components/document/pdf/PDFViewer"), { ssr: false });
-/** Below this panel width the sidebar (details, folder, comments) moves under the preview. */
-const SIDEBAR_MIN_WIDTH = 1080;
+/**
+ * Below this page width there is no room for the column beside the preview (folder, comments):
+ * the folder moves under the preview and the comments into a drawer behind a header button.
+ */
+const ASIDE_MIN_WIDTH = 1080;
 
-function Property({ label, children }: { label: string; children: ReactNode }) {
+/** One fact in the line under the title: an icon, then the label in grey and the value in ink. */
+function Fact({ icon, label, children }: { icon: ReactNode; label?: string; children: ReactNode }) {
     return (
-        <div className="grid grid-cols-[104px_minmax(0,1fr)] items-start gap-3 py-1.5">
-            <dt className="pt-0.5 text-small text-fg-muted">{label}</dt>
-            <dd className="m-0 min-w-0 text-body text-fg [overflow-wrap:anywhere]">{children}</dd>
-        </div>
+        <span className="inline-flex min-w-0 items-center gap-1.5 [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-icon">
+            {icon}
+            <span className="min-w-0 [overflow-wrap:anywhere]">
+                {label && <span className="text-fg-muted">{label} </span>}
+                <span className="text-fg-secondary">{children}</span>
+            </span>
+        </span>
     );
 }
 
@@ -51,8 +59,11 @@ export default function DocumentPreview({ id }: { id: string }) {
         return preloaded ? convertToDocument(preloaded) : null;
     });
 
-    const [showInlineComments, setShowInlineComments] = useState(false);
+    const [roomForAside, setRoomForAside] = useState(false);
     const previewLayoutRef = useRef<HTMLDivElement>(null);
+    // Open or folded away is one choice for every document, remembered across visits.
+    const asidePanel = useDocumentAsidePanel();
+    const showAside = roomForAside && asidePanel.open;
 
     const { user } = useUser();
     const { documents: siblings, loading: siblingsLoading } = useSiblingDocuments(
@@ -96,19 +107,19 @@ export default function DocumentPreview({ id }: { id: string }) {
 
     // Use the actual page area rather than a viewport breakpoint. A wide curriculum sidebar,
     // browser zoom or OS scaling can make a nominally large laptop just as cramped as a smaller
-    // screen. The comments stay inline only when both columns have genuinely useful space.
+    // screen. The column beside the preview only shows when both have genuinely useful space.
     useEffect(() => {
         const el = previewLayoutRef.current;
         if (!el) return;
 
         const observer = new ResizeObserver(([entry]) => {
-            setShowInlineComments(entry.contentRect.width >= SIDEBAR_MIN_WIDTH);
+            setRoomForAside(entry.contentRect.width >= ASIDE_MIN_WIDTH);
         });
         observer.observe(el);
         return () => observer.disconnect();
     }, [document?.id]);
 
-    const header = (actions?: ReactNode) => <PageHeader breadcrumb={<DynamicBreadcrumb />} actions={actions} />;
+    const header = (actions?: ReactNode) => <CurriculumPageHeader actions={actions} />;
 
     if (loading) return <>{header()}<LoadingPage /></>;
 
@@ -133,46 +144,28 @@ export default function DocumentPreview({ id }: { id: string }) {
             key={document.id}
             documentId={document.id}
             file={document.contentUrl}
-            displayInline={showInlineComments}
+            displayInline={showAside}
         />
     );
 
-    const details = (
-        <dl className="m-0">
-            {document.year && <Property label={t('document.year')}>{document.year}</Property>}
-            {/* Only the Seafile import fills `author` in, so this shows up on migrated archive
-                files, where the uploader is the archive account rather than the person who
-                actually wrote the notes. */}
-            {document.author && !document.anonymous && (
-                <Property label={t('document.author')}>{document.author}</Property>
-            )}
-            <Property label={t('document.uploaded-by')}>
-                {document.anonymous ? t('document.anonymous') : (document.creator?.fullName || '')}
-            </Property>
-            {document.createdAt && (
-                <Property label={t('document.date')}>
-                    <span className="tabular">
-                        {document.createdAt.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}
-                    </span>
-                </Property>
-            )}
-            {document.fileSize && (
-                <Property label={t('document.size')}>
-                    <span className="tabular">{formatFileSize(document.fileSize)}</span>
-                </Property>
-            )}
-            <Property label={t('document.votes')}>
-                <VoteButton type="document" objectId={Number(id)} disabled={!user} size="small" />
-            </Property>
-        </dl>
-    );
+    const folder = document.course && document.category ? (
+        <DocumentFolderList
+            course={document.course}
+            category={document.category}
+            currentDocument={document}
+            documents={siblings}
+            loading={siblingsLoading}
+        />
+    ) : null;
+
+    const asideLabel = t(asidePanel.open ? 'document.aside.hide' : 'document.aside.show');
 
     return (
         <>
             {header(
                 <>
                     <DocumentSiblingNav document={document} />
-                    {!showInlineComments && comments}
+                    {!showAside && comments}
                     <FavoriteButton itemId={Number(id)} itemType="document" size={18} className="vtk-icon-button" />
                     {inlineHref && (
                         <a
@@ -191,10 +184,25 @@ export default function DocumentPreview({ id }: { id: string }) {
                         fileSize={document.fileSize ? formatFileSize(document.fileSize) : undefined}
                         disabled={!user}
                     />
+                    {roomForAside && (
+                        <button
+                            type="button"
+                            onClick={() => asidePanel.setOpen(!asidePanel.open)}
+                            className="vtk-icon-button"
+                            aria-expanded={asidePanel.open}
+                            aria-controls="document-aside"
+                            aria-label={asideLabel}
+                            title={asideLabel}
+                        >
+                            {asidePanel.open
+                                ? <PanelRightClose className="size-[18px]" aria-hidden="true" />
+                                : <PanelRightOpen className="size-[18px]" aria-hidden="true" />}
+                        </button>
+                    )}
                 </>
             )}
 
-            <div ref={previewLayoutRef} className={`flex flex-1 ${showInlineComments ? 'flex-row' : 'flex-col'}`}>
+            <div ref={previewLayoutRef} className={cn('flex flex-1', showAside ? 'flex-row' : 'flex-col')}>
                 <div className="min-w-0 flex-1 px-4 pt-7 pb-16 md:px-8">
                     <h1 className="vtk-page-title">{document.name}</h1>
                     <p className="m-0 mt-1 flex flex-wrap gap-x-2 text-body text-fg-muted">
@@ -214,6 +222,35 @@ export default function DocumentPreview({ id }: { id: string }) {
                             </>
                         )}
                     </p>
+
+                    {/* What used to fill a details panel beside the preview, in one line under the
+                        title, so the column beside it is left for the folder and the comments. */}
+                    <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-small">
+                        <VoteButton type="document" objectId={Number(id)} disabled={!user} size="small" />
+                        <Fact icon={<UserRound aria-hidden="true" />} label={t('document.uploaded-by')}>
+                            {document.anonymous ? t('document.anonymous') : (document.creator?.fullName || '')}
+                        </Fact>
+                        {/* Only the Seafile import fills `author` in, so this shows up on migrated
+                            archive files, where the uploader is the archive account rather than the
+                            person who actually wrote the notes. */}
+                        {document.author && !document.anonymous && (
+                            <Fact icon={<PenLine aria-hidden="true" />} label={t('document.author')}>
+                                {document.author}
+                            </Fact>
+                        )}
+                        {document.createdAt && (
+                            <Fact icon={<CalendarDays aria-hidden="true" />} label={t('document.date')}>
+                                <span className="tabular">
+                                    {document.createdAt.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}
+                                </span>
+                            </Fact>
+                        )}
+                        {document.fileSize && (
+                            <Fact icon={<HardDrive aria-hidden="true" />}>
+                                <span className="tabular" title={t('document.size')}>{formatFileSize(document.fileSize)}</span>
+                            </Fact>
+                        )}
+                    </div>
 
                     {document.underReview && (
                         <div className="mt-5">
@@ -263,38 +300,17 @@ export default function DocumentPreview({ id }: { id: string }) {
                         )}
                     </div>
 
-                    {!showInlineComments && (
-                        <div className="mt-10 grid gap-8 md:grid-cols-2">
-                            <section>
-                                <h2 className="m-0 mb-2 text-body font-semibold">{t('document.details')}</h2>
-                                {details}
-                            </section>
-                            {document.course && document.category && (
-                                <DocumentFolderList
-                                    course={document.course}
-                                    category={document.category}
-                                    currentDocument={document}
-                                    documents={siblings}
-                                    loading={siblingsLoading}
-                                />
-                            )}
-                        </div>
-                    )}
+                    {!showAside && folder && <div className="mt-10 max-w-xl">{folder}</div>}
                 </div>
 
-                {showInlineComments && (
-                    <aside className="w-[340px] shrink-0 border-l border-border px-6 py-6">
+                {showAside && (
+                    <aside
+                        id="document-aside"
+                        style={{ width: asidePanel.width }}
+                        className="shrink-0 border-l border-border px-6 py-6"
+                    >
                         <div className="grid gap-8">
-                            {details}
-                            {document.course && document.category && (
-                                <DocumentFolderList
-                                    course={document.course}
-                                    category={document.category}
-                                    currentDocument={document}
-                                    documents={siblings}
-                                    loading={siblingsLoading}
-                                />
-                            )}
+                            {folder}
                             {comments}
                         </div>
                     </aside>

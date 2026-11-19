@@ -10,11 +10,10 @@ import { useFeature } from "@/components/FeaturesContext";
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import RelatedCourses from "@/components/coursepage/RelatedCourses";
 import ErrorPage from "@/components/error/ErrorPage";
-import PageHeader from "@/components/layout/PageHeader";
 import CourseBadge from "@/components/layout/CourseBadge";
 import CreateDocumentButton from "@/components/ui/CreateDocumentButton";
 import DownloadButton from "@/components/ui/DownloadButton";
-import DynamicBreadcrumb from "@/components/ui/DynamicBreadcrumb";
+import CurriculumPageHeader from "@/components/ui/DynamicBreadcrumb";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import { readPreloadedApi, useApi } from "@/hooks/useApi";
@@ -91,7 +90,7 @@ export default function CoursePage() {
     if (!courseId || !course || (loading && !course)) {
         return (
             <>
-                <PageHeader breadcrumb={<DynamicBreadcrumb />} />
+                <CurriculumPageHeader />
                 <Loading />
             </>
         );
@@ -105,8 +104,7 @@ export default function CoursePage() {
 
     return (
         <>
-            <PageHeader
-                breadcrumb={<DynamicBreadcrumb />}
+            <CurriculumPageHeader
                 actions={
                     <>
                         <FavoriteButton itemId={course.id} itemType="course" size={18} className="vtk-icon-button" />

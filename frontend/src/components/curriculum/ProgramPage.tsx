@@ -4,10 +4,9 @@ import Loading from '@/components/loading/LoadingPage';
 import CurriculumLevel from '@/components/curriculum/CurriculumLevel';
 import { usePublishCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import ErrorPage from '@/components/error/ErrorPage';
-import DynamicBreadcrumb from '@/components/ui/DynamicBreadcrumb';
+import CurriculumPageHeader from '@/components/ui/DynamicBreadcrumb';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import PageHead from '@/components/ui/PageHead';
-import PageHeader from '@/components/layout/PageHeader';
 import DownloadButton from '@/components/ui/DownloadButton';
 import { GraduationCap } from 'lucide-react';
 import { readPreloadedApi, useApi } from '@/hooks/useApi';
@@ -48,7 +47,7 @@ export default function ProgramPage({ id }: { id: number }) {
         }
     }, [program?.name]);
 
-    const header = (actions?: React.ReactNode) => <PageHeader breadcrumb={<DynamicBreadcrumb />} actions={actions} />;
+    const header = (actions?: React.ReactNode) => <CurriculumPageHeader actions={actions} />;
 
     if (error) return <ErrorPage status={error.status} detail={error.message} />;
     if (loading || !program) return <>{header()}<Loading /></>;

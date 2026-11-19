@@ -127,11 +127,19 @@ export default function PDFViewer({ documentId }: { documentId: number }): JSX.E
         const stackRect = stack.getBoundingClientRect();
         if (stackRect.width <= 0) return;
 
+        const scroller = stack.closest<HTMLElement>('[data-scroll-root]');
+        const scrollerTop = scroller ? scroller.getBoundingClientRect().top : 0;
         const visibleTop = Math.max(stackRect.top, 0);
         const visibleBottom = Math.min(stackRect.bottom, window.innerHeight);
-        const anchorY = clientY ?? (visibleBottom > visibleTop
-            ? (visibleTop + visibleBottom) / 2
-            : window.innerHeight / 2);
+        // While the top of the document is still in view, a button or key zoom grows the pages
+        // from their top edge and the page around them stays put. Anchoring the middle of the
+        // view instead scrolled the title and toolbar away on every click.
+        const topInView = clientY === undefined && stackRect.top >= scrollerTop;
+        const anchorY = topInView
+            ? stackRect.top
+            : clientY ?? (visibleBottom > visibleTop
+                ? (visibleTop + visibleBottom) / 2
+                : window.innerHeight / 2);
         const anchorX = clientX ?? container.getBoundingClientRect().left + container.clientWidth / 2;
 
         // The page under the anchor, or the one above it when the anchor falls in a margin.
@@ -368,9 +376,11 @@ export default function PDFViewer({ documentId }: { documentId: number }): JSX.E
                 canFitPage={fitPageZoom !== null}
             />
 
+            {/* Zoomed in, the pages pan sideways here and only here: reaching the edge does not
+                hand the swipe on to the page around it. */}
             <div
                 ref={scrollRef}
-                className="overflow-x-auto bg-vtk-paper-2 p-4"
+                className="overflow-x-auto overscroll-x-contain bg-vtk-paper-2 p-4"
             >
                 <div
                     ref={stackRef}

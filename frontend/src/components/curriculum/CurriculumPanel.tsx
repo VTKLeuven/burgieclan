@@ -17,8 +17,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useUser } from '@/components/UserContext';
 import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
+import { useSiblingDocuments } from '@/hooks/useSiblingDocuments';
 import { cn } from '@/lib/utils';
-import type { Course, DocumentCategory, Module, Program } from '@/types/entities';
+import type { Course, Document, DocumentCategory, Module, Program } from '@/types/entities';
 import { convertToDocumentCategory, convertToModule, convertToProgram } from '@/utils/convertToEntity';
 import { localizedCourseName } from '@/utils/courseName';
 import { rememberBranch } from '@/utils/curriculumBranch';
@@ -28,6 +29,7 @@ import {
     ChevronRight,
     ChevronsUpDown,
     FileText,
+    Files,
     Folder,
     GraduationCap,
     LoaderCircle,
@@ -48,11 +50,14 @@ const INDENT_STEP = 14;
 /** The chevron button is 20px wide; guides run through its centre. */
 const CHEVRON_CENTRE = 10;
 const MAX_FILTER_RESULTS = 50;
+/** How many files of the open folder to list around the one being read; the rest is one link away. */
+const FOLDER_WINDOW = 8;
 
 type NodeKey = string;
 const moduleKey = (id: number): NodeKey => `m${id}`;
 const courseKey = (id: number): NodeKey => `c${id}`;
 const categoryKey = (id: number): NodeKey => `k${id}`;
+const documentKey = (id: number): NodeKey => `d${id}`;
 
 interface ModuleChildren {
     modules: Module[];
@@ -252,7 +257,7 @@ function ProgramSwitcher({
 function ProgramTree({ programId }: { programId: number }) {
     const { t, i18n } = useTranslation();
     const { request } = useApi<unknown>();
-    const { module: currentModule, course, category, activePath } = useCurriculumLocation();
+    const { module: currentModule, course, category, document: currentDocument, activePath } = useCurriculumLocation();
 
     const [programModules, setProgramModules] = useState<Record<number, Module[]>>({});
     const [moduleChildren, setModuleChildren] = useState<Record<number, ModuleChildren>>({});
@@ -316,8 +321,10 @@ function ProgramTree({ programId }: { programId: number }) {
         if (!onBranch || !activePath) return [];
         const keys = activePath.modules.map((node) => moduleKey(node.id));
         if (course) keys.push(courseKey(course.id));
+        // On a document its folder opens too, listing the files beside it.
+        if (course && category && currentDocument) keys.push(categoryKey(category.id));
         return keys;
-    }, [onBranch, activePath, course]);
+    }, [onBranch, activePath, course, category, currentDocument]);
 
     const branchSignature = branchKeys.join('|');
     useEffect(() => {
@@ -349,14 +356,18 @@ function ProgramTree({ programId }: { programId: number }) {
     }, []);
 
     const categories = useDocumentCategories(course !== undefined);
+    // "In this folder": only fetched while a document is open. The same request as the page's own
+    // folder list, so it comes from the cache.
+    const folder = useSiblingDocuments(
+        currentDocument ? course?.id : undefined,
+        currentDocument ? category?.id : undefined,
+    );
 
-    const activeKey = category
-        ? categoryKey(category.id)
-        : course
-            ? courseKey(course.id)
-            : currentModule
-                ? moduleKey(currentModule.id)
-                : null;
+    const activeKey: NodeKey | null = currentDocument ? documentKey(currentDocument.id)
+        : category ? categoryKey(category.id)
+        : course ? courseKey(course.id)
+        : currentModule ? moduleKey(currentModule.id)
+        : null;
 
     const modules = programModules[programId];
     if (!modules) {
@@ -429,21 +440,39 @@ function ProgramTree({ programId }: { programId: number }) {
                     <ul className="m-0 flex list-none flex-col gap-0.5 p-0 pt-0.5">
                         {categories.map((item) => {
                             const count = course?.documentCounts?.[item.id];
+                            const key = categoryKey(item.id);
+                            const href = `/course/${node.id}/documents/category/${item.id}`;
+                            // Only the folder of the document being read lists its files.
+                            const holdsDocument = currentDocument !== undefined && category?.id === item.id;
+                            const folderOpen = holdsDocument && expanded.has(key);
                             return (
-                                <li key={categoryKey(item.id)}>
+                                <li key={key}>
                                     <TreeRow
                                         label={item.name ?? ''}
-                                        href={`/course/${node.id}/documents/category/${item.id}`}
+                                        href={href}
                                         apiEndpoints={[
                                             `/api/courses/${node.id}?summary=true`,
                                             `/api/document_categories/${item.id}?lang=${i18n.language}`,
                                         ]}
                                         depth={depth + 1}
-                                        icon={<FileText aria-hidden="true" />}
-                                        active={activeKey === categoryKey(item.id)}
+                                        icon={<Files aria-hidden="true" />}
+                                        expandable={holdsDocument && folder.documents.length > 0}
+                                        open={folderOpen}
+                                        loading={holdsDocument && folder.loading && folder.documents.length === 0}
+                                        active={activeKey === key}
                                         muted={count === 0}
                                         count={count}
+                                        onToggle={() => toggle(key)}
                                     />
+                                    {folderOpen && (
+                                        <FolderDocuments
+                                            documents={folder.documents}
+                                            current={currentDocument}
+                                            folderHref={href}
+                                            depth={depth + 2}
+                                            activeKey={activeKey}
+                                        />
+                                    )}
                                 </li>
                             );
                         })}
@@ -456,6 +485,56 @@ function ProgramTree({ programId }: { programId: number }) {
     return (
         <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
             {modules.map((node) => renderModule(node, 0))}
+        </ul>
+    );
+}
+
+/**
+ * The files in the folder of the document being read, a window around that document so the
+ * neighbours are in view, and a link to the folder when there are more.
+ */
+function FolderDocuments({
+    documents, current, folderHref, depth, activeKey,
+}: {
+    documents: Document[];
+    current: Document;
+    folderHref: string;
+    depth: number;
+    activeKey: NodeKey | null;
+}) {
+    const { t, i18n } = useTranslation();
+    const index = Math.max(0, documents.findIndex((doc) => doc.id === current.id));
+    const start = Math.max(0, Math.min(index - Math.floor(FOLDER_WINDOW / 2), documents.length - FOLDER_WINDOW));
+    const shown = documents.slice(start, start + FOLDER_WINDOW);
+
+    return (
+        <ul className="m-0 flex list-none flex-col gap-0.5 p-0 pt-0.5">
+            {shown.map((doc) => (
+                <li key={documentKey(doc.id)}>
+                    <TreeRow
+                        label={doc.name ?? doc.filename ?? ''}
+                        href={`/document/${doc.id}`}
+                        apiEndpoints={[
+                            `/api/documents/${doc.id}?lang=${i18n.language}`,
+                            `/api/document_comments?document=/api/documents/${doc.id}`,
+                        ]}
+                        depth={depth}
+                        icon={<FileText aria-hidden="true" />}
+                        active={activeKey === documentKey(doc.id)}
+                    />
+                </li>
+            ))}
+            {documents.length > shown.length && (
+                <li>
+                    <ApiPrefetchLink
+                        href={folderHref}
+                        className="flex h-7 items-center rounded-[8px] pr-2 text-caption font-medium text-fg-muted hover:bg-sidebar-hover hover:text-fg"
+                        style={{ paddingLeft: BASE_PADDING + Math.min(depth, MAX_INDENT) * INDENT_STEP + 22 }}
+                    >
+                        {t('shell.show_all', { count: documents.length })}
+                    </ApiPrefetchLink>
+                </li>
+            )}
         </ul>
     );
 }
