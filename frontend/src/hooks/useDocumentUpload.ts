@@ -96,6 +96,13 @@ export const useDocumentUpload = () => {
                 });
             }
 
+            // Process course parts
+            if (data.parts && data.parts.length > 0) {
+                data.parts.forEach(part => {
+                    formData.append('parts[]', part);
+                });
+            }
+
             const result = await request('POST', '/api/documents', formData);
 
             if (!result) {

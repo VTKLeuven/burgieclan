@@ -16,6 +16,7 @@ interface DocumentSectionProps {
     category?: DocumentCategory;
     filters: DocumentFilters;
     sort: DocumentSortOptions;
+    selectedPart?: string | null;
     /** Heading of a collapsible section; a section without one is always open. */
     title?: React.ReactNode;
     /** Opens a collapsed section, e.g. when the course itself has nothing in this category. */
@@ -76,6 +77,7 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
     category,
     filters,
     sort,
+    selectedPart = null,
     title,
     openByDefault = false,
     titleHref,
@@ -119,9 +121,13 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
         }
     }, [loading, totalItems, onTotal]);
 
-    const shown = useMemo(
+    const deduped = useMemo(
         () => (courses.length > 1 ? dedupeBySeafileFile(documents, courses[0].id) : documents),
         [documents, courses],
+    );
+    const shown = useMemo(
+        () => (selectedPart !== null ? deduped.filter((doc) => doc.parts?.includes(selectedPart)) : deduped),
+        [deduped, selectedPart],
     );
 
     useEffect(() => {
@@ -139,7 +145,10 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
     }, [loading, shown, onTags]);
     // The server counts every row; the copies hidden above are not files the reader will see.
     // Exact while everything fits on one page, which is the common case for a single folder.
-    const shownTotal = totalItems - (documents.length - shown.length);
+    const shownTotal = selectedPart !== null
+        ? shown.length
+        : totalItems - (documents.length - deduped.length);
+    const courseParts = courses[0]?.parts;
     const groups = useMemo(
         () => (sort.field === 'year' ? groupByYear(shown) : [{ year: null, documents: shown }]),
         [shown, sort.field],
@@ -193,6 +202,7 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
                                 courseBadge={courses.length > 1 && document.course?.id !== courses[0].id
                                     ? document.course?.code
                                     : undefined}
+                                courseParts={courseParts}
                             />
                         ))}
                     </div>

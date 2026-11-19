@@ -42,6 +42,7 @@ class CourseResourceTest extends ApiTestCase
                 'language',
                 'professors',
                 'semesters',
+                'parts',
                 'credits',
                 'identicalCourses',
                 'oldCourses',
@@ -581,5 +582,24 @@ class CourseResourceTest extends ApiTestCase
             ->assertStatus(200)
             ->assertJsonMatches('oldCourses[0]."@id"', '/api/courses/' . $predecessor->getId())
             ->assertJsonMatches('oldCourses[0].documentCount', 3);
+    }
+
+    public function testGetCourseExposesParts(): void
+    {
+        $course = CourseFactory::createOne(
+            [
+                'parts' => [' Deel 1 ', 'Deel 2', 'Deel 1', ''],
+            ]
+        );
+
+        $headers = ['headers' => ['Authorization' => 'Bearer ' . $this->token]];
+
+        $this->browser()
+            ->get('/api/courses/' . $course->getId(), $headers)
+            ->assertStatus(200)
+            ->assertJsonMatches('parts', ['Deel 1', 'Deel 2'])
+            ->get('/api/courses/' . $course->getId() . '?summary=true', $headers)
+            ->assertStatus(200)
+            ->assertJsonMatches('parts', ['Deel 1', 'Deel 2']);
     }
 }

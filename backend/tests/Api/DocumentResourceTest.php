@@ -55,6 +55,7 @@ class DocumentResourceTest extends ApiTestCase
                 'createdAt',
                 'updatedAt',
                 'tags',
+                'parts',
             ],
             array_keys($json->decoded()['hydra:member'][0])
         );
@@ -98,6 +99,7 @@ class DocumentResourceTest extends ApiTestCase
                 'createdAt',
                 'updatedAt',
                 'tags',
+                'parts',
             ],
             array_keys($json->decoded()['hydra:member'][0])
         ); // Notice that creator is not included in the response.
@@ -1623,5 +1625,100 @@ class DocumentResourceTest extends ApiTestCase
             )
             ->assertStatus(200)
             ->assertJsonMatches('seafileFileId', str_repeat('ab', 20));
+    }
+
+    public function testPostToCreateDocumentWithParts(): void
+    {
+        $course = CourseFactory::createOne(['parts' => ['Deel 1', 'Deel 2']]);
+        $category = DocumentCategoryFactory::createOne();
+
+        $filePath = tempnam(sys_get_temp_dir(), uniqid());
+        $img = file_get_contents(__DIR__ . '/../../public/image-for-test.png');
+        file_put_contents($filePath, $img);
+        $file = new UploadedFile($filePath, 'image-for-test.png');
+
+        $json = $this->browser()
+            ->post(
+                '/api/documents',
+                [
+                    'headers' => [
+                        'Content-Type' => 'multipart/form-data',
+                        'Authorization' => 'Bearer ' . $this->token,
+                    ],
+                    'body' => [
+                        'name' => 'Summary with parts',
+                        'course' => '/api/courses/' . $course->getId(),
+                        'category' => '/api/document_categories/' . $category->getId(),
+                        'anonymous' => 'true',
+                        'parts' => ['Deel 1', 'Deel 2'],
+                    ],
+                    'files' => [
+                        'file' => $file,
+                    ],
+                ]
+            )
+            ->assertStatus(201)
+            ->assertJsonMatches('parts', ['Deel 1', 'Deel 2'])
+            ->json();
+
+        $createdId = $json->decoded()['@id'];
+        $this->browser()
+            ->get(
+                $createdId,
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token,
+                    ],
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('parts', ['Deel 1', 'Deel 2']);
+
+        $contentUrl = $json->decoded()['contentUrl'] ?? null;
+        if ($contentUrl) {
+            $array = explode('/', $contentUrl);
+            $filename = end($array);
+            $target = __DIR__ . '/../../data/documents/' . $filename;
+            if (is_file($target)) {
+                unlink($target);
+            }
+        }
+    }
+
+    public function testPostToCreateDocumentRejectsInvalidPart(): void
+    {
+        $course = CourseFactory::createOne(['parts' => ['Deel 1']]);
+        $category = DocumentCategoryFactory::createOne();
+
+        $filePath = tempnam(sys_get_temp_dir(), uniqid());
+        $img = file_get_contents(__DIR__ . '/../../public/image-for-test.png');
+        file_put_contents($filePath, $img);
+        $file = new UploadedFile($filePath, 'image-for-test.png');
+
+        $this->browser()
+            ->post(
+                '/api/documents',
+                [
+                    'headers' => [
+                        'Content-Type' => 'multipart/form-data',
+                        'Authorization' => 'Bearer ' . $this->token,
+                    ],
+                    'body' => [
+                        'name' => 'Invalid part doc',
+                        'course' => '/api/courses/' . $course->getId(),
+                        'category' => '/api/document_categories/' . $category->getId(),
+                        'anonymous' => 'true',
+                        'parts' => ['Nonexistent part'],
+                    ],
+                    'files' => [
+                        'file' => $file,
+                    ],
+                ]
+            )
+            ->assertStatus(422);
+
+        if (is_file($filePath)) {
+            unlink($filePath);
+        }
     }
 }

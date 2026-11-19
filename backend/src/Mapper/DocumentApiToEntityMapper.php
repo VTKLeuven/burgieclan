@@ -10,6 +10,7 @@ use App\Entity\Tag;
 use App\Repository\DocumentRepository;
 use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -66,6 +67,16 @@ class DocumentApiToEntityMapper implements MapperInterface
         $to->setAuthor($from->author);
         $to->setUnderReview($from->under_review);
         $to->setAnonymous($from->anonymous);
+        $to->setParts($from->parts);
+
+        $allowedParts = $to->getCourse()->getParts();
+        foreach ($to->getParts() as $part) {
+            if (!in_array($part, $allowedParts, true)) {
+                throw new UnprocessableEntityHttpException(
+                    sprintf('Invalid course part "%s" for course %s.', $part, $to->getCourse()->getCode())
+                );
+            }
+        }
 
         foreach ($from->tags as $tag) {
             $tagEntity = $this->microMapper->map(

@@ -24,6 +24,7 @@ export interface Course extends BaseEntity {
     location?: string;
     professors?: string[];
     semesters?: string[];
+    parts?: string[];
     description_top?: string;
     description_bottom?: string;
     oldCourses?: Course[];
@@ -205,6 +206,7 @@ export interface Document extends NodeEntity {
     mimetype?: string;
     filename?: string;
     tags?: Tag[];
+    parts?: string[];
 }
 
 export interface User extends BaseEntity {

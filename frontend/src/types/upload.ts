@@ -7,6 +7,7 @@ export interface UploadFormData {
     file: File | null;
     tagIds: number[];
     tagQueries: string[];
+    parts: string[];
 }
 
 export interface UploadFormProps {

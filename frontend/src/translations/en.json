@@ -97,6 +97,10 @@
                 "create": "Create new tag \"{{tag}}\"",
                 "no-results": "No tags found"
             },
+            "parts": {
+                "label": "Course parts (optional)",
+                "full_course": "Full course"
+            },
             "validation": {
                 "name": {
                     "required": "Name is required",
@@ -267,7 +271,10 @@
             "from-course": "On {{code}}, an equivalent course",
             "open-course": "Open the course page of {{code}}",
             "all-tags": "All",
-            "filter-by-tag": "Filter by tag"
+            "filter-by-tag": "Filter by tag",
+            "all-parts": "All",
+            "full-course": "Full course",
+            "filter-by-part": "Filter by course part"
         },
         "related": {
             "predecessors": "Previously taught as",

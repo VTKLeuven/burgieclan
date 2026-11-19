@@ -101,10 +101,22 @@ use Symfony\Component\Validator\Constraints as Assert;
                                             ],
                                             'example' => ['/api/tags/1', '/api/tags/2'],
                                         ],
+                                        'parts[]' => [
+                                            'type' => 'array',
+                                            'items' => [
+                                                'type' => 'string',
+                                            ],
+                                            'example' => ['Deel 1', 'Deel 2'],
+                                        ],
                                     ]
                                 ],
                                 'encoding' => [
                                     'tags[]' => [
+                                        'style' => 'form',
+                                        'explode' => true,
+                                        'allowReserved' => true
+                                    ],
+                                    'parts[]' => [
                                         'style' => 'form',
                                         'explode' => true,
                                         'allowReserved' => true
@@ -270,4 +282,17 @@ class DocumentApi extends NodeApi
         ]
     )]
     public array $tags = [];
+
+    /**
+     * @var string[]
+     */
+    #[Groups(
+        [
+            SerializationGroups::SEARCH,
+            SerializationGroups::USER,
+            SerializationGroups::DOCUMENT_GET,
+            SerializationGroups::DOCUMENT_CREATE,
+        ]
+    )]
+    public array $parts = [];
 }

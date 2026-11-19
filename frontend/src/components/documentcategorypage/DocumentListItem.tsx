@@ -18,9 +18,16 @@ interface DocumentListItemProps {
      * the Dutch and English version of an exam look alike until opened.
      */
     courseBadge?: string;
+    courseParts?: string[];
 }
 
-const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelected, onToggleSelect, courseBadge }) => {
+const DocumentListItem: React.FC<DocumentListItemProps> = ({
+    document,
+    isSelected,
+    onToggleSelect,
+    courseBadge,
+    courseParts,
+}) => {
     const { t, i18n } = useTranslation();
 
     const uploader = document.anonymous
@@ -56,6 +63,13 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
     // omitting that bot name keeps rows calm instead of repeating it on every line.
     const isArchiveBotOnly = !document.author?.trim() && Boolean(document.seafileFileId);
     const uploaderLine = showAuthor ? document.author : (isArchiveBotOnly ? undefined : uploader);
+    const documentParts = document.parts ?? [];
+    const coversAllParts = Boolean(
+        documentParts.length > 0
+        && courseParts
+        && courseParts.length > 0
+        && courseParts.every((part) => documentParts.includes(part)),
+    );
 
     return (
         // Two lines, so the name gets the whole width: name on top, tags as quiet text beneath.
@@ -104,6 +118,19 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                         >
                             {courseBadge}
                         </span>
+                    )}
+                    {documentParts.length > 0 && (
+                        coversAllParts ? (
+                            <span className="vtk-badge vtk-badge-muted shrink-0">
+                                {t('course-page.documents.full-course')}
+                            </span>
+                        ) : (
+                            documentParts.map((part) => (
+                                <span key={part} className="vtk-badge vtk-badge-muted shrink-0">
+                                    {part}
+                                </span>
+                            ))
+                        )
                     )}
                     {document.underReview && (
                         <Badge text={t('document.under_review')} color="yellow" />

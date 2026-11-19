@@ -130,6 +130,20 @@ class CourseApi extends BaseEntityApi
     )]
     public array $semesters = [];
 
+    /**
+     * @var string[]
+     */
+    #[Groups(
+        [
+            SerializationGroups::COURSE_GET,
+            SerializationGroups::PROGRAM_GET,
+            SerializationGroups::MODULE_GET,
+            SerializationGroups::SEARCH,
+            SerializationGroups::DOCUMENT_GET,
+        ]
+    )]
+    public array $parts = [];
+
     #[Assert\Positive]
     #[Groups(
         [

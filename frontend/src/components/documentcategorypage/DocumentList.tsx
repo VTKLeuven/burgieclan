@@ -54,6 +54,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEn
     // "2024 - 2025", which sorts correctly as a string; files without a year come last.
     const [sort, setSort] = useState<DocumentSortOptions>({ field: 'year', direction: 'desc' });
     const [selectedDocuments, setSelectedDocuments] = useState<Document[]>([]);
+    const [selectedPart, setSelectedPart] = useState<string | null>(null);
     const [ownTotal, setOwnTotal] = useState<number | null>(null);
     const [olderTotals, setOlderTotals] = useState<Record<number, number>>({});
     const scopeKey = `${course?.id ?? ''}:${category?.id ?? ''}`;
@@ -72,6 +73,14 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEn
     useEffect(() => {
         hasActiveTagFilterRef.current = hasActiveTagFilter;
     }, [hasActiveTagFilter]);
+
+    const courseParts = useMemo(() => course?.parts ?? [], [course?.parts]);
+    const activePart = selectedPart && courseParts.includes(selectedPart) ? selectedPart : null;
+
+    const handlePartChange = (part: string | null) => {
+        setSelectedPart(part);
+        setSelectedDocuments([]);
+    };
 
     const ownCourses = useMemo(
         () => (course ? [course, ...(course.identicalCourses ?? []).filter((c) => c.id !== course.id)] : []),
@@ -262,6 +271,36 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEn
                 )}
             </div>
 
+            {courseParts.length > 0 && (
+                <div
+                    className="vtk-tabs mb-3 max-w-full overflow-x-auto"
+                    role="tablist"
+                    aria-label={t('course-page.documents.filter-by-part')}
+                >
+                    <button
+                        type="button"
+                        role="tab"
+                        aria-selected={activePart === null}
+                        onClick={() => handlePartChange(null)}
+                        className="vtk-tab shrink-0"
+                    >
+                        {t('course-page.documents.all-parts')}
+                    </button>
+                    {courseParts.map((part) => (
+                        <button
+                            key={part}
+                            type="button"
+                            role="tab"
+                            aria-selected={activePart === part}
+                            onClick={() => handlePartChange(part)}
+                            className="vtk-tab shrink-0"
+                        >
+                            {part}
+                        </button>
+                    ))}
+                </div>
+            )}
+
             <div className="flex flex-col gap-3">
                 {hasOlder && (
                     <h3 className="m-0 text-small font-medium text-fg-muted">
@@ -274,6 +313,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEn
                         category={category}
                         filters={filters}
                         sort={sort}
+                        selectedPart={activePart}
                         emptyMessage={hasOlder && ownIsEmpty ? t('course-page.documents.none-see-older') : undefined}
                         isSelected={isSelected}
                         onToggleSelect={handleToggleSelect}
@@ -297,6 +337,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEn
                         category={category}
                         filters={filters}
                         sort={sort}
+                        selectedPart={activePart}
                         openByDefault={autoOpenOlder}
                         isSelected={isSelected}
                         onToggleSelect={handleToggleSelect}
@@ -315,6 +356,7 @@ interface OlderCourseSectionProps {
     category?: DocumentCategory;
     filters: DocumentFilters;
     sort: DocumentSortOptions;
+    selectedPart?: string | null;
     openByDefault: boolean;
     isSelected: (document: Document) => boolean;
     onToggleSelect: (document: Document) => void;

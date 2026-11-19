@@ -97,6 +97,10 @@
                 "create": "Maak nieuwe tag \"{{tag}}\"",
                 "no-results": "Geen tags gevonden"
             },
+            "parts": {
+                "label": "Onderdelen (optioneel)",
+                "full_course": "Volledig vak"
+            },
             "validation": {
                 "name": {
                     "required": "Naam is verplicht",
@@ -267,7 +271,10 @@
             "from-course": "Staat op {{code}}, een gelijkwaardig vak",
             "open-course": "Open de vakpagina van {{code}}",
             "all-tags": "Alles",
-            "filter-by-tag": "Filter op tag"
+            "filter-by-tag": "Filter op tag",
+            "all-parts": "Alles",
+            "full-course": "Volledig vak",
+            "filter-by-part": "Filter op vakonderdeel"
         },
         "related": {
             "predecessors": "Vroeger gegeven als",

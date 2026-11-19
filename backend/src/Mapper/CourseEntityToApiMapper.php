@@ -45,6 +45,7 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
         $to->language = $from->getLanguage();
         $to->professors = array_values($from->getProfessors());
         $to->semesters = $from->getSemesters();
+        $to->parts = $from->getParts();
         $to->credits = $from->getCredits();
 
         // A course row already has everything it renders. Avoid walking comments, replacement

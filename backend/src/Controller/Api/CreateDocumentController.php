@@ -68,8 +68,19 @@ class CreateDocumentController extends AbstractController
             }
         }
 
+        $dto->parts = array_values(
+            array_filter(
+                array_map(
+                    static fn(mixed $part): string => is_string($part) ? trim($part) : '',
+                    $request->request->all('parts')
+                ),
+                static fn(string $part): bool => $part !== ''
+            )
+        );
+
         // Convert the documentDto to an actual Document.
         $document = $this->microMapper->map($dto, Document::class);
+        $dto->parts = $document->getParts();
 
         $uploadedFile = $request->files->get('file');
         if (!$uploadedFile) {

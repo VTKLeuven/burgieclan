@@ -52,7 +52,8 @@ export default function UploadForm({
         defaultValues: {
             anonymous: user?.defaultAnonymous,
             tagIds: [],
-            tagQueries: []
+            tagQueries: [],
+            parts: []
         }
     });
 
@@ -65,13 +66,15 @@ export default function UploadForm({
     const yearOptions = useYearOptions();
     const initialCourse = initialData?.course;
 
+    const availableCourses = useMemo(
+        () => (initialCourse && !courses.some(course => course.id === initialCourse.id)
+            ? [initialCourse, ...courses]
+            : courses),
+        [courses, initialCourse],
+    );
+
     // Sort the small result set by its localized display label, including accents.
     const courseOptions = useMemo(() => {
-        const availableCourses = initialCourse
-            && !courses.some(course => course.id === initialCourse.id)
-            ? [initialCourse, ...courses]
-            : courses;
-
         return availableCourses
             .map(course => ({
                 id: course.id,
@@ -82,7 +85,7 @@ export default function UploadForm({
                 })(),
             }))
             .sort((a, b) => a.name.localeCompare(b.name, i18n.language));
-    }, [courses, i18n.language, initialCourse, t]);
+    }, [availableCourses, i18n.language, t]);
 
     const categoryOptions = useMemo(() => {
         return categories.map(cat => ({
@@ -91,9 +94,36 @@ export default function UploadForm({
         }));
     }, [categories, t]);
 
-    // Watch the file and name fields using useWatch for better memoization compatibility
+    // Watch the file, name, course and parts fields using useWatch for better memoization compatibility
     const watchedFile = useWatch({ control, name: 'file' });
     const watchedName = useWatch({ control, name: 'name' });
+    const watchedCourseId = useWatch({ control, name: 'course' });
+    const watchedParts = useWatch({ control, name: 'parts' });
+    const selectedParts = useMemo(() => watchedParts ?? [], [watchedParts]);
+
+    const selectedCourseParts = useMemo(() => {
+        const matched = availableCourses.find(course => course.id === watchedCourseId);
+        return matched?.parts ?? [];
+    }, [availableCourses, watchedCourseId]);
+
+    const allPartsSelected = selectedCourseParts.length > 0
+        && selectedCourseParts.every(part => selectedParts.includes(part));
+
+    // Reset selected parts when the chosen course changes so stale part names are never submitted.
+    useEffect(() => {
+        setValue('parts', [], { shouldValidate: true });
+    }, [watchedCourseId, setValue]);
+
+    const handleToggleFullCourse = () => {
+        setValue('parts', allPartsSelected ? [] : [...selectedCourseParts], { shouldValidate: true });
+    };
+
+    const handleTogglePart = (part: string) => {
+        const next = selectedParts.includes(part)
+            ? selectedParts.filter(p => p !== part)
+            : selectedCourseParts.filter(p => p === part || selectedParts.includes(p));
+        setValue('parts', next, { shouldValidate: true });
+    };
 
     // Set initial file on mount if provided.
     useEffect(() => {
@@ -211,6 +241,48 @@ export default function UploadForm({
                         onTagSelectionChange={handleTagSelectionChange}
                     />
                 </div>
+
+                {selectedCourseParts.length > 0 && (
+                    <div className="col-span-full">
+                        <span className="mb-1.5 block text-sm font-medium text-vtk-ink">
+                            {t('upload.form.parts.label')}
+                        </span>
+                        <div className="flex flex-wrap gap-1.5" role="group" aria-label={t('upload.form.parts.label')}>
+                            <button
+                                type="button"
+                                disabled={isLoading}
+                                aria-pressed={allPartsSelected}
+                                onClick={handleToggleFullCourse}
+                                className={`inline-flex h-8 items-center rounded-[7px] border px-2.5 text-small font-medium transition-colors disabled:opacity-50 ${
+                                    allPartsSelected
+                                        ? 'border-primary bg-primary text-on-primary'
+                                        : 'border-border bg-surface text-fg-secondary hover:border-border-strong hover:text-fg'
+                                }`}
+                            >
+                                {t('upload.form.parts.full_course')}
+                            </button>
+                            {selectedCourseParts.map(part => {
+                                const isActive = selectedParts.includes(part);
+                                return (
+                                    <button
+                                        key={part}
+                                        type="button"
+                                        disabled={isLoading}
+                                        aria-pressed={isActive}
+                                        onClick={() => handleTogglePart(part)}
+                                        className={`inline-flex h-8 items-center rounded-[7px] border px-2.5 text-small font-medium transition-colors disabled:opacity-50 ${
+                                            isActive
+                                                ? 'border-primary bg-primary text-on-primary'
+                                                : 'border-border bg-surface text-fg-secondary hover:border-border-strong hover:text-fg'
+                                        }`}
+                                    >
+                                        {part}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
 
                 <div className="col-span-full">
                     <UploadField
