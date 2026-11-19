@@ -13,9 +13,14 @@ interface DocumentListItemProps {
     document: Document;
     isSelected: boolean;
     onToggleSelect: (document: Document) => void;
+    /**
+     * Code of the course the file actually sits on, for a list that mixes in identical courses:
+     * the Dutch and English version of an exam look alike until opened.
+     */
+    courseBadge?: string;
 }
 
-const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelected, onToggleSelect }) => {
+const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelected, onToggleSelect, courseBadge }) => {
     const { t, i18n } = useTranslation();
 
     const uploader = document.anonymous
@@ -74,6 +79,14 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                 >
                     {document.name}
                 </ApiPrefetchLink>
+                {courseBadge && (
+                    <span
+                        className="vtk-badge vtk-badge-muted shrink-0 font-mono"
+                        title={t('course-page.documents.from-course', { code: courseBadge })}
+                    >
+                        {courseBadge}
+                    </span>
+                )}
                 {document.underReview && (
                     <Badge text={t('document.under_review')} color="yellow" />
                 )}

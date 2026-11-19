@@ -1,13 +1,12 @@
 import DocumentFilter from '@/components/documentcategorypage/DocumentFilter';
-import DocumentListItem from '@/components/documentcategorypage/DocumentListItem';
+import DocumentSection from '@/components/documentcategorypage/DocumentSection';
 import DocumentSort from '@/components/documentcategorypage/DocumentSort';
-import { Checkbox } from '@/components/ui/Checkbox';
 import DownloadButton from '@/components/ui/DownloadButton';
-import Pagination from '@/components/ui/Pagination';
-import useRetrieveDocuments, { DocumentFilters, DocumentSortOptions } from '@/hooks/useRetrieveDocuments';
+import { DocumentFilters, DocumentSortOptions } from '@/hooks/useRetrieveDocuments';
 import type { Course, Document, DocumentCategory } from '@/types/entities';
-import { LoaderCircle, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { localizedCourseName } from '@/utils/courseName';
+import { X } from 'lucide-react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface DocumentListProps {
@@ -17,98 +16,80 @@ interface DocumentListProps {
     toolbarEnd?: React.ReactNode;
 }
 
+/**
+ * A folder of one course, the way the old Burgieclan folder showed it: the course's own files
+ * first, then the files of the courses it replaced.
+ *
+ * - "This course" also lists the identical courses (the same subject under another code, e.g.
+ *   the Dutch and English version), because a student cannot tell them apart. A Seafile file
+ *   on both is shown once.
+ * - Every older course gets its own collapsible section, named by its code, so a 2015 exam of
+ *   H01S4A stays recognisable as such instead of mixing in with the current course's.
+ *
+ * Filters, sorting and the download selection apply to every section at once. A course
+ * without identical or older courses renders exactly one section, without headings.
+ */
 const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEnd }) => {
-    const [page, setPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(50);
+    const { t, i18n } = useTranslation();
     const [filters, setFilters] = useState<DocumentFilters>({});
     // Newest academic year first, so a course that has been collecting notes for a
     // decade opens on the material that is still relevant. `year` is stored as
-    // "2024 - 2025", which sorts correctly as a string.
+    // "2024 - 2025", which sorts correctly as a string; files without a year come last.
     const [sort, setSort] = useState<DocumentSortOptions>({ field: 'year', direction: 'desc' });
-
-    const { documents, loading, totalItems } = useRetrieveDocuments(
-        page,
-        itemsPerPage,
-        course,
-        category,
-        false,
-        filters,
-        sort,
-        false,
-    );
-
     const [selectedDocuments, setSelectedDocuments] = useState<Document[]>([]);
-    const { t } = useTranslation();
+    const [ownTotal, setOwnTotal] = useState<number | null>(null);
+    const [olderTotals, setOlderTotals] = useState<Record<number, number>>({});
 
-    useEffect(() => {
-        // Show amount of items per page based on screen size
-        const updateItemsPerPage = () => {
-            if (window.innerWidth < 768) {
-                setItemsPerPage(50);
-            } else {
-                setItemsPerPage(50);
-            }
-        };
+    const ownCourses = useMemo(
+        () => (course ? [course, ...(course.identicalCourses ?? []).filter((c) => c.id !== course.id)] : []),
+        [course],
+    );
+    const olderCourses = useMemo(() => course?.oldCourses ?? [], [course]);
 
-        updateItemsPerPage();
-        window.addEventListener('resize', updateItemsPerPage);
-
-        return () => {
-            window.removeEventListener('resize', updateItemsPerPage);
-        };
+    // Returns the same object when nothing changed, so a section reporting its total on every
+    // render does not re-render the list in a loop.
+    const reportOlderTotal = useCallback((courseId: number, total: number) => {
+        setOlderTotals((prev) => (prev[courseId] === total ? prev : { ...prev, [courseId]: total }));
     }, []);
 
-    const handleToggleSelect = (document: Document) => {
-        setSelectedDocuments(prev => {
-            const isSelected = prev.some(doc => doc.id === document.id);
-            if (isSelected) {
-                return prev.filter(doc => doc.id !== document.id);
-            } else {
-                return [...prev, document];
-            }
+    const isSelected = useCallback(
+        (document: Document) => selectedDocuments.some((doc) => doc.id === document.id),
+        [selectedDocuments],
+    );
+
+    const handleToggleSelect = useCallback((document: Document) => {
+        setSelectedDocuments((prev) => (prev.some((doc) => doc.id === document.id)
+            ? prev.filter((doc) => doc.id !== document.id)
+            : [...prev, document]));
+    }, []);
+
+    const handleSelectMany = useCallback((documents: Document[], select: boolean) => {
+        setSelectedDocuments((prev) => {
+            const ids = new Set(documents.map((doc) => doc.id));
+            const rest = prev.filter((doc) => !ids.has(doc.id));
+            return select ? [...rest, ...documents] : rest;
         });
-    };
-
-    const handleSelectAll = () => {
-        if (selectedDocuments.length === documents.length) {
-            setSelectedDocuments([]);
-        } else {
-            setSelectedDocuments([...documents]);
-        }
-    };
-
-    const handleClearSelection = () => {
-        setSelectedDocuments([]);
-    };
-
-    const isDocumentSelected = (document: Document) => {
-        return selectedDocuments.some(doc => doc.id === document.id);
-    };
+    }, []);
 
     const handleSortChange = (newSort: DocumentSortOptions) => {
         setSort(newSort);
-        setPage(1);
         setSelectedDocuments([]);
     };
 
     const handleFilterChange = (newFilters: DocumentFilters) => {
         setFilters(newFilters);
-        setPage(1);
         setSelectedDocuments([]);
     };
 
     const handleClearFilters = () => {
         setFilters({});
-        setPage(1);
         setSelectedDocuments([]);
     };
 
-    const handlePageChange = (newPage: number) => {
-        setPage(newPage);
-        setSelectedDocuments([]);
-    };
-
-    const allSelected = documents.length > 0 && selectedDocuments.length === documents.length;
+    // Only older courses that hold something in this folder count: one with nothing renders
+    // no section, and a heading over nothing would promise files that are not there.
+    const hasOlder = olderCourses.some((older) => (olderTotals[older.id] ?? 0) > 0);
+    const ownIsEmpty = ownTotal === 0;
 
     return (
         <section aria-label={t('course-page.documents.header')}>
@@ -131,7 +112,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEn
                         <DownloadButton documents={selectedDocuments} size={16} showText={true} className="vtk-button-sm" />
                         <button
                             type="button"
-                            onClick={handleClearSelection}
+                            onClick={() => setSelectedDocuments([])}
                             className="vtk-icon-button"
                             title={t('course-page.documents.clear-selection')}
                             aria-label={t('course-page.documents.clear-selection')}
@@ -147,51 +128,89 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEn
                 )}
             </div>
 
-            <div className="vtk-panel overflow-hidden">
-                {loading ? (
-                    <div className="flex items-center justify-center py-14">
-                        <LoaderCircle className="animate-spin text-icon" size={20} />
-                    </div>
-                ) : documents.length === 0 ? (
-                    <p className="vtk-empty m-0">{t('course-page.documents.no-documents')}</p>
-                ) : (
-                    <>
-                        <div className="flex h-10 items-center gap-3 border-b border-border bg-surface-muted px-4">
-                            <Checkbox
-                                label={allSelected ? t('course-page.documents.deselect-all') : t('course-page.documents.select-all')}
-                                checked={allSelected}
-                                onChange={handleSelectAll}
-                                className="my-0"
-                                labelClassName="text-small font-medium text-fg-muted"
-                            />
-                            <span className="ml-auto text-small text-fg-muted tabular">
-                                {totalItems === 1
-                                    ? t('course-page.document-count.one')
-                                    : t('course-page.document-count.other', { count: totalItems })}
-                            </span>
-                        </div>
-
-                        <div className="vtk-rows">
-                            {documents.map((document) => (
-                                <DocumentListItem
-                                    key={document.id}
-                                    document={document}
-                                    isSelected={isDocumentSelected(document)}
-                                    onToggleSelect={handleToggleSelect}
-                                />
-                            ))}
-                        </div>
-
-                        {totalItems > itemsPerPage && (
-                            <div className="border-t border-border px-4 py-3">
-                                <Pagination totalAmount={totalItems} currentPage={page} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} />
-                            </div>
-                        )}
-                    </>
+            <div className="flex flex-col gap-3">
+                {hasOlder && (
+                    <h3 className="m-0 text-small font-medium text-fg-muted">
+                        {t('course-page.documents.this-course')}
+                    </h3>
                 )}
+                {ownCourses.length > 0 && (
+                    <DocumentSection
+                        courses={ownCourses}
+                        category={category}
+                        filters={filters}
+                        sort={sort}
+                        emptyMessage={hasOlder ? t('course-page.documents.none-see-older') : undefined}
+                        isSelected={isSelected}
+                        onToggleSelect={handleToggleSelect}
+                        onSelectMany={handleSelectMany}
+                        onTotal={setOwnTotal}
+                    />
+                )}
+
+                {hasOlder && (
+                    <h3 className="m-0 mt-2 text-small font-medium text-fg-muted">
+                        {t('course-page.documents.older-courses')}
+                    </h3>
+                )}
+                {/* Rendered before their heading is known: each section has to load to learn
+                    whether it holds anything, and hides itself when it does not. */}
+                {olderCourses.map((older) => (
+                    <OlderCourseSection
+                        key={older.id}
+                        older={older}
+                        category={category}
+                        filters={filters}
+                        sort={sort}
+                        language={i18n.language}
+                        openByDefault={ownIsEmpty}
+                        isSelected={isSelected}
+                        onToggleSelect={handleToggleSelect}
+                        onSelectMany={handleSelectMany}
+                        onTotal={reportOlderTotal}
+                    />
+                ))}
             </div>
         </section>
     );
 };
+
+interface OlderCourseSectionProps {
+    older: Course;
+    category?: DocumentCategory;
+    filters: DocumentFilters;
+    sort: DocumentSortOptions;
+    language: string;
+    openByDefault: boolean;
+    isSelected: (document: Document) => boolean;
+    onToggleSelect: (document: Document) => void;
+    onSelectMany: (documents: Document[], select: boolean) => void;
+    onTotal: (courseId: number, total: number) => void;
+}
+
+/** One older course: its own memoised course list and total callback, so the section's fetch stays put. */
+function OlderCourseSection({ older, onTotal, language, ...rest }: OlderCourseSectionProps) {
+    const { t } = useTranslation();
+    const courses = useMemo(() => [older], [older]);
+    const handleTotal = useCallback((total: number) => onTotal(older.id, total), [older.id, onTotal]);
+
+    return (
+        <DocumentSection
+            {...rest}
+            courses={courses}
+            onTotal={handleTotal}
+            // The older course's own page holds what this folder cannot show, such as its comments.
+            titleHref={`/course/${older.id}`}
+            titleLinkLabel={t('course-page.documents.open-course', { code: older.code })}
+            title={(
+                <>
+                    <span className="font-mono text-fg-muted">{older.code}</span>
+                    {' '}
+                    {localizedCourseName(older, language)}
+                </>
+            )}
+        />
+    );
+}
 
 export default DocumentList;

@@ -128,6 +128,14 @@ Zenstruck Browser. DAMA rolls the database back between tests.
 
 ## Conventions
 
+- **Never commit a credential.** The repository is public, and git history keeps a secret after the
+  file is fixed. That covers passwords, API keys and tokens, S3/object-storage key pairs, JWT keys,
+  SSH keys, OAuth client secrets and database URLs with a password, in every file, including
+  one-off scripts under `scripts/` and docs. Read them from environment variables (or the server's
+  `.env`) instead, and keep real values out of examples and test fixtures. If one has already been
+  committed, removing it from the file is not enough: tell the maintainer so it can be revoked at the
+  provider. The history of three migration scripts (`scripts/migration/20_`, `22_`, `25_`) holds a
+  hardcoded S3 key pair for exactly this reason.
 - PHP style is enforced and gates CI: PSR-12 via phpcs plus a forbidden-functions rule banning
   `dump`/`dd`/`var_dump`/`exit`/`die`. Run `make phpcbf` before pushing.
 - `backend/config/reference.php` is auto-generated and excluded from phpcs — do not hand-edit it.
