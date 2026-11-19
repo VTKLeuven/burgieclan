@@ -1,6 +1,7 @@
 'use client';
 
 import { useToast } from '@/components/ui/Toast';
+import { cn } from '@/lib/utils';
 import { useApi } from '@/hooks/useApi';
 import { CheckCircle2, Mail, MessageSquarePlus, Send } from 'lucide-react';
 import { useState } from 'react';
@@ -12,6 +13,13 @@ const MAX_LENGTH = 2000;
 const ONDERWIJS_EMAIL = 'onderwijs@vtk.be';
 
 export type FeedbackType = 'course_issue' | 'exam_feedback' | 'general_faq' | 'other';
+
+const TYPES: { value: FeedbackType; label: string }[] = [
+    { value: 'course_issue', label: 'home.feedback_chip_course' },
+    { value: 'exam_feedback', label: 'home.feedback_chip_exam' },
+    { value: 'general_faq', label: 'home.feedback_chip_general' },
+    { value: 'other', label: 'home.feedback_chip_other' },
+];
 
 export function DidacticFeedbackForm() {
     const { request } = useApi();
@@ -54,29 +62,6 @@ export function DidacticFeedbackForm() {
         }
     };
 
-    if (isSubmitted) {
-        return (
-            <div className="rounded-card border border-success-border bg-success-bg px-4 py-3.5">
-                <div className="flex items-start gap-2.5">
-                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-                    <div>
-                        <h3 className="m-0 text-body font-semibold text-fg">{t('home.feedback_success_title')}</h3>
-                        <p className="m-0 mt-1 text-small text-fg-secondary">
-                            {t('home.feedback_success_description')}
-                        </p>
-                        <button
-                            type="button"
-                            onClick={() => setIsSubmitted(false)}
-                            className="vtk-button vtk-button-sm vtk-button-ghost mt-2"
-                        >
-                            {t('home.feedback_another')}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <section aria-labelledby="didactic-feedback-heading">
             <SectionHeader
@@ -86,69 +71,102 @@ export function DidacticFeedbackForm() {
                 description={t('home.feedback_description')}
             />
 
-            <form onSubmit={handleSubmit} className="rounded-card border border-border bg-surface p-3">
-                <div className="mb-2">
-                    <label htmlFor="feedback-type" className="sr-only">
-                        {t('home.feedback_type_label')}
-                    </label>
-                    <select
-                        id="feedback-type"
-                        value={type}
-                        onChange={(e) => setType(e.target.value as FeedbackType)}
-                        disabled={isSubmitting}
-                        className="vtk-select h-8 text-small"
-                    >
-                        <option value="course_issue">{t('home.feedback_type_course_issue')}</option>
-                        <option value="exam_feedback">{t('home.feedback_type_exam')}</option>
-                        <option value="general_faq">{t('home.feedback_type_general')}</option>
-                        <option value="other">{t('home.feedback_type_other')}</option>
-                    </select>
-                </div>
-
-                <label htmlFor="didactic-feedback" className="sr-only">
-                    {t('home.feedback_label')}
-                </label>
-                <textarea
-                    id="didactic-feedback"
-                    value={question}
-                    onChange={(e) => setQuestion(e.target.value)}
-                    placeholder={t('home.feedback_placeholder')}
-                    className="vtk-textarea min-h-20 text-small"
-                    rows={2.5}
-                    maxLength={MAX_LENGTH}
-                    required
-                    disabled={isSubmitting}
-                />
-
-                <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-                    <a
-                        href={mailtoHref}
-                        className="inline-flex items-center gap-1 text-caption text-fg-muted underline-offset-2 transition-colors hover:text-fg hover:underline"
-                    >
-                        <Mail className="size-3" aria-hidden="true" />
-                        {t('home.feedback_mail')}
-                    </a>
-
-                    <div className="ml-auto flex items-center gap-2">
-                        {showLengthHint && (
-                            <p className="m-0 text-caption text-fg-muted">{t('faq.ask_hint')}</p>
-                        )}
-                        <button type="submit" disabled={!canSubmit} className="vtk-button vtk-button-sm">
-                            {isSubmitting ? (
-                                <>
-                                    <span className="spinner" />
-                                    {t('faq.ask_submitting')}
-                                </>
-                            ) : (
-                                <>
-                                    <Send className="size-3.5" aria-hidden="true" />
-                                    {t('home.feedback_button')}
-                                </>
-                            )}
-                        </button>
+            {/* After sending, the section keeps its heading and says what happens next. */}
+            {isSubmitted ? (
+                <div className="rounded-card border border-success-border bg-success-bg px-4 py-3.5">
+                    <div className="flex items-start gap-2.5">
+                        <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                        <div>
+                            <h3 className="m-0 text-body font-semibold text-fg">{t('home.feedback_success_title')}</h3>
+                            <p className="m-0 mt-1 text-small text-fg-secondary">
+                                {t('home.feedback_success_description')}
+                            </p>
+                            <button
+                                type="button"
+                                onClick={() => setIsSubmitted(false)}
+                                className="vtk-button vtk-button-sm vtk-button-ghost mt-2"
+                            >
+                                {t('home.feedback_another')}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </form>
+            ) : (
+                <>
+                    {/* One block, like the comment boxes elsewhere: the category as chips, the text
+                        field without a frame of its own, and the send button in a footer bar. */}
+                    <form
+                        onSubmit={handleSubmit}
+                        className="overflow-hidden rounded-card border border-border bg-surface transition-[border-color,box-shadow] focus-within:border-border-strong focus-within:shadow-xs"
+                    >
+                        <div role="radiogroup" aria-label={t('home.feedback_type_label')} className="flex flex-wrap gap-1.5 px-3 pt-3">
+                            {TYPES.map(({ value, label }) => {
+                                const selected = type === value;
+                                return (
+                                    <button
+                                        key={value}
+                                        type="button"
+                                        role="radio"
+                                        aria-checked={selected}
+                                        onClick={() => setType(value)}
+                                        disabled={isSubmitting}
+                                        className={cn(
+                                            'inline-flex h-7 items-center rounded-full border px-2.5 text-caption font-medium transition-colors focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-hidden',
+                                            selected
+                                                ? 'border-primary bg-primary text-on-primary'
+                                                : 'border-border bg-surface text-fg-secondary hover:border-border-strong hover:text-fg',
+                                        )}
+                                    >
+                                        {t(label)}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <label htmlFor="didactic-feedback" className="sr-only">
+                            {t('home.feedback_label')}
+                        </label>
+                        <textarea
+                            id="didactic-feedback"
+                            value={question}
+                            onChange={(e) => setQuestion(e.target.value)}
+                            placeholder={t('home.feedback_placeholder')}
+                            className="block min-h-24 w-full resize-none border-0 bg-transparent px-3 pt-2.5 pb-3 text-small leading-[20px] text-fg placeholder:text-fg-placeholder focus:outline-hidden"
+                            rows={3}
+                            maxLength={MAX_LENGTH}
+                            required
+                            disabled={isSubmitting}
+                        />
+
+                        <div className="flex items-center justify-end gap-3 border-t border-border bg-surface-muted px-3 py-2">
+                            {showLengthHint && (
+                                <p className="m-0 mr-auto text-caption text-fg-muted">{t('faq.ask_hint')}</p>
+                            )}
+                            <button type="submit" disabled={!canSubmit} className="vtk-button vtk-button-sm">
+                                {isSubmitting ? (
+                                    <>
+                                        <span className="spinner" />
+                                        {t('faq.ask_submitting')}
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send className="size-3.5" aria-hidden="true" />
+                                        {t('home.feedback_button')}
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </form>
+
+                    <p className="m-0 mt-2 flex items-center gap-1.5 text-caption text-fg-muted">
+                        <Mail className="size-3.5 shrink-0 text-icon" aria-hidden="true" />
+                        {t('home.feedback_mail_prefix')}
+                        <a href={mailtoHref} className="font-medium text-link underline-offset-2 hover:underline">
+                            {ONDERWIJS_EMAIL}
+                        </a>
+                    </p>
+                </>
+            )}
         </section>
     );
 }

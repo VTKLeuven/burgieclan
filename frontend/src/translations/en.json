@@ -138,17 +138,12 @@
         "news": "News",
         "navigate_to": "Navigate to",
         "no_quick_links": "No quick links found",
-        "feedback_title": "Feedback or Complaint for Team Onderwijs",
+        "feedback_title": "Feedback or complaint for Team Onderwijs",
         "feedback_description": "Have an issue with an exercise session, course delivery, or exam? Send a report directly to the VTK Didactic team.",
         "feedback_type_label": "Category",
-        "feedback_type_course_issue": "Exercise session / Course issue",
-        "feedback_type_exam": "Exam / Evaluation issue",
-        "feedback_type_general": "General question",
-        "feedback_type_other": "Other feedback",
         "feedback_label": "Your feedback or complaint",
         "feedback_placeholder": "Describe what went wrong or what can be improved...",
         "feedback_button": "Send feedback",
-        "feedback_mail": "Or email Team Onderwijs",
         "feedback_mail_subject": "Feedback via Burgieclan",
         "feedback_success": "Your feedback has been sent to Team Onderwijs.",
         "feedback_success_title": "Thank you for your feedback!",
@@ -167,7 +162,12 @@
         "summary_courses_other": "{{count}} courses pinned",
         "all_courses": "All courses",
         "no_courses_yet": "Star the courses you are taking this year and they will show up here and in the sidebar.",
-        "find_courses": "Find courses"
+        "find_courses": "Find courses",
+        "feedback_chip_course": "Exercise session or course",
+        "feedback_chip_exam": "Exam",
+        "feedback_chip_general": "General question",
+        "feedback_chip_other": "Other",
+        "feedback_mail_prefix": "Rather send an email?"
     },
     "form": {
         "errors": {

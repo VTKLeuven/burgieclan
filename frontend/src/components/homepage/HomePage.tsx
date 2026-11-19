@@ -83,8 +83,8 @@ export default function HomePage() {
                     </div>
 
                     <div className="grid min-w-0 gap-10 [&>*]:min-w-0">
-                        <QuickLinks />
                         <DidacticFeedbackForm />
+                        <QuickLinks />
                     </div>
                 </div>
             </div>
