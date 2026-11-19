@@ -1,6 +1,7 @@
 'use server'
 
-import { getActiveJWT, logOut } from "@/actions/auth";
+import { logOut } from "@/actions/auth";
+import { getActiveJWT } from "@/lib/auth.server";
 import { headers } from 'next/headers';
 import { redirect } from "next/navigation";
 
@@ -53,6 +54,16 @@ const handleError = async (response: Response) => {
     }
 };
 
+const hasControlChars = (value: string): boolean => {
+    for (let i = 0; i < value.length; i++) {
+        const code = value.charCodeAt(i);
+        if (code <= 0x1f || code === 0x7f) {
+            return true;
+        }
+    }
+    return false;
+};
+
 /**
  * API Client for authenticated or unauthenticated requests to the backend server.
  * - Includes JWT if available and attempts automatic refresh if expired
@@ -68,7 +79,29 @@ export const ApiClient = async (method: string, endpoint: string, body?: unknown
             return { error: { message: 'Unexpected API Error.', status: 500 } };
         }
 
-        const url = backendBaseUrl + endpoint;
+        if (
+            typeof endpoint !== 'string'
+            || !endpoint.startsWith('/api/')
+            || endpoint.startsWith('//')
+            || endpoint.includes('\\')
+            || hasControlChars(endpoint)
+        ) {
+            return { error: { message: 'Invalid API endpoint.', status: 400 } };
+        }
+
+        const baseUrl = new URL(backendBaseUrl);
+        let parsedUrl: URL;
+        try {
+            parsedUrl = new URL(endpoint, baseUrl);
+        } catch {
+            return { error: { message: 'Invalid API endpoint.', status: 400 } };
+        }
+
+        if (parsedUrl.origin !== baseUrl.origin || !parsedUrl.pathname.startsWith('/api/')) {
+            return { error: { message: 'Invalid API endpoint.', status: 400 } };
+        }
+
+        const url = parsedUrl.toString();
 
         const jwt = await getActiveJWT();
         const usesSharedAnnouncementCache = method.toUpperCase() === 'GET'

@@ -10,6 +10,7 @@ use App\ApiResource\UserApi;
 use App\Constants\MappingContext;
 use App\Entity\Document;
 use App\Entity\Tag;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 use Vich\UploaderBundle\Storage\StorageInterface;
@@ -20,6 +21,7 @@ class DocumentEntityToApiMapper extends BaseEntityToApiMapper
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
         private readonly StorageInterface $storage,
+        private readonly Security $security,
     ) {}
 
     public function load(object $from, string $toClass, array $context): object
@@ -61,14 +63,23 @@ class DocumentEntityToApiMapper extends BaseEntityToApiMapper
         $to->anonymous = $from->isAnonymous();
         $to->seafileFileId = $from->getSeafileFileId();
         $to->parts = $from->getParts();
-        $to->creator = $this->microMapper->map(
-            $from->getCreator(),
-            UserApi::class,
-            [
-                MappingContext::SUMMARY => true,
-                MicroMapperInterface::MAX_DEPTH => 1,
-            ]
-        );
+        $currentUser = $this->security->getUser();
+        if (
+            !$from->isAnonymous() ||
+            ($currentUser !== null &&
+                $from->getCreator()->getUserIdentifier() === $currentUser->getUserIdentifier())
+        ) {
+            $to->creator = $this->microMapper->map(
+                $from->getCreator(),
+                UserApi::class,
+                [
+                    MappingContext::SUMMARY => true,
+                    MicroMapperInterface::MAX_DEPTH => 1,
+                ]
+            );
+        } else {
+            $to->creator = null;
+        }
         // Always resolved, unlike the size and MIME type the provider fills in: this is a
         // string built from the stored filename, with no filesystem access behind it, and a
         // document row needs it to offer "open in the browser" next to its download button.

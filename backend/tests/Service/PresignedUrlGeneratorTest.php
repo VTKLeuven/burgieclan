@@ -185,4 +185,42 @@ class PresignedUrlGeneratorTest extends TestCase
         $this->assertStringContainsString('response-content-disposition=', $url);
         $this->assertStringContainsString('response-content-type=application%2Fpdf', $url);
     }
+
+    public function testGenerateUrlForInlineNonPreviewableForcesAttachmentAndOctetStream(): void
+    {
+        $s3Client = $this->createMock(S3Client::class);
+        $command = $this->createStub(CommandInterface::class);
+
+        $s3Client->expects($this->exactly(2))
+            ->method('getCommand')
+            ->with(
+                'GetObject',
+                $this->callback(
+                    function (array $params) {
+                        $this->assertStringStartsWith('attachment;', $params['ResponseContentDisposition']);
+                        $this->assertSame('application/octet-stream', $params['ResponseContentType']);
+
+                        return true;
+                    }
+                )
+            )
+            ->willReturn($command);
+
+        $s3Client->expects($this->exactly(2))
+            ->method('createPresignedRequest')
+            ->willReturn(
+                new Request(
+                    'GET',
+                    'https://s3.example.com/test-bucket/documents/file?X-Amz-Signature=abc'
+                )
+            );
+
+        $generator = new PresignedUrlGenerator($s3Client, 'test-bucket', 'documents', 10);
+
+        $svgDocument = $this->createDocument('Diagram', 'vector-123.svg');
+        $generator->generateUrl($svgDocument, true);
+
+        $zipDocument = $this->createDocument('Bundle', 'bundle-456.zip');
+        $generator->generateUrl($zipDocument, true);
+    }
 }

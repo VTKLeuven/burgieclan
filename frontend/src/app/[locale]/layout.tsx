@@ -1,4 +1,4 @@
-import { canAccessAdmin, getUserId } from "@/actions/auth";
+import { canAccessAdmin, getUserId } from "@/lib/auth.server";
 import { getFeatures } from "@/actions/features";
 import "@/app/globals.css";
 import initTranslations from "@/app/i18n";

@@ -11,6 +11,7 @@ use App\Entity\Document;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -18,6 +19,136 @@ use Vich\UploaderBundle\Storage\StorageInterface;
 
 class CreateDocumentController extends AbstractController
 {
+    public const MAX_FILE_SIZE = 200 * 1024 * 1024; // 200 MB
+
+    /**
+     * Allowed lowercase file extensions (mirrors frontend/src/utils/constants/upload.ts, excluding svg).
+     *
+     * @var list<string>
+     */
+    private const ALLOWED_EXTENSIONS = [
+        // Documents & Text
+        'pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'odt', 'ods', 'odp',
+        'txt', 'rtf', 'csv', 'md', 'markdown',
+        // Images (svg excluded due to active script/XSS risk)
+        'jpg', 'jpeg', 'png', 'gif', 'webp',
+        // Archives
+        'zip', 'tar', 'gz', '7z', 'rar',
+        // Code & Scripts (including Matlab)
+        'py', 'm', 'mat', 'mlx', 'slx', 'mdl', 'fig', 'p', 'r', 'c', 'cpp', 'h', 'java',
+        // CAD & 3D Formats
+        'step', 'stp', 'iges', 'igs', 'stl', 'obj', 'dwg', 'dxf',
+        'sldprt', 'sldasm', 'slddrw', 'ipt', 'iam', 'idw', 'f3d', 'f3z',
+        'catpart', 'catproduct', 'catdrawing', 'prt', 'asm', 'par', 'psm',
+        // Media
+        'mp4',
+    ];
+
+    /**
+     * Allowed MIME types (mirrors frontend/src/utils/constants/upload.ts, excluding image/svg+xml,
+     * plus generic types finfo reports for allowed source/binary/office/CAD extensions).
+     *
+     * @var list<string>
+     */
+    private const ALLOWED_MIME_TYPES = [
+        'application/pdf',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/msword',
+        'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.oasis.opendocument.text',
+        'application/vnd.oasis.opendocument.spreadsheet',
+        'application/vnd.oasis.opendocument.presentation',
+        'application/rtf',
+        'text/rtf',
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'application/zip',
+        'application/x-zip-compressed',
+        'application/x-tar',
+        'application/gzip',
+        'application/x-gzip',
+        'application/x-7z-compressed',
+        'application/x-rar-compressed',
+        'application/x-rar',
+        'text/csv',
+        'text/plain',
+        'text/markdown',
+        'text/x-matlab',
+        'application/x-matlab',
+        'application/x-matlab-data',
+        'application/matlab',
+        'text/x-python',
+        'text/x-script.python',
+        'application/x-python-code',
+        'text/x-c',
+        'text/x-c++',
+        'text/x-java',
+        'text/x-objc',
+        'video/mp4',
+        // CAD & 3D MIME types
+        'model/step',
+        'application/step',
+        'application/x-step',
+        'model/iges',
+        'application/iges',
+        'application/x-iges',
+        'model/stl',
+        'application/sla',
+        'application/vnd.ms-pki.stl',
+        'application/x-stl',
+        'image/vnd.dwg',
+        'application/dwg',
+        'application/x-dwg',
+        'image/x-dwg',
+        'application/acad',
+        'application/x-acad',
+        'image/vnd.dxf',
+        'application/dxf',
+        'application/x-dxf',
+        'image/x-dxf',
+        'model/obj',
+        'application/object',
+        'application/sldworks',
+        'application/x-solidworks',
+        'application/x-inventor',
+        // Generic container/binary types reported by finfo for .mat, .doc, .xls, CAD, etc.
+        'application/octet-stream',
+        'application/x-ole-storage',
+        'application/cdfv2',
+    ];
+
+    /**
+     * Dangerous MIME types that are always rejected even if renamed to an allowed extension.
+     *
+     * @var list<string>
+     */
+    private const DENIED_MIME_TYPES = [
+        'text/html',
+        'application/xhtml+xml',
+        'image/svg+xml',
+        'text/javascript',
+        'application/javascript',
+        'application/x-javascript',
+        'application/x-php',
+        'text/x-php',
+        'application/x-httpd-php',
+        'application/x-executable',
+        'application/x-dosexec',
+        'application/x-msdownload',
+        'application/x-sharedlib',
+        'application/x-elf',
+        'application/x-mach-binary',
+        'application/x-sh',
+        'text/x-shellscript',
+        'application/x-csh',
+    ];
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly IriConverterInterface $iriConverter,
@@ -83,9 +214,11 @@ class CreateDocumentController extends AbstractController
         $dto->parts = $document->getParts();
 
         $uploadedFile = $request->files->get('file');
-        if (!$uploadedFile) {
+        if (!$uploadedFile instanceof UploadedFile) {
             throw new BadRequestHttpException('"file" is required');
         }
+
+        $this->validateUploadedFile($uploadedFile);
 
         $document->setFile($uploadedFile);
 
@@ -100,5 +233,42 @@ class CreateDocumentController extends AbstractController
 
         // The return value is the object that gets send as reply to the user calling the API endpoint.
         return $dto;
+    }
+
+    private function validateUploadedFile(UploadedFile $file): void
+    {
+        if (!$file->isValid()) {
+            $tooLarge = [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE];
+            if (in_array($file->getError(), $tooLarge, true)) {
+                throw new BadRequestHttpException('File exceeds the maximum allowed size of 200 MB.');
+            }
+
+            throw new BadRequestHttpException('Invalid file upload: ' . $file->getErrorMessage());
+        }
+
+        $size = $file->getSize();
+        if (false === $size || $size > self::MAX_FILE_SIZE) {
+            throw new BadRequestHttpException('File exceeds the maximum allowed size of 200 MB.');
+        }
+
+        $extension = strtolower(pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION));
+        if ('' === $extension || !in_array($extension, self::ALLOWED_EXTENSIONS, true)) {
+            throw new BadRequestHttpException(
+                sprintf('File extension ".%s" is not allowed.', $extension)
+            );
+        }
+
+        $mimeType = $file->getMimeType();
+        if (null !== $mimeType) {
+            $normalizedMime = strtolower(trim(explode(';', $mimeType)[0]));
+            if (
+                in_array($normalizedMime, self::DENIED_MIME_TYPES, true)
+                || !in_array($normalizedMime, self::ALLOWED_MIME_TYPES, true)
+            ) {
+                throw new BadRequestHttpException(
+                    sprintf('File MIME type "%s" is not allowed.', $normalizedMime)
+                );
+            }
+        }
     }
 }

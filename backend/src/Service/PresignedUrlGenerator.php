@@ -39,11 +39,17 @@ class PresignedUrlGenerator
         $prefix = trim($this->prefix, '/');
         $key = ('' !== $prefix ? $prefix . '/' : '') . $filename;
 
+        $contentType = $inline ? PreviewableFile::contentTypeFor($filename) : null;
+        $effectiveInline = $inline && null !== $contentType;
+        if ($inline && !$effectiveInline) {
+            $contentType = 'application/octet-stream';
+        }
+
         return $this->generateForKey(
             $key,
             DownloadFilename::forDocument($document),
-            $inline,
-            $inline ? PreviewableFile::contentTypeFor($filename) : null,
+            $effectiveInline,
+            $contentType,
         );
     }
 
@@ -62,9 +68,14 @@ class PresignedUrlGenerator
             throw new LogicException('PresignedUrlGenerator is not enabled or S3 is not configured.');
         }
 
+        $effectiveInline = $inline && null !== $contentType;
+        if ($inline && !$effectiveInline) {
+            $contentType = 'application/octet-stream';
+        }
+
         $fallback = preg_replace('/[^A-Za-z0-9._-]/', '_', $displayName) ?: 'document';
 
-        $dispositionType = $inline ? HeaderUtils::DISPOSITION_INLINE : HeaderUtils::DISPOSITION_ATTACHMENT;
+        $dispositionType = $effectiveInline ? HeaderUtils::DISPOSITION_INLINE : HeaderUtils::DISPOSITION_ATTACHMENT;
         $contentDisposition = HeaderUtils::makeDisposition($dispositionType, $displayName, $fallback);
 
         $params = [

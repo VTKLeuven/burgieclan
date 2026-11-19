@@ -11,29 +11,17 @@ import { useTranslation } from 'react-i18next';
 function getSafeRedirectTarget(rawRedirect: string | null): string {
     if (!rawRedirect) return '/';
 
-    let target = decodeURIComponent(rawRedirect);
-
-    // If it's a full URL (e.g. https://dev.burgieclan.vtk.be/en/login), extract path
-    if (target.startsWith('http://') || target.startsWith('https://')) {
-        try {
-            const url = new URL(target);
-            target = url.pathname + url.search + url.hash;
-        } catch {
-            return '/';
-        }
-    }
-
-    if (!target.startsWith('/')) {
-        target = '/' + target;
+    if (!rawRedirect.startsWith('/') || rawRedirect.startsWith('//') || rawRedirect.includes('\\')) {
+        return '/';
     }
 
     // Do not redirect back to login or callback routes after login!
-    const cleanPathname = target.split('?')[0].split('#')[0];
+    const cleanPathname = rawRedirect.split('?')[0].split('#')[0];
     if (cleanPathname.endsWith('/login') || cleanPathname.includes('/auth/callback')) {
         return '/';
     }
 
-    return target;
+    return rawRedirect;
 }
 
 export default function AuthCallbackPage() {

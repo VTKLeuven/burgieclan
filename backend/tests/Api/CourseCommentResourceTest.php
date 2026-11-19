@@ -165,18 +165,21 @@ class CourseCommentResourceTest extends ApiTestCase
             1,
             [
                 'creator' => $user1,
+                'anonymous' => false,
             ]
         );
         CourseCommentFactory::createMany(
             2,
             [
                 'creator' => $user2,
+                'anonymous' => false,
             ]
         );
         CourseCommentFactory::createMany(
             5,
             [
                 'creator' => UserFactory::createOne(),
+                'anonymous' => false,
             ]
         );
 
@@ -428,5 +431,40 @@ class CourseCommentResourceTest extends ApiTestCase
                 ]
             )
             ->assertStatus(404);
+    }
+
+    public function testFilterByCreatorExcludesAnonymousCourseComments(): void
+    {
+        $targetUser = UserFactory::createOne(['fullName' => 'Comment Targetsson']);
+        $publicComment = CourseCommentFactory::createOne(
+            [
+            'creator' => $targetUser,
+            'anonymous' => false,
+            ]
+        );
+        CourseCommentFactory::createOne(
+            [
+            'creator' => $targetUser,
+            'anonymous' => true,
+            ]
+        );
+
+        $this->browser()
+            ->get(
+                '/api/course_comments?creator=/api/users/' . $targetUser->getId(),
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('"hydra:member"[0]."@id"', '/api/course_comments/' . $publicComment->getId());
+
+        $this->browser()
+            ->get(
+                '/api/course_comments?creator.fullName=Targetsson',
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('"hydra:totalItems"', 1)
+            ->assertJsonMatches('"hydra:member"[0]."@id"', '/api/course_comments/' . $publicComment->getId());
     }
 }

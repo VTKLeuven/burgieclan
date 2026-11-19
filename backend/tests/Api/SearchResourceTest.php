@@ -44,6 +44,7 @@ class SearchResourceTest extends ApiTestCase
         $document = DocumentFactory::createOne(
             [
                 'name' => 'DocumentwitUniqueName1',
+                'under_review' => false,
             ]
         );
 
@@ -420,5 +421,36 @@ class SearchResourceTest extends ApiTestCase
         // A question that was removed from the document is no longer found.
         self::storeQuestions($exam, ['q2' => 'Bereken de limiet.']);
         $this->assertSame(['c1'], array_column($this->searchExamQuestions('rolle'), 'uid'));
+    }
+
+    public function testSearchExcludesUnderReviewAndAnonymousCreator(): void
+    {
+        $approvedAnonymous = DocumentFactory::createOne(
+            [
+            'name' => 'PrivacySearchUniqueApproved',
+            'under_review' => false,
+            'anonymous' => true,
+            ]
+        );
+        DocumentFactory::createOne(
+            [
+            'name' => 'PrivacySearchUniquePending',
+            'under_review' => true,
+            'anonymous' => false,
+            ]
+        );
+
+        $decoded = $this->browser()
+            ->get(
+                '/api/search?searchText=PrivacySearchUnique',
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->json()
+            ->decoded();
+
+        $this->assertCount(1, $decoded['documents']);
+        $this->assertSame('/api/documents/' . $approvedAnonymous->getId(), $decoded['documents'][0]['@id']);
+        $this->assertArrayNotHasKey('creator', $decoded['documents'][0]);
     }
 }

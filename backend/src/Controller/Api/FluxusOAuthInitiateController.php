@@ -19,7 +19,7 @@ class FluxusOAuthInitiateController extends AbstractController
 
     public function __invoke(Request $request): RedirectResponse
     {
-        $redirectTo = $request->query->get('redirect_to', '/');
+        $redirectTo = self::sanitizeRedirectTo($request->query->get('redirect_to'));
 
         $client = $this->clientRegistry->getClient('fluxus_api');
         $provider = $client->getOAuth2Provider();
@@ -73,5 +73,26 @@ class FluxusOAuthInitiateController extends AbstractController
             ->withSecure($secure)
             ->withHttpOnly(true)
             ->withSameSite(Cookie::SAMESITE_LAX);
+    }
+
+    /**
+     * Restrict post-login redirects to relative paths on this origin.
+     * Rejects scheme-relative URLs (//host), backslashes (/\host), and control characters.
+     */
+    public static function sanitizeRedirectTo(mixed $redirectTo): string
+    {
+        if (!is_string($redirectTo) || '' === $redirectTo) {
+            return '/';
+        }
+
+        if (1 === preg_match('/[\x00-\x1F\x7F]/', $redirectTo) || str_contains($redirectTo, '\\')) {
+            return '/';
+        }
+
+        if (!str_starts_with($redirectTo, '/') || str_starts_with($redirectTo, '//')) {
+            return '/';
+        }
+
+        return $redirectTo;
     }
 }

@@ -263,10 +263,9 @@ class DocumentApi extends NodeApi
     #[ApiProperty(writable: false)]
     #[ApiFilter(
         SearchFilter::class,
-        strategy: 'exact',
-        properties: ['creator' => 'exact', 'creator.fullName' => 'ipartial']
+        properties: ['creator.fullName' => 'ipartial']
     )]
-    #[Groups([SerializationGroups::SEARCH, SerializationGroups::DOCUMENT_GET])]
+    #[Groups([SerializationGroups::DOCUMENT_GET])]
     public ?UserApi $creator;
 
     /**

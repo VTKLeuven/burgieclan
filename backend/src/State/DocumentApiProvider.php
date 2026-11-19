@@ -15,6 +15,7 @@ use App\Constants\MappingContext;
 use App\Entity\Document;
 use App\Entity\DocumentCategory;
 use App\Entity\User;
+use App\Security\Voter\DocumentFileVoter;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mime\MimeTypes;
@@ -62,6 +63,7 @@ class DocumentApiProvider implements ProviderInterface
                 $context['filters']['_anonymous_creator_filter'] = [
                     'value' => $context['filters']['creator.fullName']
                 ];
+                unset($context['filters']['creator.fullName']);
             }
 
             // Add a custom sort parameter to use App\Doctrine\Orm\Extension\AnonymousCreatorSortExtension
@@ -131,6 +133,14 @@ class DocumentApiProvider implements ProviderInterface
         if ($operation instanceof Get) {
             $document = $this->itemProvider->provide($operation, $uriVariables, $context);
             if (!$document) {
+                return null;
+            }
+            if (
+                null !== $request
+                && $request->isMethod('GET')
+                && DocumentApi::class === $request->attributes->get('_api_resource_class')
+                && !$this->security->isGranted(DocumentFileVoter::VIEW_FILE, $document)
+            ) {
                 return null;
             }
             return $this->processDocument($document, $mapperContext);

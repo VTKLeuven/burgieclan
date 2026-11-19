@@ -33,9 +33,13 @@ framework:
     # This is safe because nginx container network is isolated
     trusted_proxies: '127.0.0.1,REMOTE_ADDR'
     
-    # Trust these headers from the reverse proxy chain
-    # These will be passed through from your external reverse proxy
-    trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix']
+    # Trust these headers from the reverse proxy chain.
+    # x-forwarded-prefix is omitted so clients cannot spoof a base-path prefix.
+    # x-forwarded-host is omitted because .docker/nginx.conf already forwards
+    # Host ($http_host) directly (and external proxies like Caddy preserve Host),
+    # so trusting X-Forwarded-Host is unnecessary and would allow host spoofing
+    # when nginx is reached directly or behind a proxy that passes the header through.
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-port']
 
     property_info:
         with_constructor_extractor: true
