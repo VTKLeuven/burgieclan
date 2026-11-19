@@ -84,9 +84,11 @@ function NavItem({
             className={cn(
                 'group flex h-7 items-center gap-2.5 rounded-control px-2.5 text-small font-medium text-fg-nav',
                 'transition-colors duration-[var(--dur-fast)] ease-out',
-                '[&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-icon-strong',
-                // A white chip with a rim lifts the active item off the canvas.
-                active ? 'bg-surface text-fg shadow-xs ring-1 ring-border-strong' : 'hover:bg-sidebar-hover',
+                '[&_svg]:size-4 [&_svg]:shrink-0',
+                // Navy marks where you are, the same navy as the primary button.
+                active
+                    ? 'bg-primary text-on-primary [&_svg]:text-on-primary/80'
+                    : '[&_svg]:text-icon-strong hover:bg-sidebar-hover',
             )}
         >
             {icon}
@@ -193,7 +195,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                         onNavigate?.();
                         openSearch();
                     }}
-                    className="mt-3 flex h-8 w-full items-center gap-2 rounded-control border border-border-strong bg-surface px-2.5 text-left text-small text-fg-placeholder shadow-xs transition-colors hover:border-neutral-300"
+                    className="mt-3 flex h-8 w-full items-center gap-2 rounded-control border border-border-field bg-surface px-2.5 text-left text-small text-fg-placeholder shadow-xs transition-colors hover:border-fg-placeholder"
                 >
                     <Search className="size-4 text-icon" aria-hidden="true" />
                     <span className="flex-1 truncate">{t('search.placeholder')}</span>
@@ -270,7 +272,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                                                 active={currentCourse?.id === course.id && inCurriculum}
                                                 onNavigate={onNavigate}
                                                 trailing={
-                                                    <span className="text-caption font-medium text-fg-muted tabular opacity-0 transition-opacity group-hover:opacity-100">
+                                                    <span className="text-caption font-medium text-fg-muted tabular opacity-0 transition-opacity group-hover:opacity-100 group-aria-[current=page]:text-on-primary/70">
                                                         {course.code}
                                                     </span>
                                                 }

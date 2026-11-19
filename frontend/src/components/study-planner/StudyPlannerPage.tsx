@@ -167,7 +167,7 @@ export default function StudyPlannerPage() {
                                 onClick={() => setView(key)}
                                 className={cn(
                                     'relative -mb-px inline-flex h-10 items-center border-b-2 text-body font-medium transition-colors',
-                                    view === key ? 'border-fg text-fg' : 'border-transparent text-fg-muted hover:text-fg',
+                                    view === key ? 'border-primary text-primary' : 'border-transparent text-fg-muted hover:text-fg',
                                 )}
                             >
                                 {t(`study_planner.tabs.${key}`)}

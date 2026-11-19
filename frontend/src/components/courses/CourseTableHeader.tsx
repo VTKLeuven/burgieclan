@@ -13,7 +13,7 @@ export const CourseTableHeader: React.FC<CourseTableHeaderProps> = ({ courses })
     const { t } = useTranslation();
 
     return (
-        <div className="flex h-10 items-center gap-3 border-b border-border bg-surface-muted pr-2 pl-3 text-small font-medium text-fg-muted" role="row">
+        <div className="flex h-10 items-center gap-3 border-b border-primary bg-surface-muted pr-2 pl-3 text-small font-semibold text-primary" role="row">
             <div className="flex w-8 shrink-0 justify-center" role="columnheader">
                 {courses && courses.length > 0 && <TableFavoriteAllButton courses={courses} />}
             </div>
