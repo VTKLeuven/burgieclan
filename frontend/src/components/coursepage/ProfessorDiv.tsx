@@ -84,7 +84,7 @@ export default function ProfessorDiv({
     }, [sanitizedUnumber]);
 
     const roleText = index === 0 ? t('course-page.coordinator') : t('course-page.professor');
-    const borderClass = size < 36 ? 'border border-white' : 'border-2 border-white';
+    const borderClass = size < 36 ? 'border border-surface' : 'border-2 border-surface';
 
     const avatarContent = !imageError ? (
         <div

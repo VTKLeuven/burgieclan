@@ -731,6 +731,10 @@
         }
     },
     "shell": {
+        "theme": "Thema",
+        "theme_light": "Licht",
+        "theme_dark": "Donker",
+        "theme_system": "Systeem",
         "my_account": "Mijn account",
         "my_courses": "Mijn vakken",
         "favorite_documents": "Favoriete documenten",

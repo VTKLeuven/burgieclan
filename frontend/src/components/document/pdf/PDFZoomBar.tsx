@@ -40,7 +40,7 @@ export default function PDFZoomBar({
 
     const segment = (active: boolean) =>
         `inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors ${active
-            ? 'bg-vtk-ink text-white'
+            ? 'bg-vtk-ink text-vtk-paper'
             : 'text-vtk-muted hover:bg-vtk-paper-2 hover:text-vtk-ink'
         }`;
 

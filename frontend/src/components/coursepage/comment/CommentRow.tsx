@@ -137,7 +137,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
                             <button
                                 type="submit"
                                 disabled={editIsSubmitting || !editContent.trim()}
-                                className="text-xs px-3 py-1 bg-vtk-ink text-white rounded hover:bg-vtk-navy disabled:opacity-50 transition-colors inline-flex items-center"
+                                className="text-xs px-3 py-1 bg-primary text-on-primary rounded hover:bg-primary-hover disabled:opacity-50 transition-colors inline-flex items-center"
                             >
                                 {editIsSubmitting ? (
                                     <>
@@ -165,7 +165,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
                     type="course_comment"
                     objectId={comment.id}
                     size="small"
-                    className="bg-white"
+                    className="bg-surface"
                 />
                 <CommentMetadata comment={comment} />
             </div>
@@ -178,7 +178,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
                     type="course_comment"
                     objectId={comment.id}
                     size="small"
-                    className="bg-white"
+                    className="bg-surface"
                 />
                 <CommentActions onEdit={handleEditClick} onDelete={handleDeleteComment} show={isOwnComment && !isEditing} isMobile />
             </div>

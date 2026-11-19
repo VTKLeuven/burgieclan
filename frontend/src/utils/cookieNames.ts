@@ -15,6 +15,8 @@ export const COOKIE_NAMES = {
     SIDEBAR: isDev ? 'BUR_DEV_sidebar' : 'BUR_sidebar',
     CURRICULUM_PANEL: isDev ? 'BUR_DEV_curriculum_panel' : 'BUR_curriculum_panel',
     DOCUMENT_ASIDE: isDev ? 'BUR_DEV_document_aside' : 'BUR_document_aside',
+    // Light, dark or follow the system. A cookie so the server already renders a chosen theme.
+    THEME: isDev ? 'BUR_DEV_theme' : 'BUR_theme',
 } as const;
 
 // LocalStorage keys with environment-specific prefixes
