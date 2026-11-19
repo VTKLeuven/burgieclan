@@ -82,7 +82,12 @@ const DocumentFilter: React.FC<DocumentFilterProps> = ({
   return (
     <div className="relative" ref={filterRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          if (!isOpen) {
+            setTempFilters(filters);
+          }
+          setIsOpen(!isOpen);
+        }}
         className={`vtk-button vtk-button-sm ${hasActiveFilters ? 'border-info-border! bg-info-bg! text-info-text!' : ''
           }`}
         aria-expanded={isOpen}

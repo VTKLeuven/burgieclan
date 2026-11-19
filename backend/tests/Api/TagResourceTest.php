@@ -32,6 +32,7 @@ class TagResourceTest extends ApiTestCase
                 '@id',
                 '@type',
                 'name',
+                'hidden',
                 'createdAt',
                 'updatedAt',
             ],

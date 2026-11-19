@@ -232,6 +232,7 @@ export interface QuickLink extends BaseEntity {
 
 export interface Tag extends BaseEntity {
     name?: string;
+    hidden?: boolean;
 }
 
 export interface Announcement extends NodeEntity {

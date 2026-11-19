@@ -13,6 +13,9 @@ class Tag extends BaseEntity
     #[ORM\Column(length: 255, unique: true)]
     private string $name;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $hidden = false;
+
     /**
      * @var Collection<int, Document>
      */
@@ -32,6 +35,18 @@ class Tag extends BaseEntity
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->hidden;
+    }
+
+    public function setHidden(bool $hidden): static
+    {
+        $this->hidden = $hidden;
 
         return $this;
     }

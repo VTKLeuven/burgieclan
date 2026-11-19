@@ -53,6 +53,9 @@ class TagApiToEntityMapper implements MapperInterface
             throw new UnprocessableEntityHttpException('Tag name is required');
         }
         $to->setName($from->name);
+        if ($to->getId() === null) {
+            $to->setHidden($from->hidden);
+        }
 
         // Documents are attached from the Document side (POST /api/documents with
         // tags[]), never from here. A tag can carry tens of thousands of documents

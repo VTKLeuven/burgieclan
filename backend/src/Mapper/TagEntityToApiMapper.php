@@ -27,6 +27,7 @@ class TagEntityToApiMapper extends BaseEntityToApiMapper
         assert($to instanceof TagApi);
 
         $to->name = $from->getName();
+        $to->hidden = $from->isHidden();
 
         return $to;
     }

@@ -2,7 +2,7 @@ import DocumentListItem from '@/components/documentcategorypage/DocumentListItem
 import { Checkbox } from '@/components/ui/Checkbox';
 import Pagination from '@/components/ui/Pagination';
 import useRetrieveDocuments, { DocumentFilters, DocumentSortOptions } from '@/hooks/useRetrieveDocuments';
-import type { Course, Document, DocumentCategory } from '@/types/entities';
+import type { Course, Document, DocumentCategory, Tag } from '@/types/entities';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import { ArrowUpRight, ChevronRight, LoaderCircle } from 'lucide-react';
 import React, { useEffect, useId, useMemo, useState } from 'react';
@@ -28,6 +28,7 @@ interface DocumentSectionProps {
     onToggleSelect: (document: Document) => void;
     onSelectMany: (documents: Document[], select: boolean) => void;
     onTotal?: (total: number) => void;
+    onTags?: (tags: Tag[]) => void;
 }
 
 /**
@@ -84,6 +85,7 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
     onToggleSelect,
     onSelectMany,
     onTotal,
+    onTags,
 }) => {
     const { t } = useTranslation();
     const contentId = useId();
@@ -121,6 +123,20 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
         () => (courses.length > 1 ? dedupeBySeafileFile(documents, courses[0].id) : documents),
         [documents, courses],
     );
+
+    useEffect(() => {
+        if (!loading && onTags) {
+            const tags: Tag[] = [];
+            for (const doc of shown) {
+                for (const tag of doc.tags ?? []) {
+                    if (!tag.hidden && tag.name) {
+                        tags.push(tag);
+                    }
+                }
+            }
+            onTags(tags);
+        }
+    }, [loading, shown, onTags]);
     // The server counts every row; the copies hidden above are not files the reader will see.
     // Exact while everything fits on one page, which is the common case for a single folder.
     const shownTotal = totalItems - (documents.length - shown.length);

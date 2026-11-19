@@ -265,7 +265,9 @@
             "none-see-older": "No documents under this code yet. See the previous courses below.",
             "no-year": "Year unknown",
             "from-course": "On {{code}}, an equivalent course",
-            "open-course": "Open the course page of {{code}}"
+            "open-course": "Open the course page of {{code}}",
+            "all-tags": "All",
+            "filter-by-tag": "Filter by tag"
         },
         "related": {
             "predecessors": "Previously taught as",

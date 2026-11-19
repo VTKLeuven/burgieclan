@@ -48,8 +48,14 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
         })
         : null;
 
-    const tagLine = document.tags?.map(tag => tag.name).join(' · ');
-    const uploaderLine = showAuthor ? document.author : uploader;
+    const tagLine = document.tags
+        ?.filter((tag) => !tag.hidden && tag.name)
+        .map((tag) => tag.name)
+        .join(' · ');
+    // Migrated archive files without an original author belong to the archive service account;
+    // omitting that bot name keeps rows calm instead of repeating it on every line.
+    const isArchiveBotOnly = !document.author?.trim() && Boolean(document.seafileFileId);
+    const uploaderLine = showAuthor ? document.author : (isArchiveBotOnly ? undefined : uploader);
 
     return (
         // Two lines, so the name gets the whole width: name on top, tags as quiet text beneath.
@@ -124,12 +130,14 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                                 {document.year || updated}
                             </span>
                         )}
-                        <span
-                            className="block truncate text-caption text-fg-muted"
-                            title={showAuthor ? `${t('document.uploaded-by')}: ${uploader}` : undefined}
-                        >
-                            {uploaderLine}
-                        </span>
+                        {uploaderLine && (
+                            <span
+                                className="block truncate text-caption text-fg-muted"
+                                title={showAuthor ? `${t('document.uploaded-by')}: ${uploader}` : undefined}
+                            >
+                                {uploaderLine}
+                            </span>
+                        )}
                     </div>
                     <span className="reveal-on-hover absolute inset-y-0 right-0 flex items-center gap-0.5 [@media(hover:none)]:static">
                         <FavoriteButton itemId={document.id} itemType="document" size={16} className="vtk-icon-button" />

@@ -419,6 +419,7 @@ export function convertToTag(tag: unknown): Tag {
     return {
         id: parseId(data['@id']),
         name: typeof data.name === 'string' ? data.name : undefined,
+        hidden: typeof data.hidden === 'boolean' ? data.hidden : undefined,
     };
 }
 
