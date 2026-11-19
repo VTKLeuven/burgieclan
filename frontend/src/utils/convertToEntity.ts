@@ -104,6 +104,7 @@ export function convertToCourse(course: unknown): Course {
         name: typeof data.name === 'string' ? data.name : undefined,
         nameNl: typeof data.nameNl === 'string' ? data.nameNl : undefined,
         nameEn: typeof data.nameEn === 'string' ? data.nameEn : undefined,
+        language: typeof data.language === 'string' ? data.language : undefined,
         code: typeof data.code === 'string' ? data.code : undefined,
         professors: asArray(data.professors) as string[] | undefined,
         semesters: asArray(data.semesters) as string[] | undefined,

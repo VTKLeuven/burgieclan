@@ -5,58 +5,46 @@ namespace App\Tests\Entity;
 use App\Entity\Course;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * A course is shown in its own language of instruction, as the onderwijsaanbod lists it, whatever
+ * the language of its programme or of the reader.
+ */
 class CourseTest extends TestCase
 {
-    public function testLocalizedNamePicksTheReadersLanguage(): void
+    public function testCatalogNameFollowsTheCoursesOwnLanguage(): void
     {
-        $course = $this->course('Distributed Systems', 'Gedistribueerde systemen', 'Distributed Systems');
+        $english = $this->course('Gedistribueerde systemen', 'Gedistribueerde systemen', 'Distributed Systems', 'en');
+        $dutch = $this->course('Business Administration', 'Bedrijfskunde en ondernemen', 'Business Administration', 'nl');
 
-        $this->assertSame('Gedistribueerde systemen', $course->getLocalizedName('nl'));
-        $this->assertSame('Distributed Systems', $course->getLocalizedName('en'));
+        $this->assertSame('Distributed Systems', $english->getCatalogName());
+        $this->assertSame('Bedrijfskunde en ondernemen', $dutch->getCatalogName());
     }
 
     /**
      * Courses imported before name_nl/name_en existed have neither, and the migration deliberately
      * does not guess. They must keep rendering the name we already showed.
      */
-    public function testLocalizedNameFallsBackToNameWhenTheTranslationIsMissing(): void
+    public function testCatalogNameFallsBackToNameWhenTheTitleIsMissing(): void
     {
-        $course = $this->course('Gedistribueerde systemen', null, null);
+        $course = $this->course('Gedistribueerde systemen', 'Gedistribueerde systemen', null, 'en');
 
-        $this->assertSame('Gedistribueerde systemen', $course->getLocalizedName('nl'));
-        $this->assertSame('Gedistribueerde systemen', $course->getLocalizedName('en'));
+        $this->assertSame('Gedistribueerde systemen', $course->getCatalogName());
     }
 
-    public function testLocalizedNameFallsBackPerLanguage(): void
+    public function testCatalogNameIgnoresAnEmptyTitle(): void
     {
-        $course = $this->course('Alleen Nederlands', 'Alleen Nederlands', null);
+        $course = $this->course('Distributed Systems', '', '', 'nl');
 
-        $this->assertSame('Alleen Nederlands', $course->getLocalizedName('nl'));
-        $this->assertSame('Alleen Nederlands', $course->getLocalizedName('en'), 'no English title stored');
+        $this->assertSame('Distributed Systems', $course->getCatalogName());
     }
 
-    public function testLocalizedNameTreatsAnUnknownOrMissingLocaleAsDutch(): void
-    {
-        $course = $this->course('Distributed Systems', 'Gedistribueerde systemen', 'Distributed Systems');
-
-        $this->assertSame('Gedistribueerde systemen', $course->getLocalizedName(null));
-        $this->assertSame('Gedistribueerde systemen', $course->getLocalizedName('fr'));
-    }
-
-    public function testLocalizedNameIgnoresAnEmptyTranslation(): void
-    {
-        $course = $this->course('Distributed Systems', '', '');
-
-        $this->assertSame('Distributed Systems', $course->getLocalizedName('nl'));
-        $this->assertSame('Distributed Systems', $course->getLocalizedName('en'));
-    }
-
-    private function course(string $name, ?string $nameNl, ?string $nameEn): Course
+    private function course(string $name, ?string $nameNl, ?string $nameEn, string $language): Course
     {
         $course = new Course();
         $course->setName($name);
         $course->setNameNl($nameNl);
         $course->setNameEn($nameEn);
+        $course->setLanguage($language);
 
         return $course;
     }

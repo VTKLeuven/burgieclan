@@ -2,7 +2,7 @@
 
 import type { Course } from '@/types/entities';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 import { ArrowLeft, ArrowRight, Equal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -63,8 +63,8 @@ export default function RelatedCourses({ course }: RelatedCoursesProps) {
                             <span className="tabular text-fg-muted">{related.code}</span>
                             {/* The name is absent when the API returned the course as a bare
                                 IRI reference; the code alone still identifies it. */}
-                            {localizedCourseName(related, i18n.language) && (
-                                <span className="ml-1 text-link">{localizedCourseName(related, i18n.language)}</span>
+                            {courseTitle(related) && (
+                                <span className="ml-1 text-link">{courseTitle(related)}</span>
                             )}
                             {/* How much is actually over there. A reform leaves the new code
                                 nearly empty while the old one holds a decade of exams, and

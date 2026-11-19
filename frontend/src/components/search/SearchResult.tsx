@@ -2,7 +2,7 @@ import { ComboboxOption } from "@headlessui/react";
 import { Course, Document, ExamQuestionSearchHit, Module, Program } from "@/types/entities";
 import clsx from "clsx";
 import { useTranslation } from 'react-i18next';
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 import { examCalendarYear } from '@/utils/examPeriods';
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import { preloadApi } from '@/hooks/useApi';
@@ -40,7 +40,7 @@ export default function SearchResult({ mainResult, extraInfo, redirect, apiEndpo
 
 export function CourseSearchResult({ course }: { course: Course }) {
     const { t, i18n } = useTranslation();
-    return <SearchResult mainResult={localizedCourseName(course, i18n.language) || course.name || course.code || `${t('curriculum-navigator.course', { defaultValue: 'Vak' })} #${course.id}`} extraInfo={course.code}
+    return <SearchResult mainResult={courseTitle(course) || course.name || course.code || `${t('curriculum-navigator.course', { defaultValue: 'Vak' })} #${course.id}`} extraInfo={course.code}
         redirect={curriculumHref.course(course)} apiEndpoint={`/api/courses/${course.id}`} />
 }
 
@@ -57,7 +57,7 @@ export function ProgramSearchResult({ program }: { program: Program }) {
 
 export function DocumentSearchResult({ document }: { document: Document }) {
     const { i18n } = useTranslation();
-    return <SearchResult mainResult={document.name || document.filename || `Document #${document.id}`} extraInfo={localizedCourseName(document.course, i18n.language)}
+    return <SearchResult mainResult={document.name || document.filename || `Document #${document.id}`} extraInfo={courseTitle(document.course)}
         redirect={"/document/" + document.id} apiEndpoint={`/api/documents/${document.id}?lang=${i18n.language}`} />
 }
 
@@ -69,7 +69,7 @@ export function ExamQuestionSearchResult({ hit }: { hit: ExamQuestionSearchHit }
     const { t, i18n } = useTranslation();
     const router = useRouter();
     const page = `/course/${hit.course.id}/exams/${hit.examId}`;
-    const course = localizedCourseName(hit.course, i18n.language) || hit.course.code;
+    const course = courseTitle(hit.course) || hit.course.code;
     const exam = t(`exam.name.${hit.period}`, { year: examCalendarYear(hit.academicYear) });
 
     return <ComboboxOption

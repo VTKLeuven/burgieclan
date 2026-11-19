@@ -4,7 +4,7 @@ import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { useUser } from '@/components/UserContext';
-import { localizedCourseName, sortCoursesByName } from '@/utils/courseName';
+import { courseTitle, sortCoursesByName } from '@/utils/courseName';
 import { ArrowRight, BookOpen, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
@@ -42,7 +42,7 @@ export default function MyCourses() {
             ) : (
                 <div className="vtk-list">
                     {courses.map((course) => {
-                        const name = localizedCourseName(course, i18n.language) ?? course.code ?? '';
+                        const name = courseTitle(course) ?? course.code ?? '';
                         return (
                             <div key={course.id} className="group/row vtk-list-row vtk-list-row-hover py-0 pr-2">
                                 <ApiPrefetchLink

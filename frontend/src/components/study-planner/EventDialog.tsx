@@ -85,7 +85,7 @@ export default function EventDialog({
                     </dl>
                     {e.courseId !== null && (
                         <Link href={`/course/${e.courseId}`} className="vtk-link mt-3 inline-flex text-body">
-                            {t('study_planner.event.open_course', { name: subjectName(subject, locale) })}
+                            {t('study_planner.event.open_course', { name: subjectName(subject) })}
                         </Link>
                     )}
 

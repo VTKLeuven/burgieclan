@@ -197,7 +197,7 @@ class StudyPlannerSubjects
                 $key = 'course:' . $course->getId();
                 $subjects[$key] ??= [
                     'key' => $key,
-                    'label' => $course->getNameEn() ?: $course->getName(),
+                    'label' => $course->getCatalogName(),
                     'courseId' => $course->getId(),
                     'courseCode' => $course->getCode(),
                     'nameNl' => $course->getNameNl() ?: $course->getName(),

@@ -5,7 +5,7 @@ import { type HydraCollection, useApi } from '@/hooks/useApi';
 import type { Exam } from '@/types/entities';
 import { convertToExam } from '@/utils/convertToEntity';
 import { STORAGE_KEYS } from '@/utils/cookieNames';
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 import { currentExamPeriod, examCalendarYear } from '@/utils/examPeriods';
 import { NotebookPen, X } from 'lucide-react';
 import Link from 'next/link';
@@ -107,7 +107,7 @@ export const ExamPrompt = () => {
             <ul className="vtk-list m-0 list-none p-0">
                 {shown.map((exam) => {
                     const course = courses.find((candidate) => candidate.id === exam.courseId);
-                    const courseName = localizedCourseName(course, i18n.language) || t('home.exam_prompt.course_fallback');
+                    const courseName = courseTitle(course) || t('home.exam_prompt.course_fallback');
 
                     return (
                         // The close button sits outside the link: a button inside an anchor is invalid markup.

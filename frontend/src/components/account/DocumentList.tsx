@@ -11,7 +11,7 @@ import dynamic from 'next/dynamic';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 
 const PDFPages = dynamic(() => import('@/components/document/pdf/PDFPages'), { ssr: false });
 
@@ -38,7 +38,7 @@ function AccountDocumentCard({ document, onDeleted }: { document: Document; onDe
 
     // Guarded on below rather than `course.name`: a course can carry nameNl/nameEn without the
     // fallback `name` being set, and guarding on `name` would hide a title we can render.
-    const courseName = localizedCourseName(document.course, i18n.language);
+    const courseName = courseTitle(document.course);
 
     const docEndpoints = [
         `/api/documents/${document.id}?lang=${i18n.language}`,

@@ -12,7 +12,7 @@ import { memo, useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useTranslation } from 'react-i18next';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 
 interface CourseRowProps {
     course: Course;
@@ -83,7 +83,7 @@ export const CourseRow = memo(({
         semesters: <Skeleton circle width={16} height={16} />,
         professor: <Skeleton circle width={24} height={24} />
     } : {
-        name: localizedCourseName(course, i18n.language),
+        name: courseTitle(course),
         code: course.code,
         credits: course.credits,
         semesters: <SemesterIndicator semesters={course.semesters} size={16} />,

@@ -58,7 +58,7 @@ export default function ItemForm({
                 <select id={`${id}-subject`} value={subject} onChange={(e) => setSubject(e.target.value)} className="vtk-select" required>
                     {options.map((s) => (
                         <option key={s.key} value={s.key}>
-                            {subjectName(s, i18n.language)}
+                            {subjectName(s)}
                         </option>
                     ))}
                 </select>

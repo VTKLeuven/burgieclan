@@ -7,7 +7,6 @@ import type {
     StudyPlannerItem,
     StudyPlannerSubject,
 } from '@/types/entities';
-import { localizedCourseName } from '@/utils/courseName';
 import { addDays, daysBetween, mondayOf } from './time';
 
 /** Colour family of a session: lectures, practicals and exercise sessions, everything else. */
@@ -42,12 +41,9 @@ export function typeKey(type: string): string {
     return `study_planner.type.${KNOWN_TYPES.includes(type) ? type : 'other'}`;
 }
 
-export function subjectName(subject: StudyPlannerSubject | null | undefined, locale: string): string {
-    if (!subject) return '';
-    if (subject.courseId !== null) {
-        return localizedCourseName({ name: subject.label, nameNl: subject.nameNl ?? undefined, nameEn: subject.nameEn ?? undefined }, locale) || subject.label;
-    }
-    return subject.label;
+/** A course's label is already its title as the onderwijsaanbod lists it, whatever the reader's language. */
+export function subjectName(subject: StudyPlannerSubject | null | undefined): string {
+    return subject?.label ?? '';
 }
 
 // ------------------------------------------------------------------ deadlines

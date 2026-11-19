@@ -13,12 +13,12 @@ import type { Course, Document, Module, Program } from "@/types/entities";
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 
 const mapCoursesToItems = (courses: Course[], locale: string) => {
     return courses.map(course => ({
         id: course.id,
-        name: localizedCourseName(course, locale),
+        name: courseTitle(course),
         code: course.code,
         redirectUrl: `/course/${course.id}`,
         type: 'course' as const

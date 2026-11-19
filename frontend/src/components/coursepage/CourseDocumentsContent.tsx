@@ -9,7 +9,7 @@ import type { Course, DocumentCategory } from '@/types/entities';
 import { convertToCourse, convertToDocumentCategory } from '@/utils/convertToEntity';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 
 interface CourseDocumentsContentProps {
     courseId: number;
@@ -71,7 +71,7 @@ export default function CourseDocumentsContent({ courseId, categoryId }: CourseD
     usePublishCurriculumLocation({ course: course ?? undefined, category: category ?? undefined });
 
     useEffect(() => {
-        const courseName = localizedCourseName(course, currentLocale);
+        const courseName = courseTitle(course);
         if (courseName && category?.name) {
             document.title = `${courseName} - ${category.name} | Burgieclan`;
         }

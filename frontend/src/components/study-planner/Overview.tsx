@@ -102,7 +102,7 @@ export function CourseList({
                     <select value={row.subject.key} onChange={(e) => onCourse(e.target.value)} className="vtk-select">
                         {data.rows.map((r) => (
                             <option key={r.subject.key} value={r.subject.key}>
-                                {subjectName(r.subject, i18n.language)} ({ratio(r)}
+                                {subjectName(r.subject)} ({ratio(r)}
                                 {r.missed > 0 ? `, ${t('study_planner.overview.n_to_catch_up', { count: r.missed })}` : ''})
                             </option>
                         ))}
@@ -123,7 +123,7 @@ export function CourseList({
                                 )}
                             >
                                 <span className="flex items-baseline justify-between gap-3">
-                                    <span className="min-w-0 text-body font-medium text-fg">{subjectName(r.subject, i18n.language)}</span>
+                                    <span className="min-w-0 text-body font-medium text-fg">{subjectName(r.subject)}</span>
                                     <span className="shrink-0 text-small font-medium tabular text-fg-muted">{ratio(r)}</span>
                                 </span>
                                 <span className="mt-2 flex items-center gap-2">
@@ -160,7 +160,7 @@ function CourseDetail({ row, api, onSelect }: { row: CourseRow; api: PlannerApi;
         <section aria-labelledby="course-h" className="vtk-panel min-w-0 px-4 pb-3 pt-5 sm:px-5">
             {row.subject.courseCode && <p className="m-0 text-small text-fg-muted tabular">{row.subject.courseCode}</p>}
             <h2 id="course-h" className="m-0 text-title-lg font-semibold text-fg">
-                {subjectName(row.subject, i18n.language)}
+                {subjectName(row.subject)}
             </h2>
             <div className="mt-3 flex flex-wrap gap-1.5">
                 <span className="vtk-badge vtk-badge-muted">
@@ -341,7 +341,7 @@ export function SemesterGrid({ data, onCourse }: { data: SemesterView; onCourse:
                                         onClick={() => onCourse(r.subject.key)}
                                         className="text-left text-body font-medium text-fg hover:underline hover:underline-offset-4"
                                     >
-                                        {subjectName(r.subject, locale)}
+                                        {subjectName(r.subject)}
                                     </button>
                                 </div>
                                 {byWeek.map((sessions, i) => (

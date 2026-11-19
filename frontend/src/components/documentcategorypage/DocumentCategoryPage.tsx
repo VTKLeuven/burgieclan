@@ -5,7 +5,7 @@ import FavoriteDocuments from "@/components/documentcategorypage/FavoriteDocumen
 import CreateDocumentButton from "@/components/ui/CreateDocumentButton";
 import CurriculumPageHeader from "@/components/ui/DynamicBreadcrumb";
 import type { Course, DocumentCategory } from "@/types/entities";
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 import Link from "next/link";
 import { useTranslation } from 'react-i18next';
 
@@ -21,7 +21,7 @@ interface DocumentCategoryPageProps {
  */
 export default function DocumentCategoryPage({ category, course }: DocumentCategoryPageProps) {
     const { i18n } = useTranslation();
-    const courseName = localizedCourseName(course, i18n.language);
+    const courseName = courseTitle(course);
 
     return (
         <>

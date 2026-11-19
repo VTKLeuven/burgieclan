@@ -1,25 +1,23 @@
 import type { Course } from '@/types/entities';
 
-type NamedCourse = Pick<Course, 'name' | 'nameNl' | 'nameEn'>;
+type NamedCourse = Pick<Course, 'name' | 'nameNl' | 'nameEn' | 'language'>;
 
 /**
- * The course title to show a reader of `locale`.
+ * The course title, as the KU Leuven onderwijsaanbod lists it.
  *
- * KU Leuven publishes a Dutch and an English title for essentially every course and they normally
- * differ — "Gedistribueerde systemen" vs "Distributed Systems" for H0N08A. `name` holds whichever
- * language the programme happened to be imported in, so it is only a fallback: prefer the title
- * matching the reader, and fall back to `name` when that translation is missing.
+ * A course has its own language of instruction (`language`, KU Leuven's `originalLangu`), apart
+ * from the programme it sits in and from the reader's language: the English master Computer
+ * Science lists "Bedrijfskunde en ondernemen" in Dutch next to "Distributed Systems". So every
+ * reader sees the title in the course's own language. The backend already stores `name` that way;
+ * the per-language titles only win when `language` is known and that title exists.
  */
-export function localizedCourseName(
-    course: NamedCourse | undefined | null,
-    locale: string | undefined,
-): string {
+export function courseTitle(course: NamedCourse | undefined | null): string {
     if (!course) {
         return '';
     }
-    const translated = locale?.toLowerCase().startsWith('en') ? course.nameEn : course.nameNl;
+    const own = course.language === 'en' ? course.nameEn : course.language === 'nl' ? course.nameNl : undefined;
 
-    return translated?.trim() || course.name || '';
+    return own?.trim() || course.name || '';
 }
 
 /**
@@ -37,14 +35,14 @@ export function courseNameVariants(course: NamedCourse | undefined | null): stri
 }
 
 /**
- * `courses` in alphabetical order of the title shown to a reader of `locale`, ignoring case and
- * accents, so "Écologie" sits with the E's. Courses without a title sort by their code.
+ * `courses` in alphabetical order of their title, ignoring case and accents (collated for a reader
+ * of `locale`), so "Écologie" sits with the E's. Courses without a title sort by their code.
  */
 export function sortCoursesByName<T extends NamedCourse & Pick<Course, 'code'>>(
     courses: readonly T[],
     locale: string | undefined,
 ): T[] {
-    const title = (course: T) => localizedCourseName(course, locale) || course.code || '';
+    const title = (course: T) => courseTitle(course) || course.code || '';
     const collator = new Intl.Collator(locale, { sensitivity: 'base', numeric: true });
 
     return [...courses].sort((a, b) => collator.compare(title(a), title(b)));

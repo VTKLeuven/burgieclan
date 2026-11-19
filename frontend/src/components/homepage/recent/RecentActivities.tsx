@@ -3,7 +3,7 @@ import { Activity } from '@/components/homepage/recent/Activity';
 import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { DocumentView } from '@/types/entities';
 import { convertToDocumentView } from '@/utils/convertToEntity';
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 import { useEffect, useState } from 'react';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { History } from 'lucide-react';
@@ -55,7 +55,7 @@ export const RecentActivities = () => {
                         key={documentView.id}
                         documentId={documentView.document?.id}
                         documentName={documentView.document?.name || ''}
-                        courseName={localizedCourseName(documentView.document?.course, i18n.language)}
+                        courseName={courseTitle(documentView.document?.course)}
                         timestamp={documentView.lastViewed?.toISOString() || ''}
                         link={`/document/${documentView.document?.id}`}
                     />

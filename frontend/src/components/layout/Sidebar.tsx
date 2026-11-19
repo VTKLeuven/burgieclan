@@ -17,7 +17,7 @@ import {
 import { useUser } from '@/components/UserContext';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import { cn } from '@/lib/utils';
-import { localizedCourseName, sortCoursesByName } from '@/utils/courseName';
+import { courseTitle, sortCoursesByName } from '@/utils/courseName';
 import {
     ArrowUpRight,
     CalendarDays,
@@ -258,7 +258,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                                 <p className="m-0 px-2.5 py-1.5 text-small text-fg-muted">{t('shell.no_courses')}</p>
                             ) : (
                                 courses.map((course) => {
-                                    const name = localizedCourseName(course, i18n.language) ?? course.code ?? '';
+                                    const name = courseTitle(course) ?? course.code ?? '';
                                     const active = currentCourse?.id === course.id && inCurriculum;
                                     // The star says why the course is listed here, and clicking it
                                     // takes it off the list. A sibling laid over the icon slot rather

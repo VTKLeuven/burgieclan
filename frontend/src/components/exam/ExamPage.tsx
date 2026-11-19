@@ -9,7 +9,7 @@ import PageHead from '@/components/ui/PageHead';
 import { readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { Course, Exam } from '@/types/entities';
 import { convertToCourse, convertToExam } from '@/utils/convertToEntity';
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 import { examCalendarYear } from '@/utils/examPeriods';
 import { Copy, Lock, NotebookPen, PencilLine } from 'lucide-react';
 import Link from 'next/link';
@@ -76,7 +76,7 @@ export default function ExamPage() {
 
     usePublishCurriculumLocation({ course: course ?? undefined });
 
-    const courseName = localizedCourseName(course, i18n.language);
+    const courseName = courseTitle(course);
     const title = exam ? t(`exam.name.${exam.period}`, { year: examCalendarYear(exam.academicYear) }) : '';
 
     useEffect(() => {

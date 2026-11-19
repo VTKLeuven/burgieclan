@@ -25,8 +25,9 @@ class Course extends BaseEntity
     ];
 
     /**
-     * Display name in the language the programme was imported in. Kept as the single non-null
-     * name so search, admin lists and every existing API consumer keep working unchanged.
+     * Display name: the title in the course's own language of instruction ($language), as the KU
+     * Leuven onderwijsaanbod lists it — whatever the language of the programme or of the reader.
+     * Kept as the single non-null name so search, admin lists and every API consumer can use it.
      */
     #[ORM\Column(type: Types::STRING, length: 255)]
     #[Assert\NotBlank]
@@ -41,7 +42,7 @@ class Course extends BaseEntity
      * this database belong to more than one programme, importing one programme in Dutch silently
      * renamed the same course inside an English-taught one. Whichever import ran last won.
      *
-     * Nullable because a programme may publish only one language; getLocalizedName() falls back to
+     * Nullable because a programme may publish only one language; getCatalogName() falls back to
      * $name, so a missing translation degrades to what we already showed.
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
@@ -169,13 +170,14 @@ class Course extends BaseEntity
     }
 
     /**
-     * The title to show a reader of $locale, falling back to $name when that language has no title.
+     * The title in the course's own language of instruction, falling back to $name when KU Leuven
+     * publishes none in that language. This is the only title to show, to every reader.
      */
-    public function getLocalizedName(?string $locale): string
+    public function getCatalogName(): string
     {
-        $localized = strtolower((string) $locale) === 'en' ? $this->nameEn : $this->nameNl;
+        $title = $this->language === 'en' ? $this->nameEn : $this->nameNl;
 
-        return $localized !== null && $localized !== '' ? $localized : $this->name;
+        return $title !== null && $title !== '' ? $title : $this->name;
     }
 
     public function getModules(): Collection

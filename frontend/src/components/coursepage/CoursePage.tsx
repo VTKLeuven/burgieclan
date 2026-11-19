@@ -23,7 +23,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 
 function MetaDot() {
     return <span aria-hidden="true">·</span>;
@@ -65,7 +65,7 @@ export default function CoursePage() {
     usePublishCurriculumLocation({ course: course ?? undefined });
     const { activePath } = useCurriculumLocation();
 
-    const courseName = localizedCourseName(course, i18n.language);
+    const courseName = courseTitle(course);
 
     useEffect(() => {
         if (courseName) {

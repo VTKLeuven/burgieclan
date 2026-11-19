@@ -12,9 +12,11 @@ interface NodeEntity extends BaseEntity {
 
 export interface Course extends BaseEntity {
     name?: string;
-    /** KU Leuven's Dutch and English titles; usually differ. Use localizedCourseName() to pick. */
+    /** KU Leuven's Dutch and English titles; usually differ. Display courseTitle(), never these. */
     nameNl?: string;
     nameEn?: string;
+    /** The course's own language of instruction ("nl"/"en"), which decides the title shown. */
+    language?: string;
     courseComments?: CourseComment[];
     modules?: Module[];
     code?: string;

@@ -7,7 +7,7 @@ import FavoriteButton from '@/components/ui/FavoriteButton';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import type { Course, Module, Program } from '@/types/entities';
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 import { shortProgramName } from '@/utils/curriculumLabels';
 import { rememberBranch } from '@/utils/curriculumBranch';
 import { BookOpen, ChevronRight } from 'lucide-react';
@@ -61,7 +61,7 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
                                 }}
                                 className="block truncate text-body font-medium text-fg hover:underline"
                             >
-                                {localizedCourseName(course, i18n.language)}
+                                {courseTitle(course)}
                             </ApiPrefetchLink>
 
                             {/* The branch, as breadcrumbs rather than a tree to hunt through. */}

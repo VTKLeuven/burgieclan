@@ -182,7 +182,7 @@ class OnderwijsaanbodImporterPruneTest extends KernelTestCase
         self::assertInstanceOf(Course::class, $course);
         self::assertSame('Distributed Systems', $course->getNameEn(), 'the English title must survive');
         self::assertSame('Gedistribueerde systemen', $course->getNameNl());
-        self::assertSame('Distributed Systems', $course->getLocalizedName('en'));
+        self::assertSame('Distributed Systems', $course->getCatalogName());
     }
 
     public function testUnchangedReimportDetachesNothing(): void

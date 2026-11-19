@@ -132,7 +132,7 @@ function EntryRow({
     const isItem = entry.type === 'item';
     const deadline = isItem && entry.item.kind === 'deadline';
     const title = isItem ? entry.item.title : entry.event.course;
-    const subject = subjectName(entry.subject, locale) || (isItem ? entry.item.subjectLabel : '');
+    const subject = subjectName(entry.subject) || (isItem ? entry.item.subjectLabel : '');
     const when = isItem
         ? entry.time
             ? deadline

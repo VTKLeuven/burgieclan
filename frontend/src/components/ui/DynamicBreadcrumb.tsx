@@ -6,7 +6,7 @@ import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import { GraduationCap } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { useTranslation } from "react-i18next";
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 import { shortProgramName } from '@/utils/curriculumLabels';
 
 /**
@@ -55,7 +55,7 @@ export function useCurriculumCrumbs(): Crumb[] {
 
     if (course) {
         crumbs.push({
-            label: localizedCourseName(course, i18n.language) || `Course ${course.id}`,
+            label: courseTitle(course) || `Course ${course.id}`,
             href: curriculumHref.course(course),
         });
     }

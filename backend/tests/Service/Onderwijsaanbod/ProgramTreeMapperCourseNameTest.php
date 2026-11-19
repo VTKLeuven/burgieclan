@@ -20,13 +20,29 @@ class ProgramTreeMapperCourseNameTest extends TestCase
         $this->mapper = new ProgramTreeMapper();
     }
 
+    /**
+     * The name is the title in the course's own language of instruction, as the onderwijsaanbod
+     * lists it: an English-taught course keeps its English title inside a Dutch programme.
+     */
     public function testBothTitlesAreCarriedWhenImportingInDutch(): void
     {
         $course = $this->firstCourse($this->source(nl: 'Gedistribueerde systemen', en: 'Distributed Systems'), 'nl');
 
-        self::assertSame('Gedistribueerde systemen', $course->name, 'name follows the import language');
+        self::assertSame('Distributed Systems', $course->name, 'name follows the course language, not the import');
+        self::assertSame('en', $course->language);
         self::assertSame('Gedistribueerde systemen', $course->nameNl);
         self::assertSame('Distributed Systems', $course->nameEn);
+    }
+
+    public function testADutchTaughtCourseKeepsItsDutchNameInAnEnglishProgramme(): void
+    {
+        $course = $this->firstCourse(
+            $this->source(nl: 'Bedrijfskunde en ondernemen', en: 'Business Administration', langu: 'NL'),
+            'en',
+        );
+
+        self::assertSame('Bedrijfskunde en ondernemen', $course->name);
+        self::assertSame('nl', $course->language);
     }
 
     public function testBothTitlesAreCarriedWhenImportingInEnglish(): void
@@ -40,14 +56,14 @@ class ProgramTreeMapperCourseNameTest extends TestCase
 
     /**
      * The per-language fields must not fall back across languages: writing the Dutch title into
-     * nameEn would claim a translation exists, and Course::getLocalizedName() could no longer tell
+     * nameEn would claim a translation exists, and Course::getCatalogName() could no longer tell
      * that it should fall back to $name instead.
      */
     public function testAMissingTranslationStaysNullRatherThanBorrowingTheOtherLanguage(): void
     {
         $course = $this->firstCourse($this->source(nl: 'Alleen Nederlands', en: null), 'en');
 
-        self::assertSame('Alleen Nederlands', $course->name, 'name still falls back so it is never empty');
+        self::assertSame('Alleen Nederlands', $course->name, 'an English course without English title still has a name');
         self::assertSame('Alleen Nederlands', $course->nameNl);
         self::assertNull($course->nameEn);
     }
@@ -70,7 +86,7 @@ class ProgramTreeMapperCourseNameTest extends TestCase
     /**
      * @return array<string, mixed>
      */
-    private function source(string $nl, ?string $en): array
+    private function source(string $nl, ?string $en, string $langu = 'EN'): array
     {
         $titles = [
             ['moduleLangu' => 'NL', 'moduleTitleSet' => [['description' => $nl]]],
@@ -97,7 +113,7 @@ class ProgramTreeMapperCourseNameTest extends TestCase
                 'moduleSet' => [[
                     'moduleId' => 'm1',
                     'short' => 'H0N08A',
-                    'originalLangu' => 'EN',
+                    'originalLangu' => $langu,
                     'stageStart' => '1',
                     'credits' => '6',
                     'mandatory' => 'True',

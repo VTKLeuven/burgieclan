@@ -842,12 +842,15 @@ class ProgramTreeMapper
             return null;
         }
 
-        $name = $this->localized(
-            $module['moduleLanguageSet'] ?? [],
-            'moduleLangu',
-            'moduleTitleSet',
-            $language,
-        ) ?? $code;
+        // A course is shown in its own language of instruction, as the onderwijsaanbod lists it,
+        // not in the language of the programme being imported: the English master Computer Science
+        // lists "Bedrijfskunde en ondernemen" in Dutch next to "Distributed Systems". The import
+        // language only decides when the course's own language has no title.
+        $courseLanguage = $this->normalizeLanguage((string) ($module['originalLangu'] ?? ''));
+        $titles = $module['moduleLanguageSet'] ?? [];
+        $name = $this->localized($titles, 'moduleLangu', 'moduleTitleSet', $courseLanguage, false)
+            ?? $this->localized($titles, 'moduleLangu', 'moduleTitleSet', $language)
+            ?? $code;
 
         $credits = isset($module['credits']) && is_numeric($module['credits'])
             ? (int) $module['credits']
@@ -856,14 +859,12 @@ class ProgramTreeMapper
         // Both titles travel with every course regardless of the import language: they are already
         // in the response we fetched, and a course shared by a Dutch and an English programme must
         // not have its name decided by whichever import ran last.
-        $titles = $module['moduleLanguageSet'] ?? [];
-
         return new CourseData(
             code: $code,
             name: $name,
             nameNl: $this->localized($titles, 'moduleLangu', 'moduleTitleSet', 'nl', false),
             nameEn: $this->localized($titles, 'moduleLangu', 'moduleTitleSet', 'en', false),
-            language: $this->normalizeLanguage((string) ($module['originalLangu'] ?? '')),
+            language: $courseLanguage,
             credits: $credits,
             semesters: $this->semestersOf($module),
             mandatory: filter_var($module['mandatory'] ?? true, FILTER_VALIDATE_BOOL),

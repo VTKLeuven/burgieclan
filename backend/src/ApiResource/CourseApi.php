@@ -52,7 +52,7 @@ class CourseApi extends BaseEntityApi
 
     /**
      * The Dutch and English titles as published by KU Leuven. Null when there is no title in that
-     * language; clients should fall back to $name, which is always set.
+     * language. Display $name: it is already the title in the course's own language ($language).
      */
     #[Groups(
         [
@@ -97,7 +97,17 @@ class CourseApi extends BaseEntityApi
 
     #[Assert\NotBlank]
     #[Assert\Choice(choices: ['nl', 'en'], message: 'Choose a valid language.')]
-    #[Groups([SerializationGroups::COURSE_GET])]
+    #[Groups(
+        [
+            SerializationGroups::COURSE_GET,
+            SerializationGroups::PROGRAM_GET,
+            SerializationGroups::MODULE_GET,
+            SerializationGroups::SEARCH,
+            SerializationGroups::USER,
+            SerializationGroups::DOCUMENT_GET,
+            SerializationGroups::USER_DOCUMENT_VIEWS
+        ]
+    )]
     public ?string $language = null;
 
     #[Groups(

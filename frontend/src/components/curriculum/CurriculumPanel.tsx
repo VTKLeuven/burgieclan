@@ -20,7 +20,7 @@ import { useSiblingDocuments } from '@/hooks/useSiblingDocuments';
 import { cn } from '@/lib/utils';
 import type { Course, Document, DocumentCategory, Module, Program } from '@/types/entities';
 import { convertToDocumentCategory, convertToModule, convertToProgram } from '@/utils/convertToEntity';
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 import { rememberBranch } from '@/utils/curriculumBranch';
 import { treeProgramName } from '@/utils/curriculumLabels';
 import {
@@ -438,7 +438,7 @@ function ProgramTree({ programId }: { programId: number }) {
         // Only the course being read opens into its folders: every course unfolding five
         // categories would bury the semester it sits in.
         const isOpen = isCurrent && expanded.has(key);
-        const name = localizedCourseName(node, i18n.language) || node.code || '';
+        const name = courseTitle(node) || node.code || '';
 
         return (
             <li key={key}>
@@ -625,7 +625,7 @@ function FilterResults({ programId, query }: { programId: number; query: string 
     return (
         <ul className="m-0 flex list-none flex-col gap-0.5 p-0" aria-live="polite">
             {hits.map(({ course, trail, leafModuleId }) => {
-                const name = localizedCourseName(course, i18n.language) || course.code || '';
+                const name = courseTitle(course) || course.code || '';
                 return (
                     <li key={course.id}>
                         <ApiPrefetchLink

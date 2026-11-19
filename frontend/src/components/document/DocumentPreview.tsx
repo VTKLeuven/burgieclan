@@ -27,7 +27,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { localizedCourseName } from "@/utils/courseName";
+import { courseTitle } from "@/utils/courseName";
 
 // Lazy-load PDFViewer so pdfjs-dist never runs on the server (no DOMMatrix in Node)
 const PDFViewer = dynamic(() => import("@/components/document/pdf/PDFViewer"), { ssr: false });
@@ -218,7 +218,7 @@ export default function DocumentPreview({ id }: { id: string }) {
                     <h1 className="vtk-page-title">{document.name}</h1>
                     <p className="m-0 mt-1 flex flex-wrap gap-x-2 text-body text-fg-muted">
                         {document.course && (
-                            <span>{localizedCourseName(document.course, currentLocale)}</span>
+                            <span>{courseTitle(document.course)}</span>
                         )}
                         {document.category?.name && (
                             <>

@@ -11,7 +11,7 @@ import { Course, DocumentCategory } from '@/types/entities';
 import { UploadFormData } from '@/types/upload';
 import { getSuggestedNameFromFilename } from '@/utils/documentNameSuggestion';
 import { documentSchema } from '@/utils/validation/documentSchema';
-import { localizedCourseName } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useForm, useWatch, type FieldError } from 'react-hook-form';
@@ -76,7 +76,7 @@ export default function UploadForm({
             .map(course => ({
                 id: course.id,
                 name: (() => {
-                    const title = localizedCourseName(course, i18n.language) || course.name;
+                    const title = courseTitle(course) || course.name;
                     if (title && course.code) return `${title} (${course.code})`;
                     return title || course.code || `${t('upload.form.course.label')} #${course.id}`;
                 })(),
