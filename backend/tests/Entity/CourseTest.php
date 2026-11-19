@@ -14,7 +14,12 @@ class CourseTest extends TestCase
     public function testCatalogNameFollowsTheCoursesOwnLanguage(): void
     {
         $english = $this->course('Gedistribueerde systemen', 'Gedistribueerde systemen', 'Distributed Systems', 'en');
-        $dutch = $this->course('Business Administration', 'Bedrijfskunde en ondernemen', 'Business Administration', 'nl');
+        $dutch = $this->course(
+            'Business Administration',
+            'Bedrijfskunde en ondernemen',
+            'Business Administration',
+            'nl',
+        );
 
         $this->assertSame('Distributed Systems', $english->getCatalogName());
         $this->assertSame('Bedrijfskunde en ondernemen', $dutch->getCatalogName());

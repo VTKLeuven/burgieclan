@@ -63,7 +63,7 @@ class ProgramTreeMapperCourseNameTest extends TestCase
     {
         $course = $this->firstCourse($this->source(nl: 'Alleen Nederlands', en: null), 'en');
 
-        self::assertSame('Alleen Nederlands', $course->name, 'an English course without English title still has a name');
+        self::assertSame('Alleen Nederlands', $course->name, 'an English course without an English title keeps a name');
         self::assertSame('Alleen Nederlands', $course->nameNl);
         self::assertNull($course->nameEn);
     }
