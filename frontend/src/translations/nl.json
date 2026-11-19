@@ -486,7 +486,8 @@
         "info_sub": "Krijg snel toegang tot elke pagina door een globale zoekopdracht uit te voeren.",
         "no_results": "Geen resultaten gevonden",
         "no_results_sub": "Probeer een andere zoekopdracht of navigeer naar een andere pagina.",
-        "exam_questions": "Examenvragen"
+        "exam_questions": "Examenvragen",
+        "also_known_as": "ook: {{title}}"
     },
     "header": {
         "admin": "Beheer",

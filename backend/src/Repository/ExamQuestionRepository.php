@@ -133,14 +133,19 @@ class ExamQuestionRepository extends ServiceEntityRepository
             ->where('q.removedAt IS NULL');
 
         $inQuestion = [];
+        $ownMatches = [];
         foreach ($terms as $key => $term) {
             $parameter = 't_' . $key;
             $inQuestion[] = 'LOWER(q.text) LIKE :' . $parameter;
+            $ownMatches[] = sprintf(
+                '(LOWER(q.text) LIKE :%1$s OR LOWER(c.code) LIKE :%1$s OR LOWER(c.name) LIKE :%1$s)',
+                $parameter
+            );
             $queryBuilder
                 ->andWhere(
                     sprintf(
-                        // The course by its onderwijsaanbod title and code, as the course search.
-                        '(LOWER(q.text) LIKE :%1$s OR LOWER(c.code) LIKE :%1$s OR LOWER(c.name) LIKE :%1$s)',
+                        '(LOWER(q.text) LIKE :%1$s OR LOWER(c.code) LIKE :%1$s OR LOWER(c.name) LIKE :%1$s'
+                        . ' OR LOWER(c.nameNl) LIKE :%1$s OR LOWER(c.nameEn) LIKE :%1$s)',
                         $parameter
                     )
                 )
@@ -150,7 +155,9 @@ class ExamQuestionRepository extends ServiceEntityRepository
 
         /** @var ExamQuestion[] $result */
         $result = $queryBuilder
-            ->orderBy('e.academicYear', 'DESC')
+            ->addSelect('CASE WHEN ' . implode(' AND ', $ownMatches) . ' THEN 0 ELSE 1 END AS HIDDEN matchRank')
+            ->orderBy('matchRank', 'ASC')
+            ->addOrderBy('e.academicYear', 'DESC')
             ->addOrderBy('e.id', 'DESC')
             ->addOrderBy('q.position', 'ASC')
             ->setMaxResults($limit)

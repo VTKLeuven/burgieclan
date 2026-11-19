@@ -7,7 +7,7 @@ import FavoriteButton from '@/components/ui/FavoriteButton';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import type { Course, Module, Program } from '@/types/entities';
-import { courseTitle } from '@/utils/courseName';
+import { courseTitle, matchedAlternateTitle } from '@/utils/courseName';
 import { shortProgramName } from '@/utils/curriculumLabels';
 import { rememberBranch } from '@/utils/curriculumBranch';
 import { BookOpen, ChevronRight } from 'lucide-react';
@@ -28,7 +28,7 @@ export interface CourseHit {
  * hit itself is the thing worth clicking, and the path under it answers "is this the right one"
  * without going anywhere.
  */
-export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] }) {
+export default function CurriculumSearchResults({ hits, query }: { hits: CourseHit[]; query?: string }) {
     const { t, i18n } = useTranslation();
 
     if (hits.length === 0) {
@@ -41,7 +41,9 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
                 {t('curriculum-navigator.result-count', { count: hits.length })}
             </p>
             <div className="vtk-list">
-                {hits.map(({ course, program, modules }) => (
+                {hits.map(({ course, program, modules }) => {
+                    const alt = matchedAlternateTitle(course, query);
+                    return (
                     <div
                         key={`${program.id}:${course.id}`}
                         className="group/row vtk-list-row vtk-list-row-hover pr-2"
@@ -62,6 +64,11 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
                                 className="block truncate text-body font-medium text-fg hover:underline"
                             >
                                 {courseTitle(course)}
+                                {alt && (
+                                    <span className="ml-1.5 font-normal text-small text-fg-muted">
+                                        · {t('search.also_known_as', { title: alt })}
+                                    </span>
+                                )}
                             </ApiPrefetchLink>
 
                             {/* The branch, as breadcrumbs rather than a tree to hunt through. */}
@@ -91,7 +98,8 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
                         </span>
                         <FavoriteButton itemId={course.id} itemType="course" size={16} className="vtk-icon-button" />
                     </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );

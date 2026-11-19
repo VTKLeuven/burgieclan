@@ -486,7 +486,8 @@
         "info_sub": "Quickly access any page by running a global search.",
         "no_results": "No results found",
         "no_results_sub": "Try searching for something else or check your spelling.",
-        "exam_questions": "Exam questions"
+        "exam_questions": "Exam questions",
+        "also_known_as": "also: {{title}}"
     },
     "header": {
         "admin": "Admin",
