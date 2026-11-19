@@ -245,13 +245,14 @@ const CourseCommentList = ({
     };
 
     return (
-        <div className="relative z-10">
-            {/* Category header, matching the curriculum program rows */}
+        <div className="group/category relative z-10">
+            {/* Category header, matching the curriculum program rows. The sections sit in one
+                rounded box, so the first and last header round their hover wash to its corners. */}
             <div
                 role="button"
                 tabIndex={0}
                 aria-expanded={expanded}
-                className="relative z-20 flex min-h-12 cursor-pointer items-center gap-2.5 px-4 py-2 transition-colors hover:bg-surface-hover focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
+                className={`relative z-20 flex min-h-12 cursor-pointer items-center gap-2.5 px-4 py-2 transition-colors hover:bg-surface-hover focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus group-first/category:rounded-t-[11px] ${expanded ? '' : 'group-last/category:rounded-b-[11px]'}`}
                 onClick={() => setExpanded(!expanded)}
                 onKeyDown={(e) => {
                     if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {

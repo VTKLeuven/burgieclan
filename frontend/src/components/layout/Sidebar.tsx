@@ -259,6 +259,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                             ) : (
                                 courses.map((course) => {
                                     const name = localizedCourseName(course, i18n.language) ?? course.code ?? '';
+                                    const active = currentCourse?.id === course.id && inCurriculum;
                                     // The star says why the course is listed here, and clicking it
                                     // takes it off the list. A sibling laid over the icon slot rather
                                     // than inside the link, which may not hold a button.
@@ -269,7 +270,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                                                 icon={<span className="size-4 shrink-0" aria-hidden="true" />}
                                                 label={name}
                                                 title={name}
-                                                active={currentCourse?.id === course.id && inCurriculum}
+                                                active={active}
                                                 onNavigate={onNavigate}
                                                 trailing={
                                                     <span className="text-caption font-medium text-fg-muted tabular opacity-0 transition-opacity group-hover:opacity-100 group-aria-[current=page]:text-on-primary/70">
@@ -281,7 +282,9 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                                                 itemId={course.id}
                                                 itemType="course"
                                                 size={14}
-                                                className="absolute top-1/2 left-1.5 grid size-6 -translate-y-1/2 place-items-center rounded-[6px]! p-0! hover:bg-neutral-200/70!"
+                                                // A light wash on the navy active row: the grey one that suits the
+                                                // canvas reads as a hole punched in it.
+                                                className={`absolute top-1/2 left-1.5 grid size-6 -translate-y-1/2 place-items-center rounded-[6px]! p-0! ${active ? 'hover:bg-white/15!' : 'hover:bg-black/[0.07]!'}`}
                                             />
                                         </div>
                                     );

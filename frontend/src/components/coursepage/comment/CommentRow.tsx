@@ -85,7 +85,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
     };
 
     return (
-        <div className="py-2 px-3 leading-tight flex flex-col sm:flex-row overflow-visible relative items-start transition-colors border-b border-vtk-line hover:bg-vtk-paper hover:shadow-xs group/comment">
+        <div className="py-2 px-3 leading-tight flex flex-col sm:flex-row overflow-visible relative items-start group/comment">
             {/* Profile Picture - Left side (desktop only) */}
             <div className="hidden sm:flex items-center mr-2 pt-1 overflow-visible">
                 <CommentUserIcon anonymous={comment.anonymous ?? true} creatorName={comment.creator?.fullName} />
