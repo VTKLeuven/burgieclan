@@ -1,11 +1,10 @@
 'use client';
 
-import CourseBadge from '@/components/layout/CourseBadge';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { useUser } from '@/components/UserContext';
-import { localizedCourseName } from '@/utils/courseName';
+import { localizedCourseName, sortCoursesByName } from '@/utils/courseName';
 import { ArrowRight, BookOpen, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 export default function MyCourses() {
     const { t, i18n } = useTranslation();
     const { user } = useUser();
-    const courses = user?.favoriteCourses ?? [];
+    const courses = sortCoursesByName(user?.favoriteCourses ?? [], i18n.language);
 
     return (
         <section aria-labelledby="my-courses-heading">
@@ -51,7 +50,7 @@ export default function MyCourses() {
                                     apiEndpoints={[`/api/courses/${course.id}`, `/api/document_categories?lang=${i18n.language}`]}
                                     className="flex min-h-12 min-w-0 flex-1 items-center gap-3"
                                 >
-                                    <CourseBadge name={name} seed={course.code} size={20} />
+                                    <BookOpen className="size-4 shrink-0 text-icon" aria-hidden="true" />
                                     <span className="min-w-0 flex-1 truncate text-body font-medium text-fg">{name}</span>
                                     <span className="hidden shrink-0 text-small text-fg-muted tabular sm:inline">{course.code}</span>
                                 </ApiPrefetchLink>

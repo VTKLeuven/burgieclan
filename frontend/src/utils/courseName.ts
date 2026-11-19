@@ -35,3 +35,17 @@ export function courseNameVariants(course: NamedCourse | undefined | null): stri
         (name): name is string => typeof name === 'string' && name.trim() !== '',
     );
 }
+
+/**
+ * `courses` in alphabetical order of the title shown to a reader of `locale`, ignoring case and
+ * accents, so "Écologie" sits with the E's. Courses without a title sort by their code.
+ */
+export function sortCoursesByName<T extends NamedCourse & Pick<Course, 'code'>>(
+    courses: readonly T[],
+    locale: string | undefined,
+): T[] {
+    const title = (course: T) => localizedCourseName(course, locale) || course.code || '';
+    const collator = new Intl.Collator(locale, { sensitivity: 'base', numeric: true });
+
+    return [...courses].sort((a, b) => collator.compare(title(a), title(b)));
+}

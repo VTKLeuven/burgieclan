@@ -17,7 +17,7 @@ import {
 import { useUser } from '@/components/UserContext';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import { cn } from '@/lib/utils';
-import { localizedCourseName } from '@/utils/courseName';
+import { localizedCourseName, sortCoursesByName } from '@/utils/courseName';
 import {
     ArrowUpRight,
     CalendarDays,
@@ -39,7 +39,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Suspense, useState, type ReactNode } from 'react';
+import { Suspense, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /** How many favourite documents the sidebar lists before it points to the account page. */
@@ -153,7 +153,12 @@ export default function Sidebar({ onNavigate, onCollapse }: {
     const isActive = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`));
     const inCurriculum = ['/courses', '/course/', '/document/'].some((p) => path === p || path.startsWith(p));
 
-    const courses = user?.favoriteCourses ?? [];
+    // Alphabetical by the title shown, so a course is found where you expect it rather than
+    // where it happened to be starred.
+    const courses = useMemo(
+        () => sortCoursesByName(user?.favoriteCourses ?? [], i18n.language),
+        [user?.favoriteCourses, i18n.language],
+    );
     const documents = user?.favoriteDocuments ?? [];
     const adminUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin`;
 

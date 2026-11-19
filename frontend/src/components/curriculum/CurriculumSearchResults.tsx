@@ -6,12 +6,11 @@ import DownloadButton from '@/components/ui/DownloadButton';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
-import CourseBadge from '@/components/layout/CourseBadge';
 import type { Course, Module, Program } from '@/types/entities';
 import { localizedCourseName } from '@/utils/courseName';
 import { shortProgramName } from '@/utils/curriculumLabels';
 import { rememberBranch } from '@/utils/curriculumBranch';
-import { ChevronRight } from 'lucide-react';
+import { BookOpen, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 /** A course together with the one branch this result found it under. */
@@ -47,7 +46,7 @@ export default function CurriculumSearchResults({ hits }: { hits: CourseHit[] })
                         key={`${program.id}:${course.id}`}
                         className="group/row vtk-list-row vtk-list-row-hover pr-2"
                     >
-                        <CourseBadge name={localizedCourseName(course, i18n.language)} seed={course.code} size={20} />
+                        <BookOpen className="size-4 shrink-0 text-icon" aria-hidden="true" />
 
                         <div className="min-w-0 flex-1">
                             <ApiPrefetchLink

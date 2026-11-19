@@ -2,7 +2,6 @@
 
 import { useCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
-import CourseBadge from '@/components/layout/CourseBadge';
 import ResizeHandle from '@/components/layout/ResizeHandle';
 import { useCurriculumPanel, useSidebarPanel, type PanelState } from '@/components/layout/ShellPanels';
 import ShowSidebarButton from '@/components/layout/ShowSidebarButton';
@@ -25,6 +24,7 @@ import { localizedCourseName } from '@/utils/courseName';
 import { rememberBranch } from '@/utils/curriculumBranch';
 import { treeProgramName } from '@/utils/curriculumLabels';
 import {
+    BookOpen,
     Check,
     ChevronRight,
     ChevronsUpDown,
@@ -429,7 +429,7 @@ function ProgramTree({ programId }: { programId: number }) {
                     href={curriculumHref.course(node)}
                     apiEndpoints={[`/api/courses/${node.id}`, `/api/document_categories?lang=${i18n.language}`]}
                     depth={depth}
-                    icon={<CourseBadge name={name} seed={node.code} />}
+                    icon={<BookOpen aria-hidden="true" />}
                     expandable={isCurrent && categories.length > 0}
                     open={isOpen}
                     active={activeKey === key}
@@ -617,7 +617,7 @@ function FilterResults({ programId, query }: { programId: number; query: string 
                             className="flex items-start gap-2 rounded-[8px] px-2 py-1.5 transition-colors hover:bg-sidebar-hover focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-hidden"
                             title={name}
                         >
-                            <CourseBadge name={name} seed={course.code} className="mt-px" />
+                            <BookOpen className="mt-0.5 size-4 shrink-0 text-icon" aria-hidden="true" />
                             <span className="min-w-0 flex-1">
                                 <span className="block truncate text-small font-medium text-fg-nav">{name}</span>
                                 <span className="block truncate text-caption text-fg-muted">{trail}</span>

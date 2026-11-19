@@ -10,7 +10,6 @@ import { useFeature } from "@/components/FeaturesContext";
 import ProfessorDiv from "@/components/coursepage/ProfessorDiv";
 import RelatedCourses from "@/components/coursepage/RelatedCourses";
 import ErrorPage from "@/components/error/ErrorPage";
-import CourseBadge from "@/components/layout/CourseBadge";
 import CreateDocumentButton from "@/components/ui/CreateDocumentButton";
 import DownloadButton from "@/components/ui/DownloadButton";
 import CurriculumPageHeader from "@/components/ui/DynamicBreadcrumb";
@@ -19,7 +18,7 @@ import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import { readPreloadedApi, useApi } from "@/hooks/useApi";
 import { Course, CourseComment } from "@/types/entities";
 import { convertToCourse } from "@/utils/convertToEntity";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -120,7 +119,9 @@ export default function CoursePage() {
                         full width of the page instead of sharing it with a properties column. */}
                     <div className="flex flex-wrap items-start gap-x-8 gap-y-4">
                         <div className="flex min-w-0 flex-1 basis-[26rem] items-start gap-3.5">
-                            <CourseBadge name={courseName} seed={course.code} size={40} className="mt-0.5 hidden rounded-card sm:inline-flex" />
+                            <span className="mt-0.5 hidden size-10 shrink-0 place-items-center rounded-card border border-border bg-surface shadow-card sm:grid">
+                                <BookOpen className="size-5 text-icon-strong" strokeWidth={1.75} aria-hidden="true" />
+                            </span>
                             <div className="min-w-0">
                                 <h1 className="vtk-page-title">{courseName}</h1>
                                 <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-body text-fg-muted">
