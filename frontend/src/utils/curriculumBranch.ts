@@ -41,15 +41,25 @@ export function recallBranch(courseId: number): number | null {
 
 /**
  * Which of a course's placements to show: the branch the reader walked earlier in this tab if
- * one of them matches, otherwise simply the first.
+ * one of them matches, otherwise a placement in one of their favourited programmes, otherwise
+ * simply the first.
  */
-export function selectPath(paths: CurriculumPath[], courseId: number): CurriculumPath | null {
+export function selectPath(
+    paths: CurriculumPath[],
+    courseId: number,
+    favoriteProgramIds?: readonly number[],
+): CurriculumPath | null {
     if (paths.length === 0) return null;
 
     const remembered = recallBranch(courseId);
     if (remembered !== null) {
         const previous = paths.find((path) => path.modules.some((module) => module.id === remembered));
         if (previous) return previous;
+    }
+
+    if (favoriteProgramIds && favoriteProgramIds.length > 0) {
+        const favorite = paths.find((path) => favoriteProgramIds.includes(path.program.id));
+        if (favorite) return favorite;
     }
 
     return paths[0];
