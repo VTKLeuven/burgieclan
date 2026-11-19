@@ -355,6 +355,14 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 28px 16px 64px;
+    /* A page settles in as it replaces its skeleton (see page-in). */
+    animation: vtk-rise-in 200ms var(--ease-out) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .vtk-shell {
+      animation: vtk-fade-in 120ms linear both;
+    }
   }
 
   @media (min-width: 768px) {
@@ -1003,6 +1011,45 @@
 @utility scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: var(--color-neutral-300) transparent;
+}
+
+/* Loading and arrival. A skeleton waits a moment before it shows, so a fast load never flashes
+   one for a single frame, then breathes gently; the page that replaces it fades in rather than
+   snapping into place. */
+@keyframes vtk-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes vtk-rise-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes vtk-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+@utility skeleton-in {
+  animation: vtk-fade-in 220ms var(--ease-out) 140ms both;
+}
+
+@utility skeleton-bone {
+  display: block;
+  border-radius: 6px;
+  background: var(--color-neutral-150);
+  animation: vtk-breathe 1.6s ease-in-out infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@utility page-in {
+  animation: vtk-rise-in 200ms var(--ease-out) both;
+  @media (prefers-reduced-motion: reduce) {
+    animation: vtk-fade-in 120ms linear both;
+  }
 }
 
 /* Row actions that only show while their row is hovered or focused, so long lists stay quiet. */

@@ -4,8 +4,8 @@
  * The bare page renderer: a PDF drawn at whatever width the caller asks for, a chunk at a time.
  */
 
+import { PdfPageSkeleton } from '@/components/loading/LoadingPage';
 import { useDocumentFileUrl } from '@/hooks/useDocumentFileUrl';
-import { LoaderCircle } from 'lucide-react';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -217,11 +217,7 @@ export default function PDFPages({ documentId, width, pageAspect = 1.414, onDocu
         }
     }
 
-    const spinner = (
-        <div className="flex h-96 w-full items-center justify-center p-8">
-            <LoaderCircle className="animate-spin text-vtk-navy" size={40} strokeWidth={2.5} aria-label={t('document.loading')} />
-        </div>
-    );
+    const spinner = <PdfPageSkeleton />;
     const errorMessage = (
         <div className="vtk-empty flex h-96 w-full items-center justify-center p-8">
             {t('document.preview-error')}

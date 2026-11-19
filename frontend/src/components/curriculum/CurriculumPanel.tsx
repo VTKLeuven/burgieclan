@@ -4,6 +4,7 @@ import { useCurriculumLocation } from '@/components/curriculum/CurriculumLocatio
 import { curriculumHref } from '@/components/curriculum/curriculumLinks';
 import ResizeHandle from '@/components/layout/ResizeHandle';
 import SlideColumn from '@/components/layout/SlideColumn';
+import { TreeSkeleton } from '@/components/loading/LoadingPage';
 import { useCurriculumPanel, useSidebarPanel, type PanelState } from '@/components/layout/ShellPanels';
 import ShowSidebarButton from '@/components/layout/ShowSidebarButton';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
@@ -394,11 +395,7 @@ function ProgramTree({ programId }: { programId: number }) {
 
     const modules = programModules[programId];
     if (!modules) {
-        return (
-            <div className="flex justify-center py-6">
-                <LoaderCircle className="size-4 animate-spin text-icon" aria-hidden="true" />
-            </div>
-        );
+        return <TreeSkeleton />;
     }
 
     if (modules.length === 0) {
@@ -616,11 +613,7 @@ function FilterResults({ programId, query }: { programId: number; query: string 
     }
 
     if (!tree) {
-        return (
-            <div className="flex justify-center py-6">
-                <LoaderCircle className="size-4 animate-spin text-icon" aria-hidden="true" />
-            </div>
-        );
+        return <TreeSkeleton />;
     }
 
     if (hits.length === 0) {

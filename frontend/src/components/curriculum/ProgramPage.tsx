@@ -50,7 +50,7 @@ export default function ProgramPage({ id }: { id: number }) {
     const header = (actions?: React.ReactNode) => <CurriculumPageHeader actions={actions} />;
 
     if (error) return <ErrorPage status={error.status} detail={error.message} />;
-    if (loading || !program) return <>{header()}<Loading /></>;
+    if (loading || !program) return <>{header()}<Loading variant="list" /></>;
 
     const moduleCount = program.modules?.length ?? 0;
 

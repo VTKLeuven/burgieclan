@@ -81,7 +81,7 @@ export default function CourseDocumentsContent({ courseId, categoryId }: CourseD
         return (
             <>
                 <CurriculumPageHeader />
-                <Loading />
+                <Loading variant="list" />
             </>
         );
     }

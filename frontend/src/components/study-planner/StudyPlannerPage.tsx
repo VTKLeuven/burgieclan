@@ -103,7 +103,7 @@ export default function StudyPlannerPage() {
         return (
             <>
                 {header}
-                <Loading />
+                <Loading variant="planner" />
             </>
         );
     }

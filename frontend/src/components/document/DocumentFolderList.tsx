@@ -1,9 +1,10 @@
 'use client';
 
+import { TreeSkeleton } from '@/components/loading/LoadingPage';
 import SectionHeader from '@/components/ui/SectionHeader';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import type { Course, Document, DocumentCategory } from '@/types/entities';
-import { FileText, FolderOpen, LoaderCircle } from 'lucide-react';
+import { FileText, FolderOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 /** How many neighbours to show around the open document before the list points to the folder. */
@@ -58,9 +59,7 @@ export default function DocumentFolderList({
             />
 
             {loading && documents.length === 0 ? (
-                <div className="flex justify-center py-4">
-                    <LoaderCircle className="animate-spin text-icon" size={16} />
-                </div>
+                <TreeSkeleton rows={4} />
             ) : documents.length === 0 ? (
                 <p className="m-0 text-small text-fg-muted">{t('sidebar.no_documents_in_folder')}</p>
             ) : (

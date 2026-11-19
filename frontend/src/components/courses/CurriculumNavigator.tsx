@@ -121,7 +121,7 @@ export default function CurriculumNavigator() {
   const header = <PageHeader crumbs={[{ label: t('courses'), icon: <GraduationCap /> }]} />;
 
   if (initialLoading) {
-    return <>{header}<Loading /></>;
+    return <>{header}<Loading variant="list" /></>;
   }
 
   const groups = groupPrograms(programs);

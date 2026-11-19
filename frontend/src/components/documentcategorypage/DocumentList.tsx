@@ -6,7 +6,8 @@ import DownloadButton from '@/components/ui/DownloadButton';
 import Pagination from '@/components/ui/Pagination';
 import useRetrieveDocuments, { DocumentFilters, DocumentSortOptions } from '@/hooks/useRetrieveDocuments';
 import type { Course, Document, DocumentCategory } from '@/types/entities';
-import { LoaderCircle, X } from 'lucide-react';
+import { RowsSkeleton } from '@/components/loading/LoadingPage';
+import { X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -149,9 +150,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEn
 
             <div className="vtk-panel overflow-hidden">
                 {loading ? (
-                    <div className="flex items-center justify-center py-14">
-                        <LoaderCircle className="animate-spin text-icon" size={20} />
-                    </div>
+                    <RowsSkeleton rows={6} className="rounded-none border-0" />
                 ) : documents.length === 0 ? (
                     <p className="vtk-empty m-0">{t('course-page.documents.no-documents')}</p>
                 ) : (

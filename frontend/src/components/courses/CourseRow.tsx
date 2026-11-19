@@ -8,10 +8,9 @@ import type { Course } from '@/types/entities';
 import { convertToCourse } from "@/utils/convertToEntity";
 import { rememberBranch } from '@/utils/curriculumBranch';
 import { captureException } from '@sentry/nextjs';
+import { Bone } from '@/components/loading/LoadingPage';
 import { memo, useEffect, useState } from 'react';
-import Skeleton from 'react-loading-skeleton';
 import { useTranslation } from 'react-i18next';
-import 'react-loading-skeleton/dist/skeleton.css';
 import { courseTitle } from '@/utils/courseName';
 
 interface CourseRowProps {
@@ -77,11 +76,11 @@ export const CourseRow = memo(({
 
     // Render the row structure, using either real data or skeletons
     const content = loading || !course ? {
-        name: <Skeleton />,
-        code: <Skeleton />,
-        credits: <Skeleton />,
-        semesters: <Skeleton circle width={16} height={16} />,
-        professor: <Skeleton circle width={24} height={24} />
+        name: <Bone className="h-3.5 w-3/5" />,
+        code: <Bone className="h-3.5 w-14" />,
+        credits: <Bone className="h-3.5 w-6" />,
+        semesters: <Bone className="size-4 rounded-full" />,
+        professor: <Bone className="size-6 rounded-full" />
     } : {
         name: courseTitle(course),
         code: course.code,
@@ -106,7 +105,7 @@ export const CourseRow = memo(({
         <div role="row" className={`group/row flex min-h-12 items-center gap-3 py-1.5 pr-2 pl-3 transition-colors hover:bg-surface-hover ${highlightMatch ? 'bg-surface-selected' : ''}`}>
             <div role="cell" className="flex w-8 shrink-0 justify-center">
                 {loading || !course ? (
-                    <Skeleton circle width={16} height={16} />
+                    <Bone className="size-4 rounded-full" />
                 ) : (
                     <FavoriteButton itemId={course.id} itemType="course" size={16} className="vtk-icon-button size-7" />
                 )}

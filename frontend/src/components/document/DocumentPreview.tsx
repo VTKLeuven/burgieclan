@@ -123,13 +123,12 @@ export default function DocumentPreview({ id }: { id: string }) {
 
     const header = <CurriculumPageHeader />;
 
-    if (loading) return <>{header}<LoadingPage /></>;
-
     if (error) {
         return <ErrorPage status={error.status} detail={error.message} />;
     }
 
-    if (!document) return null;
+    // Also before the first request has started: a blank panel for that frame read as a glitch.
+    if (loading || !document) return <>{header}<LoadingPage variant="document" /></>;
 
     // Which types render in-browser lives in one place now, shared with the document rows
     // and kept in step with the backend list that decides what ?inline=1 actually serves.
@@ -193,7 +192,7 @@ export default function DocumentPreview({ id }: { id: string }) {
         <>
             {header}
 
-            <div ref={previewLayoutRef} className="relative flex flex-1">
+            <div ref={previewLayoutRef} className="page-in relative flex flex-1">
                 {/* The fold sits on the aside's own edge, halfway down the screen, rather than in
                     the header where nothing tied it to the column it hides. A zero-width rail as
                     tall as the page carries it, so the tab stays in view while the page scrolls. */}

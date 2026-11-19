@@ -63,7 +63,7 @@ export default function AccountPage() {
     const header = <PageHeader crumbs={[{ label: t('shell.my_account'), icon: <UserRound /> }]} />;
 
     if (loading || !user) {
-        return <>{header}<Loading /></>;
+        return <>{header}<Loading variant="list" /></>;
     }
 
     const favoriteCourses = user.favoriteCourses || [];

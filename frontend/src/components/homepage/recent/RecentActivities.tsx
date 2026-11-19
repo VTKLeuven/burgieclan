@@ -37,7 +37,7 @@ export const RecentActivities = () => {
 
     const renderContent = () => {
         if (loading && documentViews.length === 0) {
-            return <Loading />;
+            return <Loading compact />;
         }
 
         if ((error || documentViews.length === 0) && !loading) {

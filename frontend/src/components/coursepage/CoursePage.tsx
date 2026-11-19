@@ -90,7 +90,7 @@ export default function CoursePage() {
         return (
             <>
                 <CurriculumPageHeader />
-                <Loading />
+                <Loading variant="course" />
             </>
         );
     }
@@ -113,7 +113,7 @@ export default function CoursePage() {
                 }
             />
 
-            <div className="min-w-0 flex-1 px-4 pt-7 pb-16 md:px-8">
+            <div className="page-in min-w-0 flex-1 px-4 pt-7 pb-16 md:px-8">
                 <div className="mx-auto max-w-[960px]">
                     {/* Every fact about the course sits under its name, so the documents get the
                         full width of the page instead of sharing it with a properties column. */}

@@ -49,7 +49,7 @@ export default function ModulePage({ id }: { id: number }) {
     const header = (actions?: React.ReactNode) => <CurriculumPageHeader actions={actions} />;
 
     if (error) return <ErrorPage status={error.status} detail={error.message} />;
-    if (loading || !module) return <>{header()}<Loading /></>;
+    if (loading || !module) return <>{header()}<Loading variant="list" /></>;
 
     const courseCount = module.courses?.length ?? 0;
     const groupCount = module.modules?.length ?? 0;
