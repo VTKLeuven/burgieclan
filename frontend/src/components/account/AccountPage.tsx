@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { courseTitle } from '@/utils/courseName';
 
-const mapCoursesToItems = (courses: Course[], locale: string) => {
+const mapCoursesToItems = (courses: Course[]) => {
     return courses.map(course => ({
         id: course.id,
         name: courseTitle(course),
@@ -56,7 +56,7 @@ type Tab = 'documents' | 'favorites' | 'settings';
 
 export default function AccountPage() {
     const { user, loading } = useUser();
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const router = useRouter();
     const [tab, setTab] = useState<Tab>('documents');
 
@@ -126,7 +126,7 @@ export default function AccountPage() {
                         <div className="grid gap-8 md:grid-cols-2">
                             <FavoriteList
                                 title={t('account.favorite.courses')}
-                                items={mapCoursesToItems(favoriteCourses, i18n.language)}
+                                items={mapCoursesToItems(favoriteCourses)}
                                 emptyMessage={t('account.favorite.no_courses')}
                             />
                             <FavoriteList

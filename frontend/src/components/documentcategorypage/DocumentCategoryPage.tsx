@@ -7,7 +7,6 @@ import CurriculumPageHeader from "@/components/ui/DynamicBreadcrumb";
 import type { Course, DocumentCategory } from "@/types/entities";
 import { courseTitle } from '@/utils/courseName';
 import Link from "next/link";
-import { useTranslation } from 'react-i18next';
 
 interface DocumentCategoryPageProps {
     category: DocumentCategory;
@@ -20,7 +19,6 @@ interface DocumentCategoryPageProps {
  * top, then every document as a row.
  */
 export default function DocumentCategoryPage({ category, course }: DocumentCategoryPageProps) {
-    const { i18n } = useTranslation();
     const courseName = courseTitle(course);
 
     return (

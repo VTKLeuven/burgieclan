@@ -22,7 +22,7 @@ export default function ItemForm({
     onSubmit: (input: StudyPlannerItemInput) => void;
     onCancel: () => void;
 }) {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const id = useId();
     const [subject, setSubject] = useState(initial?.subject ?? subjects[0]?.key ?? '');
     const [kind, setKind] = useState<StudyPlannerItemKind>(initial?.kind ?? 'deadline');

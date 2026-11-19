@@ -39,7 +39,7 @@ export default function SearchResult({ mainResult, extraInfo, redirect, apiEndpo
 }
 
 export function CourseSearchResult({ course }: { course: Course }) {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     return <SearchResult mainResult={courseTitle(course) || course.name || course.code || `${t('curriculum-navigator.course', { defaultValue: 'Vak' })} #${course.id}`} extraInfo={course.code}
         redirect={curriculumHref.course(course)} apiEndpoint={`/api/courses/${course.id}`} />
 }
@@ -66,7 +66,7 @@ export function DocumentSearchResult({ document }: { document: Document }) {
  * the exam at the question (#q-{uid}), which the exam page scrolls to and highlights.
  */
 export function ExamQuestionSearchResult({ hit }: { hit: ExamQuestionSearchHit }) {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const router = useRouter();
     const page = `/course/${hit.course.id}/exams/${hit.examId}`;
     const course = courseTitle(hit.course) || hit.course.code;

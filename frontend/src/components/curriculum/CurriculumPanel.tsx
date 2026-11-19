@@ -559,7 +559,7 @@ function FolderDocuments({
 
 /** Courses anywhere in the programme whose name or code contains the query. */
 function FilterResults({ programId, query }: { programId: number; query: string }) {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const { request } = useApi<HydraCollection<unknown>>();
     const [tree, setTree] = useState<Program[] | null>(null);
     const [failed, setFailed] = useState(false);

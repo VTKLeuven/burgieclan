@@ -40,7 +40,7 @@ function writeDismissed(ids: number[]) {
  * the reconstructions are still open. Closing one is remembered in this browser only.
  */
 export const ExamPrompt = () => {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const { user } = useUser();
     const { request } = useApi<HydraCollection<unknown>>();
     // Kept with the query it answers, so a stale answer never shows for other favourites.

@@ -92,7 +92,7 @@ export function CourseList({
     onCourse: (key: string) => void;
     onSelect: (uid: string) => void;
 }) {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const ratio = useRatio();
     return (
         <div className="grid gap-5 md:grid-cols-[272px_minmax(0,1fr)] md:gap-6">
@@ -145,7 +145,7 @@ export function CourseList({
 }
 
 function CourseDetail({ row, api, onSelect }: { row: CourseRow; api: PlannerApi; onSelect: (uid: string) => void }) {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const sections = TONES.map((tone) => {
         const sessions = row.sessions.filter((s) => s.tone === tone);
         const types = [...new Set(sessions.map((s) => s.event.type))];

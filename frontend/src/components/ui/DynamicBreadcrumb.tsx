@@ -24,7 +24,7 @@ const MAX_MODULES = 2;
  * the sidebar already links there. Only when the programme is unknown does it stand in.
  */
 export function useCurriculumCrumbs(): Crumb[] {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const { activePath, course, category, document: currentDocument } = useCurriculumLocation();
 
     const crumbs: Crumb[] = [];

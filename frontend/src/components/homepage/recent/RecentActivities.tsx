@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 const MAX_ACTIVITIES = 6;
 
 export const RecentActivities = () => {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const { request, loading, error } = useApi<HydraCollection<unknown>>();
     const [documentViews, setDocumentViews] = useState<DocumentView[]>(() => {
         const preloaded = readPreloadedApi('/api/document_views') as HydraCollection<unknown> | undefined;

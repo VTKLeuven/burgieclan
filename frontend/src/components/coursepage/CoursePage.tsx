@@ -36,7 +36,7 @@ export default function CoursePage() {
         const preloaded = readPreloadedApi(endpoint);
         return preloaded ? convertToCourse(preloaded) : null;
     });
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const examsEnabled = useFeature('exam_reconstructions');
     const { request, loading, error } = useApi();
 
