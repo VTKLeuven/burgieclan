@@ -5,6 +5,12 @@ import type { FuseResult } from 'fuse.js';
 import { FuseBudgetSearch } from './fuseBudgetSearch';
 import { courseNameVariants } from '@/utils/courseName';
 
+/**
+ * Course fields the fuzzy search looks in: both KU Leuven titles besides the one shown, so a typo
+ * in "distribted systems" still finds a course shown under its Dutch title, and vice versa.
+ */
+const COURSE_KEYS = ['name', 'nameNl', 'nameEn', 'code'];
+
 // Persistent budget-aware Fuse instances
 let coursesBudgetFuse: FuseBudgetSearch<Course> | null = null;
 let modulesBudgetFuse: FuseBudgetSearch<Module> | null = null;
@@ -37,7 +43,7 @@ export function initializeFuseInstances(
 
   try {
     coursesBudgetFuse = new FuseBudgetSearch(courses, {
-      keys: ['name', 'code'],
+      keys: COURSE_KEYS,
       ignoreLocation: true,
     }, SEARCH_CONFIG);
 
@@ -130,7 +136,7 @@ export function courseMatchesText(course: Course, searchQuery?: string): boolean
   // Fallback to individual search
   const searchableItems = [course];
   const tempFuse = new FuseBudgetSearch(searchableItems, {
-    keys: ['name', 'code'],
+    keys: COURSE_KEYS,
     ignoreLocation: true,
   }, SEARCH_CONFIG);
 
@@ -246,7 +252,7 @@ export function getMatchingCourses(
   try {
     // Create temporary instance for this specific search
     const tempFuse = new FuseBudgetSearch(courses, {
-      keys: ['name', 'code'],
+      keys: COURSE_KEYS,
       ignoreLocation: true,
     }, SEARCH_CONFIG);
 
@@ -294,7 +300,7 @@ export function searchWithAnalytics(
     // Create temporary instances with the desired config for analytics
     if (originalCourses.length > 0) {
       const tempCoursesFuse = new FuseBudgetSearch(originalCourses, {
-        keys: ['name', 'code'],
+        keys: COURSE_KEYS,
         ignoreLocation: true,
       }, SEARCH_CONFIG);
       coursesAnalytics = tempCoursesFuse.searchWithDiagnostics(query);
