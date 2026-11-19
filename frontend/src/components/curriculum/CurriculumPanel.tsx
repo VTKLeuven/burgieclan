@@ -646,7 +646,7 @@ function FilterResults({ programId, query }: { programId: number; query: string 
                             <span className="min-w-0 flex-1">
                                 <span className="block truncate text-small font-medium text-fg-nav">{name}</span>
                                 {alt && (
-                                    <span className="block truncate text-caption text-fg-muted">
+                                    <span className="block truncate text-micro text-fg-muted">
                                         · {t('search.also_known_as', { title: alt })}
                                     </span>
                                 )}

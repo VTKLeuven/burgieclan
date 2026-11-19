@@ -65,7 +65,7 @@ export default function CurriculumSearchResults({ hits, query }: { hits: CourseH
                             >
                                 {courseTitle(course)}
                                 {alt && (
-                                    <span className="ml-1.5 font-normal text-small text-fg-muted">
+                                    <span className="ml-1.5 font-normal text-caption text-fg-muted">
                                         · {t('search.also_known_as', { title: alt })}
                                     </span>
                                 )}

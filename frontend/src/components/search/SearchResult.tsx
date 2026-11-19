@@ -33,7 +33,7 @@ export default function SearchResult({ mainResult, subtitle, extraInfo, redirect
             <span className="min-w-0 truncate">
                 {mainResult}
                 {subtitle && (
-                    <span className={clsx('ml-1.5 text-small', focus ? 'text-fg-secondary' : 'text-fg-muted')}>
+                    <span className={clsx('ml-1.5 text-caption', focus ? 'text-fg-secondary' : 'text-fg-muted')}>
                         · {subtitle}
                     </span>
                 )}

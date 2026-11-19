@@ -198,107 +198,134 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEn
     const ownIsEmpty = ownTotal === 0;
     const autoOpenOlder = ownTotal !== null && ownTotal < AUTO_OPEN_OLDER_THRESHOLD;
 
-    return (
-        <section aria-label={t('course-page.documents.header')}>
-            {/* Toolbar: filter and sort on the left, the selection's own actions on the right. */}
-            <div className="mb-3 flex min-h-8 flex-wrap items-center gap-2">
-                <DocumentFilter
-                    filters={filters}
-                    onFilterChange={handleFilterChange}
-                    onClearFilters={handleClearFilters}
-                    course={course}
-                    category={category}
-                />
-                <DocumentSort currentSort={sort} onSortChange={handleSortChange} />
-
-                {topTags.length > 0 && (
-                    <div
-                        className="flex flex-wrap items-center gap-1.5"
-                        role="group"
-                        aria-label={t('course-page.documents.filter-by-tag')}
-                    >
-                        {hasActiveTagFilter && (
-                            <button
-                                type="button"
-                                onClick={handleResetTagChips}
-                                className="inline-flex h-7 items-center rounded-[7px] border border-border-strong bg-surface-muted px-2.5 text-small font-medium text-fg-muted transition-colors hover:bg-surface-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus"
-                            >
-                                {t('course-page.documents.all-tags')}
-                            </button>
-                        )}
-                        {topTags.map((tag) => {
-                            const active = activeTagIds.includes(tag.id);
-                            return (
-                                <button
-                                    key={tag.id}
-                                    type="button"
-                                    aria-pressed={active}
-                                    onClick={() => handleToggleTagChip(tag.id)}
-                                    className={`inline-flex h-7 items-center rounded-[7px] border px-2.5 text-small font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus ${
-                                        active
-                                            ? 'border-info-border bg-info-bg text-info-text hover:bg-sky-100'
-                                            : 'border-border bg-surface text-fg-secondary hover:border-border-strong hover:bg-surface-hover hover:text-fg'
-                                    }`}
-                                >
-                                    {tag.name}
-                                </button>
-                            );
-                        })}
-                    </div>
-                )}
-
-                {selectedDocuments.length > 0 && (
-                    <div className="ml-auto flex items-center gap-1.5">
-                        <span className="text-small text-fg-muted">
-                            {t('course-page.documents.selected', { amount: selectedDocuments.length })}
-                        </span>
-                        <DownloadButton documents={selectedDocuments} size={16} showText={true} className="vtk-button-sm" />
-                        <button
-                            type="button"
-                            onClick={() => setSelectedDocuments([])}
-                            className="vtk-icon-button"
-                            title={t('course-page.documents.clear-selection')}
-                            aria-label={t('course-page.documents.clear-selection')}
-                        >
-                            <X size={16} />
-                        </button>
-                    </div>
-                )}
-                {toolbarEnd && (
-                    <div className={selectedDocuments.length > 0 ? 'flex items-center' : 'ml-auto flex items-center'}>
-                        {toolbarEnd}
-                    </div>
-                )}
-            </div>
-
-            {courseParts.length > 0 && (
-                <div
-                    className="vtk-tabs mb-3 max-w-full overflow-x-auto"
-                    role="tablist"
-                    aria-label={t('course-page.documents.filter-by-part')}
-                >
+    const toolbarActions = (
+        <>
+            {selectedDocuments.length > 0 && (
+                <div className="ml-auto flex items-center gap-1.5">
+                    <span className="text-small text-fg-muted">
+                        {t('course-page.documents.selected', { amount: selectedDocuments.length })}
+                    </span>
+                    <DownloadButton documents={selectedDocuments} size={16} showText={true} className="vtk-button-sm" />
                     <button
                         type="button"
-                        role="tab"
-                        aria-selected={activePart === null}
-                        onClick={() => handlePartChange(null)}
-                        className="vtk-tab shrink-0"
+                        onClick={() => setSelectedDocuments([])}
+                        className="vtk-icon-button"
+                        title={t('course-page.documents.clear-selection')}
+                        aria-label={t('course-page.documents.clear-selection')}
                     >
-                        {t('course-page.documents.all-parts')}
+                        <X size={16} />
                     </button>
-                    {courseParts.map((part) => (
-                        <button
-                            key={part}
-                            type="button"
-                            role="tab"
-                            aria-selected={activePart === part}
-                            onClick={() => handlePartChange(part)}
-                            className="vtk-tab shrink-0"
-                        >
-                            {part}
-                        </button>
-                    ))}
                 </div>
+            )}
+            {toolbarEnd && (
+                <div className={selectedDocuments.length > 0 ? 'flex items-center' : 'ml-auto flex items-center'}>
+                    {toolbarEnd}
+                </div>
+            )}
+        </>
+    );
+
+    const tagChips = topTags.length > 0 && (
+        <div
+            className="flex flex-wrap items-center gap-1.5"
+            role="group"
+            aria-label={t('course-page.documents.filter-by-tag')}
+        >
+            {hasActiveTagFilter && (
+                <button
+                    type="button"
+                    onClick={handleResetTagChips}
+                    className="inline-flex h-7 items-center rounded-[7px] border border-border-strong bg-surface-muted px-2.5 text-small font-medium text-fg-muted transition-colors hover:bg-surface-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus"
+                >
+                    {t('course-page.documents.all-tags')}
+                </button>
+            )}
+            {topTags.map((tag) => {
+                const active = activeTagIds.includes(tag.id);
+                return (
+                    <button
+                        key={tag.id}
+                        type="button"
+                        aria-pressed={active}
+                        onClick={() => handleToggleTagChip(tag.id)}
+                        className={`inline-flex h-7 items-center rounded-[7px] border px-2.5 text-small font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus ${
+                            active
+                                ? 'border-info-border bg-info-bg text-info-text hover:bg-sky-100'
+                                : 'border-border bg-surface text-fg-secondary hover:border-border-strong hover:bg-surface-hover hover:text-fg'
+                        }`}
+                    >
+                        {tag.name}
+                    </button>
+                );
+            })}
+        </div>
+    );
+
+    return (
+        <section aria-label={t('course-page.documents.header')}>
+            {courseParts.length > 0 ? (
+                <>
+                    {/* Row 1: primary part switcher on the left, selection + "open as page" anchored on the right. */}
+                    <div className="mb-2.5 flex min-h-8 flex-wrap items-center gap-2">
+                        <div
+                            className="vtk-tabs max-w-full overflow-x-auto"
+                            role="tablist"
+                            aria-label={t('course-page.documents.filter-by-part')}
+                        >
+                            <button
+                                type="button"
+                                role="tab"
+                                aria-selected={activePart === null}
+                                onClick={() => handlePartChange(null)}
+                                className="vtk-tab shrink-0"
+                            >
+                                {t('course-page.documents.all-parts')}
+                            </button>
+                            {courseParts.map((part) => (
+                                <button
+                                    key={part}
+                                    type="button"
+                                    role="tab"
+                                    aria-selected={activePart === part}
+                                    onClick={() => handlePartChange(part)}
+                                    className="vtk-tab shrink-0"
+                                >
+                                    {part}
+                                </button>
+                            ))}
+                        </div>
+                        {toolbarActions}
+                    </div>
+
+                    {/* Row 2: filter, sort, and dynamic tag chips wrap freely without pushing actions down. */}
+                    <div className="mb-3 flex min-h-8 flex-wrap items-center gap-2">
+                        <DocumentFilter
+                            filters={filters}
+                            onFilterChange={handleFilterChange}
+                            onClearFilters={handleClearFilters}
+                            course={course}
+                            category={category}
+                        />
+                        <DocumentSort currentSort={sort} onSortChange={handleSortChange} />
+                        {tagChips}
+                    </div>
+                </>
+            ) : (
+                <>
+                    {/* Row 1: filter & sort on the left, selection + "open as page" anchored on the right. */}
+                    <div className={`flex min-h-8 flex-wrap items-center gap-2 ${tagChips ? 'mb-2' : 'mb-3'}`}>
+                        <DocumentFilter
+                            filters={filters}
+                            onFilterChange={handleFilterChange}
+                            onClearFilters={handleClearFilters}
+                            course={course}
+                            category={category}
+                        />
+                        <DocumentSort currentSort={sort} onSortChange={handleSortChange} />
+                        {toolbarActions}
+                    </div>
+                    {tagChips && <div className="mb-3">{tagChips}</div>}
+                </>
             )}
 
             <div className="flex flex-col gap-3">
