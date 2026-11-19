@@ -1019,6 +1019,17 @@
   }
 }
 
+/* The other half of reveal-on-hover: what steps aside so a row's actions can take its place.
+   Touch screens never hover, so there it simply stays. */
+@utility hide-on-hover {
+  transition: opacity var(--dur-fast) var(--ease-out);
+  @media (hover: hover) {
+    :where(.group\/row:hover, .group\/row:focus-within) & {
+      opacity: 0;
+    }
+  }
+}
+
 @layer utilities {
   /* TipTap editor */
   .tiptap {

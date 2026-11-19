@@ -43,79 +43,77 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
         })
         : null;
 
+    const tagLine = document.tags?.map(tag => tag.name).join(' · ');
+    const uploaderLine = showAuthor ? document.author : uploader;
+
     return (
-        // A Dopl list row: select box, type, name and tags on the left; who and when in muted
-        // text on the right; the row's own actions appear on hover so a long list stays calm.
+        // Two lines, so the name gets the whole width: name on top, tags as quiet text beneath.
+        // On the right, the year (or the date when there is none) above who it came from. A
+        // row's own actions have no column of their own: on hover they take the place of that
+        // year and name, as the select box takes the place of the file type - so nothing is set
+        // aside for buttons a resting list does not show. Touch screens never hover, so there
+        // both stay in the flow instead, beside what they would otherwise cover.
         <div
-            className={`group/row flex min-h-[52px] flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-2 transition-colors sm:flex-nowrap ${isSelected ? 'bg-surface-selected' : 'hover:bg-surface-hover'}`}
+            className={`group/row flex min-h-[52px] items-center gap-3 px-4 py-2 transition-colors ${isSelected ? 'bg-surface-selected' : 'hover:bg-surface-hover'}`}
             key={document.id}
         >
-            <Checkbox
-                label=""
-                checked={isSelected}
-                onChange={() => onToggleSelect(document)}
-                aria-label={t('course-page.documents.select')}
-                className={`my-0 ${isSelected ? '' : 'reveal-on-hover'}`}
-            />
-
-            <span className="inline-flex h-6 w-11 shrink-0 items-center justify-center rounded-[6px] border border-border bg-surface-muted text-micro font-semibold text-fg-muted">
-                {fileType ?? <FileText className="size-3.5" aria-hidden="true" />}
+            <span className="relative flex shrink-0 items-center gap-3">
+                <Checkbox
+                    label=""
+                    checked={isSelected}
+                    onChange={() => onToggleSelect(document)}
+                    aria-label={t('course-page.documents.select')}
+                    className={`absolute left-0 my-0 [@media(hover:none)]:static ${isSelected ? '' : 'reveal-on-hover'}`}
+                />
+                <span className={`inline-flex h-6 w-11 items-center justify-center rounded-[6px] border border-border bg-surface-muted text-micro font-semibold text-fg-muted ${isSelected ? 'opacity-0 [@media(hover:none)]:opacity-100' : 'hide-on-hover'}`}>
+                    {fileType ?? <FileText className="size-3.5" aria-hidden="true" />}
+                </span>
             </span>
 
-            <div className="flex min-w-0 flex-1 basis-[min(100%,14rem)] items-center gap-2">
-                <ApiPrefetchLink
-                    href={`/document/${document.id}`}
-                    apiEndpoints={[
-                        `/api/documents/${document.id}?lang=${i18n.language}`,
-                        `/api/document_comments?document=/api/documents/${document.id}`,
-                    ]}
-                    className="min-w-0 truncate text-body font-medium text-fg hover:underline"
-                    title={document.name}
-                >
-                    {document.name}
-                </ApiPrefetchLink>
-                {document.underReview && (
-                    <Badge text={t('document.under_review')} color="yellow" />
-                )}
-                {document.tags && document.tags.length > 0 && (
-                    <span className="hidden min-w-0 items-center gap-1 md:flex">
-                        {document.tags.slice(0, 3).map(tag => (
-                            <span key={tag.id} className="vtk-badge vtk-badge-muted max-w-36 truncate">{tag.name}</span>
-                        ))}
-                        {document.tags.length > 3 && (
-                            <span className="text-small font-medium text-fg-muted tabular">+{document.tags.length - 3}</span>
-                        )}
-                    </span>
+            <div className="min-w-0 flex-1">
+                <div className="flex min-w-0 items-center gap-2">
+                    <ApiPrefetchLink
+                        href={`/document/${document.id}`}
+                        apiEndpoints={[
+                            `/api/documents/${document.id}?lang=${i18n.language}`,
+                            `/api/document_comments?document=/api/documents/${document.id}`,
+                        ]}
+                        className="min-w-0 truncate text-body font-medium text-fg hover:underline"
+                        title={document.name}
+                    >
+                        {document.name}
+                    </ApiPrefetchLink>
+                    {document.underReview && (
+                        <Badge text={t('document.under_review')} color="yellow" />
+                    )}
+                </div>
+                {tagLine && (
+                    <p className="m-0 truncate text-caption text-fg-muted" title={tagLine}>{tagLine}</p>
                 )}
             </div>
 
-            {/* Migrated archive files carry the original author; for those the uploader is the
-                archive account and says nothing useful, so the author wins the line and the
-                uploader moves into the tooltip. */}
-            <span
-                className="hidden max-w-40 shrink-0 truncate text-small text-fg-muted lg:block"
-                title={showAuthor ? `${t('document.uploaded-by')}: ${uploader}` : undefined}
-            >
-                {showAuthor ? document.author : uploader}
-            </span>
-            {document.year && (
-                <span className="hidden w-[86px] shrink-0 text-right text-small text-fg-muted tabular sm:block">
-                    {document.year}
-                </span>
-            )}
-            {updated && (
-                <span className="hidden w-[86px] shrink-0 text-right text-small text-fg-muted tabular xl:block">
-                    {updated}
-                </span>
-            )}
-
-            <div className="ml-auto flex shrink-0 items-center gap-0.5">
-                <VoteButton type="document" objectId={document.id} size="small" />
-                <span className="reveal-on-hover flex items-center gap-0.5">
+            <div className="relative flex shrink-0 items-center gap-0.5">
+                {/* Migrated archive files carry the original author; for those the uploader is
+                    the archive account and says nothing useful, so the author wins the line and
+                    the uploader moves into the tooltip. */}
+                <div className="hide-on-hover hidden w-[104px] text-right sm:block">
+                    {(document.year || updated) && (
+                        <span className="block truncate text-small text-fg-secondary tabular">
+                            {document.year || updated}
+                        </span>
+                    )}
+                    <span
+                        className="block truncate text-caption text-fg-muted"
+                        title={showAuthor ? `${t('document.uploaded-by')}: ${uploader}` : undefined}
+                    >
+                        {uploaderLine}
+                    </span>
+                </div>
+                <span className="reveal-on-hover absolute inset-y-0 right-0 flex items-center gap-0.5 [@media(hover:none)]:static">
                     <FavoriteButton itemId={document.id} itemType="document" size={16} className="vtk-icon-button" />
                     {/* Checking whether a scan is the right one should not mean putting a file on
                         disk first, so the browser's own viewer sits next to the download. */}
-                    {inlineHref ? (
+                    {inlineHref && (
                         <a
                             href={inlineHref}
                             target="_blank"
@@ -126,12 +124,12 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                         >
                             <ExternalLink size={16} />
                         </a>
-                    ) : (
-                        <span className="size-8 shrink-0" aria-hidden="true" />
                     )}
                     <DownloadButton documents={[document]} size={16} />
                 </span>
             </div>
+
+            <VoteButton type="document" objectId={document.id} size="small" />
         </div>
     );
 };
