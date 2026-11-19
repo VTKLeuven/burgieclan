@@ -1,5 +1,6 @@
 'use client'
 
+import Collapse from '@/components/ui/Collapse';
 import DocumentList from '@/components/documentcategorypage/DocumentList';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import { cn } from '@/lib/utils';
@@ -54,27 +55,26 @@ export default function DocumentCategory({ category, course, count = 0, open, on
                 </span>
             </button>
 
-            {open && (
-                <div id={regionId} role="region" aria-label={category.name} className="border-t border-border bg-surface-muted p-3 sm:p-4">
-                    <DocumentList
-                        course={course}
-                        category={category}
-                        toolbarEnd={
-                            <ApiPrefetchLink
-                                href={href}
-                                apiEndpoints={[
-                                    `/api/courses/${course.id}?summary=true`,
-                                    `/api/document_categories/${category.id}?lang=${i18n.language}`,
-                                ]}
-                                className="inline-flex h-8 items-center gap-1 rounded-control px-2 text-small font-medium text-fg-muted transition-colors hover:bg-neutral-150 hover:text-fg"
-                            >
-                                {t('course-page.open-category')}
-                                <ArrowUpRight className="size-3.5" aria-hidden="true" />
-                            </ApiPrefetchLink>
-                        }
-                    />
-                </div>
-            )}
+            <Collapse open={open} id={regionId} role="region" aria-label={category.name} className="border-t border-border bg-surface-muted p-3 sm:p-4">
+                <DocumentList
+                    course={course}
+                    category={category}
+                    expectedCount={count}
+                    toolbarEnd={
+                        <ApiPrefetchLink
+                            href={href}
+                            apiEndpoints={[
+                                `/api/courses/${course.id}?summary=true`,
+                                `/api/document_categories/${category.id}?lang=${i18n.language}`,
+                            ]}
+                            className="inline-flex h-8 items-center gap-1 rounded-control px-2 text-small font-medium text-fg-muted transition-colors hover:bg-neutral-150 hover:text-fg"
+                        >
+                            {t('course-page.open-category')}
+                            <ArrowUpRight className="size-3.5" aria-hidden="true" />
+                        </ApiPrefetchLink>
+                    }
+                />
+            </Collapse>
         </div>
     );
 }

@@ -16,9 +16,11 @@ interface DocumentListProps {
     category?: DocumentCategory;
     /** Extra controls at the right end of the toolbar, e.g. a link to the folder's own page. */
     toolbarEnd?: React.ReactNode;
+    /** How many documents the folder is known to hold, so the skeleton has the list's height. */
+    expectedCount?: number;
 }
 
-const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEnd }) => {
+const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEnd, expectedCount }) => {
     const [page, setPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(50);
     const [filters, setFilters] = useState<DocumentFilters>({});
@@ -150,7 +152,11 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEn
 
             <div className="vtk-panel overflow-hidden">
                 {loading ? (
-                    <RowsSkeleton rows={6} className="rounded-none border-0" />
+                    <>
+                        {/* The "select all" bar the list opens with, so the skeleton is as tall. */}
+                        <div className="h-10 border-b border-border bg-surface-muted" />
+                        <RowsSkeleton rows={Math.min(Math.max(expectedCount ?? 6, 1), 8)} className="rounded-none border-0" />
+                    </>
                 ) : documents.length === 0 ? (
                     <p className="vtk-empty m-0">{t('course-page.documents.no-documents')}</p>
                 ) : (
