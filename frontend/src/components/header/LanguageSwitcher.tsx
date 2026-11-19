@@ -52,7 +52,7 @@ const LanguageSwitcher = () => {
                     aria-label={locale === 'nl' ? 'Nederlands' : 'English'}
                     disabled={isTransitioning}
                     className={`inline-flex h-6 min-w-8 items-center justify-center rounded-[7px] px-1.5 text-caption font-medium uppercase transition-colors ${currentLocale === locale
-                        ? 'bg-surface text-fg shadow-xs'
+                        ? 'bg-surface text-fg shadow-xs dark:bg-neutral-300'
                         : 'text-fg-muted hover:text-fg'
                         }`}
                 >

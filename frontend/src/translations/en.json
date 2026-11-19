@@ -714,6 +714,10 @@
         }
     },
     "shell": {
+        "theme": "Theme",
+        "theme_light": "Light",
+        "theme_dark": "Dark",
+        "theme_system": "System",
         "my_account": "My account",
         "my_courses": "My courses",
         "favorite_documents": "Favourite documents",

@@ -32,7 +32,7 @@ export function examExtensions({ collaborative }: { collaborative: boolean }): E
             // Several people each adding "a trailing paragraph" at the same time ends up as a
             // pile of empty paragraphs. The gap cursor reaches the space after the last question.
             trailingNode: false,
-            dropcursor: { color: '#0e1a36', width: 2 },
+            dropcursor: { color: 'var(--color-primary)', width: 2 },
         }),
         ExamDocument,
         ExamQuestion,

@@ -112,7 +112,7 @@ export default function AnnouncementSlideShow() {
                     <div className="flex shrink-0 items-center justify-end gap-1.5">
                         <button
                             onClick={handlePrevious}
-                            className="grid size-7 place-items-center rounded-[8px] text-icon transition-colors hover:bg-white/70 hover:text-fg"
+                            className="grid size-7 place-items-center rounded-[8px] text-icon transition-colors hover:bg-surface/70 hover:text-fg"
                             aria-label="Previous announcement"
                         >
                             <ChevronLeft className="h-3.5 w-3.5" />
@@ -134,7 +134,7 @@ export default function AnnouncementSlideShow() {
 
                         <button
                             onClick={handleNext}
-                            className="grid size-7 place-items-center rounded-[8px] text-icon transition-colors hover:bg-white/70 hover:text-fg"
+                            className="grid size-7 place-items-center rounded-[8px] text-icon transition-colors hover:bg-surface/70 hover:text-fg"
                             aria-label="Next announcement"
                         >
                             <ChevronRight className="h-3.5 w-3.5" />

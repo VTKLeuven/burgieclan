@@ -67,6 +67,12 @@
      grey; the sidebar marks its own active item with a navy fill instead. */
   --color-sidebar-hover: #dcdde3;
   --color-sidebar-active: #d4d5dc;
+  /* The sidebar's "you are here" row: the primary navy in light mode, a raised grey in dark. */
+  --color-nav-active: #0f1a36;
+  --color-on-nav-active: #ffffff;
+  /* Page titles are set in the navy; in dark mode plain text, as lavender headings would compete
+     with the one primary button beside them. */
+  --color-page-title: #0f1a36;
   --color-border: #d9dae0;
   --color-border-strong: #c4c5cd;
   /* Edges of fields and outlined buttons: 3:1 on white (WCAG 1.4.11), where border-strong is
@@ -233,6 +239,156 @@
   color-scheme: light;
 }
 
+/*
+ * Dark mode ("Gedimd"): a soft slate rather than black, so long evenings of studying do not glare.
+ * The same token names as above, redefined while <html> carries `.dark` (set before first paint by
+ * the script in the root layout, see components/theme/). Components keep saying `bg-surface` or
+ * `text-fg-muted` and land on these values without a `dark:` variant of their own.
+ *
+ * Navy cannot stay the primary on a dark ground, so buttons take the lavender accent with dark
+ * text; where you are in the sidebar is a raised grey instead. Every text pairing meets WCAG AA
+ * on the surface: fg 11.6:1, fg-muted 6.6:1, link 8.7:1, placeholder 5.3:1, field edges 3.7:1.
+ *
+ * Only the light end of the neutral and sky scales is remapped, because those steps are used as
+ * fills (hover washes, subtle buttons, drop zones). The dark end stays dark: it backs the dialog
+ * overlays and tooltips, which want to stay dark in both themes.
+ */
+:root.dark {
+  color-scheme: dark;
+
+  --color-sky-50: #233243;
+  --color-sky-100: #29405a;
+  --color-sky-200: #345273;
+  --color-sky-300: #45688f;
+  --color-sky-700: #8fcbff;
+
+  --color-neutral-0: #24272e;
+  --color-neutral-25: #262930;
+  --color-neutral-50: #282b32;
+  --color-neutral-100: #2a2d35;
+  --color-neutral-150: #30343d;
+  --color-neutral-200: #363a44;
+  --color-neutral-250: #3c404a;
+  --color-neutral-300: #464b56;
+
+  --color-canvas: #1b1d23;
+  --color-surface: #24272e;
+  --color-surface-muted: #2a2d35;
+  --color-surface-hover: #2f333c;
+  --color-surface-selected: #2c3d52;
+  --color-sidebar-hover: #2a2d35;
+  --color-sidebar-active: #30343d;
+  --color-nav-active: #363a45;
+  --color-on-nav-active: #e1e3e8;
+  --color-page-title: #e1e3e8;
+  --color-border: #383c46;
+  --color-border-strong: #464b56;
+  --color-border-field: #7a7f8c;
+  --color-fg: #e1e3e8;
+  --color-fg-secondary: #c4c7ce;
+  --color-fg-muted: #a8acb6;
+  --color-fg-placeholder: #959aa5;
+  --color-fg-disabled: #7c808b;
+  --color-fg-nav: #d4d6dc;
+  --color-link: #8fcbff;
+  --color-link-underline: #3d5f80;
+  --color-icon: #a8acb6;
+  --color-icon-strong: #c4c7ce;
+
+  --color-primary: #b9b5ff;
+  --color-primary-hover: #cbc8ff;
+  --color-primary-active: #a7a2f5;
+  --color-on-primary: #16161a;
+  --color-focus: #ada8ff;
+
+  --color-danger-text: #fca5a5;
+  --color-danger-bg: rgb(239 68 68 / 0.14);
+  --color-danger-border: rgb(248 113 113 / 0.35);
+  --color-warning-text: #fcd34d;
+  --color-warning-bg: rgb(245 158 11 / 0.14);
+  --color-warning-border: rgb(252 211 77 / 0.3);
+  --color-success-text: #86efac;
+  --color-success-bg: rgb(34 197 94 / 0.14);
+  --color-success-border: rgb(134 239 172 / 0.3);
+  --color-info-text: #8fcbff;
+  --color-info-bg: rgb(49 153 232 / 0.16);
+  --color-info-border: rgb(136 201 254 / 0.3);
+
+  --color-tag-purple-bg: rgb(168 85 247 / 0.16);
+  --color-tag-purple-border: rgb(216 180 254 / 0.3);
+  --color-tag-purple-text: #d8b4fe;
+  --color-tag-blue-bg: rgb(59 130 246 / 0.16);
+  --color-tag-blue-border: rgb(147 197 253 / 0.3);
+  --color-tag-blue-text: #93c5fd;
+  --color-tag-green-bg: rgb(34 197 94 / 0.14);
+  --color-tag-green-border: rgb(134 239 172 / 0.3);
+  --color-tag-green-text: #86efac;
+  --color-tag-amber-bg: rgb(245 158 11 / 0.14);
+  --color-tag-amber-border: rgb(252 211 77 / 0.3);
+  --color-tag-amber-text: #fcd34d;
+  --color-tag-teal-bg: rgb(20 184 166 / 0.14);
+  --color-tag-teal-border: rgb(94 234 212 / 0.28);
+  --color-tag-teal-text: #5eead4;
+  --color-tag-pink-bg: rgb(236 72 153 / 0.14);
+  --color-tag-pink-border: rgb(249 168 212 / 0.3);
+  --color-tag-pink-text: #f9a8d4;
+  --color-tag-orange-bg: rgb(249 115 22 / 0.14);
+  --color-tag-orange-border: rgb(253 186 116 / 0.3);
+  --color-tag-orange-text: #fdba74;
+  --color-tag-grey-bg: #2f333c;
+  --color-tag-grey-border: #464b56;
+  --color-tag-grey-text: #c4c7ce;
+
+  --color-plan-lecture-bg: #2d3347;
+  --color-plan-lecture-border: #434c69;
+  --color-plan-lecture-text: #c7cff0;
+  --color-plan-lecture-fill: #56649a;
+  --color-plan-practice-bg: #263632;
+  --color-plan-practice-border: #3b5a54;
+  --color-plan-practice-text: #a9d8cf;
+  --color-plan-practice-fill: #3f7a71;
+  --color-plan-other-bg: #2e3138;
+  --color-plan-other-border: #464b56;
+  --color-plan-other-text: #c4c7ce;
+  --color-plan-other-fill: #6b6f7d;
+
+  /* Legacy names. `vtk-ink` was the darkest text and `vtk-paper` the canvas, so a chip that
+     paints `bg-vtk-ink text-vtk-paper` simply inverts and still reads. */
+  --color-vtk-ink: #e1e3e8;
+  --color-vtk-navy: #b9b5ff;
+  --color-vtk-blue: #b9b5ff;
+  --color-vtk-blue-dark: #a7a2f5;
+  --color-vtk-blue-light: #cbc8ff;
+  --color-vtk-blue-soft: #2f333c;
+  --color-vtk-blue-muted: #2a2d35;
+  --color-vtk-paper: #1b1d23;
+  --color-vtk-paper-2: #2f333c;
+  --color-vtk-surface: #24272e;
+  --color-vtk-surface-elevated: #2a2d35;
+  --color-vtk-muted: #a8acb6;
+  --color-vtk-body: #c4c7ce;
+  --color-vtk-line: #383c46;
+  --color-vtk-line-2: #464b56;
+
+  /* On a dark ground a faint shadow vanishes; floating layers need a deeper one to lift off. */
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.2);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.2), 0 1px 1px rgb(0 0 0 / 0.12);
+  --shadow-popover: 0 8px 24px -6px rgb(0 0 0 / 0.45), 0 2px 6px -2px rgb(0 0 0 / 0.3);
+  --shadow-dialog: 0 24px 64px -12px rgb(0 0 0 / 0.6), 0 4px 12px -4px rgb(0 0 0 / 0.35);
+
+  --ink: #e1e3e8;
+  --navy: #b9b5ff;
+  --paper: #1b1d23;
+  --paper-2: #2f333c;
+  --surface: #24272e;
+  --line: #383c46;
+  --line-2: #464b56;
+  --muted: #a8acb6;
+  --body: #c4c7ce;
+  --accent: #ada8ff;
+  --danger: #fca5a5;
+}
+
 @layer base {
   *,
   ::after,
@@ -395,7 +551,7 @@
   .vtk-page-title {
     margin: 0;
     min-width: 0;
-    color: var(--color-primary);
+    color: var(--color-page-title);
     font-size: 24px;
     line-height: 32px;
     letter-spacing: -0.015em;
@@ -545,7 +701,7 @@
   .vtk-button-primary svg,
   .primary-button svg,
   .vtk-button-accent svg {
-    color: rgb(255 255 255 / 0.8);
+    color: color-mix(in srgb, var(--color-on-primary) 80%, transparent);
   }
 
   .vtk-button-primary:hover:not(:disabled),

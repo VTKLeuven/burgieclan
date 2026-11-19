@@ -4,6 +4,7 @@ import { recordOldBurgieclanClick } from '@/actions/analytics';
 import { logOut } from '@/actions/auth';
 import FeedbackDialog from '@/components/header/FeedbackDialog';
 import LanguageSwitcher from '@/components/header/LanguageSwitcher';
+import ThemeSwitcher from '@/components/theme/ThemeSwitcher';
 import { useCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import { openSearch } from '@/components/layout/navEvents';
 import {
@@ -32,6 +33,7 @@ import {
     LogOut,
     MessageSquareText,
     PanelLeftClose,
+    Palette,
     Search,
     Shield,
     UserRound,
@@ -85,9 +87,10 @@ function NavItem({
                 'group flex h-7 items-center gap-2.5 rounded-control px-2.5 text-small font-medium text-fg-nav',
                 'transition-colors duration-[var(--dur-fast)] ease-out',
                 '[&_svg]:size-4 [&_svg]:shrink-0',
-                // Navy marks where you are, the same navy as the primary button.
+                // Navy marks where you are, the same navy as the primary button; in dark mode a
+                // raised grey, since the lavender primary would shout on every page.
                 active
-                    ? 'bg-primary text-on-primary [&_svg]:text-on-primary/80'
+                    ? 'bg-nav-active text-on-nav-active [&_svg]:text-on-nav-active/80'
                     : '[&_svg]:text-icon-strong hover:bg-sidebar-hover',
             )}
         >
@@ -126,7 +129,16 @@ export function SidebarBrand() {
                 aria-hidden="true"
                 width={52}
                 height={29}
-                className="h-[26px] w-auto shrink-0"
+                className="h-[26px] w-auto shrink-0 dark:hidden"
+                priority
+            />
+            <Image
+                src="/images/logos/burgieclan-cloud-white.svg"
+                alt=""
+                aria-hidden="true"
+                width={52}
+                height={29}
+                className="hidden h-[26px] w-auto shrink-0 dark:block"
                 priority
             />
             <span className="truncate text-[20px] leading-7 font-semibold tracking-[-0.02em] text-fg">Burgieclan</span>
@@ -289,7 +301,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                                                 active={active}
                                                 onNavigate={onNavigate}
                                                 trailing={
-                                                    <span className="text-caption font-medium text-fg-muted tabular opacity-0 transition-opacity group-hover:opacity-100 group-aria-[current=page]:text-on-primary/70">
+                                                    <span className="text-caption font-medium text-fg-muted tabular opacity-0 transition-opacity group-hover:opacity-100 group-aria-[current=page]:text-on-nav-active/70">
                                                         {course.code}
                                                     </span>
                                                 }
@@ -369,6 +381,11 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                         </Suspense>
                     </div>
                 )}
+                <div className="flex h-8 items-center gap-2.5 pr-0.5 pl-2.5 text-small font-medium text-fg-nav [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-icon-strong">
+                    <Palette aria-hidden="true" />
+                    <span className="min-w-0 flex-1 truncate">{t('shell.theme')}</span>
+                    <ThemeSwitcher />
+                </div>
             </div>
 
             {user ? (
