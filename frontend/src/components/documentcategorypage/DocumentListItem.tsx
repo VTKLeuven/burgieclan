@@ -53,8 +53,11 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
         // year and name, as the select box takes the place of the file type - so nothing is set
         // aside for buttons a resting list does not show. Touch screens never hover, so there
         // both stay in the flow instead, beside what they would otherwise cover.
+        //
+        // On a phone there is no room for name and actions side by side - the buttons left the
+        // name three letters - so the actions drop to a line of their own under the name.
         <div
-            className={`group/row flex min-h-[52px] items-center gap-3 px-4 py-2 transition-colors ${isSelected ? 'bg-surface-selected' : 'hover:bg-surface-hover'}`}
+            className={`group/row grid min-h-[52px] grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-1.5 px-4 py-2 transition-colors sm:grid-cols-[auto_minmax(0,1fr)_auto] ${isSelected ? 'bg-surface-selected' : 'hover:bg-surface-hover'}`}
             key={document.id}
         >
             <span className="relative flex shrink-0 items-center gap-3">
@@ -90,46 +93,55 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                 {tagLine && (
                     <p className="m-0 truncate text-caption text-fg-muted" title={tagLine}>{tagLine}</p>
                 )}
+                {(document.year || updated || uploaderLine) && (
+                    <p className="m-0 truncate text-caption text-fg-muted tabular sm:hidden">
+                        {[document.year || updated, uploaderLine].filter(Boolean).join(' · ')}
+                    </p>
+                )}
             </div>
 
-            <div className="relative flex shrink-0 items-center gap-0.5">
-                {/* Migrated archive files carry the original author; for those the uploader is
-                    the archive account and says nothing useful, so the author wins the line and
-                    the uploader moves into the tooltip. */}
-                <div className="hide-on-hover hidden w-[104px] text-right sm:block">
-                    {(document.year || updated) && (
-                        <span className="block truncate text-small text-fg-secondary tabular">
-                            {document.year || updated}
+            <div className="col-start-2 flex min-w-0 items-center gap-3 sm:col-start-auto">
+                <div className="relative -ml-2 flex shrink-0 items-center gap-0.5 sm:ml-0">
+                    {/* Migrated archive files carry the original author; for those the uploader is
+                        the archive account and says nothing useful, so the author wins the line and
+                        the uploader moves into the tooltip. */}
+                    <div className="hide-on-hover hidden w-[104px] text-right sm:block">
+                        {(document.year || updated) && (
+                            <span className="block truncate text-small text-fg-secondary tabular">
+                                {document.year || updated}
+                            </span>
+                        )}
+                        <span
+                            className="block truncate text-caption text-fg-muted"
+                            title={showAuthor ? `${t('document.uploaded-by')}: ${uploader}` : undefined}
+                        >
+                            {uploaderLine}
                         </span>
-                    )}
-                    <span
-                        className="block truncate text-caption text-fg-muted"
-                        title={showAuthor ? `${t('document.uploaded-by')}: ${uploader}` : undefined}
-                    >
-                        {uploaderLine}
+                    </div>
+                    <span className="reveal-on-hover absolute inset-y-0 right-0 flex items-center gap-0.5 [@media(hover:none)]:static">
+                        <FavoriteButton itemId={document.id} itemType="document" size={16} className="vtk-icon-button" />
+                        {/* Checking whether a scan is the right one should not mean putting a file on
+                            disk first, so the browser's own viewer sits next to the download. */}
+                        {inlineHref && (
+                            <a
+                                href={inlineHref}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="vtk-icon-button"
+                                title={t('document.open-in-browser')}
+                                aria-label={t('document.open-in-browser')}
+                            >
+                                <ExternalLink size={16} />
+                            </a>
+                        )}
+                        <DownloadButton documents={[document]} size={16} />
                     </span>
                 </div>
-                <span className="reveal-on-hover absolute inset-y-0 right-0 flex items-center gap-0.5 [@media(hover:none)]:static">
-                    <FavoriteButton itemId={document.id} itemType="document" size={16} className="vtk-icon-button" />
-                    {/* Checking whether a scan is the right one should not mean putting a file on
-                        disk first, so the browser's own viewer sits next to the download. */}
-                    {inlineHref && (
-                        <a
-                            href={inlineHref}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="vtk-icon-button"
-                            title={t('document.open-in-browser')}
-                            aria-label={t('document.open-in-browser')}
-                        >
-                            <ExternalLink size={16} />
-                        </a>
-                    )}
-                    <DownloadButton documents={[document]} size={16} />
+
+                <span className="ml-auto sm:ml-0">
+                    <VoteButton type="document" objectId={document.id} size="small" />
                 </span>
             </div>
-
-            <VoteButton type="document" objectId={document.id} size="small" />
         </div>
     );
 };

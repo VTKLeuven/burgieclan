@@ -33,7 +33,8 @@ import { courseTitle } from "@/utils/courseName";
 const PDFViewer = dynamic(() => import("@/components/document/pdf/PDFViewer"), { ssr: false });
 /**
  * Below this page width there is no room for the column beside the preview (folder, comments):
- * the folder moves under the preview and the comments into a drawer behind a header button.
+ * the comments move into a drawer behind a button beside the title, and the folder is left to
+ * the curriculum tree, the breadcrumb and the previous/next arrows.
  */
 const ASIDE_MIN_WIDTH = 1080;
 
@@ -119,9 +120,9 @@ export default function DocumentPreview({ id }: { id: string }) {
         return () => observer.disconnect();
     }, [document?.id]);
 
-    const header = (actions?: ReactNode) => <CurriculumPageHeader actions={actions} />;
+    const header = <CurriculumPageHeader />;
 
-    if (loading) return <>{header()}<LoadingPage /></>;
+    if (loading) return <>{header}<LoadingPage /></>;
 
     if (error) {
         return <ErrorPage status={error.status} detail={error.message} />;
@@ -160,32 +161,36 @@ export default function DocumentPreview({ id }: { id: string }) {
 
     const asideLabel = t(asidePanel.open ? 'document.aside.hide' : 'document.aside.show');
 
+    // Beside the title rather than in the header bar, so the breadcrumb there has the bar's
+    // whole width for the trail to this document.
+    const actions = (
+        <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+            <DocumentSiblingNav document={document} />
+            {!showAside && comments}
+            <FavoriteButton itemId={Number(id)} itemType="document" size={18} className="vtk-icon-button" />
+            {inlineHref && (
+                <a
+                    href={inlineHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="vtk-icon-button max-sm:hidden"
+                    title={t('document.open-in-browser')}
+                    aria-label={t('document.open-in-browser')}
+                >
+                    <ExternalLink className="size-[18px]" />
+                </a>
+            )}
+            <DownloadSingleDocumentButton
+                document={document}
+                fileSize={document.fileSize ? formatFileSize(document.fileSize) : undefined}
+                disabled={!user}
+            />
+        </div>
+    );
+
     return (
         <>
-            {header(
-                <>
-                    <DocumentSiblingNav document={document} />
-                    {!showAside && comments}
-                    <FavoriteButton itemId={Number(id)} itemType="document" size={18} className="vtk-icon-button" />
-                    {inlineHref && (
-                        <a
-                            href={inlineHref}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="vtk-icon-button max-sm:hidden"
-                            title={t('document.open-in-browser')}
-                            aria-label={t('document.open-in-browser')}
-                        >
-                            <ExternalLink className="size-[18px]" />
-                        </a>
-                    )}
-                    <DownloadSingleDocumentButton
-                        document={document}
-                        fileSize={document.fileSize ? formatFileSize(document.fileSize) : undefined}
-                        disabled={!user}
-                    />
-                </>
-            )}
+            {header}
 
             <div ref={previewLayoutRef} className={cn('relative flex flex-1', showAside ? 'flex-row' : 'flex-col')}>
                 {/* The fold sits on the aside's own edge, halfway down the screen, rather than in
@@ -200,8 +205,10 @@ export default function DocumentPreview({ id }: { id: string }) {
                             type="button"
                             onClick={() => asidePanel.setOpen(!asidePanel.open)}
                             className={cn(
-                                'pointer-events-auto sticky top-[45vh] grid h-10 w-6 place-items-center border border-border bg-surface text-icon shadow-xs transition-colors hover:bg-surface-hover hover:text-icon-strong focus:outline-hidden focus-visible:ring-2 focus-visible:ring-focus',
-                                showAside ? '-translate-x-1/2 rounded-full' : '-translate-x-full rounded-l-[8px] border-r-0',
+                                'pointer-events-auto sticky top-[45vh] grid h-10 w-6 place-items-center rounded-full border border-border bg-surface text-icon shadow-xs transition-colors hover:bg-surface-hover hover:text-icon-strong focus:outline-hidden focus-visible:ring-2 focus-visible:ring-focus',
+                                // Folded, it keeps clear of the panel's edge: right against it, a
+                                // click meant for the tab landed on the page's scrollbar instead.
+                                showAside ? '-translate-x-1/2' : '-translate-x-[calc(100%+12px)]',
                             )}
                             aria-expanded={asidePanel.open}
                             aria-controls="document-aside"
@@ -214,53 +221,53 @@ export default function DocumentPreview({ id }: { id: string }) {
                         </button>
                     </div>
                 )}
-                <div className="min-w-0 flex-1 px-4 pt-7 pb-16 md:px-8">
-                    <h1 className="vtk-page-title">{document.name}</h1>
-                    <p className="m-0 mt-1 flex flex-wrap gap-x-2 text-body text-fg-muted">
-                        {document.course && (
-                            <span>{courseTitle(document.course)}</span>
-                        )}
-                        {document.category?.name && (
-                            <>
-                                <span aria-hidden="true">·</span>
-                                <span>{document.category.name}</span>
-                            </>
-                        )}
-                        {document.year && (
-                            <>
-                                <span aria-hidden="true">·</span>
-                                <span className="tabular">{document.year}</span>
-                            </>
-                        )}
-                    </p>
+                <div className={cn('min-w-0 flex-1 px-4 pt-7 pb-16 md:px-8', roomForAside && !showAside && 'md:pr-12')}>
+                    {/* The actions sit right of the title; on a phone, under the facts. */}
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+                        <div className="min-w-0 flex-1">
+                            <h1 className="vtk-page-title [overflow-wrap:anywhere]">{document.name}</h1>
+                            {/* Running text, so a long course name wraps like a sentence; the
+                                no-break space keeps each "·" on the line of the item before it. */}
+                            <p className="m-0 mt-1 text-body text-fg-muted">
+                                {document.course && courseTitle(document.course)}
+                                {document.category?.name && (
+                                    <>{document.course && '\u00a0· '}{document.category.name}</>
+                                )}
+                                {document.year && (
+                                    <>{'\u00a0· '}<span className="tabular">{document.year}</span></>
+                                )}
+                            </p>
 
-                    {/* What used to fill a details panel beside the preview, in one line under the
-                        title, so the column beside it is left for the folder and the comments. */}
-                    <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-small">
-                        <VoteButton type="document" objectId={Number(id)} disabled={!user} size="small" />
-                        <Fact icon={<UserRound aria-hidden="true" />} label={t('document.uploaded-by')}>
-                            {document.anonymous ? t('document.anonymous') : (document.creator?.fullName || '')}
-                        </Fact>
-                        {/* Only the Seafile import fills `author` in, so this shows up on migrated
-                            archive files, where the uploader is the archive account rather than the
-                            person who actually wrote the notes. */}
-                        {document.author && !document.anonymous && (
-                            <Fact icon={<PenLine aria-hidden="true" />} label={t('document.author')}>
-                                {document.author}
-                            </Fact>
-                        )}
-                        {document.createdAt && (
-                            <Fact icon={<CalendarDays aria-hidden="true" />} label={t('document.date')}>
-                                <span className="tabular">
-                                    {document.createdAt.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}
-                                </span>
-                            </Fact>
-                        )}
-                        {document.fileSize && (
-                            <Fact icon={<HardDrive aria-hidden="true" />}>
-                                <span className="tabular" title={t('document.size')}>{formatFileSize(document.fileSize)}</span>
-                            </Fact>
-                        )}
+                            {/* What used to fill a details panel beside the preview, in one line under the
+                                title, so the column beside it is left for the folder and the comments. */}
+                            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-small">
+                                <VoteButton type="document" objectId={Number(id)} disabled={!user} size="small" />
+                                <Fact icon={<UserRound aria-hidden="true" />} label={t('document.uploaded-by')}>
+                                    {document.anonymous ? t('document.anonymous') : (document.creator?.fullName || '')}
+                                </Fact>
+                                {/* Only the Seafile import fills `author` in, so this shows up on migrated
+                                    archive files, where the uploader is the archive account rather than the
+                                    person who actually wrote the notes. */}
+                                {document.author && !document.anonymous && (
+                                    <Fact icon={<PenLine aria-hidden="true" />} label={t('document.author')}>
+                                        {document.author}
+                                    </Fact>
+                                )}
+                                {document.createdAt && (
+                                    <Fact icon={<CalendarDays aria-hidden="true" />} label={t('document.date')}>
+                                        <span className="tabular">
+                                            {document.createdAt.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}
+                                        </span>
+                                    </Fact>
+                                )}
+                                {document.fileSize && (
+                                    <Fact icon={<HardDrive aria-hidden="true" />}>
+                                        <span className="tabular" title={t('document.size')}>{formatFileSize(document.fileSize)}</span>
+                                    </Fact>
+                                )}
+                            </div>
+                        </div>
+                        {actions}
                     </div>
 
                     {document.underReview && (
@@ -311,16 +318,17 @@ export default function DocumentPreview({ id }: { id: string }) {
                         )}
                     </div>
 
-                    {!showAside && folder && <div className="mt-10 max-w-xl">{folder}</div>}
                 </div>
 
                 {showAside && (
                     <aside
                         id="document-aside"
                         style={{ width: asidePanel.width }}
-                        className="shrink-0 border-l border-border px-6 py-6"
+                        className="shrink-0 border-l border-border"
                     >
-                        <div className="grid gap-8">
+                        {/* Pinned under the header while the preview scrolls past, scrolling on
+                            its own when the folder and comments are longer than the screen. */}
+                        <div className="sticky top-[var(--header-height)] grid max-h-[calc(100dvh-var(--header-height))] gap-8 overflow-y-auto overscroll-contain px-6 py-6 md:max-h-[calc(100dvh-var(--header-height)-2*var(--panel-inset)-2px)]">
                             {folder}
                             {comments}
                         </div>

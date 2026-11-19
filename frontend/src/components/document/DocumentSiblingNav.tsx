@@ -31,7 +31,7 @@ export default function DocumentSiblingNav({ document }: { document: Document })
     const disabled = 'pointer-events-none opacity-40';
 
     return (
-        <div className="mr-1 hidden items-center gap-0.5 sm:flex">
+        <div className="mr-1 flex items-center gap-0.5">
             {previous ? (
                 <ApiPrefetchLink
                     href={`/document/${previous.id}`}
