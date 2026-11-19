@@ -22,17 +22,23 @@ export const TONES: SessionTone[] = ['lecture', 'practice', 'other'];
 
 /** Pale block (week view, coming up). */
 export const TONE_BLOCK: Record<SessionTone, string> = {
-    lecture: 'border-sky-200 bg-sky-50 text-sky-800',
-    practice: 'border-tag-teal-border bg-tag-teal-bg text-tag-teal-text',
-    other: 'border-lavender-200 bg-lavender-50 text-lavender-800',
+    lecture: 'border-plan-lecture-border bg-plan-lecture-bg text-plan-lecture-text',
+    practice: 'border-plan-practice-border bg-plan-practice-bg text-plan-practice-text',
+    other: 'border-plan-other-border bg-plan-other-bg text-plan-other-text',
 };
 
 /** Solid fill (ticked off). */
 export const TONE_FILL: Record<SessionTone, string> = {
-    lecture: 'bg-sky-600 text-white',
-    practice: 'bg-tag-teal-text text-white',
-    other: 'bg-lavender-500 text-white',
+    lecture: 'bg-plan-lecture-fill text-white',
+    practice: 'bg-plan-practice-fill text-white',
+    other: 'bg-plan-other-fill text-white',
 };
+
+/**
+ * A mandatory session: a red bar down its left edge rather than a red frame around it, so the
+ * week stays calm and the sessions that cannot be skipped still stand out.
+ */
+export const MANDATORY_MARK = 'shadow-[inset_3px_0_0_var(--color-danger)]';
 
 export const KNOWN_TYPES = ['college', 'practicum', 'oefenzitting', 'excursie', 'opdracht'];
 

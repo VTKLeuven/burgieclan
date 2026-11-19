@@ -5,16 +5,16 @@ import type { StudyPlannerEvent } from '@/types/entities';
 import { Check, ChevronLeft, ChevronRight, Flag } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { sessionTone, TONE_BLOCK, TONES, typeKey, type SessionTone } from './model';
+import { MANDATORY_MARK, sessionTone, TONE_BLOCK, TONES, typeKey, type SessionTone } from './model';
 import { addDays, isoWeek, longDay, mondayOf, nowInLeuven, weekdayName, weekRange } from './time';
 import type { PlannerApi } from './useStudyPlanner';
 
 const HOUR_PX = 52;
 
 const SWATCH: Record<SessionTone, string> = {
-    lecture: 'border-sky-300 bg-sky-50',
-    practice: 'border-tag-teal-border bg-tag-teal-bg',
-    other: 'border-lavender-300 bg-lavender-50',
+    lecture: 'border-plan-lecture-border bg-plan-lecture-bg',
+    practice: 'border-plan-practice-border bg-plan-practice-bg',
+    other: 'border-plan-other-border bg-plan-other-bg',
 };
 
 interface Placed {
@@ -118,14 +118,14 @@ export default function WeekCalendar({ api, onSelect }: { api: PlannerApi; onSel
             TONE_BLOCK[sessionTone(e.type)],
             e.hidden && 'border-dashed opacity-50',
             e.done && !e.hidden && 'opacity-60',
-            e.mandatory && 'ring-2 ring-danger ring-offset-1 ring-offset-surface',
+            e.mandatory && MANDATORY_MARK,
         );
 
     return (
         <section aria-labelledby="week-h">
             <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
                 <div>
-                    <p className="m-0 text-small font-medium text-link">{label}</p>
+                    <p className="m-0 text-small font-medium text-fg-muted">{label}</p>
                     <h2 id="week-h" className="vtk-page-title">
                         {weekRange(monday, locale)}
                     </h2>
@@ -293,7 +293,7 @@ export default function WeekCalendar({ api, onSelect }: { api: PlannerApi; onSel
                                 <h3 className="m-0 text-body font-semibold text-fg">
                                     {longDay(d, locale)}
                                     {d === now.date && (
-                                        <span className="ml-2 text-small font-medium text-link">{t('study_planner.week.today')}</span>
+                                        <span className="ml-2 text-small font-medium text-fg-muted">{t('study_planner.week.today')}</span>
                                     )}
                                 </h3>
                                 {list.length === 0 ? (
@@ -345,7 +345,7 @@ export default function WeekCalendar({ api, onSelect }: { api: PlannerApi; onSel
                         </span>
                     ))}
                     <span className="inline-flex items-center gap-1.5">
-                        <span aria-hidden="true" className="size-3 rounded-[3px] ring-2 ring-danger ring-offset-1 ring-offset-surface" />
+                        <span aria-hidden="true" className={cn('size-3 rounded-[3px] border', SWATCH.lecture, MANDATORY_MARK)} />
                         {t('study_planner.mark.mandatory_cap')}
                     </span>
                 </div>

@@ -136,6 +136,22 @@
   --color-tag-grey-border: #c4c5cd;
   --color-tag-grey-text: #52525b;
 
+  /* Study planner session kinds, drawn from the house palette rather than beside it: lectures in
+     a tint of the navy, practicals and exercise sessions in a muted blue-green that sits with
+     it, everything else in the neutrals. Pale for a block, solid once ticked off. */
+  --color-plan-lecture-bg: #eef1f8;
+  --color-plan-lecture-border: #c5cde0;
+  --color-plan-lecture-text: #1d2b52;
+  --color-plan-lecture-fill: #2a3a66;
+  --color-plan-practice-bg: #ecf4f2;
+  --color-plan-practice-border: #b4d2cc;
+  --color-plan-practice-text: #24524c;
+  --color-plan-practice-fill: #3f7a71;
+  --color-plan-other-bg: #f3f3f5;
+  --color-plan-other-border: #d3d4db;
+  --color-plan-other-text: #484a55;
+  --color-plan-other-fill: #757888;
+
   /* Legacy names, remapped onto the palette above. */
   --color-vtk-ink: #18181b;
   --color-vtk-navy: #0f1a36;

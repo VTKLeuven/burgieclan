@@ -26,7 +26,7 @@ function squareClass(s: Session): string {
             ? 'border-2 border-warning bg-surface'
             : TONE_FILL[s.tone]
         : cn('border', TONE_BLOCK[s.tone]);
-    return cn(base, s.event.mandatory && 'ring-2 ring-danger ring-offset-1 ring-offset-surface');
+    return cn(base, s.event.mandatory && 'ring-[1.5px] ring-danger ring-offset-1 ring-offset-surface');
 }
 
 export function TotalsRow({ totals }: { totals: Totals }) {
@@ -303,7 +303,7 @@ export function SemesterGrid({ data, onCourse }: { data: SemesterView; onCourse:
                     {t('study_planner.overview.coming_up')}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                    <span aria-hidden="true" className={cn(swatch, 'border', TONE_BLOCK.practice, 'ring-2 ring-danger ring-offset-1 ring-offset-surface')} />
+                    <span aria-hidden="true" className={cn(swatch, 'border', TONE_BLOCK.practice, 'ring-[1.5px] ring-danger ring-offset-1 ring-offset-surface')} />
                     {t('study_planner.mark.mandatory_cap')}
                 </span>
             </div>
@@ -319,7 +319,7 @@ export function SemesterGrid({ data, onCourse }: { data: SemesterView; onCourse:
                                     key={monday}
                                     className={cn(
                                         'px-0.5 py-2 text-center text-caption leading-tight',
-                                        now ? 'bg-surface-selected font-semibold text-fg' : 'font-medium text-fg-muted',
+                                        now ? 'bg-surface-muted font-semibold text-fg' : 'font-medium text-fg-muted',
                                     )}
                                 >
                                     <span className="block">W{data.firstWeek + i}</span>
@@ -349,7 +349,7 @@ export function SemesterGrid({ data, onCourse }: { data: SemesterView; onCourse:
                                         key={i}
                                         className={cn(
                                             'flex flex-wrap content-center justify-center gap-1 px-0.5 py-2.5',
-                                            data.current === data.firstWeek + i && 'bg-surface-selected/60',
+                                            data.current === data.firstWeek + i && 'bg-surface-muted',
                                         )}
                                     >
                                         {sessions.map((s) => (

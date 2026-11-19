@@ -192,7 +192,7 @@ export default function StudyPlannerPage() {
                     ) : (
                         <>
                             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                                <p className="m-0 text-small font-medium text-link">{eyebrow}</p>
+                                <p className="m-0 text-small font-medium text-fg-muted">{eyebrow}</p>
                                 {keys.length > 1 && semester && (
                                     <div className="vtk-tabs" role="group" aria-label={t('study_planner.overview.semester')}>
                                         {keys.map((k) => (

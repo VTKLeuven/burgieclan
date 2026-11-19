@@ -53,7 +53,7 @@ export default function EventDialog({
         <Dialog isOpen={event !== null} onClose={onClose} size="md">
             {e && (
                 <div className="text-left">
-                    <p className="m-0 pr-10 text-small font-medium text-link">{t(typeKey(e.type))}</p>
+                    <p className="m-0 pr-10 text-small font-medium text-fg-muted">{t(typeKey(e.type))}</p>
                     <DialogTitle as="h2" className="m-0 mt-0.5 pr-10 text-title-lg font-semibold text-fg">
                         {e.course}
                     </DialogTitle>
