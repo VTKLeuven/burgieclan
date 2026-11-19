@@ -117,7 +117,8 @@ export function convertToCourse(course: unknown): Course {
         documentCounts: (data.documentCounts && typeof data.documentCounts === 'object' && !Array.isArray(data.documentCounts))
             ? (data.documentCounts as Record<number, number>)
             : (Array.isArray(data.documentCounts) && data.documentCounts.length === 0 ? {} : undefined),
-        documentCount: typeof data.documentCount === 'number' ? data.documentCount : undefined
+        documentCount: typeof data.documentCount === 'number' ? data.documentCount : undefined,
+        commentCount: typeof data.commentCount === 'number' ? data.commentCount : undefined
     };
 }
 

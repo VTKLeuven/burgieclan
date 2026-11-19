@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Course;
 use App\Entity\CourseComment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -28,6 +29,34 @@ class CourseCommentRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * Subject evaluation totals for a set of courses, as courseId => count, in one query.
+     *
+     * @param Course[] $courses
+     * @return array<int, int>
+     */
+    public function countForCourses(array $courses): array
+    {
+        if ([] === $courses) {
+            return [];
+        }
+
+        $rows = $this->createQueryBuilder('c')
+            ->select('IDENTITY(c.course) AS courseId, COUNT(c.id) AS commentCount')
+            ->andWhere('c.course IN (:courses)')
+            ->setParameter('courses', $courses)
+            ->groupBy('c.course')
+            ->getQuery()
+            ->getArrayResult();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(int) $row['courseId']] = (int) $row['commentCount'];
+        }
+
+        return $counts;
     }
 
     public function remove(CourseComment $entity, bool $flush = false): void

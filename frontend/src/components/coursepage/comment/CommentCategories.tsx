@@ -1,9 +1,10 @@
 import Loading from '@/components/loading/LoadingPage';
 import CourseCommentList from '@/components/coursepage/comment/CourseCommentList';
 import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
-import { CommentCategory, CourseComment, CourseRatingSummary, SectionRating } from '@/types/entities';
+import { CommentCategory, Course, CourseComment, CourseRatingSummary, SectionRating } from '@/types/entities';
 import { convertToCommentCategory, convertToCourseRatingSummary } from '@/utils/convertToEntity';
 import { useCallback, useMemo, useState, useEffect } from 'react';
+import RelatedMaterial from '@/components/coursepage/RelatedMaterial';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { MessagesSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -11,10 +12,12 @@ import { useTranslation } from 'react-i18next';
 type CommentCategoriesProps = {
     comments: CourseComment[];
     courseId: number;
+    /** The course itself, for pointing at evaluations filed under a former or equivalent code. */
+    course?: Course;
     onCommentsUpdate?: (newComments: CourseComment[]) => void;
 };
 
-const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCategoriesProps) => {
+const CommentCategories = ({ comments, courseId, course, onCommentsUpdate }: CommentCategoriesProps) => {
     const { t, i18n } = useTranslation();
     const lang = i18n.language;
     const categoriesEndpoint = `/api/comment_categories?lang=${lang}`;
@@ -114,6 +117,7 @@ const CommentCategories = ({ comments, courseId, onCommentsUpdate }: CommentCate
                 count={comments.length}
                 description={t('course-page.comments.description')}
             />
+            {course && <RelatedMaterial course={course} kind="evaluations" />}
 
             {/* No overflow-hidden here, unlike .vtk-list: the comment rows show tooltips. */}
             <div className="divide-y divide-border rounded-card border border-border bg-surface">

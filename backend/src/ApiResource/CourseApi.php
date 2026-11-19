@@ -187,4 +187,12 @@ class CourseApi extends BaseEntityApi
      */
     #[Groups([SerializationGroups::COURSE_GET])]
     public ?int $documentCount = null;
+
+    /**
+     * Subject evaluations (course comments) on this course, as a single total. Like
+     * $documentCount, only filled in for the related courses on a course detail response, so the
+     * course page can point at evaluations written under a former or equivalent code.
+     */
+    #[Groups([SerializationGroups::COURSE_GET])]
+    public ?int $commentCount = null;
 }

@@ -265,7 +265,11 @@
             "successors": "Nu gegeven als",
             "equivalents": "Gelijkwaardig aan",
             "documents_one": "{{count}} document",
-            "documents_other": "{{count}} documenten"
+            "documents_other": "{{count}} documenten",
+            "more_documents": "Meer documenten onder een andere vakcode",
+            "more_evaluations": "Meer vakevaluaties onder een andere vakcode",
+            "evaluations_one": "{{count}} evaluatie",
+            "evaluations_other": "{{count}} evaluaties"
         },
         "show-empty-categories": "Toon lege mappen ({{count}})",
         "hide-empty-categories": "Verberg lege mappen",

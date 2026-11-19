@@ -265,7 +265,11 @@
             "successors": "Now taught as",
             "equivalents": "Equivalent to",
             "documents_one": "{{count}} document",
-            "documents_other": "{{count}} documents"
+            "documents_other": "{{count}} documents",
+            "more_documents": "More documents under another course code",
+            "more_evaluations": "More subject evaluations under another course code",
+            "evaluations_one": "{{count}} evaluation",
+            "evaluations_other": "{{count}} evaluations"
         },
         "show-empty-categories": "Show empty folders ({{count}})",
         "hide-empty-categories": "Hide empty folders",

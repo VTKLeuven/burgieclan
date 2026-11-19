@@ -36,6 +36,8 @@ export interface Course extends BaseEntity {
      * on a course detail response, so it is undefined on a course fetched on its own.
      */
     documentCount?: number;
+    /** Subject evaluations on a related course; only set on related courses of a course detail. */
+    commentCount?: number;
 }
 
 

@@ -1,6 +1,7 @@
 'use client'
 import Loading from '@/components/loading/LoadingPage';
 import DocumentCategoryRow from "@/components/coursepage/DocumentCategory";
+import RelatedMaterial from '@/components/coursepage/RelatedMaterial';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { HydraCollection, readPreloadedApi, useApi } from "@/hooks/useApi";
 import type { Course, DocumentCategory } from "@/types/entities";
@@ -85,6 +86,7 @@ export default function DocumentSections({ course, documentCounts }: DocumentSec
                     </button>
                 )}
             />
+            <RelatedMaterial course={course} kind="documents" />
             {loading ? (
                 <Loading compact />
             ) : visibleCategories.length === 0 ? (

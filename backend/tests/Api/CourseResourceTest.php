@@ -2,6 +2,7 @@
 
 namespace App\Tests\Api;
 
+use App\Factory\CourseCommentFactory;
 use App\Factory\CourseFactory;
 use App\Factory\DocumentCategoryFactory;
 use App\Factory\DocumentFactory;
@@ -227,6 +228,36 @@ class CourseResourceTest extends ApiTestCase
         $this->assertCount(1, $json['oldCourses']);
         $this->assertSame('H08W4A', $json['oldCourses'][0]['code']);
         $this->assertSame('Fluidummechanica', $json['oldCourses'][0]['name']);
+    }
+
+    /**
+     * The course page points at material filed under a former or equivalent code, in its
+     * documents and in its subject evaluations, so each related course carries both totals.
+     */
+    public function testGetCourseCountsDocumentsAndEvaluationsOfRelatedCourses(): void
+    {
+        $old = CourseFactory::createOne();
+        $course = CourseFactory::createOne();
+        $course->addOldCourse($old);
+        save($course);
+        DocumentFactory::createMany(2, ['course' => $old, 'under_review' => false]);
+        DocumentFactory::createOne(['course' => $old, 'under_review' => true]);
+        CourseCommentFactory::createMany(3, ['course' => $old]);
+
+        $json = $this->browser()
+            ->get(
+                '/api/courses/' . $course->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->json()->decoded();
+
+        $this->assertSame(2, $json['oldCourses'][0]['documentCount'], 'documents under review are not counted');
+        $this->assertSame(3, $json['oldCourses'][0]['commentCount']);
     }
 
     public function testGetCourseSummarySkipsExpensiveRelationsAndDocumentCounts(): void

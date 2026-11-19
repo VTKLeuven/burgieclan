@@ -177,6 +177,7 @@ export default function CoursePage() {
                         <CommentCategories
                             comments={course.courseComments ?? []}
                             courseId={course.id}
+                            course={course}
                             onCommentsUpdate={handleCommentsUpdate}
                         />
                     </div>

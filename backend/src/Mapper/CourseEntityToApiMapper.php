@@ -9,6 +9,7 @@ use App\Constants\MappingContext;
 use App\Entity\Course;
 use App\Entity\CourseComment;
 use App\Entity\Module;
+use App\Repository\CourseCommentRepository;
 use App\Repository\DocumentRepository;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -19,6 +20,7 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
     public function __construct(
         private readonly MicroMapperInterface $microMapper,
         private readonly DocumentRepository $documentRepository,
+        private readonly CourseCommentRepository $courseCommentRepository,
     ) {}
 
     public function load(object $from, string $toClass, array $context): object
@@ -88,7 +90,7 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
 
     /**
      * The courses a reader can jump to from this one - predecessors, successors and equivalents -
-     * each carrying how many documents it holds.
+     * each carrying how many documents and subject evaluations it holds.
      *
      * The count is the reason the link is worth following: after a curriculum reform the current
      * course is often near-empty while its predecessor holds years of exams, and without a number
@@ -105,9 +107,10 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
         }
 
         $counts = $this->documentRepository->countPublishedForCourses($courses);
+        $commentCounts = $this->courseCommentRepository->countForCourses($courses);
 
         return array_map(
-            function (Course $course) use ($counts): CourseApi {
+            function (Course $course) use ($counts, $commentCounts): CourseApi {
                 /** @var CourseApi $dto */
                 $dto = $this->microMapper->map(
                     $course,
@@ -122,6 +125,7 @@ class CourseEntityToApiMapper extends BaseEntityToApiMapper
                     ]
                 );
                 $dto->documentCount = $counts[$course->getId()] ?? 0;
+                $dto->commentCount = $commentCounts[$course->getId()] ?? 0;
 
                 return $dto;
             },
