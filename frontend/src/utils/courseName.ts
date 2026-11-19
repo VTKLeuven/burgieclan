@@ -21,20 +21,6 @@ export function courseTitle(course: NamedCourse | undefined | null): string {
 }
 
 /**
- * Every title a course is known by, for search: a student typing "distributed" should find a course
- * stored under its Dutch name, and vice versa, whichever language they are browsing in.
- */
-export function courseNameVariants(course: NamedCourse | undefined | null): string[] {
-    if (!course) {
-        return [];
-    }
-
-    return [course.name, course.nameNl, course.nameEn].filter(
-        (name): name is string => typeof name === 'string' && name.trim() !== '',
-    );
-}
-
-/**
  * `courses` in alphabetical order of their title, ignoring case and accents (collated for a reader
  * of `locale`), so "Écologie" sits with the E's. Courses without a title sort by their code.
  */

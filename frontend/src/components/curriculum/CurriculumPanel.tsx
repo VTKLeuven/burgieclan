@@ -595,7 +595,7 @@ function FilterResults({ programId, query }: { programId: number; query: string 
             const path = [...trail, module.name ?? ''];
             module.courses?.forEach((item) => {
                 if (seen.has(item.id)) return;
-                const haystack = [item.nameNl, item.nameEn, item.name, item.code].map(normalize).join(' ');
+                const haystack = [courseTitle(item), item.code].map(normalize).join(' ');
                 if (haystack.includes(needle)) {
                     seen.add(item.id);
                     found.push({ course: item, trail: path.join(' › '), leafModuleId: module.id });

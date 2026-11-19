@@ -54,14 +54,12 @@ class CourseRepository extends ServiceEntityRepository
 
         $queryBuilder = $this->createQueryBuilder('c');
 
+        // Only the title the onderwijsaanbod lists the course under ($name, in the course's own
+        // language) and its code: the translated title is not what the course is called, so
+        // searching it surfaced courses under a name the reader never sees.
         foreach ($searchTerms as $key => $term) {
             $queryBuilder
-                ->andWhere(
-                    '(LOWER(c.name) LIKE :t_' . $key
-                    . ' OR LOWER(c.nameNl) LIKE :t_' . $key
-                    . ' OR LOWER(c.nameEn) LIKE :t_' . $key
-                    . ' OR LOWER(c.code) LIKE :t_' . $key . ')'
-                )
+                ->andWhere('(LOWER(c.name) LIKE :t_' . $key . ' OR LOWER(c.code) LIKE :t_' . $key . ')')
                 ->setParameter('t_' . $key, '%' . mb_strtolower((string) $term) . '%');
         }
 

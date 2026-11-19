@@ -3,13 +3,13 @@ import type { Course, Module, Program } from '@/types/entities';
 import { captureException } from "@sentry/nextjs";
 import type { FuseResult } from 'fuse.js';
 import { FuseBudgetSearch } from './fuseBudgetSearch';
-import { courseNameVariants } from '@/utils/courseName';
+import { courseTitle } from '@/utils/courseName';
 
 /**
- * Course fields the fuzzy search looks in: both KU Leuven titles besides the one shown, so a typo
- * in "distribted systems" still finds a course shown under its Dutch title, and vice versa.
+ * Course fields the fuzzy search looks in: the title as the onderwijsaanbod lists it and the code.
+ * The translated title is left out on purpose; it is not the name the course goes by.
  */
-const COURSE_KEYS = ['name', 'nameNl', 'nameEn', 'code'];
+const COURSE_KEYS = ['name', 'code'];
 
 // Persistent budget-aware Fuse instances
 let coursesBudgetFuse: FuseBudgetSearch<Course> | null = null;
@@ -108,12 +108,11 @@ export function extractEntities(programs: Program[]): {
 export function courseMatchesText(course: Course, searchQuery?: string): boolean {
   if (!searchQuery) return false;
 
-  // Quick exact match check first (performance optimization)
-  // Match every title the course is known by: a student typing "distributed" should find a course
-  // stored under its Dutch name, whichever language they are browsing in.
+  // Quick exact match check first (performance optimization), on the title the course is shown
+  // under and its code.
   const needle = searchQuery.toLowerCase();
   if (
-    courseNameVariants(course).some(name => name.toLowerCase().includes(needle)) ||
+    courseTitle(course).toLowerCase().includes(needle) ||
     course.code?.toLowerCase().includes(needle)
   ) {
     return true;

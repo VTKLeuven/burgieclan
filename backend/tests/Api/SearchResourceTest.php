@@ -257,9 +257,10 @@ class SearchResourceTest extends ApiTestCase
     {
         $course = CourseFactory::createOne(
             [
-                'name' => 'Energy conversion machines and systems',
+                'name' => 'Energieconversiemachines en -systemen',
                 'nameNl' => 'Energieconversiemachines en -systemen',
                 'nameEn' => 'Energy conversion machines and systems',
+                'language' => 'nl',
                 'code' => 'H01N2A',
             ]
         );
@@ -279,7 +280,7 @@ class SearchResourceTest extends ApiTestCase
         $this->assertSame('/api/courses/' . $course->getId(), $decodedJson['courses'][0]['@id']);
 
         // The upload selector calls this same endpoint with partial input. Keep the concrete
-        // regression from the UI: "energiecon" must find the localized Dutch course title.
+        // regression from the UI: "energiecon" must find the Dutch course title.
         $decodedJson = $this->browser()
             ->get(
                 '/api/search?searchText=energiecon',
@@ -292,6 +293,36 @@ class SearchResourceTest extends ApiTestCase
 
         $this->assertCount(1, $decodedJson['courses']);
         $this->assertSame('/api/courses/' . $course->getId(), $decodedJson['courses'][0]['@id']);
+    }
+
+    /**
+     * A course is found under the title the onderwijsaanbod lists it by - in its own language of
+     * instruction - and its code, never under the translation of that title.
+     */
+    public function testCoursesAreNotFoundUnderTheirTranslatedTitle(): void
+    {
+        $course = CourseFactory::createOne(
+            [
+                'name' => 'Bedrijfskunde en ondernemen',
+                'nameNl' => 'Bedrijfskunde en ondernemen',
+                'nameEn' => 'Business Administration and Entrepreneurship',
+                'language' => 'nl',
+                'code' => 'H0R18A',
+            ]
+        );
+
+        $search = fn (string $text): array => $this->browser()
+            ->get(
+                '/api/search?searchText=' . rawurlencode($text),
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->json()
+            ->decoded()['courses'];
+
+        $this->assertSame('/api/courses/' . $course->getId(), $search('bedrijfskunde')[0]['@id']);
+        $this->assertSame('/api/courses/' . $course->getId(), $search('h0r18a')[0]['@id']);
+        $this->assertSame([], $search('business administration'));
     }
 
     /**

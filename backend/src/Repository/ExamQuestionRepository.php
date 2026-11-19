@@ -139,8 +139,8 @@ class ExamQuestionRepository extends ServiceEntityRepository
             $queryBuilder
                 ->andWhere(
                     sprintf(
-                        '(LOWER(q.text) LIKE :%1$s OR LOWER(c.code) LIKE :%1$s OR LOWER(c.name) LIKE :%1$s'
-                        . ' OR LOWER(c.nameNl) LIKE :%1$s OR LOWER(c.nameEn) LIKE :%1$s)',
+                        // The course by its onderwijsaanbod title and code, as the course search.
+                        '(LOWER(q.text) LIKE :%1$s OR LOWER(c.code) LIKE :%1$s OR LOWER(c.name) LIKE :%1$s)',
                         $parameter
                     )
                 )
