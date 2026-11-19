@@ -155,6 +155,22 @@ export default function Sidebar({ onNavigate, onCollapse }: {
     const isActive = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`));
     const inCurriculum = ['/courses', '/course/', '/document/'].some((p) => path === p || path.startsWith(p));
 
+    // The course being read. A course page says so in its URL, which changes the moment a link is
+    // followed; the location the page publishes is cleared until the next page has loaded, and
+    // keyed on that alone the highlight went from one course to "Vakken" and only then to the
+    // next. A document's URL does not name its course, so there the last known one holds until
+    // the next document has said which it belongs to.
+    const urlCourseId = path.match(/^\/course\/(\d+)(?:\/|$)/)?.[1];
+    const [lastCourseId, setLastCourseId] = useState(currentCourse?.id);
+    if (currentCourse?.id !== undefined && currentCourse.id !== lastCourseId) {
+        setLastCourseId(currentCourse.id);
+    }
+    const activeCourseId = urlCourseId !== undefined
+        ? Number(urlCourseId)
+        : path.startsWith('/document/')
+            ? (currentCourse?.id ?? lastCourseId)
+            : currentCourse?.id;
+
     // Alphabetical by the title shown, so a course is found where you expect it rather than
     // where it happened to be starred.
     const courses = useMemo(
@@ -212,7 +228,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                     href="/courses"
                     icon={<GraduationCap />}
                     label={t('courses')}
-                    active={inCurriculum && !courses.some((c) => c.id === currentCourse?.id)}
+                    active={inCurriculum && !courses.some((c) => c.id === activeCourseId)}
                     onNavigate={onNavigate}
                 />
                 {user && (
@@ -259,7 +275,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                             ) : (
                                 courses.map((course) => {
                                     const name = courseTitle(course) ?? course.code ?? '';
-                                    const active = currentCourse?.id === course.id && inCurriculum;
+                                    const active = activeCourseId === course.id && inCurriculum;
                                     // The star says why the course is listed here, and clicking it
                                     // takes it off the list. A sibling laid over the icon slot rather
                                     // than inside the link, which may not hold a button.
