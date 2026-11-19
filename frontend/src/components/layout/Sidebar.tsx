@@ -85,7 +85,8 @@ function NavItem({
                 'group flex h-7 items-center gap-2.5 rounded-control px-2.5 text-small font-medium text-fg-nav',
                 'transition-colors duration-[var(--dur-fast)] ease-out',
                 '[&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-icon-strong',
-                active ? 'bg-sidebar-active text-fg' : 'hover:bg-sidebar-hover',
+                // A white chip with a rim lifts the active item off the canvas.
+                active ? 'bg-surface text-fg shadow-xs ring-1 ring-border-strong' : 'hover:bg-sidebar-hover',
             )}
         >
             {icon}

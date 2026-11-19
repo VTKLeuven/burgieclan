@@ -42,7 +42,7 @@
   --color-neutral-25: #fcfcfd;
   --color-neutral-50: #fafafa;
   --color-neutral-100: #f5f5f6;
-  --color-neutral-150: #f0f0f2;
+  --color-neutral-150: #e6e7ec;
   --color-neutral-200: #ececee;
   --color-neutral-250: #e2e2e5;
   --color-neutral-300: #d4d4d8;
@@ -55,24 +55,28 @@
   --color-neutral-950: #16161a;
 
   /* Semantic surfaces and text */
-  --color-canvas: #f5f5f6;
+  /* The canvas is a clear step darker than the white panel, so the panel reads as one object
+     without a shadow. Text and lines are a step darker too; the placeholder meets WCAG AA. */
+  --color-canvas: #e6e7ec;
   --color-surface: #ffffff;
-  --color-surface-muted: #fafafa;
-  --color-surface-hover: #f7f7f8;
-  --color-surface-selected: #f0f8ff;
-  --color-sidebar-hover: #f0f0f2;
-  --color-sidebar-active: #ebebed;
-  --color-border: #ececee;
-  --color-border-strong: #e2e2e5;
+  --color-surface-muted: #f4f5f8;
+  --color-surface-hover: #f1f2f5;
+  --color-surface-selected: #deefff;
+  /* Also used inside the panel (CurriculumPanel, DocumentFolderList), so the active tint stays a
+     grey; the sidebar marks its own active item as a white chip instead. */
+  --color-sidebar-hover: #dcdde3;
+  --color-sidebar-active: #d4d5dc;
+  --color-border: #d9dae0;
+  --color-border-strong: #c4c5cd;
   --color-fg: #18181b;
-  --color-fg-secondary: #52525b;
-  --color-fg-muted: #6b6b73;
-  --color-fg-placeholder: #8b8b93;
-  --color-fg-disabled: #a1a1aa;
-  --color-fg-nav: #3f3f46;
-  --color-link: #0a6cba;
-  --color-icon: #6b6b73;
-  --color-icon-strong: #3f3f46;
+  --color-fg-secondary: #3a3a42;
+  --color-fg-muted: #53535c;
+  --color-fg-placeholder: #6e6e77;
+  --color-fg-disabled: #8a8a93;
+  --color-fg-nav: #232329;
+  --color-link: #0e5693;
+  --color-icon: #53535c;
+  --color-icon-strong: #232329;
 
   --color-primary: #0f1a36;
   --color-primary-hover: #1d2b52;
@@ -102,28 +106,28 @@
 
   /* Tag palette: bg-50 / border-200 / text-700 */
   --color-tag-purple-bg: #faf5ff;
-  --color-tag-purple-border: #e9d5ff;
+  --color-tag-purple-border: #d8b4fe;
   --color-tag-purple-text: #7e22ce;
   --color-tag-blue-bg: #eff6ff;
-  --color-tag-blue-border: #bfdbfe;
+  --color-tag-blue-border: #93c5fd;
   --color-tag-blue-text: #1d4ed8;
   --color-tag-green-bg: #f0fdf4;
-  --color-tag-green-border: #bbf7d0;
+  --color-tag-green-border: #86efac;
   --color-tag-green-text: #15803d;
   --color-tag-amber-bg: #fffbeb;
-  --color-tag-amber-border: #fde68a;
+  --color-tag-amber-border: #fcd34d;
   --color-tag-amber-text: #b45309;
   --color-tag-teal-bg: #f0fdfa;
-  --color-tag-teal-border: #99f6e4;
+  --color-tag-teal-border: #5eead4;
   --color-tag-teal-text: #0f766e;
   --color-tag-pink-bg: #fdf2f8;
-  --color-tag-pink-border: #fbcfe8;
+  --color-tag-pink-border: #f9a8d4;
   --color-tag-pink-text: #be185d;
   --color-tag-orange-bg: #fff7ed;
-  --color-tag-orange-border: #fed7aa;
+  --color-tag-orange-border: #fdba74;
   --color-tag-orange-text: #c2410c;
   --color-tag-grey-bg: #f4f4f5;
-  --color-tag-grey-border: #e4e4e7;
+  --color-tag-grey-border: #c4c5cd;
   --color-tag-grey-text: #52525b;
 
   /* Legacy names, remapped onto the palette above. */
@@ -136,15 +140,15 @@
   --color-vtk-blue-muted: #f5f5f6;
   --color-vtk-yellow: #f5a524;
   --color-vtk-yellow-dark: #d9890b;
-  --color-vtk-paper: #f5f5f6;
-  --color-vtk-paper-2: #f0f0f2;
+  --color-vtk-paper: #e6e7ec;
+  --color-vtk-paper-2: #dcdde3;
   --color-vtk-surface: #ffffff;
   --color-vtk-surface-elevated: #ffffff;
-  --color-vtk-muted: #6b6b73;
-  --color-vtk-body: #52525b;
+  --color-vtk-muted: #53535c;
+  --color-vtk-body: #3a3a42;
   --color-vtk-on-dark-muted: #a1a1aa;
-  --color-vtk-line: #ececee;
-  --color-vtk-line-2: #e2e2e5;
+  --color-vtk-line: #d9dae0;
+  --color-vtk-line-2: #c4c5cd;
 
   /* Typography */
   --text-display: 24px;
@@ -189,14 +193,14 @@
   /* Kept for the few places that read them as plain custom properties. */
   --ink: #18181b;
   --navy: #0f1a36;
-  --paper: #f5f5f6;
-  --paper-2: #f0f0f2;
+  --paper: #e6e7ec;
+  --paper-2: #dcdde3;
   --surface: #ffffff;
-  --line: #ececee;
-  --line-2: #e2e2e5;
+  --line: #d9dae0;
+  --line-2: #c4c5cd;
   --yellow: #f5a524;
-  --muted: #6b6b73;
-  --body: #52525b;
+  --muted: #53535c;
+  --body: #3a3a42;
   --accent: #1f82d1;
   --danger: #b91c1c;
 
@@ -795,7 +799,8 @@
 
   .vtk-table th {
     height: 40px;
-    color: var(--color-fg-muted);
+    background: var(--color-surface-muted);
+    color: var(--color-fg-secondary);
     font-size: 13px;
     font-weight: 500;
   }
@@ -871,7 +876,7 @@
   .vtk-tab.is-active {
     background: var(--color-surface);
     color: var(--color-fg);
-    box-shadow: var(--shadow-xs);
+    box-shadow: var(--shadow-xs), 0 0 0 1px var(--color-border-strong);
   }
 
   /* ---------------------------------------------------------------------
