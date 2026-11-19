@@ -162,8 +162,12 @@ export interface SemesterView {
     key: string;
     /** Monday of every teaching week, from the first to the last week with sessions. */
     mondays: string[];
-    /** The week of today (1-based), or null when today is outside the semester. */
+    /** The teaching week of today, or null when today falls outside the columns. */
     current: number | null;
+    /** The teaching week of the first column; the column at index i is week firstWeek + i. */
+    firstWeek: number;
+    /** How many teaching weeks the semester has, at least as many as there are columns. */
+    totalWeeks: number;
     firstDate: string;
     lastDate: string;
     rows: CourseRow[];
@@ -178,6 +182,24 @@ export function semesterKey(date: string): string {
     if (month === 1) return `${year - 1}-1`;
     return `${year}-2`;
 }
+
+/**
+ * Monday of a semester's first teaching week, by KU Leuven's pattern: the first semester starts
+ * on the Monday from 20 to 26 September (25 Sep 2023, 23 Sep 2024, 22 Sep 2025, 21 Sep 2026), the
+ * second on the Monday from 8 to 14 February (12 Feb 2024, 10 Feb 2025, 9 Feb 2026).
+ *
+ * The weeks cannot come from the sessions alone: the feed only reaches about two weeks back, so a
+ * planner set up halfway through the semester would otherwise call that week "week 1".
+ */
+function teachingStart(key: string): string {
+    const [year, semester] = key.split('-');
+    const from = semester === '1' ? `${year}-09-20` : `${year}-02-08`;
+    const monday = mondayOf(from);
+    return monday < from ? addDays(monday, 7) : monday;
+}
+
+/** Teaching weeks in the first semester; the second has an Easter break, so it goes by its sessions. */
+const FIRST_SEMESTER_WEEKS = 13;
 
 const visible = (state: StudyPlanner) => state.events.filter((e) => !e.hidden);
 
@@ -204,8 +226,14 @@ export function buildSemester(state: StudyPlanner, key: string, now: number): Se
     const first = mondayOf(firstDate);
     const weeks = daysBetween(first, mondayOf(lastDate)) / 7 + 1;
     const mondays = Array.from({ length: weeks }, (_, i) => addDays(first, 7 * i));
-    const todayWeek = daysBetween(first, mondayOf(state.today)) / 7 + 1;
-    const current = todayWeek >= 1 && todayWeek <= weeks ? todayWeek : null;
+    // Sessions before the first teaching week (an introduction day) keep the count from the
+    // sessions themselves rather than numbering weeks zero and below.
+    const start = teachingStart(key);
+    const firstWeek = first >= start ? daysBetween(start, first) / 7 + 1 : 1;
+    const weekOf = (date: string) => firstWeek + daysBetween(first, mondayOf(date)) / 7;
+    const todayWeek = weekOf(state.today);
+    const current = todayWeek >= firstWeek && todayWeek < firstWeek + weeks ? todayWeek : null;
+    const totalWeeks = Math.max(firstWeek + weeks - 1, key.endsWith('-1') && first >= start ? FIRST_SEMESTER_WEEKS : 0);
 
     const totals: Totals = { past: 0, done: 0, missed: 0, upcoming: 0, mandatoryLeft: 0 };
     const rows: CourseRow[] = [];
@@ -217,7 +245,7 @@ export function buildSemester(state: StudyPlanner, key: string, now: number): Se
             return {
                 event,
                 tone: sessionTone(event.type),
-                week: daysBetween(first, mondayOf(event.date)) / 7 + 1,
+                week: weekOf(event.date),
                 past,
                 missed: past && !event.done,
             };
@@ -241,5 +269,5 @@ export function buildSemester(state: StudyPlanner, key: string, now: number): Se
         totals.mandatoryLeft += row.mandatoryLeft;
         rows.push(row);
     }
-    return { key, mondays, current, firstDate, lastDate, rows, totals };
+    return { key, mondays, current, firstWeek, totalWeeks, firstDate, lastDate, rows, totals };
 }

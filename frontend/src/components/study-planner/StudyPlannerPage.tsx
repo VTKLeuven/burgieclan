@@ -136,7 +136,7 @@ export default function StudyPlannerPage() {
     const event = selected ? (state.events.find((e) => e.uid === selected) ?? null) : null;
     const eyebrow = data
         ? data.current
-            ? t('study_planner.overview.semester_week', { semester: t(`study_planner.overview.semester_${data.key.slice(-1)}`), week: data.current, weeks: data.mondays.length })
+            ? t('study_planner.overview.semester_week', { semester: t(`study_planner.overview.semester_${data.key.slice(-1)}`), week: data.current, weeks: data.totalWeeks })
             : `${t(`study_planner.overview.semester_${data.key.slice(-1)}`)} · ${shortDay(data.firstDate, i18n.language)} – ${shortDay(data.lastDate, i18n.language)}`
         : null;
 

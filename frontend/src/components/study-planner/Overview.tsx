@@ -313,7 +313,7 @@ export function SemesterGrid({ data, onCourse }: { data: SemesterView; onCourse:
                     <div className="grid border-b border-border bg-surface-muted" style={{ gridTemplateColumns: columns }}>
                         <span className="self-end px-4 py-2.5 text-small font-medium text-fg-muted">{t('study_planner.form.course')}</span>
                         {data.mondays.map((monday, i) => {
-                            const now = data.current === i + 1;
+                            const now = data.current === data.firstWeek + i;
                             return (
                                 <span
                                     key={monday}
@@ -322,7 +322,7 @@ export function SemesterGrid({ data, onCourse }: { data: SemesterView; onCourse:
                                         now ? 'bg-surface-selected font-semibold text-fg' : 'font-medium text-fg-muted',
                                     )}
                                 >
-                                    <span className="block">W{i + 1}</span>
+                                    <span className="block">W{data.firstWeek + i}</span>
                                     <span className="block font-normal">{dayMonth(monday, locale)}</span>
                                 </span>
                             );
@@ -332,7 +332,7 @@ export function SemesterGrid({ data, onCourse }: { data: SemesterView; onCourse:
                         </span>
                     </div>
                     {data.rows.map((r) => {
-                        const byWeek = data.mondays.map((_, i) => r.sessions.filter((s) => s.week === i + 1));
+                        const byWeek = data.mondays.map((_, i) => r.sessions.filter((s) => s.week === data.firstWeek + i));
                         return (
                             <div key={r.subject.key} className="grid border-b border-border last:border-b-0" style={{ gridTemplateColumns: columns }}>
                                 <div className="flex items-center px-4 py-2.5">
@@ -349,7 +349,7 @@ export function SemesterGrid({ data, onCourse }: { data: SemesterView; onCourse:
                                         key={i}
                                         className={cn(
                                             'flex flex-wrap content-center justify-center gap-1 px-0.5 py-2.5',
-                                            data.current === i + 1 && 'bg-surface-selected/60',
+                                            data.current === data.firstWeek + i && 'bg-surface-selected/60',
                                         )}
                                     >
                                         {sessions.map((s) => (
