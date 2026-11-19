@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Repository\StudyPlannerRepository;
 use App\Service\StudyPlanner\StudyPlannerIcsExport;
 use App\Service\StudyPlanner\StudyPlannerSync;
+use App\Service\StudyPlanner\VtkEventRefresher;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -30,9 +31,11 @@ class StudyPlannerFeedController extends AbstractController
         StudyPlannerRepository $planners,
         StudyPlannerSync $sync,
         StudyPlannerIcsExport $export,
+        VtkEventRefresher $vtkRefresher,
     ): Response {
         $planner = $planners->findByFeedToken($token) ?? throw new NotFoundHttpException();
         $sync->syncIfStale($planner);
+        $vtkRefresher->refreshIfStale($planner);
 
         return new Response(
             $export->build($planner),

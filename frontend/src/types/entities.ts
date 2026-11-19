@@ -332,6 +332,51 @@ export interface StudyPlannerRule {
     location: string;
 }
 
+/** One time a VTK event takes place: the event itself, or one moment of a series. Leuven time. */
+export interface StudyPlannerVtkOccurrence {
+    key: string;
+    date: string;
+    /** The last day, for an evening past midnight or an event over several days. */
+    endDate: string;
+    start: string | null;
+    end: string | null;
+    startMin: number;
+    /** 1440 when it runs past midnight. */
+    endMin: number;
+    allDay: boolean;
+    label: string | null;
+    location: string | null;
+}
+
+/** A VTK event put in the planner; the details come from the VTK website. */
+export interface StudyPlannerVtkEvent {
+    id: string;
+    slug: string;
+    titleNl: string;
+    titleEn: string | null;
+    location: string | null;
+    urlNl: string;
+    urlEn: string;
+    allDay: boolean;
+    occurrences: StudyPlannerVtkOccurrence[];
+}
+
+/** A row of GET /api/study_planner/vtk_events: what is coming up at VTK. */
+export interface StudyPlannerVtkOption {
+    id: string;
+    titleNl: string;
+    titleEn: string | null;
+    location: string | null;
+    date: string;
+    time: string | null;
+    endDate: string;
+    allDay: boolean;
+    series: boolean;
+    urlNl: string;
+    urlEn: string;
+    inPlanner: boolean;
+}
+
 export interface StudyPlanner {
     subscribed: boolean;
     icsUrl: string | null;
@@ -346,6 +391,7 @@ export interface StudyPlanner {
     events: StudyPlannerEvent[];
     items: StudyPlannerItem[];
     rules: StudyPlannerRule[];
+    vtkEvents: StudyPlannerVtkEvent[];
 }
 
 export interface StudyPlannerItemInput {
@@ -369,4 +415,6 @@ export type StudyPlannerOperation =
     | { op: 'addItem'; item: StudyPlannerItemInput }
     | { op: 'updateItem'; id: string; item: StudyPlannerItemInput }
     | { op: 'deleteItem'; id: string }
-    | { op: 'itemDone'; id: string; value: boolean };
+    | { op: 'itemDone'; id: string; value: boolean }
+    | { op: 'addVtkEvent'; vtkEventId: string }
+    | { op: 'removeVtkEvent'; vtkEventId: string };

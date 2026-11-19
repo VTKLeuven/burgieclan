@@ -4,7 +4,7 @@ import Loading from '@/components/loading/LoadingPage';
 import PageHeader, { Breadcrumbs } from '@/components/layout/PageHeader';
 import PlannerInfo from '@/components/study-planner/PlannerInfo';
 import { cn } from '@/lib/utils';
-import { AlertTriangle, CalendarDays, CalendarPlus, Settings2 } from 'lucide-react';
+import { AlertTriangle, CalendarDays, CalendarPlus, PartyPopper, Settings2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Deadlines from './Deadlines';
@@ -16,6 +16,8 @@ import SettingsDialog from './SettingsDialog';
 import SetupPanel from './SetupPanel';
 import { dateTime, nowInLeuven, shortDay } from './time';
 import { useStudyPlanner, type PlannerApi } from './useStudyPlanner';
+import { VtkEventDialog, VtkPickerDialog } from './VtkDialogs';
+import type { VtkSlot } from './vtk';
 import WeekCalendar from './WeekCalendar';
 
 type View = 'week' | 'courses' | 'grid';
@@ -33,7 +35,8 @@ function initialParams(): { view: View; course: string | null; semester: string 
 }
 
 /**
- * The study planner: the reader's KU Leuven timetable as a week view with their deadlines, and an
+ * The study planner: the reader's KU Leuven timetable as a week view with their deadlines and the
+ * VTK events they put in it (the same planner the VTK app shows), and an
  * overview of the semester per course (what is ticked off, what to catch up, what is still to
  * come) as a list or a grid. The first visit asks for the timetable's subscription link.
  */
@@ -48,6 +51,8 @@ export default function StudyPlannerPage() {
     const [selected, setSelected] = useState<string | null>(null);
     const [exporting, setExporting] = useState(false);
     const [settings, setSettings] = useState(false);
+    const [vtkSlot, setVtkSlot] = useState<VtkSlot | null>(null);
+    const [picking, setPicking] = useState(false);
 
     const keys = useMemo(() => (state ? semesterKeys(state) : []), [state]);
     const fallback = state ? defaultSemester(state, keys) : null;
@@ -88,6 +93,10 @@ export default function StudyPlannerPage() {
                             title={t('study_planner.settings.title')}
                         >
                             <Settings2 className="size-[18px]" aria-hidden="true" />
+                        </button>
+                        <button type="button" onClick={() => setPicking(true)} className="vtk-button vtk-button-sm">
+                            <PartyPopper className="size-4" aria-hidden="true" />
+                            <span className="hidden sm:inline">{t('study_planner.vtk.button')}</span>
                         </button>
                         <button type="button" onClick={() => setExporting(true)} className="vtk-button vtk-button-sm">
                             <CalendarPlus className="size-4" aria-hidden="true" />
@@ -182,7 +191,7 @@ export default function StudyPlannerPage() {
                 <div className="mt-6">
                     {view === 'week' ? (
                         <>
-                            <WeekCalendar api={api} onSelect={setSelected} />
+                            <WeekCalendar api={api} onSelect={setSelected} onSelectVtk={setVtkSlot} />
                             <div className="mt-10">
                                 <Deadlines api={api} onSelect={setSelected} />
                             </div>
@@ -234,6 +243,8 @@ export default function StudyPlannerPage() {
             </div>
 
             <EventDialog event={event} api={api} onClose={() => setSelected(null)} />
+            <VtkEventDialog slot={vtkSlot} api={api} onClose={() => setVtkSlot(null)} />
+            <VtkPickerDialog open={picking} api={api} onClose={() => setPicking(false)} />
             <ExportDialog
                 open={exporting}
                 feedPath={state.feedPath}

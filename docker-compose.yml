@@ -35,6 +35,12 @@ services:
       FLUXUS_SSO_CLIENT_ID: ${FLUXUS_SSO_CLIENT_ID:?FLUXUS_SSO_CLIENT_ID is required}
       FLUXUS_SSO_CLIENT_SECRET: ${FLUXUS_SSO_CLIENT_SECRET:?FLUXUS_SSO_CLIENT_SECRET is required}
       FRONTEND_URL: "http://localhost:3002"
+      # The VTK website (VTK events in the study planner) and the secret it signs with when the
+      # VTK app reads the planner. Must equal BURGIECLAN_SERVICE_SECRET in the VTK website's .env.
+      # host.docker.internal and not localhost: inside the container `localhost` resolves to
+      # 127.0.0.1 before the extra_hosts entry below, so it would reach the container itself.
+      VTK_URL: ${VTK_URL:-http://host.docker.internal:3000}
+      VTK_SERVICE_SECRET: ${VTK_SERVICE_SECRET:-dev-only-vtk-service-secret-not-for-production}
       # Shared with the collab service below. A development-only value; production sets its own.
       COLLAB_SECRET: &collab-secret "dev-only-collab-secret-not-for-production-0000"
       # Where uploaded documents live: `local` (backend/data/documents, the default) or
@@ -57,6 +63,7 @@ services:
     # container itself.
     extra_hosts:
       - "localhost:host-gateway"
+      - "host.docker.internal:host-gateway"
 
   frontend:
     container_name: burgieclan-frontend

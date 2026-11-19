@@ -24,6 +24,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
  * - POST /api/study_planner/sync: sync now.
  * - POST /api/study_planner/operations: one change, see StudyPlannerOperationInput.
  * - POST /api/study_planner/feed_token: a new secret in the export link; the old link stops working.
+ * - GET /api/study_planner/vtk_events: what is coming up at VTK, to put in the planner
+ *   (StudyPlannerVtkEventsController).
  *
  * Every POST answers with the whole planner. The exported calendar itself is
  * GET /api/study_planner/feed/{token}.ics (StudyPlannerFeedController), without login.
@@ -138,4 +140,15 @@ class StudyPlannerApi
      */
     #[Groups([SerializationGroups::STUDY_PLANNER_GET])]
     public array $rules = [];
+
+    /**
+     * The VTK events put in the planner (StudyPlannerVtkEvent), sorted by their first
+     * occurrence. `occurrences` holds one entry per moment of a series, else just one, in Leuven
+     * wall-clock time: `date`/`endDate` "YYYY-MM-DD", `start`/`end` "HH:MM" (null all day),
+     * `startMin`/`endMin` minutes on `date` (an evening running past midnight ends at 1440).
+     *
+     * @var list<array<string, mixed>>
+     */
+    #[Groups([SerializationGroups::STUDY_PLANNER_GET])]
+    public array $vtkEvents = [];
 }

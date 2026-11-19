@@ -105,6 +105,16 @@ Other subsystems:
   array) exists only in the frontend, in `components/exam/`. Per-user rate limits are in
   `config/packages/rate_limiter.yaml`.
 
+- **Study planner and the VTK website**: `StudyPlanner` (one per user) holds the TimeEdit timetable
+  (`StudyPlannerSync`), the marks and deadlines, and the VTK events someone added (`StudyPlannerVtkEvent`,
+  copied from `{VTK_URL}/api/burgieclan/v1/events` and refreshed hourly by `VtkEventRefresher`). The VTK app
+  shows this same planner: vtk.be calls `/api/study_planner/*` for a member with a signed `X-Vtk-User`
+  header (`VtkServiceAuthenticator`, `VtkServiceSignature`, secret `VTK_SERVICE_SECRET`) instead of a JWT.
+  That signature counts only under `/api/study_planner`; keep it that way. The scheme has a twin in
+  vtk-website-new (`apps/web/lib/burgieclan/signature.ts`) with a shared test vector
+  (`StudyPlannerVtkTest::testSignatureMatchesTheVtkWebsite`): change both together. The full story is
+  `docs/burgieclan-planning.md` in vtk-website-new.
+
 Tests: Zenstruck Foundry factories live in `src/Factory/` (not under `tests/`). API tests extend
 `tests/Api/ApiTestCase`, whose `setUp()` creates a user and logs in to obtain `$this->token`; requests use
 Zenstruck Browser. DAMA rolls the database back between tests.

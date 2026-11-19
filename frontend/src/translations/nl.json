@@ -923,7 +923,7 @@
         "export": {
             "button": "Toevoegen aan agenda",
             "title": "Je rooster in je eigen agenda",
-            "intro": "Een link waarop Apple Agenda, Google Agenda of Outlook zich kan abonneren. Hij volgt deze pagina: verborgen lessen vallen weg, verplichte lessen heten \"MANDATORY: …\" en je deadlines komen erbij. Je agenda toont een wijziging na zijn volgende verversing.",
+            "intro": "Een link waarop Apple Agenda, Google Agenda of Outlook zich kan abonneren. Hij volgt deze pagina: verborgen lessen vallen weg, verplichte lessen heten \"MANDATORY: …\" en je deadlines en de VTK-evenementen die je toevoegde komen erbij. Je agenda toont een wijziging na zijn volgende verversing.",
             "link_label": "Link naar de agenda",
             "copy": "Kopieer",
             "copied": "Gekopieerd",
@@ -969,6 +969,26 @@
             "stop_help": "Verwijdert je rooster, afvinkingen, deadlines en de agendalink.",
             "stop": "Verwijder mijn planner",
             "stop_confirm": "Alles verwijderen"
+        },
+        "vtk": {
+            "button": "VTK-evenementen",
+            "kind": "VTK-evenement",
+            "legend": "VTK-evenement",
+            "all_day": "Hele dag",
+            "until": "tot {{day}}",
+            "series": "meerdere dagen",
+            "open": "Open op vtk.be",
+            "add": "Toevoegen",
+            "add_named": "{{title}} aan je planner toevoegen",
+            "remove": "Uit je planner halen",
+            "remove_named": "{{title}} uit je planner halen",
+            "in_planner": "In je planner",
+            "dialog_hint": "Dit evenement blijft op de VTK-kalender staan; het verdwijnt enkel uit je planner en je geëxporteerde agenda. Past VTK het aan, dan zie je dat hier binnen het uur.",
+            "picker_title": "VTK-evenementen in je planner",
+            "picker_intro": "Zet de activiteiten van VTK naast je lessen: ze komen in de weekweergave, in de VTK-app en in je geëxporteerde agenda.",
+            "loading": "VTK-evenementen laden…",
+            "load_failed": "De VTK-evenementen konden niet geladen worden.",
+            "empty": "Er staat op dit moment niets gepland bij VTK."
         }
     },
     "curriculum-panel": {

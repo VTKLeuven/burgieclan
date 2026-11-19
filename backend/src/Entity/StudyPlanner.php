@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Someone's study planner: their KU Leuven timetable subscription (a TimeEdit ICS link), kept as
  * a permanent history of sessions, plus what they did with it (ticked off, hidden, marked as
- * mandatory, weekly rules, deadlines entered by hand). One per user.
+ * mandatory, weekly rules, deadlines entered by hand, VTK events added to it). One per user.
  *
  * The timetable feed is a rolling window: sessions that have taken place drop out of it after a
  * while. Every sync therefore merges the feed into the stored sessions and never deletes one; see
@@ -64,6 +64,12 @@ class StudyPlanner extends BaseEntity
     #[ORM\OneToMany(mappedBy: 'planner', targetEntity: StudyPlannerItem::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $items;
 
+    /**
+     * @var Collection<int, StudyPlannerVtkEvent>
+     */
+    #[ORM\OneToMany(mappedBy: 'planner', targetEntity: StudyPlannerVtkEvent::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $vtkEvents;
+
     public function __construct(User $user, string $icsUrl)
     {
         $this->user = $user;
@@ -72,6 +78,7 @@ class StudyPlanner extends BaseEntity
         $this->events = new ArrayCollection();
         $this->rules = new ArrayCollection();
         $this->items = new ArrayCollection();
+        $this->vtkEvents = new ArrayCollection();
     }
 
     public static function newToken(): string
@@ -220,6 +227,39 @@ class StudyPlanner extends BaseEntity
     public function removeItem(StudyPlannerItem $item): self
     {
         $this->items->removeElement($item);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, StudyPlannerVtkEvent>
+     */
+    public function getVtkEvents(): Collection
+    {
+        return $this->vtkEvents;
+    }
+
+    public function findVtkEvent(string $vtkEventId): ?StudyPlannerVtkEvent
+    {
+        foreach ($this->vtkEvents as $event) {
+            if ($event->getVtkEventId() === $vtkEventId) {
+                return $event;
+            }
+        }
+
+        return null;
+    }
+
+    public function addVtkEvent(StudyPlannerVtkEvent $event): self
+    {
+        $this->vtkEvents->add($event);
+
+        return $this;
+    }
+
+    public function removeVtkEvent(StudyPlannerVtkEvent $event): self
+    {
+        $this->vtkEvents->removeElement($event);
 
         return $this;
     }

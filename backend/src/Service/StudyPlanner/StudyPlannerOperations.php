@@ -7,21 +7,29 @@ use App\Entity\StudyPlanner;
 use App\Entity\StudyPlannerEvent;
 use App\Entity\StudyPlannerItem;
 use App\Entity\StudyPlannerRule;
+use App\Entity\StudyPlannerVtkEvent;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 /**
  * Applies one change from POST /api/study_planner/operations (see StudyPlannerOperationInput).
  */
 class StudyPlannerOperations
 {
+    /** More VTK events than this in one planner is not planning any more. */
+    public const MAX_VTK_EVENTS = 300;
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly StudyPlannerState $state,
         private readonly StudyPlannerSubjects $subjects,
+        private readonly VtkEvents $vtkEvents,
     ) {}
+
 
     public function apply(StudyPlanner $planner, StudyPlannerOperationInput $input): void
     {
@@ -60,6 +68,15 @@ class StudyPlannerOperations
                 break;
             case 'itemDone':
                 $this->item($planner, $input->id)->setDone($this->value($input), $now);
+                break;
+            case 'addVtkEvent':
+                $this->addVtkEvent($planner, $this->vtkEventId($input), $now);
+                break;
+            case 'removeVtkEvent':
+                $event = $planner->findVtkEvent($this->vtkEventId($input));
+                if (null !== $event) {
+                    $planner->removeVtkEvent($event);
+                }
                 break;
             default:
                 throw new BadRequestHttpException('Unknown operation.');
@@ -190,5 +207,44 @@ class StudyPlannerOperations
         }
 
         $item->fill($subject['key'], $subject['label'], $kind, $title, $date, $time, $end, $note);
+    }
+
+    private function vtkEventId(StudyPlannerOperationInput $input): string
+    {
+        $id = trim((string) $input->vtkEventId);
+        if ('' === $id) {
+            throw new BadRequestHttpException('vtkEventId is required.');
+        }
+
+        return $id;
+    }
+
+    /**
+     * Copies the event from the VTK website into the planner. The data always comes from VTK
+     * itself, never from the request, so the planner cannot hold an event VTK does not publish.
+     */
+    private function addVtkEvent(StudyPlanner $planner, string $id, DateTimeImmutable $now): void
+    {
+        $event = $planner->findVtkEvent($id);
+        if (null !== $event && null === $event->getGoneAt()) {
+            return;
+        }
+        if (null === $event && $planner->getVtkEvents()->count() >= self::MAX_VTK_EVENTS) {
+            throw new BadRequestHttpException(sprintf('A planner holds at most %d VTK events.', self::MAX_VTK_EVENTS));
+        }
+        try {
+            $data = $this->vtkEvents->byIds([$id])[$id] ?? null;
+        } catch (RuntimeException) {
+            throw new ServiceUnavailableHttpException(60, 'The VTK website could not be reached. Try again in a minute.');
+        }
+        if (null === $data) {
+            throw new NotFoundHttpException('Unknown VTK event.');
+        }
+        if (null === $event) {
+            $event = new StudyPlannerVtkEvent($planner, $id);
+            $planner->addVtkEvent($event);
+            $this->entityManager->persist($event);
+        }
+        $event->update($data, $now);
     }
 }

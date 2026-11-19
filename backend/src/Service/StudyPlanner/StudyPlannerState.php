@@ -7,6 +7,7 @@ use App\Entity\StudyPlanner;
 use App\Entity\StudyPlannerEvent;
 use App\Entity\StudyPlannerItem;
 use App\Entity\StudyPlannerRule;
+use App\Entity\StudyPlannerVtkEvent;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -114,7 +115,79 @@ class StudyPlannerState
             array_values($rules)
         );
 
+        $vtk = array_values(array_filter($planner->getVtkEvents()->toArray(), static fn (StudyPlannerVtkEvent $e): bool => null === $e->getGoneAt()));
+        usort($vtk, static fn (StudyPlannerVtkEvent $a, StudyPlannerVtkEvent $b): int => $a->getStartsAt() <=> $b->getStartsAt());
+        $api->vtkEvents = array_map(
+            static fn (StudyPlannerVtkEvent $e): array => [
+            'id' => $e->getVtkEventId(),
+            'slug' => $e->getSlug(),
+            'titleNl' => $e->getTitleNl(),
+            'titleEn' => $e->getTitleEn(),
+            'location' => $e->getLocation(),
+            'urlNl' => $e->getUrlNl(),
+            'urlEn' => $e->getUrlEn(),
+            'allDay' => $e->isAllDay(),
+            'occurrences' => self::occurrences($e),
+            ],
+            $vtk
+        );
+
         return $api;
+    }
+
+    /**
+     * The times a VTK event takes place, in Leuven wall-clock time: each moment of a series, else
+     * the event itself.
+     *
+     * @return list<array{key: string, date: string, endDate: string, start: ?string, end: ?string, startMin: int, endMin: int, allDay: bool, label: ?string, location: ?string}>
+     */
+    public static function occurrences(StudyPlannerVtkEvent $event): array
+    {
+        $spans = [];
+        foreach ($event->getMoments() as $moment) {
+            $spans[] = [new DateTimeImmutable($moment['start']), new DateTimeImmutable($moment['end']), $moment['label'], $moment['location'] ?? $event->getLocation(), false];
+        }
+        if ([] === $spans) {
+            $spans[] = [$event->getStartsAt(), $event->getEndsAt(), null, $event->getLocation(), $event->isAllDay()];
+        }
+
+        $out = [];
+        foreach ($spans as $i => [$start, $end, $label, $location, $allDay]) {
+            $from = LeuvenTime::wall($start);
+            if ($allDay) {
+                // An all-day event ends at midnight or a moment before; either way on the day before.
+                $last = LeuvenTime::wall($end > $start ? $end->modify('-1 second') : $start)['date'];
+                $out[] = [
+                    'key' => $event->getVtkEventId() . ':' . $i,
+                    'date' => $from['date'],
+                    'endDate' => max($last, $from['date']),
+                    'start' => null,
+                    'end' => null,
+                    'startMin' => 0,
+                    'endMin' => 1440,
+                    'allDay' => true,
+                    'label' => $label,
+                    'location' => $location,
+                ];
+                continue;
+            }
+            $to = LeuvenTime::wall($end);
+            $sameDay = $to['date'] === $from['date'];
+            $out[] = [
+                'key' => $event->getVtkEventId() . ':' . $i,
+                'date' => $from['date'],
+                'endDate' => max($to['date'], $from['date']),
+                'start' => $from['time'],
+                'end' => $end > $start ? $to['time'] : null,
+                'startMin' => $from['minutes'],
+                'endMin' => $sameDay ? min(1440, max($to['minutes'], $from['minutes'] + 15)) : 1440,
+                'allDay' => false,
+                'label' => $label,
+                'location' => $location,
+            ];
+        }
+
+        return $out;
     }
 
     /**

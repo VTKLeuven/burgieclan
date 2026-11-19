@@ -923,7 +923,7 @@
         "export": {
             "button": "Add to calendar",
             "title": "Add your timetable to your calendar",
-            "intro": "A link that Apple Calendar, Google Calendar or Outlook can subscribe to. It follows this page: hidden sessions are left out, mandatory sessions are titled \"MANDATORY: …\" and your deadlines are added. Your calendar shows a change after its next refresh.",
+            "intro": "A link that Apple Calendar, Google Calendar or Outlook can subscribe to. It follows this page: hidden sessions are left out, mandatory sessions are titled \"MANDATORY: …\" and your deadlines and the VTK events you added come along. Your calendar shows a change after its next refresh.",
             "link_label": "Link to the calendar",
             "copy": "Copy",
             "copied": "Copied",
@@ -969,6 +969,26 @@
             "stop_help": "Removes your timetable, ticks, deadlines and the calendar link.",
             "stop": "Remove my planner",
             "stop_confirm": "Remove everything"
+        },
+        "vtk": {
+            "button": "VTK events",
+            "kind": "VTK event",
+            "legend": "VTK event",
+            "all_day": "All day",
+            "until": "until {{day}}",
+            "series": "several days",
+            "open": "Open on vtk.be",
+            "add": "Add",
+            "add_named": "Add {{title}} to the planner",
+            "remove": "Take out of the planner",
+            "remove_named": "Take {{title}} out of the planner",
+            "in_planner": "In planner",
+            "dialog_hint": "This event stays on the VTK calendar; taking it out only removes it from your planner and your exported calendar. Changes VTK makes to it show up here within the hour.",
+            "picker_title": "VTK events in your planner",
+            "picker_intro": "Put VTK's activities next to your lessons: they show up in the week view, in the VTK app and in your exported calendar.",
+            "loading": "Loading VTK events…",
+            "load_failed": "The VTK events could not be loaded.",
+            "empty": "Nothing is planned at VTK right now."
         }
     },
     "curriculum-panel": {

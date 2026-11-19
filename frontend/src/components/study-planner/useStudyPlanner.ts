@@ -85,7 +85,7 @@ export function useStudyPlanner(): StudyPlannerHandle {
             }
             if (result === null) {
                 // DELETE: unsubscribed.
-                setState((s) => (s ? { ...s, subscribed: false, icsUrl: null, feedPath: null, events: [], items: [], rules: [], subjects: [] } : s));
+                setState((s) => (s ? { ...s, subscribed: false, icsUrl: null, feedPath: null, events: [], items: [], rules: [], subjects: [], vtkEvents: [] } : s));
             } else {
                 setState(convertToStudyPlanner(result));
             }

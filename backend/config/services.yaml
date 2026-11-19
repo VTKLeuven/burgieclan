@@ -14,6 +14,11 @@ parameters:
     env(COLLAB_SECRET): ''
     # Where Symfony reaches the collab server itself, for rollbacks and locks (CollabServerClient).
     env(COLLAB_INTERNAL_URL): 'http://collab:1234'
+    # The VTK website, for the VTK events in the study planner (VtkEvents), and the secret it
+    # signs with when it speaks for a member (VtkServiceSignature, the VTK app). Empty switches
+    # the VTK app's access off; the planner itself keeps working.
+    env(VTK_URL): 'http://localhost:3000'
+    env(VTK_SERVICE_SECRET): ''
 
 services:
     # default configuration for services in *this* file

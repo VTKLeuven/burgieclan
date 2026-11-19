@@ -59,10 +59,41 @@ class UserRepository extends ServiceEntityRepository
      */
     public function createUserFromFluxusUser(FluxusResourceOwner $fluxusUser, AccessToken $accessToken): User
     {
+        $user = $this->findOrCreateFromFluxusClaims($fluxusUser);
+
+        $this->roleSynchronizer->synchronize($user, $fluxusUser);
+
+        $user->setAccessToken($accessToken);
+
+        $this->getEntityManager()->flush();
+
+        return $user;
+    }
+
+    /**
+     * The account of a member the VTK website speaks for (VtkServiceAuthenticator), found and
+     * created exactly like on an SSO login, so the VTK app and a later login land on the same
+     * account. Roles are not touched: they follow the `permissions` claim, which only a real
+     * login fetches; a new account starts as ROLE_USER, as it would there.
+     */
+    public function findOrCreateFromVtkIdentity(string $sub, string $email, string $name): User
+    {
+        $user = $this->findOrCreateFromFluxusClaims(new FluxusResourceOwner(['sub' => $sub, 'email' => $email, 'name' => $name]));
+        $this->getEntityManager()->flush();
+
+        return $user;
+    }
+
+    /**
+     * Matches on `sub`, then on email (linking the account once), else creates one. Does not
+     * flush.
+     */
+    private function findOrCreateFromFluxusClaims(FluxusResourceOwner $fluxusUser): User
+    {
         $sub = $fluxusUser->getId();
         $email = $fluxusUser->getEmail();
 
-        if (null === $sub || null === $email) {
+        if (null === $sub || '' === $sub || null === $email || '' === $email) {
             // Without a subject or an email there is nothing to key an account on.
             throw new AuthenticationException('VTK userinfo is missing sub or email.');
         }
@@ -89,12 +120,6 @@ class UserRepository extends ServiceEntityRepository
                 $this->getEntityManager()->persist($user);
             }
         }
-
-        $this->roleSynchronizer->synchronize($user, $fluxusUser);
-
-        $user->setAccessToken($accessToken);
-
-        $this->getEntityManager()->flush();
 
         return $user;
     }

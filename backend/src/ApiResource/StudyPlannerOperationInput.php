@@ -17,10 +17,12 @@ use Symfony\Component\Validator\Constraints as Assert;
  * - {"op": "addItem", "item"}, {"op": "updateItem", "id", "item"}, {"op": "deleteItem", "id"},
  *   {"op": "itemDone", "id", "value"}: deadlines and mandatory sessions entered by hand, where
  *   item = {"subject", "kind": "deadline"|"mandatory", "title", "date", "time", "end", "note"}.
+ * - {"op": "addVtkEvent", "vtkEventId"} / {"op": "removeVtkEvent", "vtkEventId"}: put a VTK event
+ *   in the planner, or take it out again. Both do nothing when it is already so.
  */
 class StudyPlannerOperationInput
 {
-    public const OPS = ['done', 'hide', 'mandatory', 'keepOnly', 'addRule', 'removeRule', 'addItem', 'updateItem', 'deleteItem', 'itemDone'];
+    public const OPS = ['done', 'hide', 'mandatory', 'keepOnly', 'addRule', 'removeRule', 'addItem', 'updateItem', 'deleteItem', 'itemDone', 'addVtkEvent', 'removeVtkEvent'];
 
     #[Assert\NotBlank]
     #[Assert\Choice(choices: self::OPS)]
@@ -41,4 +43,8 @@ class StudyPlannerOperationInput
      * @var array<string, mixed>|null
      */
     public ?array $item = null;
+
+    /** The id of an event on the VTK website. */
+    #[Assert\Length(max: 64)]
+    public ?string $vtkEventId = null;
 }

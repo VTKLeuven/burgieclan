@@ -62,6 +62,10 @@ services:
 
       # Fluxus SSO (OAuth2 / OIDC)
       FLUXUS_SSO_ISSUER: ${FLUXUS_SSO_ISSUER:?FLUXUS_SSO_ISSUER is required}
+      # The VTK website, for VTK events in the study planner, and the secret it signs with
+      # when the VTK app reads the planner. Empty secret = the VTK app gets no access.
+      VTK_URL: ${VTK_URL:-https://vtk.be}
+      VTK_SERVICE_SECRET: ${VTK_SERVICE_SECRET:-}
       FLUXUS_SSO_CLIENT_ID: ${FLUXUS_SSO_CLIENT_ID:?FLUXUS_SSO_CLIENT_ID is required}
       FLUXUS_SSO_CLIENT_SECRET: ${FLUXUS_SSO_CLIENT_SECRET:?FLUXUS_SSO_CLIENT_SECRET is required}
 

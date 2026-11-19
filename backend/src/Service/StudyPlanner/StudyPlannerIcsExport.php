@@ -11,8 +11,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /**
  * The calendar a study planner exports, for a calendar app to subscribe to instead of the KU
  * Leuven timetable (RFC 5545): the same sessions with their own titles and rooms, without the ones
- * hidden in the planner, the mandatory ones titled "MANDATORY: …", plus the deadlines (all day)
- * and the mandatory sessions entered by hand.
+ * hidden in the planner, the mandatory ones titled "MANDATORY: …", plus the deadlines (all day),
+ * the mandatory sessions entered by hand, and the VTK events put in the planner (one entry per
+ * moment of a series), so lessons and VTK's activities sit in one calendar.
  */
 class StudyPlannerIcsExport
 {
@@ -52,7 +53,7 @@ class StudyPlannerIcsExport
             'CALSCALE:GREGORIAN',
             'METHOD:PUBLISH',
             'X-WR-CALNAME:' . $this->text('Timetable (Burgieclan)'),
-            'X-WR-CALDESC:' . $this->text('KU Leuven timetable from Burgieclan: without the sessions hidden there, with the mandatory sessions marked and the deadlines added.'),
+            'X-WR-CALDESC:' . $this->text('KU Leuven timetable from Burgieclan: without the sessions hidden there, with the mandatory sessions marked and the deadlines and VTK events added.'),
             'X-WR-TIMEZONE:' . LeuvenTime::TIME_ZONE,
             'REFRESH-INTERVAL;VALUE=DURATION:PT1H',
             'X-PUBLISHED-TTL:PT1H',
@@ -133,6 +134,31 @@ class StudyPlannerIcsExport
                 null === $time ? 'TRANSP:TRANSPARENT' : null,
                 ]
             );
+        }
+
+        foreach ($api->vtkEvents as $vtk) {
+            $title = $vtk['titleEn'] ?? $vtk['titleNl'];
+            $url = '' !== $vtk['urlEn'] ? $vtk['urlEn'] : $vtk['urlNl'];
+            foreach ($vtk['occurrences'] as $i => $o) {
+                $add(
+                    [
+                    'UID:vtk-' . $vtk['id'] . '-' . $i . '@' . $host,
+                    'DTSTAMP:' . $stamp,
+                    $o['allDay']
+                        ? 'DTSTART;VALUE=DATE:' . str_replace('-', '', $o['date'])
+                        : 'DTSTART:' . $this->utc(LeuvenTime::at($o['date'], (string) $o['start'])),
+                    $o['allDay']
+                        ? 'DTEND;VALUE=DATE:' . (new DateTimeImmutable($o['endDate']))->modify('+1 day')->format('Ymd')
+                        : (null !== $o['end'] ? 'DTEND:' . $this->utc(LeuvenTime::at($o['endDate'], $o['end'])) : null),
+                    'SUMMARY:' . $this->text(null !== $o['label'] ? $title . ': ' . $o['label'] : $title),
+                    null !== $o['location'] ? 'LOCATION:' . $this->text($o['location']) : null,
+                    'DESCRIPTION:' . $this->text("VTK event, added to the planner on Burgieclan\n" . $url),
+                    'CATEGORIES:VTK',
+                    '' !== $url ? 'URL:' . $url : null,
+                    $o['allDay'] ? 'TRANSP:TRANSPARENT' : null,
+                    ]
+                );
+            }
         }
 
         $lines[] = 'END:VCALENDAR';

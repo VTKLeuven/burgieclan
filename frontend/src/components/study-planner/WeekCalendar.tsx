@@ -2,12 +2,13 @@
 
 import { cn } from '@/lib/utils';
 import type { StudyPlannerEvent } from '@/types/entities';
-import { Check, ChevronLeft, ChevronRight, Flag } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Flag, PartyPopper } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MANDATORY_MARK, sessionTone, TONE_BLOCK, TONES, typeKey, type SessionTone } from './model';
 import { addDays, isoWeek, longDay, mondayOf, nowInLeuven, weekdayName, weekRange } from './time';
 import type { PlannerApi } from './useStudyPlanner';
+import { vtkSlots, vtkTitle, type VtkSlot } from './vtk';
 
 const HOUR_PX = 52;
 
@@ -17,17 +18,22 @@ const SWATCH: Record<SessionTone, string> = {
     other: 'border-plan-other-border bg-plan-other-bg',
 };
 
-interface Placed {
-    event: StudyPlannerEvent;
+type Timed = { startMin: number; endMin: number };
+
+interface Placed<T extends Timed> {
+    event: T;
     lane: number;
     lanes: number;
 }
 
-/** Side by side columns for sessions that overlap in time. */
-function place(events: StudyPlannerEvent[]): Placed[] {
+/** A VTK event on the week view: the yellow rail, the house accent, on a plain card. */
+const VTK_BLOCK = 'border-border-strong bg-surface text-fg shadow-[inset_3px_0_0_var(--color-vtk-yellow)]';
+
+/** Side by side columns for sessions (and VTK events) that overlap in time. */
+function place<T extends Timed>(events: T[]): Placed<T>[] {
     const sorted = [...events].sort((a, b) => a.startMin - b.startMin || b.endMin - a.endMin);
-    const out: Placed[] = [];
-    let cluster: Placed[] = [];
+    const out: Placed<T>[] = [];
+    let cluster: Placed<T>[] = [];
     let laneEnds: number[] = [];
     let clusterEnd = -1;
     const flush = () => {
@@ -56,7 +62,15 @@ function place(events: StudyPlannerEvent[]): Placed[] {
 }
 
 /** The week view of the timetable: Monday to Friday, plus the weekend when it has sessions. */
-export default function WeekCalendar({ api, onSelect }: { api: PlannerApi; onSelect: (uid: string) => void }) {
+export default function WeekCalendar({
+    api,
+    onSelect,
+    onSelectVtk,
+}: {
+    api: PlannerApi;
+    onSelect: (uid: string) => void;
+    onSelectVtk: (slot: VtkSlot) => void;
+}) {
     const { t, i18n } = useTranslation();
     const locale = i18n.language;
     const { state } = api;
@@ -74,15 +88,29 @@ export default function WeekCalendar({ api, onSelect }: { api: PlannerApi; onSel
     const inWeek = state.events.filter((e) => e.date >= monday && e.date <= sunday);
     const hiddenCount = inWeek.filter((e) => e.hidden).length;
     const visible = showHidden ? inWeek : inWeek.filter((e) => !e.hidden);
-    const weekend = visible.some((e) => e.date > addDays(monday, 4));
+    const vtk = vtkSlots(state.vtkEvents, monday, sunday);
+    const vtkTimed = vtk.filter((v) => !v.allDay);
+    const vtkAllDay = vtk.filter((v) => v.allDay);
+    const weekend = visible.some((e) => e.date > addDays(monday, 4)) || vtk.some((v) => v.date > addDays(monday, 4));
     const days = Array.from({ length: weekend ? 7 : 5 }, (_, i) => addDays(monday, i));
 
     let minH = 8;
     let maxH = 18;
-    if (visible.length > 0) {
-        minH = Math.min(minH, Math.floor(Math.min(...visible.map((e) => e.startMin)) / 60));
-        maxH = Math.max(maxH, Math.ceil(Math.max(...visible.map((e) => e.endMin)) / 60));
+    const timed: Timed[] = [...visible, ...vtkTimed];
+    if (timed.length > 0) {
+        minH = Math.min(minH, Math.floor(Math.min(...timed.map((e) => e.startMin)) / 60));
+        maxH = Math.max(maxH, Math.ceil(Math.max(...timed.map((e) => e.endMin)) / 60));
     }
+    const vtkLabel = (v: VtkSlot) =>
+        [
+            t('study_planner.vtk.kind'),
+            vtkTitle(v.event, locale),
+            v.occurrence.label,
+            v.allDay ? null : v.occurrence.start,
+            v.occurrence.location ?? v.event.location,
+        ]
+            .filter(Boolean)
+            .join(', ');
     const hours = Array.from({ length: maxH - minH + 1 }, (_, i) => minH + i);
     const height = (maxH - minH) * HOUR_PX;
     const y = (minutes: number) => ((minutes - minH * 60) / 60) * HOUR_PX;
@@ -202,6 +230,31 @@ export default function WeekCalendar({ api, onSelect }: { api: PlannerApi; onSel
                             );
                         })}
                     </div>
+                    {vtkAllDay.length > 0 && (
+                        <div
+                            className="grid border-b border-border"
+                            style={{ gridTemplateColumns: `52px repeat(${days.length}, minmax(0, 1fr))` }}
+                        >
+                            <span className="self-center pr-2 text-right text-caption text-fg-placeholder">{t('study_planner.vtk.all_day')}</span>
+                            {days.map((d) => (
+                                <div key={d} className="space-y-1 border-l border-border p-1">
+                                    {vtkAllDay
+                                        .filter((v) => v.date === d)
+                                        .map((v) => (
+                                            <button
+                                                key={v.key}
+                                                type="button"
+                                                onClick={() => onSelectVtk(v)}
+                                                aria-label={vtkLabel(v)}
+                                                className={cn('block w-full truncate rounded-[6px] border px-2 py-0.5 text-left text-caption font-semibold', VTK_BLOCK)}
+                                            >
+                                                {vtkTitle(v.event, locale)}
+                                            </button>
+                                        ))}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                     <div
                         className="relative grid"
                         style={{ gridTemplateColumns: `52px repeat(${days.length}, minmax(0, 1fr))`, height }}
@@ -218,7 +271,10 @@ export default function WeekCalendar({ api, onSelect }: { api: PlannerApi; onSel
                             ))}
                         </div>
                         {days.map((d) => {
-                            const placed = place(visible.filter((e) => e.date === d));
+                            const placed = place<StudyPlannerEvent | VtkSlot>([
+                                ...visible.filter((e) => e.date === d),
+                                ...vtkTimed.filter((v) => v.date === d),
+                            ]);
                             const today = d === now.date;
                             return (
                                 <div key={d} className={cn('relative border-l border-border', today && 'bg-surface-muted')}>
@@ -230,8 +286,43 @@ export default function WeekCalendar({ api, onSelect }: { api: PlannerApi; onSel
                                             style={{ top: y(h * 60) }}
                                         />
                                     ))}
-                                    {placed.map(({ event: e, lane, lanes }) => {
-                                        const h = Math.max(26, y(e.endMin) - y(e.startMin) - 3);
+                                    {placed.map(({ event: item, lane, lanes }) => {
+                                        const h = Math.max(26, y(item.endMin) - y(item.startMin) - 3);
+                                        const box = {
+                                            top: y(item.startMin) + 1,
+                                            height: h,
+                                            left: `calc(${(lane / lanes) * 100}% + 3px)`,
+                                            width: `calc(${100 / lanes}% - 6px)`,
+                                        };
+                                        if ('occurrence' in item) {
+                                            return (
+                                                <button
+                                                    key={item.key}
+                                                    type="button"
+                                                    onClick={() => onSelectVtk(item)}
+                                                    aria-label={vtkLabel(item)}
+                                                    className={cn(
+                                                        'absolute flex flex-col items-stretch justify-start overflow-hidden rounded-[7px] border px-2 py-1 pl-2.5 text-left transition-[filter] hover:brightness-[0.97]',
+                                                        VTK_BLOCK,
+                                                    )}
+                                                    style={box}
+                                                >
+                                                    <span className="flex items-center gap-1 text-caption font-semibold tabular text-fg-muted">
+                                                        {item.startMin === item.occurrence.startMin ? item.occurrence.start : ''}
+                                                        <PartyPopper className="size-3" aria-hidden="true" />
+                                                        VTK
+                                                    </span>
+                                                    <span className={cn('mt-0.5 block text-small font-semibold leading-tight text-fg', h > 70 ? 'line-clamp-3' : 'line-clamp-2')}>
+                                                        {vtkTitle(item.event, locale)}
+                                                        {item.occurrence.label ? `: ${item.occurrence.label}` : ''}
+                                                    </span>
+                                                    {h > 84 && (item.occurrence.location ?? item.event.location) && (
+                                                        <span className="mt-0.5 block truncate text-caption">{item.occurrence.location ?? item.event.location}</span>
+                                                    )}
+                                                </button>
+                                            );
+                                        }
+                                        const e = item;
                                         return (
                                             <button
                                                 key={e.uid}
@@ -242,12 +333,7 @@ export default function WeekCalendar({ api, onSelect }: { api: PlannerApi; onSel
                                                     'absolute flex flex-col items-stretch justify-start overflow-hidden rounded-[7px] border px-2 py-1 text-left transition-[filter] hover:brightness-[0.97]',
                                                     blockClass(e),
                                                 )}
-                                                style={{
-                                                    top: y(e.startMin) + 1,
-                                                    height: h,
-                                                    left: `calc(${(lane / lanes) * 100}% + 3px)`,
-                                                    width: `calc(${100 / lanes}% - 6px)`,
-                                                }}
+                                                style={box}
                                             >
                                                 <span className="flex items-center gap-1 text-caption font-semibold tabular">
                                                     {e.start}
@@ -288,6 +374,7 @@ export default function WeekCalendar({ api, onSelect }: { api: PlannerApi; onSel
                 <ol className="m-0 list-none divide-y divide-border p-0 md:hidden">
                     {days.map((d) => {
                         const list = visible.filter((e) => e.date === d);
+                        const vtkToday = vtk.filter((v) => v.date === d);
                         return (
                             <li key={d} className="px-4 py-3">
                                 <h3 className="m-0 text-body font-semibold text-fg">
@@ -296,9 +383,36 @@ export default function WeekCalendar({ api, onSelect }: { api: PlannerApi; onSel
                                         <span className="ml-2 text-small font-medium text-fg-muted">{t('study_planner.week.today')}</span>
                                     )}
                                 </h3>
-                                {list.length === 0 ? (
+                                {vtkToday.length > 0 && (
+                                    <ul className="m-0 mt-2 list-none space-y-2 p-0">
+                                        {vtkToday.map((v) => (
+                                            <li key={v.key}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onSelectVtk(v)}
+                                                    aria-label={vtkLabel(v)}
+                                                    className={cn('grid w-full grid-cols-[48px_minmax(0,1fr)] gap-3 rounded-control border px-3 py-2.5 pl-4 text-left', VTK_BLOCK)}
+                                                >
+                                                    <span className="text-small font-semibold tabular">
+                                                        {v.allDay ? t('study_planner.vtk.all_day') : v.startMin === v.occurrence.startMin ? v.occurrence.start : ''}
+                                                    </span>
+                                                    <span className="min-w-0">
+                                                        <span className="block text-body font-semibold text-fg">
+                                                            {vtkTitle(v.event, locale)}
+                                                            {v.occurrence.label ? `: ${v.occurrence.label}` : ''}
+                                                        </span>
+                                                        <span className="block text-small text-fg-muted">
+                                                            {[t('study_planner.vtk.kind'), v.occurrence.location ?? v.event.location].filter(Boolean).join(', ')}
+                                                        </span>
+                                                    </span>
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                {list.length === 0 && vtkToday.length === 0 ? (
                                     <p className="m-0 mt-1 text-small text-fg-muted">{t('study_planner.week.no_sessions')}</p>
-                                ) : (
+                                ) : list.length === 0 ? null : (
                                     <ul className="m-0 mt-2 list-none space-y-2 p-0">
                                         {list.map((e) => (
                                             <li key={e.uid}>
@@ -347,6 +461,10 @@ export default function WeekCalendar({ api, onSelect }: { api: PlannerApi; onSel
                     <span className="inline-flex items-center gap-1.5">
                         <span aria-hidden="true" className={cn('size-3 rounded-[3px] border', SWATCH.lecture, MANDATORY_MARK)} />
                         {t('study_planner.mark.mandatory_cap')}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                        <span aria-hidden="true" className={cn('size-3 rounded-[3px] border', VTK_BLOCK)} />
+                        {t('study_planner.vtk.legend')}
                     </span>
                 </div>
                 <p className="m-0">{t('study_planner.week.hint')}</p>

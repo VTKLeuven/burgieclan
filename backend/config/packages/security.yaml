@@ -31,6 +31,10 @@ security:
               success_handler: lexik_jwt_authentication.handler.authentication_success
               failure_handler: lexik_jwt_authentication.handler.authentication_failure
             jwt: ~
+            # The VTK website speaking for a member, on the study planner routes only
+            # (the VTK app shows the same planner). See VtkServiceAuthenticator.
+            custom_authenticators:
+                - App\Security\VtkServiceAuthenticator
             refresh_jwt:
               check_path: /api/auth/token/refresh
               invalidate_token_on_logout: true

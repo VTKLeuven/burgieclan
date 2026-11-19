@@ -25,6 +25,8 @@ import {
     type StudyPlannerItem,
     type StudyPlannerMark,
     type StudyPlannerRule,
+    type StudyPlannerVtkEvent,
+    type StudyPlannerVtkOption,
     type StudyPlannerSubject,
     type Tag,
     type User,
@@ -555,6 +557,28 @@ export function convertToStudyPlanner(planner: unknown): StudyPlanner {
         time: str(r.time),
         location: str(r.location),
     }));
+    const vtkEvents: StudyPlannerVtkEvent[] = records(data.vtkEvents).map((v) => ({
+        id: str(v.id),
+        slug: str(v.slug),
+        titleNl: str(v.titleNl),
+        titleEn: strOrNull(v.titleEn),
+        location: strOrNull(v.location),
+        urlNl: str(v.urlNl),
+        urlEn: str(v.urlEn),
+        allDay: v.allDay === true,
+        occurrences: records(v.occurrences).map((o) => ({
+            key: str(o.key),
+            date: str(o.date),
+            endDate: str(o.endDate) || str(o.date),
+            start: strOrNull(o.start),
+            end: strOrNull(o.end),
+            startMin: num(o.startMin),
+            endMin: num(o.endMin),
+            allDay: o.allDay === true,
+            label: strOrNull(o.label),
+            location: strOrNull(o.location),
+        })),
+    }));
     return {
         subscribed: data.subscribed === true,
         icsUrl: strOrNull(data.icsUrl),
@@ -567,5 +591,24 @@ export function convertToStudyPlanner(planner: unknown): StudyPlanner {
         events,
         items,
         rules,
+        vtkEvents,
     };
+}
+
+export function convertToStudyPlannerVtkOptions(payload: unknown): StudyPlannerVtkOption[] {
+    const data = toRecord(payload, 'StudyPlannerVtkEvents');
+    return records(data.events).map((e) => ({
+        id: str(e.id),
+        titleNl: str(e.titleNl),
+        titleEn: strOrNull(e.titleEn),
+        location: strOrNull(e.location),
+        date: str(e.date),
+        time: strOrNull(e.time),
+        endDate: str(e.endDate) || str(e.date),
+        allDay: e.allDay === true,
+        series: e.series === true,
+        urlNl: str(e.urlNl),
+        urlEn: str(e.urlEn),
+        inPlanner: e.inPlanner === true,
+    }));
 }
