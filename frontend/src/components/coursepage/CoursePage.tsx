@@ -147,7 +147,7 @@ export default function CoursePage() {
                                         href={`https://onderwijsaanbod.kuleuven.be/syllabi/n/${course.code}N.htm`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="vtk-link inline-flex items-center gap-1"
+                                        className="inline-flex items-center gap-1 font-medium text-link hover:underline"
                                     >
                                         {t('course-page.ects-sheet')}
                                         <ArrowUpRight className="size-3.5" aria-hidden="true" />

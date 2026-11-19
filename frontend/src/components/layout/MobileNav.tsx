@@ -33,7 +33,7 @@ export default function MobileNav() {
             />
             <DialogPanel
                 transition
-                className="fixed inset-y-0 left-0 w-[280px] max-w-[85vw] bg-sidebar shadow-dialog transition-transform duration-200 ease-out data-closed:-translate-x-full"
+                className="fixed inset-y-0 left-0 w-[280px] max-w-[85vw] bg-canvas shadow-dialog transition-transform duration-200 ease-out data-closed:-translate-x-full"
             >
                 <DialogTitle className="sr-only">{t('open_menu')}</DialogTitle>
                 <Sidebar onNavigate={() => setOpen(false)} />
