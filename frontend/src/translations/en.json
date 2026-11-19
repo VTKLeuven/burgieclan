@@ -97,6 +97,10 @@
                 "create": "Create new tag \"{{tag}}\"",
                 "no-results": "No tags found"
             },
+            "parts": {
+                "label": "Course parts (optional)",
+                "full_course": "Full course"
+            },
             "validation": {
                 "name": {
                     "required": "Name is required",
@@ -189,7 +193,8 @@
         "document-count": {
             "zero": "0 documents",
             "one": "1 document",
-            "other": "{{count}} documents"
+            "other": "{{count}} documents",
+            "related": "+{{count}} from equivalent and previous courses"
         },
         "comments": {
             "comment-single": "1 comment",
@@ -258,7 +263,18 @@
             "select-all": "Select all",
             "deselect-all": "Deselect all",
             "clear-selection": "Clear selection",
-            "favorites-see-all": "See all favorites"
+            "favorites-see-all": "See all favorites",
+            "this-course": "This course",
+            "older-courses": "Previously taught as",
+            "none-see-older": "No documents under this code yet. See the previous courses below.",
+            "no-year": "Year unknown",
+            "from-course": "On {{code}}, an equivalent course",
+            "open-course": "Open the course page of {{code}}",
+            "all-tags": "All",
+            "filter-by-tag": "Filter by tag",
+            "all-parts": "All",
+            "full-course": "Full course",
+            "filter-by-part": "Filter by course part"
         },
         "related": {
             "predecessors": "Previously taught as",
@@ -477,7 +493,8 @@
         "info_sub": "Quickly access any page by running a global search.",
         "no_results": "No results found",
         "no_results_sub": "Try searching for something else or check your spelling.",
-        "exam_questions": "Exam questions"
+        "exam_questions": "Exam questions",
+        "also_known_as": "also: {{title}}"
     },
     "header": {
         "admin": "Admin",

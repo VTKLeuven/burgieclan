@@ -296,18 +296,29 @@ class SearchResourceTest extends ApiTestCase
     }
 
     /**
-     * A course is found under the title the onderwijsaanbod lists it by - in its own language of
-     * instruction - and its code, never under the translation of that title.
+     * A course is found under its own teaching-language title, its code, and its translated title,
+     * with hits on the course's own title or code ranked ahead of translated-title-only hits.
      */
-    public function testCoursesAreNotFoundUnderTheirTranslatedTitle(): void
+    public function testCoursesMatchTranslatedTitlesWithOwnLanguagePriority(): void
     {
-        $course = CourseFactory::createOne(
+        $dutchCourse = CourseFactory::createOne(
             [
                 'name' => 'Bedrijfskunde en ondernemen',
                 'nameNl' => 'Bedrijfskunde en ondernemen',
                 'nameEn' => 'Business Administration and Entrepreneurship',
                 'language' => 'nl',
                 'code' => 'H0R18A',
+            ]
+        );
+        // Alphabetically after "Bedrijfskunde en ondernemen", so it only ranks first when
+        // own-language matches take priority over translated-title matches.
+        $englishCourse = CourseFactory::createOne(
+            [
+                'name' => 'Business Administration',
+                'nameNl' => 'Bedrijfsbeheer',
+                'nameEn' => 'Business Administration',
+                'language' => 'en',
+                'code' => 'H0R19A',
             ]
         );
 
@@ -320,9 +331,20 @@ class SearchResourceTest extends ApiTestCase
             ->json()
             ->decoded()['courses'];
 
-        $this->assertSame('/api/courses/' . $course->getId(), $search('bedrijfskunde')[0]['@id']);
-        $this->assertSame('/api/courses/' . $course->getId(), $search('h0r18a')[0]['@id']);
-        $this->assertSame([], $search('business administration'));
+        $this->assertSame('/api/courses/' . $dutchCourse->getId(), $search('bedrijfskunde')[0]['@id']);
+        $this->assertSame('/api/courses/' . $dutchCourse->getId(), $search('h0r18a')[0]['@id']);
+
+        // Translated Dutch title finds the English-taught course.
+        $dutchTranslationHits = $search('bedrijfsbeheer');
+        $this->assertCount(1, $dutchTranslationHits);
+        $this->assertSame('/api/courses/' . $englishCourse->getId(), $dutchTranslationHits[0]['@id']);
+
+        // Both courses match "business administration", but the English course whose own title
+        // matches must rank ahead of the Dutch course that only matches via nameEn.
+        $bilingualHits = $search('business administration');
+        $this->assertCount(2, $bilingualHits);
+        $this->assertSame('/api/courses/' . $englishCourse->getId(), $bilingualHits[0]['@id']);
+        $this->assertSame('/api/courses/' . $dutchCourse->getId(), $bilingualHits[1]['@id']);
     }
 
     /**
@@ -386,6 +408,11 @@ class SearchResourceTest extends ApiTestCase
         $this->assertSame('january', $hits[0]['period']);
         $this->assertSame('/api/courses/' . $analysis->getId(), $hits[0]['course']['@id']);
         $this->assertSame('H01A0B', $hits[0]['course']['code']);
+
+        // Searching by the course's translated title also finds its questions.
+        $translatedHits = $this->searchExamQuestions('analysis rolle');
+        $this->assertCount(1, $translatedHits);
+        $this->assertSame('q1', $translatedHits[0]['uid']);
 
         // Only the course: that lists the course, not every question of it.
         $this->assertSame([], $this->searchExamQuestions('analyse'));

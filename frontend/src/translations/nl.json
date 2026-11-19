@@ -97,6 +97,10 @@
                 "create": "Maak nieuwe tag \"{{tag}}\"",
                 "no-results": "Geen tags gevonden"
             },
+            "parts": {
+                "label": "Onderdelen (optioneel)",
+                "full_course": "Volledig vak"
+            },
             "validation": {
                 "name": {
                     "required": "Naam is verplicht",
@@ -189,7 +193,8 @@
         "document-count": {
             "zero": "0 documenten",
             "one": "1 document",
-            "other": "{{count}} documenten"
+            "other": "{{count}} documenten",
+            "related": "+{{count}} van gelijkwaardige en vorige vakken"
         },
         "comments": {
             "comment-single": "1 reactie",
@@ -258,7 +263,18 @@
             "select-all": "Selecteer alles",
             "deselect-all": "Deselecteer alles",
             "clear-selection": "Selectie wissen",
-            "favorites-see-all": "Bekijk alle favorieten"
+            "favorites-see-all": "Bekijk alle favorieten",
+            "this-course": "Dit vak",
+            "older-courses": "Vroeger gegeven als",
+            "none-see-older": "Nog geen documenten onder deze code. Bekijk de vorige vakken hieronder.",
+            "no-year": "Jaar onbekend",
+            "from-course": "Staat op {{code}}, een gelijkwaardig vak",
+            "open-course": "Open de vakpagina van {{code}}",
+            "all-tags": "Alles",
+            "filter-by-tag": "Filter op tag",
+            "all-parts": "Alles",
+            "full-course": "Volledig vak",
+            "filter-by-part": "Filter op vakonderdeel"
         },
         "related": {
             "predecessors": "Vroeger gegeven als",
@@ -477,7 +493,8 @@
         "info_sub": "Krijg snel toegang tot elke pagina door een globale zoekopdracht uit te voeren.",
         "no_results": "Geen resultaten gevonden",
         "no_results_sub": "Probeer een andere zoekopdracht of navigeer naar een andere pagina.",
-        "exam_questions": "Examenvragen"
+        "exam_questions": "Examenvragen",
+        "also_known_as": "ook: {{title}}"
     },
     "header": {
         "admin": "Beheer",

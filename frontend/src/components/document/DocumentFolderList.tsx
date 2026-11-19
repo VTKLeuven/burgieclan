@@ -6,6 +6,7 @@ import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import type { Course, Document, DocumentCategory } from '@/types/entities';
 import { FileText, FolderOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { categoryPageCourseEndpoint } from '@/utils/courseEndpoints';
 
 /** How many neighbours to show around the open document before the list points to the folder. */
 const WINDOW = 8;
@@ -47,7 +48,7 @@ export default function DocumentFolderList({
                     <ApiPrefetchLink
                         href={folderHref}
                         apiEndpoints={[
-                            `/api/courses/${course.id}?summary=true`,
+                            categoryPageCourseEndpoint(course.id),
                             `/api/document_categories/${category.id}?lang=${i18n.language}`,
                         ]}
                         className="max-w-36 truncate text-small font-medium text-fg-muted hover:text-fg"

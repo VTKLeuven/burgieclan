@@ -35,6 +35,11 @@ export default function DocumentSections({ course, documentCounts }: DocumentSec
     const { request, loading } = useApi<HydraCollection<unknown>>();
 
     const countFor = (category: DocumentCategory) => documentCounts?.[category.id] ?? 0;
+    // Files of identical and older courses, which an opened folder lists under this course's own.
+    // A folder counts as empty only when both are zero: after a reform the new course often has
+    // nothing yet while its predecessor holds years of exams in that very folder.
+    const relatedCountFor = (category: DocumentCategory) => course.relatedDocumentCounts?.[category.id] ?? 0;
+    const totalFor = (category: DocumentCategory) => countFor(category) + relatedCountFor(category);
 
     useEffect(() => {
         if (documentCategories.length > 0) return;
@@ -58,11 +63,11 @@ export default function DocumentSections({ course, documentCounts }: DocumentSec
     // rather than blanking the section on a shape we did not expect.
     const hasCounts = documentCounts !== undefined;
     const emptyCategories = hasCounts
-        ? documentCategories.filter((category) => countFor(category) === 0)
+        ? documentCategories.filter((category) => totalFor(category) === 0)
         : [];
     const visibleCategories = showEmpty || !hasCounts
         ? documentCategories
-        : documentCategories.filter((category) => countFor(category) > 0);
+        : documentCategories.filter((category) => totalFor(category) > 0);
 
     const total = documentCategories.reduce((sum, category) => sum + countFor(category), 0);
 
@@ -99,6 +104,7 @@ export default function DocumentSections({ course, documentCounts }: DocumentSec
                             category={category}
                             course={course}
                             count={countFor(category)}
+                            relatedCount={relatedCountFor(category)}
                             open={openIds.has(category.id)}
                             onToggle={() => toggleCategory(category.id)}
                         />

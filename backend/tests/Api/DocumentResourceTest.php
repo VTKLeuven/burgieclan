@@ -55,6 +55,7 @@ class DocumentResourceTest extends ApiTestCase
                 'createdAt',
                 'updatedAt',
                 'tags',
+                'parts',
             ],
             array_keys($json->decoded()['hydra:member'][0])
         );
@@ -98,6 +99,7 @@ class DocumentResourceTest extends ApiTestCase
                 'createdAt',
                 'updatedAt',
                 'tags',
+                'parts',
             ],
             array_keys($json->decoded()['hydra:member'][0])
         ); // Notice that creator is not included in the response.
@@ -1546,5 +1548,177 @@ class DocumentResourceTest extends ApiTestCase
                 ]
             )
             ->assertJsonMatches('canDelete', false);
+    }
+
+    /**
+     * `course[]` returns the documents of any of the listed courses as one paged list: a
+     * category page shows a course together with its identical courses that way.
+     */
+    public function testGetCollectionFilteredByListOfCourses(): void
+    {
+        $course = CourseFactory::createOne();
+        $twin = CourseFactory::createOne();
+        $other = CourseFactory::createOne();
+        DocumentFactory::createMany(2, ['course' => $course, 'anonymous' => false]);
+        DocumentFactory::createOne(['course' => $twin, 'anonymous' => false]);
+        DocumentFactory::createOne(['course' => $other, 'anonymous' => false]);
+
+        $this->browser()
+            ->get(
+                '/api/documents?course[]=/api/courses/' . $course->getId()
+                    . '&course[]=/api/courses/' . $twin->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('"hydra:totalItems"', 3);
+    }
+
+    /**
+     * "Newest year first" is the default order of every document list. Postgres sorts NULL first
+     * on DESC, which would put the undated files above the newest exams.
+     */
+    public function testOrderByYearPutsDocumentsWithoutYearLast(): void
+    {
+        $course = CourseFactory::createOne();
+        DocumentFactory::createOne(['course' => $course, 'year' => null, 'name' => 'undated']);
+        DocumentFactory::createOne(['course' => $course, 'year' => '2023 - 2024', 'name' => 'older']);
+        DocumentFactory::createOne(['course' => $course, 'year' => '2024 - 2025', 'name' => 'newer']);
+
+        $expectedByDirection = [
+            'desc' => ['newer', 'older', 'undated'],
+            'asc' => ['older', 'newer', 'undated'],
+        ];
+        foreach ($expectedByDirection as $direction => $expected) {
+            $json = $this->browser()
+                ->get(
+                    '/api/documents?course=/api/courses/' . $course->getId() . '&order[year]=' . $direction,
+                    [
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $this->token
+                        ]
+                    ]
+                )
+                ->assertStatus(200)
+                ->json()->decoded();
+
+            $this->assertSame($expected, array_column($json['hydra:member'], 'name'), "order[year]=$direction");
+        }
+    }
+
+    /** A file migrated onto two identical courses is recognisable as the same file. */
+    public function testGetDocumentExposesSeafileFileId(): void
+    {
+        $document = DocumentFactory::createOne(['seafileFileId' => str_repeat('ab', 20)]);
+
+        $this->browser()
+            ->get(
+                '/api/documents/' . $document->getId(),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token
+                    ]
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('seafileFileId', str_repeat('ab', 20));
+    }
+
+    public function testPostToCreateDocumentWithParts(): void
+    {
+        $course = CourseFactory::createOne(['parts' => ['Deel 1', 'Deel 2']]);
+        $category = DocumentCategoryFactory::createOne();
+
+        $filePath = tempnam(sys_get_temp_dir(), uniqid());
+        $img = file_get_contents(__DIR__ . '/../../public/image-for-test.png');
+        file_put_contents($filePath, $img);
+        $file = new UploadedFile($filePath, 'image-for-test.png');
+
+        $json = $this->browser()
+            ->post(
+                '/api/documents',
+                [
+                    'headers' => [
+                        'Content-Type' => 'multipart/form-data',
+                        'Authorization' => 'Bearer ' . $this->token,
+                    ],
+                    'body' => [
+                        'name' => 'Summary with parts',
+                        'course' => '/api/courses/' . $course->getId(),
+                        'category' => '/api/document_categories/' . $category->getId(),
+                        'anonymous' => 'true',
+                        'parts' => ['Deel 1', 'Deel 2'],
+                    ],
+                    'files' => [
+                        'file' => $file,
+                    ],
+                ]
+            )
+            ->assertStatus(201)
+            ->assertJsonMatches('parts', ['Deel 1', 'Deel 2'])
+            ->json();
+
+        $createdId = $json->decoded()['@id'];
+        $this->browser()
+            ->get(
+                $createdId,
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token,
+                    ],
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('parts', ['Deel 1', 'Deel 2']);
+
+        $contentUrl = $json->decoded()['contentUrl'] ?? null;
+        if ($contentUrl) {
+            $array = explode('/', $contentUrl);
+            $filename = end($array);
+            $target = __DIR__ . '/../../data/documents/' . $filename;
+            if (is_file($target)) {
+                unlink($target);
+            }
+        }
+    }
+
+    public function testPostToCreateDocumentRejectsInvalidPart(): void
+    {
+        $course = CourseFactory::createOne(['parts' => ['Deel 1']]);
+        $category = DocumentCategoryFactory::createOne();
+
+        $filePath = tempnam(sys_get_temp_dir(), uniqid());
+        $img = file_get_contents(__DIR__ . '/../../public/image-for-test.png');
+        file_put_contents($filePath, $img);
+        $file = new UploadedFile($filePath, 'image-for-test.png');
+
+        $this->browser()
+            ->post(
+                '/api/documents',
+                [
+                    'headers' => [
+                        'Content-Type' => 'multipart/form-data',
+                        'Authorization' => 'Bearer ' . $this->token,
+                    ],
+                    'body' => [
+                        'name' => 'Invalid part doc',
+                        'course' => '/api/courses/' . $course->getId(),
+                        'category' => '/api/document_categories/' . $category->getId(),
+                        'anonymous' => 'true',
+                        'parts' => ['Nonexistent part'],
+                    ],
+                    'files' => [
+                        'file' => $file,
+                    ],
+                ]
+            )
+            ->assertStatus(422);
+
+        if (is_file($filePath)) {
+            unlink($filePath);
+        }
     }
 }

@@ -45,6 +45,17 @@ function asArray(value: unknown): unknown[] | null {
     return Array.isArray(value) ? value : null;
 }
 
+/**
+ * A PHP `array<int, int>` keyed by category id. PHP serialises an empty one as `[]`, so an
+ * empty list means "no documents anywhere" ({}), while a missing field stays undefined.
+ */
+function asCountMap(value: unknown): Record<number, number> | undefined {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+        return value as Record<number, number>;
+    }
+    return Array.isArray(value) && value.length === 0 ? {} : undefined;
+}
+
 function parseDate(value: unknown): Date | undefined {
     if (typeof value === 'string' || typeof value === 'number') {
         return new Date(value);
@@ -108,15 +119,15 @@ export function convertToCourse(course: unknown): Course {
         code: typeof data.code === 'string' ? data.code : undefined,
         professors: asArray(data.professors) as string[] | undefined,
         semesters: asArray(data.semesters) as string[] | undefined,
+        parts: asArray(data.parts)?.filter((p): p is string => typeof p === 'string'),
         credits: typeof data.credits === 'number' ? data.credits : undefined,
         oldCourses: asArray(data.oldCourses)?.map(convertToCourse),
         newCourses: asArray(data.newCourses)?.map(convertToCourse),
         identicalCourses: asArray(data.identicalCourses)?.map(convertToCourse),
         modules: asArray(data.modules)?.map(convertToModule),
         courseComments: asArray(data.courseComments)?.map(convertToCourseComment),
-        documentCounts: (data.documentCounts && typeof data.documentCounts === 'object' && !Array.isArray(data.documentCounts))
-            ? (data.documentCounts as Record<number, number>)
-            : (Array.isArray(data.documentCounts) && data.documentCounts.length === 0 ? {} : undefined),
+        documentCounts: asCountMap(data.documentCounts),
+        relatedDocumentCounts: asCountMap(data.relatedDocumentCounts),
         documentCount: typeof data.documentCount === 'number' ? data.documentCount : undefined,
         commentCount: typeof data.commentCount === 'number' ? data.commentCount : undefined
     };
@@ -177,10 +188,12 @@ export function convertToDocument(doc: unknown): Document {
         anonymous: typeof data.anonymous === 'boolean' ? data.anonymous : undefined,
         canDelete: typeof data.canDelete === 'boolean' ? data.canDelete : undefined,
         contentUrl: contentUrl ? process.env.NEXT_PUBLIC_BACKEND_URL + contentUrl : undefined,
+        seafileFileId: typeof data.seafileFileId === 'string' ? data.seafileFileId : undefined,
         mimetype: typeof data.mimetype === 'string' ? data.mimetype : undefined,
         filename: typeof data.filename === 'string' ? data.filename : undefined,
         fileSize: typeof data.fileSize === 'number' ? data.fileSize : undefined,
-        tags: asArray(data.tags)?.map(convertToTag)
+        tags: asArray(data.tags)?.map(convertToTag),
+        parts: asArray(data.parts)?.filter((p): p is string => typeof p === 'string')
     };
 }
 
@@ -408,6 +421,7 @@ export function convertToTag(tag: unknown): Tag {
     return {
         id: parseId(data['@id']),
         name: typeof data.name === 'string' ? data.name : undefined,
+        hidden: typeof data.hidden === 'boolean' ? data.hidden : undefined,
     };
 }
 

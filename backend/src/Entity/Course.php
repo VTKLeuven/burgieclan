@@ -62,6 +62,12 @@ class Course extends BaseEntity
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $semesters = [];
 
+    /**
+     * @var string[]
+     */
+    #[ORM\Column(type: Types::JSON, options: ['default' => '[]'])]
+    private array $parts = [];
+
     #[ORM\Column(type: Types::STRING, length: 7)]
     #[Assert\NotBlank]
     #[Assert\Choice(choices: ['nl', 'en'], message: 'Choose a valid language.')]
@@ -212,6 +218,34 @@ class Course extends BaseEntity
     public function setSemesters(?array $semesters): self
     {
         $this->semesters = $semesters;
+
+        return $this;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getParts(): array
+    {
+        return $this->parts;
+    }
+
+    /**
+     * @param array<int|string, mixed>|null $parts
+     */
+    public function setParts(?array $parts): self
+    {
+        $this->parts = array_values(
+            array_unique(
+                array_filter(
+                    array_map(
+                        static fn(mixed $part): string => is_string($part) ? trim($part) : '',
+                        $parts ?? []
+                    ),
+                    static fn(string $part): bool => $part !== ''
+                )
+            )
+        );
 
         return $this;
     }

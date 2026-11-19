@@ -61,6 +61,12 @@ export const documentSchema = (t: TFunction): yup.ObjectSchema<UploadFormData> =
         .transform((value) => value || []) // Transform null or undefined to empty array
         .default([]),
 
+    parts: yup
+        .array(yup.string().required().trim())
+        .defined()
+        .transform((value) => value || [])
+        .default([]),
+
     file: yup
         .mixed<File>()
         .nullable()

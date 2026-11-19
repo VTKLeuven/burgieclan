@@ -13,9 +13,21 @@ interface DocumentListItemProps {
     document: Document;
     isSelected: boolean;
     onToggleSelect: (document: Document) => void;
+    /**
+     * Code of the course the file actually sits on, for a list that mixes in identical courses:
+     * the Dutch and English version of an exam look alike until opened.
+     */
+    courseBadge?: string;
+    courseParts?: string[];
 }
 
-const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelected, onToggleSelect }) => {
+const DocumentListItem: React.FC<DocumentListItemProps> = ({
+    document,
+    isSelected,
+    onToggleSelect,
+    courseBadge,
+    courseParts,
+}) => {
     const { t, i18n } = useTranslation();
 
     const uploader = document.anonymous
@@ -43,8 +55,21 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
         })
         : null;
 
-    const tagLine = document.tags?.map(tag => tag.name).join(' · ');
-    const uploaderLine = showAuthor ? document.author : uploader;
+    const tagLine = document.tags
+        ?.filter((tag) => !tag.hidden && tag.name)
+        .map((tag) => tag.name)
+        .join(' · ');
+    // Migrated archive files without an original author belong to the archive service account;
+    // omitting that bot name keeps rows calm instead of repeating it on every line.
+    const isArchiveBotOnly = !document.author?.trim() && Boolean(document.seafileFileId);
+    const uploaderLine = showAuthor ? document.author : (isArchiveBotOnly ? undefined : uploader);
+    const documentParts = document.parts ?? [];
+    const coversAllParts = Boolean(
+        documentParts.length > 0
+        && courseParts
+        && courseParts.length > 0
+        && courseParts.every((part) => documentParts.includes(part)),
+    );
 
     return (
         // Two lines, so the name gets the whole width: name on top, tags as quiet text beneath.
@@ -86,6 +111,27 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                     >
                         {document.name}
                     </ApiPrefetchLink>
+                    {courseBadge && (
+                        <span
+                            className="vtk-badge vtk-badge-muted shrink-0 font-mono"
+                            title={t('course-page.documents.from-course', { code: courseBadge })}
+                        >
+                            {courseBadge}
+                        </span>
+                    )}
+                    {documentParts.length > 0 && (
+                        coversAllParts ? (
+                            <span className="vtk-badge vtk-badge-muted shrink-0">
+                                {t('course-page.documents.full-course')}
+                            </span>
+                        ) : (
+                            documentParts.map((part) => (
+                                <span key={part} className="vtk-badge vtk-badge-muted shrink-0">
+                                    {part}
+                                </span>
+                            ))
+                        )
+                    )}
                     {document.underReview && (
                         <Badge text={t('document.under_review')} color="yellow" />
                     )}
@@ -111,12 +157,14 @@ const DocumentListItem: React.FC<DocumentListItemProps> = ({ document, isSelecte
                                 {document.year || updated}
                             </span>
                         )}
-                        <span
-                            className="block truncate text-caption text-fg-muted"
-                            title={showAuthor ? `${t('document.uploaded-by')}: ${uploader}` : undefined}
-                        >
-                            {uploaderLine}
-                        </span>
+                        {uploaderLine && (
+                            <span
+                                className="block truncate text-caption text-fg-muted"
+                                title={showAuthor ? `${t('document.uploaded-by')}: ${uploader}` : undefined}
+                            >
+                                {uploaderLine}
+                            </span>
+                        )}
                     </div>
                     <span className="reveal-on-hover absolute inset-y-0 right-0 flex items-center gap-0.5 [@media(hover:none)]:static">
                         <FavoriteButton itemId={document.id} itemType="document" size={16} className="vtk-icon-button" />

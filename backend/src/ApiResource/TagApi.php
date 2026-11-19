@@ -42,4 +42,15 @@ class TagApi extends BaseEntityApi
         ]
     )]
     public ?string $name = null;
+
+    #[Groups(
+        [
+            SerializationGroups::TAG_GET,
+            SerializationGroups::SEARCH,
+            SerializationGroups::USER,
+            SerializationGroups::DOCUMENT_GET,
+            SerializationGroups::DOCUMENT_CREATE
+        ]
+    )]
+    public bool $hidden = false;
 }

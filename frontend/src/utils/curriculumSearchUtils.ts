@@ -6,10 +6,15 @@ import { FuseBudgetSearch } from './fuseBudgetSearch';
 import { courseTitle } from '@/utils/courseName';
 
 /**
- * Course fields the fuzzy search looks in: the title as the onderwijsaanbod lists it and the code.
- * The translated title is left out on purpose; it is not the name the course goes by.
+ * Course fields the fuzzy search looks in: the course's own onderwijsaanbod title and code carry
+ * higher weight than the translated titles so own-language matches rank above translated hits.
  */
-const COURSE_KEYS = ['name', 'code'];
+const COURSE_KEYS = [
+  { name: 'name', weight: 2 },
+  { name: 'code', weight: 2 },
+  { name: 'nameNl', weight: 1 },
+  { name: 'nameEn', weight: 1 },
+];
 
 // Persistent budget-aware Fuse instances
 let coursesBudgetFuse: FuseBudgetSearch<Course> | null = null;
@@ -108,11 +113,13 @@ export function extractEntities(programs: Program[]): {
 export function courseMatchesText(course: Course, searchQuery?: string): boolean {
   if (!searchQuery) return false;
 
-  // Quick exact match check first (performance optimization), on the title the course is shown
-  // under and its code.
+  // Quick exact match check first (performance optimization), covering both the displayed title,
+  // its translations, and the course code.
   const needle = searchQuery.toLowerCase();
   if (
     courseTitle(course).toLowerCase().includes(needle) ||
+    course.nameNl?.toLowerCase().includes(needle) ||
+    course.nameEn?.toLowerCase().includes(needle) ||
     course.code?.toLowerCase().includes(needle)
   ) {
     return true;

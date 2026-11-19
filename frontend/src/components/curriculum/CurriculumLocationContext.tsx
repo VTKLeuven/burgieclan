@@ -1,5 +1,6 @@
 'use client';
 
+import { useUser } from '@/components/UserContext';
 import { useApi } from '@/hooks/useApi';
 import type { Course, CurriculumPath, Document, DocumentCategory, Module, Program } from '@/types/entities';
 import { convertToCurriculumPaths, convertToModulePath } from '@/utils/convertToEntity';
@@ -48,6 +49,14 @@ const EMPTY: CurriculumLocationValue = {
 export function CurriculumLocationProvider({ children }: { children: ReactNode }) {
     const [location, setLocation] = useState<CurriculumLocation>({});
     const { request } = useApi<unknown>();
+    const { user } = useUser();
+
+    const favoriteProgramIds = useMemo(
+        () => (user?.favoritePrograms ?? [])
+            .map((p) => p.id)
+            .filter((id): id is number => typeof id === 'number'),
+        [user?.favoritePrograms],
+    );
 
     const courseId = location.course?.id;
     const moduleId = location.module?.id;
@@ -124,14 +133,14 @@ export function CurriculumLocationProvider({ children }: { children: ReactNode }
                 const chosen = paths.find((path) => path.modules.some((node) => node.id === chosenBranch));
                 if (chosen) return chosen;
             }
-            return selectPath(paths, courseId);
+            return selectPath(paths, courseId, favoriteProgramIds);
         }
 
         if (moduleId !== undefined) return modulePath;
         if (program) return { program, modules: [] };
 
         return null;
-    }, [courseId, moduleId, program, paths, modulePath, chosenBranch]);
+    }, [courseId, moduleId, program, paths, modulePath, chosenBranch, favoriteProgramIds]);
 
     const chooseBranch = useCallback((leafModuleId: number) => {
         if (courseId !== undefined) {

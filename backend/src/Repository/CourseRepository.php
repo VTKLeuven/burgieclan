@@ -54,18 +54,28 @@ class CourseRepository extends ServiceEntityRepository
 
         $queryBuilder = $this->createQueryBuilder('c');
 
-        // Only the title the onderwijsaanbod lists the course under ($name, in the course's own
-        // language) and its code: the translated title is not what the course is called, so
-        // searching it surfaced courses under a name the reader never sees.
+        // Match both the course's own onderwijsaanbod title ($name), its translations ($nameNl,
+        // $nameEn) and its code, but rank courses whose own title or code matches every term ahead
+        // of courses that only match through a translated title.
+        $ownMatches = [];
         foreach ($searchTerms as $key => $term) {
+            $parameter = 't_' . $key;
+            $ownMatches[] = '(LOWER(c.name) LIKE :' . $parameter . ' OR LOWER(c.code) LIKE :' . $parameter . ')';
             $queryBuilder
-                ->andWhere('(LOWER(c.name) LIKE :t_' . $key . ' OR LOWER(c.code) LIKE :t_' . $key . ')')
-                ->setParameter('t_' . $key, '%' . mb_strtolower((string) $term) . '%');
+                ->andWhere(
+                    '(LOWER(c.name) LIKE :' . $parameter
+                    . ' OR LOWER(c.nameNl) LIKE :' . $parameter
+                    . ' OR LOWER(c.nameEn) LIKE :' . $parameter
+                    . ' OR LOWER(c.code) LIKE :' . $parameter . ')'
+                )
+                ->setParameter($parameter, '%' . mb_strtolower((string) $term) . '%');
         }
 
         /** @var Course[] $result */
         $result = $queryBuilder
-            ->orderBy('c.name', 'ASC')
+            ->addSelect('CASE WHEN ' . implode(' AND ', $ownMatches) . ' THEN 0 ELSE 1 END AS HIDDEN matchRank')
+            ->orderBy('matchRank', 'ASC')
+            ->addOrderBy('c.name', 'ASC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();

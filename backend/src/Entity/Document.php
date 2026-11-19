@@ -6,8 +6,11 @@ use App\Constants\AcademicYear;
 use App\Repository\DocumentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Vich\UploaderBundle\Mapping\Attribute as Vich;
 
 #[Vich\Uploadable]
@@ -59,6 +62,12 @@ class Document extends Node implements VotableInterface
      */
     #[ORM\Column(length: 40, nullable: true)]
     private ?string $seafile_file_id = null;
+
+    /**
+     * @var string[]
+     */
+    #[ORM\Column(type: Types::JSON, options: ['default' => '[]'])]
+    private array $parts = [];
 
     /**
      * @var Collection<int, Tag>
@@ -231,6 +240,52 @@ class Document extends Node implements VotableInterface
     {
         $this->seafile_file_id = $seafile_file_id;
         return $this;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getParts(): array
+    {
+        return $this->parts;
+    }
+
+    /**
+     * @param array<int|string, mixed>|null $parts
+     */
+    public function setParts(?array $parts): static
+    {
+        $this->parts = array_values(
+            array_unique(
+                array_filter(
+                    array_map(
+                        static fn(mixed $part): string => is_string($part) ? trim($part) : '',
+                        $parts ?? []
+                    ),
+                    static fn(string $part): bool => $part !== ''
+                )
+            )
+        );
+
+        return $this;
+    }
+
+    #[Assert\Callback]
+    public function validateParts(ExecutionContextInterface $context): void
+    {
+        if ($this->parts === [] || !isset($this->course)) {
+            return;
+        }
+
+        $allowedParts = $this->course->getParts();
+        foreach ($this->parts as $part) {
+            if (!in_array($part, $allowedParts, true)) {
+                $context->buildViolation('The course part "{{ part }}" is not valid for this course.')
+                    ->setParameter('{{ part }}', $part)
+                    ->atPath('parts')
+                    ->addViolation();
+            }
+        }
     }
 
     /**

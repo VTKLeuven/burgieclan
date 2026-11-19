@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class TagCrudController extends AbstractCrudController
@@ -21,6 +22,7 @@ class TagCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield TextField::new('name');
+        yield BooleanField::new('hidden');
 
         if (in_array($pageName, [Crud::PAGE_INDEX, Crud::PAGE_DETAIL])) {
             // Index and detail pages – simple association display
@@ -49,6 +51,7 @@ class TagCrudController extends AbstractCrudController
     {
         return $filters
             ->add('name')
+            ->add('hidden')
             ->add(EntityContainsFilter::new('documents', Document::class));
     }
 }

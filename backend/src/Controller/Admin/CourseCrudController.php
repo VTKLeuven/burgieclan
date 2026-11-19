@@ -46,6 +46,9 @@ class CourseCrudController extends AbstractCrudController
         yield AssociationField::new('modules')
             ->setFormTypeOption('by_reference', false);
         yield ArrayField::new('professors');
+        yield ArrayField::new('parts')
+            ->setHelp('Optional course parts (e.g. "Deel 1", "Deel 2"). Leave empty if the course has no parts.')
+            ->hideOnIndex();
         yield ChoiceField::new('semesters')
             ->setChoices(Course::SEMESTERS)
             ->allowMultipleChoices()

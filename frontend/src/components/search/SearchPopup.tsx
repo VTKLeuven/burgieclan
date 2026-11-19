@@ -218,7 +218,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                                         className="m-0 mt-1 p-0 text-body text-fg"
                                                     >
                                                         {items.courses.map((course) => (
-                                                            <CourseSearchResult key={course.id} course={course} />
+                                                            <CourseSearchResult key={course.id} course={course} query={debouncedQuery} />
                                                         ))}
                                                     </ul>
                                                 </li>
@@ -270,7 +270,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                                         className="m-0 mt-1 p-0 text-body text-fg"
                                                     >
                                                         {items.examQuestions.map((hit) => (
-                                                            <ExamQuestionSearchResult key={`${hit.examId}-${hit.uid}`} hit={hit} />
+                                                            <ExamQuestionSearchResult key={`${hit.examId}-${hit.uid}`} hit={hit} query={debouncedQuery} />
                                                         ))}
                                                     </ul>
                                                 </li>

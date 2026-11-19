@@ -24,6 +24,7 @@ export interface Course extends BaseEntity {
     location?: string;
     professors?: string[];
     semesters?: string[];
+    parts?: string[];
     description_top?: string;
     description_bottom?: string;
     oldCourses?: Course[];
@@ -31,6 +32,11 @@ export interface Course extends BaseEntity {
     /** Courses teaching the same subject under another code, e.g. a sister-faculty variant. */
     identicalCourses?: Course[];
     documentCounts?: Record<number, number>;
+    /**
+     * Per category, the published documents of the identical and older courses, which the
+     * category page lists below this course's own. Only on a full course response.
+     */
+    relatedDocumentCounts?: Record<number, number>;
     /**
      * Published documents on this course as a single total. Only sent for the related courses
      * on a course detail response, so it is undefined on a course fetched on its own.
@@ -194,10 +200,13 @@ export interface Document extends NodeEntity {
     // uploads - the default - come back without one.
     canDelete?: boolean;
     contentUrl?: string;
+    /** The Seafile file a migrated document came from; one file can sit on identical courses. */
+    seafileFileId?: string;
     fileSize?: number;
     mimetype?: string;
     filename?: string;
     tags?: Tag[];
+    parts?: string[];
 }
 
 export interface User extends BaseEntity {
@@ -225,6 +234,7 @@ export interface QuickLink extends BaseEntity {
 
 export interface Tag extends BaseEntity {
     name?: string;
+    hidden?: boolean;
 }
 
 export interface Announcement extends NodeEntity {

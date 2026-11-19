@@ -10,6 +10,7 @@ import { convertToCourse, convertToDocumentCategory } from '@/utils/convertToEnt
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { courseTitle } from '@/utils/courseName';
+import { categoryPageCourseEndpoint } from '@/utils/courseEndpoints';
 
 interface CourseDocumentsContentProps {
     courseId: number;
@@ -19,7 +20,7 @@ interface CourseDocumentsContentProps {
 export default function CourseDocumentsContent({ courseId, categoryId }: CourseDocumentsContentProps) {
     const { i18n } = useTranslation();
     const currentLocale = i18n.language;
-    const courseEndpoint = `/api/courses/${courseId}?summary=true`;
+    const courseEndpoint = categoryPageCourseEndpoint(courseId);
     const categoryEndpoint = `/api/document_categories/${categoryId}?lang=${currentLocale}`;
     const [course, setCourse] = useState<Course | null>(() => {
         const preloaded = readPreloadedApi(courseEndpoint);

@@ -22,7 +22,7 @@ import { useSiblingDocuments } from '@/hooks/useSiblingDocuments';
 import { cn } from '@/lib/utils';
 import type { Course, Document, DocumentCategory, Module, Program } from '@/types/entities';
 import { convertToDocumentCategory, convertToModule, convertToProgram } from '@/utils/convertToEntity';
-import { courseTitle } from '@/utils/courseName';
+import { courseTitle, matchedAlternateTitle } from '@/utils/courseName';
 import { rememberBranch } from '@/utils/curriculumBranch';
 import { treeProgramName } from '@/utils/curriculumLabels';
 import {
@@ -40,6 +40,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { categoryPageCourseEndpoint } from '@/utils/courseEndpoints';
 
 const PROGRAMS_ENDPOINT = '/api/programs?pagination=false&order[name]=asc';
 const TREE_ENDPOINT = '/api/programs/tree?pagination=false&order[name]=asc';
@@ -471,7 +472,7 @@ function ProgramTree({ programId }: { programId: number }) {
                                         label={item.name ?? ''}
                                         href={href}
                                         apiEndpoints={[
-                                            `/api/courses/${node.id}?summary=true`,
+                                            categoryPageCourseEndpoint(node.id),
                                             `/api/document_categories/${item.id}?lang=${i18n.language}`,
                                         ]}
                                         depth={depth + 1}
@@ -588,24 +589,31 @@ function FilterResults({ programId, query }: { programId: number; query: string 
         if (!program) return [];
 
         const needle = normalize(query.trim());
-        const found: FilterHit[] = [];
+        const ownHits: FilterHit[] = [];
+        const altHits: FilterHit[] = [];
         const seen = new Set<number>();
 
         const walk = (module: Module, trail: string[]) => {
             const path = [...trail, module.name ?? ''];
             module.courses?.forEach((item) => {
                 if (seen.has(item.id)) return;
-                const haystack = [courseTitle(item), item.code].map(normalize).join(' ');
-                if (haystack.includes(needle)) {
+                const ownHaystack = [courseTitle(item), item.code].map(normalize).join(' ');
+                if (ownHaystack.includes(needle)) {
                     seen.add(item.id);
-                    found.push({ course: item, trail: path.join(' › '), leafModuleId: module.id });
+                    ownHits.push({ course: item, trail: path.join(' › '), leafModuleId: module.id });
+                    return;
+                }
+                const altHaystack = [item.nameNl, item.nameEn].map(normalize).join(' ');
+                if (altHaystack.includes(needle)) {
+                    seen.add(item.id);
+                    altHits.push({ course: item, trail: path.join(' › '), leafModuleId: module.id });
                 }
             });
             module.modules?.forEach((child) => walk(child, path));
         };
         program.modules?.forEach((module) => walk(module, []));
 
-        return found.slice(0, MAX_FILTER_RESULTS);
+        return [...ownHits, ...altHits].slice(0, MAX_FILTER_RESULTS);
     }, [tree, programId, query]);
 
     if (failed) {
@@ -624,6 +632,7 @@ function FilterResults({ programId, query }: { programId: number; query: string 
         <ul className="m-0 flex list-none flex-col gap-0.5 p-0" aria-live="polite">
             {hits.map(({ course, trail, leafModuleId }) => {
                 const name = courseTitle(course) || course.code || '';
+                const alt = matchedAlternateTitle(course, query);
                 return (
                     <li key={course.id}>
                         <ApiPrefetchLink
@@ -636,6 +645,11 @@ function FilterResults({ programId, query }: { programId: number; query: string 
                             <BookOpen className="mt-0.5 size-4 shrink-0 text-icon" aria-hidden="true" />
                             <span className="min-w-0 flex-1">
                                 <span className="block truncate text-small font-medium text-fg-nav">{name}</span>
+                                {alt && (
+                                    <span className="block truncate text-micro text-fg-muted">
+                                        · {t('search.also_known_as', { title: alt })}
+                                    </span>
+                                )}
                                 <span className="block truncate text-caption text-fg-muted">{trail}</span>
                             </span>
                         </ApiPrefetchLink>

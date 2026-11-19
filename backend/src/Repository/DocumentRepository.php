@@ -101,6 +101,89 @@ class DocumentRepository extends ServiceEntityRepository
     }
 
     /**
+     * Published documents per category summed over a set of courses, as categoryId => count.
+     *
+     * @param Course[] $courses
+     * @return array<int, int>
+     */
+    public function countByCategoryForCourses(array $courses): array
+    {
+        if ([] === $courses) {
+            return [];
+        }
+
+        $results = $this->createQueryBuilder('d')
+            ->select('IDENTITY(d.category) AS categoryId, COUNT(d.id) AS docCount')
+            ->andWhere('d.course IN (:courses)')
+            ->andWhere('d.under_review = false')
+            ->setParameter('courses', $courses)
+            ->groupBy('d.category')
+            ->getQuery()
+            ->getArrayResult();
+
+        $counts = [];
+        foreach ($results as $row) {
+            $counts[(int) $row['categoryId']] = (int) $row['docCount'];
+        }
+
+        return $counts;
+    }
+
+    /**
+     * Per category, the published documents of a course's identical courses that its folder adds
+     * to the course's own, as categoryId => count.
+     *
+     * The folder lists the course and its identical courses as one list and shows a migrated
+     * Seafile file once, so a file the course itself holds adds nothing, and a file on several
+     * identical courses adds one. Documents without a Seafile file (uploads) always count.
+     *
+     * @param Course[] $identicalCourses
+     * @return array<int, int>
+     */
+    public function countIdenticalExtrasByCategory(Course $course, array $identicalCourses): array
+    {
+        if ([] === $identicalCourses) {
+            return [];
+        }
+
+        $uploads = $this->createQueryBuilder('d')
+            ->select('IDENTITY(d.category) AS categoryId, COUNT(d.id) AS docCount')
+            ->andWhere('d.course IN (:courses)')
+            ->andWhere('d.under_review = false')
+            ->andWhere('d.seafile_file_id IS NULL')
+            ->setParameter('courses', $identicalCourses)
+            ->groupBy('d.category')
+            ->getQuery()
+            ->getArrayResult();
+
+        $ownFiles = $this->createQueryBuilder('own')
+            ->select('own.seafile_file_id')
+            ->andWhere('own.course = :course')
+            ->andWhere('own.under_review = false')
+            ->andWhere('own.seafile_file_id IS NOT NULL');
+
+        $migrated = $this->createQueryBuilder('d')
+            ->select('IDENTITY(d.category) AS categoryId, COUNT(DISTINCT d.seafile_file_id) AS docCount')
+            ->andWhere('d.course IN (:courses)')
+            ->andWhere('d.under_review = false')
+            ->andWhere('d.seafile_file_id IS NOT NULL')
+            ->andWhere('d.seafile_file_id NOT IN (' . $ownFiles->getDQL() . ')')
+            ->setParameter('courses', $identicalCourses)
+            ->setParameter('course', $course)
+            ->groupBy('d.category')
+            ->getQuery()
+            ->getArrayResult();
+
+        $counts = [];
+        foreach ([...$uploads, ...$migrated] as $row) {
+            $categoryId = (int) $row['categoryId'];
+            $counts[$categoryId] = ($counts[$categoryId] ?? 0) + (int) $row['docCount'];
+        }
+
+        return $counts;
+    }
+
+    /**
      * Published document totals for a set of courses, as courseId => count.
      *
      * One query for the whole set: the related courses on a course page are counted together,

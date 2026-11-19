@@ -14,6 +14,7 @@ import { useUser } from "@/components/UserContext";
 import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { Course, Module, Program } from '@/types/entities';
 import { convertToProgram } from "@/utils/convertToEntity";
+import { matchedAlternateTitle } from '@/utils/courseName';
 import { programQualifier, shortProgramName } from '@/utils/curriculumLabels';
 import { courseMatchesFilters, initializeFuseInstances } from '@/utils/curriculumSearchUtils';
 import { ChevronRight, GraduationCap } from 'lucide-react';
@@ -52,6 +53,7 @@ export default function CurriculumNavigator() {
   });
   const [allHits, setAllHits] = useState<CourseHit[] | null>(null);
   const [results, setResults] = useState<CourseHit[] | null>(null);
+  const [activeQuery, setActiveQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const searchVersion = useRef(0);
 
@@ -98,6 +100,7 @@ export default function CurriculumNavigator() {
     const isEmpty = !filters.query && !filters.semester && !filters.minCredits
       && !filters.maxCredits && !filters.showOnlyFavorites;
     if (isEmpty) {
+      setActiveQuery('');
       setResults(null);
       return;
     }
@@ -109,12 +112,23 @@ export default function CurriculumNavigator() {
     if (!hits) return;
 
     const favorites: Course[] = user?.favoriteCourses ?? [];
-    setResults(hits.filter((hit) => courseMatchesFilters(hit.course, filters, favorites)));
+    const filtered = hits.filter((hit) => courseMatchesFilters(hit.course, filters, favorites));
+    if (filters.query) {
+      const query = filters.query;
+      filtered.sort((a, b) => {
+        const aAlt = matchedAlternateTitle(a.course, query) ? 1 : 0;
+        const bAlt = matchedAlternateTitle(b.course, query) ? 1 : 0;
+        return aAlt - bAlt;
+      });
+    }
+    setActiveQuery(filters.query ?? '');
+    setResults(filtered);
   };
 
   const clearSearch = () => {
     searchVersion.current += 1;
     setSearching(false);
+    setActiveQuery('');
     setResults(null);
   };
 
@@ -149,7 +163,7 @@ export default function CurriculumNavigator() {
         )}
 
         {!programError && (results
-          ? <CurriculumSearchResults hits={results} />
+          ? <CurriculumSearchResults hits={results} query={activeQuery} />
           : (
             // grid-cols-1 is minmax(0, 1fr): an implicit column grows to the longest programme name,
             // which pushed the whole page sideways on a phone instead of truncating the names.
