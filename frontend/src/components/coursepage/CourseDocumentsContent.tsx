@@ -4,7 +4,8 @@ import Loading from '@/components/loading/LoadingPage';
 import { usePublishCurriculumLocation } from '@/components/curriculum/CurriculumLocationContext';
 import DocumentCategoryPage from '@/components/documentcategorypage/DocumentCategoryPage';
 import CurriculumPageHeader from '@/components/ui/DynamicBreadcrumb';
-import { readPreloadedApi, useApi } from '@/hooks/useApi';
+import { useApi } from '@/hooks/useApi';
+import { usePreloadedApi } from '@/components/ApiSeed';
 import type { Course, DocumentCategory } from '@/types/entities';
 import { convertToCourse, convertToDocumentCategory } from '@/utils/convertToEntity';
 import { useEffect, useState } from 'react';
@@ -18,6 +19,7 @@ interface CourseDocumentsContentProps {
 }
 
 export default function CourseDocumentsContent({ courseId, categoryId }: CourseDocumentsContentProps) {
+    const readPreloadedApi = usePreloadedApi();
     const { i18n } = useTranslation();
     const currentLocale = i18n.language;
     const courseEndpoint = categoryPageCourseEndpoint(courseId);

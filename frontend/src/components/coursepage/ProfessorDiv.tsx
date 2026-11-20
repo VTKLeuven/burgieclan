@@ -2,7 +2,7 @@
 
 import { captureException } from '@sentry/nextjs';
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
 import { useTranslation } from 'react-i18next';
 import {
     subjectName,

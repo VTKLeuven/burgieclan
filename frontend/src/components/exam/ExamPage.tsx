@@ -6,13 +6,14 @@ import ExamEditor from '@/components/exam/ExamEditor';
 import Loading from '@/components/loading/LoadingPage';
 import CurriculumPageHeader from '@/components/ui/DynamicBreadcrumb';
 import PageHead from '@/components/ui/PageHead';
-import { readPreloadedApi, useApi } from '@/hooks/useApi';
+import { useApi } from '@/hooks/useApi';
+import { usePreloadedApi } from '@/components/ApiSeed';
 import type { Course, Exam } from '@/types/entities';
 import { convertToCourse, convertToExam } from '@/utils/convertToEntity';
 import { courseTitle } from '@/utils/courseName';
 import { examCalendarYear } from '@/utils/examPeriods';
 import { Copy, Lock, NotebookPen, PencilLine } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +22,7 @@ import { useTranslation } from 'react-i18next';
  * One exam reconstruction: course/{id}/exams/{examId}.
  */
 export default function ExamPage() {
+    const readPreloadedApi = usePreloadedApi();
     const params = useParams<{ id: string; examId: string }>();
     const courseId = Number(params.id);
     const examId = Number(params.examId);

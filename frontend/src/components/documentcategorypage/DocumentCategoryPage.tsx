@@ -6,7 +6,7 @@ import CreateDocumentButton from "@/components/ui/CreateDocumentButton";
 import CurriculumPageHeader from "@/components/ui/DynamicBreadcrumb";
 import type { Course, DocumentCategory } from "@/types/entities";
 import { courseTitle } from '@/utils/courseName';
-import Link from "next/link";
+import Link from '@/components/ui/Link';
 
 interface DocumentCategoryPageProps {
     category: DocumentCategory;

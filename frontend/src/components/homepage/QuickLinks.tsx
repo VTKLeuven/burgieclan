@@ -1,18 +1,21 @@
-import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
+import { HydraCollection, useApi } from '@/hooks/useApi';
+import { usePreloadedApi } from '@/components/ApiSeed';
 import type { QuickLink } from '@/types/entities';
 import { MAX_QUICK_LINKS } from '@/utils/constants/homepage';
 import { convertToQuickLink } from '@/utils/convertToEntity';
 import Loading from '@/components/loading/LoadingPage';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { ArrowUpRight, Compass } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { apiEndpoints } from '@/utils/apiEndpoints';
 
 export function QuickLinks() {
+    const readPreloadedApi = usePreloadedApi();
     const { t, i18n } = useTranslation();
     const currentLanguage = i18n.language;
-    const endpoint = `/api/quick_links?lang=${currentLanguage}`;
+    const endpoint = apiEndpoints.quickLinks(currentLanguage);
     const [links, setLinks] = useState<QuickLink[]>(() => {
         const preloaded = readPreloadedApi(endpoint) as HydraCollection<unknown> | undefined;
         return preloaded?.['hydra:member'] ? preloaded['hydra:member'].map(convertToQuickLink).slice(0, MAX_QUICK_LINKS) : [];

@@ -7,7 +7,7 @@ import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { shortProgramName } from '@/utils/curriculumLabels';
 import { ArrowRight, GraduationCap, Layers, Star } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

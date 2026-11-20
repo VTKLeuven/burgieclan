@@ -128,6 +128,12 @@ const tryRefreshToken = async (request: NextRequest): Promise<RefreshedSession |
 };
 
 export default async function proxy(request: NextRequest) {
+    // The browser's read route (app/bff/route.ts): not a page, so neither a locale to add nor a
+    // login page to send it to. It passes the session on to the backend, which decides.
+    if (request.nextUrl.pathname === '/bff') {
+        return NextResponse.next();
+    }
+
     const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || request.url;
 
     // Match and extract the locale from the URL path
@@ -158,6 +164,16 @@ export default async function proxy(request: NextRequest) {
             const refreshed = await tryRefreshToken(request);
 
             if (refreshed) {
+                // The page rendered for this very request has to see the new session too, not
+                // only the browser: it reads the cookie header it was sent, which still holds the
+                // expired token. Rendered with that, the first paint after a night away was the
+                // logged-out shell, and the real one only replaced it once the client caught up.
+                // i18nRouter forwards the request headers, and setting a cookie here rewrites them.
+                request.cookies.set(COOKIE_NAMES.JWT, refreshed.jwt);
+                if (refreshed.refreshToken) {
+                    request.cookies.set(COOKIE_NAMES.REFRESH_TOKEN, refreshed.refreshToken);
+                }
+
                 // Create response with new JWT cookie
                 const response = i18nRouter(request, i18nConfig);
 

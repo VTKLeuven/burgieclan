@@ -9,17 +9,20 @@ import FavoriteButton from '@/components/ui/FavoriteButton';
 import PageHead from '@/components/ui/PageHead';
 import DownloadButton from '@/components/ui/DownloadButton';
 import { GraduationCap } from 'lucide-react';
-import { readPreloadedApi, useApi } from '@/hooks/useApi';
+import { useApi } from '@/hooks/useApi';
+import { usePreloadedApi } from '@/components/ApiSeed';
 import type { Program } from '@/types/entities';
 import { convertToProgram } from '@/utils/convertToEntity';
 import { programQualifier, shortProgramName } from '@/utils/curriculumLabels';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { apiEndpoints } from '@/utils/apiEndpoints';
 
 export default function ProgramPage({ id }: { id: number }) {
+    const readPreloadedApi = usePreloadedApi();
     const { t } = useTranslation();
     const { request, loading, error } = useApi<unknown>();
-    const endpoint = `/api/programs/${id}`;
+    const endpoint = apiEndpoints.program(id);
     const [program, setProgram] = useState<Program | null>(() => {
         const preloaded = readPreloadedApi(endpoint);
         return preloaded ? convertToProgram(preloaded) : null;

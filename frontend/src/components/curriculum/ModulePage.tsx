@@ -8,17 +8,20 @@ import DownloadButton from '@/components/ui/DownloadButton';
 import CurriculumPageHeader from '@/components/ui/DynamicBreadcrumb';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import PageHead from '@/components/ui/PageHead';
-import { readPreloadedApi, useApi } from '@/hooks/useApi';
+import { useApi } from '@/hooks/useApi';
+import { usePreloadedApi } from '@/components/ApiSeed';
 import type { Module } from '@/types/entities';
 import { convertToModule } from '@/utils/convertToEntity';
 import { Folder } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { apiEndpoints } from '@/utils/apiEndpoints';
 
 export default function ModulePage({ id }: { id: number }) {
+    const readPreloadedApi = usePreloadedApi();
     const { t } = useTranslation();
     const { request, loading, error } = useApi<unknown>();
-    const endpoint = `/api/modules/${id}`;
+    const endpoint = apiEndpoints.module(id);
     const [module, setModule] = useState<Module | null>(() => {
         const preloaded = readPreloadedApi(endpoint);
         return preloaded ? convertToModule(preloaded) : null;

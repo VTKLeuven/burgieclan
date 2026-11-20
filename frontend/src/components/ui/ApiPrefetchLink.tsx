@@ -1,9 +1,10 @@
 'use client';
 
 import { preloadApi } from '@/hooks/useApi';
-import Link from 'next/link';
+import Link, { localizedHref } from '@/components/ui/Link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, type ComponentProps, type FocusEvent, type MouseEvent, type TouchEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type Props = ComponentProps<typeof Link> & {
     apiEndpoints?: string | string[];
@@ -24,11 +25,12 @@ export default function ApiPrefetchLink({
     ...props
 }: Props) {
     const router = useRouter();
+    const { i18n } = useTranslation();
     const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const warm = () => {
         if (typeof href === 'string') {
-            router.prefetch(href);
+            router.prefetch(localizedHref(href, i18n.language));
             if (href.includes('/document/')) {
                 void import('@/components/document/pdf/PDFViewer');
             }

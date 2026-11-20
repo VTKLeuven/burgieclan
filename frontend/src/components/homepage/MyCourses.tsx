@@ -6,7 +6,7 @@ import SectionHeader from '@/components/ui/SectionHeader';
 import { useUser } from '@/components/UserContext';
 import { courseTitle, sortCoursesByName } from '@/utils/courseName';
 import { ArrowRight, BookOpen, ChevronRight } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
 import { useTranslation } from 'react-i18next';
 
 /**

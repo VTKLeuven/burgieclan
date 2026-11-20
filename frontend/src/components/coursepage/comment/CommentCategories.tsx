@@ -1,6 +1,7 @@
 import Loading from '@/components/loading/LoadingPage';
 import CourseCommentList from '@/components/coursepage/comment/CourseCommentList';
-import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
+import { HydraCollection, useApi } from '@/hooks/useApi';
+import { usePreloadedApi } from '@/components/ApiSeed';
 import { CommentCategory, Course, CourseComment, CourseRatingSummary, SectionRating } from '@/types/entities';
 import { convertToCommentCategory, convertToCourseRatingSummary } from '@/utils/convertToEntity';
 import { useCallback, useMemo, useState, useEffect } from 'react';
@@ -8,6 +9,7 @@ import RelatedMaterial from '@/components/coursepage/RelatedMaterial';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { MessagesSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { apiEndpoints } from '@/utils/apiEndpoints';
 
 type CommentCategoriesProps = {
     comments: CourseComment[];
@@ -18,10 +20,11 @@ type CommentCategoriesProps = {
 };
 
 const CommentCategories = ({ comments, courseId, course, onCommentsUpdate }: CommentCategoriesProps) => {
+    const readPreloadedApi = usePreloadedApi();
     const { t, i18n } = useTranslation();
     const lang = i18n.language;
-    const categoriesEndpoint = `/api/comment_categories?lang=${lang}`;
-    const ratingsEndpoint = `/api/courses/${courseId}/ratings`;
+    const categoriesEndpoint = apiEndpoints.commentCategories(lang);
+    const ratingsEndpoint = apiEndpoints.courseRatings(courseId);
 
     const [allCategories, setAllCategories] = useState<CommentCategory[]>(() => {
         const preloaded = readPreloadedApi(categoriesEndpoint) as HydraCollection<unknown> | undefined;

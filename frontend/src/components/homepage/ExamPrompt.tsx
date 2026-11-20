@@ -8,7 +8,7 @@ import { STORAGE_KEYS } from '@/utils/cookieNames';
 import { courseTitle } from '@/utils/courseName';
 import { currentExamPeriod, examCalendarYear } from '@/utils/examPeriods';
 import { NotebookPen, X } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
 import { useEffect, useMemo, useState } from 'react';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { useTranslation } from 'react-i18next';

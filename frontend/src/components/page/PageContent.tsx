@@ -5,20 +5,23 @@ import ErrorPage from "@/components/error/ErrorPage";
 import PageHeader from '@/components/layout/PageHeader';
 import { FileText } from 'lucide-react';
 import PageHead from "@/components/ui/PageHead";
-import { readPreloadedApi, useApi } from "@/hooks/useApi";
+import { useApi } from "@/hooks/useApi";
+import { usePreloadedApi } from '@/components/ApiSeed';
 import { type Page } from "@/types/entities";
 import { convertToPage } from "@/utils/convertToEntity";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { apiEndpoints } from '@/utils/apiEndpoints';
 
 interface PageContentProps {
     url_key: string;
 }
 
 export default function PageContent({ url_key }: PageContentProps) {
+    const readPreloadedApi = usePreloadedApi();
     const { i18n } = useTranslation();
     const currentLocale = i18n.language;
-    const endpoint = `/api/pages/${url_key}?lang=${currentLocale}`;
+    const endpoint = apiEndpoints.page(url_key, currentLocale);
     const [page, setPage] = useState<Page | null>(() => {
         const preloaded = readPreloadedApi(endpoint);
         return preloaded ? convertToPage(preloaded) : null;

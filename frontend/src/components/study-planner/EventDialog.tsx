@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import type { StudyPlannerEvent, StudyPlannerMark, StudyPlannerOperation } from '@/types/entities';
 import { DialogTitle } from '@headlessui/react';
 import { Check, EyeOff, Flag } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { subjectName, typeKey } from './model';

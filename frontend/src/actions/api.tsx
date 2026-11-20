@@ -2,67 +2,15 @@
 
 import { logOut } from "@/actions/auth";
 import { getActiveJWT } from "@/lib/auth.server";
+import {
+    backendUrl,
+    handleError,
+    readSharedAnnouncement,
+    usesSharedAnnouncementCache as sharesAnnouncements,
+    writeSharedAnnouncement,
+} from "@/lib/backendApi.server";
 import { headers } from 'next/headers';
 import { redirect } from "next/navigation";
-
-type SharedAnnouncementCacheEntry = {
-    value: unknown;
-    expiresAt: number;
-};
-
-// Announcements are identical for every authenticated reader. Keep one response per locale/time
-// bucket in the Next server process, so different users do not all repeat the same backend query.
-const SHARED_ANNOUNCEMENT_TTL_MS = 5 * 60_000;
-const sharedAnnouncementCache = new Map<string, SharedAnnouncementCacheEntry>();
-
-const readSharedAnnouncement = (endpoint: string): unknown | undefined => {
-    const now = Date.now();
-    const cached = sharedAnnouncementCache.get(endpoint);
-
-    if (cached && cached.expiresAt > now) return cached.value;
-
-    sharedAnnouncementCache.delete(endpoint);
-    return undefined;
-};
-
-/**
- * Encodes an API error response from the backend server into a structured serializable format for the frontend.
- */
-const handleError = async (response: Response) => {
-    // Not every error reaches us as JSON: nginx serves an HTML page for 413/502, and PHP
-    // emits a plain-text warning when a request body exceeds post_max_size. Parsing those
-    // as JSON throws, which used to collapse the real status into a generic 500 and hide
-    // the cause from the user entirely.
-    // `reason` is a short machine-readable cause some endpoints add, for a translated message
-    // (e.g. POST /api/exams/{id}/images).
-    let errorData: { message?: string; title?: string; detail?: string; reason?: string } = {};
-    try {
-        errorData = await response.json();
-    } catch {
-        errorData = { detail: `${response.status} ${response.statusText}`.trim() };
-    }
-
-    switch (response.status) {
-        case 401:
-            return { error: { message: errorData.message || errorData.title || 'Unauthorized. Please log in again.', detail: errorData.detail, status: 401 } };
-        case 404:
-            return { error: { message: errorData.message || errorData.title || 'Resource not found.', detail: errorData.detail, status: 404 } };
-        case 500:
-            return { error: { message: errorData.message || errorData.title || 'Internal Server Error. Please try again later.', detail: errorData.detail, status: 500 } };
-        default:
-            return { error: { message: errorData.message || errorData.title || 'Unexpected Error.', detail: errorData.detail, status: response.status || 500, reason: errorData.reason } };
-    }
-};
-
-const hasControlChars = (value: string): boolean => {
-    for (let i = 0; i < value.length; i++) {
-        const code = value.charCodeAt(i);
-        if (code <= 0x1f || code === 0x7f) {
-            return true;
-        }
-    }
-    return false;
-};
 
 /**
  * API Client for authenticated or unauthenticated requests to the backend server.
@@ -79,34 +27,13 @@ export const ApiClient = async (method: string, endpoint: string, body?: unknown
             return { error: { message: 'Unexpected API Error.', status: 500 } };
         }
 
-        if (
-            typeof endpoint !== 'string'
-            || !endpoint.startsWith('/api/')
-            || endpoint.startsWith('//')
-            || endpoint.includes('\\')
-            || hasControlChars(endpoint)
-        ) {
+        const url = backendUrl(endpoint);
+        if (!url) {
             return { error: { message: 'Invalid API endpoint.', status: 400 } };
         }
-
-        const baseUrl = new URL(backendBaseUrl);
-        let parsedUrl: URL;
-        try {
-            parsedUrl = new URL(endpoint, baseUrl);
-        } catch {
-            return { error: { message: 'Invalid API endpoint.', status: 400 } };
-        }
-
-        if (parsedUrl.origin !== baseUrl.origin || !parsedUrl.pathname.startsWith('/api/')) {
-            return { error: { message: 'Invalid API endpoint.', status: 400 } };
-        }
-
-        const url = parsedUrl.toString();
 
         const jwt = await getActiveJWT();
-        const usesSharedAnnouncementCache = method.toUpperCase() === 'GET'
-            && endpoint.startsWith('/api/announcements')
-            && Boolean(jwt);
+        const usesSharedAnnouncementCache = sharesAnnouncements(method, endpoint, jwt);
 
         if (usesSharedAnnouncementCache) {
             const cached = readSharedAnnouncement(endpoint);
@@ -146,10 +73,7 @@ export const ApiClient = async (method: string, endpoint: string, body?: unknown
             }
             const result = await response.json();
             if (usesSharedAnnouncementCache) {
-                sharedAnnouncementCache.set(endpoint, {
-                    value: result,
-                    expiresAt: Date.now() + SHARED_ANNOUNCEMENT_TTL_MS,
-                });
+                writeSharedAnnouncement(endpoint, result);
             }
             return result;
         }

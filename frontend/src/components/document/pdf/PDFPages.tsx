@@ -217,7 +217,7 @@ export default function PDFPages({ documentId, width, pageAspect = 1.414, onDocu
         }
     }
 
-    const spinner = <PdfPageSkeleton />;
+    const spinner = <PdfPageSkeleton width={width > 0 ? width : undefined} aspect={pageAspect} />;
     const errorMessage = (
         <div className="vtk-empty flex h-96 w-full items-center justify-center p-8">
             {t('document.preview-error')}
@@ -230,7 +230,9 @@ export default function PDFPages({ documentId, width, pageAspect = 1.414, onDocu
                 file={file}
                 onLoadSuccess={onDocumentLoadSuccess}
                 options={options}
-                className="flex flex-col items-center w-full"
+                // react-pdf wraps `loading` and `noData` in a message div of its own, which this
+                // column would shrink to nothing: the full-width placeholder collapsed for a frame.
+                className="flex flex-col items-center w-full [&>.react-pdf\_\_message]:w-full"
                 // react-pdf 11 suspends while loading and throws load failures at the nearest error
                 // boundary, which here is the route's error.tsx — one unreadable file would replace the
                 // whole page. Opting out keeps `loading` and `error` below working;

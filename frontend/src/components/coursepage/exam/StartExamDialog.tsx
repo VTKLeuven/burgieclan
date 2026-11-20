@@ -5,7 +5,7 @@ import { useApi } from '@/hooks/useApi';
 import type { Exam, ExamPeriod } from '@/types/entities';
 import { convertToExam } from '@/utils/convertToEntity';
 import { academicYearsWithExams, EXAM_PERIODS, examCalendarYear, periodHasStarted } from '@/utils/examPeriods';
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';

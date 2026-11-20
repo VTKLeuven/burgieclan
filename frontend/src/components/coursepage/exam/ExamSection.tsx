@@ -8,9 +8,10 @@ import { convertToExam } from '@/utils/convertToEntity';
 import { compareExamsNewestFirst, examCalendarYear } from '@/utils/examPeriods';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { ChevronRight, Lock, NotebookPen, Plus } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { apiEndpoints } from '@/utils/apiEndpoints';
 
 /**
  * "Examens" on a course page: the exam reconstructions of this course, newest first, and the
@@ -24,7 +25,7 @@ export default function ExamSection({ courseId }: { courseId: number }) {
 
     useEffect(() => {
         let cancelled = false;
-        request('GET', `/api/exams?course=/api/courses/${courseId}&itemsPerPage=100`).then((data) => {
+        request('GET', apiEndpoints.courseExams(courseId)).then((data) => {
             // On failure `error` is set and the list stays unknown rather than "empty".
             if (!cancelled && data) {
                 setExams((data['hydra:member'] ?? []).map(convertToExam).sort(compareExamsNewestFirst));

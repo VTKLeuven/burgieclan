@@ -1,5 +1,8 @@
 import initTranslations from "@/app/i18n";
+import { ApiSeed } from "@/components/ApiSeed";
 import CurriculumNavigator from "@/components/courses/CurriculumNavigator";
+import { seedApi } from "@/lib/seedApi.server";
+import { apiEndpoints } from "@/utils/apiEndpoints";
 import type { Metadata } from "next";
 
 type Params = Promise<{ locale: string }>;
@@ -16,6 +19,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     };
 }
 
-export default function Page() {
-    return <CurriculumNavigator />;
+export default async function Page() {
+    const seed = await seedApi([apiEndpoints.programs()]);
+
+    return <ApiSeed seed={seed}><CurriculumNavigator /></ApiSeed>;
 }

@@ -7,7 +7,7 @@ import DocumentFolderList from "@/components/document/DocumentFolderList";
 import DocumentSiblingNav from "@/components/document/DocumentSiblingNav";
 import UnderReviewBox from "@/components/document/UnderReviewBox";
 import ErrorPage from "@/components/error/ErrorPage";
-import LoadingPage from "@/components/loading/LoadingPage";
+import LoadingPage, { PdfPageSkeleton } from "@/components/loading/LoadingPage";
 import DownloadSingleDocumentButton from "@/components/ui/buttons/DownloadSingleDocumentButton";
 import VoteButton from "@/components/ui/buttons/VoteButton";
 import CurriculumPageHeader from "@/components/ui/DynamicBreadcrumb";
@@ -15,7 +15,8 @@ import FavoriteButton from "@/components/ui/FavoriteButton";
 import { useUser } from "@/components/UserContext";
 import { logDocumentView } from "@/hooks/logDocumentView";
 import { useSiblingDocuments } from "@/hooks/useSiblingDocuments";
-import { readPreloadedApi, useApi } from "@/hooks/useApi";
+import { useApi } from "@/hooks/useApi";
+import { usePreloadedApi } from '@/components/ApiSeed';
 import type { Document } from "@/types/entities";
 import { convertToDocument } from "@/utils/convertToEntity";
 import { formatFileSize } from "@/utils/fileSize";
@@ -25,13 +26,35 @@ import SlideColumn from "@/components/layout/SlideColumn";
 import { cn } from "@/lib/utils";
 import { CalendarDays, ChevronLeft, ChevronRight, ExternalLink, HardDrive, PenLine, UserRound } from "lucide-react";
 import dynamic from "next/dynamic";
+import PDFZoomBar from "@/components/document/pdf/PDFZoomBar";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { courseTitle } from "@/utils/courseName";
+import { apiEndpoints } from '@/utils/apiEndpoints';
+
+/**
+ * The viewer's frame while its code loads: the zoom bar and the grey column with a blank page, as
+ * the viewer itself first draws them. Without it the space under the title stayed empty and the
+ * viewer then appeared in steps.
+ */
+function PDFViewerPlaceholder() {
+    const noop = () => { };
+    return (
+        <div aria-hidden="true" className="pointer-events-none">
+            <PDFZoomBar fit="width" zoom={1} onFitChange={noop} onZoomChange={noop} onZoomStep={noop} canFitPage={false} />
+            <div className="bg-vtk-paper-2 p-4">
+                <PdfPageSkeleton />
+            </div>
+        </div>
+    );
+}
 
 // Lazy-load PDFViewer so pdfjs-dist never runs on the server (no DOMMatrix in Node)
-const PDFViewer = dynamic(() => import("@/components/document/pdf/PDFViewer"), { ssr: false });
+const PDFViewer = dynamic(() => import("@/components/document/pdf/PDFViewer"), {
+    ssr: false,
+    loading: () => <PDFViewerPlaceholder />,
+});
 /**
  * Below this page width there is no room for the column beside the preview (folder, comments):
  * the comments move into a drawer behind a button beside the title, and the folder is left to
@@ -53,9 +76,10 @@ function Fact({ icon, label, children }: { icon: ReactNode; label?: string; chil
 }
 
 export default function DocumentPreview({ id }: { id: string }) {
+    const readPreloadedApi = usePreloadedApi();
     const { t, i18n } = useTranslation();
     const currentLocale = i18n.language;
-    const endpoint = `/api/documents/${id}?lang=${currentLocale}`;
+    const endpoint = apiEndpoints.document(id, currentLocale);
     const [document, setDocument] = useState<Document | null>(() => {
         const preloaded = readPreloadedApi(endpoint);
         return preloaded ? convertToDocument(preloaded) : null;

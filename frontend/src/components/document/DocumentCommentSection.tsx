@@ -1,6 +1,7 @@
 import AddDocumentCommentBox from "@/components/document/AddDocumentCommentBox";
 import DocumentComment from "@/components/document/DocumentComment";
-import { HydraCollection, readPreloadedApi, useApi } from "@/hooks/useApi";
+import { HydraCollection, useApi } from "@/hooks/useApi";
+import { usePreloadedApi } from '@/components/ApiSeed';
 import type { DocumentComment as DocumentCommentEntity } from "@/types/entities";
 import { convertToDocumentComment } from "@/utils/convertToEntity";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -8,6 +9,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import { MessagesSquare, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { apiEndpoints } from '@/utils/apiEndpoints';
 
 interface DocumentCommentSectionProps {
     documentId: number;
@@ -20,7 +22,8 @@ export default function DocumentCommentSection({
     file,
     displayInline,
 }: DocumentCommentSectionProps) {
-    const commentsEndpoint = `/api/document_comments?document=/api/documents/${documentId}`;
+    const readPreloadedApi = usePreloadedApi();
+    const commentsEndpoint = apiEndpoints.documentComments(documentId);
     const [comments, setComments] = useState<DocumentCommentEntity[]>(() => {
         const preloaded = readPreloadedApi(commentsEndpoint) as HydraCollection<unknown> | undefined;
         return preloaded?.['hydra:member'] ? preloaded['hydra:member'].map(convertToDocumentComment) : [];

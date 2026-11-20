@@ -1,5 +1,6 @@
 import { canAccessAdmin, getUserId } from "@/lib/auth.server";
 import { getFeatures } from "@/actions/features";
+import { seedApi } from "@/lib/seedApi.server";
 import "@/app/globals.css";
 import initTranslations from "@/app/i18n";
 import CookieBanner from "@/components/cookie-banner/CookieBanner";
@@ -40,19 +41,26 @@ type Params = Promise<{ locale: string }>;
 export default async function RootLayout({ children, params }: Readonly<{ children: React.ReactNode; params: Params; }>) {
   const { locale } = await params;
 
-  const [translations, userId, isAdmin, features, cookieStore] = await Promise.all([
+  // The signed-in reader is fetched here rather than after hydration: drawn without them, every
+  // page load first showed the logged-out shell (no search, no "Mijn vakken", a login button)
+  // and then swapped it for the real one.
+  const userId = await getUserId();
+  const userEndpoint = userId !== null ? `/api/users/${userId}` : null;
+
+  const [translations, isAdmin, features, cookieStore, userSeed] = await Promise.all([
     initTranslations(locale),
-    getUserId(),
     canAccessAdmin(),
     getFeatures(),
     cookies(),
+    seedApi([userEndpoint]),
   ]);
   const { resources } = translations;
+  const initialUser = userEndpoint ? userSeed.values[userEndpoint] ?? null : null;
   const theme = parseThemePreference(cookieStore.get(COOKIE_NAMES.THEME)?.value);
 
   return (
     // UserProvider and TranslationsProvider are server components designed for root-level wrapping.
-    <UserProvider userId={userId} isAdmin={isAdmin}>
+    <UserProvider userId={userId} isAdmin={isAdmin} initialUser={initialUser}>
       <TranslationsProvider
         locale={locale}
         resources={resources}>

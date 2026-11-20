@@ -1,29 +1,19 @@
 import Announcement from '@/components/announcement/Announcement';
-import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
+import { HydraCollection, useApi } from '@/hooks/useApi';
+import { usePreloadedApi } from '@/components/ApiSeed';
 import { Announcement as AnnouncementEntity } from '@/types/entities';
 import { convertToAnnouncement } from '@/utils/convertToEntity';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { apiEndpoints } from '@/utils/apiEndpoints';
 
-const getAnnouncementEndpoint = (locale: string) => {
-    const now = new Date();
-    // Bucket to 5-minute intervals so requests are deduplicated and cacheable
-    now.setSeconds(0, 0);
-    now.setMinutes(Math.floor(now.getMinutes() / 5) * 5);
-    const formattedNow = now.toLocaleString("sv-SE", { timeZone: "Europe/Brussels" }).replace("T", " ");
-    const params = new URLSearchParams({
-        "startTime[strictly_before]": formattedNow,
-        "endTime[after]": formattedNow,
-        "lang": locale
-    });
-    return `/api/announcements?${params.toString()}`;
-};
 
 export default function AnnouncementSlideShow() {
+    const readPreloadedApi = usePreloadedApi();
     const { i18n } = useTranslation();
     const currentLocale = i18n.language;
-    const endpoint = getAnnouncementEndpoint(currentLocale);
+    const endpoint = apiEndpoints.announcements(currentLocale);
     const [announcements, setAnnouncements] = useState<AnnouncementEntity[]>(() => {
         const preloaded = readPreloadedApi(endpoint) as HydraCollection<unknown> | undefined;
         return preloaded?.['hydra:member']?.map(convertToAnnouncement) || [];
@@ -58,7 +48,7 @@ export default function AnnouncementSlideShow() {
         };
 
         fetchAnnouncements();
-    }, [endpoint, request]);
+    }, [endpoint, readPreloadedApi, request]);
 
     useEffect(() => {
         if (announcements.length <= 1) return;

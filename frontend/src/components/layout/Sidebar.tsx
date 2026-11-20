@@ -39,9 +39,9 @@ import {
     UserRound,
 } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Suspense, useMemo, useState, type ReactNode } from 'react';
+import { Suspense, useEffect, useMemo, useState, type MouseEvent, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /** How many favourite documents the sidebar lists before it points to the account page. */
@@ -66,7 +66,7 @@ function NavItem({
     icon: ReactNode;
     label: string;
     active?: boolean;
-    onNavigate?: () => void;
+    onNavigate?: (event: MouseEvent<HTMLAnchorElement>) => void;
     trailing?: ReactNode;
     external?: boolean;
     title?: string;
@@ -75,9 +75,9 @@ function NavItem({
     return (
         <Link
             href={href}
-            onClick={() => {
+            onClick={(event) => {
                 onClick?.();
-                onNavigate?.();
+                onNavigate?.(event);
             }}
             target={external ? '_blank' : undefined}
             rel={external ? 'noopener noreferrer' : undefined}
@@ -85,7 +85,8 @@ function NavItem({
             title={title}
             className={cn(
                 'group flex h-7 items-center gap-2.5 rounded-control px-2.5 text-small font-medium text-fg-nav',
-                'transition-colors duration-[var(--dur-fast)] ease-out',
+                // No colour transition: the highlight moves from one row to the next in a single
+                // frame. Faded, both rows sat half-highlighted in between.
                 '[&_svg]:size-4 [&_svg]:shrink-0',
                 // Navy marks where you are, the same navy as the primary button; in dark mode a
                 // raised grey, since the lavender primary would shout on every page.
@@ -164,6 +165,29 @@ export default function Sidebar({ onNavigate, onCollapse }: {
     const { course: currentCourse } = useCurriculumLocation();
     const [feedbackOpen, setFeedbackOpen] = useState(false);
 
+    // The row just clicked, highlighted at once. A page now stays up until the next one is ready
+    // to be drawn whole, and without this a click showed nothing at all for that moment. Cleared
+    // as soon as the address changes, after which the real highlight below takes over.
+    const [pending, setPending] = useState<{ href: string; from: string } | null>(null);
+    if (pending && pending.from !== path) {
+        setPending(null);
+    }
+    const pendingHref = pending?.from === path ? pending.href : null;
+    const follow = (href: string) => (event: MouseEvent<HTMLAnchorElement>) => {
+        onNavigate?.();
+        // A new tab, a download or a click on the page already open moves nothing here.
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        if (href === path) return;
+        setPending({ href, from: path });
+    };
+    // A navigation that never lands (an error page, a cancelled click) must not leave a row lit.
+    useEffect(() => {
+        if (!pending) return;
+        const timer = setTimeout(() => setPending(null), 8000);
+        return () => clearTimeout(timer);
+    }, [pending]);
+    const shownActive = (href: string, actual: boolean) => (pendingHref !== null ? pendingHref === href : actual);
+
     const isActive = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`));
     const inCurriculum = ['/courses', '/course/', '/document/'].some((p) => path === p || path.startsWith(p));
 
@@ -235,21 +259,21 @@ export default function Sidebar({ onNavigate, onCollapse }: {
             )}
 
             <div className="mt-3 flex flex-col gap-0.5">
-                <NavItem href="/" icon={<House />} label={t('home.title')} active={path === '/'} onNavigate={onNavigate} />
+                <NavItem href="/" icon={<House />} label={t('home.title')} active={shownActive('/', path === '/')} onNavigate={follow('/')} />
                 <NavItem
                     href="/courses"
                     icon={<GraduationCap />}
                     label={t('courses')}
-                    active={inCurriculum && !courses.some((c) => c.id === activeCourseId)}
-                    onNavigate={onNavigate}
+                    active={shownActive('/courses', inCurriculum && !courses.some((c) => c.id === activeCourseId))}
+                    onNavigate={follow('/courses')}
                 />
                 {user && (
                     <NavItem
                         href="/planner"
                         icon={<CalendarDays />}
                         label={t('study_planner.nav')}
-                        active={isActive('/planner')}
-                        onNavigate={onNavigate}
+                        active={shownActive('/planner', isActive('/planner'))}
+                        onNavigate={follow('/planner')}
                     />
                 )}
                 {user && (
@@ -257,11 +281,11 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                         href="/account"
                         icon={<UserRound />}
                         label={t('shell.my_account')}
-                        active={isActive('/account')}
-                        onNavigate={onNavigate}
+                        active={shownActive('/account', isActive('/account'))}
+                        onNavigate={follow('/account')}
                     />
                 )}
-                <NavItem href="/faq" icon={<CircleHelp />} label={t('FAQ')} active={isActive('/faq')} onNavigate={onNavigate} />
+                <NavItem href="/faq" icon={<CircleHelp />} label={t('FAQ')} active={shownActive('/faq', isActive('/faq'))} onNavigate={follow('/faq')} />
             </div>
 
             {/* Scrolls on its own, so the account menu always stays at the bottom. */}
@@ -287,7 +311,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                             ) : (
                                 courses.map((course) => {
                                     const name = courseTitle(course) ?? course.code ?? '';
-                                    const active = activeCourseId === course.id && inCurriculum;
+                                    const active = shownActive(`/course/${course.id}`, activeCourseId === course.id && inCurriculum);
                                     // The star says why the course is listed here, and clicking it
                                     // takes it off the list. A sibling laid over the icon slot rather
                                     // than inside the link, which may not hold a button.
@@ -299,7 +323,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                                                 label={name}
                                                 title={name}
                                                 active={active}
-                                                onNavigate={onNavigate}
+                                                onNavigate={follow(`/course/${course.id}`)}
                                                 trailing={
                                                     <span className="text-caption font-medium text-fg-muted tabular opacity-0 transition-opacity group-hover:opacity-100 group-aria-[current=page]:text-on-nav-active/70">
                                                         {course.code}
@@ -331,8 +355,8 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                                             icon={<FileText />}
                                             label={document.name ?? ''}
                                             title={document.name}
-                                            active={isActive(`/document/${document.id}`)}
-                                            onNavigate={onNavigate}
+                                            active={shownActive(`/document/${document.id}`, isActive(`/document/${document.id}`))}
+                                            onNavigate={follow(`/document/${document.id}`)}
                                         />
                                     ))}
                                     {documents.length > MAX_DOCUMENTS && (

@@ -1,11 +1,12 @@
 'use client';
 
 import { useUser } from '@/components/UserContext';
-import { useApi } from '@/hooks/useApi';
+import { readPreloadedApi, useApi } from '@/hooks/useApi';
 import type { Course, CurriculumPath, Document, DocumentCategory, Module, Program } from '@/types/entities';
 import { convertToCurriculumPaths, convertToModulePath } from '@/utils/convertToEntity';
 import { rememberBranch, selectPath } from '@/utils/curriculumBranch';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
+import { apiEndpoints } from '@/utils/apiEndpoints';
 
 /**
  * Where in the curriculum the reader currently is. A programme or module page names its own
@@ -66,13 +67,22 @@ export function CurriculumLocationProvider({ children }: { children: ReactNode }
         courseId: number;
         paths: CurriculumPath[];
     } | null>(null);
-    const [modulePath, setModulePath] = useState<CurriculumPath | null>(null);
+    // Keyed on the module it answers for, so the previous module's trail never shows for the next.
+    const [modulePath, setModulePath] = useState<{ moduleId: number; path: CurriculumPath | null } | null>(null);
     const [pathsLoading, setPathsLoading] = useState(false);
     // Never expose the previous course's placements while the next request is in flight. A stale
     // path briefly opened the wrong programme, and the tree then kept both programmes expanded.
+    // Until the request below has answered, whatever the cache already holds: the page that
+    // published this course usually brought its placements along (ApiSeed primes the cache), and
+    // reading them here puts the full breadcrumb on the page's first frame instead of the next.
+    const cachedPaths = useMemo(() => {
+        if (courseId === undefined) return null;
+        const cached = readPreloadedApi(apiEndpoints.coursePaths(courseId));
+        return cached ? convertToCurriculumPaths(cached) : null;
+    }, [courseId]);
     const paths = loadedCoursePaths && loadedCoursePaths.courseId === courseId
         ? loadedCoursePaths.paths
-        : NO_PATHS;
+        : cachedPaths ?? NO_PATHS;
 
     // A course can sit in several programmes and needs the full list; a module sits in exactly
     // one place. A programme is its own branch and needs no lookup at all.
@@ -87,7 +97,7 @@ export function CurriculumLocationProvider({ children }: { children: ReactNode }
         setPathsLoading(true);
 
         void (async () => {
-            const result = await request('GET', `/api/courses/${courseId}/paths`);
+            const result = await request('GET', apiEndpoints.coursePaths(courseId));
             if (cancelled) return;
             setLoadedCoursePaths({
                 courseId,
@@ -110,9 +120,9 @@ export function CurriculumLocationProvider({ children }: { children: ReactNode }
         setPathsLoading(true);
 
         void (async () => {
-            const result = await request('GET', `/api/modules/${moduleId}/path`);
+            const result = await request('GET', apiEndpoints.modulePath(moduleId));
             if (cancelled) return;
-            setModulePath(result ? convertToModulePath(result) : null);
+            setModulePath({ moduleId, path: result ? convertToModulePath(result) : null });
             setPathsLoading(false);
         })();
 
@@ -136,7 +146,11 @@ export function CurriculumLocationProvider({ children }: { children: ReactNode }
             return selectPath(paths, courseId, favoriteProgramIds);
         }
 
-        if (moduleId !== undefined) return modulePath;
+        if (moduleId !== undefined) {
+            if (modulePath?.moduleId === moduleId) return modulePath.path;
+            const cached = readPreloadedApi(apiEndpoints.modulePath(moduleId));
+            return cached ? convertToModulePath(cached) : null;
+        }
         if (program) return { program, modules: [] };
 
         return null;
@@ -174,7 +188,9 @@ export function usePublishCurriculumLocation(location: CurriculumLocation): void
     const setLocation = context?.setLocation;
     const { program, module, course, category, document } = location;
 
-    useEffect(() => {
+    // A layout effect, so the chrome has caught up before the page is first painted: with a plain
+    // effect the first frame of every curriculum page showed a breadcrumb of just "Courses".
+    useLayoutEffect(() => {
         if (!setLocation) return;
 
         setLocation({ program, module, course, category, document });

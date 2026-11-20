@@ -4,7 +4,8 @@ import Pagination from '@/components/ui/Pagination';
 import useRetrieveDocuments, { DocumentFilters, DocumentSortOptions } from '@/hooks/useRetrieveDocuments';
 import type { Course, Document, DocumentCategory, Tag } from '@/types/entities';
 import ApiPrefetchLink from '@/components/ui/ApiPrefetchLink';
-import { ArrowUpRight, ChevronRight, LoaderCircle } from 'lucide-react';
+import { Bone } from '@/components/loading/LoadingPage';
+import { ArrowUpRight, ChevronRight } from 'lucide-react';
 import React, { useEffect, useId, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -30,6 +31,46 @@ interface DocumentSectionProps {
     onSelectMany: (documents: Document[], select: boolean) => void;
     onTotal?: (total: number) => void;
     onTags?: (tags: Tag[]) => void;
+    /** How many documents the section is known to hold, so its skeleton has the list's height. */
+    expectedCount?: number;
+}
+
+/** Widths that vary from row to row, so the skeleton reads as a list of names. */
+const ROW_WIDTHS = ['52%', '38%', '61%', '44%', '57%', '35%', '48%', '41%'];
+
+/**
+ * The list while it loads, row for row as it will be drawn (the bar with "select all", then a
+ * row per document), so opening a folder slides open to its real height once and the documents
+ * take the rows' place instead of pushing the page down after a spinner.
+ */
+function SectionSkeleton({ rows, yearHeader }: { rows: number; yearHeader: boolean }) {
+    return (
+        <div role="status" aria-busy="true">
+            <span className="sr-only">Loading…</span>
+            <div className="flex h-10 items-center gap-3 border-b border-border bg-surface-muted px-4">
+                <Bone className="size-4 rounded-[4px]" />
+                <Bone className="h-3 w-20" />
+                <Bone className="ml-auto h-3 w-16" />
+            </div>
+            {yearHeader && (
+                <div className="flex h-[29px] items-center border-b border-border bg-surface px-4">
+                    <Bone className="h-3 w-20" />
+                </div>
+            )}
+            <div className="vtk-rows">
+                {Array.from({ length: rows }, (_, index) => (
+                    <div key={index} className="flex min-h-[52px] items-center gap-3 px-4 py-2">
+                        <Bone className="h-6 w-9 shrink-0 rounded-[6px]" />
+                        <div className="min-w-0 flex-1">
+                            <Bone className="h-3.5" style={{ width: ROW_WIDTHS[index % ROW_WIDTHS.length] }} />
+                            <Bone className="mt-1.5 h-3 w-24" />
+                        </div>
+                        <Bone className="h-3 w-20 shrink-0" />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 }
 
 /**
@@ -88,6 +129,7 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
     onSelectMany,
     onTotal,
     onTags,
+    expectedCount,
 }) => {
     const { t } = useTranslation();
     const contentId = useId();
@@ -163,9 +205,7 @@ const DocumentSection: React.FC<DocumentSectionProps> = ({
     }
 
     const body = loading ? (
-        <div className="flex items-center justify-center py-14">
-            <LoaderCircle className="animate-spin text-icon" size={20} />
-        </div>
+        <SectionSkeleton rows={Math.max(1, Math.min(expectedCount ?? 3, 8))} yearHeader={sort.field === 'year'} />
     ) : shown.length === 0 ? (
         <p className="vtk-empty m-0">{emptyMessage ?? t('course-page.documents.no-documents')}</p>
     ) : (

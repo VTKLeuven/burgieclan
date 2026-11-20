@@ -1,7 +1,9 @@
 'use client';
 
 import { ApiClient } from '@/actions/api';
-import { isErrorResponse } from '@/hooks/useApi';
+import { usePreloadedApi } from '@/components/ApiSeed';
+import { apiGet, isErrorResponse } from '@/hooks/useApi';
+import { apiEndpoints } from '@/utils/apiEndpoints';
 import type { StudyPlanner, StudyPlannerOperation } from '@/types/entities';
 import { convertToStudyPlanner } from '@/utils/convertToEntity';
 import { captureException } from '@sentry/nextjs';
@@ -43,17 +45,26 @@ function message(result: unknown): string {
  * change: each POST answers with the whole planner, so there is never a second request.
  */
 export function useStudyPlanner(): StudyPlannerHandle {
-    const [state, setState] = useState<StudyPlanner | null>(null);
-    const [loading, setLoading] = useState(true);
+    const readPreloadedApi = usePreloadedApi();
+    // The page fetches the planner while it renders (see planner/page.tsx), so the timetable is
+    // there on the first frame instead of after a skeleton.
+    const [initial] = useState(() => {
+        const preloaded = readPreloadedApi(apiEndpoints.studyPlanner());
+        return preloaded && !isErrorResponse(preloaded) ? convertToStudyPlanner(preloaded) : null;
+    });
+    const [state, setState] = useState<StudyPlanner | null>(initial);
+    const [loading, setLoading] = useState(initial === null);
     const [loadError, setLoadError] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        if (initial !== null) return;
+
         let cancelled = false;
         (async () => {
             try {
-                const result = await ApiClient('GET', '/api/study_planner');
+                const result = await apiGet(apiEndpoints.studyPlanner());
                 if (cancelled) return;
                 if (result === null || isErrorResponse(result)) {
                     setLoadError(message(result));
@@ -72,7 +83,7 @@ export function useStudyPlanner(): StudyPlannerHandle {
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [initial]);
 
     const send = useCallback(async (method: string, endpoint: string, body?: unknown): Promise<boolean> => {
         setBusy(true);

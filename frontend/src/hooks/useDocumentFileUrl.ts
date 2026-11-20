@@ -1,7 +1,6 @@
 'use client'
 
-import { ApiClient } from '@/actions/api';
-import { isErrorResponse } from '@/hooks/useApi';
+import { apiGet, isErrorResponse } from '@/hooks/useApi';
 import { captureException } from '@sentry/nextjs';
 import { useEffect, useState } from 'react';
 
@@ -26,7 +25,7 @@ export type DocumentFileUrlResult =
 export async function fetchDocumentFileUrl(documentId: number, inline: boolean): Promise<DocumentFileUrlResult | null> {
     let result: unknown;
     try {
-        result = await ApiClient('GET', `/api/documents/${documentId}/file-url${inline ? '?inline=1' : ''}`);
+        result = await apiGet(`/api/documents/${documentId}/file-url${inline ? '?inline=1' : ''}`);
     } catch {
         // A redirect to the login page surfaces here; Next.js carries it out.
         return null;

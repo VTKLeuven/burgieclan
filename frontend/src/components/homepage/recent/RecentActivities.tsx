@@ -1,6 +1,7 @@
 import Loading from '@/components/loading/LoadingPage';
 import { Activity } from '@/components/homepage/recent/Activity';
-import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
+import { HydraCollection, useApi } from '@/hooks/useApi';
+import { usePreloadedApi } from '@/components/ApiSeed';
 import type { DocumentView } from '@/types/entities';
 import { convertToDocumentView } from '@/utils/convertToEntity';
 import { courseTitle } from '@/utils/courseName';
@@ -8,21 +9,23 @@ import { useEffect, useState } from 'react';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { History } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { apiEndpoints } from '@/utils/apiEndpoints';
 
 /** The panel is a nudge back into recent work, not a history page: four rows is enough. */
 const MAX_ACTIVITIES = 6;
 
 export const RecentActivities = () => {
+    const readPreloadedApi = usePreloadedApi();
     const { t } = useTranslation();
     const { request, loading, error } = useApi<HydraCollection<unknown>>();
     const [documentViews, setDocumentViews] = useState<DocumentView[]>(() => {
-        const preloaded = readPreloadedApi('/api/document_views') as HydraCollection<unknown> | undefined;
+        const preloaded = readPreloadedApi(apiEndpoints.documentViews()) as HydraCollection<unknown> | undefined;
         return preloaded?.['hydra:member']?.map(convertToDocumentView) || [];
     });
 
     useEffect(() => {
         const fetchActivities = async () => {
-            const response = await request('GET', '/api/document_views');
+            const response = await request('GET', apiEndpoints.documentViews());
 
             if (!response) {
                 return;

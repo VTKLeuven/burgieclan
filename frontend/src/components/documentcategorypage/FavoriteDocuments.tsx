@@ -10,7 +10,7 @@ import { convertToDocument } from '@/utils/convertToEntity';
 import { captureException } from '@sentry/nextjs';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { ChevronRight, FileText, Star } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

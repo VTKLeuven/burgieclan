@@ -1,8 +1,7 @@
 'use client';
 
-import { ApiClient } from '@/actions/api';
 import { Dialog } from '@/components/ui/Dialog';
-import { isErrorResponse } from '@/hooks/useApi';
+import { apiGet, isErrorResponse } from '@/hooks/useApi';
 import { cn } from '@/lib/utils';
 import type { StudyPlannerVtkOption } from '@/types/entities';
 import { convertToStudyPlannerVtkOptions } from '@/utils/convertToEntity';
@@ -93,7 +92,7 @@ export function VtkPickerDialog({ open, api, onClose }: { open: boolean; api: Pl
         if (!open) return;
         let cancelled = false;
         (async () => {
-            const result = await ApiClient('GET', '/api/study_planner/vtk_events');
+            const result = await apiGet('/api/study_planner/vtk_events');
             if (cancelled) return;
             if (result === null || isErrorResponse(result)) {
                 setLoadError(isErrorResponse(result) ? result.error.detail || result.error.message || null : null);

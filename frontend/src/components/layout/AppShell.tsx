@@ -3,12 +3,13 @@
 import CurriculumPanel from '@/components/curriculum/CurriculumPanel';
 import GlobalSearch from '@/components/layout/GlobalSearch';
 import MobileNav from '@/components/layout/MobileNav';
+import NavigationProgress from '@/components/layout/NavigationProgress';
 import ResizeHandle from '@/components/layout/ResizeHandle';
 import { useSidebarPanel } from '@/components/layout/ShellPanels';
 import Sidebar from '@/components/layout/Sidebar';
 import SlideColumn from '@/components/layout/SlideColumn';
 import { cn } from '@/lib/utils';
-import { useRef, type ReactNode } from 'react';
+import { Suspense, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -46,6 +47,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
                     !sidebar.open && 'md:ml-[var(--panel-inset)]',
                 )}
             >
+                <Suspense fallback={null}>
+                    <NavigationProgress />
+                </Suspense>
                 <CurriculumPanel />
                 <main
                     id="main-content"

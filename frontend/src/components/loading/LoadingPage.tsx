@@ -52,19 +52,28 @@ export function TreeSkeleton({ rows = 7 }: { rows?: number }) {
     );
 }
 
-/** A page of a document while the viewer fetches and draws it. */
-export function PdfPageSkeleton() {
+/**
+ * A page of a document while the viewer fetches and draws it: a blank sheet of exactly the size
+ * and look of the page that will be drawn into it (PDFPage), shown at once rather than after the
+ * skeleton delay. The viewer then fills the sheet in place; it used to go from nothing, to a grey
+ * box, to a white page, to the page itself.
+ */
+export function PdfPageSkeleton({ width, aspect = 1.414 }: { width?: number; aspect?: number }) {
     return (
-        <SkeletonFrame className="flex w-full justify-center p-6">
-            <div className="flex aspect-[1/1.414] w-full max-w-[760px] flex-col gap-3 bg-surface p-[8%] shadow-xs">
-                <Bone className="h-5 w-1/3" />
-                <Bone className="mt-4 h-3 w-full" />
-                <Bone className="h-3 w-11/12" />
-                <Bone className="h-3 w-4/5" />
-                <Bone className="mt-4 h-3 w-full" />
-                <Bone className="h-3 w-2/3" />
-            </div>
-        </SkeletonFrame>
+        <div
+            role="status"
+            aria-busy="true"
+            className={cn('relative mx-auto my-4 flex flex-col gap-3 overflow-hidden bg-white p-[8%] shadow-md shadow-black/50', !width && 'w-full')}
+            style={width ? { width, minHeight: Math.round(width * aspect), aspectRatio: `1 / ${aspect}` } : { aspectRatio: `1 / ${aspect}` }}
+        >
+            <span className="sr-only">Loading…</span>
+            <Bone className="h-5 w-1/3" />
+            <Bone className="mt-4 h-3 w-full" />
+            <Bone className="h-3 w-11/12" />
+            <Bone className="h-3 w-4/5" />
+            <Bone className="mt-4 h-3 w-full" />
+            <Bone className="h-3 w-2/3" />
+        </div>
     );
 }
 

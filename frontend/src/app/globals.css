@@ -527,13 +527,13 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 28px 16px 64px;
-    /* A page settles in as it replaces its skeleton (see page-in). */
-    animation: vtk-rise-in 200ms var(--ease-out) both;
+    /* A page settles in as it replaces the previous one (see page-in). */
+    animation: vtk-rise-in 180ms var(--ease-out) both;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .vtk-shell {
-      animation: vtk-fade-in 120ms linear both;
+      animation: none;
     }
   }
 
@@ -1186,15 +1186,18 @@
 }
 
 /* Loading and arrival. A skeleton waits a moment before it shows, so a fast load never flashes
-   one for a single frame, then breathes gently; the page that replaces it fades in rather than
+   one for a single frame, then breathes gently; the page that replaces it settles in rather than
    snapping into place. */
 @keyframes vtk-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
+/* A page arrives drawn whole and usually replaces another one, not a blank panel. Starting from
+   transparent flashed the white panel between the two; starting half-way it reads as the new page
+   settling into place. */
 @keyframes vtk-rise-in {
-  from { opacity: 0; transform: translateY(4px); }
+  from { opacity: 0.5; transform: translateY(3px); }
   to { opacity: 1; transform: none; }
 }
 
@@ -1218,10 +1221,37 @@
 }
 
 @utility page-in {
-  animation: vtk-rise-in 200ms var(--ease-out) both;
+  animation: vtk-rise-in 180ms var(--ease-out) both;
   @media (prefers-reduced-motion: reduce) {
-    animation: vtk-fade-in 120ms linear both;
+    animation: none;
   }
+}
+
+/* The bar along the top of the panel while the next page is on its way (NavigationProgress).
+   It slows as it goes, never reaching the end on its own, then fills and fades when the page lands. */
+@keyframes vtk-progress-run {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(0.9); }
+}
+
+@keyframes vtk-progress-done {
+  from { transform: scaleX(0.9); opacity: 1; }
+  60% { transform: scaleX(1); opacity: 1; }
+  to { transform: scaleX(1); opacity: 0; }
+}
+
+@utility nav-progress-run {
+  height: 100%;
+  background: var(--color-primary);
+  transform-origin: left;
+  animation: vtk-progress-run 6s cubic-bezier(0.1, 0.6, 0.2, 1) both;
+}
+
+@utility nav-progress-done {
+  height: 100%;
+  background: var(--color-primary);
+  transform-origin: left;
+  animation: vtk-progress-done 300ms var(--ease-out) both;
 }
 
 /* Row actions that only show while their row is hovered or focused, so long lists stay quiet. */

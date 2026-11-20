@@ -6,7 +6,7 @@ import ShowSidebarButton from '@/components/layout/ShowSidebarButton';
 import { useUser } from '@/components/UserContext';
 import { cn } from '@/lib/utils';
 import { ChevronRight, ListTree, Menu, Search } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
 import { Fragment, useEffect, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 

@@ -11,7 +11,8 @@ import PageHeader from '@/components/layout/PageHeader';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import PageHead from '@/components/ui/PageHead';
 import { useUser } from "@/components/UserContext";
-import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
+import { HydraCollection, useApi } from '@/hooks/useApi';
+import { usePreloadedApi } from '@/components/ApiSeed';
 import type { Course, Module, Program } from '@/types/entities';
 import { convertToProgram } from "@/utils/convertToEntity";
 import { matchedAlternateTitle } from '@/utils/courseName';
@@ -20,6 +21,7 @@ import { courseMatchesFilters, initializeFuseInstances } from '@/utils/curriculu
 import { ChevronRight, GraduationCap } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { apiEndpoints } from '@/utils/apiEndpoints';
 
 /** Every course in the curriculum, each with the branch it hangs under. */
 function flatten(programs: Program[]): CourseHit[] {
@@ -46,7 +48,8 @@ function flatten(programs: Program[]): CourseHit[] {
  * and opening one programme no longer pushes the other nine off the screen.
  */
 export default function CurriculumNavigator() {
-  const programsEndpoint = '/api/programs?pagination=false&order[name]=asc';
+  const readPreloadedApi = usePreloadedApi();
+  const programsEndpoint = apiEndpoints.programs();
   const [programs, setPrograms] = useState<Program[]>(() => {
     const preloaded = readPreloadedApi(programsEndpoint) as HydraCollection<unknown> | undefined;
     return preloaded?.['hydra:member'].map(convertToProgram) ?? [];

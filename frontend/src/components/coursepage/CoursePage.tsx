@@ -15,23 +15,26 @@ import DownloadButton from "@/components/ui/DownloadButton";
 import CurriculumPageHeader from "@/components/ui/DynamicBreadcrumb";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
-import { readPreloadedApi, useApi } from "@/hooks/useApi";
+import { useApi } from "@/hooks/useApi";
+import { usePreloadedApi } from '@/components/ApiSeed';
 import { Course, CourseComment } from "@/types/entities";
 import { convertToCourse } from "@/utils/convertToEntity";
 import { ArrowUpRight, BookOpen } from "lucide-react";
-import Link from "next/link";
+import Link from '@/components/ui/Link';
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { courseTitle } from '@/utils/courseName';
+import { apiEndpoints } from '@/utils/apiEndpoints';
 
 function MetaDot() {
     return <span aria-hidden="true">·</span>;
 }
 
 export default function CoursePage() {
+    const readPreloadedApi = usePreloadedApi();
     const { id: courseId } = useParams();
-    const endpoint = `/api/courses/${courseId}`;
+    const endpoint = apiEndpoints.course(String(courseId));
     const [course, setCourse] = useState<Course | null>(() => {
         const preloaded = readPreloadedApi(endpoint);
         return preloaded ? convertToCourse(preloaded) : null;

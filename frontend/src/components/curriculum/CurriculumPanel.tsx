@@ -18,9 +18,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useUser } from '@/components/UserContext';
 import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
+import { usePreloadedApi } from '@/components/ApiSeed';
 import { useSiblingDocuments } from '@/hooks/useSiblingDocuments';
 import { cn } from '@/lib/utils';
 import type { Course, Document, DocumentCategory, Module, Program } from '@/types/entities';
+import { apiEndpoints } from '@/utils/apiEndpoints';
 import { convertToDocumentCategory, convertToModule, convertToProgram } from '@/utils/convertToEntity';
 import { courseTitle, matchedAlternateTitle } from '@/utils/courseName';
 import { rememberBranch } from '@/utils/curriculumBranch';
@@ -38,7 +40,7 @@ import {
     Search,
     X,
 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { categoryPageCourseEndpoint } from '@/utils/courseEndpoints';
 
@@ -201,6 +203,7 @@ function CurriculumColumn({ panel }: { panel: PanelState }) {
 }
 
 function usePrograms(): Program[] {
+    const readPreloadedApi = usePreloadedApi();
     const { request } = useApi<HydraCollection<unknown>>();
     const [programs, setPrograms] = useState<Program[]>(() => {
         const preloaded = readPreloadedApi(PROGRAMS_ENDPOINT) as HydraCollection<unknown> | undefined;
@@ -279,6 +282,24 @@ function ProgramSwitcher({
 }
 
 /** One programme's modules, opened along the reader's own branch; deeper levels load on demand. */
+/**
+ * A level of the tree as the cache already holds it: the page that was just opened usually
+ * brought its branch along (ApiSeed primes the cache), and drawing from it puts the open branch
+ * on the page's first frame instead of rebuilding it level by level a moment later. The fetches
+ * below still run and take over; with the answer cached they cost nothing.
+ */
+function cachedProgramModules(id: number): Module[] | undefined {
+    const cached = readPreloadedApi(apiEndpoints.program(id));
+    return cached ? convertToProgram(cached).modules ?? [] : undefined;
+}
+
+function cachedModuleChildren(id: number): ModuleChildren | undefined {
+    const cached = readPreloadedApi(apiEndpoints.module(id));
+    if (!cached) return undefined;
+    const loaded = convertToModule(cached);
+    return { modules: loaded.modules ?? [], courses: loaded.courses ?? [] };
+}
+
 function ProgramTree({ programId }: { programId: number }) {
     const { t, i18n } = useTranslation();
     const { request } = useApi<unknown>();
@@ -304,7 +325,7 @@ function ProgramTree({ programId }: { programId: number }) {
 
         inFlight.current.add(key);
         markLoading(key, true);
-        const data = await request('GET', `/api/programs/${id}`);
+        const data = await request('GET', apiEndpoints.program(id));
         inFlight.current.delete(key);
         markLoading(key, false);
 
@@ -319,7 +340,7 @@ function ProgramTree({ programId }: { programId: number }) {
 
         inFlight.current.add(key);
         markLoading(key, true);
-        const data = await request('GET', `/api/modules/${id}`);
+        const data = await request('GET', apiEndpoints.module(id));
         inFlight.current.delete(key);
         markLoading(key, false);
 
@@ -352,7 +373,9 @@ function ProgramTree({ programId }: { programId: number }) {
     }, [onBranch, activePath, course, category, currentDocument]);
 
     const branchSignature = branchKeys.join('|');
-    useEffect(() => {
+    // Before paint, so the branch is drawn open on the frame the page arrives in, not folded shut
+    // for one frame first.
+    useLayoutEffect(() => {
         if (branchKeys.length === 0 || !activePath) return;
 
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -394,7 +417,7 @@ function ProgramTree({ programId }: { programId: number }) {
         : currentModule ? moduleKey(currentModule.id)
         : null;
 
-    const modules = programModules[programId];
+    const modules = programModules[programId] ?? cachedProgramModules(programId);
     if (!modules) {
         return <TreeSkeleton />;
     }
@@ -406,7 +429,7 @@ function ProgramTree({ programId }: { programId: number }) {
     const renderModule = (node: Module, depth: number): ReactNode => {
         const key = moduleKey(node.id);
         const isOpen = expanded.has(key);
-        const children = moduleChildren[node.id];
+        const children = moduleChildren[node.id] ?? cachedModuleChildren(node.id);
 
         return (
             <li key={key}>

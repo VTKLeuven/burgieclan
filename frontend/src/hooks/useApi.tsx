@@ -129,6 +129,32 @@ const freshCachedValue = (endpoint: string): unknown | undefined => {
     return undefined;
 };
 
+/**
+ * One GET, answered exactly as `ApiClient('GET', endpoint)` would answer it.
+ *
+ * It goes through the /bff route rather than the server action, because Next runs a tab's server
+ * actions one at a time: the reads a page makes used to queue behind each other (and any click
+ * behind them), so its sections came in one round trip apart. The route answers 401 for whatever
+ * it leaves to the action — a token to refresh, a session that is over — and so does anything
+ * else unexpected, so the action stays the fallback that refreshes and redirects.
+ */
+export const apiGet = async (endpoint: string): Promise<unknown> => {
+    if (typeof window !== 'undefined') {
+        try {
+            const response = await fetch(`/bff?endpoint=${encodeURIComponent(endpoint)}`, {
+                credentials: 'same-origin',
+                cache: 'no-store',
+            });
+            if (response.status === 200) {
+                return await response.json();
+            }
+        } catch {
+            // Offline for a moment or the route failed: the action below has its own say.
+        }
+    }
+    return ApiClient('GET', endpoint);
+};
+
 const getWithDedupe = async (endpoint: string): Promise<unknown> => {
     if (isCacheableGet(endpoint)) {
         const cached = freshCachedValue(endpoint);
@@ -138,7 +164,7 @@ const getWithDedupe = async (endpoint: string): Promise<unknown> => {
     const pending = pendingGets.get(endpoint);
     if (pending) return pending;
 
-    const request = ApiClient('GET', endpoint);
+    const request = apiGet(endpoint);
     pendingGets.set(endpoint, request);
 
     try {
@@ -163,6 +189,42 @@ const getWithDedupe = async (endpoint: string): Promise<unknown> => {
 export const invalidateApiCache = (): void => {
     getCache.clear();
     clearStorageCache();
+    lastInvalidatedAt = Date.now();
+};
+
+/** When the cache was last cleared after a write; data fetched before then is out of date. */
+let lastInvalidatedAt = 0;
+
+/**
+ * Responses a page's server component fetched while rendering (see `seedApi`), with the moment it
+ * fetched them. Serializable, so it travels in the page's RSC payload.
+ */
+export type ApiSeedData = {
+    at: number;
+    values: Record<string, unknown>;
+};
+
+/** Whether seeded data still describes the world, i.e. nothing was written since it was fetched. */
+export const isSeedCurrent = (seed: ApiSeedData): boolean => seed.at > lastInvalidatedAt;
+
+/**
+ * Hands what the server fetched to the request cache, so a component that asks for the same
+ * endpoint with `request()` gets it without a round trip. Browser only: on the server this module
+ * is shared by every visitor. Never overwrites a newer response, and expires on the clock of the
+ * fetch rather than of the hand-over, so a page restored from the router cache cannot pass off
+ * old data as fresh.
+ */
+export const primeApiCache = (seed: ApiSeedData): void => {
+    if (typeof window === 'undefined' || !isSeedCurrent(seed)) return;
+
+    for (const [endpoint, value] of Object.entries(seed.values)) {
+        if (!isCacheableGet(endpoint)) continue;
+        const ttl = getTtlForEndpoint(endpoint);
+        const expiresAt = seed.at + ttl;
+        const existing = getCache.get(endpoint);
+        if (expiresAt <= Date.now() || (existing && existing.expiresAt >= expiresAt)) continue;
+        getCache.set(endpoint, { value, expiresAt });
+    }
 };
 
 /** Start a cacheable API request before the reader clicks. */

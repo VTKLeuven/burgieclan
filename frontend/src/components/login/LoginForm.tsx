@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/Toast";
 import { useUser } from "@/components/UserContext";
 import { useApi } from "@/hooks/useApi";
 import { ChevronDown, Eye, EyeOff, LoaderCircle } from "lucide-react";
-import Link from 'next/link';
+import Link from '@/components/ui/Link';
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

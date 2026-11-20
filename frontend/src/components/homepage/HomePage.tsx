@@ -15,8 +15,23 @@ import UploadDialog from '@/components/upload/UploadDialog';
 import { useUploadFlow } from '@/hooks/useUploadFlow';
 import { House } from 'lucide-react';
 import { useFeature } from '@/components/FeaturesContext';
-import { useEffect, useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
+
+const noSubscription = () => () => { };
+
+/**
+ * The reader's time zone. The server, and the browser while it takes over the server's HTML, use
+ * Brussels: where nearly every reader is, so the greeting and the date are right from the first
+ * paint rather than filled in a moment later. Elsewhere the browser corrects them right after.
+ */
+function useTimeZone(): string {
+    return useSyncExternalStore(
+        noSubscription,
+        () => Intl.DateTimeFormat().resolvedOptions().timeZone,
+        () => 'Europe/Brussels',
+    );
+}
 
 function greetingKey(hour: number) {
     if (hour < 6) return 'home.greeting_night';
@@ -35,20 +50,18 @@ export default function HomePage() {
     const { user } = useUser();
     const { isDialogOpen, initialFile, handleFileDrop, closeDialog } = useUploadFlow();
 
-    // The time of day is the visitor's, not the server's, so it is filled in after hydration.
-    const [now, setNow] = useState<Date | null>(null);
+    const timeZone = useTimeZone();
+    const [now] = useState(() => new Date());
     const examsEnabled = useFeature('exam_reconstructions');
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setNow(new Date());
-    }, []);
 
     const firstName = user?.fullName?.split(' ')[0];
-    const greeting = now ? t(greetingKey(now.getHours()), { name: firstName ?? '' }) : t('home.title');
-    const date = now?.toLocaleDateString(i18n.language === 'nl' ? 'nl-BE' : 'en-GB', {
+    const hour = Number(new Intl.DateTimeFormat('en-GB', { hour: 'numeric', hourCycle: 'h23', timeZone }).format(now));
+    const greeting = t(greetingKey(hour), { name: firstName ?? '' });
+    const date = now.toLocaleDateString(i18n.language === 'nl' ? 'nl-BE' : 'en-GB', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
+        timeZone,
     });
     const courseCount = user?.favoriteCourses?.length ?? 0;
 
@@ -60,7 +73,8 @@ export default function HomePage() {
             />
 
             <div className="vtk-shell @container">
-                <h1 className="vtk-page-title">{user && firstName ? greeting : t('home.title')}</h1>
+                {/* The server's clock and the browser's can straddle an hour or midnight. */}
+                <h1 className="vtk-page-title" suppressHydrationWarning>{user && firstName ? greeting : t('home.title')}</h1>
                 <p className="vtk-page-subtitle m-0 first-letter:uppercase" suppressHydrationWarning>
                     {[date, user && courseCount > 0 ? t('home.summary_courses', { count: courseCount }) : null].filter(Boolean).join(' · ')}
                 </p>

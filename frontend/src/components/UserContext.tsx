@@ -20,10 +20,25 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider = ({ children, userId, isAdmin = false }: { children: ReactNode, userId: number | null, isAdmin?: boolean }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState<boolean>(() => userId !== null);
+export const UserProvider = ({ children, userId, isAdmin = false, initialUser = null }: {
+    children: ReactNode;
+    userId: number | null;
+    isAdmin?: boolean;
+    /** The user as the root layout fetched them, raw from the API, so the first paint is already theirs. */
+    initialUser?: unknown;
+}) => {
+    const [user, setUser] = useState<User | null>(() => (userId !== null && initialUser ? convertToUser(initialUser) : null));
+    const [loading, setLoading] = useState<boolean>(() => userId !== null && !initialUser);
     const { error, isRedirecting, request } = useApi();
+
+    // A login or logout re-renders the root layout with someone else: take the new initial user
+    // over, rather than showing the previous one until a fetch comes back.
+    const [shownUserId, setShownUserId] = useState(userId);
+    if (shownUserId !== userId) {
+        setShownUserId(userId);
+        setUser(userId !== null && initialUser ? convertToUser(initialUser) : null);
+        setLoading(userId !== null && !initialUser);
+    }
 
     const fetchUser = useCallback(async () => {
         if (!userId) {
@@ -51,11 +66,14 @@ export const UserProvider = ({ children, userId, isAdmin = false }: { children: 
         });
     }, []);
 
-    // Initial fetch when component mounts or userId changes
+    // Fetch only when the server could not hand the user over (a backend hiccup, a token that
+    // needed refreshing first); otherwise the first paint already has them.
+    const hasInitialUser = userId !== null && Boolean(initialUser);
     useEffect(() => {
+        if (hasInitialUser) return;
         // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchUser();
-    }, [fetchUser]);
+    }, [fetchUser, hasInitialUser]);
 
     const contextValue: UserContextType = {
         user,

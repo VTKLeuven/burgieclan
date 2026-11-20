@@ -3,12 +3,14 @@ import Loading from '@/components/loading/LoadingPage';
 import DocumentCategoryRow from "@/components/coursepage/DocumentCategory";
 import RelatedMaterial from '@/components/coursepage/RelatedMaterial';
 import SectionHeader from '@/components/ui/SectionHeader';
-import { HydraCollection, readPreloadedApi, useApi } from "@/hooks/useApi";
+import { HydraCollection, useApi } from "@/hooks/useApi";
+import { usePreloadedApi } from '@/components/ApiSeed';
 import type { Course, DocumentCategory } from "@/types/entities";
 import { convertToDocumentCategory } from "@/utils/convertToEntity";
 import { FolderOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { apiEndpoints } from '@/utils/apiEndpoints';
 
 interface DocumentSectionsProps {
     course: Course;
@@ -16,8 +18,9 @@ interface DocumentSectionsProps {
 }
 
 export default function DocumentSections({ course, documentCounts }: DocumentSectionsProps) {
+    const readPreloadedApi = usePreloadedApi();
     const { t, i18n } = useTranslation();
-    const categoriesEndpoint = `/api/document_categories?lang=${i18n.language}`;
+    const categoriesEndpoint = apiEndpoints.documentCategories(i18n.language);
     const [documentCategories, setDocumentCategories] = useState<DocumentCategory[]>(() => {
         const preloaded = readPreloadedApi(categoriesEndpoint) as HydraCollection<unknown> | undefined;
         return preloaded?.['hydra:member'].map(convertToDocumentCategory) ?? [];

@@ -1,7 +1,6 @@
 'use client'
 
-import { ApiClient } from '@/actions/api';
-import { isErrorResponse } from '@/hooks/useApi';
+import { apiGet, isErrorResponse } from '@/hooks/useApi';
 import { useCallback, useEffect, useSyncExternalStore } from 'react';
 
 /**
@@ -116,7 +115,7 @@ class ExamImageLinks {
 
         let images: ApiImages | null = null;
         try {
-            const result = await ApiClient('GET', `/api/exams/${this.examId}/image-urls`);
+            const result = await apiGet(`/api/exams/${this.examId}/image-urls`);
             if (!isErrorResponse(result)) {
                 images = (result as { images?: ApiImages } | null)?.images ?? null;
             }

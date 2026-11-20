@@ -20,6 +20,7 @@ import { Frown, Globe, Search as SearchIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { localizedHref } from '@/components/ui/Link';
 import { i18nConfig } from '../../../i18nConfig';
 
 type SearchPopupProps = {
@@ -56,7 +57,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
     const [debouncedQuery, setDebouncedQuery] = useState('');
     const [items, setItems] = useState<SearchResults>(NO_RESULTS);
     const { error, loading, isRedirecting, request } = useApi<SearchApiResponse | null>();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const router = useRouter();
 
     function convertToObjects(obj: SearchApiResponse): SearchResults {
@@ -142,7 +143,7 @@ export default function SearchPopup({ open, setOpen }: SearchPopupProps) {
                                     window.history.pushState(null, '', new URL(param.redirect, window.location.href).hash);
                                     window.dispatchEvent(new HashChangeEvent('hashchange'));
                                 } else {
-                                    router.push(param.redirect);
+                                    router.push(localizedHref(param.redirect, i18n.language));
                                 }
                             }
                         }}

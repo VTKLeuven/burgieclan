@@ -5,21 +5,19 @@ import FaqQuestionForm from '@/components/faq/FaqQuestionForm';
 import PageHeader from '@/components/layout/PageHeader';
 import { CircleHelp } from 'lucide-react';
 import PageHead from '@/components/ui/PageHead';
-import { HydraCollection, readPreloadedApi, useApi } from '@/hooks/useApi';
+import { HydraCollection, useApi } from '@/hooks/useApi';
+import { usePreloadedApi } from '@/components/ApiSeed';
 import { FaqItem } from '@/types/entities';
 import { convertToFaqItem } from '@/utils/convertToEntity';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { apiEndpoints } from '@/utils/apiEndpoints';
 
 export default function FaqPage() {
+    const readPreloadedApi = usePreloadedApi();
     const { t, i18n } = useTranslation();
     const currentLocale = i18n.language;
-    const params = new URLSearchParams({
-        'published': 'true',
-        'pagination': 'false',
-        'lang': currentLocale,
-    });
-    const endpoint = `/api/faq_items?${params.toString()}`;
+    const endpoint = apiEndpoints.faqItems(currentLocale);
     const [faqItems, setFaqItems] = useState<FaqItem[]>(() => {
         const preloaded = readPreloadedApi(endpoint) as HydraCollection<unknown> | undefined;
         return preloaded?.['hydra:member']?.map(convertToFaqItem) || [];

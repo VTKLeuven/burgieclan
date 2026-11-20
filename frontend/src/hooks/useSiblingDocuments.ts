@@ -1,14 +1,9 @@
+import { usePreloadedApi } from '@/components/ApiSeed';
 import { HydraCollection, useApi } from '@/hooks/useApi';
 import type { Document } from '@/types/entities';
+import { apiEndpoints } from '@/utils/apiEndpoints';
 import { convertToDocument } from '@/utils/convertToEntity';
-import { useEffect, useState } from 'react';
-
-/**
- * A category never holds this many documents in practice, but a course with a decade of
- * scanned exercise sessions can come close. Past the cap the neighbours are simply not
- * offered rather than paged through - the full list stays one click away either way.
- */
-const MAX_SIBLINGS = 200;
+import { useEffect, useMemo, useState } from 'react';
 
 /**
  * The documents sitting in the same course and category as the one being read, in the order
@@ -18,41 +13,42 @@ const MAX_SIBLINGS = 200;
  * file; with the neighbours in hand the reader can step straight from one to the next.
  */
 export function useSiblingDocuments(courseId?: number, categoryId?: number) {
+    const readPreloadedApi = usePreloadedApi();
     const { request } = useApi<HydraCollection<unknown>>();
-    const [documents, setDocuments] = useState<Document[]>([]);
-    const [loading, setLoading] = useState(false);
+    const url = courseId !== undefined && categoryId !== undefined
+        ? apiEndpoints.siblingDocuments(courseId, categoryId)
+        : null;
+    // Kept with the folder it lists, so the previous document's neighbours never show for the next.
+    const [loaded, setLoaded] = useState<{ url: string; documents: Document[] } | null>(null);
+
+    // What the page brought along or an earlier visit left in the cache, until the request answers:
+    // the "2 of 11" beside the title used to appear a moment after the title and push it onto a
+    // second line.
+    const preloaded = useMemo(() => {
+        if (!url) return null;
+        const members = (readPreloadedApi(url) as HydraCollection<unknown> | undefined)?.['hydra:member'];
+        return Array.isArray(members) ? members.map(convertToDocument) : null;
+    }, [url, readPreloadedApi]);
 
     useEffect(() => {
-        if (courseId === undefined || categoryId === undefined) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setDocuments([]);
-            return;
-        }
+        if (!url) return;
 
         let cancelled = false;
-        setLoading(true);
-
-        const fetchSiblings = async () => {
-            const url = `/api/documents?page=1&itemsPerPage=${MAX_SIBLINGS}`
-                + '&includeFileMetadata=false'
-                + `&course=${encodeURIComponent(`/api/courses/${courseId}`)}`
-                + `&category=${encodeURIComponent(`/api/document_categories/${categoryId}`)}`
-                + '&order[year]=desc&order[name]=asc';
-
+        void (async () => {
             const response = await request('GET', url);
             if (cancelled) return;
-
             const members = response?.['hydra:member'];
-            setDocuments(Array.isArray(members) ? members.map(convertToDocument) : []);
-            setLoading(false);
-        };
-
-        void fetchSiblings();
+            setLoaded({ url, documents: Array.isArray(members) ? members.map(convertToDocument) : [] });
+        })();
 
         return () => {
             cancelled = true;
         };
-    }, [courseId, categoryId, request]);
+    }, [url, request]);
 
-    return { documents, loading };
+    const current = loaded && loaded.url === url ? loaded.documents : null;
+    return {
+        documents: current ?? preloaded ?? [],
+        loading: url !== null && current === null && preloaded === null,
+    };
 }

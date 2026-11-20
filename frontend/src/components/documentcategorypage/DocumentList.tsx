@@ -46,7 +46,7 @@ interface DocumentListProps {
  * Filters, sorting and the download selection apply to every section at once. A course
  * without identical or older courses renders exactly one section, without headings.
  */
-const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEnd }) => {
+const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEnd, expectedCount }) => {
     const { t } = useTranslation();
     const [filters, setFilters] = useState<DocumentFilters>({});
     // Newest academic year first, so a course that has been collecting notes for a
@@ -347,6 +347,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEn
                         onSelectMany={handleSelectMany}
                         onTotal={setOwnTotal}
                         onTags={reportOwnTags}
+                        expectedCount={expectedCount}
                     />
                 )}
 
