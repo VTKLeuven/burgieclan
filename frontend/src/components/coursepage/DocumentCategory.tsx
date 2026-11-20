@@ -16,6 +16,8 @@ interface DocumentCategoryProps {
     count?: number;
     /** Documents of identical and older courses, which the folder also lists below the course's own. */
     relatedCount?: number;
+    /** List only this course's own files when opened; see DocumentList. */
+    onlyThisCourse?: boolean;
     open: boolean;
     onToggle: () => void;
 }
@@ -25,7 +27,7 @@ interface DocumentCategoryProps {
  * with the same filter, sort and selection as the folder's own page, which stays one click away
  * for a link to share or a view with more room.
  */
-export default function DocumentCategory({ category, course, count = 0, relatedCount = 0, open, onToggle }: DocumentCategoryProps) {
+export default function DocumentCategory({ category, course, count = 0, relatedCount = 0, onlyThisCourse = false, open, onToggle }: DocumentCategoryProps) {
     const { t, i18n } = useTranslation();
     const regionId = useId();
     const href = `/course/${course.id}/documents/category/${category.id}`;
@@ -67,6 +69,7 @@ export default function DocumentCategory({ category, course, count = 0, relatedC
                     course={course}
                     category={category}
                     expectedCount={count}
+                    onlyThisCourse={onlyThisCourse}
                     toolbarEnd={
                         <ApiPrefetchLink
                             href={href}

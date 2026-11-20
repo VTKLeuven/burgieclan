@@ -90,6 +90,11 @@ type CourseCommentListProps = {
     /** Absent for a discussion section, and while the summary is still loading. */
     rating?: SectionRating;
     recentYearCount?: number;
+    /**
+     * Shown on another course's page, under the tab of a related code: the scores and comments
+     * are there to read, but rating happens on the course they belong to.
+     */
+    readOnly?: boolean;
 };
 
 const CourseCommentList = ({
@@ -99,6 +104,7 @@ const CourseCommentList = ({
     onCommentAdded,
     rating,
     recentYearCount = 0,
+    readOnly = false,
 }: CourseCommentListProps) => {
     const { user } = useUser();
 
@@ -321,19 +327,21 @@ const CourseCommentList = ({
                         once the summary has arrived - never a placeholder that shifts the layout. */}
                     {rating && (
                         <div className="flex flex-wrap items-start justify-between gap-4 rounded-card border border-border bg-surface px-4 py-3">
-                            <div className="flex flex-col gap-1.5">
-                                <span className="text-caption font-medium text-fg-muted">
-                                    {t('course-page.comments.your-rating')}
-                                </span>
-                                <StarRating
-                                    value={ownRating}
-                                    onChange={handleRate}
-                                    disabled={!user || savingRating}
-                                    lowLabel={category.ratingLowLabel}
-                                    highLabel={category.ratingHighLabel}
-                                    label={category.name ?? ''}
-                                />
-                            </div>
+                            {!readOnly && (
+                                <div className="flex flex-col gap-1.5">
+                                    <span className="text-caption font-medium text-fg-muted">
+                                        {t('course-page.comments.your-rating')}
+                                    </span>
+                                    <StarRating
+                                        value={ownRating}
+                                        onChange={handleRate}
+                                        disabled={!user || savingRating}
+                                        lowLabel={category.ratingLowLabel}
+                                        highLabel={category.ratingHighLabel}
+                                        label={category.name ?? ''}
+                                    />
+                                </div>
+                            )}
                             <RatingSummary rating={rating} recentYearCount={recentYearCount} />
                         </div>
                     )}

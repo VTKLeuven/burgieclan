@@ -31,6 +31,11 @@ interface DocumentListProps {
     toolbarEnd?: React.ReactNode;
     /** How many documents the folder is known to hold, so the skeleton has the list's height. */
     expectedCount?: number;
+    /**
+     * List this course's own files only, without its identical and older courses. The course page
+     * shows those under a tab of their own, so mixing them in here would count them twice.
+     */
+    onlyThisCourse?: boolean;
 }
 
 /**
@@ -46,7 +51,7 @@ interface DocumentListProps {
  * Filters, sorting and the download selection apply to every section at once. A course
  * without identical or older courses renders exactly one section, without headings.
  */
-const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEnd, expectedCount }) => {
+const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEnd, expectedCount, onlyThisCourse = false }) => {
     const { t } = useTranslation();
     const [filters, setFilters] = useState<DocumentFilters>({});
     // Newest academic year first, so a course that has been collecting notes for a
@@ -83,10 +88,14 @@ const DocumentList: React.FC<DocumentListProps> = ({ course, category, toolbarEn
     };
 
     const ownCourses = useMemo(
-        () => (course ? [course, ...(course.identicalCourses ?? []).filter((c) => c.id !== course.id)] : []),
-        [course],
+        () => {
+            if (!course) return [];
+            if (onlyThisCourse) return [course];
+            return [course, ...(course.identicalCourses ?? []).filter((c) => c.id !== course.id)];
+        },
+        [course, onlyThisCourse],
     );
-    const olderCourses = useMemo(() => course?.oldCourses ?? [], [course]);
+    const olderCourses = useMemo(() => (onlyThisCourse ? [] : course?.oldCourses ?? []), [course, onlyThisCourse]);
 
     // Returns the same object when nothing changed, so a section reporting its total on every
     // render does not re-render the list in a loop.
