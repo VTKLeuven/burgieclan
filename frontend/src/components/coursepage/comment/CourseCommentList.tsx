@@ -87,6 +87,8 @@ type CourseCommentListProps = {
     comments: CourseComment[];
     courseId: number;
     onCommentAdded?: (newComment: CourseComment) => void;
+    onCommentUpdated?: (comment: CourseComment) => void;
+    onCommentDeleted?: (commentId: number) => void;
     /** Absent for a discussion section, and while the summary is still loading. */
     rating?: SectionRating;
     recentYearCount?: number;
@@ -102,6 +104,8 @@ const CourseCommentList = ({
     comments: initialComments,
     courseId,
     onCommentAdded,
+    onCommentUpdated,
+    onCommentDeleted,
     rating,
     recentYearCount = 0,
     readOnly = false,
@@ -246,8 +250,15 @@ const CourseCommentList = ({
         }
     };
 
+    // Kept here as well as handed up: on a related code's tab there is no parent list to update.
+    const handleUpdateComment = (updated: CourseComment) => {
+        setComments((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+        onCommentUpdated?.(updated);
+    };
+
     const handleDeleteComment = (commentId: number) => {
         setComments((prev) => prev.filter((c) => c.id !== commentId));
+        onCommentDeleted?.(commentId);
     };
 
     return (
@@ -420,6 +431,7 @@ const CourseCommentList = ({
                                             <CommentRow
                                                 key={comment.id}
                                                 comment={comment}
+                                                onUpdate={handleUpdateComment}
                                                 onDelete={handleDeleteComment}
                                             />
                                         ))}

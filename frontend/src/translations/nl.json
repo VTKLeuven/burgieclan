@@ -248,7 +248,12 @@
             "rating-stars": "{{count}} van 5 sterren",
             "year-unknown": "Jaar onbekend",
             "show-older": "Toon oudere reacties ({{count}})",
-            "hide-older": "Verberg oudere reacties"
+            "hide-older": "Verberg oudere reacties",
+            "delete": {
+                "title": "Opmerking verwijderen?",
+                "description": "Je opmerking wordt definitief verwijderd. Dit kan je niet ongedaan maken.",
+                "submit": "Verwijderen"
+            }
         },
         "documents": {
             "header": "Documenten",

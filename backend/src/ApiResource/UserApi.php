@@ -67,7 +67,8 @@ class UserApi extends BaseEntityApi
             SerializationGroups::USER,
             SerializationGroups::COURSE_GET,
             SerializationGroups::DOCUMENT_GET,
-            SerializationGroups::DOCUMENT_COMMENT_GET
+            SerializationGroups::DOCUMENT_COMMENT_GET,
+            SerializationGroups::COURSE_COMMENT_GET
         ]
     )]
     public ?string $fullName = null;

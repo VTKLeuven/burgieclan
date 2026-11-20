@@ -3,25 +3,34 @@ import CommentActions from '@/components/coursepage/comment/CommentActions';
 import CommentMetadata from '@/components/coursepage/comment/CommentMetadata';
 import CommentUserIcon from '@/components/coursepage/comment/CommentUserIcon';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog';
 import VoteButton from '@/components/ui/buttons/VoteButton';
 import { useDeleteComment } from '@/hooks/useDeleteComment';
 import { useUpdateComment } from '@/hooks/useUpdateComment';
 import { CourseComment } from '@/types/entities';
-import { Send } from 'lucide-react';
+import { LoaderCircle, Send } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type CommentRowProps = {
     comment: CourseComment;
+    /** Called with the comment as it is after an accepted edit. */
+    onUpdate?: (comment: CourseComment) => void;
+    /** Called once the backend has accepted the deletion. */
     onDelete?: (commentId: number) => void;
 };
 
+/**
+ * The row draws the comment it is given and owns none of it: an edit or a delete is handed up,
+ * so the list, the section counts and the course all agree on it. A copy held here used to
+ * survive the parent's next update and bring an edited or deleted comment back.
+ */
 const CommentRow: React.FC<CommentRowProps> = ({
-    comment: initialComment,
+    comment,
+    onUpdate,
     onDelete,
 }) => {
     const { user } = useUser();
-    const [comment, setComment] = useState(initialComment);
     const isOwnComment = !!(user && comment.creator?.id === user.id);
 
     const [isEditing, setIsEditing] = useState(false);
@@ -29,6 +38,8 @@ const CommentRow: React.FC<CommentRowProps> = ({
     const [editAnonymous, setEditAnonymous] = useState(comment.anonymous ?? false);
     const [editIsSubmitting, setEditIsSubmitting] = useState(false);
     const editTextareaRef = useRef<HTMLTextAreaElement>(null);
+    const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const { t } = useTranslation();
     const updateComment = useUpdateComment();
@@ -69,20 +80,40 @@ const CommentRow: React.FC<CommentRowProps> = ({
         if (!editContent.trim()) return;
         setEditIsSubmitting(true);
         try {
-            const updatedComment = await updateComment(comment.id, { content: editContent, anonymous: editAnonymous });
-            setComment({ ...comment, ...updatedComment });
+            const updated = await updateComment(comment.id, { content: editContent, anonymous: editAnonymous });
+            // Only what an edit can change. The rest of the response is shallower than what the
+            // course page has (the course comes back as a bare reference), so spreading it over
+            // the row would blank fields that were fine.
+            onUpdate?.({
+                ...comment,
+                content: updated.content ?? editContent,
+                anonymous: updated.anonymous ?? editAnonymous,
+                updatedAt: updated.updatedAt ?? comment.updatedAt,
+                creator: updated.creator?.fullName ? updated.creator : comment.creator,
+            });
             setIsEditing(false);
         } catch {
-            // Error handling can be added here
+            // The hook has already shown an error toast; keep the form open to try again.
         } finally {
             setEditIsSubmitting(false);
         }
     };
 
-    const handleDeleteComment = async () => {
-        await deleteComment(comment.id);
-        if (onDelete) onDelete(comment.id);
+    const handleConfirmDelete = async () => {
+        setIsDeleting(true);
+        try {
+            await deleteComment(comment.id);
+            setIsConfirmingDelete(false);
+            onDelete?.(comment.id);
+        } catch {
+            // The hook has already shown an error toast. Keep the dialog open so the reader
+            // can see nothing happened and try again.
+        } finally {
+            setIsDeleting(false);
+        }
     };
+
+    const handleDeleteClick = () => setIsConfirmingDelete(true);
 
     return (
         <div className="py-2 px-3 leading-tight flex flex-col sm:flex-row overflow-visible relative items-start group/comment">
@@ -160,7 +191,7 @@ const CommentRow: React.FC<CommentRowProps> = ({
 
             {/* Right-side controls (desktop only) */}
             <div className="hidden sm:flex items-center gap-2.5 shrink-0 pt-0.5 ml-auto">
-                <CommentActions onEdit={handleEditClick} onDelete={handleDeleteComment} show={isOwnComment && !isEditing} />
+                <CommentActions onEdit={handleEditClick} onDelete={handleDeleteClick} show={isOwnComment && !isEditing} />
                 <VoteButton
                     type="course_comment"
                     objectId={comment.id}
@@ -180,8 +211,42 @@ const CommentRow: React.FC<CommentRowProps> = ({
                     size="small"
                     className="bg-surface"
                 />
-                <CommentActions onEdit={handleEditClick} onDelete={handleDeleteComment} show={isOwnComment && !isEditing} isMobile />
+                <CommentActions onEdit={handleEditClick} onDelete={handleDeleteClick} show={isOwnComment && !isEditing} isMobile />
             </div>
+
+            <Dialog
+                isOpen={isConfirmingDelete}
+                onClose={() => {
+                    if (!isDeleting) setIsConfirmingDelete(false);
+                }}
+                size="md"
+            >
+                <DialogTitle className="text-lg font-semibold text-vtk-ink">
+                    {t('course-page.comments.delete.title')}
+                </DialogTitle>
+                <DialogBody className="text-sm text-vtk-body">
+                    <p>{t('course-page.comments.delete.description')}</p>
+                </DialogBody>
+                <DialogActions>
+                    <button
+                        type="button"
+                        onClick={() => setIsConfirmingDelete(false)}
+                        disabled={isDeleting}
+                        className="vtk-button vtk-button-sm vtk-button-subtle cursor-pointer"
+                    >
+                        {t('course-page.comments.dialog.button.cancel')}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleConfirmDelete}
+                        disabled={isDeleting}
+                        className="vtk-button vtk-button-sm vtk-button-danger inline-flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                        {isDeleting && <LoaderCircle size={14} className="animate-spin" aria-hidden="true" />}
+                        {t('course-page.comments.delete.submit')}
+                    </button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };

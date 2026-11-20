@@ -65,6 +65,14 @@ const CommentCategories = ({ comments, courseId, course, onCommentsUpdate }: Com
         }
     }, [comments, onCommentsUpdate]);
 
+    const handleCommentUpdated = useCallback((updated: CourseComment) => {
+        onCommentsUpdate?.(comments.map((comment) => (comment.id === updated.id ? updated : comment)));
+    }, [comments, onCommentsUpdate]);
+
+    const handleCommentDeleted = useCallback((commentId: number) => {
+        onCommentsUpdate?.(comments.filter((comment) => comment.id !== commentId));
+    }, [comments, onCommentsUpdate]);
+
     if (loading && allCategories.length === 0) {
         return (
             <Loading compact />
@@ -85,6 +93,8 @@ const CommentCategories = ({ comments, courseId, course, onCommentsUpdate }: Com
                 comments={comments}
                 categories={allCategories}
                 onCommentAdded={handleCommentAdded}
+                onCommentUpdated={handleCommentUpdated}
+                onCommentDeleted={handleCommentDeleted}
             />
         );
     } else if (related.failed) {
@@ -137,11 +147,13 @@ const NO_COMMENTS: CourseComment[] = [];
  * The evaluation sections of one course, each with its comments and score. Without
  * `onCommentAdded` it only reads: that is how a related code's evaluations are shown.
  */
-function EvaluationList({ courseId, comments, categories, onCommentAdded, readOnly = false }: {
+function EvaluationList({ courseId, comments, categories, onCommentAdded, onCommentUpdated, onCommentDeleted, readOnly = false }: {
     courseId: number;
     comments: CourseComment[];
     categories: CommentCategory[];
     onCommentAdded?: (comment: CourseComment) => void;
+    onCommentUpdated?: (comment: CourseComment) => void;
+    onCommentDeleted?: (commentId: number) => void;
     readOnly?: boolean;
 }) {
     const readPreloadedApi = usePreloadedApi();
@@ -202,6 +214,8 @@ function EvaluationList({ courseId, comments, categories, onCommentAdded, readOn
                     comments={commentsByCategory[category.id] ?? NO_COMMENTS}
                     courseId={courseId}
                     onCommentAdded={onCommentAdded}
+                    onCommentUpdated={onCommentUpdated}
+                    onCommentDeleted={onCommentDeleted}
                     rating={ratingFor(category.id)}
                     recentYearCount={summary?.recentYears.length ?? 0}
                     readOnly={readOnly}

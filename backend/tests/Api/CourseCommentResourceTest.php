@@ -467,4 +467,37 @@ class CourseCommentResourceTest extends ApiTestCase
             ->assertJsonMatches('"hydra:totalItems"', 1)
             ->assertJsonMatches('"hydra:member"[0]."@id"', '/api/course_comments/' . $publicComment->getId());
     }
+
+    /**
+     * The course page puts the edited comment back in its row from this response: without the
+     * name, a signed comment would show as anonymous after an edit.
+     */
+    public function testPatchResponseNamesTheCreatorButAnonymousCommentsStayAnonymous(): void
+    {
+        $creator = UserFactory::createOne(['fullName' => 'Edith Editor', 'plainPassword' => 'password']);
+        $comment = CourseCommentFactory::createOne(['creator' => $creator, 'anonymous' => false]);
+        $anonymous = CourseCommentFactory::createOne(['creator' => $creator, 'anonymous' => true]);
+
+        $this->browser()
+            ->patch(
+                '/api/course_comments/' . $comment->getId(),
+                [
+                    'json' => ['content' => 'Edited'],
+                    'headers' => [
+                        'Content-Type' => 'application/merge-patch+json',
+                        'Authorization' => 'Bearer ' . $this->getToken($creator->getUsername(), 'password'),
+                    ],
+                ]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('creator.fullName', 'Edith Editor');
+
+        $this->browser()
+            ->get(
+                '/api/course_comments/' . $anonymous->getId(),
+                ['headers' => ['Authorization' => 'Bearer ' . $this->token]]
+            )
+            ->assertStatus(200)
+            ->assertJsonMatches('creator', null);
+    }
 }
