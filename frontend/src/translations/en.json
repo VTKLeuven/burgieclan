@@ -747,7 +747,6 @@
         "theme_system": "System",
         "my_account": "My account",
         "my_courses": "My courses",
-        "favorite_documents": "Favourite documents",
         "browse": "Browse",
         "no_courses": "Star a course to pin it here.",
         "show_all": "View all {{count}}",

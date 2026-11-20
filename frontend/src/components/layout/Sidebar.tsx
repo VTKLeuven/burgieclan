@@ -23,11 +23,9 @@ import { courseTitle, sortCoursesByName } from '@/utils/courseName';
 import {
     ArrowUpRight,
     CalendarDays,
-    ChevronRight,
     ChevronsUpDown,
     CircleHelp,
     ExternalLink,
-    FileText,
     GraduationCap,
     House,
     Languages,
@@ -45,9 +43,6 @@ import Link from '@/components/ui/Link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState, type MouseEvent, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-
-/** How many favourite documents the sidebar lists before it points to the account page. */
-const MAX_DOCUMENTS = 6;
 
 function stripLocale(pathname: string) {
     return pathname.replace(/^\/(?:en|nl)(?=\/|$)/, '') || '/';
@@ -151,8 +146,8 @@ export function SidebarBrand() {
 
 /**
  * The app's navigation, sitting directly on the grey canvas next to the white panel (Dopl's
- * shell). Top to bottom: brand, search, the few places there are, the reader's own courses and
- * documents, and the account menu. Everything that used to live in the navy header and the
+ * shell). Top to bottom: brand, search, the few places there are, the reader's own courses, and the
+ * account menu. Everything that used to live in the navy header and the
  * footer is in here now, so a page never has to say where else you can go.
  */
 export default function Sidebar({ onNavigate, onCollapse }: {
@@ -219,7 +214,6 @@ export default function Sidebar({ onNavigate, onCollapse }: {
         () => sortCoursesByName(user?.favoriteCourses ?? [], i18n.language),
         [user?.favoriteCourses, i18n.language],
     );
-    const documents = user?.favoriteDocuments ?? [];
     const adminUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin`;
 
     const handleLogout = async () => {
@@ -367,34 +361,6 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                             )}
                         </div>
 
-                        {documents.length > 0 && (
-                            <>
-                                <SectionLabel>{t('shell.favorite_documents')}</SectionLabel>
-                                <div className="flex flex-col gap-0.5">
-                                    {documents.slice(0, MAX_DOCUMENTS).map((document) => (
-                                        <NavItem
-                                            key={document.id}
-                                            href={`/document/${document.id}`}
-                                            icon={<FileText />}
-                                            label={document.name ?? ''}
-                                            title={document.name}
-                                            active={shownActive(`/document/${document.id}`, isActive(`/document/${document.id}`))}
-                                            onNavigate={follow(`/document/${document.id}`)}
-                                        />
-                                    ))}
-                                    {documents.length > MAX_DOCUMENTS && (
-                                        <Link
-                                            href="/account"
-                                            onClick={onNavigate}
-                                            className="flex h-7 items-center gap-1 rounded-control px-2.5 text-small text-fg-muted hover:bg-sidebar-hover hover:text-fg"
-                                        >
-                                            {t('shell.show_all', { count: documents.length })}
-                                            <ChevronRight className="size-3.5" aria-hidden="true" />
-                                        </Link>
-                                    )}
-                                </div>
-                            </>
-                        )}
                     </>
                 )}
             </div>
