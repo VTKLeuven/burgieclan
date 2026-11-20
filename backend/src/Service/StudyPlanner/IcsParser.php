@@ -12,8 +12,10 @@ use Exception;
  * floating (then Leuven time).
  *
  * A summary reads "H0T34a Nuclear Energy: Basic Aspects, William D'haeseleer": the code of the
- * teaching activity, the course, and after the first comma the teaching staff. The first line of
- * the description starts with the kind of session ("01 College", "02 Practicum", ...).
+ * teaching activity, the course, and after the first comma the teaching staff. The kind of session
+ * ("01 College", "02 Practicum", ...) appears at the start of the description or as a segment of
+ * the summary; when absent, a ": <activity>" suffix in the summary or keyword in the description
+ * serves as fallback.
  */
 final class IcsParser
 {
@@ -23,6 +25,18 @@ final class IcsParser
         '03' => 'opdracht',
         '07' => 'excursie',
         '15' => 'oefenzitting',
+    ];
+
+    private const CODE_PREFIX = '/^(01|02|03|07|15)(?:\s|$)/';
+
+    /** @var array<string, string> */
+    private const KEYWORD_TYPES = [
+        'practicum' => '/\b(?:practicum|practica|practicals?|labo(?:[\'’]?s)?|labs?|laboratory)\b/iu',
+        'oefenzitting' => '/\b(?:oefenzitting(?:en)?|oefening(?:en)?|exercises?|tutorials?'
+            . '|werkcolleges?|seminars?)\b/iu',
+        'college' => '/\b(?:hoorcolleges?|colleges?|lectures?|theorie|theory)\b/iu',
+        'excursie' => '/\b(?:excursies?|excursions?)\b/iu',
+        'opdracht' => '/\b(?:opdracht(?:en)?|assignments?)\b/iu',
     ];
 
     /**
@@ -129,7 +143,6 @@ final class IcsParser
         $code = preg_match('/^[A-Z0-9]{5,7}[a-z0-9]*/', $summary, $m) ? $m[0] : null;
         $location = trim($this->text($event['LOCATION']['value'] ?? ''));
         $description = $this->text($event['DESCRIPTION']['value'] ?? '');
-        $kind = substr(trim(explode("\n", $description)[0]), 0, 2);
 
         return [
             'uid' => $uid,
@@ -139,8 +152,51 @@ final class IcsParser
             'course' => $course,
             'people' => '' === $people ? null : $people,
             'location' => '' === $location ? null : $location,
-            'type' => self::TYPES[$kind] ?? 'other',
+            'type' => $this->detectType($description, $summary),
         ];
+    }
+
+    /**
+     * Detects the session type from TimeEdit's numeric prefix in DESCRIPTION or SUMMARY, falling
+     * back to `: <activity>` suffixes in SUMMARY and plain keyword lines in DESCRIPTION.
+     */
+    private function detectType(string $description, string $summary): string
+    {
+        $descriptionLines = array_filter(
+            array_map('trim', explode("\n", $description)),
+            static fn (string $line): bool => '' !== $line,
+        );
+        $summaryParts = array_filter(
+            array_map('trim', explode(',', $summary)),
+            static fn (string $part): bool => '' !== $part,
+        );
+
+        foreach ([...$descriptionLines, ...$summaryParts] as $candidate) {
+            if (1 === preg_match(self::CODE_PREFIX, $candidate, $m)) {
+                return self::TYPES[$m[1]];
+            }
+        }
+
+        $fallback = [];
+        foreach ($summaryParts as $part) {
+            $colon = strrpos($part, ': ');
+            if (false !== $colon) {
+                $fallback[] = substr($part, $colon + 2);
+            }
+        }
+        foreach ($descriptionLines as $line) {
+            $fallback[] = $line;
+        }
+
+        foreach ($fallback as $text) {
+            foreach (self::KEYWORD_TYPES as $type => $pattern) {
+                if (1 === preg_match($pattern, $text)) {
+                    return $type;
+                }
+            }
+        }
+
+        return 'other';
     }
 
     /**
