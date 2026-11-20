@@ -4,6 +4,7 @@ import AnnouncementSlideShow from '@/components/announcement/AnnouncementSlideSh
 import { DidacticFeedbackForm } from '@/components/homepage/DidacticFeedbackForm';
 import { ExamPrompt } from '@/components/homepage/ExamPrompt';
 import { FavoriteCurriculum } from '@/components/homepage/FavoriteCurriculum';
+import { HomePolls } from '@/components/homepage/HomePolls';
 import MyCourses from '@/components/homepage/MyCourses';
 import { QuickLinks } from '@/components/homepage/QuickLinks';
 import { RecentActivities } from "@/components/homepage/recent/RecentActivities";
@@ -90,6 +91,7 @@ export default function HomePage() {
                     column beside them. */}
                 <div className="mt-8 grid items-start gap-x-8 gap-y-10 @[52rem]:grid-cols-[minmax(0,1fr)_340px]">
                     <div className="grid min-w-0 gap-10 [&>*]:min-w-0">
+                        {user && <HomePolls />}
                         {examsEnabled && <ExamPrompt />}
                         <RecentActivities />
                         <MyCourses />

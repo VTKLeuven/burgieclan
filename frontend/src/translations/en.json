@@ -1011,5 +1011,34 @@
         "switch-program": "Look at another programme",
         "favorite-programs": "Favourite programmes",
         "all-programs": "All programmes"
+    },
+    "polls": {
+        "nav": "Polls",
+        "title": "Polls",
+        "home_title": "Your student representatives want your opinion",
+        "subtitle": "Your student representatives ask for your opinion before they sit down with your professors at the POC. Your answers go into the same poll as on vtk.be and Discord: answering in two places counts once.",
+        "none": "There is no poll running for your programme right now.",
+        "missing_programme": "There is no poll we can show you: your VTK account has no study programme yet. Set it on vtk.be under Account.",
+        "unanswered_one": "{{count}} poll not answered yet",
+        "unanswered_other": "{{count}} polls not answered yet",
+        "yes": "Yes",
+        "no": "No",
+        "optional": "Optional",
+        "placeholder": "Type your answer here",
+        "default_low": "Disagree",
+        "default_high": "Agree",
+        "submit": "Send my answers",
+        "submitting": "Sending...",
+        "saved": "Your answers have been recorded.",
+        "thanks_title": "Thanks, your answers have been recorded.",
+        "edit": "Change my answers",
+        "errors": {
+            "POLL_CLOSED": "Not sent: this poll has closed in the meantime.",
+            "POLL_NOT_YOURS": "Not sent: this poll is for another programme.",
+            "POLL_EMPTY": "Not sent: you have not filled in anything yet.",
+            "POLL_INVALID": "Not sent: one of your answers is not valid. Refresh the page.",
+            "POLL_TOO_LONG": "Not sent: your answer to the open question is too long.",
+            "failed": "Not sent: vtk.be could not be reached. Please try again."
+        }
     }
 }

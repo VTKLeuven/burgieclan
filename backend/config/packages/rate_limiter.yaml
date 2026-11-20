@@ -29,6 +29,12 @@ framework:
             limit: 30
             interval: '1 hour'
 
+        # Answering a POC poll of the VTK website (VtkPollController). Each one is a call to vtk.be.
+        vtk_poll_answer:
+            policy: sliding_window
+            limit: 20
+            interval: '10 minutes'
+
         # Syncing a study planner's timetable by hand, or subscribing (StudyPlannerProcessor).
         study_planner_sync:
             policy: sliding_window

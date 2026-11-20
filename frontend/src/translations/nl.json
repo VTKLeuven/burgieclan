@@ -1011,5 +1011,34 @@
         "switch-program": "Andere opleiding bekijken",
         "favorite-programs": "Favoriete opleidingen",
         "all-programs": "Alle opleidingen"
+    },
+    "polls": {
+        "nav": "Peilingen",
+        "title": "Peilingen",
+        "home_title": "Je RiVers vragen je mening",
+        "subtitle": "Je RiVers vragen je mening voor ze met je proffen rond de tafel zitten op de POC. Je antwoorden komen in dezelfde peiling als op vtk.be en Discord: wie op twee plaatsen antwoordt, telt één keer.",
+        "none": "Er loopt nu geen peiling voor jouw richting.",
+        "missing_programme": "Er loopt geen peiling die we je kunnen tonen: op je VTK-account staat nog geen richting. Stel ze in op vtk.be onder Account.",
+        "unanswered_one": "{{count}} peiling nog niet beantwoord",
+        "unanswered_other": "{{count}} peilingen nog niet beantwoord",
+        "yes": "Ja",
+        "no": "Nee",
+        "optional": "Optioneel",
+        "placeholder": "Typ hier je antwoord",
+        "default_low": "Oneens",
+        "default_high": "Eens",
+        "submit": "Verstuur mijn antwoorden",
+        "submitting": "Bezig met versturen...",
+        "saved": "Je antwoorden zijn genoteerd.",
+        "thanks_title": "Bedankt, je antwoorden zijn genoteerd.",
+        "edit": "Wijzig mijn antwoorden",
+        "errors": {
+            "POLL_CLOSED": "Niet verstuurd: deze peiling is intussen gesloten.",
+            "POLL_NOT_YOURS": "Niet verstuurd: deze peiling is voor een andere richting.",
+            "POLL_EMPTY": "Niet verstuurd: je hebt nog niets ingevuld.",
+            "POLL_INVALID": "Niet verstuurd: een van je antwoorden klopt niet. Vernieuw de pagina.",
+            "POLL_TOO_LONG": "Niet verstuurd: je antwoord op de open vraag is te lang.",
+            "failed": "Niet verstuurd: vtk.be was niet te bereiken. Probeer het opnieuw."
+        }
     }
 }

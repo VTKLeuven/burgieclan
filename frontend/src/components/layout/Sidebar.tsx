@@ -16,6 +16,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useUser } from '@/components/UserContext';
+import { useVtkPolls } from '@/hooks/useVtkPolls';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import { cn } from '@/lib/utils';
 import { courseTitle, sortCoursesByName } from '@/utils/courseName';
@@ -37,6 +38,7 @@ import {
     Search,
     Shield,
     UserRound,
+    Vote,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from '@/components/ui/Link';
@@ -164,6 +166,10 @@ export default function Sidebar({ onNavigate, onCollapse }: {
     const path = stripLocale(usePathname());
     const { course: currentCourse } = useCurriculumLocation();
     const [feedbackOpen, setFeedbackOpen] = useState(false);
+    // The tab only exists while vtk.be has a poll open for this member.
+    const vtkPolls = useVtkPolls();
+    const polls = vtkPolls?.polls ?? [];
+    const unansweredPolls = polls.filter((poll) => !poll.answered).length;
 
     // The row just clicked, highlighted at once. A page now stays up until the next one is ready
     // to be drawn whole, and without this a click showed nothing at all for that moment. Cleared
@@ -274,6 +280,23 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                         label={t('study_planner.nav')}
                         active={shownActive('/planner', isActive('/planner'))}
                         onNavigate={follow('/planner')}
+                    />
+                )}
+                {polls.length > 0 && (
+                    <NavItem
+                        href="/polls"
+                        icon={<Vote />}
+                        label={t('polls.nav')}
+                        active={shownActive('/polls', isActive('/polls'))}
+                        onNavigate={follow('/polls')}
+                        trailing={unansweredPolls > 0 ? (
+                            <span
+                                className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-vtk-yellow px-1 text-caption font-semibold text-vtk-navy"
+                                aria-label={t('polls.unanswered', { count: unansweredPolls })}
+                            >
+                                {unansweredPolls}
+                            </span>
+                        ) : undefined}
                     />
                 )}
                 {user && (

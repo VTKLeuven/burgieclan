@@ -30,7 +30,11 @@ import {
     type StudyPlannerSubject,
     type Tag,
     type User,
-    type VoteSummary
+    type VoteSummary,
+    type VtkPoll,
+    type VtkPollAnswer,
+    type VtkPollQuestionKind,
+    type VtkPolls
 } from '@/types/entities';
 
 type ApiRecord = Record<string, unknown>;
@@ -611,4 +615,50 @@ export function convertToStudyPlannerVtkOptions(payload: unknown): StudyPlannerV
         urlEn: str(e.urlEn),
         inPlanner: e.inPlanner === true,
     }));
+}
+
+// ---------------------------------------------------------------------------------------------
+// POC polls of the VTK website (GET /api/vtk_polls). Plain JSON, not Hydra.
+
+const POLL_KINDS: VtkPollQuestionKind[] = ['YES_NO', 'SCORE', 'OPEN'];
+
+export function convertToVtkPolls(value: unknown): VtkPolls {
+    const data = toRecord(value, 'VtkPolls');
+    return {
+        available: data.available === true,
+        missingProgramme: data.missingProgramme === true,
+        polls: records(data.polls).map((poll): VtkPoll => {
+            const answers: Record<string, VtkPollAnswer> = {};
+            const rawAnswers = poll.answers;
+            if (rawAnswers && typeof rawAnswers === 'object' && !Array.isArray(rawAnswers)) {
+                for (const [questionId, answer] of Object.entries(rawAnswers as ApiRecord)) {
+                    if (answer && typeof answer === 'object') {
+                        const record = answer as ApiRecord;
+                        answers[questionId] = { value: numOrNull(record.value), text: strOrNull(record.text) };
+                    }
+                }
+            }
+            return {
+                id: str(poll.id),
+                title: str(poll.title),
+                askedBy: str(poll.askedBy),
+                openUntil: str(poll.openUntil),
+                lead: str(poll.lead),
+                thanks: str(poll.thanks),
+                anonymous: str(poll.anonymous),
+                closesAt: new Date(str(poll.closesAt)),
+                answered: poll.answered === true,
+                questions: records(poll.questions)
+                    .filter((question) => POLL_KINDS.includes(question.kind as VtkPollQuestionKind))
+                    .map((question) => ({
+                        id: str(question.id),
+                        kind: question.kind as VtkPollQuestionKind,
+                        text: str(question.text),
+                        low: strOrNull(question.low),
+                        high: strOrNull(question.high),
+                    })),
+                answers,
+            };
+        }),
+    };
 }

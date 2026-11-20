@@ -34,6 +34,8 @@ export const apiEndpoints = {
     faqItems: (lang: string) => `/api/faq_items?${new URLSearchParams({ published: 'true', pagination: 'false', lang }).toString()}`,
     page: (urlKey: string, lang: string) => `/api/pages/${urlKey}?lang=${lang}`,
     studyPlanner: () => '/api/study_planner',
+    /** The VTK POC polls for the signed-in member, worded in this language by vtk.be. */
+    vtkPolls: (lang: string) => `/api/vtk_polls?locale=${lang}`,
 
     /**
      * The announcements showing now. The time is rounded down to five minutes (Brussels time,

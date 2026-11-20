@@ -39,6 +39,11 @@ const getTtlForEndpoint = (endpoint: string): number => {
     if (endpoint.startsWith('/api/document_views')) {
         return 2 * 60_000; // 2 minutes for recent views
     }
+    if (endpoint.startsWith('/api/vtk_polls')) {
+        // The sidebar, the homepage and the polls page all ask; every page load is a call to vtk.be.
+        // Sending answers is a write, which clears the cache, so the tab updates at once.
+        return 2 * 60_000;
+    }
     return DEFAULT_GET_CACHE_TTL_MS;
 };
 
@@ -102,6 +107,7 @@ const isCacheableGet = (endpoint: string): boolean => (
     || endpoint.startsWith('/api/pages')
     || endpoint.startsWith('/api/tags')
     || endpoint.startsWith('/api/document_views')
+    || endpoint.startsWith('/api/vtk_polls')
     || /^\/api\/users\/\d+(?:$|\?|\/favorites)/.test(endpoint)
 );
 

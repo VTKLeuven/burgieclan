@@ -418,3 +418,51 @@ export type StudyPlannerOperation =
     | { op: 'itemDone'; id: string; value: boolean }
     | { op: 'addVtkEvent'; vtkEventId: string }
     | { op: 'removeVtkEvent'; vtkEventId: string };
+
+// ---------------------------------------------------------------------------------------------
+// POC polls of the VTK website, asked through the backend (GET /api/vtk_polls). The sentences
+// come from vtk.be already translated, the same ones its homepage shows.
+
+export type VtkPollQuestionKind = 'YES_NO' | 'SCORE' | 'OPEN';
+
+export interface VtkPollQuestion {
+    id: string;
+    kind: VtkPollQuestionKind;
+    text: string;
+    /** The labels under 1 and 5 of a score; null for the defaults. */
+    low: string | null;
+    high: string | null;
+}
+
+export interface VtkPollAnswer {
+    /** 1/0 for yes-no, 1-5 for a score. */
+    value: number | null;
+    /** An open answer. */
+    text: string | null;
+}
+
+export interface VtkPoll {
+    id: string;
+    title: string;
+    /** The POC asking, or "VTK Onderwijs" for a poll for every programme. */
+    askedBy: string;
+    /** E.g. "Open tot vrijdag 27 november". */
+    openUntil: string;
+    /** Why the answer matters, e.g. when the student representatives meet the professors. */
+    lead: string;
+    thanks: string;
+    /** The promise about anonymity, as vtk.be words it. */
+    anonymous: string;
+    closesAt: Date;
+    answered: boolean;
+    questions: VtkPollQuestion[];
+    answers: Record<string, VtkPollAnswer>;
+}
+
+export interface VtkPolls {
+    /** False when vtk.be cannot be asked for this account; the polls tab then stays hidden. */
+    available: boolean;
+    polls: VtkPoll[];
+    /** No study programme on the VTK account, so vtk.be cannot tell which POC asks. */
+    missingProgramme: boolean;
+}

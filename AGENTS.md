@@ -114,6 +114,12 @@ Other subsystems:
   vtk-website-new (`apps/web/lib/burgieclan/signature.ts`) with a shared test vector
   (`StudyPlannerVtkTest::testSignatureMatchesTheVtkWebsite`): change both together. The full story is
   `docs/burgieclan-planning.md` in vtk-website-new.
+- **VTK POC polls**: the polls student representatives run on vtk.be also show here, as a sidebar tab
+  that only exists while one is open for the member (`useVtkPolls`, `components/polls/`). Burgieclan stores
+  nothing: `VtkPolls` asks `{VTK_URL}/api/burgieclan/v1/polls` on the member's behalf, signed with the same
+  `VTK_SERVICE_SECRET` the other way round, and passes the answers on. vtk.be decides who a poll is for and
+  keeps every answer anonymous. Only accounts that signed in through VTK (`fluxusSub`) get polls. The signature
+  has a shared vector with vtk-website-new (`VtkPollsTest::testSignatureMatchesTheVtkWebsite`).
 
 Tests: Zenstruck Foundry factories live in `src/Factory/` (not under `tests/`). API tests extend
 `tests/Api/ApiTestCase`, whose `setUp()` creates a user and logs in to obtain `$this->token`; requests use
