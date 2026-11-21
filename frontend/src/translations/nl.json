@@ -772,7 +772,8 @@
         "tabs": {
             "week": "Week",
             "courses": "Per vak",
-            "grid": "Semester"
+            "grid": "Semester",
+            "block": "Blok"
         },
         "type": {
             "college": "Hoorcollege",
@@ -960,7 +961,10 @@
             "link_label": "Abonnementslink van je KU Leuven-lessenrooster",
             "submit": "Rooster toevoegen",
             "loading": "Rooster laden…",
-            "privacy": "Alleen jij ziet je planner. Burgieclan kijkt ongeveer elk uur of de link gewijzigd is."
+            "privacy": "Alleen jij ziet je planner. Burgieclan kijkt ongeveer elk uur of de link gewijzigd is.",
+            "exams_title": "Alleen je blok plannen?",
+            "exams_text": "Daarvoor heb je geen lessenrooster nodig: zet je examens in de kalender en plan per dag wat je wilt doen.",
+            "exams_button": "Naar je blok"
         },
         "settings": {
             "title": "Roosterinstellingen",
@@ -975,7 +979,7 @@
             "change_warning": "Een andere link begint een nieuw rooster: afvinkingen en markeringen op lessen verdwijnen. Wekelijkse regels en deadlines blijven.",
             "save_link": "Link opslaan",
             "stop_title": "Stoppen met de planner",
-            "stop_help": "Verwijdert je rooster, afvinkingen, deadlines en de agendalink.",
+            "stop_help": "Verwijdert je rooster, afvinkingen, deadlines en de agendalink. Je blok blijft staan.",
             "stop": "Verwijder mijn planner",
             "stop_confirm": "Alles verwijderen"
         },
@@ -998,6 +1002,109 @@
             "loading": "VTK-evenementen laden…",
             "load_failed": "De VTK-evenementen konden niet geladen worden.",
             "empty": "Er staat op dit moment niets gepland bij VTK."
+        },
+        "block": {
+            "title": "Je blok",
+            "intro": "Zet je examens in de kalender en plan per dag wat je wilt doen. Klik op een dag om te beginnen.",
+            "countdown_one": "Nog 1 dag tot je volgende examen",
+            "countdown_other": "Nog {{count}} dagen tot je volgende examen",
+            "exam_today": "Vandaag: examen {{course}}",
+            "next_exam": "Volgende: {{course}}, {{date}}",
+            "add_exam": "Examen toevoegen",
+            "catch_up_one": "1 taak is voorbij en niet afgevinkt.",
+            "catch_up_other": "{{count}} taken zijn voorbij en niet afgevinkt.",
+            "catch_up_hint": "Zet ze op vandaag, of open de dag om ze ergens anders te zetten.",
+            "catch_up_button": "Naar vandaag",
+            "today_free": "Vandaag is een vrije dag. Geniet ervan.",
+            "previous_month": "Vorige maand",
+            "next_month": "Volgende maand",
+            "free": "Vrij",
+            "exam": "Examen",
+            "missed": "in te halen",
+            "tasks_ratio": "{{done}}/{{total}} gedaan",
+            "no_exam": "Geen examen ingevuld",
+            "n_missed_one": "1 taak in te halen",
+            "n_missed_other": "{{count}} taken in te halen",
+            "save": "Opslaan",
+            "cancel": "Annuleren",
+            "close": "Sluiten",
+            "picker": {
+                "clear": "{{course}} wissen",
+                "searching": "Zoeken…",
+                "own": "‘{{name}}’ als eigen vak"
+            },
+            "task": {
+                "course": "Vak",
+                "course_placeholder": "Vak (optioneel)",
+                "title": "Wat wil je doen?",
+                "title_placeholder": "bv. H1–H3, lesvideo 1–2",
+                "date": "Dag",
+                "add": "Toevoegen",
+                "edit": "{{task}} wijzigen",
+                "delete": "{{task}} verwijderen"
+            },
+            "exam_form": {
+                "course": "Vak",
+                "course_placeholder": "Zoek een vak of typ een naam",
+                "date": "Datum",
+                "time": "Uur (optioneel)",
+                "add": "Examen toevoegen",
+                "pick_course": "Kies een vak."
+            },
+            "day": {
+                "free": "Vrije dag",
+                "exams": "Examens",
+                "edit_exam": "Examen wijzigen",
+                "delete_exam": "Examen verwijderen",
+                "add_exam": "Examen op deze dag",
+                "tasks": "Wat wil je doen?",
+                "no_tasks": "Nog niets gepland.",
+                "studied": "Gestudeerd: {{time}}",
+                "running": "nu",
+                "delete_session": "Deze meting verwijderen"
+            },
+            "timer": {
+                "title": "Studietimer",
+                "start": "Start",
+                "pause": "Pauze",
+                "resume": "Hervat",
+                "not_started": "Druk op start wanneer je begint.",
+                "running_since": "Bezig sinds {{time}}",
+                "paused_at": "Gepauzeerd om {{time}}",
+                "started": "Begonnen",
+                "stopped": "Gestopt",
+                "now": "Nu",
+                "breaks": "Pauzes",
+                "stop": "Stoppen",
+                "stop_title": "Sluit je sessie af in Samen blokken",
+                "samen": "Telt mee in Samen blokken",
+                "friends_one": "1 van je groep zit nu",
+                "friends_other": "{{count}} van je groep zitten nu",
+                "streak_one": "reeks van 1 dag",
+                "streak_other": "reeks van {{count}} dagen",
+                "goal": "{{percent}}% van je dagdoel van {{goal}}",
+                "unreachable": "Samen blokken is even niet bereikbaar.",
+                "now_lower": "nu",
+                "breaks_short": "{{time}} pauze",
+                "paused": "gepauzeerd"
+            },
+            "views": {
+                "month": "Maand",
+                "week": "Week"
+            },
+            "view_label": "Weergave",
+            "legend_done": "gedaan",
+            "legend_todo": "te doen",
+            "n_tasks_one": "1 taak",
+            "n_tasks_other": "{{count}} taken",
+            "previous_week": "Vorige week",
+            "next_week": "Volgende week",
+            "this_week": "Deze week",
+            "week_done": "Deze week: {{done}} van {{total}} taken gedaan",
+            "back_to_today": "Terug naar vandaag",
+            "today": "Vandaag",
+            "kurt_title": "Een bibplaats nodig?",
+            "kurt_text": "Reserveer via KURT"
         }
     },
     "curriculum-panel": {

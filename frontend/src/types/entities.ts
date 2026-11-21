@@ -392,6 +392,83 @@ export interface StudyPlanner {
     items: StudyPlannerItem[];
     rules: StudyPlannerRule[];
     vtkEvents: StudyPlannerVtkEvent[];
+    /** The "Blok" calendar; there with or without a timetable. */
+    block: StudyPlannerBlok;
+}
+
+/** An exam in the "Blok" calendar. `subject` is "course:{id}" or "name:{name}". */
+export interface StudyPlannerExam {
+    id: string;
+    subject: string;
+    subjectLabel: string;
+    date: string;
+    time: string | null;
+}
+
+/** What someone plans to study on a day; past and not done = to catch up. */
+export interface StudyPlannerTask {
+    id: string;
+    date: string;
+    /** null for a task of no course in particular. */
+    subject: string | null;
+    subjectLabel: string | null;
+    title: string;
+    done: boolean;
+}
+
+/** A stretch timed with the study timer; `end` is null while it runs. ISO timestamps. */
+export interface StudyPlannerSession {
+    id: string;
+    /** The Leuven date it started on. */
+    date: string;
+    start: string;
+    end: string | null;
+}
+
+export interface StudyPlannerBlok {
+    exams: StudyPlannerExam[];
+    tasks: StudyPlannerTask[];
+    freeDays: string[];
+    sessions: StudyPlannerSession[];
+}
+
+/**
+ * The study timer as "Samen blokken" on vtk.be (GET /api/vtk_study), for accounts that signed in
+ * through VTK; `available` false otherwise, and the page uses Burgieclan's own timer.
+ */
+export interface VtkStudy {
+    available: boolean;
+    /** When the server answered, to count on from. */
+    receivedAt: number;
+    session: {
+        startedAt: string;
+        /** Net seconds when the server answered, pauses taken off. */
+        seconds: number;
+        paused: boolean;
+        pausedAt: string | null;
+        maxSeconds: number;
+    } | null;
+    todaySeconds: number;
+    dailyGoalMinutes: number;
+    streak: number;
+    /** Members of their study groups studying right now, themselves not counted. */
+    friendsStudying: number;
+    /** Today's sessions, oldest first. */
+    today: { startedAt: string; endedAt: string | null; seconds: number }[];
+    /** Seconds studied per day ("YYYY-MM-DD"), only days with time. */
+    days: Record<string, number>;
+}
+
+export interface StudyPlannerExamInput {
+    subject: string;
+    date: string;
+    time: string | null;
+}
+
+export interface StudyPlannerTaskInput {
+    date: string;
+    subject: string | null;
+    title: string;
 }
 
 export interface StudyPlannerItemInput {
@@ -417,7 +494,19 @@ export type StudyPlannerOperation =
     | { op: 'deleteItem'; id: string }
     | { op: 'itemDone'; id: string; value: boolean }
     | { op: 'addVtkEvent'; vtkEventId: string }
-    | { op: 'removeVtkEvent'; vtkEventId: string };
+    | { op: 'removeVtkEvent'; vtkEventId: string }
+    | { op: 'addExam'; exam: StudyPlannerExamInput }
+    | { op: 'updateExam'; id: string; exam: StudyPlannerExamInput }
+    | { op: 'deleteExam'; id: string }
+    | { op: 'addTask'; task: StudyPlannerTaskInput }
+    | { op: 'updateTask'; id: string; task: StudyPlannerTaskInput }
+    | { op: 'deleteTask'; id: string }
+    | { op: 'taskDone'; id: string; value: boolean }
+    | { op: 'catchUp'; date: string }
+    | { op: 'freeDay'; date: string; value: boolean }
+    | { op: 'timerStart' }
+    | { op: 'timerPause' }
+    | { op: 'deleteSession'; id: string };
 
 // ---------------------------------------------------------------------------------------------
 // POC polls of the VTK website, asked through the backend (GET /api/vtk_polls). The sentences

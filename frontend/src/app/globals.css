@@ -142,21 +142,29 @@
   --color-tag-grey-border: #c4c5cd;
   --color-tag-grey-text: #52525b;
 
-  /* Study planner session kinds, drawn from the house palette rather than beside it: lectures in
-     a tint of the navy, practicals and exercise sessions in a muted blue-green that sits with
-     it, everything else in the neutrals. Pale for a block, solid once ticked off. */
-  --color-plan-lecture-bg: #eef1f8;
-  --color-plan-lecture-border: #c5cde0;
-  --color-plan-lecture-text: #1d2b52;
-  --color-plan-lecture-fill: #2a3a66;
-  --color-plan-practice-bg: #ecf4f2;
-  --color-plan-practice-border: #b4d2cc;
-  --color-plan-practice-text: #24524c;
-  --color-plan-practice-fill: #3f7a71;
-  --color-plan-other-bg: #f3f3f5;
-  --color-plan-other-border: #d3d4db;
-  --color-plan-other-text: #484a55;
-  --color-plan-other-fill: #757888;
+  /* Study planner session kinds: lectures in the house sky blue, practicals and exercise sessions
+     in a clear teal, everything else in the lavender of the accent. Pale for a block, solid once
+     ticked off. */
+  --color-plan-lecture-bg: #e8f2fd;
+  --color-plan-lecture-border: #a9cdf3;
+  --color-plan-lecture-text: #0b4f8c;
+  --color-plan-lecture-fill: #2477c9;
+  --color-plan-practice-bg: #e2f5ef;
+  --color-plan-practice-border: #94d6c2;
+  --color-plan-practice-text: #0b5c4c;
+  --color-plan-practice-fill: #129278;
+  --color-plan-other-bg: #f0effc;
+  --color-plan-other-border: #c9c4f3;
+  --color-plan-other-text: #463c9f;
+  --color-plan-other-fill: #6b5fd6;
+
+  /* What is past and not ticked off ("in te halen"): a raspberry that stands apart from the
+     session colours without shouting like the danger red. */
+  --color-plan-catchup-bg: #fdf0f6;
+  --color-plan-catchup-border: #f5bdd5;
+  --color-plan-catchup-text: #a3245a;
+  --color-plan-catchup-fill: #d6407a;
+
 
   /* Legacy names, remapped onto the palette above. */
   --color-vtk-ink: #18181b;
@@ -218,6 +226,20 @@
 }
 
 :root {
+  /* One colour per course in the block planner, handed out in order (components/study-planner/
+     block/colors.ts). Only the solid tone is defined; the pale block, its edge and its text are
+     mixed from it with the surface and the text colour (.plan-course-* below), so dark mode only
+     needs eight lighter tones. Outside @theme on purpose: no utility uses them, and Tailwind
+     leaves out the theme variables no utility uses. */
+  --color-course-1: #2477c9;
+  --color-course-2: #129278;
+  --color-course-3: #6b5fd6;
+  --color-course-4: #b98900;
+  --color-course-5: #0e8fb3;
+  --color-course-6: #3e9a45;
+  --color-course-7: #33478f;
+  --color-course-8: #9b4fb0;
+
   /* Kept for the few places that read them as plain custom properties. */
   --ink: #18181b;
   --navy: #0f1a36;
@@ -339,18 +361,32 @@
   --color-tag-grey-border: #464b56;
   --color-tag-grey-text: #c4c7ce;
 
-  --color-plan-lecture-bg: #2d3347;
-  --color-plan-lecture-border: #434c69;
-  --color-plan-lecture-text: #c7cff0;
-  --color-plan-lecture-fill: #56649a;
-  --color-plan-practice-bg: #263632;
-  --color-plan-practice-border: #3b5a54;
-  --color-plan-practice-text: #a9d8cf;
-  --color-plan-practice-fill: #3f7a71;
-  --color-plan-other-bg: #2e3138;
-  --color-plan-other-border: #464b56;
-  --color-plan-other-text: #c4c7ce;
-  --color-plan-other-fill: #6b6f7d;
+  --color-plan-lecture-bg: #1b2a40;
+  --color-plan-lecture-border: #2f4a6e;
+  --color-plan-lecture-text: #b5d6fa;
+  --color-plan-lecture-fill: #3a8ee0;
+  --color-plan-practice-bg: #152f29;
+  --color-plan-practice-border: #24574b;
+  --color-plan-practice-text: #9fe2cf;
+  --color-plan-practice-fill: #1fa587;
+  --color-plan-other-bg: #252344;
+  --color-plan-other-border: #3d3975;
+  --color-plan-other-text: #cbc6ff;
+  --color-plan-other-fill: #7f73ea;
+
+  --color-plan-catchup-bg: rgb(214 64 122 / 0.16);
+  --color-plan-catchup-border: rgb(245 130 180 / 0.38);
+  --color-plan-catchup-text: #f7a8c9;
+  --color-plan-catchup-fill: #e0598f;
+
+  --color-course-1: #4a9be8;
+  --color-course-2: #2bb596;
+  --color-course-3: #8f84f0;
+  --color-course-4: #d9a92a;
+  --color-course-5: #35b2d4;
+  --color-course-6: #5cb862;
+  --color-course-7: #7085d6;
+  --color-course-8: #bb78d1;
 
   /* Legacy names. `vtk-ink` was the darkest text and `vtk-paper` the canvas, so a chip that
      paints `bg-vtk-ink text-vtk-paper` simply inverts and still reads. */
@@ -518,6 +554,19 @@
 }
 
 @layer components {
+  /* A course in the block planner; the element sets --course to one of --color-course-N. */
+  .plan-course-block {
+    background-color: color-mix(in oklab, var(--course) 13%, var(--color-surface));
+    border-color: color-mix(in oklab, var(--course) 42%, var(--color-surface));
+    color: color-mix(in oklab, var(--course) 55%, var(--color-fg));
+  }
+  .plan-course-text {
+    color: color-mix(in oklab, var(--course) 55%, var(--color-fg));
+  }
+  .plan-course-fill {
+    background-color: var(--course);
+  }
+
   /* ---------------------------------------------------------------------
      Page content inside the white panel. The panel itself and its header
      belong to the app shell (components/layout).

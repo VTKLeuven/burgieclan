@@ -21,6 +21,8 @@ import {
     type Program,
     type QuickLink,
     type StudyPlanner,
+    type StudyPlannerBlok,
+    type VtkStudy,
     type StudyPlannerEvent,
     type StudyPlannerItem,
     type StudyPlannerMark,
@@ -586,6 +588,7 @@ export function convertToStudyPlanner(planner: unknown): StudyPlanner {
             location: strOrNull(o.location),
         })),
     }));
+    const block = convertStudyPlannerBlok(data.block && typeof data.block === 'object' ? (data.block as ApiRecord) : {});
     return {
         subscribed: data.subscribed === true,
         icsUrl: strOrNull(data.icsUrl),
@@ -599,6 +602,60 @@ export function convertToStudyPlanner(planner: unknown): StudyPlanner {
         items,
         rules,
         vtkEvents,
+        block,
+    };
+}
+
+function convertStudyPlannerBlok(data: ApiRecord): StudyPlannerBlok {
+    return {
+        exams: records(data.exams).map((e) => ({
+            id: str(e.id),
+            subject: str(e.subject),
+            subjectLabel: str(e.subjectLabel),
+            date: str(e.date),
+            time: strOrNull(e.time),
+        })),
+        tasks: records(data.tasks).map((t) => ({
+            id: str(t.id),
+            date: str(t.date),
+            subject: strOrNull(t.subject),
+            subjectLabel: strOrNull(t.subjectLabel),
+            title: str(t.title),
+            done: t.done === true,
+        })),
+        freeDays: Array.isArray(data.freeDays) ? data.freeDays.filter((d): d is string => typeof d === 'string') : [],
+        sessions: records(data.sessions).map((x) => ({
+            id: str(x.id),
+            date: str(x.date),
+            start: str(x.start),
+            end: strOrNull(x.end),
+        })),
+    };
+}
+
+export function convertToVtkStudy(value: unknown): VtkStudy {
+    const data = toRecord(value, 'VtkStudy');
+    const session = data.session && typeof data.session === 'object' ? (data.session as ApiRecord) : null;
+    const days: Record<string, number> = {};
+    for (const d of records(data.days)) days[str(d.date)] = num(d.seconds);
+    return {
+        available: data.available === true,
+        receivedAt: Date.now(),
+        session: session
+            ? {
+                startedAt: str(session.startedAt),
+                seconds: num(session.seconds),
+                paused: session.paused === true,
+                pausedAt: strOrNull(session.pausedAt),
+                maxSeconds: num(session.maxSeconds),
+            }
+            : null,
+        todaySeconds: num(data.todaySeconds),
+        dailyGoalMinutes: num(data.dailyGoalMinutes),
+        streak: num(data.streak),
+        friendsStudying: num(data.friendsStudying),
+        today: records(data.today).map((t) => ({ startedAt: str(t.startedAt), endedAt: strOrNull(t.endedAt), seconds: num(t.seconds) })),
+        days,
     };
 }
 

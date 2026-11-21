@@ -114,6 +114,13 @@ Other subsystems:
   vtk-website-new (`apps/web/lib/burgieclan/signature.ts`) with a shared test vector
   (`StudyPlannerVtkTest::testSignatureMatchesTheVtkWebsite`): change both together. The full story is
   `docs/burgieclan-planning.md` in vtk-website-new.
+- **The "Blok" calendar** (the Blok tab of the study planner): exams, what to study each day, free days and a
+  study timer, all filled in by the student and stored per user (`StudyPlannerExam`, `StudyPlannerTask`,
+  `StudyPlannerFreeDay`, `StudyPlannerSession`; `StudyPlannerBlok`), so it works without a timetable. Its operations
+  go through `/api/study_planner/operations` like the rest. For accounts that signed in through VTK the timer is
+  "Samen blokken" of the VTK app instead: `VtkStudy` asks `{VTK_URL}/api/burgieclan/v1/studeren` signed with
+  `VTK_SERVICE_SECRET`, and the page sends a heartbeat every minute (`/api/vtk_study`). Shared signature vector:
+  `VtkStudyTest::testSignatureMatchesTheVtkWebsite`.
 - **VTK POC polls**: the polls student representatives run on vtk.be also show here, as a sidebar tab
   that only exists while one is open for the member (`useVtkPolls`, `components/polls/`). Burgieclan stores
   nothing: `VtkPolls` asks `{VTK_URL}/api/burgieclan/v1/polls` on the member's behalf, signed with the same
