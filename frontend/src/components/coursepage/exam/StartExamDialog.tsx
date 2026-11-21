@@ -1,6 +1,7 @@
 'use client'
 
 import { Dialog, DialogActions, DialogBody, DialogTitle } from '@/components/ui/Dialog';
+import Select from '@/components/ui/Select';
 import { useApi } from '@/hooks/useApi';
 import type { Exam, ExamPeriod } from '@/types/entities';
 import { convertToExam } from '@/utils/convertToEntity';
@@ -66,16 +67,14 @@ export default function StartExamDialog({ isOpen, onClose, courseId, exams }: St
 
                     <label className="vtk-field">
                         <span className="vtk-field-label">{t('exam.start.year')}</span>
-                        <select
-                            className="vtk-select"
+                        <Select
                             value={academicYear}
-                            onChange={(event) => {
-                                setAcademicYear(event.target.value);
+                            onChange={(year) => {
+                                setAcademicYear(year);
                                 setPeriod(null);
                             }}
-                        >
-                            {years.map((year) => <option key={year} value={year}>{year}</option>)}
-                        </select>
+                            options={years.map((year) => ({ value: year, label: year }))}
+                        />
                     </label>
 
                     <fieldset className="vtk-field m-0 border-0 p-0">
@@ -121,14 +120,17 @@ export default function StartExamDialog({ isOpen, onClose, courseId, exams }: St
                     {exams.length > 0 && !chosenExists && (
                         <label className="vtk-field">
                             <span className="vtk-field-label">{t('exam.start.copy')}</span>
-                            <select className="vtk-select" value={copyFrom} onChange={(event) => setCopyFrom(event.target.value)}>
-                                <option value="">{t('exam.start.copy-none')}</option>
-                                {exams.map((exam) => (
-                                    <option key={exam.id} value={exam.id}>
-                                        {t(`exam.name.${exam.period}`, { year: examCalendarYear(exam.academicYear) })} ({t('exam.section.questions', { count: exam.questionCount })})
-                                    </option>
-                                ))}
-                            </select>
+                            <Select
+                                value={copyFrom}
+                                onChange={setCopyFrom}
+                                options={[
+                                    { value: '', label: t('exam.start.copy-none') },
+                                    ...exams.map((exam) => ({
+                                        value: String(exam.id),
+                                        label: `${t(`exam.name.${exam.period}`, { year: examCalendarYear(exam.academicYear) })} (${t('exam.section.questions', { count: exam.questionCount })})`,
+                                    })),
+                                ]}
+                            />
                             <span className="vtk-help">{t('exam.start.copy-help')}</span>
                         </label>
                     )}

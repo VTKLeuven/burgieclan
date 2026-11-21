@@ -1,5 +1,6 @@
 'use client';
 
+import Select from '@/components/ui/Select';
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
 import Link from '@/components/ui/Link';
@@ -99,14 +100,14 @@ export function CourseList({
             <div>
                 <label className="vtk-field md:hidden">
                     <span className="vtk-field-label">{t('study_planner.form.course')}</span>
-                    <select value={row.subject.key} onChange={(e) => onCourse(e.target.value)} className="vtk-select">
-                        {data.rows.map((r) => (
-                            <option key={r.subject.key} value={r.subject.key}>
-                                {subjectName(r.subject)} ({ratio(r)}
-                                {r.missed > 0 ? `, ${t('study_planner.overview.n_to_catch_up', { count: r.missed })}` : ''})
-                            </option>
-                        ))}
-                    </select>
+                    <Select
+                        value={row.subject.key}
+                        onChange={onCourse}
+                        options={data.rows.map((r) => ({
+                            value: r.subject.key,
+                            label: `${subjectName(r.subject)} (${ratio(r)}${r.missed > 0 ? `, ${t('study_planner.overview.n_to_catch_up', { count: r.missed })}` : ''})`,
+                        }))}
+                    />
                 </label>
                 <nav aria-label={t('study_planner.overview.courses')} className="hidden flex-col gap-1 md:flex">
                     {data.rows.map((r) => {

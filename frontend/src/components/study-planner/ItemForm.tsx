@@ -1,5 +1,6 @@
 'use client';
 
+import Select from '@/components/ui/Select';
 import { cn } from '@/lib/utils';
 import type { StudyPlannerItem, StudyPlannerItemInput, StudyPlannerItemKind, StudyPlannerSubject } from '@/types/entities';
 import { useId, useState } from 'react';
@@ -55,13 +56,12 @@ export default function ItemForm({
                 <label htmlFor={`${id}-subject`} className="vtk-field-label">
                     {t('study_planner.form.course')}
                 </label>
-                <select id={`${id}-subject`} value={subject} onChange={(e) => setSubject(e.target.value)} className="vtk-select" required>
-                    {options.map((s) => (
-                        <option key={s.key} value={s.key}>
-                            {subjectName(s)}
-                        </option>
-                    ))}
-                </select>
+                <Select
+                    id={`${id}-subject`}
+                    value={subject}
+                    onChange={setSubject}
+                    options={options.map((s) => ({ value: s.key, label: subjectName(s) }))}
+                />
             </div>
 
             <fieldset className="m-0 border-0 p-0 sm:col-span-2">
