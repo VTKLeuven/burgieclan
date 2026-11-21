@@ -34,7 +34,10 @@ import {
     type VtkPoll,
     type VtkPollAnswer,
     type VtkPollQuestionKind,
-    type VtkPolls
+    type VtkPolls,
+    type AppNotification,
+    type AppNotificationType,
+    type NotificationFeed
 } from '@/types/entities';
 
 type ApiRecord = Record<string, unknown>;
@@ -660,5 +663,40 @@ export function convertToVtkPolls(value: unknown): VtkPolls {
                 answers,
             };
         }),
+    };
+}
+
+const NOTIFICATION_TYPES: AppNotificationType[] = ['document', 'course_comment', 'exam', 'exam_questions'];
+
+/** GET /api/notifications. Items of a kind this frontend does not know yet are left out. */
+export function convertToNotificationFeed(value: unknown): NotificationFeed {
+    const data = toRecord(value, 'NotificationFeed');
+    const items = records(data.items).flatMap((item): AppNotification[] => {
+        const type = NOTIFICATION_TYPES.find((known) => known === item.type);
+        if (!type) return [];
+        const course = item.course && typeof item.course === 'object' ? item.course as ApiRecord : {};
+        const document = item.document && typeof item.document === 'object' ? item.document as ApiRecord : null;
+        const exam = item.exam && typeof item.exam === 'object' ? item.exam as ApiRecord : null;
+        const comment = item.comment && typeof item.comment === 'object' ? item.comment as ApiRecord : null;
+        const period = EXAM_PERIODS.find((known) => known === exam?.period);
+
+        return [{
+            id: num(item.id),
+            type,
+            count: num(item.count, 1),
+            read: item.read === true,
+            createdAt: parseDate(item.createdAt) ?? new Date(0),
+            updatedAt: parseDate(item.updatedAt) ?? parseDate(item.createdAt) ?? new Date(0),
+            course: { id: num(course.id), code: str(course.code), name: str(course.name) },
+            document: document ? { id: num(document.id), name: str(document.name) } : null,
+            exam: exam && period ? { id: num(exam.id), academicYear: str(exam.academicYear), period } : null,
+            comment: comment ? { id: num(comment.id), excerpt: str(comment.excerpt) } : null,
+        }];
+    });
+
+    return {
+        unreadCount: num(data.unreadCount),
+        mutedCourseIds: (asArray(data.mutedCourseIds) ?? []).filter((id): id is number => typeof id === 'number'),
+        items,
     };
 }

@@ -30,12 +30,16 @@ class ExamQuestionSync
      * removed. Does not flush.
      *
      * @param array<string, mixed>|null $content TipTap JSON, as CollabDocument::getContent()
+     *
+     * @return int how many questions it saw for the first time; one brought back by a rollback
+     *             or an undo was seen before and does not count
      */
-    public function sync(Exam $exam, ?array $content, ?DateTimeImmutable $now = null): void
+    public function sync(Exam $exam, ?array $content, ?DateTimeImmutable $now = null): int
     {
         $existing = $this->questions->findAllByUid($exam);
         $seen = [];
         $position = 0;
+        $added = 0;
 
         foreach (ExamContent::questions($content) as $question) {
             $uid = $question['uid'];
@@ -48,6 +52,7 @@ class ExamQuestionSync
             if (null === $row) {
                 $row = new ExamQuestion($exam, $uid);
                 $this->entityManager->persist($row);
+                ++$added;
             }
 
             $row->setPosition($position++)
@@ -61,5 +66,7 @@ class ExamQuestionSync
                 $row->setRemovedAt($now ?? new DateTimeImmutable());
             }
         }
+
+        return $added;
     }
 }

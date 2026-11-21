@@ -466,3 +466,31 @@ export interface VtkPolls {
     /** No study programme on the VTK account, so vtk.be cannot tell which POC asks. */
     missingProgramme: boolean;
 }
+
+// ---------------------------------------------------------------------------------------------
+// Notifications about the courses a user follows, i.e. their favourite courses
+// (GET /api/notifications). They never say who did something: comments and uploads can be anonymous.
+
+export type AppNotificationType = 'document' | 'course_comment' | 'exam' | 'exam_questions';
+
+export interface AppNotification {
+    id: number;
+    type: AppNotificationType;
+    /** How many questions a bundle of exam questions stands for; 1 for every other kind. */
+    count: number;
+    read: boolean;
+    createdAt: Date;
+    /** Moves when a bundle grows; the list is sorted on it. */
+    updatedAt: Date;
+    course: { id: number; code: string; name: string };
+    document: { id: number; name: string } | null;
+    exam: { id: number; academicYear: string; period: ExamPeriod } | null;
+    comment: { id: number; excerpt: string } | null;
+}
+
+export interface NotificationFeed {
+    unreadCount: number;
+    /** Favourite courses whose notifications are switched off. */
+    mutedCourseIds: number[];
+    items: AppNotification[];
+}

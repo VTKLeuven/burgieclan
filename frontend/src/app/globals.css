@@ -1206,6 +1206,13 @@
   50% { opacity: 0.55; }
 }
 
+/* A count in the sidebar (open polls, unread notifications) arrives after the page: it pops in
+   instead of shoving the row's label aside in one frame. */
+@keyframes nav-count-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: none; }
+}
+
 @utility skeleton-in {
   animation: vtk-fade-in 220ms var(--ease-out) 140ms both;
 }

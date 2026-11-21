@@ -117,6 +117,18 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     private Collection $favoriteDocuments;
 
     /**
+     * Courses among the favourites whose notifications this user switched off. A favourite course
+     * is followed; this is the exception, so a course starred later starts out followed.
+     *
+     * @var Collection<int, Course>
+     */
+    #[ORM\ManyToMany(targetEntity: Course::class)]
+    #[ORM\JoinTable(name: 'notification_muted_course')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(onDelete: 'CASCADE')]
+    private Collection $mutedCourses;
+
+    /**
      * Indicates if the user wants uploads/comments to be anonymous by default.
      */
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
@@ -167,6 +179,7 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
         $this->favoriteModules = new ArrayCollection();
         $this->favoriteCourses = new ArrayCollection();
         $this->favoriteDocuments = new ArrayCollection();
+        $this->mutedCourses = new ArrayCollection();
         $this->viewedDocuments = new ArrayCollection();
         $this->documentVotes = new ArrayCollection();
         $this->documentCommentVotes = new ArrayCollection();
@@ -447,6 +460,30 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     public function removeFavoriteDocument(Document $document): self
     {
         $this->favoriteDocuments->removeElement($document);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Course>
+     */
+    public function getMutedCourses(): Collection
+    {
+        return $this->mutedCourses;
+    }
+
+    public function muteCourse(Course $course): self
+    {
+        if (!$this->mutedCourses->contains($course)) {
+            $this->mutedCourses->add($course);
+        }
+
+        return $this;
+    }
+
+    public function unmuteCourse(Course $course): self
+    {
+        $this->mutedCourses->removeElement($course);
 
         return $this;
     }

@@ -36,6 +36,8 @@ export const apiEndpoints = {
     studyPlanner: () => '/api/study_planner',
     /** The VTK POC polls for the signed-in member, worded in this language by vtk.be. */
     vtkPolls: (lang: string) => `/api/vtk_polls?locale=${lang}`,
+    /** The signed-in user's notifications about the courses they follow. Never cached. */
+    notifications: () => '/api/notifications',
 
     /**
      * The announcements showing now. The time is rounded down to five minutes (Brussels time,

@@ -4,14 +4,17 @@ namespace App\Service\Collab;
 
 use App\Entity\CollabDocument;
 use App\Entity\CollabDocumentRevision;
+use App\Entity\Exam;
 use App\Repository\CollabDocumentRepository;
 use App\Repository\CollabDocumentRevisionRepository;
 use App\Repository\ExamRepository;
 use App\Service\Exam\ExamQuestionSync;
+use App\Service\Notification\CourseNotifier;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 /**
  * Writes live documents to the database and keeps their history.
@@ -37,6 +40,7 @@ class CollabDocumentStore
         private readonly ExamQuestionSync $questionSync,
         private readonly CollabServerClient $collab,
         private readonly LoggerInterface $logger,
+        private readonly CourseNotifier $notifier,
     ) {}
 
     /**
@@ -70,9 +74,14 @@ class CollabDocumentStore
         $document->setContent($content);
         $document->setFields($fields);
         $document->addPendingContributors($contributors);
-        $this->syncQuestions($name, $content);
+        $exam = $this->exams->findByDocumentName($name);
+        $added = null === $exam ? 0 : $this->questionSync->sync($exam, $content);
 
         $this->entityManager->flush();
+
+        if (null !== $exam && $added > 0) {
+            $this->notifyQuestionsAdded($exam, $added, $contributors, $now);
+        }
 
         return $document;
     }
@@ -162,6 +171,31 @@ class CollabDocumentStore
         $exam = $this->exams->findByDocumentName($name);
         if (null !== $exam) {
             $this->questionSync->sync($exam, $content);
+        }
+    }
+
+    /**
+     * Tells the followers of the course about new questions, after the store went through. Whoever
+     * wrote them is among $contributors and hears nothing about their own questions. A failure
+     * here is logged, not thrown: the document is stored, and an error would only make the collab
+     * server send it again.
+     *
+     * @param int[] $contributors
+     */
+    private function notifyQuestionsAdded(Exam $exam, int $added, array $contributors, ?DateTimeImmutable $now): void
+    {
+        try {
+            $this->notifier->questionsAdded($exam, $added, $contributors, $now);
+        } catch (Throwable $exception) {
+            $this->logger->error(
+                'Could not notify the followers of exam {exam} about {count} new questions: {reason}',
+                [
+                    'exam' => $exam->getId(),
+                    'count' => $added,
+                    'reason' => $exception->getMessage(),
+                    'exception' => $exception,
+                ]
+            );
         }
     }
 

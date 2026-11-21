@@ -14,6 +14,7 @@ import CreateDocumentButton from "@/components/ui/CreateDocumentButton";
 import DownloadButton from "@/components/ui/DownloadButton";
 import CurriculumPageHeader from "@/components/ui/DynamicBreadcrumb";
 import FavoriteButton from "@/components/ui/FavoriteButton";
+import CourseNotificationButton from "@/components/ui/CourseNotificationButton";
 import SemesterIndicator from '@/components/ui/SemesterIndicator';
 import { useApi } from "@/hooks/useApi";
 import { usePreloadedApi } from '@/components/ApiSeed';
@@ -110,6 +111,7 @@ export default function CoursePage() {
                 actions={
                     <>
                         <FavoriteButton itemId={course.id} itemType="course" size={18} className="vtk-icon-button" />
+                        <CourseNotificationButton courseId={course.id} size={18} className="vtk-icon-button" />
                         <DownloadButton courses={[course]} size={18} />
                         <CreateDocumentButton initialData={{ course }} size={16} />
                     </>

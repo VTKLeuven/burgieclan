@@ -1011,6 +1011,28 @@
         "favorite-programs": "Favourite programmes",
         "all-programs": "All programmes"
     },
+    "notifications": {
+        "nav": "Notifications",
+        "title": "Notifications",
+        "subtitle": "What is new in the courses you follow. You follow a course by starring it; the bell on the course page switches that course's notifications off.",
+        "unread_one": "{{count}} unread notification",
+        "unread_other": "{{count}} unread notifications",
+        "unread_label": "Unread",
+        "new": "New",
+        "earlier": "Earlier",
+        "empty": "No notifications yet. Star a course and you will hear about it here as soon as a document, comment or exam reconstruction is added.",
+        "browse": "Browse courses",
+        "document": "New document",
+        "document_in": "New document in {{course}}",
+        "comment": "New comment",
+        "comment_in": "New comment on {{course}}",
+        "exam": "New reconstruction",
+        "exam_in": "Reconstruction started for {{course}}",
+        "questions_one": "{{count}} new exam question",
+        "questions_other": "{{count}} new exam questions",
+        "mute_course": "Turn off notifications for this course",
+        "unmute_course": "Turn on notifications for this course"
+    },
     "polls": {
         "nav": "Polls",
         "title": "Polls",

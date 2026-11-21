@@ -1011,6 +1011,28 @@
         "favorite-programs": "Favoriete opleidingen",
         "all-programs": "Alle opleidingen"
     },
+    "notifications": {
+        "nav": "Meldingen",
+        "title": "Meldingen",
+        "subtitle": "Wat er nieuw is in de vakken die je volgt. Je volgt een vak door het een ster te geven; met het belletje op de vakpagina zet je de meldingen van dat vak uit.",
+        "unread_one": "{{count}} ongelezen melding",
+        "unread_other": "{{count}} ongelezen meldingen",
+        "unread_label": "Ongelezen",
+        "new": "Nieuw",
+        "earlier": "Eerder",
+        "empty": "Nog geen meldingen. Geef een vak een ster en je hoort het hier zodra er een document, reactie of examenreconstructie bijkomt.",
+        "browse": "Naar de vakken",
+        "document": "Nieuw document",
+        "document_in": "Nieuw document in {{course}}",
+        "comment": "Nieuwe reactie",
+        "comment_in": "Nieuwe reactie bij {{course}}",
+        "exam": "Nieuwe reconstructie",
+        "exam_in": "Reconstructie gestart voor {{course}}",
+        "questions_one": "{{count}} nieuwe examenvraag",
+        "questions_other": "{{count}} nieuwe examenvragen",
+        "mute_course": "Meldingen voor dit vak uitzetten",
+        "unmute_course": "Meldingen voor dit vak aanzetten"
+    },
     "polls": {
         "nav": "Peilingen",
         "title": "Peilingen",

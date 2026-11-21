@@ -120,6 +120,13 @@ Other subsystems:
   `VTK_SERVICE_SECRET` the other way round, and passes the answers on. vtk.be decides who a poll is for and
   keeps every answer anonymous. Only accounts that signed in through VTK (`fluxusSub`) get polls. The signature
   has a shared vector with vtk-website-new (`VtkPollsTest::testSignatureMatchesTheVtkWebsite`).
+- **Course notifications**: a favourite course ("Mijn vakken") is a followed course; `User::$mutedCourses` holds
+  the exceptions (the bell next to the star). `CourseNotifier` fans out with one DBAL statement per event from
+  `CourseNotificationListener` (document out of review, course comment, exam started) and from
+  `CollabDocumentStore::store()` (new exam questions, bundled per exam per Brussels day, `$contributors` left
+  out). Whoever caused it is never notified, and a notification never names them. Served by
+  `NotificationController` (`/api/notifications`), shown under `/notifications` with a sidebar count
+  (`useNotifications`). In-app only: there is no mailer.
 
 Tests: Zenstruck Foundry factories live in `src/Factory/` (not under `tests/`). API tests extend
 `tests/Api/ApiTestCase`, whose `setUp()` creates a user and logs in to obtain `$this->token`; requests use

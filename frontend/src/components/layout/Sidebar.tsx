@@ -16,12 +16,14 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useUser } from '@/components/UserContext';
+import { useNotifications } from '@/hooks/useNotifications';
 import { useVtkPolls } from '@/hooks/useVtkPolls';
 import FavoriteButton from '@/components/ui/FavoriteButton';
 import { cn } from '@/lib/utils';
 import { courseTitle, sortCoursesByName } from '@/utils/courseName';
 import {
     ArrowUpRight,
+    Bell,
     CalendarDays,
     ChevronsUpDown,
     CircleHelp,
@@ -99,6 +101,18 @@ function NavItem({
     );
 }
 
+/** The amber count at the end of a row: open polls, unread notifications. Pops in rather than appearing. */
+function NavCount({ label, children }: { label: string; children: ReactNode }) {
+    return (
+        <span
+            className="flex h-[18px] min-w-[18px] animate-[nav-count-in_180ms_var(--ease-out)] items-center motion-reduce:animate-none justify-center rounded-full bg-vtk-yellow px-1 text-caption font-semibold text-vtk-navy tabular"
+            aria-label={label}
+        >
+            {children}
+        </span>
+    );
+}
+
 function SectionLabel({ children, action }: { children: ReactNode; action?: ReactNode }) {
     return (
         <div className="mt-4 mb-0.5 flex h-6 items-center justify-between px-2.5">
@@ -165,6 +179,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
     const vtkPolls = useVtkPolls();
     const polls = vtkPolls?.polls ?? [];
     const unansweredPolls = polls.filter((poll) => !poll.answered).length;
+    const unreadNotifications = useNotifications()?.unreadCount ?? 0;
 
     // The row just clicked, highlighted at once. A page now stays up until the next one is ready
     // to be drawn whole, and without this a click showed nothing at all for that moment. Cleared
@@ -276,6 +291,20 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                         onNavigate={follow('/planner')}
                     />
                 )}
+                {user && (
+                    <NavItem
+                        href="/notifications"
+                        icon={<Bell />}
+                        label={t('notifications.nav')}
+                        active={shownActive('/notifications', isActive('/notifications'))}
+                        onNavigate={follow('/notifications')}
+                        trailing={unreadNotifications > 0 ? (
+                            <NavCount label={t('notifications.unread', { count: unreadNotifications })}>
+                                {unreadNotifications > 99 ? '99+' : unreadNotifications}
+                            </NavCount>
+                        ) : undefined}
+                    />
+                )}
                 {polls.length > 0 && (
                     <NavItem
                         href="/polls"
@@ -284,12 +313,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                         active={shownActive('/polls', isActive('/polls'))}
                         onNavigate={follow('/polls')}
                         trailing={unansweredPolls > 0 ? (
-                            <span
-                                className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-vtk-yellow px-1 text-caption font-semibold text-vtk-navy"
-                                aria-label={t('polls.unanswered', { count: unansweredPolls })}
-                            >
-                                {unansweredPolls}
-                            </span>
+                            <NavCount label={t('polls.unanswered', { count: unansweredPolls })}>{unansweredPolls}</NavCount>
                         ) : undefined}
                     />
                 )}
