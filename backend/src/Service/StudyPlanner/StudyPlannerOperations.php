@@ -16,7 +16,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 /**
- * Applies one change from POST /api/study_planner/operations (see StudyPlannerOperationInput).
+ * Applies one change from POST /api/study_planner/operations (see StudyPlannerOperationInput),
+ * except those of the "Blok" calendar, which need no timetable (StudyPlannerBlok).
  */
 class StudyPlannerOperations
 {

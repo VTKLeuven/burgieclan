@@ -95,7 +95,7 @@ export function useStudyPlanner(): StudyPlannerHandle {
                 return false;
             }
             if (result === null) {
-                // DELETE: unsubscribed.
+                // DELETE: unsubscribed. The exam period does not depend on the timetable and stays.
                 setState((s) => (s ? { ...s, subscribed: false, icsUrl: null, feedPath: null, events: [], items: [], rules: [], subjects: [], vtkEvents: [] } : s));
             } else {
                 setState(convertToStudyPlanner(result));

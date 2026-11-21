@@ -10,10 +10,12 @@ use App\ApiResource\StudyPlannerSubscriptionInput;
 use App\Entity\StudyPlanner;
 use App\Entity\User;
 use App\Service\RateLimit\UserRateLimiter;
+use App\Service\StudyPlanner\StudyPlannerBlok;
 use App\Service\StudyPlanner\StudyPlannerOperations;
 use App\Service\StudyPlanner\StudyPlannerState;
 use App\Service\StudyPlanner\StudyPlannerSync;
 use App\Service\StudyPlanner\TimetableUrl;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -40,6 +42,7 @@ class StudyPlannerProcessor implements ProcessorInterface
         private readonly StudyPlannerSync $sync,
         private readonly StudyPlannerState $state,
         private readonly StudyPlannerOperations $operations,
+        private readonly StudyPlannerBlok $blok,
         private readonly EntityManagerInterface $entityManager,
         private readonly Security $security,
         private readonly UserRateLimiter $rateLimiter,
@@ -76,8 +79,14 @@ class StudyPlannerProcessor implements ProcessorInterface
 
             case self::OPERATION:
                 assert($data instanceof StudyPlannerOperationInput);
-                $planner = $this->required($planner);
                 $this->rateLimiter->consume($this->changeLimiter, 'Slow down a little. Try again in a minute.');
+                // The "Blok" calendar works without a timetable.
+                if (in_array($data->op, StudyPlannerBlok::OPS, true)) {
+                    $this->blok->apply($this->provider->user(), $data, new DateTimeImmutable());
+
+                    return $this->state->build($planner, $this->provider->user());
+                }
+                $planner = $this->required($planner);
                 $this->operations->apply($planner, $data);
 
                 return $this->state->build($planner);

@@ -23,7 +23,7 @@ import type { PlannerApi } from './useStudyPlanner';
 function squareClass(s: Session): string {
     const base = s.past
         ? s.missed
-            ? 'border-2 border-warning bg-surface'
+            ? 'border-2 border-plan-catchup-fill bg-surface'
             : TONE_FILL[s.tone]
         : cn('border', TONE_BLOCK[s.tone]);
     return cn(base, s.event.mandatory && 'ring-[1.5px] ring-danger ring-offset-1 ring-offset-surface');
@@ -42,9 +42,9 @@ export function TotalsRow({ totals }: { totals: Totals }) {
                 </span>
                 <span className="text-small text-fg-muted">{t('study_planner.overview.ticked_off')}</span>
             </div>
-            <div className={cn(tile, totals.missed > 0 && 'border-warning-border bg-warning-bg')}>
-                <span className={cn(number, totals.missed > 0 ? 'text-warning-text' : 'text-fg')}>{totals.missed}</span>
-                <span className={cn('text-small', totals.missed > 0 ? 'text-warning-text' : 'text-fg-muted')}>
+            <div className={cn(tile, totals.missed > 0 && 'border-plan-catchup-border bg-plan-catchup-bg')}>
+                <span className={cn(number, totals.missed > 0 ? 'text-plan-catchup-text' : 'text-fg')}>{totals.missed}</span>
+                <span className={cn('text-small', totals.missed > 0 ? 'text-plan-catchup-text' : 'text-fg-muted')}>
                     {t('study_planner.overview.to_catch_up')}
                 </span>
             </div>
@@ -66,7 +66,7 @@ function ProgressBar({ row }: { row: CourseRow }) {
     return (
         <span aria-hidden="true" className="flex h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-neutral-150">
             <span className="bg-primary" style={{ width: `${(row.done / total) * 100}%` }} />
-            <span className="bg-warning" style={{ width: `${(row.missed / total) * 100}%` }} />
+            <span className="bg-plan-catchup-fill" style={{ width: `${(row.missed / total) * 100}%` }} />
         </span>
     );
 }
@@ -129,7 +129,7 @@ export function CourseList({
                                 <span className="mt-2 flex items-center gap-2">
                                     <ProgressBar row={r} />
                                     {r.missed > 0 && (
-                                        <span className="shrink-0 text-caption font-medium text-warning-text">
+                                        <span className="shrink-0 text-caption font-medium text-plan-catchup-text">
                                             {t('study_planner.overview.n_to_catch_up', { count: r.missed })}
                                         </span>
                                     )}
@@ -222,11 +222,11 @@ function SessionRow({
     const box = done
         ? TONE_FILL[s.tone]
         : s.missed
-            ? 'border-2 border-warning bg-surface'
+            ? 'border-2 border-plan-catchup-fill bg-surface'
             : 'border-[1.5px] border-dashed border-neutral-300 bg-surface';
 
     return (
-        <li className={cn('-mx-2 flex items-center gap-2 rounded-control px-2 py-0.5', s.missed && 'bg-warning-bg/60')}>
+        <li className={cn('-mx-2 flex items-center gap-2 rounded-control px-2 py-0.5', s.missed && 'bg-plan-catchup-bg')}>
             <button
                 type="button"
                 disabled={!canTick || api.busy}
@@ -258,7 +258,7 @@ function SessionRow({
                     {e.mandatory && (
                         <span className="vtk-badge vtk-badge-danger h-5 px-1.5 text-caption">{t('study_planner.mark.mandatory_cap')}</span>
                     )}
-                    {s.missed && <span className="text-small font-medium text-warning-text">{t('study_planner.overview.not_ticked')}</span>}
+                    {s.missed && <span className="text-small font-medium text-plan-catchup-text">{t('study_planner.overview.not_ticked')}</span>}
                 </span>
             </div>
         </li>
@@ -295,7 +295,7 @@ export function SemesterGrid({ data, onCourse }: { data: SemesterView; onCourse:
             <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-small text-fg-muted">
                 {TONES.map(legendTone)}
                 <span className="inline-flex items-center gap-1.5">
-                    <span aria-hidden="true" className={cn(swatch, 'border-2 border-warning bg-surface')} />
+                    <span aria-hidden="true" className={cn(swatch, 'border-2 border-plan-catchup-fill bg-surface')} />
                     {t('study_planner.overview.legend_missed')}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
@@ -362,7 +362,7 @@ export function SemesterGrid({ data, onCourse }: { data: SemesterView; onCourse:
                                     <span
                                         className={cn(
                                             'text-caption font-medium',
-                                            r.past === 0 ? 'text-fg-muted' : r.missed > 0 ? 'text-warning-text' : 'text-success-text',
+                                            r.past === 0 ? 'text-fg-muted' : r.missed > 0 ? 'text-plan-catchup-text' : 'text-success-text',
                                         )}
                                     >
                                         {r.past === 0

@@ -17,12 +17,15 @@ use Symfony\Component\Serializer\Attribute\Groups;
  * is no way to read someone else's.
  *
  * - GET /api/study_planner: the planner (syncs the timetable first when it is over an hour old).
- *   Without a subscription, `subscribed` is false and the lists are empty.
+ *   Without a subscription, `subscribed` is false and the timetable's lists are empty; the "Blok"
+ *   calendar (`block`) is there either way.
  * - POST /api/study_planner/subscription {"icsUrl"}: subscribe, or change the link. A different
  *   link starts a fresh timetable; marks on sessions go, weekly rules and deadlines stay.
- * - DELETE /api/study_planner: unsubscribe and forget everything.
+ * - DELETE /api/study_planner: unsubscribe and forget the timetable and everything marked in it.
+ *   The "Blok" calendar stays.
  * - POST /api/study_planner/sync: sync now.
- * - POST /api/study_planner/operations: one change, see StudyPlannerOperationInput.
+ * - POST /api/study_planner/operations: one change, see StudyPlannerOperationInput; that includes
+ *   the "Blok" calendar (StudyPlannerBlok).
  * - POST /api/study_planner/feed_token: a new secret in the export link; the old link stops working.
  * - GET /api/study_planner/vtk_events: what is coming up at VTK, to put in the planner
  *   (StudyPlannerVtkEventsController).
@@ -151,4 +154,13 @@ class StudyPlannerApi
      */
     #[Groups([SerializationGroups::STUDY_PLANNER_GET])]
     public array $vtkEvents = [];
+
+    /**
+     * The "Blok" calendar, with or without a timetable: `exams`, `tasks` (what to study each day),
+     * `freeDays` and the study timer's `sessions`. See StudyPlannerBlok::view().
+     *
+     * @var array<string, mixed>
+     */
+    #[Groups([SerializationGroups::STUDY_PLANNER_GET])]
+    public array $block = ['exams' => [], 'tasks' => [], 'freeDays' => [], 'sessions' => []];
 }

@@ -8,6 +8,7 @@ use App\Entity\StudyPlannerEvent;
 use App\Entity\StudyPlannerItem;
 use App\Entity\StudyPlannerRule;
 use App\Entity\StudyPlannerVtkEvent;
+use App\Entity\User;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,6 +25,7 @@ class StudyPlannerState
         private readonly EntityManagerInterface $entityManager,
         private readonly StudyPlannerSubjects $subjects,
         private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly StudyPlannerBlok $blok,
     ) {}
 
     /** The first line of a location; some sessions list two rooms on separate lines. */
@@ -54,12 +56,20 @@ class StudyPlannerState
         return $events;
     }
 
-    public function build(?StudyPlanner $planner): StudyPlannerApi
+    /**
+     * The planner of $user, or of $planner's owner. Without a timetable only `today`, `now` and
+     * the "Blok" calendar are filled in.
+     */
+    public function build(?StudyPlanner $planner, ?User $user = null): StudyPlannerApi
     {
         $api = new StudyPlannerApi();
         $now = LeuvenTime::wall(new DateTimeImmutable());
         $api->today = $now['date'];
         $api->now = $now['minutes'];
+        $user ??= $planner?->getUser();
+        if (null !== $user) {
+            $api->block = $this->blok->view($user);
+        }
         if (null === $planner) {
             return $api;
         }

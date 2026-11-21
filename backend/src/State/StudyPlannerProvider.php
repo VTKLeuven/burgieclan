@@ -37,14 +37,19 @@ class StudyPlannerProvider implements ProviderInterface
             $this->vtkRefresher->refreshIfStale($planner);
         }
 
-        return $this->state->build($planner);
+        return $this->state->build($planner, $this->user());
     }
 
-    public function planner(): ?StudyPlanner
+    public function user(): User
     {
         $user = $this->security->getUser();
         assert($user instanceof User);
 
-        return $this->planners->findForUser($user);
+        return $user;
+    }
+
+    public function planner(): ?StudyPlanner
+    {
+        return $this->planners->findForUser($this->user());
     }
 }

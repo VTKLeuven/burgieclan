@@ -19,16 +19,18 @@ import { useStudyPlanner, type PlannerApi } from './useStudyPlanner';
 import { VtkEventDialog, VtkPickerDialog } from './VtkDialogs';
 import type { VtkSlot } from './vtk';
 import WeekCalendar from './WeekCalendar';
+import BlockPlanner from './block/BlockPlanner';
 
-type View = 'week' | 'courses' | 'grid';
-const VIEWS: View[] = ['week', 'courses', 'grid'];
+type View = 'week' | 'courses' | 'grid' | 'block';
+const VIEWS: View[] = ['week', 'courses', 'grid', 'block'];
 
-function initialParams(): { view: View; course: string | null; semester: string | null } {
-    if (typeof window === 'undefined') return { view: 'week', course: null, semester: null };
+/** `view` is null when the address names none: the page then picks one from the planner. */
+function initialParams(): { view: View | null; course: string | null; semester: string | null } {
+    if (typeof window === 'undefined') return { view: null, course: null, semester: null };
     const params = new URLSearchParams(window.location.search);
     const view = params.get('view');
     return {
-        view: VIEWS.includes(view as View) ? (view as View) : 'week',
+        view: VIEWS.includes(view as View) ? (view as View) : null,
         course: params.get('course'),
         semester: params.get('semester'),
     };
@@ -38,14 +40,18 @@ function initialParams(): { view: View; course: string | null; semester: string 
  * The study planner: the reader's KU Leuven timetable as a week view with their deadlines and the
  * VTK events they put in it (the same planner the VTK app shows), and an
  * overview of the semester per course (what is ticked off, what to catch up, what is still to
- * come) as a list or a grid. The first visit asks for the timetable's subscription link.
+ * come) as a list or a grid, and the "Blok" calendar. The timetable tabs ask for the timetable's
+ * subscription link until there is one; the "Blok" calendar works without it.
  */
 export default function StudyPlannerPage() {
     const { t, i18n } = useTranslation();
     const handle = useStudyPlanner();
     const { state } = handle;
     const [initial] = useState(initialParams);
-    const [view, setView] = useState<View>(initial.view);
+    const [viewChoice, setView] = useState<View | null>(initial.view);
+    // Without a timetable but with something in the "Blok" calendar, that is what there is to see.
+    const hasBlok = state ? state.block.exams.length + state.block.tasks.length + state.block.sessions.length > 0 : false;
+    const view: View = viewChoice ?? (state && !state.subscribed && hasBlok ? 'block' : 'week');
     const [course, setCourse] = useState<string | null>(initial.course);
     const [semesterChoice, setSemester] = useState<string | null>(initial.semester);
     const [selected, setSelected] = useState<string | null>(null);
@@ -67,7 +73,7 @@ export default function StudyPlannerPage() {
     useEffect(() => {
         const params = new URLSearchParams();
         if (view !== 'week') params.set('view', view);
-        if (view !== 'week' && semester && semester !== fallback) params.set('semester', semester);
+        if ((view === 'courses' || view === 'grid') && semester && semester !== fallback) params.set('semester', semester);
         if (view === 'courses' && course) params.set('course', course);
         const query = params.toString();
         window.history.replaceState(window.history.state, '', query ? `?${query}` : window.location.pathname);
@@ -130,17 +136,6 @@ export default function StudyPlannerPage() {
         );
     }
 
-    if (!state.subscribed) {
-        return (
-            <>
-                {header}
-                <div className="vtk-shell">
-                    <SetupPanel busy={handle.busy} error={handle.error} onSubmit={(link) => void handle.subscribe(link)} />
-                </div>
-            </>
-        );
-    }
-
     const api: PlannerApi = { state, run: handle.run, busy: handle.busy, error: handle.error };
     const event = selected ? (state.events.find((e) => e.uid === selected) ?? null) : null;
     const eyebrow = data
@@ -189,7 +184,16 @@ export default function StudyPlannerPage() {
                 </div>
 
                 <div className="mt-6">
-                    {view === 'week' ? (
+                    {view === 'block' ? (
+                        <BlockPlanner api={api} />
+                    ) : !state.subscribed ? (
+                        <SetupPanel
+                            busy={handle.busy}
+                            error={handle.error}
+                            onSubmit={(link) => void handle.subscribe(link)}
+                            onPlanExams={() => setView('block')}
+                        />
+                    ) : view === 'week' ? (
                         <>
                             <WeekCalendar api={api} onSelect={setSelected} onSelectVtk={setVtkSlot} />
                             <div className="mt-10">

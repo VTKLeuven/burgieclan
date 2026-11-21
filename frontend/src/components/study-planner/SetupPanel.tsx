@@ -1,6 +1,6 @@
 'use client';
 
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, GraduationCap } from 'lucide-react';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -74,10 +74,13 @@ export default function SetupPanel({
     busy,
     error,
     onSubmit,
+    onPlanExams,
 }: {
     busy: boolean;
     error: string | null;
     onSubmit: (link: string) => void;
+    /** Opens the exam period, which needs no timetable. */
+    onPlanExams: () => void;
 }) {
     const { t } = useTranslation();
     return (
@@ -105,6 +108,17 @@ export default function SetupPanel({
                 <LinkForm busy={busy} error={error} submitLabel={t('study_planner.setup.submit')} onSubmit={onSubmit} />
             </div>
             <p className="m-0 mt-3 text-small text-fg-muted">{t('study_planner.setup.privacy')}</p>
+
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-card border border-border bg-surface-muted px-5 py-4">
+                <div className="min-w-0 flex-[1_1_320px]">
+                    <h2 className="m-0 text-title font-semibold">{t('study_planner.setup.exams_title')}</h2>
+                    <p className="m-0 mt-0.5 text-body text-fg-secondary">{t('study_planner.setup.exams_text')}</p>
+                </div>
+                <button type="button" onClick={onPlanExams} className="vtk-button">
+                    <GraduationCap className="size-4" aria-hidden="true" />
+                    {t('study_planner.setup.exams_button')}
+                </button>
+            </div>
         </div>
     );
 }
