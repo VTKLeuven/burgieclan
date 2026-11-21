@@ -325,7 +325,7 @@ const CourseCommentList = ({
                 inert={!expanded}
                 className={`grid transition-all duration-300 ease-in-out ${expanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
             >
-                <div className={`min-h-0 space-y-2 px-4 ${expanded ? 'overflow-visible pb-4' : 'overflow-hidden'}`}>
+                <div className={`min-h-0 space-y-2 px-4 ${expanded ? 'overflow-visible pt-3 pb-4' : 'overflow-hidden'}`}>
                     {/* Category description */}
                     {category.description && (
                         <div className="flex items-start gap-2.5 rounded-card border border-border bg-surface-muted px-4 py-3">
