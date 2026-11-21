@@ -88,7 +88,7 @@ function NavItem({
                 // frame. Faded, both rows sat half-highlighted in between.
                 '[&_svg]:size-4 [&_svg]:shrink-0',
                 // Navy marks where you are, the same navy as the primary button; in dark mode a
-                // raised grey, since the blue primary would shout on every page.
+                // raised grey, since a near-white row would shout on every page.
                 active
                     ? 'bg-nav-active text-on-nav-active [&_svg]:text-on-nav-active/80'
                     : '[&_svg]:text-icon-strong hover:bg-sidebar-hover',

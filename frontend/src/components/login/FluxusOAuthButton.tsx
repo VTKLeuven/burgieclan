@@ -18,8 +18,9 @@ const FluxusOAuthButton = ({ loginHandler }: FluxusOAuthButtonProps) => {
                 alt=""
                 width={50}
                 height={25}
-                // White on the primary button in both themes, like the label beside it.
-                className="h-4 w-auto object-contain"
+                // White on the navy button; on the near-white one in dark mode it goes dark,
+                // like the label beside it.
+                className="h-4 w-auto object-contain dark:brightness-0"
             />
             {t('login_vtk')}
         </button>

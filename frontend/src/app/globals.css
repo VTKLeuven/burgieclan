@@ -93,8 +93,8 @@
   --color-primary: #0f1a36;
   --color-primary-hover: #1d2b52;
   --color-primary-active: #0a1226;
-  /* The primary as text on the panel (active tabs, table headers). In light mode the navy itself;
-     in dark mode the button blue is too dark to read as text on black, so it takes the link sky. */
+  /* The primary as text on the panel (active tabs, table headers): the navy in light mode, white
+     in dark, next to the near-white button. */
   --color-primary-text: #0f1a36;
   --color-on-primary: #ffffff;
   --color-focus: #1f82d1;
@@ -265,17 +265,17 @@
 }
 
 /*
- * Dark mode ("Diep"): a true black canvas with the panel a hair above it, so the working area reads
- * as one object by tint alone and OLED screens stay dark. Neutral greys without a blue cast. The
- * same token names as above, redefined while <html> carries `.dark` (set before first paint by the
+ * Dark mode ("Grafiet"): the light mode turned around. Neutral near-black greys without a blue
+ * cast; the canvas a clear step below the panel, so the panel still reads as one object. The same
+ * token names as above, redefined while <html> carries `.dark` (set before first paint by the
  * script in the root layout, see components/theme/). Components keep saying `bg-surface` or
  * `text-fg-muted` and land on these values without a `dark:` variant of their own.
  *
- * The primary is the sky blue of the light mode's links, deepened until white text on it meets
- * AA (4.8:1); it is too dark to read as text on black, so text in the primary colour uses
- * `primary-text` (the link sky). Where you are in the sidebar is a raised grey. Every text pairing
- * meets WCAG AA on the surface: fg 18:1, fg-muted 7.6:1, link 9.6:1, placeholder 6:1, field
- * edges 3.6:1.
+ * Where the light mode has one near-black navy button on white, this has one near-white button
+ * on black, with dark text. Sky stays for links and focus, as in the light mode; where you are in
+ * the sidebar is a raised grey, since a white row would shout on every page. Every text pairing
+ * meets WCAG AA on the surface: fg 15:1, fg-muted 6.9:1, link 8.6:1, placeholder 5.2:1, field
+ * edges 3.5:1.
  *
  * Only the light end of the neutral and sky scales is remapped, because those steps are used as
  * fills (hover washes, subtle buttons, drop zones). The dark end stays dark: it backs the dialog
@@ -284,51 +284,51 @@
 :root.dark {
   color-scheme: dark;
 
-  --color-sky-50: #0a1828;
-  --color-sky-100: #0d2238;
-  --color-sky-200: #143150;
-  --color-sky-300: #1e4670;
-  --color-sky-700: #7cc0ff;
+  --color-sky-50: #15202c;
+  --color-sky-100: #182a3d;
+  --color-sky-200: #1f3954;
+  --color-sky-300: #2a4d70;
+  --color-sky-700: #7dbdff;
 
-  --color-neutral-0: #0c0c0e;
-  --color-neutral-25: #0f0f11;
-  --color-neutral-50: #111114;
-  --color-neutral-100: #141417;
-  --color-neutral-150: #18181c;
-  --color-neutral-200: #1c1c21;
-  --color-neutral-250: #222227;
-  --color-neutral-300: #2d2d33;
+  --color-neutral-0: #18181b;
+  --color-neutral-25: #19191c;
+  --color-neutral-50: #1b1b1e;
+  --color-neutral-100: #1e1e22;
+  --color-neutral-150: #222226;
+  --color-neutral-200: #27272c;
+  --color-neutral-250: #2c2c31;
+  --color-neutral-300: #36363c;
 
-  --color-canvas: #000000;
-  --color-surface: #0c0c0e;
-  --color-surface-muted: #141417;
-  --color-surface-hover: #17171b;
-  --color-surface-selected: #0d2238;
-  --color-sidebar-hover: #141417;
-  --color-sidebar-active: #1c1c21;
-  --color-nav-active: #1c1c21;
-  --color-on-nav-active: #f5f5f7;
-  --color-page-title: #f5f5f7;
-  --color-border: #1e1e23;
-  --color-border-strong: #2d2d33;
-  --color-border-field: #6b6b75;
-  --color-fg: #f5f5f7;
-  --color-fg-secondary: #d4d4d8;
-  --color-fg-muted: #a1a1aa;
-  --color-fg-placeholder: #8b8b94;
+  --color-canvas: #0f0f11;
+  --color-surface: #18181b;
+  --color-surface-muted: #1e1e22;
+  --color-surface-hover: #212126;
+  --color-surface-selected: #182a3d;
+  --color-sidebar-hover: #1c1c20;
+  --color-sidebar-active: #232328;
+  --color-nav-active: #27272c;
+  --color-on-nav-active: #f4f4f5;
+  --color-page-title: #ededef;
+  --color-border: #27272b;
+  --color-border-strong: #36363c;
+  --color-border-field: #6f6f78;
+  --color-fg: #ededef;
+  --color-fg-secondary: #d0d0d5;
+  --color-fg-muted: #a1a1a9;
+  --color-fg-placeholder: #8c8c95;
   --color-fg-disabled: #6b6b73;
   --color-fg-nav: #e4e4e7;
-  --color-link: #7cc0ff;
-  --color-link-underline: #1f4466;
-  --color-icon: #a1a1aa;
-  --color-icon-strong: #d4d4d8;
+  --color-link: #7dbdff;
+  --color-link-underline: #2a4d70;
+  --color-icon: #a1a1a9;
+  --color-icon-strong: #d0d0d5;
 
-  --color-primary: #1d74c4;
-  --color-primary-hover: #2079cc;
-  --color-primary-active: #1965ad;
-  --color-on-primary: #ffffff;
-  --color-primary-text: #7cc0ff;
-  --color-focus: #42b0ff;
+  --color-primary: #ededef;
+  --color-primary-hover: #ffffff;
+  --color-primary-active: #d4d4d8;
+  --color-on-primary: #16161a;
+  --color-primary-text: #ffffff;
+  --color-focus: #7dbdff;
 
   --color-danger-text: #fca5a5;
   --color-danger-bg: rgb(239 68 68 / 0.14);
@@ -339,7 +339,7 @@
   --color-success-text: #86efac;
   --color-success-bg: rgb(34 197 94 / 0.14);
   --color-success-border: rgb(134 239 172 / 0.3);
-  --color-info-text: #7cc0ff;
+  --color-info-text: #7dbdff;
   --color-info-bg: rgb(49 153 232 / 0.16);
   --color-info-border: rgb(136 201 254 / 0.3);
 
@@ -364,20 +364,20 @@
   --color-tag-orange-bg: rgb(249 115 22 / 0.14);
   --color-tag-orange-border: rgb(253 186 116 / 0.3);
   --color-tag-orange-text: #fdba74;
-  --color-tag-grey-bg: #17171b;
-  --color-tag-grey-border: #2d2d33;
-  --color-tag-grey-text: #d4d4d8;
+  --color-tag-grey-bg: #212126;
+  --color-tag-grey-border: #36363c;
+  --color-tag-grey-text: #d0d0d5;
 
-  --color-plan-lecture-bg: #0d1a2b;
-  --color-plan-lecture-border: #1f3a5c;
+  --color-plan-lecture-bg: #16202e;
+  --color-plan-lecture-border: #2a3f5c;
   --color-plan-lecture-text: #b5d6fa;
   --color-plan-lecture-fill: #3a8ee0;
-  --color-plan-practice-bg: #0b201b;
-  --color-plan-practice-border: #1a443a;
+  --color-plan-practice-bg: #142420;
+  --color-plan-practice-border: #24483f;
   --color-plan-practice-text: #9fe2cf;
   --color-plan-practice-fill: #1fa587;
-  --color-plan-other-bg: #17152e;
-  --color-plan-other-border: #2e2a5c;
+  --color-plan-other-bg: #1e1c33;
+  --color-plan-other-border: #383466;
   --color-plan-other-text: #cbc6ff;
   --color-plan-other-fill: #7f73ea;
 
@@ -397,38 +397,38 @@
 
   /* Legacy names. `vtk-ink` was the darkest text and `vtk-paper` the canvas, so a chip that
      paints `bg-vtk-ink text-vtk-paper` simply inverts and still reads. */
-  --color-vtk-ink: #f5f5f7;
-  --color-vtk-navy: #1d74c4;
-  --color-vtk-blue: #1d74c4;
-  --color-vtk-blue-dark: #1965ad;
-  --color-vtk-blue-light: #2079cc;
-  --color-vtk-blue-soft: #17171b;
-  --color-vtk-blue-muted: #141417;
-  --color-vtk-paper: #000000;
-  --color-vtk-paper-2: #17171b;
-  --color-vtk-surface: #0c0c0e;
-  --color-vtk-surface-elevated: #141417;
-  --color-vtk-muted: #a1a1aa;
-  --color-vtk-body: #d4d4d8;
-  --color-vtk-line: #1e1e23;
-  --color-vtk-line-2: #2d2d33;
+  --color-vtk-ink: #ededef;
+  --color-vtk-navy: #ededef;
+  --color-vtk-blue: #ededef;
+  --color-vtk-blue-dark: #d4d4d8;
+  --color-vtk-blue-light: #ffffff;
+  --color-vtk-blue-soft: #212126;
+  --color-vtk-blue-muted: #1e1e22;
+  --color-vtk-paper: #0f0f11;
+  --color-vtk-paper-2: #212126;
+  --color-vtk-surface: #18181b;
+  --color-vtk-surface-elevated: #1e1e22;
+  --color-vtk-muted: #a1a1a9;
+  --color-vtk-body: #d0d0d5;
+  --color-vtk-line: #27272b;
+  --color-vtk-line-2: #36363c;
 
-  /* On black a shadow barely shows, so floating layers also get a faint light edge to lift off. */
+  /* On a near-black ground a shadow barely shows, so floating layers also get a faint light edge. */
   --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.2);
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.2), 0 1px 1px rgb(0 0 0 / 0.12);
   --shadow-popover: 0 8px 24px -6px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(255 255 255 / 0.06);
   --shadow-dialog: 0 24px 64px -12px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06);
 
-  --ink: #f5f5f7;
-  --navy: #1d74c4;
-  --paper: #000000;
-  --paper-2: #17171b;
-  --surface: #0c0c0e;
-  --line: #1e1e23;
-  --line-2: #2d2d33;
-  --muted: #a1a1aa;
-  --body: #d4d4d8;
-  --accent: #42b0ff;
+  --ink: #ededef;
+  --navy: #ededef;
+  --paper: #0f0f11;
+  --paper-2: #212126;
+  --surface: #18181b;
+  --line: #27272b;
+  --line-2: #36363c;
+  --muted: #a1a1a9;
+  --body: #d0d0d5;
+  --accent: #7dbdff;
   --danger: #fca5a5;
 }
 
