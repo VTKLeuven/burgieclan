@@ -23,7 +23,7 @@ class FeatureFlagTest extends ApiTestCase
             ->json()
             ->decoded();
 
-        $this->assertSame([Feature::EXAM_RECONSTRUCTIONS->value => false], $features);
+        $this->assertSame([Feature::EXAM_RECONSTRUCTIONS->value => false, Feature::EXCHANGE->value => false], $features);
     }
 
     public function testAnEnabledFeatureIsReported(): void

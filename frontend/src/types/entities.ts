@@ -583,3 +583,81 @@ export interface NotificationFeed {
     mutedCourseIds: number[];
     items: AppNotification[];
 }
+
+/** How an exchange is arranged, from the destination's country. */
+export type ExchangeScheme = 'erasmus' | 'semp' | 'bilateral' | 'belgium';
+
+/** The parts of an exchange report, in the order they are shown. */
+export const EXCHANGE_TOPICS = ['general', 'education', 'housing', 'life', 'transport', 'other'] as const;
+export type ExchangeTopic = typeof EXCHANGE_TOPICS[number];
+
+export interface ExchangeDestination {
+    id: number;
+    name: string;
+    city: string;
+    /** ISO 3166-1 alpha-2. */
+    country: string;
+    scheme: ExchangeScheme;
+    /** Programme codes it is open to; see allPrograms. Empty without allPrograms: nobody knows yet. */
+    programs: string[];
+    /** Open to every programme, as most partners on the faculty's list outside Europe. */
+    allPrograms: boolean;
+    /** Where it comes from: the faculty's lists, the old VTK wiki, or a student. */
+    source: 'faculty' | 'wiki' | 'student';
+    /** False for a destination a student added that waits for a moderator. */
+    approved: boolean;
+    reportCount: number;
+    /** e.g. "2024 - 2025"; null without approved reports. */
+    lastYear: string | null;
+    website: string | null;
+}
+
+export interface ExchangeCourse {
+    name: string;
+    code: string;
+    /** What it was recognised as at KU Leuven. */
+    equivalent: string;
+    text: string;
+}
+
+export interface ExchangeReport {
+    id: number;
+    academicYear: string;
+    phase: string;
+    /** S1, S2 or J (the whole year). */
+    period: string;
+    program: string;
+    sections: Partial<Record<ExchangeTopic, string>>;
+    courses: ExchangeCourse[];
+    /** Only when the author chose to show their name. */
+    author: string | null;
+    /** Only when the author is happy to answer questions. */
+    contactEmail: string | null;
+    /** "Nuttig" per part: a topic, or "course-{index}". */
+    helpful: Record<string, number>;
+    myHelpful: string[];
+    mine: boolean;
+    underReview: boolean;
+}
+
+export interface ExchangeRecent {
+    reportId: number;
+    destination: { id: number; name: string };
+    topic: ExchangeTopic;
+    excerpt: string;
+    academicYear: string;
+    program: string;
+}
+
+export interface ExchangeOverview {
+    destinations: ExchangeDestination[];
+    recent: ExchangeRecent[];
+}
+
+export interface ExchangeDestinationDetail {
+    destination: ExchangeDestination;
+    reports: ExchangeReport[];
+    nearby: ExchangeDestination[];
+    /** The reader's own programme suggestions that still wait for a moderator. */
+    pendingSuggestions: { program: string; action: 'add' | 'remove' }[];
+}

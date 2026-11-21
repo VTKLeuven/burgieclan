@@ -4,6 +4,8 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Repository\DocumentRepository;
+use App\Repository\ExchangeDestinationRepository;
+use App\Repository\ExchangeReportRepository;
 use App\Repository\FaqQuestionRepository;
 use App\Repository\LegacySiteClickRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
@@ -22,6 +24,8 @@ class DashboardController extends AbstractDashboardController
 {
     public function __construct(
         private readonly DocumentRepository $documentRepository,
+        private readonly ExchangeReportRepository $exchangeReportRepository,
+        private readonly ExchangeDestinationRepository $exchangeDestinationRepository,
         private readonly FaqQuestionRepository $faqQuestionRepository,
         private readonly LegacySiteClickRepository $legacySiteClickRepository,
     ) {}
@@ -116,6 +120,28 @@ class DashboardController extends AbstractDashboardController
             $pendingDocumentsMenu->setBadge($amountPending, 'danger');
         }
         yield $documentsMenu;
+        // Moderators review what students share about their exchange, and the universities they add.
+        $exchangeReportsMenu = MenuItem::linkTo(ExchangeReportCrudController::class, 'Reports', 'fa-solid fa-comment-dots');
+        $exchangeDestinationsMenu = MenuItem::linkTo(ExchangeDestinationCrudController::class, 'Destinations', 'fa-solid fa-building-columns');
+        $exchangeSuggestionsMenu = MenuItem::linkTo(ExchangeProgramSuggestionCrudController::class, 'Programme suggestions', 'fa-solid fa-code-pull-request');
+        $exchangeMenu = MenuItem::subMenu('Exchanges', 'fa-solid fa-earth-europe')
+            ->setSubItems([$exchangeReportsMenu, $exchangeDestinationsMenu, $exchangeSuggestionsMenu]);
+        $reportsUnderReview = $this->exchangeReportRepository->countUnderReview();
+        $destinationsUnapproved = $this->exchangeDestinationRepository->countUnapproved();
+        $suggestionsPending = $this->exchangeDestinationRepository->countPendingSuggestions();
+        if ($suggestionsPending > 0) {
+            $exchangeSuggestionsMenu->setBadge($suggestionsPending, 'danger');
+        }
+        if ($reportsUnderReview > 0) {
+            $exchangeReportsMenu->setBadge($reportsUnderReview, 'danger');
+        }
+        if ($destinationsUnapproved > 0) {
+            $exchangeDestinationsMenu->setBadge($destinationsUnapproved, 'danger');
+        }
+        if ($reportsUnderReview + $destinationsUnapproved + $suggestionsPending > 0) {
+            $exchangeMenu->setBadge($reportsUnderReview + $destinationsUnapproved + $suggestionsPending, 'danger');
+        }
+        yield $exchangeMenu;
         yield MenuItem::linkTo(PageCrudController::class, 'Pages', 'fa-solid fa-newspaper')
             ->setPermission(User::ROLE_ADMIN);
         yield MenuItem::linkTo(QuickLinkCrudController::class, 'Quick Links', 'fa-solid fa-link')

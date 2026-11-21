@@ -16,6 +16,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useUser } from '@/components/UserContext';
+import { useFeature } from '@/components/FeaturesContext';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useVtkPolls } from '@/hooks/useVtkPolls';
 import FavoriteButton from '@/components/ui/FavoriteButton';
@@ -27,6 +28,7 @@ import {
     CalendarDays,
     ChevronsUpDown,
     CircleHelp,
+    Earth,
     ExternalLink,
     GraduationCap,
     House,
@@ -171,6 +173,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
 }) {
     const { t, i18n } = useTranslation();
     const { user, isAdmin } = useUser();
+    const exchangeOn = useFeature('exchange');
     const router = useRouter();
     const path = stripLocale(usePathname());
     const { course: currentCourse } = useCurriculumLocation();
@@ -289,6 +292,15 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                         label={t('study_planner.nav')}
                         active={shownActive('/planner', isActive('/planner'))}
                         onNavigate={follow('/planner')}
+                    />
+                )}
+                {user && exchangeOn && (
+                    <NavItem
+                        href="/exchange"
+                        icon={<Earth />}
+                        label={t('exchange.nav')}
+                        active={shownActive('/exchange', isActive('/exchange'))}
+                        onNavigate={follow('/exchange')}
                     />
                 )}
                 {user && (

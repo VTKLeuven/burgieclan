@@ -3,11 +3,11 @@
 import { captureException } from '@sentry/nextjs';
 
 /** The admin's feature switches (backend App\Constants\Feature), keyed by name. */
-export type Feature = 'exam_reconstructions';
+export type Feature = 'exam_reconstructions' | 'exchange';
 export type Features = Record<Feature, boolean>;
 
 /** What a page sees when the switches cannot be read: everything off, like a feature without a row. */
-const ALL_OFF: Features = { exam_reconstructions: false };
+const ALL_OFF: Features = { exam_reconstructions: false, exchange: false };
 
 /**
  * Reads which features are switched on. Public on the backend, so no token is needed; uncached,

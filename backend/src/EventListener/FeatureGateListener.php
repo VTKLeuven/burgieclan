@@ -28,6 +28,9 @@ class FeatureGateListener
             'api_exam_image_',
             'exam_image_signed',
         ],
+        Feature::EXCHANGE->value => [
+            'api_exchange_',
+        ],
     ];
 
     public function __construct(private readonly FeatureFlags $flags) {}

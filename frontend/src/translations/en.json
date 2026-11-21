@@ -1168,5 +1168,309 @@
             "POLL_TOO_LONG": "Not sent: your answer to the open question is too long.",
             "failed": "Not sent: vtk.be could not be reached. Please try again."
         }
+    },
+    "exchange": {
+        "nav": "Exchanges",
+        "title": "Exchanges",
+        "tabs": {
+            "erasmus": "Erasmus",
+            "short": "Shorter stays abroad"
+        },
+        "share": "Share your experience",
+        "info": {
+            "button": "How does this page work?",
+            "title": "How does this page work?",
+            "read": "Read what students who already went on exchange say about their destination: the courses, finding a room, life there.",
+            "programme": "Pick your programme to see the destinations the faculty recommends for your master. Others are possible too, but talk them over with your exchange coordinator.",
+            "share": "Been away yourself? Write about whatever you like, every topic is optional. A moderator reads your report before it goes online.",
+            "private": "Your name and e-mail address only show if you switch that on yourself."
+        },
+        "overview": {
+            "intro": "What students who already went on exchange say about their destination, and what you need to know to go yourself.",
+            "destinations": "Destinations",
+            "count_one": "{{count}} destination",
+            "count_other": "{{count}} destinations",
+            "program": "Programme",
+            "all": "All",
+            "search": "Search a university, city or country",
+            "only_reports": "Only with experiences",
+            "program_hint": "The faculty's preferred destinations for {{program}}. Others are possible too, in consultation with your exchange coordinator. Your choice is remembered.",
+            "empty": "No destinations for these filters.",
+            "clear": "Clear filters",
+            "reports_one": "{{count}} experience",
+            "reports_other": "{{count}} experiences",
+            "no_reports": "No experiences yet",
+            "last": "latest {{year}}",
+            "all_programs": "All programmes",
+            "pending": "Awaiting review",
+            "recent": "Recently shared",
+            "recent_hint": "From the reports of students who went",
+            "load_failed": "The destinations could not be loaded. Please try again later.",
+            "unknown_programs": "Programmes unknown",
+            "from_wiki": "from the old wiki"
+        },
+        "scheme": {
+            "erasmus": "Erasmus+",
+            "semp": "SEMP",
+            "bilateral": "Outside Europe",
+            "belgium": "Belgium"
+        },
+        "scheme_hint": {
+            "erasmus": "Exchange within Erasmus+, with an Erasmus grant.",
+            "semp": "Switzerland is not part of Erasmus+; its grant is called SEMP.",
+            "bilateral": "Through an agreement between the faculty and the university, with a limited number of grants.",
+            "belgium": "Exchange within Belgium."
+        },
+        "round": {
+            "title": "On exchange in {{from}}–{{to}}",
+            "intro": "This is how applying through the faculty works.",
+            "now": "Now",
+            "steps": {
+                "info": {
+                    "title": "Info session",
+                    "text": "During Go Global week, with an info market and questions per master.",
+                    "when": "Nov {{year}}"
+                },
+                "choose": {
+                    "title": "Choose a destination",
+                    "text": "Look at the courses and discuss your choice with your exchange coordinator. Applications without that talk are not considered.",
+                    "when": "Nov – Feb"
+                },
+                "apply": {
+                    "title": "Apply online",
+                    "text": "At set.kuleuven.be/exchange, with a motivation letter and a signed declaration of intent.",
+                    "when": "15 Feb {{year}}"
+                },
+                "decision": {
+                    "title": "Decision",
+                    "text": "The faculty board tells you by e-mail which destination you get.",
+                    "when": "March {{year}}"
+                },
+                "host": {
+                    "title": "Apply at the host university",
+                    "text": "Your coordinator passes on the procedure. Outside Europe you also request a study period abroad in KU Loket.",
+                    "when": "March – June"
+                },
+                "agreement": {
+                    "title": "Learning agreement",
+                    "text": "30 credits per semester, 60 for a year. Compulsory courses are replaced by similar courses there.",
+                    "when": "before leaving"
+                },
+                "leave": {
+                    "title": "Departure",
+                    "text": "For one semester or a whole year.",
+                    "when": "Sep {{year}} or Feb {{next}}"
+                }
+            },
+            "requirements": "Requirements",
+            "req_master": "You go during your master, in the first or second year.",
+            "req_bachelor": "You have your bachelor's degree before you leave.",
+            "req_grade": "Your average is at least 60%, 70% for Global E3.",
+            "req_priority": "Students who have not studied abroad before get priority.",
+            "links": "Useful links",
+            "link": {
+                "procedure": "The faculty's procedure",
+                "application": "Online application",
+                "preferred": "Preferred destinations per master",
+                "outside": "Partners outside Europe",
+                "contacts": "Exchange coordinators",
+                "erasmus_grant": "Erasmus+ grant",
+                "exchange_grants": "Grants outside Europe",
+                "go_global": "Go Global week",
+                "global_e3": "Global E3",
+                "double_degree": "Double degree",
+                "discord": "FirW exchanges Discord"
+            },
+            "contact": "Questions for the faculty:"
+        },
+        "destination": {
+            "by_topic": "By topic",
+            "courses": "Courses",
+            "reports": "Reports",
+            "not_found": "This destination does not exist (anymore).",
+            "back": "Back to the destinations",
+            "load_failed": "This destination could not be loaded. Please try again later.",
+            "properties": "Properties",
+            "country": "Country",
+            "city": "City",
+            "scheme": "Programme",
+            "programs": "Programmes",
+            "reports_label": "Experiences",
+            "reports_none": "none yet",
+            "website": "Website",
+            "nearby": "Also in {{country}}",
+            "empty_title": "No experiences about {{name}} yet",
+            "empty_text": "Did you go on exchange in {{city}}? Help the next students with a short report. You choose which topics to fill in.",
+            "topic_empty": "Nobody wrote about this yet.",
+            "fill_in": "Add",
+            "helpful": "Helpful",
+            "helpful_label": "Mark as helpful",
+            "contact": "Ask a question",
+            "contactable": "Happy to answer questions",
+            "under_review": "Awaiting review",
+            "under_review_hint": "Only you see this report until a moderator reviews it.",
+            "delete": "Delete",
+            "delete_confirm": "Really delete?",
+            "delete_failed": "Deleting failed.",
+            "courses_intro": "Courses students took here and what they were recognised as. Handy for your learning agreement.",
+            "course_host": "Course",
+            "course_equivalent": "Recognised as",
+            "course_who": "Who",
+            "course_opinion": "Opinion",
+            "recognised_as": "Recognised as",
+            "courses_empty": "No courses shared yet.",
+            "topics_of": "{{count}} of {{total}} topics",
+            "unapproved": "You added this destination. It is listed once a moderator has reviewed it.",
+            "wiki_hint": "This destination was on the old VTK wiki (2023) but is not on the faculty's current list. It may no longer be a partner: check with your exchange coordinator.",
+            "programs_wrong": "Not right?",
+            "programs_unknown": "Not known yet",
+            "contacts": "Students you can contact"
+        },
+        "topics": {
+            "general": {
+                "name": "General",
+                "prompt": "Language, paperwork, arriving"
+            },
+            "education": {
+                "name": "Education",
+                "prompt": "Classes, exams, guidance, level"
+            },
+            "housing": {
+                "name": "Housing",
+                "prompt": "Finding a room, prices, neighbourhood"
+            },
+            "life": {
+                "name": "Life",
+                "prompt": "The city, student associations, going out, trips"
+            },
+            "transport": {
+                "name": "Transport",
+                "prompt": "Getting there and back, getting around"
+            },
+            "other": {
+                "name": "Other",
+                "prompt": "Phone, bank account, grant, tips"
+            }
+        },
+        "programs": {
+            "ARCH": "Architecture",
+            "AI": "Artificial Intelligence",
+            "BMT": "Biomedical Engineering",
+            "BWK": "Civil Engineering",
+            "CIT": "Chemical Engineering",
+            "CW": "Computer Science",
+            "ELT": "Electrical Engineering",
+            "ENE": "Energy",
+            "MTK": "Materials Engineering",
+            "MSCE": "Mobility and Supply Chain Engineering",
+            "NANO": "Nanotechnology",
+            "WIT": "Mathematical Engineering",
+            "WTK": "Mechanical Engineering"
+        },
+        "period": {
+            "S1": "S1",
+            "S2": "S2",
+            "J": "Year"
+        },
+        "period_long": {
+            "S1": "First semester",
+            "S2": "Second semester",
+            "J": "Whole year"
+        },
+        "form": {
+            "title": "Share your experience",
+            "intro": "Write about whatever you like, every topic is optional. Your report goes online once a moderator has reviewed it.",
+            "destination": "Destination",
+            "choose_destination": "Choose your destination",
+            "other_destination": "My university is not in the list",
+            "new_name": "Name of the university",
+            "new_city": "City",
+            "new_country": "Country",
+            "choose_country": "Choose a country",
+            "program": "Programme",
+            "year": "Academic year",
+            "phase": "Phase",
+            "period": "Period",
+            "topics": "Topics",
+            "courses": "Courses",
+            "courses_hint": "Which courses did you take there, and what were they recognised as?",
+            "course_name": "Course at the host university",
+            "course_code": "Code",
+            "course_equivalent": "Recognised as (KU Leuven)",
+            "course_text": "What did you think of it?",
+            "add_course": "Add a course",
+            "remove_course": "Remove course",
+            "contactable": "I'm happy to answer questions",
+            "contactable_hint": "Signed-in students then see your e-mail address with your report.",
+            "show_name": "Show my name",
+            "show_name_hint": "Otherwise only your programme, phase and year are shown.",
+            "cancel": "Cancel",
+            "submit": "Submit",
+            "submitting": "Submitting…",
+            "sent": "Thanks! Your report goes online once a moderator has reviewed it.",
+            "errors": {
+                "destination": "Choose a destination, or fill in the name, city and country of your university.",
+                "empty": "Write about at least one topic or course.",
+                "rate": "You shared a lot of reports today. Please try again tomorrow.",
+                "failed": "Submitting failed. {{detail}}",
+                "program": "Choose your programme."
+            }
+        },
+        "short": {
+            "intro": "Not ready for a whole semester away? These are the shorter ways to study or work abroad.",
+            "more": "More on the faculty's website",
+            "athens": {
+                "title": "ATHENS week",
+                "text": "An intensive one-week course at one of 21 European partner universities, with classes and an exam. It counts towards your master.",
+                "facts": "1 week · 30 hours of classes + exam · 3 credits · November or March",
+                "note": "Once per master."
+            },
+            "best": {
+                "title": "BEST Courses",
+                "text": "Short courses all over Europe, organised by local BEST groups, together with about twenty other STEM students. Accommodation, food and activities are included in the price.",
+                "facts": "1–2 weeks · around €70–90 · apply per season",
+                "note": "You apply for up to three courses per season, with a motivation letter, and are accepted for one."
+            },
+            "summer": {
+                "title": "Summer and winter schools",
+                "text": "Intensive programmes at universities all over the world. With prior approval from your programme director they count for 3 credits (Capita Selecta H0V03A or H0V04A).",
+                "facts": "A few weeks · 3 credits possible · no grant",
+                "note": "You register at the host university and request a study period abroad in KU Loket."
+            },
+            "internship": {
+                "title": "Internship or thesis abroad",
+                "text": "An internship or your master's thesis abroad is possible, from a few weeks to several months. Talk it over in time with your internship coordinator or supervisor.",
+                "facts": "A few weeks to several months",
+                "note": "IAESTE arranges technical internships abroad for students of Belgian universities. HUMASOL and AIESEC offer internships too."
+            },
+            "south": {
+                "title": "Going South",
+                "text": "Projects, internships and theses in the Global South, with travel grants from KU Leuven.",
+                "facts": "Travel grants possible",
+                "note": ""
+            },
+            "link": {
+                "athens": "ATHENS at the faculty",
+                "best": "List of BEST Courses",
+                "summer": "Summer schools at the faculty",
+                "internships": "Internship and thesis abroad",
+                "iaeste": "IAESTE Belgium",
+                "humasol": "HUMASOL",
+                "aiesec": "AIESEC",
+                "south": "Going South",
+                "travel_grants": "Travel grants"
+            }
+        },
+        "suggest": {
+            "title": "Change programmes",
+            "intro": "Tick the programmes you can go to {{name}} with. A moderator reviews your suggestion before the list changes.",
+            "note": "Explanation (optional)",
+            "note_placeholder": "E.g. no longer on the faculty's list for 2027–2028",
+            "submit": "Send suggestion",
+            "nothing": "You have not changed anything yet.",
+            "sent": "Thanks! A moderator will review your suggestion.",
+            "failed": "Sending failed. {{detail}}",
+            "pending": "Your suggestion awaits review: {{changes}}"
+        }
     }
 }

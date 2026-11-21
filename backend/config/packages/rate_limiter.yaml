@@ -46,3 +46,21 @@ framework:
             policy: sliding_window
             limit: 240
             interval: '1 minute'
+
+        # Sharing an exchange report (ExchangeController::create). Each one waits for a moderator.
+        exchange_report:
+            policy: sliding_window
+            limit: 5
+            interval: '1 day'
+
+        # "Nuttig" on exchange reports, on and off (ExchangeController::helpful).
+        exchange_helpful:
+            policy: sliding_window
+            limit: 120
+            interval: '1 minute'
+
+        # Suggesting that a destination is (no longer) open to a programme (ExchangeController::suggestPrograms).
+        exchange_suggestion:
+            policy: sliding_window
+            limit: 20
+            interval: '1 day'

@@ -1168,5 +1168,309 @@
             "POLL_TOO_LONG": "Niet verstuurd: je antwoord op de open vraag is te lang.",
             "failed": "Niet verstuurd: vtk.be was niet te bereiken. Probeer het opnieuw."
         }
+    },
+    "exchange": {
+        "nav": "Uitwisselingen",
+        "title": "Uitwisselingen",
+        "tabs": {
+            "erasmus": "Erasmus",
+            "short": "Korter naar het buitenland"
+        },
+        "share": "Deel je ervaring",
+        "info": {
+            "button": "Hoe werkt deze pagina?",
+            "title": "Hoe werkt deze pagina?",
+            "read": "Hier lees je wat studenten die al op uitwisseling waren vertellen over hun bestemming: de vakken, een kot zoeken, het leven daar.",
+            "programme": "Kies je richting om de bestemmingen te zien die de faculteit voor jouw master aanraadt. Andere kunnen ook, maar bespreek dat met je uitwisselingscoördinator.",
+            "share": "Ben je zelf weggeweest? Schrijf over wat je wil, elk onderwerp is optioneel. Een moderator kijkt je verslag na voor het online komt.",
+            "private": "Je naam en je e-mailadres staan er enkel bij als je dat zelf aanzet."
+        },
+        "overview": {
+            "intro": "Wat studenten die al op uitwisseling waren vertellen over hun bestemming, en wat je moet weten om zelf te gaan.",
+            "destinations": "Bestemmingen",
+            "count_one": "{{count}} bestemming",
+            "count_other": "{{count}} bestemmingen",
+            "program": "Richting",
+            "all": "Alle",
+            "search": "Zoek een universiteit, stad of land",
+            "only_reports": "Enkel met ervaringen",
+            "program_hint": "Voorkeursbestemmingen van de faculteit voor {{program}}. Andere kunnen ook, in overleg met je uitwisselingscoördinator. Je keuze wordt onthouden.",
+            "empty": "Geen bestemmingen voor deze filters.",
+            "clear": "Filters wissen",
+            "reports_one": "{{count}} ervaring",
+            "reports_other": "{{count}} ervaringen",
+            "no_reports": "Nog geen ervaringen",
+            "last": "laatst {{year}}",
+            "all_programs": "Alle richtingen",
+            "pending": "Wacht op nazicht",
+            "recent": "Laatst gedeeld",
+            "recent_hint": "Uit de verslagen van studenten die al weg waren",
+            "load_failed": "De bestemmingen konden niet geladen worden. Probeer het later opnieuw.",
+            "unknown_programs": "Richtingen onbekend",
+            "from_wiki": "uit de oude wiki"
+        },
+        "scheme": {
+            "erasmus": "Erasmus+",
+            "semp": "SEMP",
+            "bilateral": "Buiten Europa",
+            "belgium": "België"
+        },
+        "scheme_hint": {
+            "erasmus": "Uitwisseling binnen Erasmus+, met een Erasmusbeurs.",
+            "semp": "Zwitserland doet niet mee aan Erasmus+; de beurs heet hier SEMP.",
+            "bilateral": "Via een akkoord tussen de faculteit en de universiteit, met een beperkt aantal beurzen.",
+            "belgium": "Uitwisseling binnen België."
+        },
+        "round": {
+            "title": "Op uitwisseling in {{from}}–{{to}}",
+            "intro": "Zo verloopt een aanvraag bij de faculteit.",
+            "now": "Nu",
+            "steps": {
+                "info": {
+                    "title": "Infosessie",
+                    "text": "Tijdens de Go Global-week, met een infomarkt en vragen per master.",
+                    "when": "nov {{year}}"
+                },
+                "choose": {
+                    "title": "Bestemming kiezen",
+                    "text": "Bekijk de vakken en bespreek je keuze met je uitwisselingscoördinator. Zonder dat gesprek wordt je aanvraag niet bekeken.",
+                    "when": "nov – feb"
+                },
+                "apply": {
+                    "title": "Online aanvragen",
+                    "text": "Op set.kuleuven.be/exchange, met een motivatiebrief en een ondertekende intentieverklaring.",
+                    "when": "15 feb {{year}}"
+                },
+                "decision": {
+                    "title": "Beslissing",
+                    "text": "De faculteitsraad laat per mail weten welke bestemming je krijgt.",
+                    "when": "maart {{year}}"
+                },
+                "host": {
+                    "title": "Inschrijven aan de gastuniversiteit",
+                    "text": "Je coördinator stuurt de procedure door. Buiten Europa vraag je ook een studieverblijf in het buitenland aan in KU Loket.",
+                    "when": "maart – juni"
+                },
+                "agreement": {
+                    "title": "Learning agreement",
+                    "text": "30 studiepunten per semester, 60 voor een jaar. Verplichte vakken vervang je door gelijkaardige vakken daar.",
+                    "when": "voor vertrek"
+                },
+                "leave": {
+                    "title": "Vertrek",
+                    "text": "Voor een semester of een heel jaar.",
+                    "when": "sep {{year}} of feb {{next}}"
+                }
+            },
+            "requirements": "Voorwaarden",
+            "req_master": "Je gaat in je master, in het eerste of tweede jaar.",
+            "req_bachelor": "Je bachelordiploma heb je behaald voor je vertrekt.",
+            "req_grade": "Je haalde gemiddeld minstens 60%, voor Global E3 70%.",
+            "req_priority": "Wie nog niet in het buitenland studeerde, krijgt voorrang.",
+            "links": "Handige links",
+            "link": {
+                "procedure": "Procedure van de faculteit",
+                "application": "Online aanvraag",
+                "preferred": "Voorkeursbestemmingen per master",
+                "outside": "Partners buiten Europa",
+                "contacts": "Uitwisselingscoördinatoren",
+                "erasmus_grant": "Erasmus+-beurs",
+                "exchange_grants": "Beurzen buiten Europa",
+                "go_global": "Go Global-week",
+                "global_e3": "Global E3",
+                "double_degree": "Dubbel diploma",
+                "discord": "Discord Uitwisselingen FirW"
+            },
+            "contact": "Vragen voor de faculteit:"
+        },
+        "destination": {
+            "by_topic": "Per onderwerp",
+            "courses": "Vakken",
+            "reports": "Verslagen",
+            "not_found": "Deze bestemming bestaat niet (meer).",
+            "back": "Terug naar de bestemmingen",
+            "load_failed": "Deze bestemming kon niet geladen worden. Probeer het later opnieuw.",
+            "properties": "Eigenschappen",
+            "country": "Land",
+            "city": "Stad",
+            "scheme": "Programma",
+            "programs": "Richtingen",
+            "reports_label": "Ervaringen",
+            "reports_none": "nog geen",
+            "website": "Website",
+            "nearby": "Ook in {{country}}",
+            "empty_title": "Nog geen ervaringen over {{name}}",
+            "empty_text": "Ben je in {{city}} op uitwisseling geweest? Help de volgende studenten met een kort verslag. Je kiest zelf welke onderwerpen je invult.",
+            "topic_empty": "Nog niemand schreef hierover.",
+            "fill_in": "Vul aan",
+            "helpful": "Nuttig",
+            "helpful_label": "Duid aan als nuttig",
+            "contact": "Stel een vraag",
+            "contactable": "Beantwoordt graag vragen",
+            "under_review": "Wacht op nazicht",
+            "under_review_hint": "Enkel jij ziet dit verslag tot een moderator het nakijkt.",
+            "delete": "Verwijderen",
+            "delete_confirm": "Echt verwijderen?",
+            "delete_failed": "Verwijderen lukte niet.",
+            "courses_intro": "Vakken die studenten hier volgden en waarvoor ze erkend werden. Handig voor je learning agreement.",
+            "course_host": "Vak",
+            "course_equivalent": "Erkend als",
+            "course_who": "Wie",
+            "course_opinion": "Mening",
+            "recognised_as": "Erkend als",
+            "courses_empty": "Nog geen vakken gedeeld.",
+            "topics_of": "{{count}} van {{total}} onderwerpen",
+            "unapproved": "Jij voegde deze bestemming toe. Ze staat in de lijst zodra een moderator ze nakijkt.",
+            "wiki_hint": "Deze bestemming stond op de oude VTK-wiki (2023), maar niet op de huidige lijst van de faculteit. Ze is misschien geen partner meer: vraag het na bij je uitwisselingscoördinator.",
+            "programs_wrong": "Klopt dit niet?",
+            "programs_unknown": "Nog niet bekend",
+            "contacts": "Studenten die je kan contacteren"
+        },
+        "topics": {
+            "general": {
+                "name": "Algemeen",
+                "prompt": "Taal, administratie, aankomst"
+            },
+            "education": {
+                "name": "Onderwijs",
+                "prompt": "Lessen, examens, begeleiding, niveau"
+            },
+            "housing": {
+                "name": "Wonen",
+                "prompt": "Een kot zoeken, prijzen, buurt"
+            },
+            "life": {
+                "name": "Leven",
+                "prompt": "De stad, verenigingen, uitgaan, uitstappen"
+            },
+            "transport": {
+                "name": "Transport",
+                "prompt": "Heen en terug, je verplaatsen ter plekke"
+            },
+            "other": {
+                "name": "Andere",
+                "prompt": "Gsm, bankrekening, beurs, tips"
+            }
+        },
+        "programs": {
+            "ARCH": "Architectuur",
+            "AI": "Artificiële intelligentie",
+            "BMT": "Biomedische technologie",
+            "BWK": "Bouwkunde",
+            "CIT": "Chemische technologie",
+            "CW": "Computerwetenschappen",
+            "ELT": "Elektrotechniek",
+            "ENE": "Energie",
+            "MTK": "Materiaalkunde",
+            "MSCE": "Mobility and Supply Chain Engineering",
+            "NANO": "Nanotechnologie",
+            "WIT": "Wiskundige ingenieurstechnieken",
+            "WTK": "Werktuigkunde"
+        },
+        "period": {
+            "S1": "S1",
+            "S2": "S2",
+            "J": "Jaar"
+        },
+        "period_long": {
+            "S1": "Eerste semester",
+            "S2": "Tweede semester",
+            "J": "Volledig jaar"
+        },
+        "form": {
+            "title": "Deel je ervaring",
+            "intro": "Schrijf over wat je wil, elk onderwerp is optioneel. Je verslag komt online nadat een moderator het nagekeken heeft.",
+            "destination": "Bestemming",
+            "choose_destination": "Kies je bestemming",
+            "other_destination": "Mijn universiteit staat er niet tussen",
+            "new_name": "Naam van de universiteit",
+            "new_city": "Stad",
+            "new_country": "Land",
+            "choose_country": "Kies een land",
+            "program": "Richting",
+            "year": "Academiejaar",
+            "phase": "Fase",
+            "period": "Periode",
+            "topics": "Onderwerpen",
+            "courses": "Vakken",
+            "courses_hint": "Welke vakken volgde je daar, en waarvoor werden ze erkend?",
+            "course_name": "Vak aan de gastuniversiteit",
+            "course_code": "Code",
+            "course_equivalent": "Erkend als (KU Leuven)",
+            "course_text": "Wat vond je ervan?",
+            "add_course": "Vak toevoegen",
+            "remove_course": "Vak verwijderen",
+            "contactable": "Ik beantwoord graag vragen",
+            "contactable_hint": "Ingelogde studenten zien dan je e-mailadres bij je verslag.",
+            "show_name": "Toon mijn naam",
+            "show_name_hint": "Anders staat er enkel je richting, fase en jaar bij.",
+            "cancel": "Annuleren",
+            "submit": "Insturen",
+            "submitting": "Bezig…",
+            "sent": "Bedankt! Je verslag staat online zodra een moderator het nagekeken heeft.",
+            "errors": {
+                "destination": "Kies een bestemming, of vul de naam, stad en het land van je universiteit in.",
+                "empty": "Schrijf over minstens één onderwerp of vak.",
+                "rate": "Je deelde vandaag al veel verslagen. Probeer het morgen opnieuw.",
+                "failed": "Insturen lukte niet. {{detail}}",
+                "program": "Kies je richting."
+            }
+        },
+        "short": {
+            "intro": "Niet meteen een heel semester weg? Dit zijn de kortere manieren om in het buitenland te studeren of te werken.",
+            "more": "Meer op de site van de faculteit",
+            "athens": {
+                "title": "ATHENS-week",
+                "text": "Een intensief vak van een week aan een van de 21 Europese partneruniversiteiten, met les en examen. Het telt mee in je master.",
+                "facts": "1 week · 30 uur les + examen · 3 studiepunten · november of maart",
+                "note": "Eén keer per master."
+            },
+            "best": {
+                "title": "BEST Courses",
+                "text": "Korte vakken in heel Europa, georganiseerd door de lokale BEST-groepen, samen met ongeveer twintig andere STEM-studenten. Logement, eten en activiteiten zitten in de prijs.",
+                "facts": "1–2 weken · rond €70–90 · kandidaat stellen per seizoen",
+                "note": "Je stelt je kandidaat voor maximaal drie courses per seizoen, met een motivatiebrief, en wordt voor één toegelaten."
+            },
+            "summer": {
+                "title": "Summer en winter schools",
+                "text": "Intensieve programma's van universiteiten over de hele wereld. Met goedkeuring vooraf van je programmadirecteur tellen ze voor 3 studiepunten (Capita Selecta H0V03A of H0V04A).",
+                "facts": "Enkele weken · 3 studiepunten mogelijk · geen beurs",
+                "note": "Je schrijft je in bij de gastuniversiteit en vraagt een studieverblijf in het buitenland aan in KU Loket."
+            },
+            "internship": {
+                "title": "Stage of masterproef in het buitenland",
+                "text": "Een stage of je masterproef in het buitenland kan, van enkele weken tot enkele maanden. Bespreek het op tijd met je stagecoördinator of promotor.",
+                "facts": "Enkele weken tot maanden",
+                "note": "IAESTE bemiddelt technische stages in het buitenland voor studenten van Belgische universiteiten. HUMASOL en AIESEC hebben ook stages."
+            },
+            "south": {
+                "title": "Naar het Zuiden",
+                "text": "Projecten, stages en masterproeven in het Zuiden, met reisbeurzen van de KU Leuven.",
+                "facts": "Reisbeurzen mogelijk",
+                "note": ""
+            },
+            "link": {
+                "athens": "ATHENS bij de faculteit",
+                "best": "Lijst van BEST Courses",
+                "summer": "Summer schools bij de faculteit",
+                "internships": "Stage en masterproef in het buitenland",
+                "iaeste": "IAESTE België",
+                "humasol": "HUMASOL",
+                "aiesec": "AIESEC",
+                "south": "Naar het Zuiden",
+                "travel_grants": "Reisbeurzen"
+            }
+        },
+        "suggest": {
+            "title": "Richtingen aanpassen",
+            "intro": "Duid aan voor welke richtingen je naar {{name}} kan. Een moderator kijkt je voorstel na voor de lijst verandert.",
+            "note": "Toelichting (optioneel)",
+            "note_placeholder": "Bv. staat niet meer in de lijst van de faculteit voor 2027–2028",
+            "submit": "Voorstel insturen",
+            "nothing": "Je hebt nog niets veranderd.",
+            "sent": "Bedankt! Een moderator kijkt je voorstel na.",
+            "failed": "Insturen lukte niet. {{detail}}",
+            "pending": "Jouw voorstel wacht op nazicht: {{changes}}"
+        }
     }
 }

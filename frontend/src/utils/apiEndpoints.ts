@@ -38,6 +38,9 @@ export const apiEndpoints = {
     vtkPolls: (lang: string) => `/api/vtk_polls?locale=${lang}`,
     /** The signed-in user's notifications about the courses they follow. Never cached. */
     notifications: () => '/api/notifications',
+    /** Every exchange destination with its number of reports, and the latest reports. */
+    exchange: () => '/api/exchange',
+    exchangeDestination: (id: number | string) => `/api/exchange/destinations/${id}`,
 
     /**
      * The announcements showing now. The time is rounded down to five minutes (Brussels time,

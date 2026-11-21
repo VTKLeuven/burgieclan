@@ -9,6 +9,13 @@ import {
     type DocumentComment,
     type DocumentView,
     type Exam,
+    EXCHANGE_TOPICS,
+    type ExchangeDestination,
+    type ExchangeDestinationDetail,
+    type ExchangeOverview,
+    type ExchangeRecent,
+    type ExchangeReport,
+    type ExchangeScheme,
     type ExamQuestionComment,
     type ExamQuestionSearchHit,
     type ExamQuestionStats,
@@ -755,5 +762,90 @@ export function convertToNotificationFeed(value: unknown): NotificationFeed {
         unreadCount: num(data.unreadCount),
         mutedCourseIds: (asArray(data.mutedCourseIds) ?? []).filter((id): id is number => typeof id === 'number'),
         items,
+    };
+}
+
+const EXCHANGE_SCHEMES: ExchangeScheme[] = ['erasmus', 'semp', 'bilateral', 'belgium'];
+const stringList = (value: unknown): string[] => (Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []);
+
+function convertToExchangeDestination(value: unknown): ExchangeDestination {
+    const data = toRecord(value, 'ExchangeDestination');
+    return {
+        id: num(data.id),
+        name: str(data.name),
+        city: str(data.city),
+        country: str(data.country),
+        scheme: EXCHANGE_SCHEMES.find((scheme) => scheme === data.scheme) ?? 'erasmus',
+        programs: stringList(data.programs),
+        allPrograms: data.allPrograms === true,
+        source: data.source === 'wiki' || data.source === 'student' ? data.source : 'faculty',
+        approved: data.approved !== false,
+        reportCount: num(data.reportCount),
+        lastYear: typeof data.lastYear === 'string' ? data.lastYear : null,
+        website: typeof data.website === 'string' ? data.website : null,
+    };
+}
+
+function convertToExchangeReport(value: unknown): ExchangeReport {
+    const data = toRecord(value, 'ExchangeReport');
+    const sectionsRaw = data.sections && typeof data.sections === 'object' ? data.sections as ApiRecord : {};
+    const sections: ExchangeReport['sections'] = {};
+    for (const topic of EXCHANGE_TOPICS) {
+        const text = sectionsRaw[topic];
+        if (typeof text === 'string' && text.trim() !== '') sections[topic] = text;
+    }
+    const helpfulRaw = data.helpful && typeof data.helpful === 'object' ? data.helpful as ApiRecord : {};
+
+    return {
+        id: num(data.id),
+        academicYear: str(data.academicYear),
+        phase: str(data.phase),
+        period: str(data.period),
+        program: str(data.program),
+        sections,
+        courses: records(data.courses).map((course) => ({
+            name: str(course.name),
+            code: str(course.code),
+            equivalent: str(course.equivalent),
+            text: str(course.text),
+        })),
+        author: typeof data.author === 'string' ? data.author : null,
+        contactEmail: typeof data.contactEmail === 'string' ? data.contactEmail : null,
+        helpful: Object.fromEntries(Object.entries(helpfulRaw).map(([part, count]) => [part, num(count)])),
+        myHelpful: stringList(data.myHelpful),
+        mine: data.mine === true,
+        underReview: data.underReview === true,
+    };
+}
+
+export function convertToExchangeOverview(value: unknown): ExchangeOverview {
+    const data = toRecord(value, 'ExchangeOverview');
+    return {
+        destinations: records(data.destinations).map(convertToExchangeDestination),
+        recent: records(data.recent).flatMap((item): ExchangeRecent[] => {
+            const topic = EXCHANGE_TOPICS.find((known) => known === item.topic);
+            const destination = item.destination && typeof item.destination === 'object' ? item.destination as ApiRecord : null;
+            if (!topic || !destination) return [];
+            return [{
+                reportId: num(item.reportId),
+                destination: { id: num(destination.id), name: str(destination.name) },
+                topic,
+                excerpt: str(item.excerpt),
+                academicYear: str(item.academicYear),
+                program: str(item.program),
+            }];
+        }),
+    };
+}
+
+export function convertToExchangeDestinationDetail(value: unknown): ExchangeDestinationDetail {
+    const data = toRecord(value, 'ExchangeDestinationDetail');
+    return {
+        destination: convertToExchangeDestination(data.destination),
+        reports: records(data.reports).map(convertToExchangeReport),
+        nearby: records(data.nearby).map(convertToExchangeDestination),
+        pendingSuggestions: records(data.pendingSuggestions).flatMap((item) => (
+            item.action === 'add' || item.action === 'remove' ? [{ program: str(item.program), action: item.action }] : []
+        )),
     };
 }

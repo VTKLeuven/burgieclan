@@ -11,7 +11,12 @@
 
 namespace App\DataFixtures;
 
+use App\Constants\Feature;
 use App\Entity\Course;
+use App\Entity\ExchangeDestination;
+use App\Entity\ExchangeProgramSuggestion;
+use App\Entity\ExchangeReport;
+use App\Entity\FeatureFlag;
 use App\Entity\FaqQuestion;
 use App\Entity\User;
 use App\Factory\AnnouncementFactory;
@@ -32,6 +37,7 @@ use App\Factory\ProgramFactory;
 use App\Factory\QuickLinkFactory;
 use App\Factory\TagFactory;
 use App\Factory\UserDocumentViewFactory;
+use App\Service\Exchange\ExchangeDestinationCatalog;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -40,6 +46,7 @@ final class AppFixtures extends Fixture
 {
     public function __construct(
         private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly ExchangeDestinationCatalog $exchangeDestinations,
     ) {}
 
     public function load(ObjectManager $manager): void
@@ -79,6 +86,54 @@ final class AppFixtures extends Fixture
         CourseCommentVoteFactory::createSequence($uniqueCourseCommentVotes);
 
         $this->linkRelatedCourses($manager);
+        $this->loadExchange($manager);
+    }
+
+    /**
+     * The exchange destinations, switched on, with one report, one that still waits for review and
+     * a programme suggestion, so the pages and the admin have something to show. The old wiki's
+     * reports are not here: they hold names and addresses and stay out of the repository
+     * (`app:exchange:import-wiki`).
+     */
+    private function loadExchange(ObjectManager $manager): void
+    {
+        $this->exchangeDestinations->seed();
+        $manager->persist(new FeatureFlag(Feature::EXCHANGE, true));
+
+        $destinations = $manager->getRepository(ExchangeDestination::class);
+        $delft = $destinations->findOneBy(['name' => 'TU Delft']);
+        $ntnu = $destinations->findOneBy(['name' => 'NTNU']);
+        $john = $this->getReference('john_user', User::class);
+        $jane = $this->getReference('jane_admin', User::class);
+        if (null === $delft || null === $ntnu) {
+            return;
+        }
+
+        $manager->persist(
+            (new ExchangeReport($delft, $john))
+                ->setAcademicYear('2024 - 2025')->setPhase('M1')->setPeriod('S2')->setProgram('MSCE')
+                ->setContactable(true)
+                ->setShowName(true)
+                ->setUnderReview(false)
+                ->setSections(
+                    [
+                    'general' => 'Voorbeeldverslag uit de fixtures. Delft is vlakbij, dus je gaat makkelijk eens naar huis.',
+                    'housing' => 'Via DUWO, en begin op tijd: de wachtlijst is lang.',
+                    ]
+                )
+                ->setCourses([['name' => 'Transport Policy', 'code' => 'TIL4010', 'equivalent' => 'Mobility Policy', 'text' => 'Veel groepswerk.']])
+        );
+        $manager->persist(
+            (new ExchangeReport($ntnu, $jane))
+                ->setAcademicYear('2025 - 2026')->setPhase('M2')->setPeriod('S1')->setProgram('WTK')
+                ->setSections(['housing' => 'Via SiT (de studentenhuisvesting) had ik meteen een kamer in Moholt. Vraag op tijd aan, de goedkoopste kamers zijn snel weg.'])
+        );
+        $manager->persist(
+            (new ExchangeProgramSuggestion($ntnu, $john, 'ELT', ExchangeProgramSuggestion::ACTION_ADD))
+                ->setNote('Een vriend uit elektrotechniek ging hier vorig jaar naartoe.')
+        );
+
+        $manager->flush();
     }
 
     /**
