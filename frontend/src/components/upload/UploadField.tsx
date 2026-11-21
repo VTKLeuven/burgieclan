@@ -152,7 +152,7 @@ export const UploadField: React.FC<FileUploadProps> = ({
                         <div className="flex text-sm leading-6 text-vtk-body">
                             <label
                                 htmlFor="file-upload"
-                                className="relative cursor-pointer rounded-md bg-surface font-semibold text-vtk-ink focus-within:outline-hidden focus-within:ring-2 focus-within:ring-vtk-ink focus-within:ring-offset-2 hover:text-vtk-navy"
+                                className="relative cursor-pointer rounded-md bg-surface font-semibold text-vtk-ink focus-within:outline-hidden focus-within:ring-2 focus-within:ring-vtk-ink focus-within:ring-offset-2 hover:text-primary-text"
                             >
                                 <p className={'text-sm'}>{t('upload.field.upload_button')}</p>
                                 <input

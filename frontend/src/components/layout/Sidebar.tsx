@@ -88,7 +88,7 @@ function NavItem({
                 // frame. Faded, both rows sat half-highlighted in between.
                 '[&_svg]:size-4 [&_svg]:shrink-0',
                 // Navy marks where you are, the same navy as the primary button; in dark mode a
-                // raised grey, since the lavender primary would shout on every page.
+                // raised grey, since the blue primary would shout on every page.
                 active
                     ? 'bg-nav-active text-on-nav-active [&_svg]:text-on-nav-active/80'
                     : '[&_svg]:text-icon-strong hover:bg-sidebar-hover',
@@ -105,7 +105,7 @@ function NavItem({
 function NavCount({ label, children }: { label: string; children: ReactNode }) {
     return (
         <span
-            className="flex h-[18px] min-w-[18px] animate-[nav-count-in_180ms_var(--ease-out)] items-center motion-reduce:animate-none justify-center rounded-full bg-vtk-yellow px-1 text-caption font-semibold text-vtk-navy tabular"
+            className="flex h-[18px] min-w-[18px] animate-[nav-count-in_180ms_var(--ease-out)] items-center motion-reduce:animate-none justify-center rounded-full bg-vtk-yellow px-1 text-caption font-semibold text-neutral-950 tabular"
             aria-label={label}
         >
             {children}

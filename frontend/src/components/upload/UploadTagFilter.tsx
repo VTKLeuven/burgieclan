@@ -288,7 +288,7 @@ const UploadTagFilter: React.FC<TagFilterProps> = ({
                     {/* Create new tag option - only show if input doesn't exactly match an existing tag */}
                     {tagInput.trim() !== '' && !hasExactMatch && (
                         <li
-                            className={`px-3 py-2 text-sm hover:bg-vtk-paper-2 cursor-pointer border-t border-vtk-line-2 flex items-center text-vtk-navy transition-colors ${
+                            className={`px-3 py-2 text-sm hover:bg-vtk-paper-2 cursor-pointer border-t border-vtk-line-2 flex items-center text-primary-text transition-colors ${
                                 selectedSuggestionIndex === filteredTags.length ? 'bg-vtk-paper-2 font-medium' : ''
                             }`}
                             onMouseDown={(e) => {

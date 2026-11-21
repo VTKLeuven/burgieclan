@@ -93,6 +93,9 @@
   --color-primary: #0f1a36;
   --color-primary-hover: #1d2b52;
   --color-primary-active: #0a1226;
+  /* The primary as text on the panel (active tabs, table headers). In light mode the navy itself;
+     in dark mode the button blue is too dark to read as text on black, so it takes the link sky. */
+  --color-primary-text: #0f1a36;
   --color-on-primary: #ffffff;
   --color-focus: #1f82d1;
 
@@ -262,14 +265,17 @@
 }
 
 /*
- * Dark mode ("Gedimd"): a soft slate rather than black, so long evenings of studying do not glare.
- * The same token names as above, redefined while <html> carries `.dark` (set before first paint by
- * the script in the root layout, see components/theme/). Components keep saying `bg-surface` or
+ * Dark mode ("Diep"): a true black canvas with the panel a hair above it, so the working area reads
+ * as one object by tint alone and OLED screens stay dark. Neutral greys without a blue cast. The
+ * same token names as above, redefined while <html> carries `.dark` (set before first paint by the
+ * script in the root layout, see components/theme/). Components keep saying `bg-surface` or
  * `text-fg-muted` and land on these values without a `dark:` variant of their own.
  *
- * Navy cannot stay the primary on a dark ground, so buttons take the lavender accent with dark
- * text; where you are in the sidebar is a raised grey instead. Every text pairing meets WCAG AA
- * on the surface: fg 11.6:1, fg-muted 6.6:1, link 8.7:1, placeholder 5.3:1, field edges 3.7:1.
+ * The primary is the sky blue of the light mode's links, deepened until white text on it meets
+ * AA (4.8:1); it is too dark to read as text on black, so text in the primary colour uses
+ * `primary-text` (the link sky). Where you are in the sidebar is a raised grey. Every text pairing
+ * meets WCAG AA on the surface: fg 18:1, fg-muted 7.6:1, link 9.6:1, placeholder 6:1, field
+ * edges 3.6:1.
  *
  * Only the light end of the neutral and sky scales is remapped, because those steps are used as
  * fills (hover washes, subtle buttons, drop zones). The dark end stays dark: it backs the dialog
@@ -278,50 +284,51 @@
 :root.dark {
   color-scheme: dark;
 
-  --color-sky-50: #233243;
-  --color-sky-100: #29405a;
-  --color-sky-200: #345273;
-  --color-sky-300: #45688f;
-  --color-sky-700: #8fcbff;
+  --color-sky-50: #0a1828;
+  --color-sky-100: #0d2238;
+  --color-sky-200: #143150;
+  --color-sky-300: #1e4670;
+  --color-sky-700: #7cc0ff;
 
-  --color-neutral-0: #24272e;
-  --color-neutral-25: #262930;
-  --color-neutral-50: #282b32;
-  --color-neutral-100: #2a2d35;
-  --color-neutral-150: #30343d;
-  --color-neutral-200: #363a44;
-  --color-neutral-250: #3c404a;
-  --color-neutral-300: #464b56;
+  --color-neutral-0: #0c0c0e;
+  --color-neutral-25: #0f0f11;
+  --color-neutral-50: #111114;
+  --color-neutral-100: #141417;
+  --color-neutral-150: #18181c;
+  --color-neutral-200: #1c1c21;
+  --color-neutral-250: #222227;
+  --color-neutral-300: #2d2d33;
 
-  --color-canvas: #1b1d23;
-  --color-surface: #24272e;
-  --color-surface-muted: #2a2d35;
-  --color-surface-hover: #2f333c;
-  --color-surface-selected: #2c3d52;
-  --color-sidebar-hover: #2a2d35;
-  --color-sidebar-active: #30343d;
-  --color-nav-active: #363a45;
-  --color-on-nav-active: #e1e3e8;
-  --color-page-title: #e1e3e8;
-  --color-border: #383c46;
-  --color-border-strong: #464b56;
-  --color-border-field: #7a7f8c;
-  --color-fg: #e1e3e8;
-  --color-fg-secondary: #c4c7ce;
-  --color-fg-muted: #a8acb6;
-  --color-fg-placeholder: #959aa5;
-  --color-fg-disabled: #7c808b;
-  --color-fg-nav: #d4d6dc;
-  --color-link: #8fcbff;
-  --color-link-underline: #3d5f80;
-  --color-icon: #a8acb6;
-  --color-icon-strong: #c4c7ce;
+  --color-canvas: #000000;
+  --color-surface: #0c0c0e;
+  --color-surface-muted: #141417;
+  --color-surface-hover: #17171b;
+  --color-surface-selected: #0d2238;
+  --color-sidebar-hover: #141417;
+  --color-sidebar-active: #1c1c21;
+  --color-nav-active: #1c1c21;
+  --color-on-nav-active: #f5f5f7;
+  --color-page-title: #f5f5f7;
+  --color-border: #1e1e23;
+  --color-border-strong: #2d2d33;
+  --color-border-field: #6b6b75;
+  --color-fg: #f5f5f7;
+  --color-fg-secondary: #d4d4d8;
+  --color-fg-muted: #a1a1aa;
+  --color-fg-placeholder: #8b8b94;
+  --color-fg-disabled: #6b6b73;
+  --color-fg-nav: #e4e4e7;
+  --color-link: #7cc0ff;
+  --color-link-underline: #1f4466;
+  --color-icon: #a1a1aa;
+  --color-icon-strong: #d4d4d8;
 
-  --color-primary: #b9b5ff;
-  --color-primary-hover: #cbc8ff;
-  --color-primary-active: #a7a2f5;
-  --color-on-primary: #16161a;
-  --color-focus: #ada8ff;
+  --color-primary: #1d74c4;
+  --color-primary-hover: #2079cc;
+  --color-primary-active: #1965ad;
+  --color-on-primary: #ffffff;
+  --color-primary-text: #7cc0ff;
+  --color-focus: #42b0ff;
 
   --color-danger-text: #fca5a5;
   --color-danger-bg: rgb(239 68 68 / 0.14);
@@ -332,7 +339,7 @@
   --color-success-text: #86efac;
   --color-success-bg: rgb(34 197 94 / 0.14);
   --color-success-border: rgb(134 239 172 / 0.3);
-  --color-info-text: #8fcbff;
+  --color-info-text: #7cc0ff;
   --color-info-bg: rgb(49 153 232 / 0.16);
   --color-info-border: rgb(136 201 254 / 0.3);
 
@@ -357,20 +364,20 @@
   --color-tag-orange-bg: rgb(249 115 22 / 0.14);
   --color-tag-orange-border: rgb(253 186 116 / 0.3);
   --color-tag-orange-text: #fdba74;
-  --color-tag-grey-bg: #2f333c;
-  --color-tag-grey-border: #464b56;
-  --color-tag-grey-text: #c4c7ce;
+  --color-tag-grey-bg: #17171b;
+  --color-tag-grey-border: #2d2d33;
+  --color-tag-grey-text: #d4d4d8;
 
-  --color-plan-lecture-bg: #1b2a40;
-  --color-plan-lecture-border: #2f4a6e;
+  --color-plan-lecture-bg: #0d1a2b;
+  --color-plan-lecture-border: #1f3a5c;
   --color-plan-lecture-text: #b5d6fa;
   --color-plan-lecture-fill: #3a8ee0;
-  --color-plan-practice-bg: #152f29;
-  --color-plan-practice-border: #24574b;
+  --color-plan-practice-bg: #0b201b;
+  --color-plan-practice-border: #1a443a;
   --color-plan-practice-text: #9fe2cf;
   --color-plan-practice-fill: #1fa587;
-  --color-plan-other-bg: #252344;
-  --color-plan-other-border: #3d3975;
+  --color-plan-other-bg: #17152e;
+  --color-plan-other-border: #2e2a5c;
   --color-plan-other-text: #cbc6ff;
   --color-plan-other-fill: #7f73ea;
 
@@ -390,38 +397,38 @@
 
   /* Legacy names. `vtk-ink` was the darkest text and `vtk-paper` the canvas, so a chip that
      paints `bg-vtk-ink text-vtk-paper` simply inverts and still reads. */
-  --color-vtk-ink: #e1e3e8;
-  --color-vtk-navy: #b9b5ff;
-  --color-vtk-blue: #b9b5ff;
-  --color-vtk-blue-dark: #a7a2f5;
-  --color-vtk-blue-light: #cbc8ff;
-  --color-vtk-blue-soft: #2f333c;
-  --color-vtk-blue-muted: #2a2d35;
-  --color-vtk-paper: #1b1d23;
-  --color-vtk-paper-2: #2f333c;
-  --color-vtk-surface: #24272e;
-  --color-vtk-surface-elevated: #2a2d35;
-  --color-vtk-muted: #a8acb6;
-  --color-vtk-body: #c4c7ce;
-  --color-vtk-line: #383c46;
-  --color-vtk-line-2: #464b56;
+  --color-vtk-ink: #f5f5f7;
+  --color-vtk-navy: #1d74c4;
+  --color-vtk-blue: #1d74c4;
+  --color-vtk-blue-dark: #1965ad;
+  --color-vtk-blue-light: #2079cc;
+  --color-vtk-blue-soft: #17171b;
+  --color-vtk-blue-muted: #141417;
+  --color-vtk-paper: #000000;
+  --color-vtk-paper-2: #17171b;
+  --color-vtk-surface: #0c0c0e;
+  --color-vtk-surface-elevated: #141417;
+  --color-vtk-muted: #a1a1aa;
+  --color-vtk-body: #d4d4d8;
+  --color-vtk-line: #1e1e23;
+  --color-vtk-line-2: #2d2d33;
 
-  /* On a dark ground a faint shadow vanishes; floating layers need a deeper one to lift off. */
+  /* On black a shadow barely shows, so floating layers also get a faint light edge to lift off. */
   --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.2);
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.2), 0 1px 1px rgb(0 0 0 / 0.12);
-  --shadow-popover: 0 8px 24px -6px rgb(0 0 0 / 0.45), 0 2px 6px -2px rgb(0 0 0 / 0.3);
-  --shadow-dialog: 0 24px 64px -12px rgb(0 0 0 / 0.6), 0 4px 12px -4px rgb(0 0 0 / 0.35);
+  --shadow-popover: 0 8px 24px -6px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(255 255 255 / 0.06);
+  --shadow-dialog: 0 24px 64px -12px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06);
 
-  --ink: #e1e3e8;
-  --navy: #b9b5ff;
-  --paper: #1b1d23;
-  --paper-2: #2f333c;
-  --surface: #24272e;
-  --line: #383c46;
-  --line-2: #464b56;
-  --muted: #a8acb6;
-  --body: #c4c7ce;
-  --accent: #ada8ff;
+  --ink: #f5f5f7;
+  --navy: #1d74c4;
+  --paper: #000000;
+  --paper-2: #17171b;
+  --surface: #0c0c0e;
+  --line: #1e1e23;
+  --line-2: #2d2d33;
+  --muted: #a1a1aa;
+  --body: #d4d4d8;
+  --accent: #42b0ff;
   --danger: #fca5a5;
 }
 
@@ -1546,11 +1553,11 @@
   }
 
   .exam-chip--active {
-    @apply border-vtk-navy bg-vtk-navy text-vtk-paper;
+    @apply border-primary bg-primary text-on-primary;
   }
 
   button.exam-chip--active:hover {
-    @apply bg-vtk-blue-light text-vtk-paper;
+    @apply bg-primary-hover text-on-primary;
   }
 
   .exam-chip--day {

@@ -109,7 +109,7 @@ export default function AccountPage() {
                             aria-controls={`account-panel-${key}`}
                             onClick={() => setTab(key)}
                             className={`relative -mb-px inline-flex h-10 items-center gap-1.5 border-b-2 text-body font-medium transition-colors ${tab === key
-                                ? 'border-primary text-primary'
+                                ? 'border-primary text-primary-text'
                                 : 'border-transparent text-fg-muted hover:text-fg'
                                 }`}
                         >
