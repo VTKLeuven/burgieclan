@@ -256,12 +256,17 @@ export default function ErasmusPage() {
         for (const destination of shown) {
             byCountry.set(destination.country, [...(byCountry.get(destination.country) ?? []), destination]);
         }
-        return {
-            count: shown.length,
-            countries: [...byCountry.entries()]
-                .map(([code, list]) => ({ code, name: countryName(code, locale), list }))
-                .sort((a, b) => a.name.localeCompare(b.name, locale)),
-        };
+        const countries = [...byCountry.entries()]
+            .map(([code, list]) => ({ code, name: countryName(code, locale), list }))
+            .sort((a, b) => a.name.localeCompare(b.name, locale));
+        // Europe first; the faculty's own agreements further away get a section of their own.
+        const regions = (['europe', 'outside'] as const)
+            .map((region) => {
+                const list = countries.filter((country) => (country.list[0].scheme === 'bilateral') === (region === 'outside'));
+                return { region, countries: list, count: list.reduce((sum, country) => sum + country.list.length, 0) };
+            })
+            .filter((region) => region.count > 0);
+        return { count: shown.length, regions };
     }, [overview, program, onlyReports, query, locale]);
 
     return (
@@ -332,17 +337,28 @@ export default function ErasmusPage() {
                             </button>
                         </div>
                     ) : (
-                        <div className="flex flex-col gap-5">
-                            {groups.countries.map((country) => (
-                                <section key={country.code} aria-label={country.name} className="mt-3">
-                                    <div className="mb-2 flex items-center gap-2">
-                                        <h3 className="m-0 text-body font-semibold text-fg">{country.name}</h3>
-                                        <SchemeBadge scheme={country.list[0].scheme} />
-                                        <span className="text-caption text-fg-muted tabular">{country.list.length}</span>
+                        <div className="flex flex-col gap-10">
+                            {groups.regions.map(({ region, countries, count }) => (
+                                <section key={region} aria-labelledby={`exchange-region-${region}`}>
+                                    <div className="mt-3 flex items-baseline gap-2 border-b border-border pb-2">
+                                        <h3 id={`exchange-region-${region}`} className="m-0 text-title font-semibold text-fg">{t(`exchange.overview.region.${region}`)}</h3>
+                                        <span className="text-small text-fg-muted tabular">{count}</span>
                                     </div>
-                                    <ul className="vtk-list m-0 list-none p-0">
-                                        {country.list.map((destination) => <DestinationRow key={destination.id} destination={destination} program={program} />)}
-                                    </ul>
+                                    {region === 'outside' && <p className="m-0 mt-2 mb-2 max-w-[68ch] text-small text-fg-muted">{t('exchange.scheme_hint.bilateral')}</p>}
+                                    <div className="flex flex-col gap-5">
+                                        {countries.map((country) => (
+                                            <section key={country.code} aria-label={country.name} className="mt-3">
+                                                <div className="mb-2 flex items-center gap-2">
+                                                    <h4 className="m-0 text-body font-semibold text-fg">{country.name}</h4>
+                                                    {region === 'europe' && <SchemeBadge scheme={country.list[0].scheme} />}
+                                                    <span className="text-caption text-fg-muted tabular">{country.list.length}</span>
+                                                </div>
+                                                <ul className="vtk-list m-0 list-none p-0">
+                                                    {country.list.map((destination) => <DestinationRow key={destination.id} destination={destination} program={program} />)}
+                                                </ul>
+                                            </section>
+                                        ))}
+                                    </div>
                                 </section>
                             ))}
                         </div>

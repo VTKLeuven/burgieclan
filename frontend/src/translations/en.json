@@ -1207,7 +1207,11 @@
             "recent_hint": "From the reports of students who went",
             "load_failed": "The destinations could not be loaded. Please try again later.",
             "unknown_programs": "Programmes unknown",
-            "from_wiki": "from the old wiki"
+            "from_wiki": "from the old wiki",
+            "region": {
+                "europe": "Europe",
+                "outside": "Outside Europe"
+            }
         },
         "scheme": {
             "erasmus": "Erasmus+",

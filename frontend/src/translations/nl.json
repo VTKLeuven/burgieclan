@@ -1207,7 +1207,11 @@
             "recent_hint": "Uit de verslagen van studenten die al weg waren",
             "load_failed": "De bestemmingen konden niet geladen worden. Probeer het later opnieuw.",
             "unknown_programs": "Richtingen onbekend",
-            "from_wiki": "uit de oude wiki"
+            "from_wiki": "uit de oude wiki",
+            "region": {
+                "europe": "Europa",
+                "outside": "Buiten Europa"
+            }
         },
         "scheme": {
             "erasmus": "Erasmus+",
