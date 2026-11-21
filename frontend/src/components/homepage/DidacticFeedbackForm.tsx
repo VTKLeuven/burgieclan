@@ -97,7 +97,7 @@ export function DidacticFeedbackForm() {
                         field without a frame of its own, and the send button in a footer bar. */}
                     <form
                         onSubmit={handleSubmit}
-                        className="overflow-hidden rounded-card border border-border bg-surface transition-[border-color,box-shadow] focus-within:border-border-strong focus-within:shadow-xs"
+                        className="overflow-hidden rounded-card border border-border-raised bg-surface-raised transition-[border-color,box-shadow] focus-within:border-border-strong focus-within:shadow-xs"
                     >
                         <div role="radiogroup" aria-label={t('home.feedback_type_label')} className="flex flex-wrap gap-1.5 px-3 pt-3">
                             {TYPES.map(({ value, label }) => {
@@ -114,7 +114,7 @@ export function DidacticFeedbackForm() {
                                             'inline-flex h-7 items-center rounded-full border px-2.5 text-caption font-medium transition-colors focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-hidden',
                                             selected
                                                 ? 'border-primary bg-primary text-on-primary'
-                                                : 'border-border bg-surface text-fg-secondary hover:border-border-strong hover:text-fg',
+                                                : 'border-border bg-surface text-fg-secondary hover:border-border-strong hover:text-fg dark:border-transparent dark:bg-surface-hover dark:hover:border-transparent dark:hover:bg-neutral-300',
                                         )}
                                     >
                                         {t(label)}
@@ -138,7 +138,7 @@ export function DidacticFeedbackForm() {
                             disabled={isSubmitting}
                         />
 
-                        <div className="flex items-center justify-end gap-3 border-t border-border bg-surface-muted px-3 py-2">
+                        <div className="flex items-center justify-end gap-3 border-t border-border-raised bg-surface-muted px-3 py-2">
                             {showLengthHint && (
                                 <p className="m-0 mr-auto text-caption text-fg-muted">{t('faq.ask_hint')}</p>
                             )}

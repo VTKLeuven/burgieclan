@@ -111,7 +111,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
                     "flex h-12 w-full cursor-pointer items-center gap-3 rounded-card border px-4 text-left transition-colors duration-150",
                     isDragging
                         ? "border-dashed border-sky-500 bg-sky-50"
-                        : "border-border bg-surface hover:border-border-strong hover:bg-surface-hover",
+                        : "border-border-raised bg-surface-raised hover:border-border-strong hover:bg-surface-hover",
                     className
                 )}
                 {...handlers}

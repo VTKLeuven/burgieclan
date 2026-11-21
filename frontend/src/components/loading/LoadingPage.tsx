@@ -22,12 +22,12 @@ function SkeletonFrame({ className, children }: { className?: string; children: 
 /** Widths that vary from row to row, so a list skeleton reads as a list and not as a grid. */
 const ROW_WIDTHS = ['58%', '42%', '66%', '37%', '51%', '45%', '61%', '33%'];
 
-/** Hairline rows in a panel, as `.vtk-list` and the document rows draw them. */
+/** The rows of a `.vtk-list`, in the list's own frame, so the list arrives where its skeleton was. */
 export function RowsSkeleton({ rows = 3, className }: { rows?: number; className?: string }) {
     return (
-        <div className={cn('vtk-panel overflow-hidden', className)}>
+        <div className={cn('vtk-list', className)}>
             {Array.from({ length: rows }, (_, index) => (
-                <div key={index} className={cn('flex h-[52px] items-center gap-3 px-4', index > 0 && 'border-t border-border')}>
+                <div key={index} className="flex h-[52px] items-center gap-3 px-4">
                     <Bone className="size-4 shrink-0 rounded-[4px]" />
                     <Bone className="h-3.5" style={{ width: ROW_WIDTHS[index % ROW_WIDTHS.length] }} />
                     <Bone className="ml-auto h-3 w-16 shrink-0" />

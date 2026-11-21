@@ -63,6 +63,11 @@
   --color-surface-muted: #f4f5f8;
   --color-surface-hover: #f1f2f5;
   --color-surface-selected: #deefff;
+  /* An object on the panel: a list, an empty state, the upload bar, a form card. Light mode draws
+     it as the panel's own white inside a hairline; dark mode lifts it with a fill of its own and
+     drops the line (:root.dark), because a 1px grey line barely shows on a dark ground. */
+  --color-surface-raised: #ffffff;
+  --color-border-raised: #d9dae0;
   /* Also used inside the panel (CurriculumPanel, DocumentFolderList), so the active tint stays a
      grey; the sidebar marks its own active item with a navy fill instead. */
   --color-sidebar-hover: #dcdde3;
@@ -234,6 +239,10 @@
      mixed from it with the surface and the text colour (.plan-course-* below), so dark mode only
      needs eight lighter tones. Outside @theme on purpose: no utility uses them, and Tailwind
      leaves out the theme variables no utility uses. */
+  /* The line between rows of a raised list (.vtk-list). Here, not in @theme: only CSS reads it. */
+  --color-divider-raised: #d9dae0;
+  --divider-raised-width: 1px;
+
   --color-course-1: #2477c9;
   --color-course-2: #129278;
   --color-course-3: #6b5fd6;
@@ -290,40 +299,46 @@
   --color-sky-300: #2a4d70;
   --color-sky-700: #7dbdff;
 
-  --color-neutral-0: #18181b;
-  --color-neutral-25: #19191c;
-  --color-neutral-50: #1b1b1e;
-  --color-neutral-100: #1e1e22;
-  --color-neutral-150: #222226;
-  --color-neutral-200: #27272c;
-  --color-neutral-250: #2c2c31;
-  --color-neutral-300: #36363c;
+  --color-neutral-0: #1a1a1e;
+  --color-neutral-25: #1b1b1f;
+  --color-neutral-50: #1d1d21;
+  --color-neutral-100: #202024;
+  --color-neutral-150: #2c2c31;
+  --color-neutral-200: #29292e;
+  --color-neutral-250: #2f2f34;
+  --color-neutral-300: #38383e;
 
-  --color-canvas: #0f0f11;
-  --color-surface: #18181b;
+  --color-canvas: #121214;
+  --color-surface: #1a1a1e;
   --color-surface-muted: #1e1e22;
-  --color-surface-hover: #212126;
+  --color-surface-hover: #2a2a2f;
   --color-surface-selected: #182a3d;
-  --color-sidebar-hover: #1c1c20;
-  --color-sidebar-active: #232328;
-  --color-nav-active: #27272c;
-  --color-on-nav-active: #f4f4f5;
-  --color-page-title: #ededef;
-  --color-border: #27272b;
-  --color-border-strong: #36363c;
+  /* Lists and the other objects on the panel are a filled step lighter, without a line; their
+     rows are parted by a groove of panel colour. The steps follow Discord's dark theme. */
+  --color-surface-raised: #222327;
+  --color-border-raised: transparent;
+  --color-divider-raised: #1a1a1e;
+  --divider-raised-width: 2px;
+  --color-sidebar-hover: #1e1e22;
+  --color-sidebar-active: #26262a;
+  --color-nav-active: #2c2c30;
+  --color-on-nav-active: #ffffff;
+  --color-page-title: #f2f3f5;
+  --color-border: #2a2a2e;
+  --color-border-strong: #38383e;
   --color-border-field: #6f6f78;
-  --color-fg: #ededef;
-  --color-fg-secondary: #d0d0d5;
-  --color-fg-muted: #a1a1a9;
+  --color-fg: #f2f3f5;
+  --color-fg-secondary: #dcdde0;
+  --color-fg-muted: #96979e;
   --color-fg-placeholder: #8c8c95;
   --color-fg-disabled: #6b6b73;
-  --color-fg-nav: #e4e4e7;
+  --color-fg-nav: #e6e7ea;
   --color-link: #7dbdff;
   --color-link-underline: #2a4d70;
-  --color-icon: #a1a1a9;
-  --color-icon-strong: #d0d0d5;
+  --color-icon: #a3a4ab;
+  --color-icon-strong: #d4d5d9;
 
-  --color-primary: #ededef;
+  --color-primary: #f2f3f5;
   --color-primary-hover: #ffffff;
   --color-primary-active: #d4d4d8;
   --color-on-primary: #16161a;
@@ -364,7 +379,7 @@
   --color-tag-orange-bg: rgb(249 115 22 / 0.14);
   --color-tag-orange-border: rgb(253 186 116 / 0.3);
   --color-tag-orange-text: #fdba74;
-  --color-tag-grey-bg: #212126;
+  --color-tag-grey-bg: #26262b;
   --color-tag-grey-border: #36363c;
   --color-tag-grey-text: #d0d0d5;
 
@@ -397,20 +412,20 @@
 
   /* Legacy names. `vtk-ink` was the darkest text and `vtk-paper` the canvas, so a chip that
      paints `bg-vtk-ink text-vtk-paper` simply inverts and still reads. */
-  --color-vtk-ink: #ededef;
+  --color-vtk-ink: #f2f3f5;
   --color-vtk-navy: #ededef;
   --color-vtk-blue: #ededef;
   --color-vtk-blue-dark: #d4d4d8;
   --color-vtk-blue-light: #ffffff;
   --color-vtk-blue-soft: #212126;
   --color-vtk-blue-muted: #1e1e22;
-  --color-vtk-paper: #0f0f11;
+  --color-vtk-paper: #121214;
   --color-vtk-paper-2: #212126;
-  --color-vtk-surface: #18181b;
-  --color-vtk-surface-elevated: #1e1e22;
-  --color-vtk-muted: #a1a1a9;
-  --color-vtk-body: #d0d0d5;
-  --color-vtk-line: #27272b;
+  --color-vtk-surface: #1a1a1e;
+  --color-vtk-surface-elevated: #222327;
+  --color-vtk-muted: #96979e;
+  --color-vtk-body: #dcdde0;
+  --color-vtk-line: #2a2a2e;
   --color-vtk-line-2: #36363c;
 
   /* On a near-black ground a shadow barely shows, so floating layers also get a faint light edge. */
@@ -419,15 +434,15 @@
   --shadow-popover: 0 8px 24px -6px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(255 255 255 / 0.06);
   --shadow-dialog: 0 24px 64px -12px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06);
 
-  --ink: #ededef;
+  --ink: #f2f3f5;
   --navy: #ededef;
-  --paper: #0f0f11;
+  --paper: #121214;
   --paper-2: #212126;
-  --surface: #18181b;
-  --line: #27272b;
+  --surface: #1a1a1e;
+  --line: #2a2a2e;
   --line-2: #36363c;
-  --muted: #a1a1a9;
-  --body: #d0d0d5;
+  --muted: #96979e;
+  --body: #dcdde0;
   --accent: #7dbdff;
   --danger: #fca5a5;
 }
@@ -667,13 +682,13 @@
   /* A bordered list: rows separated by hairlines, the Dopl list pattern. */
   .vtk-list {
     overflow: hidden;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-raised);
     border-radius: var(--radius-card);
-    background: var(--color-surface);
+    background: var(--color-surface-raised);
   }
 
   .vtk-list > * + * {
-    border-top: 1px solid var(--color-border);
+    border-top: var(--divider-raised-width) solid var(--color-divider-raised);
   }
 
   .vtk-list-row {
@@ -1070,6 +1085,11 @@
 
   .vtk-row-click:hover {
     background: var(--color-surface-hover);
+  }
+
+  .vtk-panel.vtk-empty {
+    border-color: var(--color-border-raised);
+    background: var(--color-surface-raised);
   }
 
   .vtk-empty {

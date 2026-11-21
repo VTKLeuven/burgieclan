@@ -265,7 +265,7 @@ export default function Sidebar({ onNavigate, onCollapse }: {
                         onNavigate?.();
                         openSearch();
                     }}
-                    className="mt-3 flex h-8 w-full items-center gap-2 rounded-control border border-border-field bg-surface px-2.5 text-left text-small text-fg-placeholder shadow-xs transition-colors hover:border-fg-placeholder"
+                    className="mt-3 flex h-8 w-full items-center gap-2 rounded-control border border-border-field bg-surface px-2.5 text-left text-small text-fg-placeholder shadow-xs transition-colors hover:border-fg-placeholder dark:border-transparent dark:bg-surface-raised dark:shadow-none dark:hover:border-transparent dark:hover:bg-surface-hover"
                 >
                     <Search className="size-4 text-icon" aria-hidden="true" />
                     <span className="flex-1 truncate">{t('search.placeholder')}</span>
