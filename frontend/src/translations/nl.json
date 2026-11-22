@@ -1174,6 +1174,7 @@
         "title": "Uitwisselingen",
         "tabs": {
             "erasmus": "Erasmus",
+            "athens": "ATHENS",
             "short": "Korter naar het buitenland"
         },
         "share": "Deel je ervaring",
@@ -1462,7 +1463,8 @@
                 "humasol": "HUMASOL",
                 "aiesec": "AIESEC",
                 "south": "Naar het Zuiden",
-                "travel_grants": "Reisbeurzen"
+                "travel_grants": "Reisbeurzen",
+                "athens_tab": "Vakken, reviews en inschrijven"
             }
         },
         "suggest": {
@@ -1475,6 +1477,150 @@
             "sent": "Bedankt! Een moderator kijkt je voorstel na.",
             "failed": "Insturen lukte niet. {{detail}}",
             "pending": "Jouw voorstel wacht op nazicht: {{changes}}"
+        },
+        "athens": {
+            "share": "Schrijf een review",
+            "intro": "Een intensief vak van een week aan een andere Europese technische universiteit, in november of maart. Hier vind je welke vakken uit de catalogus van de faculteit meetellen voor jouw richting, wat studenten die ze volgden ervan vonden, en hoe je je inschrijft.",
+            "courses": "Vakken",
+            "edition": "Catalogus {{edition}} van de faculteit",
+            "count_one": "{{count}} vak",
+            "count_other": "{{count}} vakken",
+            "search": "Zoek een vak, code, universiteit of stad",
+            "all_universities": "Alle universiteiten",
+            "choose_program": "Kies je richting: enkel vakken met een positief advies voor jouw richting tellen mee voor je aanvraag.",
+            "program_hint": "Enkel vakken met een positief advies voor {{program}}: alleen die tellen mee. Welke er in de volgende sessie echt doorgaan, zie je pas op het registratieplatform.",
+            "sort": {
+                "label": "Sorteren",
+                "university": "Per universiteit",
+                "mine": "Mijn sterren",
+                "rating": "Best beoordeeld"
+            },
+            "only_starred_one": "Enkel met mijn sterren ({{count}})",
+            "only_starred_other": "Enkel met mijn sterren ({{count}})",
+            "only_reviews": "Enkel met reviews",
+            "empty": "Geen vakken voor deze filters.",
+            "empty_starred": "Je gaf nog geen enkel vak sterren. Klik op de sterren naast een vak om bij te houden wat je interesseert.",
+            "load_failed": "De ATHENS-vakken konden niet geladen worden. Probeer het later opnieuw.",
+            "no_reviews": "Nog geen reviews",
+            "average": "Gemiddeld {{rating}} op 5",
+            "advice_count_one": "positief advies voor {{count}} richting",
+            "advice_count_other": "positief advies voor {{count}} richtingen",
+            "advice_none": "voor geen enkele richting",
+            "erasmus_too": "Ook een Erasmus-bestemming",
+            "recent_hint": "Uit de reviews van studenten die al een ATHENS-week deden",
+            "under_review_hint": "Enkel jij ziet deze review tot een moderator ze nakijkt.",
+            "stars": {
+                "label": "Mijn interesse",
+                "hint": "De sterren naast elk vak zijn enkel voor jou: hoe graag je het zou doen. Niemand anders ziet ze. Handig om je drie keuzes te kiezen.",
+                "private": "Enkel jij ziet dit, ook na het vernieuwen.",
+                "n_one": "{{count}} ster",
+                "n_other": "{{count}} sterren"
+            },
+            "session": {
+                "november": "november {{year}}",
+                "march": "maart {{year}}"
+            },
+            "session_short": {
+                "november": "nov {{year}}",
+                "march": "mrt {{year}}"
+            },
+            "sessions": {
+                "title": "Volgende sessies",
+                "none": "De volgende data staan nog niet vast. Kijk op de site van de faculteit.",
+                "range": "{{start}} – {{end}}",
+                "deadline": "Inschrijven tot {{date}}",
+                "opens": "Aanbod en inschrijvingen vanaf {{month}}"
+            },
+            "steps": {
+                "title": "Zo schrijf je je in",
+                "register": "Maak een account op het ATHENS-registratieplatform met je student.kuleuven.be-adres en vul je gegevens in.",
+                "choose": "Kies minstens drie vakken met een positief advies voor je richting, en keur de Student Commitment goed.",
+                "sign": "Druk je aanvraag af, onderteken ze en mail de scan voor de deadline naar de ATHENS-coördinator van de faculteit. Dien ze ook online in.",
+                "selection": "Je programmadirecteur keurt je keuzes goed; daarna wijst ParisTech de vakken willekeurig toe. Je krijgt een mail met je vak en de praktische info.",
+                "isp": "Zet H0V01A (Capita Selecta ATHENS I, november) of H0V02A (ATHENS II, maart) in je ISP."
+            },
+            "rules": {
+                "title": "Goed om te weten",
+                "once": "Je kan één keer meedoen, tijdens je master.",
+                "before": "Enkel vóór een semester- of jaaruitwisseling, niet erna.",
+                "room": "Je moet in je ISP nog ruimte hebben voor keuzevakken.",
+                "retake": "Er is geen herexamen. Doe je het in je laatste jaar, dan moet je slagen om af te studeren.",
+                "costs": "Geen beurs en geen logement: reken op €250 tot €600 voor de week, plus de bijdrage voor de European Dimension-activiteiten.",
+                "cancel": "Afzeggen na de selectie kost een annulatievergoeding."
+            },
+            "link": {
+                "practical": "ATHENS voor KU Leuven-studenten",
+                "procedure": "Aanvraagprocedure",
+                "catalogue": "Catalogus met het advies per richting (pdf)",
+                "register": "Registratieplatform",
+                "network": "ATHENS Network",
+                "coordinator": "ATHENS-coördinator van de faculteit"
+            },
+            "topics": {
+                "course": {
+                    "name": "Het vak",
+                    "prompt": "Inhoud, niveau, docenten, hoeveel werk"
+                },
+                "exam": {
+                    "name": "Evaluatie",
+                    "prompt": "Hoe werd je beoordeeld, en hoe zwaar was dat"
+                },
+                "city": {
+                    "name": "Stad en activiteiten",
+                    "prompt": "De stad, de European Dimension-activiteiten, de groep"
+                },
+                "practical": {
+                    "name": "Praktisch",
+                    "prompt": "Logement, kosten, de reis"
+                }
+            },
+            "form": {
+                "title": "Schrijf een review",
+                "intro": "Een paar zinnen helpen al. Elk onderwerp is optioneel. Je review komt online nadat een moderator ze nagekeken heeft.",
+                "course": "Vak",
+                "choose_course": "Kies het vak dat je volgde",
+                "session": "Sessie",
+                "rating": "Zou je het aanraden?",
+                "rating_words": {
+                    "1": "Zeker niet",
+                    "2": "Eerder niet",
+                    "3": "Gaat wel",
+                    "4": "Ja",
+                    "5": "Absoluut"
+                },
+                "contactable_hint": "Ingelogde studenten zien dan je e-mailadres bij je review.",
+                "show_name_hint": "Anders staat er enkel je richting en de sessie bij.",
+                "sent": "Bedankt! Je review staat online zodra een moderator ze nagekeken heeft.",
+                "errors": {
+                    "course": "Kies het vak dat je volgde.",
+                    "rating": "Geef het vak een score van 1 tot 5 sterren.",
+                    "empty": "Schrijf over minstens één onderwerp.",
+                    "rate": "Je schreef vandaag al veel reviews. Probeer het morgen opnieuw."
+                }
+            },
+            "course": {
+                "advice": "Telt het mee voor jouw richting?",
+                "advice_hint": "Het advies van de programmadirecteurs in de catalogus. Enkel vakken met een positief advies voor jouw richting komen in aanmerking.",
+                "advice_yes": "Positief advies voor {{program}}: dit vak telt mee voor je aanvraag.",
+                "advice_no": "Geen positief advies voor {{program}}: dit vak telt niet mee voor je aanvraag.",
+                "positive": "positief advies",
+                "negative": "geen positief advies",
+                "university": "Universiteit",
+                "code": "Code",
+                "evaluation": "Evaluatie",
+                "catalogue": "In de catalogus",
+                "erasmus": "Ervaringen met een semester aan {{name}}",
+                "siblings": "Ook aan {{name}}",
+                "reviews": "Reviews",
+                "empty_title": "Nog geen reviews",
+                "empty_text": "Volgde je dit vak in {{city}}? Help wie nog moet kiezen met een korte review.",
+                "inactive": "Dit vak staat niet meer in de catalogus van de faculteit (het laatst in {{last}}), dus je kan het nu niet kiezen. De reviews blijven staan voor als het terugkomt.",
+                "elsewhere": "Over {{city}}",
+                "elsewhere_hint": "Uit reviews van andere vakken aan {{name}}",
+                "load_failed": "Dit vak kon niet geladen worden. Probeer het later opnieuw.",
+                "not_found": "Dit vak bestaat niet.",
+                "back": "Terug naar de ATHENS-vakken"
+            }
         }
     }
 }

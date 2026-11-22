@@ -1,5 +1,6 @@
 'use client';
 
+import AthensReviewDialog from '@/components/exchange/AthensReviewDialog';
 import ExchangeInfo from '@/components/exchange/ExchangeInfo';
 import ShareReportDialog from '@/components/exchange/ShareReportDialog';
 import PageHeader, { Breadcrumbs, type Crumb } from '@/components/layout/PageHeader';
@@ -12,29 +13,37 @@ import { useTranslation } from 'react-i18next';
 type ShareContextValue = (destinationId?: number) => void;
 const ShareContext = createContext<ShareContextValue>(() => {});
 
-/** Opens "Deel je ervaring" from anywhere on an exchange page, optionally for one destination. */
+/**
+ * Opens "Deel je ervaring" from anywhere on an exchange page, optionally for one destination; on
+ * the ATHENS pages, the review form, optionally for one course.
+ */
 export const useShareExperience = () => useContext(ShareContext);
 
 /**
  * The frame of every exchange page: the header with the trail, the ⓘ and "Deel je ervaring",
- * the Erasmus / shorter tabs where they apply, and the share dialog.
+ * the Erasmus / ATHENS / shorter tabs where they apply, and the share dialog: an exchange report,
+ * or on the ATHENS pages a course review.
  */
 export default function ExchangeShell({
     crumbs = [],
     tab,
     destinationId,
+    courseId,
     children,
 }: {
     /** Levels after "Uitwisselingen". */
     crumbs?: Crumb[];
-    tab?: 'erasmus' | 'short';
+    tab?: 'erasmus' | 'athens' | 'short';
     /** The destination the page is about, chosen beforehand when sharing from its header. */
     destinationId?: number;
+    /** On an ATHENS page: the header's button writes a review, of this course if given. */
+    courseId?: number;
     children: ReactNode;
 }) {
     const { t } = useTranslation();
-    const [sharing, setSharing] = useState<{ destinationId?: number } | null>(null);
-    const share = useCallback<ShareContextValue>((destinationId) => setSharing({ destinationId }), []);
+    const athens = tab === 'athens' || courseId !== undefined;
+    const [sharing, setSharing] = useState<{ id?: number } | null>(null);
+    const share = useCallback<ShareContextValue>((id) => setSharing({ id }), []);
 
     const trail = useMemo<Crumb[]>(
         () => [{ label: t('exchange.title'), href: crumbs.length > 0 ? '/exchange' : undefined, icon: <Earth /> }, ...crumbs],
@@ -51,9 +60,9 @@ export default function ExchangeShell({
                     </div>
                 }
                 actions={
-                    <button type="button" onClick={() => share(destinationId)} className="vtk-button vtk-button-primary vtk-button-sm">
+                    <button type="button" onClick={() => share(athens ? courseId : destinationId)} className="vtk-button vtk-button-primary vtk-button-sm">
                         <Plus className="size-4" aria-hidden="true" />
-                        <span className="hidden sm:inline">{t('exchange.share')}</span>
+                        <span className="hidden sm:inline">{t(athens ? 'exchange.athens.share' : 'exchange.share')}</span>
                     </button>
                 }
             />
@@ -61,10 +70,10 @@ export default function ExchangeShell({
             <div className="vtk-shell">
                 {tab && (
                     <nav aria-label={t('exchange.title')} className="mb-6 flex items-center gap-5 border-b border-border">
-                        {(['erasmus', 'short'] as const).map((key) => (
+                        {(['erasmus', 'athens', 'short'] as const).map((key) => (
                             <Link
                                 key={key}
-                                href={key === 'erasmus' ? '/exchange' : '/exchange/short'}
+                                href={key === 'erasmus' ? '/exchange' : `/exchange/${key}`}
                                 aria-current={tab === key ? 'page' : undefined}
                                 className={cn(
                                     'relative -mb-px inline-flex h-10 items-center border-b-2 text-body font-medium whitespace-nowrap transition-colors',
@@ -79,11 +88,11 @@ export default function ExchangeShell({
                 {children}
             </div>
 
-            <ShareReportDialog
-                open={sharing !== null}
-                initialDestinationId={sharing?.destinationId}
-                onClose={() => setSharing(null)}
-            />
+            {athens ? (
+                <AthensReviewDialog open={sharing !== null} initialCourseId={sharing?.id} onClose={() => setSharing(null)} />
+            ) : (
+                <ShareReportDialog open={sharing !== null} initialDestinationId={sharing?.id} onClose={() => setSharing(null)} />
+            )}
         </ShareContext.Provider>
     );
 }

@@ -41,6 +41,9 @@ export const apiEndpoints = {
     /** Every exchange destination with its number of reports, and the latest reports. */
     exchange: () => '/api/exchange',
     exchangeDestination: (id: number | string) => `/api/exchange/destinations/${id}`,
+    /** The ATHENS courses of the current catalogue, with the reader's own stars. */
+    athens: () => '/api/exchange/athens',
+    athensCourse: (id: number | string) => `/api/exchange/athens/courses/${id}`,
 
     /**
      * The announcements showing now. The time is rounded down to five minutes (Brussels time,

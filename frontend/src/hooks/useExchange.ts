@@ -3,9 +3,9 @@
 import { ApiClient } from '@/actions/api';
 import { usePreloadedApi } from '@/components/ApiSeed';
 import { invalidateApiCache, isErrorResponse, useApi } from '@/hooks/useApi';
-import type { ExchangeCourse, ExchangeDestinationDetail, ExchangeOverview, ExchangeTopic } from '@/types/entities';
+import type { AthensCourseDetail, AthensOverview, AthensTopic, ExchangeCourse, ExchangeDestinationDetail, ExchangeOverview, ExchangeTopic } from '@/types/entities';
 import { apiEndpoints } from '@/utils/apiEndpoints';
-import { convertToExchangeDestinationDetail, convertToExchangeOverview } from '@/utils/convertToEntity';
+import { convertToAthensCourseDetail, convertToAthensOverview, convertToExchangeDestinationDetail, convertToExchangeOverview } from '@/utils/convertToEntity';
 import { useCallback, useEffect, useState } from 'react';
 
 /** Sent after a report was shared, deleted or marked, so every exchange read on the page asks again. */
@@ -121,4 +121,54 @@ export function useExchangeActions() {
     }, []);
 
     return { share, remove, markHelpful, suggestPrograms };
+}
+
+/** The ATHENS courses of the current catalogue; `enabled` false skips the fetch (a closed dialog). */
+export function useAthensOverview(enabled = true): { overview: AthensOverview | null; failed: boolean } {
+    const { value, failed } = useExchangeRead(enabled ? apiEndpoints.athens() : null, convertToAthensOverview);
+    return { overview: value, failed };
+}
+
+export function useAthensCourse(id: string | null): { detail: AthensCourseDetail | null; failed: boolean } {
+    const { value, failed } = useExchangeRead(id ? apiEndpoints.athensCourse(id) : null, convertToAthensCourseDetail);
+    return { detail: value, failed };
+}
+
+export interface AthensReviewInput {
+    courseId: number;
+    session: string;
+    program: string;
+    rating: number;
+    sections: Partial<Record<AthensTopic, string>>;
+    contactable: boolean;
+    showName: boolean;
+}
+
+/** Reviews of ATHENS courses, and the reader's private stars. */
+export function useAthensActions() {
+    const share = useCallback(async (input: AthensReviewInput): Promise<{ id: number; courseId: number }> => {
+        const result = await ApiClient('POST', '/api/exchange/athens/reviews', input);
+        throwIfError(result);
+        invalidateApiCache();
+        notifyChanged();
+        const data = (result ?? {}) as { id?: unknown; courseId?: unknown };
+        return { id: Number(data.id), courseId: Number(data.courseId) };
+    }, []);
+
+    const remove = useCallback(async (reviewId: number): Promise<void> => {
+        throwIfError(await ApiClient('DELETE', `/api/exchange/athens/reviews/${reviewId}`));
+        invalidateApiCache();
+        notifyChanged();
+    }, []);
+
+    /**
+     * Stars change on screen at once (the caller keeps them), so this does not make every read on
+     * the page fetch again; it only drops the cache for the next visit.
+     */
+    const setStars = useCallback(async (courseId: number, stars: number | null): Promise<void> => {
+        throwIfError(await ApiClient('PUT', `/api/exchange/athens/courses/${courseId}/stars`, { stars }));
+        invalidateApiCache();
+    }, []);
+
+    return { share, remove, setStars };
 }

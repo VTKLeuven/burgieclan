@@ -1,4 +1,10 @@
 import {
+    ATHENS_TOPICS,
+    type AthensCourse,
+    type AthensCourseDetail,
+    type AthensOverview,
+    type AthensReview,
+    type AthensUniversity,
     type Announcement,
     type CommentCategory,
     type Course,
@@ -847,5 +853,115 @@ export function convertToExchangeDestinationDetail(value: unknown): ExchangeDest
         pendingSuggestions: records(data.pendingSuggestions).flatMap((item) => (
             item.action === 'add' || item.action === 'remove' ? [{ program: str(item.program), action: item.action }] : []
         )),
+    };
+}
+
+function convertToAthensUniversity(value: unknown): AthensUniversity {
+    const data = toRecord(value, 'AthensUniversity');
+    return {
+        id: num(data.id),
+        name: str(data.name),
+        city: str(data.city),
+        country: str(data.country),
+        erasmusDestinationId: numOrNull(data.erasmusDestinationId),
+    };
+}
+
+function convertToAthensCourse(value: unknown): AthensCourse {
+    const data = toRecord(value, 'AthensCourse');
+    return {
+        id: num(data.id),
+        code: str(data.code),
+        title: str(data.title),
+        evaluation: str(data.evaluation),
+        programs: stringList(data.programs),
+        universityId: num(data.universityId),
+        reviewCount: num(data.reviewCount),
+        rating: numOrNull(data.rating),
+        myStars: numOrNull(data.myStars),
+    };
+}
+
+function athensSections<K extends string>(value: unknown, topics: readonly K[]): Partial<Record<K, string>> {
+    const raw = value && typeof value === 'object' ? value as ApiRecord : {};
+    const sections: Partial<Record<K, string>> = {};
+    for (const topic of topics) {
+        const text = raw[topic];
+        if (typeof text === 'string' && text.trim() !== '') sections[topic] = text;
+    }
+    return sections;
+}
+
+function convertToAthensReview(value: unknown): AthensReview {
+    const data = toRecord(value, 'AthensReview');
+    return {
+        id: num(data.id),
+        session: str(data.session),
+        program: str(data.program),
+        rating: num(data.rating, 3),
+        sections: athensSections(data.sections, ATHENS_TOPICS),
+        author: strOrNull(data.author),
+        contactEmail: strOrNull(data.contactEmail),
+        mine: data.mine === true,
+        underReview: data.underReview === true,
+        createdAt: str(data.createdAt),
+    };
+}
+
+export function convertToAthensOverview(value: unknown): AthensOverview {
+    const data = toRecord(value, 'AthensOverview');
+    return {
+        edition: str(data.edition),
+        published: str(data.published),
+        source: str(data.source),
+        sessions: records(data.sessions).map((session) => ({
+            start: str(session.start),
+            end: str(session.end),
+            deadline: strOrNull(session.deadline),
+            registrationOpens: strOrNull(session.registrationOpens),
+        })),
+        universities: records(data.universities).map(convertToAthensUniversity),
+        courses: records(data.courses).map(convertToAthensCourse),
+        recent: records(data.recent).flatMap((item) => {
+            const topic = ATHENS_TOPICS.find((known) => known === item.topic);
+            const course = item.course && typeof item.course === 'object' ? item.course as ApiRecord : null;
+            if (!topic || !course) return [];
+            return [{
+                reviewId: num(item.reviewId),
+                course: { id: num(course.id), code: str(course.code), title: str(course.title) },
+                university: str(item.university),
+                topic,
+                excerpt: str(item.excerpt),
+                session: str(item.session),
+                program: str(item.program),
+                rating: num(item.rating, 3),
+            }];
+        }),
+    };
+}
+
+export function convertToAthensCourseDetail(value: unknown): AthensCourseDetail {
+    const data = toRecord(value, 'AthensCourseDetail');
+    const course = toRecord(data.course, 'AthensCourse');
+    return {
+        course: {
+            ...convertToAthensCourse(course),
+            active: course.active !== false,
+            firstEdition: str(course.firstEdition),
+            lastEdition: str(course.lastEdition),
+        },
+        university: convertToAthensUniversity(data.university),
+        reviews: records(data.reviews).map(convertToAthensReview),
+        siblings: records(data.siblings).map(convertToAthensCourse),
+        elsewhere: records(data.elsewhere).map((item) => {
+            const other = item.course && typeof item.course === 'object' ? item.course as ApiRecord : {};
+            return {
+                reviewId: num(item.reviewId),
+                course: { id: num(other.id), title: str(other.title), active: other.active !== false },
+                session: str(item.session),
+                program: str(item.program),
+                sections: athensSections(item.sections, ['city', 'practical'] as const),
+            };
+        }),
     };
 }

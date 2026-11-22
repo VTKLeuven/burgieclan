@@ -12,6 +12,9 @@
 namespace App\DataFixtures;
 
 use App\Constants\Feature;
+use App\Entity\AthensCourse;
+use App\Entity\AthensCourseInterest;
+use App\Entity\AthensReview;
 use App\Entity\Course;
 use App\Entity\ExchangeDestination;
 use App\Entity\ExchangeProgramSuggestion;
@@ -37,6 +40,7 @@ use App\Factory\ProgramFactory;
 use App\Factory\QuickLinkFactory;
 use App\Factory\TagFactory;
 use App\Factory\UserDocumentViewFactory;
+use App\Service\Exchange\AthensCatalogue;
 use App\Service\Exchange\ExchangeDestinationCatalog;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -47,6 +51,7 @@ final class AppFixtures extends Fixture
     public function __construct(
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly ExchangeDestinationCatalog $exchangeDestinations,
+        private readonly AthensCatalogue $athensCatalogue,
     ) {}
 
     public function load(ObjectManager $manager): void
@@ -87,6 +92,7 @@ final class AppFixtures extends Fixture
 
         $this->linkRelatedCourses($manager);
         $this->loadExchange($manager);
+        $this->loadAthens($manager);
     }
 
     /**
@@ -133,6 +139,46 @@ final class AppFixtures extends Fixture
                 ->setNote('Een vriend uit elektrotechniek ging hier vorig jaar naartoe.')
         );
 
+        $manager->flush();
+    }
+
+    /**
+     * The real ATHENS catalogue (resources/athens/catalogue.json), with two reviews of one course,
+     * one still under review, and a few of John's private stars.
+     */
+    private function loadAthens(ObjectManager $manager): void
+    {
+        $this->athensCatalogue->import($this->athensCatalogue->read());
+
+        $courses = $manager->getRepository(AthensCourse::class);
+        $delft = $courses->findOneBy(['code' => 'TUD24']);
+        $madrid = $courses->findOneBy(['code' => 'UPM189']);
+        $john = $this->getReference('john_user', User::class);
+        $jane = $this->getReference('jane_admin', User::class);
+        if (null === $delft || null === $madrid) {
+            return;
+        }
+
+        $manager->persist(
+            (new AthensReview($delft, $jane))
+                ->setSession('2025-11')->setProgram('CW')->setRating(4)
+                ->setContactable(true)
+                ->setUnderReview(false)
+                ->setSections(
+                    [
+                    'course' => 'Voorbeeldreview uit de fixtures. Een week vol hands-on werk met neurale netwerken, goed te volgen met de basis uit de bachelor.',
+                    'exam' => 'Een groepsproject dat je op vrijdag voorstelt. Niet moeilijk als je de week meedoet.',
+                    'city' => 'Delft is klein en gezellig; de activiteiten van de European Dimension waren een fietstocht en een cantus.',
+                    ]
+                )
+        );
+        $manager->persist(
+            (new AthensReview($delft, $john))
+                ->setSession('2026-03')->setProgram('WTK')->setRating(3)
+                ->setSections(['practical' => 'Hostel in Den Haag, 25 minuten met de tram. Rond €300 voor de week.'])
+        );
+        $manager->persist(new AthensCourseInterest($john, $delft, 5));
+        $manager->persist(new AthensCourseInterest($john, $madrid, 3));
         $manager->flush();
     }
 

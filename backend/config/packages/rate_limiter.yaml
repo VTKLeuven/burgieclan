@@ -64,3 +64,15 @@ framework:
             policy: sliding_window
             limit: 20
             interval: '1 day'
+
+        # Reviewing an ATHENS course (AthensController::create). Each one waits for a moderator.
+        athens_review:
+            policy: sliding_window
+            limit: 5
+            interval: '1 day'
+
+        # Private stars on ATHENS courses (AthensController::stars).
+        athens_stars:
+            policy: sliding_window
+            limit: 120
+            interval: '1 minute'

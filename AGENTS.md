@@ -127,6 +127,12 @@ Other subsystems:
   `VTK_SERVICE_SECRET` the other way round, and passes the answers on. vtk.be decides who a poll is for and
   keeps every answer anonymous. Only accounts that signed in through VTK (`fluxusSub`) get polls. The signature
   has a shared vector with vtk-website-new (`VtkPollsTest::testSignatureMatchesTheVtkWebsite`).
+- **ATHENS** (the ATHENS tab of Uitwisselingen, `/exchange/athens`): the courses of the faculty's ATHENS catalogue
+  (`AthensCourse`, `AthensUniversity`), moderated reviews (`AthensReview`) and each student's private 1–5 stars
+  (`AthensCourseInterest`, never shown to anyone else), served by `AthensController`. The catalogue lives in
+  `backend/resources/athens/catalogue.json` and changes every year: `resources/athens/README.md` has the update
+  (PDF → `catalogue_from_pdf.py` → `app:exchange:import-athens --dry-run`). Every deploy runs the import. Courses
+  that leave the catalogue are made inactive, never deleted, so their reviews come back with them (`AthensCatalogue`).
 - **Course notifications**: a favourite course ("Mijn vakken") is a followed course; `User::$mutedCourses` holds
   the exceptions (the bell next to the star). `CourseNotifier` fans out with one DBAL statement per event from
   `CourseNotificationListener` (document out of review, course comment, exam started) and from

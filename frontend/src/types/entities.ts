@@ -661,3 +661,91 @@ export interface ExchangeDestinationDetail {
     /** The reader's own programme suggestions that still wait for a moderator. */
     pendingSuggestions: { program: string; action: 'add' | 'remove' }[];
 }
+
+/** The parts of an ATHENS review, in the order they are shown. */
+export const ATHENS_TOPICS = ['course', 'exam', 'city', 'practical'] as const;
+export type AthensTopic = typeof ATHENS_TOPICS[number];
+
+/** An ATHENS week, as in the catalogue file: dates as YYYY-MM-DD, registrationOpens as YYYY-MM. */
+export interface AthensSession {
+    start: string;
+    end: string;
+    deadline: string | null;
+    registrationOpens: string | null;
+}
+
+export interface AthensUniversity {
+    id: number;
+    name: string;
+    city: string;
+    country: string;
+    /** The same university among the Erasmus destinations, if it is one. */
+    erasmusDestinationId: number | null;
+}
+
+export interface AthensCourse {
+    id: number;
+    code: string;
+    title: string;
+    evaluation: string;
+    /** Programme codes with a positive advice; only those count for an application. */
+    programs: string[];
+    universityId: number;
+    reviewCount: number;
+    /** Average score of the approved reviews, one decimal. */
+    rating: number | null;
+    /** The reader's own stars: how much they would like to take it. Nobody else sees them. */
+    myStars: number | null;
+}
+
+export interface AthensReview {
+    id: number;
+    /** "2025-11" or "2026-03". */
+    session: string;
+    program: string;
+    rating: number;
+    sections: Partial<Record<AthensTopic, string>>;
+    author: string | null;
+    contactEmail: string | null;
+    mine: boolean;
+    underReview: boolean;
+    createdAt: string;
+}
+
+export interface AthensRecent {
+    reviewId: number;
+    course: { id: number; code: string; title: string };
+    university: string;
+    topic: AthensTopic;
+    excerpt: string;
+    session: string;
+    program: string;
+    rating: number;
+}
+
+export interface AthensOverview {
+    edition: string;
+    published: string;
+    source: string;
+    sessions: AthensSession[];
+    universities: AthensUniversity[];
+    courses: AthensCourse[];
+    recent: AthensRecent[];
+}
+
+/** What students of the university's other courses wrote about the city and the practical side. */
+export interface AthensElsewhere {
+    reviewId: number;
+    course: { id: number; title: string; active: boolean };
+    session: string;
+    program: string;
+    sections: Partial<Record<'city' | 'practical', string>>;
+}
+
+export interface AthensCourseDetail {
+    course: AthensCourse & { active: boolean; firstEdition: string; lastEdition: string };
+    university: AthensUniversity;
+    reviews: AthensReview[];
+    siblings: AthensCourse[];
+    elsewhere: AthensElsewhere[];
+}

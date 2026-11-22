@@ -2,12 +2,16 @@
 
 import { LINKS } from '@/components/exchange/exchangeData';
 import ExchangeShell from '@/components/exchange/ExchangeShell';
-import { BriefcaseBusiness, CalendarRange, ExternalLink, GraduationCap, HandHeart, Sun, type LucideIcon } from 'lucide-react';
+import Link from '@/components/ui/Link';
+import { ArrowRight, BriefcaseBusiness, CalendarRange, ExternalLink, GraduationCap, HandHeart, Sun, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-/** The shorter options, as the faculty describes them, each with the pages that tell more. */
+/**
+ * The shorter options, as the faculty describes them, each with the pages that tell more. A link
+ * starting with "/" is a page of our own (ATHENS has a tab of its own).
+ */
 const OPTIONS: { key: string; icon: LucideIcon; links: [string, string][] }[] = [
-    { key: 'athens', icon: CalendarRange, links: [['athens', LINKS.athens]] },
+    { key: 'athens', icon: CalendarRange, links: [['athens_tab', '/exchange/athens'], ['athens', LINKS.athens]] },
     { key: 'best', icon: GraduationCap, links: [['best', LINKS.best]] },
     { key: 'summer', icon: Sun, links: [['summer', LINKS.summerSchools]] },
     {
@@ -47,10 +51,17 @@ export default function ShortTermPage() {
                             <ul className="m-0 mt-auto flex list-none flex-wrap gap-x-4 gap-y-1.5 p-0 pt-4 text-small">
                                 {links.map(([label, href]) => (
                                     <li key={label}>
-                                        <a href={href} target="_blank" rel="noopener noreferrer" className="vtk-link inline-flex items-center gap-1.5">
-                                            {t(`exchange.short.link.${label}`)}
-                                            <ExternalLink className="size-3 shrink-0" aria-hidden="true" />
-                                        </a>
+                                        {href.startsWith('/') ? (
+                                            <Link href={href} className="vtk-link inline-flex items-center gap-1.5 font-medium">
+                                                {t(`exchange.short.link.${label}`)}
+                                                <ArrowRight className="size-3 shrink-0" aria-hidden="true" />
+                                            </Link>
+                                        ) : (
+                                            <a href={href} target="_blank" rel="noopener noreferrer" className="vtk-link inline-flex items-center gap-1.5">
+                                                {t(`exchange.short.link.${label}`)}
+                                                <ExternalLink className="size-3 shrink-0" aria-hidden="true" />
+                                            </a>
+                                        )}
                                     </li>
                                 ))}
                             </ul>

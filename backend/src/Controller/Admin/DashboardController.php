@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Repository\AthensReviewRepository;
 use App\Repository\DocumentRepository;
 use App\Repository\ExchangeDestinationRepository;
 use App\Repository\ExchangeReportRepository;
@@ -26,6 +27,7 @@ class DashboardController extends AbstractDashboardController
         private readonly DocumentRepository $documentRepository,
         private readonly ExchangeReportRepository $exchangeReportRepository,
         private readonly ExchangeDestinationRepository $exchangeDestinationRepository,
+        private readonly AthensReviewRepository $athensReviewRepository,
         private readonly FaqQuestionRepository $faqQuestionRepository,
         private readonly LegacySiteClickRepository $legacySiteClickRepository,
     ) {}
@@ -124,8 +126,14 @@ class DashboardController extends AbstractDashboardController
         $exchangeReportsMenu = MenuItem::linkTo(ExchangeReportCrudController::class, 'Reports', 'fa-solid fa-comment-dots');
         $exchangeDestinationsMenu = MenuItem::linkTo(ExchangeDestinationCrudController::class, 'Destinations', 'fa-solid fa-building-columns');
         $exchangeSuggestionsMenu = MenuItem::linkTo(ExchangeProgramSuggestionCrudController::class, 'Programme suggestions', 'fa-solid fa-code-pull-request');
+        $athensReviewsMenu = MenuItem::linkTo(AthensReviewCrudController::class, 'ATHENS reviews', 'fa-solid fa-star-half-stroke');
+        $athensCoursesMenu = MenuItem::linkTo(AthensCourseCrudController::class, 'ATHENS courses', 'fa-solid fa-list');
         $exchangeMenu = MenuItem::subMenu('Exchanges', 'fa-solid fa-earth-europe')
-            ->setSubItems([$exchangeReportsMenu, $exchangeDestinationsMenu, $exchangeSuggestionsMenu]);
+            ->setSubItems([$exchangeReportsMenu, $exchangeDestinationsMenu, $exchangeSuggestionsMenu, $athensReviewsMenu, $athensCoursesMenu]);
+        $athensUnderReview = $this->athensReviewRepository->countUnderReview();
+        if ($athensUnderReview > 0) {
+            $athensReviewsMenu->setBadge($athensUnderReview, 'danger');
+        }
         $reportsUnderReview = $this->exchangeReportRepository->countUnderReview();
         $destinationsUnapproved = $this->exchangeDestinationRepository->countUnapproved();
         $suggestionsPending = $this->exchangeDestinationRepository->countPendingSuggestions();
@@ -138,8 +146,9 @@ class DashboardController extends AbstractDashboardController
         if ($destinationsUnapproved > 0) {
             $exchangeDestinationsMenu->setBadge($destinationsUnapproved, 'danger');
         }
-        if ($reportsUnderReview + $destinationsUnapproved + $suggestionsPending > 0) {
-            $exchangeMenu->setBadge($reportsUnderReview + $destinationsUnapproved + $suggestionsPending, 'danger');
+        $exchangeTodo = $reportsUnderReview + $destinationsUnapproved + $suggestionsPending + $athensUnderReview;
+        if ($exchangeTodo > 0) {
+            $exchangeMenu->setBadge($exchangeTodo, 'danger');
         }
         yield $exchangeMenu;
         yield MenuItem::linkTo(PageCrudController::class, 'Pages', 'fa-solid fa-newspaper')

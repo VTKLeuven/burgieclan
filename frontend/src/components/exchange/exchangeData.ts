@@ -135,6 +135,11 @@ export const LINKS = {
     doubleDegree: 'https://eng.kuleuven.be/en/study/internationalisation/dual_double_joint_degree',
     internationalisation: 'https://eng.kuleuven.be/studeren/internationalisering',
     athens: 'https://eng.kuleuven.be/studeren/internationalisering/athens',
+    athensPractical: 'https://eng.kuleuven.be/en/study/internationalisation/athens/athens-practical-info-for-kuleuven-students',
+    athensProcedure: 'https://eng.kuleuven.be/en/study/internationalisation/athens/athens_applicationprocedure',
+    athensNetwork: 'https://athensnetwork.eu/',
+    athensRegister: 'https://register.athensnetwork.eu',
+    athensCoordinator: 'https://www.kuleuven.be/wieiswie/nl/person/ue708881',
     best: 'https://best.eu.org/courses/list.jsp',
     summerSchools: 'https://eng.kuleuven.be/studeren/internationalisering/summerschools',
     internships: 'https://eng.kuleuven.be/studeren/internationalisering/stage-masterproef',
@@ -166,4 +171,46 @@ export function saveProgram(program: string | null): void {
     } catch {
         // Private mode or blocked storage: the filter just is not remembered.
     }
+}
+
+/**
+ * The ATHENS weeks someone can have taken part in, newest first: every November and March
+ * session that has started, back to six academic years ago. As "2025-11".
+ */
+export function pastAthensSessions(today = new Date()): string[] {
+    const sessions: string[] = [];
+    for (let year = today.getFullYear(); year >= today.getFullYear() - 6; year -= 1) {
+        for (const month of [11, 3]) {
+            if (new Date(year, month - 1, 1) <= today) sessions.push(`${year}-${String(month).padStart(2, '0')}`);
+        }
+    }
+    return sessions;
+}
+
+/** "2025-11" → "november 2025"; with `short`, "nov 25". */
+export function athensSessionLabel(session: string, t: (key: string, options?: Record<string, unknown>) => string, short = false): string {
+    const match = /^(\d{4})-(03|11)$/.exec(session);
+    if (!match) return session;
+    const month = match[2] === '11' ? 'november' : 'march';
+    return short
+        ? t(`exchange.athens.session_short.${month}`, { year: match[1].slice(2) })
+        : t(`exchange.athens.session.${month}`, { year: match[1] });
+}
+
+const MONTH_NAMES: [string[], string[]] = [
+    ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'],
+    ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+];
+
+/**
+ * "2027-03-13" → "13 maart 2027" (without the year with `withYear` false), "2027-01" → "januari
+ * 2027". Its own table rather than Intl, which Node and the browser do not always word the same
+ * (see COUNTRY_NAMES).
+ */
+export function formatAthensDate(value: string, locale: string, withYear = true): string {
+    const match = /^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(value);
+    if (!match) return value;
+    const month = MONTH_NAMES[locale.startsWith('en') ? 1 : 0][Number(match[2]) - 1] ?? match[2];
+    if (!match[3]) return `${month} ${match[1]}`;
+    return `${Number(match[3])} ${month}${withYear ? ` ${match[1]}` : ''}`;
 }

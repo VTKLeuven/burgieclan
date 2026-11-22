@@ -1174,6 +1174,7 @@
         "title": "Exchanges",
         "tabs": {
             "erasmus": "Erasmus",
+            "athens": "ATHENS",
             "short": "Shorter stays abroad"
         },
         "share": "Share your experience",
@@ -1462,7 +1463,8 @@
                 "humasol": "HUMASOL",
                 "aiesec": "AIESEC",
                 "south": "Going South",
-                "travel_grants": "Travel grants"
+                "travel_grants": "Travel grants",
+                "athens_tab": "Courses, reviews and how to apply"
             }
         },
         "suggest": {
@@ -1475,6 +1477,150 @@
             "sent": "Thanks! A moderator will review your suggestion.",
             "failed": "Sending failed. {{detail}}",
             "pending": "Your suggestion awaits review: {{changes}}"
+        },
+        "athens": {
+            "share": "Write a review",
+            "intro": "An intensive one-week course at another European technical university, in November or March. Here you find which courses of the faculty's catalogue count for your programme, what students who took them thought, and how to apply.",
+            "courses": "Courses",
+            "edition": "The faculty's {{edition}} catalogue",
+            "count_one": "{{count}} course",
+            "count_other": "{{count}} courses",
+            "search": "Search a course, code, university or city",
+            "all_universities": "All universities",
+            "choose_program": "Choose your programme: only courses with a positive advice for your programme count for your application.",
+            "program_hint": "Only courses with a positive advice for {{program}}: only those count. Which ones actually run in the next session only shows on the registration platform.",
+            "sort": {
+                "label": "Sort",
+                "university": "By university",
+                "mine": "My stars",
+                "rating": "Best rated"
+            },
+            "only_starred_one": "Only with my stars ({{count}})",
+            "only_starred_other": "Only with my stars ({{count}})",
+            "only_reviews": "Only with reviews",
+            "empty": "No courses for these filters.",
+            "empty_starred": "You have not starred any course yet. Click the stars next to a course to keep track of what interests you.",
+            "load_failed": "The ATHENS courses could not be loaded. Try again later.",
+            "no_reviews": "No reviews yet",
+            "average": "{{rating}} out of 5 on average",
+            "advice_count_one": "positive advice for {{count}} programme",
+            "advice_count_other": "positive advice for {{count}} programmes",
+            "advice_none": "for no programme",
+            "erasmus_too": "Also an Erasmus destination",
+            "recent_hint": "From the reviews of students who did an ATHENS week",
+            "under_review_hint": "Only you see this review until a moderator checks it.",
+            "stars": {
+                "label": "My interest",
+                "hint": "The stars next to each course are just for you: how much you would like to take it. Nobody else sees them. Handy for picking your three choices.",
+                "private": "Only you see this, also after a reload.",
+                "n_one": "{{count}} star",
+                "n_other": "{{count}} stars"
+            },
+            "session": {
+                "november": "November {{year}}",
+                "march": "March {{year}}"
+            },
+            "session_short": {
+                "november": "Nov {{year}}",
+                "march": "Mar {{year}}"
+            },
+            "sessions": {
+                "title": "Next sessions",
+                "none": "The next dates are not known yet. See the faculty's site.",
+                "range": "{{start}} – {{end}}",
+                "deadline": "Apply until {{date}}",
+                "opens": "Courses and registration from {{month}}"
+            },
+            "steps": {
+                "title": "How to apply",
+                "register": "Create an account on the ATHENS registration platform with your student.kuleuven.be address and fill in your details.",
+                "choose": "Choose at least three courses with a positive advice for your programme, and approve the Student Commitment.",
+                "sign": "Print your application, sign it and e-mail the scan to the faculty's ATHENS coordinator before the deadline. Submit it online too.",
+                "selection": "Your programme director approves your choices; then ParisTech assigns the courses at random. You get an e-mail with your course and the practical details.",
+                "isp": "Add H0V01A (Capita Selecta ATHENS I, November) or H0V02A (ATHENS II, March) to your ISP."
+            },
+            "rules": {
+                "title": "Good to know",
+                "once": "You can take part once, during your master's.",
+                "before": "Only before a semester or year abroad, not after it.",
+                "room": "Your ISP must still have room for electives.",
+                "retake": "There is no resit. If you take it in your final year, you must pass to graduate.",
+                "costs": "No grant and no housing: count on €250 to €600 for the week, plus the fee for the European Dimension activities.",
+                "cancel": "Cancelling after the selection costs a cancellation fee."
+            },
+            "link": {
+                "practical": "ATHENS for KU Leuven students",
+                "procedure": "Application procedure",
+                "catalogue": "Catalogue with the advice per programme (pdf)",
+                "register": "Registration platform",
+                "network": "ATHENS Network",
+                "coordinator": "The faculty's ATHENS coordinator"
+            },
+            "topics": {
+                "course": {
+                    "name": "The course",
+                    "prompt": "Content, level, teachers, workload"
+                },
+                "exam": {
+                    "name": "Evaluation",
+                    "prompt": "How you were assessed, and how hard it was"
+                },
+                "city": {
+                    "name": "City and activities",
+                    "prompt": "The city, the European Dimension activities, the group"
+                },
+                "practical": {
+                    "name": "Practical",
+                    "prompt": "Housing, costs, the journey"
+                }
+            },
+            "form": {
+                "title": "Write a review",
+                "intro": "A few sentences already help. Every topic is optional. Your review goes online once a moderator has checked it.",
+                "course": "Course",
+                "choose_course": "Choose the course you took",
+                "session": "Session",
+                "rating": "Would you recommend it?",
+                "rating_words": {
+                    "1": "Not at all",
+                    "2": "Rather not",
+                    "3": "It's okay",
+                    "4": "Yes",
+                    "5": "Absolutely"
+                },
+                "contactable_hint": "Signed-in students then see your e-mail address with your review.",
+                "show_name_hint": "Otherwise only your programme and the session are shown.",
+                "sent": "Thanks! Your review goes online once a moderator has checked it.",
+                "errors": {
+                    "course": "Choose the course you took.",
+                    "rating": "Give the course a score from 1 to 5 stars.",
+                    "empty": "Write about at least one topic.",
+                    "rate": "You wrote a lot of reviews today. Try again tomorrow."
+                }
+            },
+            "course": {
+                "advice": "Does it count for your programme?",
+                "advice_hint": "The programme directors' advice in the catalogue. Only courses with a positive advice for your programme are considered.",
+                "advice_yes": "Positive advice for {{program}}: this course counts for your application.",
+                "advice_no": "No positive advice for {{program}}: this course does not count for your application.",
+                "positive": "positive advice",
+                "negative": "no positive advice",
+                "university": "University",
+                "code": "Code",
+                "evaluation": "Evaluation",
+                "catalogue": "In the catalogue",
+                "erasmus": "Experiences of a semester at {{name}}",
+                "siblings": "Also at {{name}}",
+                "reviews": "Reviews",
+                "empty_title": "No reviews yet",
+                "empty_text": "Did you take this course in {{city}}? Help those still choosing with a short review.",
+                "inactive": "This course is no longer in the faculty's catalogue (last in {{last}}), so you cannot choose it now. The reviews stay for when it comes back.",
+                "elsewhere": "About {{city}}",
+                "elsewhere_hint": "From reviews of other courses at {{name}}",
+                "load_failed": "This course could not be loaded. Try again later.",
+                "not_found": "This course does not exist.",
+                "back": "Back to the ATHENS courses"
+            }
         }
     }
 }
