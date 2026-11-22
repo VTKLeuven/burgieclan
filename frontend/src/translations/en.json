@@ -1487,21 +1487,16 @@
             "count_other": "{{count}} courses",
             "search": "Search a course, code, university or city",
             "all_universities": "All universities",
-            "choose_program": "Choose your programme: only courses with a positive advice for your programme count for your application.",
-            "program_hint": "Only courses with a positive advice for {{program}}: only those count. Which ones actually run in the next session only shows on the registration platform.",
+            "choose_program": "Choose your programme: only courses with a positive advice for your programme count.",
             "sort": {
                 "label": "Sort",
                 "university": "By university",
-                "mine": "My stars",
+                "mine": "My stars first",
                 "rating": "Best rated"
             },
-            "only_starred_one": "Only with my stars ({{count}})",
-            "only_starred_other": "Only with my stars ({{count}})",
-            "only_reviews": "Only with reviews",
             "empty": "No courses for these filters.",
             "empty_starred": "You have not starred any course yet. Click the stars next to a course to keep track of what interests you.",
             "load_failed": "The ATHENS courses could not be loaded. Try again later.",
-            "no_reviews": "No reviews yet",
             "average": "{{rating}} out of 5 on average",
             "advice_count_one": "positive advice for {{count}} programme",
             "advice_count_other": "positive advice for {{count}} programmes",
@@ -1511,7 +1506,6 @@
             "under_review_hint": "Only you see this review until a moderator checks it.",
             "stars": {
                 "label": "My interest",
-                "hint": "The stars next to each course are just for you: how much you would like to take it. Nobody else sees them. Handy for picking your three choices.",
                 "private": "Only you see this, also after a reload.",
                 "n_one": "{{count}} star",
                 "n_other": "{{count}} stars"
@@ -1620,7 +1614,47 @@
                 "load_failed": "This course could not be loaded. Try again later.",
                 "not_found": "This course does not exist.",
                 "back": "Back to the ATHENS courses"
-            }
+            },
+            "edition_program": "The faculty's {{edition}} catalogue · only courses with a positive advice for {{program}}",
+            "all_programs": "All programmes",
+            "filter": {
+                "starred": "My stars",
+                "reviews": "With reviews",
+                "starred_hint": "The stars next to each course are yours alone: how much you would like to take it. Nobody else sees them."
+            },
+            "register": {
+                "label": "List of the registration platform",
+                "all": "All courses",
+                "on": "In {{month}}",
+                "off": "Not in {{month}}",
+                "hint": "According to the list of the ATHENS registration platform for {{session}} (updated {{date}}). Courses not on it do not run then.",
+                "badge_title": "On the {{session}} list of the ATHENS registration platform",
+                "empty_on": "None of these courses is on the {{session}} list."
+            },
+            "info": {
+                "title": "About this course",
+                "source": "From the course's page on the ATHENS registration platform, in the university's language.",
+                "on_list": "On the {{session}} list of the ATHENS registration platform.",
+                "off_list": "Last on the {{session}} list of the ATHENS registration platform; it is not on it now.",
+                "open": "View on the registration platform",
+                "prerequisites": "Prerequisites",
+                "objectives": "Objectives",
+                "programme": "Programme",
+                "exam": "Exam",
+                "activities": "European Dimension activities",
+                "language": "Language",
+                "minimum_year": "From",
+                "year": "year {{year}}",
+                "type": "Type",
+                "professors": "Professors",
+                "address": "Address",
+                "start": "Starts",
+                "cost": "Activities cost",
+                "categories": "Fields",
+                "more": "Read more",
+                "less": "Less"
+            },
+            "no_reviews": "No reviews yet"
         }
     }
 }

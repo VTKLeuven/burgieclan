@@ -34,6 +34,7 @@ export default function Select({
     placeholder,
     disabled,
     className,
+    inputClassName,
     'aria-label': ariaLabel,
 }: {
     id?: string;
@@ -44,6 +45,8 @@ export default function Select({
     placeholder?: string;
     disabled?: boolean;
     className?: string;
+    /** On the field itself, such as a smaller height; the plain select is the field, so it gets both. */
+    inputClassName?: string;
     'aria-label'?: string;
 }) {
     if (options.length < SEARCH_FROM) {
@@ -51,7 +54,7 @@ export default function Select({
             <select
                 id={id}
                 aria-label={ariaLabel}
-                className={cn('vtk-select', className)}
+                className={cn('vtk-select', className, inputClassName)}
                 value={value}
                 disabled={disabled}
                 onChange={(event) => onChange(event.target.value)}
@@ -71,6 +74,7 @@ export default function Select({
             placeholder={placeholder}
             disabled={disabled}
             className={className}
+            inputClassName={inputClassName}
             aria-label={ariaLabel}
         />
     );
@@ -84,6 +88,7 @@ function SearchSelect({
     placeholder,
     disabled,
     className,
+    inputClassName,
     'aria-label': ariaLabel,
 }: {
     id?: string;
@@ -93,6 +98,7 @@ function SearchSelect({
     placeholder?: string;
     disabled?: boolean;
     className?: string;
+    inputClassName?: string;
     'aria-label'?: string;
 }) {
     const { t } = useTranslation();
@@ -120,7 +126,7 @@ function SearchSelect({
                 <ComboboxInput
                     id={id}
                     aria-label={ariaLabel}
-                    className="vtk-input pr-9"
+                    className={cn('vtk-input pr-9', inputClassName)}
                     displayValue={(option: SelectOption | null) => option?.label ?? ''}
                     placeholder={placeholder}
                     autoComplete="off"

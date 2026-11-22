@@ -696,6 +696,47 @@ export interface AthensCourse {
     rating: number | null;
     /** The reader's own stars: how much they would like to take it. Nobody else sees them. */
     myStars: number | null;
+    /** On the list of the ATHENS registration platform for the session open there now. */
+    onRegister: boolean;
+}
+
+/** The list of the ATHENS registration platform, as last read: which session it shows. */
+export interface AthensRegisterList {
+    /** "2026-11" */
+    session: string;
+    /** YYYY-MM-DD */
+    fetched: string;
+    source: string;
+}
+
+/**
+ * What a course's own page on the ATHENS registration platform says, as plain text (paragraphs on
+ * lines of their own, list items starting with "• "). Empty strings where the page says nothing.
+ */
+export interface AthensRegisterInfo {
+    url: string;
+    /** On the list of the session open there now. */
+    onList: boolean;
+    /** The session the page was read for, "2026-11". */
+    session: string;
+    fetched: string;
+    type: string;
+    language: string;
+    minimumYear: string;
+    location: string;
+    address: string;
+    city: string;
+    professors: string;
+    otherProfessors: string;
+    prerequisites: string;
+    objectives: string;
+    programme: string;
+    exam: string;
+    /** The extra activities around the course week (city trip, welcome evening…). */
+    activitiesStart: string;
+    activitiesCost: string;
+    activities: string;
+    categories: string[];
 }
 
 export interface AthensReview {
@@ -731,6 +772,7 @@ export interface AthensOverview {
     universities: AthensUniversity[];
     courses: AthensCourse[];
     recent: AthensRecent[];
+    register: AthensRegisterList | null;
 }
 
 /** What students of the university's other courses wrote about the city and the practical side. */
@@ -748,4 +790,5 @@ export interface AthensCourseDetail {
     reviews: AthensReview[];
     siblings: AthensCourse[];
     elsewhere: AthensElsewhere[];
+    register: AthensRegisterInfo | null;
 }

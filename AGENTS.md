@@ -133,6 +133,9 @@ Other subsystems:
   `backend/resources/athens/catalogue.json` and changes every year: `resources/athens/README.md` has the update
   (PDF → `catalogue_from_pdf.py` → `app:exchange:import-athens --dry-run`). Every deploy runs the import. Courses
   that leave the catalogue are made inactive, never deleted, so their reviews come back with them (`AthensCatalogue`).
+  Each course also links to its page on the ATHENS registration platform, with what that page says and whether it
+  is on the list of the session open there: `app:exchange:scrape-athens-register` writes `register.json`
+  (`AthensRegister`), the import copies it onto the courses. Scrape again when a new session's list goes up.
 - **Course notifications**: a favourite course ("Mijn vakken") is a followed course; `User::$mutedCourses` holds
   the exceptions (the bell next to the star). `CourseNotifier` fans out with one DBAL statement per event from
   `CourseNotificationListener` (document out of review, course comment, exam started) and from

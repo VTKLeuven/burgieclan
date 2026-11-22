@@ -47,7 +47,7 @@ class AthensCatalogue
      *     published: string,
      *     source: string,
      *     sessions: list<array<string, string>>,
-     *     universities: array<string, array{name: string, city: string, country: string}>,
+     *     universities: array<string, array{name: string, city: string, country: string, registerNames: list<string>}>,
      *     courses: list<array{code: string, university: string, title: string, evaluation: string, programs: list<string>}>
      * }
      */
@@ -214,7 +214,7 @@ class AthensCatalogue
      *     published: string,
      *     source: string,
      *     sessions: list<array<string, string>>,
-     *     universities: array<string, array{name: string, city: string, country: string}>,
+     *     universities: array<string, array{name: string, city: string, country: string, registerNames: list<string>}>,
      *     courses: list<array{code: string, university: string, title: string, evaluation: string, programs: list<string>}>
      * }
      */
@@ -266,7 +266,14 @@ class AthensCatalogue
                 $problems[] = sprintf('University "%s" needs a slug (a-z, 0-9, -), a name, a city and a two-letter country code.', is_string($slug) ? $slug : '?');
                 continue;
             }
-            $universities[$slug] = ['name' => trim($name), 'city' => trim($city), 'country' => $country];
+            $registerNames = is_array($university['registerNames'] ?? null) ? $university['registerNames'] : [];
+            $universities[$slug] = [
+                'name' => trim($name),
+                'city' => trim($city),
+                'country' => $country,
+                // How the ATHENS registration platform writes the name, when it differs (AthensRegister).
+                'registerNames' => array_values(array_filter($registerNames, static fn (mixed $alias): bool => is_string($alias) && '' !== trim($alias))),
+            ];
         }
 
         $programs = array_map(static fn (ExchangeProgram $program): string => $program->value, ExchangeProgram::cases());

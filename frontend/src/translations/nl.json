@@ -1487,21 +1487,16 @@
             "count_other": "{{count}} vakken",
             "search": "Zoek een vak, code, universiteit of stad",
             "all_universities": "Alle universiteiten",
-            "choose_program": "Kies je richting: enkel vakken met een positief advies voor jouw richting tellen mee voor je aanvraag.",
-            "program_hint": "Enkel vakken met een positief advies voor {{program}}: alleen die tellen mee. Welke er in de volgende sessie echt doorgaan, zie je pas op het registratieplatform.",
+            "choose_program": "Kies je richting: enkel vakken met een positief advies voor jouw richting tellen mee.",
             "sort": {
                 "label": "Sorteren",
                 "university": "Per universiteit",
-                "mine": "Mijn sterren",
+                "mine": "Mijn sterren eerst",
                 "rating": "Best beoordeeld"
             },
-            "only_starred_one": "Enkel met mijn sterren ({{count}})",
-            "only_starred_other": "Enkel met mijn sterren ({{count}})",
-            "only_reviews": "Enkel met reviews",
             "empty": "Geen vakken voor deze filters.",
             "empty_starred": "Je gaf nog geen enkel vak sterren. Klik op de sterren naast een vak om bij te houden wat je interesseert.",
             "load_failed": "De ATHENS-vakken konden niet geladen worden. Probeer het later opnieuw.",
-            "no_reviews": "Nog geen reviews",
             "average": "Gemiddeld {{rating}} op 5",
             "advice_count_one": "positief advies voor {{count}} richting",
             "advice_count_other": "positief advies voor {{count}} richtingen",
@@ -1511,7 +1506,6 @@
             "under_review_hint": "Enkel jij ziet deze review tot een moderator ze nakijkt.",
             "stars": {
                 "label": "Mijn interesse",
-                "hint": "De sterren naast elk vak zijn enkel voor jou: hoe graag je het zou doen. Niemand anders ziet ze. Handig om je drie keuzes te kiezen.",
                 "private": "Enkel jij ziet dit, ook na het vernieuwen.",
                 "n_one": "{{count}} ster",
                 "n_other": "{{count}} sterren"
@@ -1620,7 +1614,47 @@
                 "load_failed": "Dit vak kon niet geladen worden. Probeer het later opnieuw.",
                 "not_found": "Dit vak bestaat niet.",
                 "back": "Terug naar de ATHENS-vakken"
-            }
+            },
+            "edition_program": "Catalogus {{edition}} · enkel vakken met een positief advies voor {{program}}",
+            "all_programs": "Alle richtingen",
+            "filter": {
+                "starred": "Mijn sterren",
+                "reviews": "Met reviews",
+                "starred_hint": "De sterren naast elk vak zijn enkel voor jou: hoe graag je het zou doen. Niemand anders ziet ze."
+            },
+            "register": {
+                "label": "Lijst van het registratieplatform",
+                "all": "Alle vakken",
+                "on": "In {{month}}",
+                "off": "Niet in {{month}}",
+                "hint": "Volgens de lijst van het ATHENS-registratieplatform voor {{session}} (bijgewerkt op {{date}}). Vakken die er niet op staan, gaan dan niet door.",
+                "badge_title": "Op de lijst van {{session}} van het ATHENS-registratieplatform",
+                "empty_on": "Geen van deze vakken staat op de lijst van {{session}}."
+            },
+            "info": {
+                "title": "Over dit vak",
+                "source": "Van de pagina van het vak op het ATHENS-registratieplatform, in de taal van de universiteit.",
+                "on_list": "Op de lijst van {{session}} van het ATHENS-registratieplatform.",
+                "off_list": "Stond het laatst op de lijst van {{session}} van het ATHENS-registratieplatform; nu staat het er niet op.",
+                "open": "Bekijk op het registratieplatform",
+                "prerequisites": "Voorkennis",
+                "objectives": "Doelstellingen",
+                "programme": "Programma",
+                "exam": "Examen",
+                "activities": "European Dimension-activiteiten",
+                "language": "Taal",
+                "minimum_year": "Vanaf",
+                "year": "{{year}}e jaar",
+                "type": "Soort",
+                "professors": "Docenten",
+                "address": "Adres",
+                "start": "Begint op",
+                "cost": "Kost activiteiten",
+                "categories": "Domeinen",
+                "more": "Lees meer",
+                "less": "Minder"
+            },
+            "no_reviews": "Nog geen reviews"
         }
     }
 }

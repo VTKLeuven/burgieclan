@@ -49,6 +49,33 @@ The faculty publishes a new PDF before the November session, usually in Septembe
 
 The PDF is not stored in the repository.
 
+## The registration platform (`register.json`)
+
+The ATHENS network's registration platform (<https://register.athensnetwork.eu/courses>) lists the courses of
+the session that is open now, each with a page of its own: what it is about, the programme of the week, the
+exam, the professors, and the European Dimension activities around it. `register.json` is that list as last
+read, with for every course the catalogue course it is (`match`) and, for those, the page (`info`). The
+ATHENS tab links each course to its page, shows the information, and filters on "on the list" or "not on it".
+
+The platform only shows one session at a time, so read it again whenever a new list goes up (September for
+November, January for March):
+
+```bash
+docker compose exec -T backend php bin/console app:exchange:scrape-athens-register --dry-run -v
+docker compose exec -T backend php bin/console app:exchange:scrape-athens-register
+```
+
+It fetches one page at a time with a short pause, so it takes a minute or two. Then read the list "Not in the
+catalogue": the courses of KU Leuven itself belong there, and so does a course the faculty gave no advice
+for. If the platform names a university differently than `catalogue.json` does, add that name to the
+university's `registerNames` there and scrape again. Commit `register.json`; `app:exchange:import-athens`
+(every deploy) copies it onto the courses. A course that is not on the new list keeps the information it had,
+and its page says when it was last on the list.
+
+A course is recognised at the same university by the same code (spaces, a "BIP" suffix and remarks in
+brackets aside) with a title that is nearly the same or shares words with it, or else by a nearly identical
+title under another code. A code alone is not enough: the platform reuses codes for other courses.
+
 ## How courses are matched
 
 For each course in the file, the import looks for one in the database at the same university:
@@ -76,7 +103,8 @@ or a BIP version) are separate courses, each with its own reviews.
     {"start": "2026-11-14", "end": "2026-11-21", "deadline": "2026-09-21"}
   ],
   "universities": {                 // slug => university; the slug must never change
-    "upm": {"name": "Universidad Politécnica de Madrid", "city": "Madrid", "country": "ES", "sourceNames": ["UPMadrid"]}
+    "upm": {"name": "Universidad Politécnica de Madrid", "city": "Madrid", "country": "ES", "sourceNames": ["UPMadrid"],
+            "registerNames": ["Universidad Politecnica de Madrid"]}   // optional: the name on the registration platform
   },
   "courses": [                      // programs = the programmes with a positive advice (ExchangeProgram codes)
     {"code": "UPM188", "university": "upm", "title": "Accessible Digital Home", "evaluation": "Oral presentation", "programs": ["ARCH", "BMT"]}

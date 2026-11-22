@@ -3,6 +3,7 @@ import {
     type AthensCourse,
     type AthensCourseDetail,
     type AthensOverview,
+    type AthensRegisterInfo,
     type AthensReview,
     type AthensUniversity,
     type Announcement,
@@ -879,6 +880,26 @@ function convertToAthensCourse(value: unknown): AthensCourse {
         reviewCount: num(data.reviewCount),
         rating: numOrNull(data.rating),
         myStars: numOrNull(data.myStars),
+        onRegister: data.onRegister === true,
+    };
+}
+
+const REGISTER_TEXT_FIELDS = [
+    'type', 'language', 'minimumYear', 'location', 'address', 'city', 'professors', 'otherProfessors',
+    'prerequisites', 'objectives', 'programme', 'exam', 'activitiesStart', 'activitiesCost', 'activities',
+] as const;
+
+function convertToAthensRegisterInfo(value: unknown): AthensRegisterInfo | null {
+    if (!value || typeof value !== 'object') return null;
+    const data = value as ApiRecord;
+    const text = Object.fromEntries(REGISTER_TEXT_FIELDS.map((field) => [field, str(data[field]).trim()])) as Record<typeof REGISTER_TEXT_FIELDS[number], string>;
+    return {
+        ...text,
+        url: str(data.url),
+        onList: data.onList === true,
+        session: str(data.session),
+        fetched: str(data.fetched),
+        categories: stringList(data.categories),
     };
 }
 
@@ -937,6 +958,9 @@ export function convertToAthensOverview(value: unknown): AthensOverview {
                 rating: num(item.rating, 3),
             }];
         }),
+        register: data.register && typeof data.register === 'object'
+            ? { session: str((data.register as ApiRecord).session), fetched: str((data.register as ApiRecord).fetched), source: str((data.register as ApiRecord).source) }
+            : null,
     };
 }
 
@@ -963,5 +987,6 @@ export function convertToAthensCourseDetail(value: unknown): AthensCourseDetail 
                 sections: athensSections(item.sections, ['city', 'practical'] as const),
             };
         }),
+        register: convertToAthensRegisterInfo(data.register),
     };
 }

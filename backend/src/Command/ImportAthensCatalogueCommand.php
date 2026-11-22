@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Service\Exchange\AthensCatalogue;
+use App\Service\Exchange\AthensRegister;
 use InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -17,6 +18,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Courses that left the catalogue are hidden, not deleted; their reviews stay. Running it again
  * on the same file changes nothing, so the deploy runs it every time.
  *
+ * Afterwards it copies resources/athens/register.json onto the courses (AthensRegister): the link to
+ * each course's page on the ATHENS registration platform, what that page says, and whether the course
+ * is on the list of the session open there.
+ *
  *     php bin/console app:exchange:import-athens --dry-run
  *     php bin/console app:exchange:import-athens
  */
@@ -28,6 +33,7 @@ final class ImportAthensCatalogueCommand extends Command
 {
     public function __construct(
         private readonly AthensCatalogue $catalogue,
+        private readonly AthensRegister $register,
     ) {
         parent::__construct();
     }
@@ -53,6 +59,15 @@ final class ImportAthensCatalogueCommand extends Command
             return Command::FAILURE;
         }
 
+        try {
+            $register = null === $file ? $this->register->read() : null;
+        } catch (InvalidArgumentException $exception) {
+            $io->error($exception->getMessage());
+
+            return Command::FAILURE;
+        }
+
+        // In a dry run nothing is stored, so the register is only applied for real.
         $result = $this->catalogue->import($catalogue, $dryRun);
 
         foreach (['added' => 'New', 'returned' => 'Back in the catalogue', 'updated' => 'Changed', 'hidden' => 'Hidden (no longer in the catalogue)'] as $key => $title) {
@@ -71,6 +86,14 @@ final class ImportAthensCatalogueCommand extends Command
             count($result['hidden']),
             $result['unchanged']
         );
+        if (null !== $register && !$dryRun) {
+            $applied = $this->register->apply($register);
+            if ([] !== $applied['unknown']) {
+                $io->section(sprintf('In register.json but not among the courses: %d', count($applied['unknown'])));
+                $io->listing($applied['unknown']);
+            }
+            $summary .= sprintf(' Registration platform (%s): %d courses on the list.', $register['session'], $applied['linked']);
+        }
         $dryRun ? $io->note('Dry run, nothing stored. ' . $summary) : $io->success($summary);
 
         return Command::SUCCESS;

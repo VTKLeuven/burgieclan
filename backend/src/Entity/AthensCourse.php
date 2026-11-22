@@ -52,6 +52,23 @@ class AthensCourse extends BaseEntity
     #[ORM\Column(length: 9)]
     private string $lastEdition = '';
 
+    /** Its page on the ATHENS registration platform (AthensRegister::courseUrl()), once it has been on the list there. */
+    #[ORM\Column(nullable: true)]
+    private ?int $registerId = null;
+
+    /**
+     * What its page on the registration platform said the last time it was on the list there:
+     * "session" (YYYY-MM), "fetched", and the fields of AthensRegister::FIELDS plus "categories".
+     *
+     * @var array<string, mixed>|null
+     */
+    #[ORM\Column(type: Types::JSON, nullable: true, options: ['jsonb' => true])]
+    private ?array $registerInfo = null;
+
+    /** On the registration platform's list of the session that is open now (register.json). */
+    #[ORM\Column(options: ['default' => false])]
+    private bool $onRegister = false;
+
     public function __construct(AthensUniversity $university)
     {
         $this->university = $university;
@@ -144,6 +161,44 @@ class AthensCourse extends BaseEntity
     public function setLastEdition(string $lastEdition): static
     {
         $this->lastEdition = $lastEdition;
+
+        return $this;
+    }
+
+    public function getRegisterId(): ?int
+    {
+        return $this->registerId;
+    }
+
+    public function setRegisterId(?int $registerId): static
+    {
+        $this->registerId = $registerId;
+
+        return $this;
+    }
+
+    /** @return array<string, mixed>|null */
+    public function getRegisterInfo(): ?array
+    {
+        return $this->registerInfo;
+    }
+
+    /** @param array<string, mixed>|null $registerInfo */
+    public function setRegisterInfo(?array $registerInfo): static
+    {
+        $this->registerInfo = $registerInfo;
+
+        return $this;
+    }
+
+    public function isOnRegister(): bool
+    {
+        return $this->onRegister;
+    }
+
+    public function setOnRegister(bool $onRegister): static
+    {
+        $this->onRegister = $onRegister;
 
         return $this;
     }

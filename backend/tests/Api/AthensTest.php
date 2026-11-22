@@ -9,8 +9,11 @@ use App\Entity\AthensReview;
 use App\Entity\User;
 use App\Factory\UserFactory;
 use App\Service\Exchange\AthensCatalogue;
+use App\Service\Exchange\AthensRegister;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Browser\KernelBrowser;
 
@@ -289,5 +292,149 @@ class AthensTest extends ApiTestCase
         $this->browser()->put('/api/exchange/athens/courses/' . $id . '/stars', HttpOptions::json(['stars' => null])->withHeader('Authorization', 'Bearer ' . $this->token))
             ->assertStatus(204);
         $this->assertSame(0, $this->entityManager()->getRepository(AthensCourseInterest::class)->count(['course' => $id]));
+    }
+
+    /** A course page of the ATHENS registration platform, as it sends it. */
+    private static function registerPage(string $code, string $title, string $institution, string $extra = ''): string
+    {
+        return <<<HTML
+            <turbo-frame id="content"><div class="card"><div class="card-body"><dl class="row">
+              <dt class="col-md-2">Session</dt><dd class="col-md-4">
+                November 2026
+              </dd>
+              <dt>Institution</dt><dd>{$institution}</dd>
+              <dt>Title</dt><dd>{$title}</dd>
+              <dt>Code</dt><dd>{$code}</dd>
+              <dt>Type of Course</dt><dd> Classic ATHENS course </dd>
+              {$extra}
+              <dt>Categories</dt><dd><span class="badge">Mechanics</span> <span class="badge">Physics</span></dd>
+            </dl></div></div></div></turbo-frame>
+            HTML;
+    }
+
+    /** @param list<array{int, string, string, string, string}> $pages [id, code, title, institution, extra] */
+    private function registerFor(array $pages): AthensRegister
+    {
+        $list = '<turbo-frame id="content"><h2 class="text-xl"> Current courses for November 2026 </h2><div class="accordion">';
+        foreach ($pages as [$id]) {
+            $list .= sprintf('<div class="accordion-item"><h2 class="accordion-header"><button data-bs-target="#accordion-%d-collapse">x</button></h2></div>', $id);
+        }
+        $responses = [new MockResponse($list . '</div></turbo-frame>')];
+        foreach ($pages as [, $code, $title, $institution, $extra]) {
+            $responses[] = new MockResponse(self::registerPage($code, $title, $institution, $extra));
+        }
+
+        return new AthensRegister(new MockHttpClient($responses), $this->entityManager(), '/nonexistent/register.json', 0);
+    }
+
+    public function testTheRegisterSnapshotInTheRepositoryIsValid(): void
+    {
+        $catalogue = $this->catalogue()->read();
+        $snapshot = self::getContainer()->get(AthensRegister::class)->read();
+        $this->assertNotNull($snapshot);
+        $this->assertMatchesRegularExpression('/^\d{4}-(03|11)$/', $snapshot['session']);
+
+        $codes = [];
+        foreach ($catalogue['courses'] as $course) {
+            $codes[$course['university'] . ' ' . $course['code']] = true;
+        }
+        $matched = array_filter($snapshot['courses'], static fn (array $course): bool => null !== $course['match']);
+        $this->assertGreaterThan(50, count($matched));
+        foreach ($matched as $course) {
+            $this->assertArrayHasKey($course['match']['university'] . ' ' . $course['match']['code'], $codes, $course['code'] . ' points to a course the catalogue does not have.');
+        }
+    }
+
+    public function testTheRegisterIsReadAndItsCoursesRecognisedInTheCatalogue(): void
+    {
+        $catalogue = [
+            'universities' => [
+                'tud' => ['name' => 'TU Delft', 'registerNames' => ['Delft University of Technology']],
+                'ist' => ['name' => 'Instituto Superior Técnico', 'registerNames' => []],
+            ],
+            'courses' => [
+                ['code' => 'TUD01', 'university' => 'tud', 'title' => 'Finite Element Modeling of Vibrating Elastic Structures'],
+                ['code' => 'TUD06', 'university' => 'tud', 'title' => 'Green and Liveable Cities'],
+                ['code' => 'IST11', 'university' => 'ist', 'title' => 'Value Proposition Design for Startups in Sustainable Energy'],
+            ],
+        ];
+        $rich = <<<'HTML'
+            <dt>Objectives</dt><dd><div class="trix-content">
+              Basic
+              notions of mechanics.<br>And of physics.
+              <ul><li>Day 1: springs</li><li>Day 2: beams</li></ul>
+              <figure><img src="x.png"><figcaption>a picture</figcaption></figure>
+            </div></dd>
+            <dt>Cost of EDA</dt><dd>0</dd>
+            <dt>Language of Tuition</dt><dd>English</dd>
+            HTML;
+
+        $snapshot = $this->registerFor(
+            [
+            [11, 'TUD 01', 'Finite element modeling of vibrating elastic structures', 'Delft University of Technology (TUD)', $rich],
+            // Renumbered on the platform.
+            [12, 'TUD21', 'Green and liveable cities', 'Delft University of Technology (TUD)', ''],
+            // The same code for another course: not the catalogue's IST11.
+            [13, 'IST11', 'Photography, Society and Territory', 'Instituto Superior Tecnico', ''],
+            // KU Leuven's own courses are not in the catalogue.
+            [14, 'KUL37', 'Chip Design', 'KU Leuven (KUL)', ''],
+            ]
+        )->scrape($catalogue, null, '2026-11-22');
+
+        $this->assertSame('2026-11', $snapshot['session']);
+        $this->assertSame('2026-11-22', $snapshot['fetched']);
+        $byId = array_column($snapshot['courses'], null, 'id');
+        $this->assertSame(['university' => 'tud', 'code' => 'TUD01'], $byId[11]['match']);
+        $this->assertSame(['university' => 'tud', 'code' => 'TUD06'], $byId[12]['match']);
+        $this->assertNull($byId[13]['match']);
+        $this->assertNull($byId[14]['match']);
+        $this->assertArrayNotHasKey('info', $byId[14]);
+
+        $info = $byId[11]['info'];
+        $this->assertSame('Delft University of Technology', $byId[11]['institution']);
+        $this->assertSame("Basic notions of mechanics.\nAnd of physics.\n\n• Day 1: springs\n\n• Day 2: beams", $info['objectives']);
+        $this->assertSame('', $info['activitiesCost']);
+        $this->assertSame('English', $info['language']);
+        $this->assertSame('Classic ATHENS course', $info['type']);
+        $this->assertSame(['Mechanics', 'Physics'], $info['categories']);
+    }
+
+    public function testTheListOfTheRegisterShowsOnTheCoursesAndItsInformationStays(): void
+    {
+        $this->import(self::edition('2026-2027', [['TUD01', 'tud', 'Bridges', ['BWK']], ['UPM10', 'upm', 'Pneumatic Architecture', ['ARCH']]]));
+        $register = self::getContainer()->get(AthensRegister::class);
+        $bridges = $this->course('TUD01')->getId();
+        $entry = static fn (int $id, string $code, ?string $match): array => [
+            'id' => $id,
+            'code' => $code,
+            'title' => 'Bridges',
+            'institution' => 'TU Delft',
+            'match' => null === $match ? null : ['university' => 'tud', 'code' => $match],
+            'info' => ['objectives' => 'Learn to build bridges.', 'language' => 'English'],
+        ];
+
+        $result = $register->apply(['session' => '2026-11', 'fetched' => '2026-09-20', 'source' => 'https://example.org', 'courses' => [$entry(3399, 'TUD 01', 'TUD01'), $entry(5, 'TUD99', 'TUD99')]]);
+        $this->assertSame(1, $result['linked']);
+        $this->assertCount(1, $result['unknown']);
+
+        $overview = $this->browser()->get('/api/exchange/athens', $this->auth())->json()->decoded();
+        $onRegister = array_column($overview['courses'], 'onRegister', 'code');
+        $this->assertTrue($onRegister['TUD01']);
+        $this->assertFalse($onRegister['UPM10']);
+        $detail = $this->browser()->get('/api/exchange/athens/courses/' . $bridges, $this->auth())->json()->decoded();
+        $this->assertSame('https://register.athensnetwork.eu/courses/3399', $detail['register']['url']);
+        $this->assertTrue($detail['register']['onList']);
+        $this->assertSame('2026-11', $detail['register']['session']);
+        $this->assertSame('Learn to build bridges.', $detail['register']['objectives']);
+
+        // The March list does not have it: off the list, but what its page said stays.
+        $this->entityManager()->clear();
+        self::getContainer()->get(AthensRegister::class)->apply(['session' => '2027-03', 'fetched' => '2027-01-20', 'source' => 'https://example.org', 'courses' => []]);
+        $detail = $this->browser()->get('/api/exchange/athens/courses/' . $bridges, $this->auth())->json()->decoded();
+        $this->assertFalse($detail['course']['onRegister']);
+        $this->assertFalse($detail['register']['onList']);
+        $this->assertSame('2026-11', $detail['register']['session']);
+        $upm = $this->browser()->get('/api/exchange/athens/courses/' . $this->course('UPM10')->getId(), $this->auth())->json()->decoded();
+        $this->assertNull($upm['register']);
     }
 }

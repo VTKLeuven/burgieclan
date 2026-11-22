@@ -2,6 +2,7 @@
 
 import { ReviewSummary } from '@/components/exchange/AthensPage';
 import { ATHENS_TOPIC_ICONS } from '@/components/exchange/athensData';
+import RegisterInfo, { registerFacts } from '@/components/exchange/AthensRegisterInfo';
 import { athensSessionLabel, countryName, EXCHANGE_PROGRAMS, readSavedProgram } from '@/components/exchange/exchangeData';
 import ExchangeShell, { useShareExperience } from '@/components/exchange/ExchangeShell';
 import { MyStars, StarRow } from '@/components/exchange/Stars';
@@ -10,9 +11,9 @@ import Link from '@/components/ui/Link';
 import { useAthensActions, useAthensCourse } from '@/hooks/useExchange';
 import { cn } from '@/lib/utils';
 import { ATHENS_TOPICS, type AthensCourseDetail, type AthensReview } from '@/types/entities';
-import { Check, Clock, EyeOff, History, Mail, MapPin, Plus, Trash2, X } from 'lucide-react';
+import { CalendarCheck, Check, Clock, EyeOff, History, Mail, MapPin, Plus, Trash2, X } from 'lucide-react';
 import { useParams } from 'next/navigation';
-import { useEffect, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 function ReviewCard({ review }: { review: AthensReview }) {
@@ -139,7 +140,7 @@ function Advice({ detail, program }: { detail: AthensCourseDetail; program: stri
 
 function Properties({ detail }: { detail: AthensCourseDetail }) {
     const { t, i18n } = useTranslation();
-    const { course, university, siblings } = detail;
+    const { course, university, siblings, register } = detail;
 
     const row = (label: string, value: ReactNode) => (
         <>
@@ -163,6 +164,9 @@ function Properties({ detail }: { detail: AthensCourseDetail }) {
                             {course.firstEdition === course.lastEdition ? course.lastEdition : `${course.firstEdition.slice(0, 4)} – ${course.lastEdition}`}
                         </span>,
                     )}
+                    {register && registerFacts(register, t).map(([label, value]) => (
+                        <Fragment key={label}>{row(label, value)}</Fragment>
+                    ))}
                 </dl>
                 {university.erasmusDestinationId && (
                     <Link href={`/exchange/${university.erasmusDestinationId}`} className="vtk-link mt-3 inline-block text-small">
@@ -211,6 +215,12 @@ function CourseContent({ detail }: { detail: AthensCourseDetail }) {
                 </span>
                 <span className="vtk-badge vtk-badge-muted h-[22px]! text-caption! tabular">{course.code}</span>
                 <span className="vtk-badge vtk-badge-info h-[22px]! text-caption!">{course.evaluation}</span>
+                {detail.register?.onList && (
+                    <span className="vtk-badge vtk-badge-info h-[22px]! text-caption!" title={t('exchange.athens.info.on_list', { session: athensSessionLabel(detail.register.session, t) })}>
+                        <CalendarCheck className="size-3" aria-hidden="true" />
+                        {athensSessionLabel(detail.register.session, t)}
+                    </span>
+                )}
             </p>
 
             {!course.active && (
@@ -234,6 +244,8 @@ function CourseContent({ detail }: { detail: AthensCourseDetail }) {
             <div className="mt-2 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_17.5rem] lg:gap-10">
                 <div className="min-w-0">
                     <Advice detail={detail} program={program} />
+
+                    {detail.register && <RegisterInfo info={detail.register} />}
 
                     <section className="mt-8" aria-labelledby="athens-reviews">
                         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-2">

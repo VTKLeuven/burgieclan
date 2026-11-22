@@ -41,6 +41,7 @@ use App\Factory\QuickLinkFactory;
 use App\Factory\TagFactory;
 use App\Factory\UserDocumentViewFactory;
 use App\Service\Exchange\AthensCatalogue;
+use App\Service\Exchange\AthensRegister;
 use App\Service\Exchange\ExchangeDestinationCatalog;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -52,6 +53,7 @@ final class AppFixtures extends Fixture
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly ExchangeDestinationCatalog $exchangeDestinations,
         private readonly AthensCatalogue $athensCatalogue,
+        private readonly AthensRegister $athensRegister,
     ) {}
 
     public function load(ObjectManager $manager): void
@@ -143,12 +145,17 @@ final class AppFixtures extends Fixture
     }
 
     /**
-     * The real ATHENS catalogue (resources/athens/catalogue.json), with two reviews of one course,
-     * one still under review, and a few of John's private stars.
+     * The real ATHENS catalogue (resources/athens/catalogue.json) with what the registration
+     * platform says about its courses (register.json), two reviews of one course, one still under
+     * review, and a few of John's private stars.
      */
     private function loadAthens(ObjectManager $manager): void
     {
         $this->athensCatalogue->import($this->athensCatalogue->read());
+        $register = $this->athensRegister->read();
+        if (null !== $register) {
+            $this->athensRegister->apply($register);
+        }
 
         $courses = $manager->getRepository(AthensCourse::class);
         $delft = $courses->findOneBy(['code' => 'TUD24']);

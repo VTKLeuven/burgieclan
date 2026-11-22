@@ -13,9 +13,11 @@ use App\Entity\User;
 use App\Repository\AthensCourseRepository;
 use App\Repository\AthensReviewRepository;
 use App\Service\Exchange\AthensCatalogue;
+use App\Service\Exchange\AthensRegister;
 use App\Service\RateLimit\UserRateLimiter;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,10 +32,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * and each student's private stars. Behind the EXCHANGE feature (route names `api_exchange_`).
  *
  * - GET /api/exchange/athens: {"edition", "published", "source", "sessions", "universities",
- *   "courses", "recent"}: the courses of the current catalogue only, each with its number of
- *   approved reviews, their average score and the reader's own stars ("myStars").
+ *   "courses", "recent", "register"}: the courses of the current catalogue only, each with its
+ *   number of approved reviews, their average score, the reader's own stars ("myStars") and
+ *   whether it is on the list of the ATHENS registration platform ("onRegister"). "register" is
+ *   that list's {"session": "2026-11", "fetched", "source"}, or null.
  * - GET /api/exchange/athens/courses/{id}: {"course", "university", "reviews", "siblings",
- *   "elsewhere"}; also for a course no longer in the catalogue ("active": false).
+ *   "elsewhere", "register"}; also for a course no longer in the catalogue ("active": false).
+ *   "register" is what the course's page on the registration platform says, with its "url", or
+ *   null when it has never been on the list there.
  * - POST /api/exchange/athens/reviews {"courseId", "session": "2025-11", "program", "rating": 1-5,
  *   "sections", "contactable", "showName"}: under review until a moderator approves it. One per
  *   student per course. 201 {"id", "courseId"}, or 422 {"detail"}.
@@ -53,6 +59,7 @@ class AthensController extends AbstractController
         private readonly AthensCourseRepository $courses,
         private readonly AthensReviewRepository $reviews,
         private readonly AthensCatalogue $catalogue,
+        private readonly AthensRegister $register,
         private readonly EntityManagerInterface $entityManager,
     ) {}
 
@@ -108,6 +115,7 @@ class AthensController extends AbstractController
                 $courses
             ),
             'recent' => $recent,
+            'register' => $this->registerList(),
             ]
         );
     }
@@ -157,6 +165,10 @@ class AthensController extends AbstractController
                 $this->courses->findActiveAt($university, $course)
             ),
             'elsewhere' => $elsewhere,
+            'register' => null === $course->getRegisterId() ? null : [
+                'url' => AthensRegister::courseUrl($course->getRegisterId()),
+                'onList' => $course->isOnRegister(),
+            ] + ($course->getRegisterInfo() ?? []),
             ]
         );
     }
@@ -287,6 +299,22 @@ class AthensController extends AbstractController
         return new Response(null, Response::HTTP_NO_CONTENT);
     }
 
+    /**
+     * The session on the registration platform's list, as last read (register.json).
+     *
+     * @return array{session: string, fetched: string, source: string}|null
+     */
+    private function registerList(): ?array
+    {
+        try {
+            $snapshot = $this->register->read();
+        } catch (InvalidArgumentException) {
+            return null;
+        }
+
+        return null === $snapshot ? null : ['session' => $snapshot['session'], 'fetched' => $snapshot['fetched'], 'source' => $snapshot['source']];
+    }
+
     /** @return array<int, int> course id => stars */
     private function starsOf(User $user): array
     {
@@ -377,6 +405,7 @@ class AthensController extends AbstractController
             'reviewCount' => $summary[$id]['count'] ?? 0,
             'rating' => $summary[$id]['rating'] ?? null,
             'myStars' => $stars[$id] ?? null,
+            'onRegister' => $course->isOnRegister(),
         ];
     }
 
