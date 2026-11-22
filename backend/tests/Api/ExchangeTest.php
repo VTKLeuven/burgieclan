@@ -11,6 +11,7 @@ use App\Factory\UserFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Browser\KernelBrowser;
 
@@ -191,6 +192,116 @@ class ExchangeTest extends ApiTestCase
         $this->post(['sections' => [], 'courses' => []] + $base)->assertStatus(422);
         $this->post(['courses' => [['name' => '', 'code' => 'X1', 'equivalent' => '', 'text' => '']]] + $base)->assertStatus(422);
         $this->post(['destinationId' => 999999] + $base)->assertStatus(422);
+    }
+
+    /**
+     * A report sent as multipart, with the JSON in "report" and the files as "files[]".
+     *
+     * @param array<string, mixed> $report
+     * @param list<UploadedFile>   $files
+     */
+    private function postWithFiles(array $report, array $files, ?string $token = null): KernelBrowser
+    {
+        return $this->browser()->post(
+            '/api/exchange/reports',
+            [
+            'headers' => ['Authorization' => 'Bearer ' . ($token ?? $this->token)],
+            'body' => ['report' => json_encode($report)],
+            'files' => ['files' => $files],
+            ]
+        );
+    }
+
+    private function upload(string $name, string $contents): UploadedFile
+    {
+        $path = tempnam(sys_get_temp_dir(), 'exchange');
+        file_put_contents($path, $contents);
+
+        return new UploadedFile($path, $name, null, null, true);
+    }
+
+    private function pdf(string $name = 'Vakkenpakket ETH.pdf'): UploadedFile
+    {
+        return $this->upload($name, "%PDF-1.7\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF");
+    }
+
+    private function storedFile(string $fileName): string
+    {
+        return self::getContainer()->getParameter('kernel.project_dir') . '/var/test-exchange-files/' . $fileName;
+    }
+
+    public function testAFileAloneIsEnoughForAReport(): void
+    {
+        $eth = $this->destination();
+        $report = ['destinationId' => $eth->getId(), 'sections' => [], 'courses' => []] + $this->validReport();
+
+        $created = $this->postWithFiles($report, [$this->pdf()])->assertStatus(201)->json()->decoded();
+
+        $data = $this->browser()->get('/api/exchange/destinations/' . $eth->getId(), $this->auth())->json()->decoded();
+        $files = $data['reports'][0]['files'];
+        $this->assertCount(1, $files);
+        $this->assertSame('Vakkenpakket ETH.pdf', $files[0]['name']);
+        $this->assertSame('pdf', $files[0]['extension']);
+
+        $url = $this->browser()
+            ->get(sprintf('/api/exchange/reports/%d/files/%d', $created['id'], $files[0]['id']), $this->auth())
+            ->assertStatus(200)
+            ->json()
+            ->decoded()['url'];
+
+        // The signed link works without a token, and serves the file under its own name.
+        $this->browser()
+            ->get($url)
+            ->assertStatus(200)
+            ->assertHeaderContains('Content-Type', 'application/pdf')
+            ->assertHeaderContains('Content-Disposition', 'inline');
+        $this->browser()->get($url . 'x')->assertStatus(403);
+    }
+
+    public function testOthersOnlyReachTheFileOnceTheReportIsApproved(): void
+    {
+        $eth = $this->destination();
+        $created = $this->postWithFiles(['destinationId' => $eth->getId()] + $this->validReport(), [$this->pdf()])->assertStatus(201)->json()->decoded();
+        $report = $this->entityManager()->find(ExchangeReport::class, $created['id']);
+        $file = $report->getFiles()->first();
+        $url = sprintf('/api/exchange/reports/%d/files/%d', $report->getId(), $file->getId());
+
+        $other = $this->getToken(UserFactory::createOne(['plainPassword' => 'password'])->getUsername(), 'password');
+        $this->browser()->get($url, $this->auth($other))->assertStatus(404);
+
+        // Each request boots a fresh container, so look the report up again in the current one.
+        $this->entityManager()->find(ExchangeReport::class, $created['id'])->setUnderReview(false);
+        $this->entityManager()->flush();
+        $this->browser()->get($url, $this->auth($other))->assertStatus(200);
+    }
+
+    public function testFilesThatAreNotDocumentsAreRefused(): void
+    {
+        $eth = $this->destination();
+        $report = ['destinationId' => $eth->getId()] + $this->validReport();
+
+        // A script renamed to .pdf is still a script.
+        $this->postWithFiles($report, [$this->upload('vakken.pdf', "#!/bin/sh\necho hi\n")])
+            ->assertStatus(422)
+            ->assertJsonMatches('reason', 'type');
+        $this->postWithFiles($report, [$this->upload('vakken.exe', 'MZ')])->assertStatus(422)->assertJsonMatches('reason', 'type');
+        $this->postWithFiles($report, array_map(fn (int $i): UploadedFile => $this->pdf("deel $i.pdf"), range(1, 6)))
+            ->assertStatus(422)
+            ->assertJsonMatches('reason', 'count');
+
+        $this->assertSame(0, $this->entityManager()->getRepository(ExchangeReport::class)->count([]));
+    }
+
+    public function testDeletingAReportDeletesItsFiles(): void
+    {
+        $eth = $this->destination();
+        $created = $this->postWithFiles(['destinationId' => $eth->getId()] + $this->validReport(), [$this->pdf()])->assertStatus(201)->json()->decoded();
+        $fileName = $this->entityManager()->find(ExchangeReport::class, $created['id'])->getFiles()->first()->getFileName();
+        $this->assertFileExists($this->storedFile($fileName));
+
+        $this->browser()->delete('/api/exchange/reports/' . $created['id'], $this->auth())->assertStatus(204);
+
+        $this->assertFileDoesNotExist($this->storedFile($fileName));
     }
 
     public function testHelpfulCountsPerPart(): void

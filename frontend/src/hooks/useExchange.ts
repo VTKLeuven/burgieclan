@@ -2,7 +2,7 @@
 
 import { ApiClient } from '@/actions/api';
 import { usePreloadedApi } from '@/components/ApiSeed';
-import { invalidateApiCache, isErrorResponse, useApi } from '@/hooks/useApi';
+import { apiGet, invalidateApiCache, isErrorResponse, useApi } from '@/hooks/useApi';
 import type { AthensCourseDetail, AthensOverview, AthensTopic, ExchangeCourse, ExchangeDestinationDetail, ExchangeOverview, ExchangeTopic } from '@/types/entities';
 import { apiEndpoints } from '@/utils/apiEndpoints';
 import { convertToAthensCourseDetail, convertToAthensOverview, convertToExchangeDestinationDetail, convertToExchangeOverview } from '@/utils/convertToEntity';
@@ -75,9 +75,15 @@ export interface ExchangeReportInput {
     showName: boolean;
 }
 
+/** ExchangeReportFileStore in the backend: what a report may carry. */
+export const EXCHANGE_FILE_EXTENSIONS = ['pdf', 'docx', 'doc', 'xlsx', 'xls', 'pptx', 'odt', 'ods', 'png', 'jpg', 'jpeg'];
+export const MAX_EXCHANGE_FILE_BYTES = 20 * 1024 * 1024;
+export const MAX_EXCHANGE_FILES = 5;
+
 /** The backend's reason, in English; shown under the form when the page has no better words. */
 export class ExchangeError extends Error {
-    constructor(readonly detail: string, readonly status: number) {
+    /** For refused files: "size", "type", "count" or "failed". */
+    constructor(readonly detail: string, readonly status: number, readonly reason?: string) {
         super(detail);
         this.name = 'ExchangeError';
     }
@@ -85,7 +91,8 @@ export class ExchangeError extends Error {
 
 const throwIfError = (result: unknown) => {
     if (isErrorResponse(result)) {
-        throw new ExchangeError(result.error.detail ?? result.error.message ?? '', result.error.status ?? 500);
+        const reason = typeof result.error.reason === 'string' ? result.error.reason : undefined;
+        throw new ExchangeError(result.error.detail ?? result.error.message ?? '', result.error.status ?? 500, reason);
     }
 };
 
@@ -94,8 +101,19 @@ const throwIfError = (result: unknown) => {
  * returns null both for a 204 and for an error, so they drop the GET cache themselves.
  */
 export function useExchangeActions() {
-    const share = useCallback(async (input: ExchangeReportInput): Promise<{ id: number; destinationId: number }> => {
-        const result = await ApiClient('POST', '/api/exchange/reports', input);
+    const share = useCallback(async (input: ExchangeReportInput, files: File[] = []): Promise<{ id: number; destinationId: number }> => {
+        // With files, as multipart: the report as JSON in "report", the files as "files[]".
+        let body: ExchangeReportInput | FormData = input;
+        if (files.length > 0) {
+            body = new FormData();
+            body.append('report', JSON.stringify(input));
+            for (const file of files) body.append('files[]', file, file.name);
+        }
+        const result = await ApiClient('POST', '/api/exchange/reports', body);
+        if (isErrorResponse(result) && result.error.status === 413) {
+            // nginx answers an oversized body itself, without our JSON.
+            throw new ExchangeError('', 413, 'size');
+        }
         throwIfError(result);
         invalidateApiCache();
         notifyChanged();
@@ -120,7 +138,19 @@ export function useExchangeActions() {
         notifyChanged();
     }, []);
 
-    return { share, remove, markHelpful, suggestPrograms };
+    /**
+     * A short-lived link to a file attached to a report, asked for right before it is opened:
+     * links expire after ten minutes. Local storage answers with a path on the backend.
+     */
+    const fileUrl = useCallback(async (reportId: number, fileId: number): Promise<string> => {
+        const result = await apiGet(`/api/exchange/reports/${reportId}/files/${fileId}`);
+        throwIfError(result);
+        const url = (result as { url?: unknown } | null)?.url;
+        if (typeof url !== 'string') throw new ExchangeError('Unexpected response', 500);
+        return new URL(url, process.env.NEXT_PUBLIC_BACKEND_URL).toString();
+    }, []);
+
+    return { share, remove, markHelpful, suggestPrograms, fileUrl };
 }
 
 /** The ATHENS courses of the current catalogue; `enabled` false skips the fetch (a closed dialog). */

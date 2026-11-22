@@ -1,5 +1,6 @@
 'use client';
 
+import ReportFilesField from '@/components/exchange/ReportFilesField';
 import { COUNTRY_CODES, countryName, EXCHANGE_PROGRAMS, readSavedProgram, recentAcademicYears, TOPIC_ICONS } from '@/components/exchange/exchangeData';
 import { Dialog } from '@/components/ui/Dialog';
 import Select from '@/components/ui/Select';
@@ -62,6 +63,7 @@ function ShareForm({ initialDestinationId, onClose }: { initialDestinationId?: n
     const [sections, setSections] = useState<Partial<Record<ExchangeTopic, string>>>({});
     const [openTopic, setOpenTopic] = useState<ExchangeTopic | null>('general');
     const [courses, setCourses] = useState<ExchangeCourse[]>([emptyCourse()]);
+    const [files, setFiles] = useState<File[]>([]);
     const [contactable, setContactable] = useState(true);
     const [showName, setShowName] = useState(false);
     const [busy, setBusy] = useState(false);
@@ -97,7 +99,7 @@ function ShareForm({ initialDestinationId, onClose }: { initialDestinationId?: n
             setError(t('exchange.form.errors.destination'));
             return;
         }
-        if (Object.keys(filledSections).length === 0 && filledCourses.length === 0) {
+        if (Object.keys(filledSections).length === 0 && filledCourses.length === 0 && files.length === 0) {
             setError(t('exchange.form.errors.empty'));
             return;
         }
@@ -120,14 +122,25 @@ function ShareForm({ initialDestinationId, onClose }: { initialDestinationId?: n
 
         setBusy(true);
         try {
-            const created = await share(input);
+            const created = await share(input, files);
             showToast(t('exchange.form.sent'), 'success');
             onClose();
             router.push(`/exchange/${created.destinationId}`);
         } catch (caught) {
             const status = caught instanceof ExchangeError ? caught.status : 0;
             const detail = caught instanceof ExchangeError ? caught.detail : '';
-            setError(status === 429 ? t('exchange.form.errors.rate') : t('exchange.form.errors.failed', { detail }));
+            const reason = caught instanceof ExchangeError ? caught.reason : undefined;
+            if (status === 429) {
+                setError(t('exchange.form.errors.rate'));
+            } else if (reason === 'count') {
+                setError(t('exchange.form.errors.file_count'));
+            } else if (reason === 'size' || reason === 'type' || reason === 'failed') {
+                // The backend names the file in its own words; ours say what to do, without it.
+                const name = /"([^"]+)"/.exec(detail)?.[1] ?? '';
+                setError(t(`exchange.form.errors.file_${reason}`, { name }));
+            } else {
+                setError(t('exchange.form.errors.failed', { detail }));
+            }
         } finally {
             setBusy(false);
         }
@@ -256,6 +269,12 @@ function ShareForm({ initialDestinationId, onClose }: { initialDestinationId?: n
                     <div>
                         <span className="vtk-field-label">{t('exchange.form.courses')}</span>
                         <p className="vtk-help m-0">{t('exchange.form.courses_hint')}</p>
+                    </div>
+                    <ReportFilesField files={files} onChange={setFiles} />
+                    <div className="mt-1 flex items-center gap-3 text-caption font-medium text-fg-muted" aria-hidden="true">
+                        <span className="h-px flex-1 bg-border" />
+                        {t('exchange.form.or_per_course')}
+                        <span className="h-px flex-1 bg-border" />
                     </div>
                     {courses.map((course, index) => (
                         <div key={index} className="grid gap-2 rounded-card border border-border p-3 sm:grid-cols-[minmax(0,1fr)_8rem_minmax(0,1fr)_auto]">

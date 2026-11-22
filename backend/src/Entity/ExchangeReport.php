@@ -4,13 +4,16 @@ namespace App\Entity;
 
 use App\Constants\ExchangeTopic;
 use App\Repository\ExchangeReportRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * One student's experience at an exchange destination: when they went, in which programme, and a
  * piece of text per topic (ExchangeTopic), plus the courses they took there and what those were
- * recognised as at KU Leuven.
+ * recognised as at KU Leuven, and any files they attached (ExchangeReportFile), e.g. their whole
+ * course package as one PDF.
  *
  * A report is shown once a moderator has approved it; until then only its author sees it. The
  * author's name is only shown with showName, their e-mail address only with contactable, and
@@ -84,10 +87,38 @@ class ExchangeReport extends BaseEntity
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $legacyContactEmail = null;
 
+    /** @var Collection<int, ExchangeReportFile> */
+    #[ORM\OneToMany(targetEntity: ExchangeReportFile::class, mappedBy: 'report', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['id' => 'ASC'])]
+    private Collection $files;
+
     public function __construct(ExchangeDestination $destination, ?User $author)
     {
         $this->destination = $destination;
         $this->author = $author;
+        $this->files = new ArrayCollection();
+    }
+
+    /** @return Collection<int, ExchangeReportFile> */
+    public function getFiles(): Collection
+    {
+        return $this->files;
+    }
+
+    public function addFile(ExchangeReportFile $file): static
+    {
+        if (!$this->files->contains($file)) {
+            $this->files->add($file);
+        }
+
+        return $this;
+    }
+
+    public function removeFile(ExchangeReportFile $file): static
+    {
+        $this->files->removeElement($file);
+
+        return $this;
     }
 
     public function getDestination(): ExchangeDestination

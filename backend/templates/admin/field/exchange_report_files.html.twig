@@ -1,0 +1,17 @@
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{# The files a student attached to an exchange report, each a link that opens it through the
+   admin session (ExchangeReportFileController::forAdmin). Names are the student's: escaped. #}
+{% if field.value is empty %}
+    <span class="badge badge-secondary">None</span>
+{% else %}
+    <ul class="list-unstyled m-0">
+        {% for file in field.value %}
+            <li>
+                <a href="{{ path('admin_exchange_report_file', {fileName: file.fileName}) }}" target="_blank" rel="noopener">
+                    <i class="fa-regular fa-file"></i> {{ file.originalName }}
+                </a>
+                <span class="text-muted">({{ (file.size / 1024 / 1024)|number_format(1) }} MB)</span>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

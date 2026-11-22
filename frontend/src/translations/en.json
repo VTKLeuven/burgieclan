@@ -1329,7 +1329,11 @@
             "wiki_hint": "This destination was on the old VTK wiki (2023) but is not on the faculty's current list. It may no longer be a partner: check with your exchange coordinator.",
             "programs_wrong": "Not right?",
             "programs_unknown": "Not known yet",
-            "contacts": "Students you can contact"
+            "contacts": "Students you can contact",
+            "files": "Course packages",
+            "files_intro": "Whole course packages of students who went here, as a file.",
+            "file_open": "Open {{name}}",
+            "file_failed": "This file could not be opened. Please try again."
         },
         "topics": {
             "general": {
@@ -1398,7 +1402,7 @@
             "period": "Period",
             "topics": "Topics",
             "courses": "Courses",
-            "courses_hint": "Which courses did you take there, and what were they recognised as?",
+            "courses_hint": "Upload your whole course package as a file, or add the courses one by one. Both is fine too.",
             "course_name": "Course at the host university",
             "course_code": "Code",
             "course_equivalent": "Recognised as (KU Leuven)",
@@ -1415,11 +1419,21 @@
             "sent": "Thanks! Your report goes online once a moderator has reviewed it.",
             "errors": {
                 "destination": "Choose a destination, or fill in the name, city and country of your university.",
-                "empty": "Write about at least one topic or course.",
+                "empty": "Write about at least one topic or course, or attach a file.",
                 "rate": "You shared a lot of reports today. Please try again tomorrow.",
                 "failed": "Submitting failed. {{detail}}",
-                "program": "Choose your programme."
-            }
+                "program": "Choose your programme.",
+                "file_type": "\"{{name}}\" won't work: choose a PDF, Word, Excel, PowerPoint, OpenDocument or image file.",
+                "file_size": "\"{{name}}\" is larger than 20 MB.",
+                "file_count": "You can attach at most 5 files.",
+                "file_failed": "A file did not arrive properly. Please try again."
+            },
+            "files_drop": "Drop your course package here or",
+            "files_choose": "choose a file",
+            "files_types": "PDF, Word, Excel, PowerPoint, OpenDocument or image · up to 20 MB · max. 5 files",
+            "files_dragging": "Release to add",
+            "remove_file": "Remove file",
+            "or_per_course": "Or course by course"
         },
         "short": {
             "intro": "Not ready for a whole semester away? These are the shorter ways to study or work abroad.",

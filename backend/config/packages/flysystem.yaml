@@ -72,6 +72,22 @@ flysystem:
             lazy:
                 source: 'exam_images.%env(DOCUMENT_STORAGE)%'
 
+        # Files attached to exchange reports (App\Service\Exchange\ExchangeReportFileStore), e.g.
+        # a master's whole course package at the host, handed out through the same kind of signed link.
+        exchange_files.local:
+            local:
+                directory: '%kernel.project_dir%/data/exchange-files'
+
+        exchange_files.s3:
+            aws:
+                client: 's3_client'
+                bucket: '%env(S3_BUCKET)%'
+                prefix: 'exchange-files'
+
+        exchange_files.storage:
+            lazy:
+                source: 'exchange_files.%env(DOCUMENT_STORAGE)%'
+
 services:
     s3_client:
         class: Aws\S3\S3Client
@@ -113,3 +129,6 @@ when@test:
             exam_images.local:
                 local:
                     directory: '%kernel.project_dir%/var/test-exam-images'
+            exchange_files.local:
+                local:
+                    directory: '%kernel.project_dir%/var/test-exchange-files'

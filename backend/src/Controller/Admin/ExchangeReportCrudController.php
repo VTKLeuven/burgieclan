@@ -19,6 +19,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -93,6 +94,10 @@ class ExchangeReportCrudController extends AbstractCrudController
             yield TextareaField::new($property, $label)->renderAsHtml(false)->hideOnIndex();
         }
         yield TextareaField::new('coursesSummary', 'Courses')->renderAsHtml(false)->onlyOnDetail();
+        yield Field::new('files', 'Files')
+            ->setTemplatePath('admin/field/exchange_report_files.html.twig')
+            ->setHelp('Usually the course package of the master at the host. Delete the report to remove them.')
+            ->onlyOnDetail();
 
         yield FormField::addFieldset('Visibility')->hideOnIndex();
         yield BooleanField::new('contactable')->setHelp('Signed-in students see the author\'s e-mail address.')->hideOnIndex();

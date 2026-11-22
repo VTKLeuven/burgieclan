@@ -2,6 +2,7 @@
 
 import { ProgramChip, SchemeBadge } from '@/components/exchange/ErasmusPage';
 import { countryName, readSavedProgram, shortYear, TOPIC_ICONS } from '@/components/exchange/exchangeData';
+import ReportFiles from '@/components/exchange/ReportFiles';
 import ExchangeShell, { useShareExperience } from '@/components/exchange/ExchangeShell';
 import SuggestProgramsDialog from '@/components/exchange/SuggestProgramsDialog';
 import { Bone, RowsSkeleton } from '@/components/loading/LoadingPage';
@@ -9,7 +10,7 @@ import Link from '@/components/ui/Link';
 import { useExchangeActions, useExchangeDestination } from '@/hooks/useExchange';
 import { cn } from '@/lib/utils';
 import { EXCHANGE_TOPICS, type ExchangeCourse, type ExchangeDestinationDetail, type ExchangeReport, type ExchangeTopic } from '@/types/entities';
-import { ArrowLeftRight, Clock, ExternalLink, History, Mail, MapPin, Plus, ThumbsUp, Trash2 } from 'lucide-react';
+import { ArrowLeftRight, Clock, Files, ExternalLink, History, Mail, MapPin, Plus, ThumbsUp, Trash2 } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -131,12 +132,27 @@ function CourseCard({ course, report, index }: { course: ExchangeCourse; report:
     );
 }
 
+/** The files of one report, with who shared them: usually their whole course package. */
+function FilesCard({ report }: { report: ExchangeReport }) {
+    return (
+        <article className="rounded-card border border-border px-4 py-3.5">
+            <ReportTags report={report} />
+            <ReportFiles report={report} className="mt-2.5" />
+            <div className="mt-2 -ml-2 flex flex-wrap gap-1 empty:hidden">
+                <ContactLink report={report} />
+            </div>
+        </article>
+    );
+}
+
 function TopicsView({ detail }: { detail: ExchangeDestinationDetail }) {
     const { t } = useTranslation();
     const share = useShareExperience();
     const { reports, destination } = detail;
     const courses = reports.flatMap((report) => report.courses.map((course, index) => ({ course, report, index })));
-    const count = (topic: ExchangeTopic) => reports.filter((report) => report.sections[topic]).length + (topic === 'education' ? courses.length : 0);
+    const withFiles = reports.filter((report) => report.files.length > 0);
+    const count = (topic: ExchangeTopic) => reports.filter((report) => report.sections[topic]).length
+        + (topic === 'education' ? courses.length + withFiles.length : 0);
 
     // A link from "Laatst gedeeld" lands on its topic once the topics are drawn.
     useEffect(() => {
@@ -171,6 +187,7 @@ function TopicsView({ detail }: { detail: ExchangeDestinationDetail }) {
                 const Icon = TOPIC_ICONS[topic];
                 const entries = reports.filter((report) => report.sections[topic]);
                 const topicCourses = topic === 'education' ? courses : [];
+                const topicFiles = topic === 'education' ? withFiles : [];
                 return (
                     <section key={topic} id={`topic-${topic}`} className="scroll-mt-20 pt-7" aria-labelledby={`topic-${topic}-title`}>
                         <div className="flex items-center gap-2.5">
@@ -192,10 +209,11 @@ function TopicsView({ detail }: { detail: ExchangeDestinationDetail }) {
                                     </div>
                                 </article>
                             ))}
+                            {topicFiles.map((report) => <FilesCard key={`files-${report.id}`} report={report} />)}
                             {topicCourses.map(({ course, report, index }) => (
                                 <CourseCard key={`${report.id}-${index}`} course={course} report={report} index={index} />
                             ))}
-                            {entries.length === 0 && topicCourses.length === 0 && (
+                            {entries.length === 0 && topicCourses.length === 0 && topicFiles.length === 0 && (
                                 <div className="flex flex-wrap items-center justify-between gap-3 rounded-card border border-dashed border-border-strong px-4 py-3 text-small text-fg-muted">
                                     {t('exchange.destination.topic_empty')}
                                     <button type="button" className="vtk-button vtk-button-sm" onClick={() => share(destination.id)}>
@@ -216,8 +234,9 @@ function CoursesView({ detail }: { detail: ExchangeDestinationDetail }) {
     const { t } = useTranslation();
     const share = useShareExperience();
     const courses = detail.reports.flatMap((report) => report.courses.map((course) => ({ course, report })));
+    const withFiles = detail.reports.filter((report) => report.files.length > 0);
 
-    if (courses.length === 0) {
+    if (courses.length === 0 && withFiles.length === 0) {
         return (
             <div className="flex flex-col items-center gap-3 rounded-card border border-dashed border-border-strong px-6 py-10 text-center">
                 <p className="m-0 text-body text-fg-muted">{t('exchange.destination.courses_empty')}</p>
@@ -231,32 +250,54 @@ function CoursesView({ detail }: { detail: ExchangeDestinationDetail }) {
 
     return (
         <>
-            <p className="m-0 mb-3 max-w-[68ch] text-small text-fg-muted">{t('exchange.destination.courses_intro')}</p>
-            <div className="vtk-table-wrap">
-                <table className="vtk-table min-w-[40rem]">
-                    <thead>
-                        <tr>
-                            <th>{t('exchange.destination.course_host')}</th>
-                            <th>{t('exchange.destination.course_equivalent')}</th>
-                            <th>{t('exchange.destination.course_who')}</th>
-                            <th>{t('exchange.destination.course_opinion')}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {courses.map(({ course, report }, index) => (
-                            <tr key={index}>
-                                <td className="align-top">
-                                    <strong className="block font-medium text-fg">{course.name}</strong>
-                                    {course.code && <span className="text-caption text-fg-muted tabular">{course.code}</span>}
-                                </td>
-                                <td className="align-top">{course.equivalent || '—'}</td>
-                                <td className="align-top whitespace-nowrap tabular">{[shortYear(report.academicYear), `${report.phase}${report.period}`, report.program].filter(Boolean).join(' · ')}</td>
-                                <td className="align-top text-fg-secondary">{course.text || '—'}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            {withFiles.length > 0 && (
+                <section aria-labelledby="course-files-title" className={cn(courses.length > 0 && 'mb-7')}>
+                    <h2 id="course-files-title" className="m-0 flex items-center gap-2 text-title font-semibold text-fg">
+                        <Files className="size-4 text-icon" aria-hidden="true" />
+                        {t('exchange.destination.files')}
+                    </h2>
+                    <p className="m-0 mt-1 mb-3 max-w-[68ch] text-small text-fg-muted">{t('exchange.destination.files_intro')}</p>
+                    <div className="flex flex-col gap-2.5">
+                        {withFiles.map((report) => <FilesCard key={report.id} report={report} />)}
+                    </div>
+                </section>
+            )}
+            {courses.length > 0 && (
+                <>
+                    {withFiles.length > 0 && (
+                        <h2 className="m-0 flex items-center gap-2 text-title font-semibold text-fg">
+                            <ArrowLeftRight className="size-4 text-icon" aria-hidden="true" />
+                            {t('exchange.destination.courses')}
+                        </h2>
+                    )}
+                    <p className={cn('m-0 mb-3 max-w-[68ch] text-small text-fg-muted', withFiles.length > 0 && 'mt-1')}>{t('exchange.destination.courses_intro')}</p>
+                    <div className="vtk-table-wrap">
+                        <table className="vtk-table min-w-[40rem]">
+                            <thead>
+                                <tr>
+                                    <th>{t('exchange.destination.course_host')}</th>
+                                    <th>{t('exchange.destination.course_equivalent')}</th>
+                                    <th>{t('exchange.destination.course_who')}</th>
+                                    <th>{t('exchange.destination.course_opinion')}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {courses.map(({ course, report }, index) => (
+                                    <tr key={index}>
+                                        <td className="align-top">
+                                            <strong className="block font-medium text-fg">{course.name}</strong>
+                                            {course.code && <span className="text-caption text-fg-muted tabular">{course.code}</span>}
+                                        </td>
+                                        <td className="align-top">{course.equivalent || '—'}</td>
+                                        <td className="align-top whitespace-nowrap tabular">{[shortYear(report.academicYear), `${report.phase}${report.period}`, report.program].filter(Boolean).join(' · ')}</td>
+                                        <td className="align-top text-fg-secondary">{course.text || '—'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </>
+            )}
         </>
     );
 }
@@ -331,6 +372,15 @@ function ReportsView({ detail }: { detail: ExchangeDestinationDetail }) {
                                             </li>
                                         ))}
                                     </ul>
+                                </div>
+                            )}
+                            {report.files.length > 0 && (
+                                <div className="pt-3.5">
+                                    <h3 className="m-0 flex items-center gap-2 text-small font-semibold text-fg">
+                                        <Files className="size-3.5 text-icon" aria-hidden="true" />
+                                        {t('exchange.destination.files')}
+                                    </h3>
+                                    <ReportFiles report={report} className="mt-2" />
                                 </div>
                             )}
                         </div>
@@ -454,8 +504,8 @@ function DestinationContent({ detail }: { detail: ExchangeDestinationDetail }) {
     const share = useShareExperience();
     const { destination, reports } = detail;
     const [view, setView] = useState<View>('topics');
-    const hasText = reports.some((report) => Object.keys(report.sections).length > 0 || report.courses.length > 0);
-    const courseCount = reports.reduce((total, report) => total + report.courses.length, 0);
+    const hasText = reports.some((report) => Object.keys(report.sections).length > 0 || report.courses.length > 0 || report.files.length > 0);
+    const courseCount = reports.reduce((total, report) => total + report.courses.length + (report.files.length > 0 ? 1 : 0), 0);
     const views: [View, number | null][] = [['topics', null], ['courses', courseCount], ['reports', reports.length]];
 
     return (

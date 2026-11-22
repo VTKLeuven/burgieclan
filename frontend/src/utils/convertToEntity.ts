@@ -816,6 +816,12 @@ function convertToExchangeReport(value: unknown): ExchangeReport {
             equivalent: str(course.equivalent),
             text: str(course.text),
         })),
+        files: records(data.files).map((file) => ({
+            id: num(file.id),
+            name: str(file.name),
+            extension: str(file.extension),
+            size: num(file.size),
+        })),
         author: typeof data.author === 'string' ? data.author : null,
         contactEmail: typeof data.contactEmail === 'string' ? data.contactEmail : null,
         helpful: Object.fromEntries(Object.entries(helpfulRaw).map(([part, count]) => [part, num(count)])),

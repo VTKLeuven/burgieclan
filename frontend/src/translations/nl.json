@@ -1329,7 +1329,11 @@
             "wiki_hint": "Deze bestemming stond op de oude VTK-wiki (2023), maar niet op de huidige lijst van de faculteit. Ze is misschien geen partner meer: vraag het na bij je uitwisselingscoördinator.",
             "programs_wrong": "Klopt dit niet?",
             "programs_unknown": "Nog niet bekend",
-            "contacts": "Studenten die je kan contacteren"
+            "contacts": "Studenten die je kan contacteren",
+            "files": "Vakkenpakketten",
+            "files_intro": "Volledige vakkenpakketten van studenten die hier waren, als bestand.",
+            "file_open": "{{name}} openen",
+            "file_failed": "Dit bestand openen lukte niet. Probeer het opnieuw."
         },
         "topics": {
             "general": {
@@ -1398,7 +1402,7 @@
             "period": "Periode",
             "topics": "Onderwerpen",
             "courses": "Vakken",
-            "courses_hint": "Welke vakken volgde je daar, en waarvoor werden ze erkend?",
+            "courses_hint": "Upload je volledige vakkenpakket als bestand, of voeg de vakken één voor één toe. Allebei mag ook.",
             "course_name": "Vak aan de gastuniversiteit",
             "course_code": "Code",
             "course_equivalent": "Erkend als (KU Leuven)",
@@ -1415,11 +1419,21 @@
             "sent": "Bedankt! Je verslag staat online zodra een moderator het nagekeken heeft.",
             "errors": {
                 "destination": "Kies een bestemming, of vul de naam, stad en het land van je universiteit in.",
-                "empty": "Schrijf over minstens één onderwerp of vak.",
+                "empty": "Schrijf over minstens één onderwerp of vak, of voeg een bestand toe.",
                 "rate": "Je deelde vandaag al veel verslagen. Probeer het morgen opnieuw.",
                 "failed": "Insturen lukte niet. {{detail}}",
-                "program": "Kies je richting."
-            }
+                "program": "Kies je richting.",
+                "file_type": "\"{{name}}\" kan niet: kies een PDF-, Word-, Excel-, PowerPoint-, OpenDocument- of afbeeldingsbestand.",
+                "file_size": "\"{{name}}\" is groter dan 20 MB.",
+                "file_count": "Je kan maximaal 5 bestanden toevoegen.",
+                "file_failed": "Een bestand kwam niet goed aan. Probeer het opnieuw."
+            },
+            "files_drop": "Sleep je vakkenpakket hierheen of",
+            "files_choose": "kies een bestand",
+            "files_types": "PDF, Word, Excel, PowerPoint, OpenDocument of afbeelding · tot 20 MB · max. 5 bestanden",
+            "files_dragging": "Laat los om toe te voegen",
+            "remove_file": "Bestand verwijderen",
+            "or_per_course": "Of vak per vak"
         },
         "short": {
             "intro": "Niet meteen een heel semester weg? Dit zijn de kortere manieren om in het buitenland te studeren of te werken.",

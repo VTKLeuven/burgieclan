@@ -620,6 +620,16 @@ export interface ExchangeCourse {
     text: string;
 }
 
+/** A file attached to an exchange report, usually the whole course package at the host. */
+export interface ExchangeReportFile {
+    id: number;
+    name: string;
+    /** Lower case, without the dot: "pdf", "docx", … */
+    extension: string;
+    /** In bytes. */
+    size: number;
+}
+
 export interface ExchangeReport {
     id: number;
     academicYear: string;
@@ -629,6 +639,7 @@ export interface ExchangeReport {
     program: string;
     sections: Partial<Record<ExchangeTopic, string>>;
     courses: ExchangeCourse[];
+    files: ExchangeReportFile[];
     /** Only when the author chose to show their name. */
     author: string | null;
     /** Only when the author is happy to answer questions. */

@@ -7,21 +7,27 @@ use App\Constants\ExchangeTopic;
 use App\Entity\ExchangeDestination;
 use App\Entity\ExchangeProgramSuggestion;
 use App\Entity\ExchangeReport;
+use App\Entity\ExchangeReportFile;
 use App\Entity\ExchangeReportHelpful;
 use App\Entity\User;
 use App\Repository\ExchangeDestinationRepository;
 use App\Repository\ExchangeReportRepository;
+use App\Service\Exchange\ExchangeReportFileStore;
+use App\Service\Exchange\ExchangeReportFileUrlGenerator;
+use App\Service\Exchange\InvalidExchangeFileException;
 use App\Service\RateLimit\UserRateLimiter;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Target;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Throwable;
 
 /**
  * Exchange destinations and the reports of students who went there. Behind the EXCHANGE feature
@@ -33,7 +39,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  *   reports, plus the user's own ones still under review.
  * - POST /api/exchange/reports: a new report, under review until a moderator approves it. Takes
  *   either "destinationId" or "newDestination" {name, city, country}, which adds an unapproved
- *   destination. 201 {"id", "destinationId"}, or 422 {"detail"}.
+ *   destination. 201 {"id", "destinationId"}, or 422 {"detail"}. Sent as multipart instead, with
+ *   that JSON as the `report` field, it also takes up to ExchangeReportFileStore::MAX_FILES
+ *   files as `files[]` (a 422 then carries a `reason`: "size", "type", "count" or "failed").
+ * - GET /api/exchange/reports/{id}/files/{fileId}: {"url"}, a short-lived link to an attached file.
  * - DELETE /api/exchange/reports/{id}: by its author or a moderator. 204.
  * - PUT /api/exchange/reports/{id}/helpful {"part", "helpful": bool}: "Nuttig" on a topic of an
  *   approved report, or on one of its courses ("course-{index}"). 204.
@@ -53,6 +62,8 @@ class ExchangeController extends AbstractController
         private readonly ExchangeDestinationRepository $destinations,
         private readonly ExchangeReportRepository $reports,
         private readonly EntityManagerInterface $entityManager,
+        private readonly ExchangeReportFileStore $fileStore,
+        private readonly ExchangeReportFileUrlGenerator $fileUrls,
     ) {}
 
     #[Route('/api/exchange', name: 'api_exchange_overview', methods: ['GET'])]
@@ -142,9 +153,22 @@ class ExchangeController extends AbstractController
         RateLimiterFactoryInterface $limiter,
     ): JsonResponse {
         $user = $this->user();
-        $payload = json_decode($request->getContent(), true);
+        $multipart = 'form' === $request->getContentTypeFormat();
+        $payload = json_decode($multipart ? (string) $request->request->get('report', '') : $request->getContent(), true);
         if (!is_array($payload)) {
-            return self::invalid('Expected a JSON object.');
+            return self::invalid($multipart ? 'Expected the report as JSON in the "report" field.' : 'Expected a JSON object.');
+        }
+
+        $uploads = $multipart ? array_values(array_filter($request->files->all('files'), static fn (mixed $file): bool => $file instanceof UploadedFile)) : [];
+        if (count($uploads) > ExchangeReportFileStore::MAX_FILES) {
+            return self::invalid(sprintf('Attach at most %d files.', ExchangeReportFileStore::MAX_FILES), 'count');
+        }
+        try {
+            foreach ($uploads as $upload) {
+                $this->fileStore->check($upload);
+            }
+        } catch (InvalidExchangeFileException $exception) {
+            return self::invalid($exception->getMessage(), $exception->reason);
         }
 
         $academicYear = $payload['academicYear'] ?? null;
@@ -185,8 +209,8 @@ class ExchangeController extends AbstractController
             return self::invalid(sprintf('Add at most %d courses, each with a name.', self::MAX_COURSES));
         }
 
-        if ('' === trim(implode('', $sections)) && [] === $courses) {
-            return self::invalid('Write about at least one topic or course.');
+        if ('' === trim(implode('', $sections)) && [] === $courses && [] === $uploads) {
+            return self::invalid('Write about at least one topic or course, or attach a file.');
         }
 
         $destination = $this->resolveDestination($payload, $user, $program);
@@ -206,8 +230,23 @@ class ExchangeController extends AbstractController
             ->setContactable(true === ($payload['contactable'] ?? false))
             ->setShowName(true === ($payload['showName'] ?? false));
 
-        $this->entityManager->persist($report);
-        $this->entityManager->flush();
+        $stored = [];
+        try {
+            foreach ($uploads as $upload) {
+                $stored[] = $this->fileStore->store($report, $upload)->getFileName();
+            }
+            $this->entityManager->persist($report);
+            $this->entityManager->flush();
+        } catch (Throwable $exception) {
+            foreach ($stored as $fileName) {
+                $this->fileStore->deleteFile($fileName);
+            }
+            if ($exception instanceof InvalidExchangeFileException) {
+                return self::invalid($exception->getMessage(), $exception->reason);
+            }
+
+            throw $exception;
+        }
 
         return self::private(['id' => $report->getId(), 'destinationId' => $destination->getId()], Response::HTTP_CREATED);
     }
@@ -228,6 +267,23 @@ class ExchangeController extends AbstractController
         $this->entityManager->flush();
 
         return new Response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route(
+        '/api/exchange/reports/{id}/files/{fileId}',
+        name: 'api_exchange_report_file',
+        requirements: ['id' => '\d+', 'fileId' => '\d+'],
+        methods: ['GET']
+    )]
+    public function fileUrl(int $id, int $fileId): JsonResponse
+    {
+        $report = $this->reports->find($id);
+        $file = $this->entityManager->getRepository(ExchangeReportFile::class)->find($fileId);
+        if (null === $report || null === $file || $file->getReport() !== $report || !$this->canSeeReport($report, $this->user())) {
+            return self::private(['detail' => 'File not found.'], Response::HTTP_NOT_FOUND);
+        }
+
+        return self::private(['url' => $this->fileUrls->generate($file)]);
     }
 
     #[Route('/api/exchange/reports/{id}/helpful', name: 'api_exchange_report_helpful', requirements: ['id' => '\d+'], methods: ['PUT'])]
@@ -489,6 +545,15 @@ class ExchangeController extends AbstractController
             'program' => $report->getProgram(),
             'sections' => (object) $report->getSections(),
             'courses' => $report->getCourses(),
+            'files' => array_map(
+                static fn (ExchangeReportFile $file): array => [
+                    'id' => $file->getId(),
+                    'name' => $file->getOriginalName(),
+                    'extension' => $file->getExtension(),
+                    'size' => $file->getSize(),
+                ],
+                $report->getFiles()->getValues()
+            ),
             'author' => $report->displayName(),
             'contactEmail' => $report->contactEmail(),
             'helpful' => (object) ($helpful['counts'][$id] ?? []),
@@ -514,9 +579,9 @@ class ExchangeController extends AbstractController
         return $user;
     }
 
-    private static function invalid(string $detail): JsonResponse
+    private static function invalid(string $detail, ?string $reason = null): JsonResponse
     {
-        return self::private(['detail' => $detail], Response::HTTP_UNPROCESSABLE_ENTITY);
+        return self::private(['detail' => $detail] + (null !== $reason ? ['reason' => $reason] : []), Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     /**
