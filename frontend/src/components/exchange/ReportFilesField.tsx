@@ -88,7 +88,7 @@ export default function ReportFilesField({ files, onChange }: { files: File[]; o
                         const extension = extensionOf(file.name);
                         const Icon = fileIcon(extension);
                         return (
-                            <li key={`${file.name}-${file.size}`} className="flex items-center gap-3 rounded-control border border-border px-3 py-2">
+                            <li key={`${file.name}-${file.size}`} className="page-in flex items-center gap-3 rounded-control border border-border px-3 py-2">
                                 <span className="grid size-8 shrink-0 place-items-center rounded-chip bg-surface-muted text-icon">
                                     <Icon className="size-4" aria-hidden="true" />
                                 </span>
