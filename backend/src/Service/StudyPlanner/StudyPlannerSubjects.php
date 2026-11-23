@@ -18,7 +18,9 @@ use Doctrine\ORM\EntityManagerInterface;
  *  - A session given to two programmes at once lists both activities in its summary, often once
  *    in Dutch and once in English: "H00T2a Eindige elementen voor elektromagnetische velden:
  *    oefeningen, H04C0a Finite Elements for Electromagnetic Fields: Exercises, Ruth Vazquez
- *    Sabariego". Everything named together in one session is one course (activities()).
+ *    Sabariego". Everything named together in one session is one course (activities()), unless
+ *    two of those names also have sessions of their own: then it is a session several courses
+ *    share, like an exam review that names every course of the year.
  *
  * The names that end up together form one subject, labelled with the name the timetable uses
  * most. A subject is linked to a Burgieclan course when one of its codes is that course's code
@@ -138,14 +140,39 @@ class StudyPlannerSubjects
             }
         };
 
+        // How many sessions name each course on its own.
         $activitiesOf = [];
+        $alone = [];
+        foreach ($events as $event) {
+            $activities = self::activities($event);
+            $activitiesOf[$event->getUid()] = $activities;
+            $bases = array_unique(array_map(static fn (array $a): string => mb_strtolower($a['base']), $activities));
+            if (1 === count($bases)) {
+                $alone[$bases[0]] = ($alone[$bases[0]] ?? 0) + 1;
+            }
+        }
+
+        // A session naming two courses that each also have sessions of their own is not one course
+        // under two names but a session they share, such as an exam review for a whole year. It
+        // goes with the first of them, and the others it names are left out.
+        foreach ($activitiesOf as $uid => $activities) {
+            $own = array_values(
+                array_filter(
+                    $activities,
+                    static fn (array $a): bool => isset($alone[mb_strtolower($a['base'])]),
+                )
+            );
+            $distinct = array_unique(array_map(static fn (array $a): string => mb_strtolower($a['base']), $own));
+            if (count($distinct) > 1) {
+                $activitiesOf[$uid] = [$own[0]];
+            }
+        }
+
         $mentions = [];
         $display = [];
         $codes = [];
         $names = [];
-        foreach ($events as $event) {
-            $activities = self::activities($event);
-            $activitiesOf[$event->getUid()] = $activities;
+        foreach ($activitiesOf as $activities) {
             foreach ($activities as $activity) {
                 $key = mb_strtolower($activity['base']);
                 $parent[$key] ??= $key;
