@@ -90,12 +90,12 @@ class StudyPlannerSubjectsTest extends KernelTestCase
             ]
         );
 
-        $this->assertSame('Analyse', $labels['analyse']);
+        $this->assertSame('Analyse, deel 1', $labels['analyse']);
         $this->assertSame('Toegepaste algebra', $labels['algebra']);
         $this->assertSame('Algemene en technische scheikunde', $labels['chemie']);
         $this->assertSame('Algemene en technische scheikunde', $labels['chemie-oef']);
         // The review goes with the course it names first; a course it only mentions gets no row.
-        $this->assertSame('Analyse', $labels['inkijk']);
+        $this->assertSame('Analyse, deel 1', $labels['inkijk']);
         $this->assertCount(3, array_unique($labels));
     }
 }

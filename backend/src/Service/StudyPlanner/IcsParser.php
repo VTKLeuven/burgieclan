@@ -12,7 +12,8 @@ use Exception;
  * floating (then Leuven time).
  *
  * A summary reads "H0T34a Nuclear Energy: Basic Aspects, William D'haeseleer": the code of the
- * teaching activity, the course, and after the first comma the teaching staff. The kind of session
+ * teaching activity, the course, and after the first comma the teaching staff (a comma inside the
+ * course name is told apart by StudyPlannerSubjects::split()). The kind of session
  * ("01 College", "02 Practicum", ...) appears at the start of the description or as a segment of
  * the summary; when absent, a ": <activity>" suffix in the summary or keyword in the description
  * serves as fallback.
@@ -137,9 +138,9 @@ final class IcsParser
             $end = null;
         }
 
-        $parts = array_map('trim', explode(',', $summary));
-        $course = $parts[0];
-        $people = trim(implode(', ', array_slice($parts, 1)));
+        $parts = StudyPlannerSubjects::split($summary, true);
+        $course = $parts[0] ?? $summary;
+        $people = implode(', ', array_slice($parts, 1));
         $code = preg_match('/^[A-Z0-9]{5,7}[a-z0-9]*/', $summary, $m) ? $m[0] : null;
         $location = trim($this->text($event['LOCATION']['value'] ?? ''));
         $description = $this->text($event['DESCRIPTION']['value'] ?? '');

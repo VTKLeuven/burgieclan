@@ -227,6 +227,58 @@ class IcsParserTest extends TestCase
         ];
     }
 
+    /** @return iterable<string, array{string, string, ?string}> */
+    public static function summariesWithACommaInTheCourse(): iterable
+    {
+        yield 'course name with a comma' => [
+            'H01A0a Analyse, deel 1: hoorcollege, Lutgarde Beernaert, 1Bbi: Groep A',
+            'H01A0a Analyse, deel 1: hoorcollege',
+            'Lutgarde Beernaert, 1Bbi: Groep A',
+        ];
+        yield 'no teaching staff' => [
+            'H01A1a Analyse, deel 1: oefeningen',
+            'H01A1a Analyse, deel 1: oefeningen',
+            null,
+        ];
+        yield 'another activity with a comma among the people' => [
+            'H01A0a Analyse, deel 1: hoorcollege, H01A4a Toegepaste algebra: hoorcollege, H01X1a Wiskunde, deel 2: oefeningen, geen docent',
+            'H01A0a Analyse, deel 1: hoorcollege',
+            'H01A4a Toegepaste algebra: hoorcollege, H01X1a Wiskunde, deel 2: oefeningen, geen docent',
+        ];
+        yield 'a course with its kind of session stays apart from a group' => [
+            'H01A5a Toegepaste algebra: oefeningen, geen docent, 1Bbi: Reeks B1',
+            'H01A5a Toegepaste algebra: oefeningen',
+            'geen docent, 1Bbi: Reeks B1',
+        ];
+        yield 'a name without a kind of session keeps the old split' => [
+            'H01C4a Wijsbegeerte, Stefan Rummens, 2Bbi: groep A en B',
+            'H01C4a Wijsbegeerte',
+            'Stefan Rummens, 2Bbi: groep A en B',
+        ];
+    }
+
+    #[DataProvider('summariesWithACommaInTheCourse')]
+    public function testKeepsACommaInsideTheCourseName(string $summary, string $course, ?string $people): void
+    {
+        $ics = implode(
+            "\r\n",
+            [
+            'BEGIN:VCALENDAR',
+            'BEGIN:VEVENT',
+            'UID:comma@timeedit.com',
+            'DTSTART:20261026T083500Z',
+            'SUMMARY:' . str_replace(',', '\\,', $summary),
+            'END:VEVENT',
+            'END:VCALENDAR',
+            ]
+        );
+
+        $events = (new IcsParser())->parse($ics);
+
+        $this->assertSame($course, $events[0]['course']);
+        $this->assertSame($people, $events[0]['people']);
+    }
+
     private function parseEventType(string $summary, ?string $description = null): string
     {
         $lines = [

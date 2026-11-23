@@ -43,8 +43,11 @@ class StudyPlannerSubjects
     /** "H04S7a Combustion Engines: Lectures" -> "Combustion Engines: Lectures". */
     public static function courseName(StudyPlannerEvent $event): string
     {
-        $code = $event->getCourseCode();
-        $course = $event->getCourse();
+        return self::nameOf($event->getCourseCode(), $event->getCourse());
+    }
+
+    public static function nameOf(?string $code, string $course): string
+    {
         $name = null !== $code && str_starts_with($course, $code) ? substr($course, strlen($code)) : $course;
         $name = trim($name);
 
@@ -61,14 +64,57 @@ class StudyPlannerSubjects
         return self::base(self::courseName($event));
     }
 
-    private static function base(string $name): string
+    public static function base(string $name): string
+    {
+        return self::endsInActivity($name) ? trim(substr($name, 0, (int) strrpos($name, ': '))) : trim($name);
+    }
+
+    /** Whether a name ends in a kind of session: "Analyse, deel 1: hoorcollege". */
+    private static function endsInActivity(string $name): bool
     {
         $colon = strrpos($name, ': ');
-        if (false !== $colon && preg_match(self::ACTIVITY, substr($name, $colon + 2))) {
-            return trim(substr($name, 0, $colon));
+
+        return false !== $colon && 1 === preg_match(self::ACTIVITY, substr($name, $colon + 2));
+    }
+
+    private static function isActivityEntry(string $part): bool
+    {
+        return 1 === preg_match(self::ACTIVITY_ENTRY, $part, $m) && 1 === preg_match('/\d/', $m[1]);
+    }
+
+    /**
+     * The parts of a timetable summary (its course name first), or of the people of a session.
+     *
+     * TimeEdit escapes the commas between the parts and the ones inside a course name alike, so
+     * "H01A0a Analyse, deel 1: hoorcollege, Lutgarde Beernaert" has three pieces where it means
+     * two. A piece that ends in a kind of session ("deel 1: hoorcollege") goes back onto the
+     * course name before it, if that name does not end in one already.
+     *
+     * @return list<string>
+     */
+    public static function split(string $text, bool $startsWithCourse): array
+    {
+        $parts = [];
+        foreach (explode(',', $text) as $piece) {
+            $piece = trim($piece);
+            if ('' === $piece) {
+                continue;
+            }
+            $last = count($parts) - 1;
+            if (
+                $last >= 0
+                && ((0 === $last && $startsWithCourse) || self::isActivityEntry($parts[$last]))
+                && !self::endsInActivity($parts[$last])
+                && !self::isActivityEntry($piece)
+                && self::endsInActivity($piece)
+            ) {
+                $parts[$last] .= ', ' . $piece;
+            } else {
+                $parts[] = $piece;
+            }
         }
 
-        return trim($name);
+        return $parts;
     }
 
     /**
@@ -82,7 +128,7 @@ class StudyPlannerSubjects
         $name = self::courseName($event);
         $activities = [['code' => $event->getCourseCode(), 'name' => $name, 'base' => self::base($name)]];
         foreach (self::peopleParts($event) as $part) {
-            if (preg_match(self::ACTIVITY_ENTRY, $part, $m) && preg_match('/\d/', $m[1])) {
+            if (self::isActivityEntry($part) && preg_match(self::ACTIVITY_ENTRY, $part, $m)) {
                 $activities[] = ['code' => $m[1], 'name' => trim($m[2]), 'base' => self::base($m[2])];
             }
         }
@@ -98,7 +144,7 @@ class StudyPlannerSubjects
     {
         $people = array_filter(
             self::peopleParts($event),
-            static fn (string $part): bool => !(preg_match(self::ACTIVITY_ENTRY, $part, $m) && preg_match('/\d/', $m[1])),
+            static fn (string $part): bool => !self::isActivityEntry($part),
         );
 
         return [] === $people ? null : implode(', ', $people);
@@ -109,9 +155,7 @@ class StudyPlannerSubjects
      */
     private static function peopleParts(StudyPlannerEvent $event): array
     {
-        $parts = array_map('trim', explode(',', (string) $event->getPeople()));
-
-        return array_values(array_filter($parts, static fn (string $part): bool => '' !== $part));
+        return self::split((string) $event->getPeople(), false);
     }
 
     /**
