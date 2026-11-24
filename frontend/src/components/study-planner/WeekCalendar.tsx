@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils';
 import type { StudyPlannerEvent } from '@/types/entities';
 import { Check, ChevronLeft, ChevronRight, Flag, PartyPopper } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MANDATORY_MARK, sessionTone, TONE_BLOCK, TONES, typeKey, type SessionTone } from './model';
 import { addDays, isoWeek, longDay, mondayOf, nowInLeuven, weekdayName, weekRange } from './time';
@@ -11,6 +11,11 @@ import type { PlannerApi } from './useStudyPlanner';
 import { vtkSlots, vtkTitle, type VtkSlot } from './vtk';
 
 const HOUR_PX = 52;
+/** The hours the time grid shows without scrolling; anything earlier or later is a scroll away. */
+const VIEW_FROM = 8;
+const VIEW_TO = 21;
+/** Room above the first hour in view, so its label is not cut in half by the edge. */
+const VIEW_PAD = 10;
 
 const SWATCH: Record<SessionTone, string> = {
     lecture: 'border-plan-lecture-border bg-plan-lecture-bg',
@@ -114,6 +119,14 @@ export default function WeekCalendar({
     const hours = Array.from({ length: maxH - minH + 1 }, (_, i) => minH + i);
     const height = (maxH - minH) * HOUR_PX;
     const y = (minutes: number) => ((minutes - minH * 60) / 60) * HOUR_PX;
+    // Open at 08:00, or at the first session of the week when one starts earlier. A VTK event that runs
+    // past midnight would otherwise stretch the grid to 00:00 and push the lessons out of view.
+    const anchorMin = Math.min(VIEW_FROM * 60, ...visible.map((e) => e.startMin));
+    const scroller = useRef<HTMLDivElement>(null);
+    useLayoutEffect(() => {
+        const el = scroller.current;
+        if (el) el.scrollTop = Math.max(0, ((anchorMin - minH * 60) / 60) * HOUR_PX - VIEW_PAD);
+    }, [monday, anchorMin, minH]);
 
     const label =
         monday === thisMonday
@@ -207,7 +220,7 @@ export default function WeekCalendar({
                 {/* Tablet and up: a time grid. */}
                 <div className="hidden md:block">
                     <div
-                        className="grid border-b border-border"
+                        className="grid overflow-y-hidden border-b border-border [scrollbar-gutter:stable]"
                         style={{ gridTemplateColumns: `52px repeat(${days.length}, minmax(0, 1fr))` }}
                     >
                         <span />
@@ -232,7 +245,7 @@ export default function WeekCalendar({
                     </div>
                     {vtkAllDay.length > 0 && (
                         <div
-                            className="grid border-b border-border"
+                            className="grid overflow-y-hidden border-b border-border [scrollbar-gutter:stable]"
                             style={{ gridTemplateColumns: `52px repeat(${days.length}, minmax(0, 1fr))` }}
                         >
                             <span className="self-center pr-2 text-right text-caption text-fg-placeholder">{t('study_planner.vtk.all_day')}</span>
@@ -256,117 +269,123 @@ export default function WeekCalendar({
                         </div>
                     )}
                     <div
-                        className="relative grid"
-                        style={{ gridTemplateColumns: `52px repeat(${days.length}, minmax(0, 1fr))`, height }}
+                        ref={scroller}
+                        className="overflow-y-auto [scrollbar-gutter:stable]"
+                        style={{ maxHeight: (VIEW_TO - VIEW_FROM) * HOUR_PX + 2 * VIEW_PAD }}
                     >
-                        <div className="relative select-none">
-                            {hours.slice(0, -1).map((h) => (
-                                <span
-                                    key={h}
-                                    className="absolute right-2 -translate-y-1/2 text-caption tabular text-fg-placeholder first:translate-y-0"
-                                    style={{ top: y(h * 60) }}
-                                >
-                                    {String(h).padStart(2, '0')}:00
-                                </span>
-                            ))}
-                        </div>
-                        {days.map((d) => {
-                            const placed = place<StudyPlannerEvent | VtkSlot>([
-                                ...visible.filter((e) => e.date === d),
-                                ...vtkTimed.filter((v) => v.date === d),
-                            ]);
-                            const today = d === now.date;
-                            return (
-                                <div key={d} className={cn('relative border-l border-border', today && 'bg-surface-muted')}>
-                                    {hours.slice(1, -1).map((h) => (
-                                        <span
-                                            key={h}
-                                            aria-hidden="true"
-                                            className="absolute inset-x-0 border-t border-border"
-                                            style={{ top: y(h * 60) }}
-                                        />
-                                    ))}
-                                    {placed.map(({ event: item, lane, lanes }) => {
-                                        const h = Math.max(26, y(item.endMin) - y(item.startMin) - 3);
-                                        const box = {
-                                            top: y(item.startMin) + 1,
-                                            height: h,
-                                            left: `calc(${(lane / lanes) * 100}% + 3px)`,
-                                            width: `calc(${100 / lanes}% - 6px)`,
-                                        };
-                                        if ('occurrence' in item) {
+                        <div
+                            className="relative grid"
+                            style={{ gridTemplateColumns: `52px repeat(${days.length}, minmax(0, 1fr))`, height }}
+                        >
+                            <div className="relative select-none">
+                                {hours.slice(0, -1).map((h) => (
+                                    <span
+                                        key={h}
+                                        className="absolute right-2 -translate-y-1/2 text-caption tabular text-fg-placeholder first:translate-y-0"
+                                        style={{ top: y(h * 60) }}
+                                    >
+                                        {String(h).padStart(2, '0')}:00
+                                    </span>
+                                ))}
+                            </div>
+                            {days.map((d) => {
+                                const placed = place<StudyPlannerEvent | VtkSlot>([
+                                    ...visible.filter((e) => e.date === d),
+                                    ...vtkTimed.filter((v) => v.date === d),
+                                ]);
+                                const today = d === now.date;
+                                return (
+                                    <div key={d} className={cn('relative border-l border-border', today && 'bg-surface-muted')}>
+                                        {hours.slice(1, -1).map((h) => (
+                                            <span
+                                                key={h}
+                                                aria-hidden="true"
+                                                className="absolute inset-x-0 border-t border-border"
+                                                style={{ top: y(h * 60) }}
+                                            />
+                                        ))}
+                                        {placed.map(({ event: item, lane, lanes }) => {
+                                            const h = Math.max(26, y(item.endMin) - y(item.startMin) - 3);
+                                            const box = {
+                                                top: y(item.startMin) + 1,
+                                                height: h,
+                                                left: `calc(${(lane / lanes) * 100}% + 3px)`,
+                                                width: `calc(${100 / lanes}% - 6px)`,
+                                            };
+                                            if ('occurrence' in item) {
+                                                return (
+                                                    <button
+                                                        key={item.key}
+                                                        type="button"
+                                                        onClick={() => onSelectVtk(item)}
+                                                        aria-label={vtkLabel(item)}
+                                                        className={cn(
+                                                            'absolute flex flex-col items-stretch justify-start overflow-hidden rounded-[7px] border px-2 py-1 pl-2.5 text-left transition-[filter] hover:brightness-[0.97]',
+                                                            VTK_BLOCK,
+                                                        )}
+                                                        style={box}
+                                                    >
+                                                        <span className="flex items-center gap-1 text-caption font-semibold tabular text-fg-muted">
+                                                            {item.startMin === item.occurrence.startMin ? item.occurrence.start : ''}
+                                                            <PartyPopper className="size-3" aria-hidden="true" />
+                                                            VTK
+                                                        </span>
+                                                        <span className={cn('mt-0.5 block text-small font-semibold leading-tight text-fg', h > 70 ? 'line-clamp-3' : 'line-clamp-2')}>
+                                                            {vtkTitle(item.event, locale)}
+                                                            {item.occurrence.label ? `: ${item.occurrence.label}` : ''}
+                                                        </span>
+                                                        {h > 84 && (item.occurrence.location ?? item.event.location) && (
+                                                            <span className="mt-0.5 block truncate text-caption">{item.occurrence.location ?? item.event.location}</span>
+                                                        )}
+                                                    </button>
+                                                );
+                                            }
+                                            const e = item;
                                             return (
                                                 <button
-                                                    key={item.key}
+                                                    key={e.uid}
                                                     type="button"
-                                                    onClick={() => onSelectVtk(item)}
-                                                    aria-label={vtkLabel(item)}
+                                                    onClick={() => onSelect(e.uid)}
+                                                    aria-label={eventLabel(e)}
                                                     className={cn(
-                                                        'absolute flex flex-col items-stretch justify-start overflow-hidden rounded-[7px] border px-2 py-1 pl-2.5 text-left transition-[filter] hover:brightness-[0.97]',
-                                                        VTK_BLOCK,
+                                                        'absolute flex flex-col items-stretch justify-start overflow-hidden rounded-[7px] border px-2 py-1 text-left transition-[filter] hover:brightness-[0.97]',
+                                                        blockClass(e),
                                                     )}
                                                     style={box}
                                                 >
-                                                    <span className="flex items-center gap-1 text-caption font-semibold tabular text-fg-muted">
-                                                        {item.startMin === item.occurrence.startMin ? item.occurrence.start : ''}
-                                                        <PartyPopper className="size-3" aria-hidden="true" />
-                                                        VTK
+                                                    <span className="flex items-center gap-1 text-caption font-semibold tabular">
+                                                        {e.start}
+                                                        {e.mandatory && <Flag className="size-3 text-danger" aria-hidden="true" />}
+                                                        {e.done && <Check className="size-3" aria-hidden="true" />}
                                                     </span>
-                                                    <span className={cn('mt-0.5 block text-small font-semibold leading-tight text-fg', h > 70 ? 'line-clamp-3' : 'line-clamp-2')}>
-                                                        {vtkTitle(item.event, locale)}
-                                                        {item.occurrence.label ? `: ${item.occurrence.label}` : ''}
+                                                    <span
+                                                        className={cn(
+                                                            'mt-0.5 block text-small font-semibold leading-tight text-fg',
+                                                            h > 70 ? 'line-clamp-3' : 'line-clamp-2',
+                                                            e.done && 'line-through decoration-1',
+                                                        )}
+                                                    >
+                                                        {e.course}
                                                     </span>
-                                                    {h > 84 && (item.occurrence.location ?? item.event.location) && (
-                                                        <span className="mt-0.5 block truncate text-caption">{item.occurrence.location ?? item.event.location}</span>
+                                                    {h > 84 && e.location && (
+                                                        <span className="mt-0.5 block truncate text-caption">{e.location}</span>
                                                     )}
                                                 </button>
                                             );
-                                        }
-                                        const e = item;
-                                        return (
-                                            <button
-                                                key={e.uid}
-                                                type="button"
-                                                onClick={() => onSelect(e.uid)}
-                                                aria-label={eventLabel(e)}
-                                                className={cn(
-                                                    'absolute flex flex-col items-stretch justify-start overflow-hidden rounded-[7px] border px-2 py-1 text-left transition-[filter] hover:brightness-[0.97]',
-                                                    blockClass(e),
-                                                )}
-                                                style={box}
+                                        })}
+                                        {today && now.minutes >= minH * 60 && now.minutes <= maxH * 60 && (
+                                            <span
+                                                aria-hidden="true"
+                                                className="pointer-events-none absolute inset-x-0 z-10 border-t-2 border-danger"
+                                                style={{ top: y(now.minutes) }}
                                             >
-                                                <span className="flex items-center gap-1 text-caption font-semibold tabular">
-                                                    {e.start}
-                                                    {e.mandatory && <Flag className="size-3 text-danger" aria-hidden="true" />}
-                                                    {e.done && <Check className="size-3" aria-hidden="true" />}
-                                                </span>
-                                                <span
-                                                    className={cn(
-                                                        'mt-0.5 block text-small font-semibold leading-tight text-fg',
-                                                        h > 70 ? 'line-clamp-3' : 'line-clamp-2',
-                                                        e.done && 'line-through decoration-1',
-                                                    )}
-                                                >
-                                                    {e.course}
-                                                </span>
-                                                {h > 84 && e.location && (
-                                                    <span className="mt-0.5 block truncate text-caption">{e.location}</span>
-                                                )}
-                                            </button>
-                                        );
-                                    })}
-                                    {today && now.minutes >= minH * 60 && now.minutes <= maxH * 60 && (
-                                        <span
-                                            aria-hidden="true"
-                                            className="pointer-events-none absolute inset-x-0 z-10 border-t-2 border-danger"
-                                            style={{ top: y(now.minutes) }}
-                                        >
-                                            <span className="absolute -left-1 -top-[5px] size-2 rounded-full bg-danger" />
-                                        </span>
-                                    )}
-                                </div>
-                            );
-                        })}
+                                                <span className="absolute -left-1 -top-[5px] size-2 rounded-full bg-danger" />
+                                            </span>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
 
