@@ -3,7 +3,11 @@
 namespace App\Tests\Api;
 
 use App\Entity\User;
+use App\Entity\CommentCategory;
+use App\Factory\CommentCategoryFactory;
+use App\Factory\CourseCommentFactory;
 use App\Factory\CourseFactory;
+use App\Factory\CourseRatingFactory;
 use App\Factory\DocumentFactory;
 use App\Factory\UserFactory;
 use App\Service\VtkService\VtkServiceSignature;
@@ -116,5 +120,28 @@ class VtkAppTest extends ApiTestCase
         $browser = $this->browser();
         $this->asVtk($browser, 'GET', '/api/courses', 401);
         $this->asVtk($browser, 'GET', '/api/documents', 401);
+    }
+
+    public function testCourseShowsItsEvaluations(): void
+    {
+        $browser = $this->browser();
+        $course = CourseFactory::createOne();
+        $rated = CommentCategoryFactory::createOne(['name_nl' => 'Algemeen', 'type' => CommentCategory::TYPE_RATED]);
+        $discussion = CommentCategoryFactory::createOne(['name_nl' => 'Tips', 'type' => CommentCategory::TYPE_DISCUSSION]);
+        CommentCategoryFactory::createOne(['name_nl' => 'Leeg', 'type' => CommentCategory::TYPE_DISCUSSION]);
+        foreach ([4, 5, 3] as $value) {
+            CourseRatingFactory::createOne(['course' => $course, 'category' => $rated, 'value' => $value, 'creator' => UserFactory::createOne()]);
+        }
+        CourseCommentFactory::createOne(['course' => $course, 'category' => $discussion, 'content' => 'Maak de oefeningen', 'anonymous' => true]);
+
+        $evaluations = $this->asVtk($browser, 'GET', '/api/vtk_app/courses/' . $course->getId())['evaluations'];
+        $byName = array_column($evaluations['sections'], null, 'name');
+
+        $this->assertArrayNotHasKey('Leeg', $byName);
+        $this->assertTrue($byName['Algemeen']['rated']);
+        $this->assertSame(3, $byName['Algemeen']['allTime']['count']);
+        $this->assertEqualsWithDelta(4.0, $byName['Algemeen']['allTime']['average'], 0.01);
+        $this->assertSame('Maak de oefeningen', $byName['Tips']['comments'][0]['content']);
+        $this->assertNull($byName['Tips']['comments'][0]['author']);
     }
 }

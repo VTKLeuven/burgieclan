@@ -2,9 +2,14 @@
 
 namespace App\Controller\Api;
 
+use App\Constants\AcademicYear;
 use App\Entity\Course;
+use App\Entity\CourseComment;
 use App\Entity\Document;
 use App\Entity\User;
+use App\Repository\CommentCategoryRepository;
+use App\Repository\CourseCommentRepository;
+use App\Repository\CourseRatingRepository;
 use App\Repository\CourseRepository;
 use App\Repository\DocumentRepository;
 use App\Security\Voter\DocumentFileVoter;
@@ -21,7 +26,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Burgieclan in the VTK app: your courses, their documents and a link to open one.
+ * Burgieclan in the VTK app: your courses, their documents and evaluations, and a link to
+ * open a document.
  *
  * The app never talks to Burgieclan itself. It talks to vtk.be with its session cookie, and vtk.be
  * calls these routes for the member with a signed X-Vtk-User header (VtkServiceAuthenticator),
@@ -29,7 +35,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * opens beyond the planner, and they are kept small on purpose:
  *
  * - reading: courses, approved documents (plus the member's own ones under review, as on the
- *   site), and a short-lived link to a file the member may open (DocumentFileVoter);
+ *   site), the course evaluations (stars and comments), and a short-lived link to a file the
+ *   member may open (DocumentFileVoter);
  * - one write: marking a course as a favourite, the same list as "My courses" on the site.
  *
  * Uploading, voting, comments and moderation stay on burgieclan.vtk.be; the app links there.
@@ -50,6 +57,9 @@ final class VtkAppController extends AbstractController
 
     public function __construct(
         private readonly CourseRepository $courses,
+        private readonly CourseRatingRepository $ratings,
+        private readonly CourseCommentRepository $comments,
+        private readonly CommentCategoryRepository $categories,
         private readonly DocumentRepository $documents,
         private readonly EntityManagerInterface $entityManager,
         private readonly DocumentFileUrlGenerator $fileUrlGenerator,
@@ -99,6 +109,7 @@ final class VtkAppController extends AbstractController
                 fn (Document $document) => $this->normalizeDocument($document, $user, $lang),
                 $this->visibleDocuments($course, $user),
             ),
+            'evaluations' => $this->evaluations($course, $lang),
             ]
         );
     }
@@ -149,6 +160,58 @@ final class VtkAppController extends AbstractController
         }
 
         return self::private(['url' => $url, 'expiresInMinutes' => DocumentFileUrlGenerator::TTL_MINUTES]);
+    }
+
+    /**
+     * The course evaluations as the course page shows them: per section the average stars
+     * (recent years and all time, null below the minimum number of ratings, as on the site)
+     * and the comments, newest first. Read only: rating and commenting stay on Burgieclan.
+     *
+     * @return array<string, mixed>
+     */
+    private function evaluations(Course $course, string $lang): array
+    {
+        $recentYears = AcademicYear::mostRecent(GetCourseRatingSummaryController::RECENT_YEARS);
+        $recent = $this->ratings->summaryForCourse($course, $recentYears);
+        $allTime = $this->ratings->summaryForCourse($course);
+        $empty = ['average' => null, 'count' => 0];
+
+        /** @var CourseComment[] $comments */
+        $comments = $this->comments->findBy(['course' => $course], ['createdAt' => 'DESC'], 200);
+        $byCategory = [];
+        foreach ($comments as $comment) {
+            $byCategory[$comment->getCategory()->getId()][] = [
+                'id' => $comment->getId(),
+                'content' => $comment->getContent(),
+                'year' => $comment->getAcademicYear(),
+                'author' => $comment->isAnonymous() ? null : $comment->getCreator()->getFullName(),
+                'createdAt' => $comment->getCreatedAt()->format(DATE_ATOM),
+                'score' => $comment->getVoteScore(),
+            ];
+        }
+
+        $sections = [];
+        foreach ($this->categories->findBy([], ['id' => 'ASC']) as $category) {
+            $id = $category->getId();
+            $rated = $category->isRated();
+            // A discussion section nobody wrote in says nothing; a rated one still shows its stars.
+            if (!$rated && !isset($byCategory[$id])) {
+                continue;
+            }
+            $sections[] = [
+                'id' => $id,
+                'name' => $category->getName($lang) ?? $category->getNameNl(),
+                'description' => $category->getDescription($lang),
+                'rated' => $rated,
+                'lowLabel' => $rated ? $category->getRatingLowLabel($lang) : null,
+                'highLabel' => $rated ? $category->getRatingHighLabel($lang) : null,
+                'recent' => $recent[$id] ?? $empty,
+                'allTime' => $allTime[$id] ?? $empty,
+                'comments' => $byCategory[$id] ?? [],
+            ];
+        }
+
+        return ['recentYears' => $recentYears, 'sections' => $sections];
     }
 
     /**
