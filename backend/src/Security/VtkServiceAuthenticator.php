@@ -22,13 +22,16 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
  * a JWT. The member is found or created exactly like on an SSO login (by `sub`, then by email),
  * so the app and Burgieclan always see one account and one planner.
  *
- * Only /api/study_planner: a leaked secret must not open the rest of the API (documents,
- * moderation) in anyone's name. The exported calendar under /api/study_planner/feed/ needs no
- * login at all and is left alone.
+ * Only two prefixes: /api/study_planner, and /api/vtk_app (VtkAppController: courses, documents
+ * to read, a file link, favourite courses). A leaked secret must not open the rest of the API
+ * (uploads, votes, comments, moderation) in anyone's name; VtkAppController is kept to what the
+ * app shows for exactly that reason. The exported calendar under /api/study_planner/feed/ needs
+ * no login at all and is left alone.
  */
 class VtkServiceAuthenticator extends AbstractAuthenticator
 {
     public const PATH_PREFIX = '/api/study_planner';
+    public const APP_PREFIX = '/api/vtk_app';
 
     public function __construct(
         private readonly VtkServiceSignature $signature,
@@ -39,8 +42,14 @@ class VtkServiceAuthenticator extends AbstractAuthenticator
     {
         $path = $request->getPathInfo();
 
-        return $request->headers->has(VtkServiceSignature::HEADER_SIGNATURE)
-            && (self::PATH_PREFIX === $path || str_starts_with($path, self::PATH_PREFIX . '/'))
+        if (!$request->headers->has(VtkServiceSignature::HEADER_SIGNATURE)) {
+            return false;
+        }
+        if (str_starts_with($path, self::APP_PREFIX . '/')) {
+            return true;
+        }
+
+        return (self::PATH_PREFIX === $path || str_starts_with($path, self::PATH_PREFIX . '/'))
             && !str_starts_with($path, self::PATH_PREFIX . '/feed/');
     }
 

@@ -414,7 +414,7 @@ These variables **must** be set in the `.env` file. The application will fail to
 | `SENTRY_DSN` | Sentry error tracking URL | Empty (disabled) |
 | `CORS_ALLOW_ORIGIN` | CORS origin pattern | Localhost only |
 | `VTK_URL` | The VTK website, read for the VTK events in the study planner | `https://vtk.be` |
-| `VTK_SERVICE_SECRET` | Shared with `BURGIECLAN_SERVICE_SECRET` on the VTK website: it signs the calls through which the VTK app reads and changes the study planner. At least 32 bytes; empty switches the app off | Empty |
+| `VTK_SERVICE_SECRET` | Shared with `BURGIECLAN_SERVICE_SECRET` on the VTK website: it signs the calls through which the VTK app reads and changes the study planner (`/api/study_planner`) and reads courses and documents and stars courses (`/api/vtk_app`, VtkAppController). The rest of the API does not accept it. At least 32 bytes; empty switches the app off | Empty |
 
 > The upload size limit and allowed MIME types used to be the `NEXT_PUBLIC_MAX_FILE_SIZE_MB` and
 > `NEXT_PUBLIC_ALLOWED_MIME_TYPES` env vars. They are no longer read from the environment — see
