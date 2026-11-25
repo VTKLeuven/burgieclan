@@ -134,6 +134,7 @@ final class SetupS3BucketCommand extends Command
     private function applyCors(SymfonyStyle $io, array $origins): bool
     {
         $ruleId = 'burgieclan-frontend';
+        $call = 'GetBucketCors';
 
         try {
             try {
@@ -145,42 +146,49 @@ final class SetupS3BucketCommand extends Command
                 $rules = [];
             }
 
+            $current = null;
             $otherRules = [];
             foreach ($rules as $rule) {
                 if (($rule['ID'] ?? null) === $ruleId) {
+                    $current = $rule;
                     $origins = [...$rule['AllowedOrigins'] ?? [], ...$origins];
                 } else {
                     $otherRules[] = $rule;
                 }
             }
             $origins = array_values(array_unique($origins));
+            $wanted = [
+                'ID' => $ruleId,
+                'AllowedOrigins' => $origins,
+                'AllowedMethods' => ['GET', 'HEAD'],
+                'AllowedHeaders' => ['*'],
+                'ExposeHeaders' => [
+                    'Content-Disposition',
+                    'Content-Length',
+                    'Content-Type',
+                    'Accept-Ranges',
+                    'Content-Range',
+                ],
+                'MaxAgeSeconds' => 3600,
+            ];
 
+            // Nothing to change: leave the bucket alone. Most deploys end here, and a store that
+            // refuses writes to its CORS configuration then does not block them.
+            if (null !== $current && self::sameRule($current, $wanted)) {
+                $io->success(sprintf('CORS rules already allow: %s', implode(', ', $origins)));
+
+                return true;
+            }
+
+            $call = 'PutBucketCors';
             $this->s3Client->putBucketCors(
                 [
                 'Bucket' => $this->bucket,
-                'CORSConfiguration' => [
-                    'CORSRules' => [
-                        ...$otherRules,
-                        [
-                            'ID' => $ruleId,
-                            'AllowedOrigins' => $origins,
-                            'AllowedMethods' => ['GET', 'HEAD'],
-                            'AllowedHeaders' => ['*'],
-                            'ExposeHeaders' => [
-                                'Content-Disposition',
-                                'Content-Length',
-                                'Content-Type',
-                                'Accept-Ranges',
-                                'Content-Range',
-                            ],
-                            'MaxAgeSeconds' => 3600,
-                        ],
-                    ],
-                ],
+                'CORSConfiguration' => ['CORSRules' => [...$otherRules, $wanted]],
                 ]
             );
         } catch (S3Exception $e) {
-            $io->error(sprintf('Could not apply CORS rules: %s', $e->getAwsErrorMessage() ?? $e->getMessage()));
+            $io->error(sprintf('Could not apply CORS rules: %s', self::describe($call, $e)));
 
             return false;
         }
@@ -188,6 +196,49 @@ final class SetupS3BucketCommand extends Command
         $io->success(sprintf('CORS rules allow: %s', implode(', ', $origins)));
 
         return true;
+    }
+
+    /**
+     * Whether a CORS rule read from the bucket says the same as ours. Lists are compared as sets:
+     * a store may hand them back in another order.
+     *
+     * @param array<string, mixed> $current
+     * @param array<string, mixed> $wanted
+     */
+    private static function sameRule(array $current, array $wanted): bool
+    {
+        foreach ($wanted as $key => $value) {
+            $have = $current[$key] ?? null;
+            if (is_array($value)) {
+                if (!is_array($have)) {
+                    return false;
+                }
+                $value = array_map('strval', $value);
+                $have = array_map('strval', $have);
+                sort($value);
+                sort($have);
+            }
+            if ($have != $value) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /** "PutBucketCors: AccessDenied (HTTP 403) Access Denied", whatever parts the store sent. */
+    private static function describe(string $call, S3Exception $e): string
+    {
+        $parts = array_filter(
+            [
+            $call . ':',
+            $e->getAwsErrorCode(),
+            null === $e->getStatusCode() ? null : sprintf('(HTTP %d)', $e->getStatusCode()),
+            $e->getAwsErrorMessage() ?: null,
+            ]
+        );
+
+        return 2 > count($parts) ? $call . ': ' . $e->getMessage() : implode(' ', $parts);
     }
 
     /**
@@ -230,7 +281,7 @@ final class SetupS3BucketCommand extends Command
             $io->warning(
                 sprintf(
                     'Could not set the lifecycle rule for old zips (%s). Schedule app:delete-old-zips instead.',
-                    $e->getAwsErrorMessage() ?? $e->getMessage()
+                    $e->getAwsErrorMessage() ?: $e->getMessage()
                 )
             );
 
