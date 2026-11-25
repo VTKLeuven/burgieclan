@@ -3,14 +3,14 @@
 import { Dialog } from '@/components/ui/Dialog';
 import type { StudyPlanner } from '@/types/entities';
 import { DialogTitle } from '@headlessui/react';
-import { RefreshCw } from 'lucide-react';
-import { useState } from 'react';
+import { CalendarPlus, RefreshCw } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LinkForm } from './SetupPanel';
 import { dateTime } from './time';
 import type { StudyPlannerHandle } from './useStudyPlanner';
 
-/** The timetable link: sync now, change it, or stop and forget everything. */
+/** The timetable link: sync now, change it, add older sessions from a file, or stop and forget everything. */
 export default function SettingsDialog({
     open,
     state,
@@ -25,9 +25,14 @@ export default function SettingsDialog({
     const { t, i18n } = useTranslation();
     const [editing, setEditing] = useState(false);
     const [confirmStop, setConfirmStop] = useState(false);
+    const [imported, setImported] = useState<number | null>(null);
+    const [unreadable, setUnreadable] = useState(false);
+    const fileInput = useRef<HTMLInputElement>(null);
     const close = () => {
         setEditing(false);
         setConfirmStop(false);
+        setImported(null);
+        setUnreadable(false);
         handle.clearError();
         onClose();
     };
@@ -85,6 +90,53 @@ export default function SettingsDialog({
                                     {t('study_planner.settings.change_link')}
                                 </button>
                             </>
+                        )}
+                    </div>
+
+                    <div className="border-t border-border pt-5">
+                        <p className="m-0 text-small font-semibold text-fg">{t('study_planner.settings.import_title')}</p>
+                        <p className="m-0 mt-0.5 text-body text-fg-muted">{t('study_planner.settings.import_help')}</p>
+                        <input
+                            ref={fileInput}
+                            type="file"
+                            accept=".ics,text/calendar"
+                            className="hidden"
+                            onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                e.target.value = '';
+                                if (!file) return;
+                                setImported(null);
+                                setUnreadable(false);
+                                let ics: string;
+                                try {
+                                    ics = await file.text();
+                                } catch {
+                                    setUnreadable(true);
+                                    return;
+                                }
+                                setImported(await handle.importIcs(ics));
+                            }}
+                        />
+                        <button
+                            type="button"
+                            disabled={handle.busy}
+                            onClick={() => fileInput.current?.click()}
+                            className="vtk-button mt-2"
+                        >
+                            <CalendarPlus aria-hidden="true" className="size-4" />
+                            {t('study_planner.settings.import_button')}
+                        </button>
+                        {imported !== null && (
+                            <p role="status" className="m-0 mt-2 text-body text-fg-muted">
+                                {imported > 0
+                                    ? t('study_planner.settings.imported', { count: imported })
+                                    : t('study_planner.settings.imported_none')}
+                            </p>
+                        )}
+                        {unreadable && (
+                            <p role="alert" className="m-0 mt-2 text-body text-danger-text">
+                                {t('study_planner.settings.import_unreadable')}
+                            </p>
                         )}
                     </div>
 

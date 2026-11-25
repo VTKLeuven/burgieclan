@@ -24,6 +24,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
  * - DELETE /api/study_planner: unsubscribe and forget the timetable and everything marked in it.
  *   The "Blok" calendar stays.
  * - POST /api/study_planner/sync: sync now.
+ * - POST /api/study_planner/import {"ics"}: add the sessions from before the timetable's own history
+ *   out of a calendar file (StudyPlannerIcsImport).
  * - POST /api/study_planner/operations: one change, see StudyPlannerOperationInput; that includes
  *   the "Blok" calendar (StudyPlannerBlok).
  * - POST /api/study_planner/feed_token: a new secret in the export link; the old link stops working.
@@ -62,6 +64,14 @@ use Symfony\Component\Serializer\Attribute\Groups;
             deserialize: false,
             processor: StudyPlannerProcessor::class,
             name: StudyPlannerProcessor::SYNC,
+        ),
+        new Post(
+            uriTemplate: '/study_planner/import',
+            status: 200,
+            input: StudyPlannerImportInput::class,
+            read: false,
+            processor: StudyPlannerProcessor::class,
+            name: StudyPlannerProcessor::IMPORT,
         ),
         new Post(
             uriTemplate: '/study_planner/operations',

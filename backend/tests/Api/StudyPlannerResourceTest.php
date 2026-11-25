@@ -243,6 +243,52 @@ class StudyPlannerResourceTest extends ApiTestCase
         $this->assertContains('p1@timeedit.com', $uids);
     }
 
+    public function testImportAddsOnlySessionsBeforeTheTimetablesHistory(): void
+    {
+        $token = $this->token();
+        $this->feed = $this->defaultFeed();
+        $browser = $this->browserWithFeed();
+        $this->call($browser, $token, 'POST', '/api/study_planner/subscription', ['icsUrl' => self::LINK]);
+
+        // An export of another planner: its own UIDs, "Mandatory: " titles, all-day deadlines.
+        $file = self::ics(
+            [
+            ['uid' => 'old1@cursus.example', 'start' => '20260914T083500Z', 'end' => '20260914T103000Z', 'summary' => 'H04A9a Power System Calculations: Lecture, Dirk Van Hertem', 'kind' => 'Lecture (H04A9a)'],
+            ['uid' => 'old2@cursus.example', 'start' => '20260915T120000Z', 'end' => '20260915T140000Z', 'summary' => 'Mandatory: H04B0a Power System Calculations: Exercises and Practica', 'kind' => 'Practical (H04B0a)'],
+            // The feed has these (l1 under another domain) or will have them: the feed decides.
+            ['uid' => 'l1@cursus.example', 'start' => '20260921T083500Z', 'end' => '20260921T103000Z', 'summary' => 'H04A9a Power System Calculations: Lecture'],
+            ['uid' => 'later@cursus.example', 'start' => '20261012T083500Z', 'end' => '20261012T103000Z', 'summary' => 'H04A9a Power System Calculations: Lecture'],
+            ]
+        );
+        $file = str_replace('END:VCALENDAR', "BEGIN:VEVENT\r\nUID:item-1@cursus.example\r\nDTSTART;VALUE=DATE:20260910\r\nSUMMARY:Deadline: report\r\nEND:VEVENT\r\nEND:VCALENDAR", $file);
+
+        $state = $this->call($browser, $token, 'POST', '/api/study_planner/import', ['ics' => $file]);
+
+        $uids = array_column($state['events'], 'uid');
+        $this->assertCount(7, $uids);
+        $this->assertContains('old1@cursus.example', $uids);
+        $this->assertNotContains('l1@cursus.example', $uids);
+        $this->assertNotContains('later@cursus.example', $uids);
+        $this->assertNotContains('item-1@cursus.example', $uids);
+        $old2 = self::event($state, 'old2@cursus.example');
+        $this->assertSame('event', $old2['mandatory']);
+        $this->assertSame('practicum', $old2['type']);
+        $this->assertSame('H04B0a', $old2['code']);
+        $this->assertSame('college', self::event($state, 'old1@cursus.example')['type']);
+
+        // Once more changes nothing, and a sync leaves the imported sessions alone.
+        $this->assertCount(7, $this->call($browser, $token, 'POST', '/api/study_planner/import', ['ics' => $file])['events']);
+        $this->assertCount(7, $this->call($browser, $token, 'POST', '/api/study_planner/sync')['events']);
+
+        $this->call($browser, $token, 'POST', '/api/study_planner/import', ['ics' => 'not a calendar'], 422);
+    }
+
+    public function testImportNeedsATimetable(): void
+    {
+        $token = $this->token();
+        $this->call($this->browserWithFeed(), $token, 'POST', '/api/study_planner/import', ['ics' => $this->defaultFeed()], 404);
+    }
+
     public function testFailingFeedKeepsTheTimetable(): void
     {
         $token = $this->token();

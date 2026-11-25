@@ -17,6 +17,10 @@ use Exception;
  * ("01 College", "02 Practicum", ...) appears at the start of the description or as a segment of
  * the summary; when absent, a ": <activity>" suffix in the summary or keyword in the description
  * serves as fallback.
+ *
+ * Calendars exported by other planners (see StudyPlannerIcsImport) may put "Mandatory: " or
+ * "Verplicht: " before the title; that prefix is taken off and reported as `mandatory`. TimeEdit
+ * never does that. `allDay` says the start was a date without a time.
  */
 final class IcsParser
 {
@@ -30,6 +34,8 @@ final class IcsParser
 
     private const CODE_PREFIX = '/^(01|02|03|07|15)(?:\s|$)/';
 
+    private const MANDATORY_PREFIX = '/^(?:mandatory|verplicht)\s*:\s*/iu';
+
     /** @var array<string, string> */
     private const KEYWORD_TYPES = [
         'practicum' => '/\b(?:practicum|practica|practicals?|labo(?:[\'’]?s)?|labs?|laboratory)\b/iu',
@@ -41,7 +47,7 @@ final class IcsParser
     ];
 
     /**
-     * @return list<array{uid: string, start: DateTimeImmutable, end: ?DateTimeImmutable, courseCode: ?string, course: string, people: ?string, location: ?string, type: string}>
+     * @return list<array{uid: string, start: DateTimeImmutable, end: ?DateTimeImmutable, courseCode: ?string, course: string, people: ?string, location: ?string, type: string, mandatory: bool, allDay: bool}>
      */
     public function parse(string $ics): array
     {
@@ -123,12 +129,16 @@ final class IcsParser
     /**
      * @param array<string, array{value: string, params: array<string, string>}> $event
      *
-     * @return array{uid: string, start: DateTimeImmutable, end: ?DateTimeImmutable, courseCode: ?string, course: string, people: ?string, location: ?string, type: string}|null
+     * @return array{uid: string, start: DateTimeImmutable, end: ?DateTimeImmutable, courseCode: ?string, course: string, people: ?string, location: ?string, type: string, mandatory: bool, allDay: bool}|null
      */
     private function toEvent(array $event): ?array
     {
         $uid = trim($this->text($event['UID']['value'] ?? ''));
         $summary = trim($this->text($event['SUMMARY']['value'] ?? ''));
+        $mandatory = 1 === preg_match(self::MANDATORY_PREFIX, $summary);
+        if ($mandatory) {
+            $summary = trim((string) preg_replace(self::MANDATORY_PREFIX, '', $summary));
+        }
         $start = isset($event['DTSTART']) ? $this->time($event['DTSTART']) : null;
         if ('' === $uid || '' === $summary || null === $start || strlen($uid) > 255) {
             return null;
@@ -154,6 +164,9 @@ final class IcsParser
             'people' => '' === $people ? null : $people,
             'location' => '' === $location ? null : $location,
             'type' => $this->detectType($description, $summary),
+            'mandatory' => $mandatory,
+            'allDay' => 'DATE' === strtoupper($event['DTSTART']['params']['VALUE'] ?? '')
+                || 1 === preg_match('/^\d{8}$/', trim($event['DTSTART']['value'])),
         ];
     }
 

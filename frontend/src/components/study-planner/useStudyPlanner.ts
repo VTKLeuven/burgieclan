@@ -7,7 +7,7 @@ import { apiEndpoints } from '@/utils/apiEndpoints';
 import type { StudyPlanner, StudyPlannerOperation } from '@/types/entities';
 import { convertToStudyPlanner } from '@/utils/convertToEntity';
 import { captureException } from '@sentry/nextjs';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface PlannerApi {
     state: StudyPlanner;
@@ -30,6 +30,8 @@ export interface StudyPlannerHandle {
     subscribe: (icsUrl: string) => Promise<boolean>;
     unsubscribe: () => Promise<boolean>;
     sync: () => Promise<boolean>;
+    /** Adds the older sessions in a calendar file; resolves to how many, or null when it failed. */
+    importIcs: (ics: string) => Promise<number | null>;
     rotateFeed: () => Promise<boolean>;
 }
 
@@ -85,7 +87,13 @@ export function useStudyPlanner(): StudyPlannerHandle {
         };
     }, [initial]);
 
-    const send = useCallback(async (method: string, endpoint: string, body?: unknown): Promise<boolean> => {
+    // The planner as last received, so importIcs can count what an import added.
+    const latest = useRef(state);
+    useEffect(() => {
+        latest.current = state;
+    }, [state]);
+
+    const send = useCallback(async (method: string, endpoint: string, body?: unknown): Promise<StudyPlanner | null | false> => {
         setBusy(true);
         setError(null);
         try {
@@ -97,10 +105,11 @@ export function useStudyPlanner(): StudyPlannerHandle {
             if (result === null) {
                 // DELETE: unsubscribed. The exam period does not depend on the timetable and stays.
                 setState((s) => (s ? { ...s, subscribed: false, icsUrl: null, feedPath: null, events: [], items: [], rules: [], subjects: [], vtkEvents: [] } : s));
-            } else {
-                setState(convertToStudyPlanner(result));
+                return null;
             }
-            return true;
+            const planner = convertToStudyPlanner(result);
+            setState(planner);
+            return planner;
         } catch (err) {
             captureException(err);
             setError(err instanceof Error ? err.message : String(err));
@@ -117,10 +126,15 @@ export function useStudyPlanner(): StudyPlannerHandle {
         busy,
         error,
         clearError: useCallback(() => setError(null), []),
-        run: useCallback((op: StudyPlannerOperation) => send('POST', '/api/study_planner/operations', op), [send]),
-        subscribe: useCallback((icsUrl: string) => send('POST', '/api/study_planner/subscription', { icsUrl }), [send]),
-        unsubscribe: useCallback(() => send('DELETE', '/api/study_planner'), [send]),
-        sync: useCallback(() => send('POST', '/api/study_planner/sync', {}), [send]),
-        rotateFeed: useCallback(() => send('POST', '/api/study_planner/feed_token', {}), [send]),
+        run: useCallback(async (op: StudyPlannerOperation) => (await send('POST', '/api/study_planner/operations', op)) !== false, [send]),
+        subscribe: useCallback(async (icsUrl: string) => (await send('POST', '/api/study_planner/subscription', { icsUrl })) !== false, [send]),
+        unsubscribe: useCallback(async () => (await send('DELETE', '/api/study_planner')) !== false, [send]),
+        sync: useCallback(async () => (await send('POST', '/api/study_planner/sync', {})) !== false, [send]),
+        importIcs: useCallback(async (ics: string) => {
+            const before = latest.current?.events.length ?? 0;
+            const planner = await send('POST', '/api/study_planner/import', { ics });
+            return planner ? Math.max(0, planner.events.length - before) : null;
+        }, [send]),
+        rotateFeed: useCallback(async () => (await send('POST', '/api/study_planner/feed_token', {})) !== false, [send]),
     };
 }

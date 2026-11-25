@@ -5,18 +5,21 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\StudyPlannerApi;
+use App\ApiResource\StudyPlannerImportInput;
 use App\ApiResource\StudyPlannerOperationInput;
 use App\ApiResource\StudyPlannerSubscriptionInput;
 use App\Entity\StudyPlanner;
 use App\Entity\User;
 use App\Service\RateLimit\UserRateLimiter;
 use App\Service\StudyPlanner\StudyPlannerBlok;
+use App\Service\StudyPlanner\StudyPlannerIcsImport;
 use App\Service\StudyPlanner\StudyPlannerOperations;
 use App\Service\StudyPlanner\StudyPlannerState;
 use App\Service\StudyPlanner\StudyPlannerSync;
 use App\Service\StudyPlanner\TimetableUrl;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -27,13 +30,14 @@ use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
  * Every change to the caller's study planner (see StudyPlannerApi). Answers with the whole
  * planner, or nothing after unsubscribing.
  *
- * @implements ProcessorInterface<StudyPlannerSubscriptionInput|StudyPlannerOperationInput|null, StudyPlannerApi|null>
+ * @implements ProcessorInterface<StudyPlannerSubscriptionInput|StudyPlannerImportInput|StudyPlannerOperationInput|null, StudyPlannerApi|null>
  */
 class StudyPlannerProcessor implements ProcessorInterface
 {
     public const SUBSCRIBE = 'study_planner_subscribe';
     public const UNSUBSCRIBE = 'study_planner_unsubscribe';
     public const SYNC = 'study_planner_sync';
+    public const IMPORT = 'study_planner_import';
     public const OPERATION = 'study_planner_operation';
     public const ROTATE_FEED = 'study_planner_rotate_feed';
 
@@ -43,6 +47,7 @@ class StudyPlannerProcessor implements ProcessorInterface
         private readonly StudyPlannerState $state,
         private readonly StudyPlannerOperations $operations,
         private readonly StudyPlannerBlok $blok,
+        private readonly StudyPlannerIcsImport $import,
         private readonly EntityManagerInterface $entityManager,
         private readonly Security $security,
         private readonly UserRateLimiter $rateLimiter,
@@ -74,6 +79,18 @@ class StudyPlannerProcessor implements ProcessorInterface
                 $planner = $this->required($planner);
                 $this->rateLimiter->consume($this->syncLimiter, 'You just synced. Try again in a minute.');
                 $this->sync->sync($planner);
+
+                return $this->state->build($planner);
+
+            case self::IMPORT:
+                assert($data instanceof StudyPlannerImportInput);
+                $planner = $this->required($planner);
+                $this->rateLimiter->consume($this->syncLimiter, 'You just imported a calendar. Try again in a minute.');
+                try {
+                    $this->import->import($planner, (string) $data->ics);
+                } catch (RuntimeException $e) {
+                    throw new UnprocessableEntityHttpException($e->getMessage(), $e);
+                }
 
                 return $this->state->build($planner);
 
