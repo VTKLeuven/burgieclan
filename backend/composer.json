@@ -53,9 +53,9 @@
     "symfony/validator": "8.1.11",
     "symfony/webpack-encore-bundle": "2.4.3",
     "symfonycasts/micro-mapper": "0.3",
-    "twig/extra-bundle": "3.29.0",
-    "twig/intl-extra": "3.30.0",
-    "twig/markdown-extra": "3.29.0",
+    "twig/extra-bundle": "3.31.0",
+    "twig/intl-extra": "3.31.0",
+    "twig/markdown-extra": "3.31.1",
     "vich/uploader-bundle": "3.0.0"
   },
   "require-dev": {
