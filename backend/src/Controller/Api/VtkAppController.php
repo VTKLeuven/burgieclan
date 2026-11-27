@@ -72,7 +72,7 @@ final class VtkAppController extends AbstractController
     {
         $user = $this->user();
         $courses = $user->getFavoriteCourses()->toArray();
-        usort($courses, static fn (Course $a, Course $b) => strcmp($a->getName(), $b->getName()));
+        usort($courses, static fn (Course $a, Course $b) => strcmp($a->getCatalogName(), $b->getCatalogName()));
 
         return $this->courseList($courses, $user, self::lang($request));
     }
@@ -104,7 +104,7 @@ final class VtkAppController extends AbstractController
 
         return self::private(
             [
-            'course' => $this->normalizeCourse($course, $user, $lang, $this->documents->countPublishedForCourses([$course])[$course->getId()] ?? 0),
+            'course' => $this->normalizeCourse($course, $user, $this->documents->countPublishedForCourses([$course])[$course->getId()] ?? 0),
             'documents' => array_map(
                 fn (Document $document) => $this->normalizeDocument($document, $user, $lang),
                 $this->visibleDocuments($course, $user),
@@ -131,7 +131,7 @@ final class VtkAppController extends AbstractController
 
         return self::private(
             [
-            'course' => $this->normalizeCourse($course, $user, self::lang($request), $this->documents->countPublishedForCourses([$course])[$course->getId()] ?? 0),
+            'course' => $this->normalizeCourse($course, $user, $this->documents->countPublishedForCourses([$course])[$course->getId()] ?? 0),
             ]
         );
     }
@@ -261,7 +261,7 @@ final class VtkAppController extends AbstractController
         return self::private(
             [
             'courses' => array_map(
-                fn (Course $course) => $this->normalizeCourse($course, $user, $lang, $counts[$course->getId()] ?? 0),
+                fn (Course $course) => $this->normalizeCourse($course, $user, $counts[$course->getId()] ?? 0),
                 $courses,
             ),
             ]
@@ -269,9 +269,12 @@ final class VtkAppController extends AbstractController
     }
 
     /** @return array<string, mixed> */
-    private function normalizeCourse(Course $course, User $user, string $lang, int $documentCount): array
+    private function normalizeCourse(Course $course, User $user, int $documentCount): array
     {
-        $name = 'en' === $lang ? ($course->getNameEn() ?? $course->getName()) : ($course->getNameNl() ?? $course->getName());
+        // The title in the course's own language of instruction, the one the Burgieclan frontend
+        // shows to every reader (`courseTitle` in frontend/src/utils/courseName.ts), and not the
+        // title in the reader's language: an English-taught course stays English in the VTK app.
+        $name = $course->getCatalogName();
 
         return [
             'id' => $course->getId(),

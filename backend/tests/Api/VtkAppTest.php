@@ -72,6 +72,23 @@ class VtkAppTest extends ApiTestCase
         $this->assertSame([], $this->asVtk($browser, 'GET', '/api/vtk_app/courses')['courses']);
     }
 
+    public function testCourseTitleIsInItsOwnLanguageWhateverTheReader(): void
+    {
+        $browser = $this->browser();
+        CourseFactory::createOne([
+            'code' => 'H04I4A',
+            'name' => 'Distributed Systems',
+            'nameEn' => 'Distributed Systems',
+            'nameNl' => 'Gedistribueerde systemen',
+            'language' => 'en',
+        ]);
+
+        foreach (['nl', 'en'] as $lang) {
+            $found = $this->asVtk($browser, 'GET', '/api/vtk_app/courses/search?q=distributed&lang=' . $lang)['courses'];
+            $this->assertSame(['Distributed Systems'], array_column($found, 'name'), $lang);
+        }
+    }
+
     public function testSearchNeedsTwoCharacters(): void
     {
         $browser = $this->browser();
